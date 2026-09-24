@@ -4,7 +4,7 @@ function loadScenario(id){
   currentScenario=id;
   terrain=new Set(config.terrain);
   units.splice(0,units.length,...JSON.parse(JSON.stringify(config.units)).map(unit=>({...unit,moveCount:0,moveFrom:null,acted:false,disabled:false,justHit:false})));
-  selected=null;turn=1;phase='player';gameOver=false;
+  selected=null;turn=1;phase='player';turnPhase='movement';gameOver=false;resetActionState();
   $('#modal').classList.add('hidden');
   $('#mission-kicker').textContent=config.kicker;
   $('#mission-title').textContent=config.title;
