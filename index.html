@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a1015" />
+    <title>G.O.B.L.I.N — Field Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css?v=3" />
+    <style>
+      .unit-svg { pointer-events: all; cursor: pointer; visibility: visible; opacity: 1; }
+      .unit-svg.wreck { pointer-events: none; cursor: default; }
+      .unit-label { pointer-events: none; }
+      .hex.fire-range { fill: #7a382d55; stroke: none; stroke-width: 0; stroke-dasharray: none; }
+      .hex.fire-range.attack { fill: #a9463999; stroke: #ffb09b; stroke-width: 3.5; stroke-dasharray: none; }
+      .hex.fire-boundary { fill: transparent; stroke: #e36b56; stroke-width: 3; stroke-dasharray: 5 4; }
+      .hex.attack { fill: transparent !important; stroke: #ffb09b; stroke-width: 3.5; }
+      .target-ring { fill: none; stroke: #ffb09b; stroke-width: 4; filter: drop-shadow(0 0 4px #ff624d); pointer-events: none; }
+      .hex.movement-fill { fill: #79bd6848; }
+      .area-boundary { fill: none; pointer-events: none; stroke-linecap: round; stroke-linejoin: round; }
+      .area-boundary.movement-boundary { stroke: #8ad36f; stroke-width: 4; }
+      .area-boundary.fire-boundary { stroke: #ef705b; stroke-width: 4; stroke-dasharray: none; }
+      .view-toggle { display:flex; gap:4px; margin-top:9px; }
+      .view-option { background:#111c20; border:1px solid #34484b; color:#77908b; padding:5px 7px; font:700 9px Rajdhani; letter-spacing:.08em; cursor:pointer; }
+      .view-option:hover,.view-option.active { color:#d1f35a; border-color:#91ad44; background:#263520; }
+      .unit-svg.acted-unit { opacity: .42; filter: grayscale(.75) saturate(.45); }
+      .unit-card.acted { opacity: .42; }
+      .unit-card.acted:hover { opacity: .7; }
+      .unit-card.destroyed { opacity: .5; }
+      .unit-card.destroyed .unit-token { border-color: #a34e46; color: #e36b56; }
+      .unit-card.covered { border-left: 3px solid #e0b45a; }
+      .cover-mark { fill: #1b2425; stroke: #e0b45a; stroke-width: 2; filter: drop-shadow(0 0 3px #e0b45a); pointer-events: none; }
+      .intel-card h3 { margin: 8px 0 5px; color: #dfe8e1; font: 700 17px Barlow Condensed; letter-spacing: .1em; }
+      .intel-facts { display: grid; gap: 6px; margin-top: 10px; }
+      .intel-facts div { display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid #2b3a3b; padding-top: 5px; font-size: 9px; }
+      .intel-facts span { color: #6f8984; }
+      .intel-facts b { color: #d6e5d5; text-align: right; }
+      .scenario-picker { display:grid; gap:4px; color:#6f8984; font:700 10px Rajdhani; letter-spacing:.14em; }
+      .scenario-picker select { background:#111c20; border:1px solid #40565c; color:#d1f35a; padding:7px 10px; font:700 11px Rajdhani; letter-spacing:.1em; }
+      .wreck-mark { fill: #e36b56; font: 700 22px Rajdhani; }
+      .unit-svg.hit-flash { animation: hit-flash .56s ease-out; }
+      .unit-svg.wreck { filter: grayscale(.35); opacity: .78; }
+      .guide-button { padding: 7px 10px; font-size: 10px; }
+      .guide-modal { z-index: 25; }
+      .guide-card { width: min(620px, calc(100% - 32px)); height: 470px; padding: 22px; background: linear-gradient(145deg,#152328,#0d171b); border: 1px solid #536d55; box-shadow: 0 0 90px #000; }
+      .guide-head { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; border-bottom:1px solid #304348; padding-bottom:14px; }
+      .guide-head h2 { color:#d1f35a; font-size:30px; margin-top:5px; }
+      .guide-close { background:transparent; border:1px solid #40565c; color:#9eb0aa; width:30px; height:30px; cursor:pointer; font:700 16px Rajdhani; }
+      .guide-close:hover { border-color:#d1f35a; color:#d1f35a; }
+      .guide-body { display:grid; grid-template-columns:120px 1fr; gap:20px; padding:22px 0; height:304px; }
+      .guide-symbol { display:grid; place-items:center; align-self:start; width:112px; height:112px; border:1px solid #4d6f70; color:#72d0de; background:#102226; clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); font:700 38px Barlow Condensed; }
+      .guide-symbol.enemy { color:#ef705b; border-color:#89534a; background:#2b1c1c; }
+      .guide-kicker { color:#ef705b; font:700 10px Rajdhani; letter-spacing:.18em; }
+      .guide-body h3 { color:#e4eee5; font:700 28px Barlow Condensed; letter-spacing:.08em; margin:5px 0 2px; }
+      .guide-role { color:#8fa7a2; font-size:12px; letter-spacing:.12em; }
+      .guide-copy { color:#b7c7c0; font-size:13px; line-height:1.5; margin:14px 0 16px; }
+      .guide-facts { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+      .guide-fact { border-top:1px solid #395052; padding-top:6px; }
+      .guide-fact span { display:block; color:#6f8984; font-size:9px; }
+      .guide-fact b { display:block; color:#d1f35a; font:700 17px Barlow Condensed; margin-top:2px; }
+      .guide-nav { display:flex; align-items:center; justify-content:space-between; border-top:1px solid #304348; padding-top:14px; }
+      .guide-nav button { background:#18272b; border:1px solid #40565c; color:#c8d4ce; padding:8px 12px; cursor:pointer; font:700 10px Rajdhani; letter-spacing:.12em; }
+      .guide-nav button:hover { border-color:#d1f35a; color:#d1f35a; }
+      .guide-count { color:#78928e; font:700 11px Rajdhani; letter-spacing:.15em; }
+      .auto-turn { display:flex; align-items:center; gap:6px; color:#8fa7a2; font:700 10px Rajdhani; letter-spacing:.08em; cursor:pointer; white-space:nowrap; }
+      .auto-turn input { accent-color:#d1f35a; width:14px; height:14px; cursor:pointer; }
+      @media(max-width:560px){.guide-card{height:min(620px,calc(100vh - 32px));overflow:auto}.guide-body{grid-template-columns:1fr;height:auto;min-height:420px}.guide-symbol{width:78px;height:78px;font-size:28px}.guide-facts{grid-template-columns:repeat(2,1fr)}}
+      @keyframes hit-flash { 0%,100% { filter: brightness(1); } 18% { filter: brightness(3.2) saturate(1.9); } 42% { filter: brightness(.7); } 70% { filter: brightness(2.2); } }
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div>
+            <div class="eyebrow">GROUND OPERATIONS / BATTLEFIELD LOGISTICS / INTELLIGENCE NETWORK</div>
+            <h1>G.O.B.L.I.N</h1>
+          </div>
+        </div>
+        <div class="top-status">
+          <span class="signal"><b></b> LIVE FEED</span>
+          <span class="build">FIELD TEST 0.1.4</span>
+          <button id="unit-guide-open" class="action-button guide-button">UNIT GUIDE</button>
+        </div>
+      </header>
+
+      <section class="mission-strip">
+        <div class="mission-copy">
+          <span class="eyebrow" id="mission-kicker">MISSION 07 / IRON DUST</span>
+          <strong id="mission-title">Durchbrechen. Ausschalten. Überleben.</strong>
+          <span class="mission-sub" id="mission-sub">Zerstöre den feindlichen Kommandokern, bevor Verstärkungen eintreffen.</span>
+        </div>
+        <div class="objective">
+          <span class="objective-label">OBJECTIVE</span>
+          <div class="objective-track"><span id="objective-progress"></span></div>
+          <span id="objective-text">0 / 1 CORE</span>
+        </div>
+        <label class="scenario-picker"><span>SCENARIO</span><select id="scenario-select"><option value="iron-dust">IRON DUST</option><option value="relay-run">RELAY RUN</option></select></label>
+      </section>
+
+      <section class="game-layout">
+        <aside class="left-rail panel">
+          <div class="panel-heading"><span>YOUR FORCE</span><span class="count" id="force-count">04</span></div>
+          <div id="unit-roster" class="unit-roster"></div>
+          <div class="legend-block">
+            <div class="panel-heading"><span>READOUT</span><span class="live-dot"></span></div>
+            <div class="readout-row"><span>SECTOR</span><b id="sector-readout">D-04</b></div>
+            <div class="readout-row"><span>WEATHER</span><b>ASH / LOW VIS</b></div>
+            <div class="readout-row"><span>THREAT</span><b class="warning">ELEVATED</b></div>
+          </div>
+        </aside>
+
+        <section class="battlefield panel">
+          <div class="battlefield-head">
+            <div><span class="eyebrow">TACTICAL MAP</span><h2 id="phase-title">PLAYER PHASE</h2></div>
+            <div class="view-toggle" role="group" aria-label="Reichweitenansicht"><button class="view-option active" data-view="combo">COMBO</button><button class="view-option" data-view="fire">FIRE AREA</button><button class="view-option" data-view="movement">MOVEMENT AREA</button></div>
+            <div class="turn-counter"><span>TURN</span><strong id="turn-number">01</strong></div>
+          </div>
+          <div class="map-frame">
+            <div class="map-corner corner-tl">N<span>↑</span></div>
+            <div class="map-corner corner-tr">GRID // 12 × 8</div>
+            <div class="map-corner corner-bl">LIVE TERRAIN SCAN</div>
+            <div class="map-corner corner-br">DUST-7</div>
+            <svg id="battlefield-map" role="img" aria-label="Hexfeld-Schlachtfeld"></svg>
+            <div id="map-toast" class="map-toast">WÄHLE EINE EINHEIT</div>
+          </div>
+          <div class="battlefield-footer">
+            <div id="selection-readout" class="selection-readout"><span class="selection-icon">+</span><div><b>NO UNIT SELECTED</b><small>Wähle eine Einheit für Befehle</small></div></div>
+            <div class="action-row"><label class="auto-turn" title="Gegnerzug automatisch starten, sobald alle eigenen Einheiten gehandelt haben"><input id="auto-end-turn" type="checkbox" checked /> AUTO</label><button id="end-turn" class="action-button primary">END TURN <span>↵</span></button><button id="reset-game" class="action-button">RESTART</button></div>
+          </div>
+        </section>
+
+        <aside class="right-rail panel">
+          <div class="panel-heading"><span>COMBAT LOG</span><span id="log-status" class="status-pill">STANDBY</span></div>
+          <div id="combat-log" class="combat-log"></div>
+          <div class="divider"></div>
+          <div class="panel-heading"><span>COMMANDS</span></div>
+          <div class="command-list"><div><kbd>CLICK</kbd><span>Einheit wählen / bewegen</span></div><div><kbd>F</kbd><span>Feind in Reichweite feuern</span></div><div><kbd>ESC</kbd><span>Auswahl aufheben</span></div></div>
+          <div class="intel-card" id="unit-intel-card"><span class="eyebrow" id="unit-intel-kicker">UNIT INTEL</span><h3 id="unit-intel-title">NO UNIT SELECTED</h3><p id="unit-intel-copy">Klicke eine Einheit für taktische Informationen.</p><div id="unit-intel-facts" class="intel-facts"><div><span>STATUS</span><b>SCANNING</b></div></div></div>
+          <div class="intel-card" id="intel-card"><span class="eyebrow" id="intel-kicker">FIELD INTEL</span><h3 id="intel-title">SECTOR BRIEF</h3><p id="intel-copy">Klicke ein Feld für taktische Informationen.</p><div id="intel-facts" class="intel-facts"><div><span>SECTOR</span><b>D-04</b></div><div><span>STATUS</span><b>SCANNING</b></div></div></div>
+        </aside>
+      </section>
+
+      <footer class="footer-note"><span>UNOFFICIAL BROWSER FIELD TEST · ORIGINAL TACTICAL UI / VECTOR ASSETS</span><span>© 2026 TACTICAL DESIGN CELL</span></footer>
+    </main>
+    <div id="modal" class="modal hidden"><div class="modal-card"><div class="modal-kicker">MISSION REPORT</div><h2 id="modal-title">MISSION COMPLETE</h2><p id="modal-copy"></p><button id="modal-reset" class="action-button primary">RUN IT BACK</button></div></div>
+    <div id="unit-guide-modal" class="modal guide-modal hidden" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+      <section class="guide-card">
+        <div class="guide-head"><div><span class="eyebrow">TACTICAL ARCHIVE</span><h2 id="guide-title">UNIT GUIDE</h2></div><button id="unit-guide-close" class="guide-close" aria-label="Einheitenführer schließen">×</button></div>
+        <div class="guide-body"><div id="guide-symbol" class="guide-symbol">G</div><div><span id="guide-kicker" class="guide-kicker">FRIENDLY SYSTEM</span><h3 id="guide-name">GOBLIN MK III</h3><div id="guide-role" class="guide-role">HEAVY ASSAULT</div><p id="guide-copy" class="guide-copy"></p><div id="guide-facts" class="guide-facts"></div></div></div>
+        <div class="guide-nav"><button id="guide-prev">← PREVIOUS</button><span id="guide-count" class="guide-count">01 / 07</span><button id="guide-next">NEXT →</button></div>
+      </section>
+    </div>
+    <script src="game.js?v=3"></script>
+    <script src="scenario.js?v=2"></script>
+    <script src="unit-guide.js?v=1"></script>
+  </body>
+</html>

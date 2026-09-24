@@ -1,0 +1,3 @@
+.edge-headless/
+node_modules/
+*.log
