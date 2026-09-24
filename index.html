@@ -68,7 +68,7 @@
       .auto-turn input { accent-color:#d1f35a; width:14px; height:14px; cursor:pointer; }
       @media(max-width:560px){.guide-card{height:min(620px,calc(100vh - 32px));overflow:auto}.guide-body{grid-template-columns:1fr;height:auto;min-height:420px}.guide-symbol{width:78px;height:78px;font-size:28px}.guide-facts{grid-template-columns:repeat(2,1fr)}}
       @keyframes hit-flash { 0%,100% { filter: brightness(1); } 18% { filter: brightness(3.2) saturate(1.9); } 42% { filter: brightness(.7); } 70% { filter: brightness(2.2); } }
-    </style>
+          .phase-ready{display:block;color:#6c858a;font:700 9px Rajdhani;letter-spacing:.16em;margin-top:5px}.phase-transition{position:absolute;z-index:4;inset:0;display:grid;place-items:center;pointer-events:none;background:#071014b8;opacity:0;transition:opacity .18s}.phase-transition.show{opacity:1}.phase-transition-card{text-align:center;border-top:1px solid #d1f35a;border-bottom:1px solid #d1f35a;padding:18px 42px;background:#101b1dd9;box-shadow:0 0 45px #000}.phase-transition-card small{display:block;color:#6c858a;font:700 10px Rajdhani;letter-spacing:.2em;margin-bottom:8px}.phase-transition-card strong{display:block;color:#d1f35a;font:700 28px Barlow Condensed;letter-spacing:.12em}</style>
   </head>
   <body>
     <main class="app-shell">
@@ -115,7 +115,7 @@
 
         <section class="battlefield panel">
           <div class="battlefield-head">
-            <div><span class="eyebrow">TACTICAL MAP</span><h2 id="phase-title">PLAYER PHASE</h2></div>
+            <div><span class="eyebrow">TACTICAL MAP</span><h2 id="phase-title">PLAYER PHASE</h2><span id="phase-ready" class="phase-ready">READY 4/4</span></div>
             <div class="view-toggle" role="group" aria-label="Reichweitenansicht"><button class="view-option active" data-view="combo">COMBO</button><button class="view-option" data-view="fire">FIRE AREA</button><button class="view-option" data-view="movement">MOVEMENT AREA</button></div>
             <div class="turn-counter"><span>TURN</span><strong id="turn-number">01</strong></div>
           </div>
