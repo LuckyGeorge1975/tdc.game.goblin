@@ -10,7 +10,7 @@ function loadScenario(id){
   $('#mission-title').textContent=config.title;
   $('#mission-sub').textContent=config.sub;
   $('#turn-number').textContent='01';
-  $('#phase-title').textContent='PLAYER PHASE';updatePhaseControls();
+  $('#phase-title').textContent='MOVEMENT PHASE';updatePhaseControls();
   $('#log-status').textContent='STANDBY';
   logEl.innerHTML='';
   addLog(`${config.kicker} online. Awaiting command.`);
