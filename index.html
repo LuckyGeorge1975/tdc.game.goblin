@@ -14,14 +14,14 @@
       .unit-svg.wreck { pointer-events: none; cursor: default; }
       .unit-label { pointer-events: none; }
       .hex.fire-range { fill: #7a382d55; stroke: none; stroke-width: 0; stroke-dasharray: none; }
-      .hex.fire-range.attack { fill: #a9463999; stroke: #ffb09b; stroke-width: 3.5; stroke-dasharray: none; }.hex.los-visible { fill: #4fa9b844; stroke: #8de5f2; stroke-width: 2.5; }.hex.los-blocked { fill: #7a382d24; stroke: #c05d55; stroke-width: 1.5; }
+      .hex.fire-range.attack { fill: #a9463999; stroke: #ffb09b; stroke-width: 3.5; stroke-dasharray: none; }.hex.los-visible { fill: #76e6f055; stroke: none; stroke-width: 0; }.hex.los-blocked { fill: transparent; stroke: none; }
       .hex.fire-boundary { fill: transparent; stroke: #e36b56; stroke-width: 3; stroke-dasharray: 5 4; }
       .hex.attack { fill: transparent !important; stroke: #ffb09b; stroke-width: 3.5; }
       .target-ring { fill: none; stroke: #ffb09b; stroke-width: 4; filter: drop-shadow(0 0 4px #ff624d); pointer-events: none; }
       .hex.movement-fill { fill: #79bd6848; }.hex.movement-fill.reference { fill: #79bd6828; }.hex.fire-range.reference { fill: #7a382d28; }.area-boundary.reference { opacity: .48; }
       .area-boundary { fill: none; pointer-events: none; stroke-linecap: round; stroke-linejoin: round; }
       .area-boundary.movement-boundary { stroke: #8ad36f; stroke-width: 4; }
-      .area-boundary.fire-boundary { stroke: #ef705b; stroke-width: 4; stroke-dasharray: none; }.area-boundary.los-boundary { stroke: #8de5f2; stroke-width: 3; stroke-dasharray: 7 4; }
+      .area-boundary.fire-boundary { stroke: #ef705b; stroke-width: 4; stroke-dasharray: none; }.area-boundary.los-boundary { stroke: #8de5f2; stroke-width: 4; stroke-dasharray: none; }
       .view-toggle { display:flex; gap:4px; margin-top:9px; }
       .view-option { background:#111c20; border:1px solid #34484b; color:#77908b; padding:5px 7px; font:700 9px Rajdhani; letter-spacing:.08em; cursor:pointer; }
       .view-option:hover,.view-option.active { color:#d1f35a; border-color:#91ad44; background:#263520; }
@@ -154,7 +154,7 @@
         <div class="guide-nav"><button id="guide-prev">← PREVIOUS</button><span id="guide-count" class="guide-count">01 / 07</span><button id="guide-next">NEXT →</button></div>
       </section>
     </div>
-    <script src="game.js?v=13"></script>
+    <script src="game.js?v=14"></script>
     <script src="scenario.js?v=3"></script>
     <script src="unit-guide.js?v=1"></script>
   </body>
