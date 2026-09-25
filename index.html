@@ -64,6 +64,16 @@
       .guide-nav button { background:#18272b; border:1px solid #40565c; color:#c8d4ce; padding:8px 12px; cursor:pointer; font:700 10px Rajdhani; letter-spacing:.12em; }
       .guide-nav button:hover { border-color:#d1f35a; color:#d1f35a; }
       .guide-count { color:#78928e; font:700 11px Rajdhani; letter-spacing:.15em; }
+      .guide-actions { display:flex; gap:6px; align-items:center; }
+      .quick-guide-card { width:min(760px,calc(100% - 32px)); max-height:min(620px,calc(100vh - 32px)); overflow:auto; padding:24px; background:linear-gradient(145deg,#152328,#0d171b); border:1px solid #536d55; box-shadow:0 0 90px #000; }
+      .quick-guide-intro { color:#b7c7c0; font-size:13px; line-height:1.5; margin:16px 0 20px; max-width:640px; }
+      .quick-guide-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+      .quick-guide-section { border:1px solid #304348; background:#101c20; padding:13px 15px; }
+      .quick-guide-section h3 { color:#d1f35a; font:700 17px Barlow Condensed; letter-spacing:.1em; margin:0 0 7px; }
+      .quick-guide-section p { color:#b7c7c0; font-size:12px; line-height:1.45; margin:0; }
+      .quick-guide-section kbd { color:#d1f35a; border:1px solid #536d55; padding:1px 4px; font:700 10px Rajdhani; }
+      .quick-guide-footer { margin-top:18px; padding-top:13px; border-top:1px solid #304348; color:#78928e; font:700 10px Rajdhani; letter-spacing:.1em; }
+      @media(max-width:620px){.guide-actions{gap:3px}.quick-guide-grid{grid-template-columns:1fr}.quick-guide-card{padding:18px}}
       .auto-turn { display:flex; align-items:center; gap:6px; color:#8fa7a2; font:700 10px Rajdhani; letter-spacing:.08em; cursor:pointer; white-space:nowrap; }
       .auto-turn input { accent-color:#d1f35a; width:14px; height:14px; cursor:pointer; }
       @media(max-width:560px){.guide-card{height:min(620px,calc(100vh - 32px));overflow:auto}.guide-body{grid-template-columns:1fr;height:auto;min-height:420px}.guide-symbol{width:78px;height:78px;font-size:28px}.guide-facts{grid-template-columns:repeat(2,1fr)}}
@@ -83,7 +93,7 @@
         <div class="top-status">
           <span class="signal"><b></b> LIVE FEED</span>
           <span class="build">FIELD TEST 0.1.4</span>
-          <button id="unit-guide-open" class="action-button guide-button">UNIT GUIDE</button>
+          <div class="guide-actions"><button id="quick-start-open" class="action-button guide-button">QUICK START</button><button id="unit-guide-open" class="action-button guide-button">UNIT GUIDE</button></div>
         </div>
       </header>
 
@@ -147,7 +157,23 @@
       <footer class="footer-note"><span>UNOFFICIAL BROWSER FIELD TEST · ORIGINAL TACTICAL UI / VECTOR ASSETS</span><span>© 2026 TACTICAL DESIGN CELL</span></footer>
     </main>
 
-    <div id="unit-guide-modal" class="modal guide-modal hidden" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+    <div id="quick-start-modal" class="modal guide-modal hidden" role="dialog" aria-modal="true" aria-labelledby="quick-start-title">
+      <section class="quick-guide-card">
+        <div class="guide-head"><div><span class="eyebrow">FIELD MANUAL</span><h2 id="quick-start-title">QUICK START</h2></div><button id="quick-start-close" class="guide-close" aria-label="Quick Start schließen">×</button></div>
+        <p class="quick-guide-intro">G.O.B.L.I.N ist eine rundenbasierte Hexfeld-Taktikmission. Bewege deine Einheiten, nutze Gelände und schalte den feindlichen Kommandokern aus.</p>
+        <div class="quick-guide-grid">
+          <article class="quick-guide-section"><h3>1 · AUSWÄHLEN</h3><p>Klicke auf ein Feld oder eine Einheit. Bei einer Einheit werden Unit Intel, Feldinformationen und die verfügbaren Bereiche angezeigt. <kbd>ESC</kbd> hebt die Auswahl auf.</p></article>
+          <article class="quick-guide-section"><h3>2 · BEWEGEN</h3><p>Wähle eine eigene handlungsfähige Einheit und klicke ein grün markiertes Ziel. Gelände kostet zusätzliche Bewegung. Bereits bewegte Einheiten sind ausgegraut.</p></article>
+          <article class="quick-guide-section"><h3>3 · FEUERN</h3><p>In der Fire Phase wählst du ein sichtbares Ziel im roten Bereich. Die Feuerwahrscheinlichkeit folgt dem Verhältnis Angriff zu Verteidigung und kann NE, D oder X ergeben. <kbd>F</kbd> greift das nächste gültige Ziel an.</p></article>
+          <article class="quick-guide-section"><h3>4 · GEV-PHASE</h3><p>GEVs erhalten nach Bewegung und Feuer eine zusätzliche Bewegung. Light GEV und GEV-PC verwenden denselben GEV-Bewegungsmodus.</p></article>
+          <article class="quick-guide-section"><h3>5 · GELÄNDE</h3><p>Berg-/Trümmerfelder geben Deckung, kosten mehr Bewegung und blockieren die Sichtlinie. Mit den Schaltern <b>MOVEMENT RANGE</b>, <b>FIRE RANGE</b>, <b>LINE OF SIGHT</b> und <b>GRID</b> kannst du die Karte prüfen.</p></article>
+          <article class="quick-guide-section"><h3>6 · PHASEN</h3><p>Jede Runde besteht aus Movement, Fire, GEV Movement und dem automatischen Hostile Turn. <b>END TURN</b> wechselt die Phase; offene Aktionen werden vorher bestätigt.</p></article>
+          <article class="quick-guide-section"><h3>7 · KAMPFRESULTATE</h3><p><b>NE</b> bedeutet kein Effekt. <b>D</b> deaktiviert Fahrzeuge vorübergehend oder reduziert Infanterie. <b>X</b> zerstört das Ziel. Wracks bleiben sichtbar.</p></article>
+          <article class="quick-guide-section"><h3>8 · ZIEL</h3><p>Zerstöre den Command Core beziehungsweise Relay Node. Nach Sieg oder Niederlage bleibt der Combat Log sichtbar; <b>RESTART</b> beginnt die Mission neu.</p></article>
+        </div>
+        <div class="quick-guide-footer">TIPP · Öffne den UNIT GUIDE für Einheitenwerte und Sonderrollen. Die Szenarien UNIT TRIAL und RELAY RUN eignen sich zum Testen einzelner Mechaniken.</div>
+      </section>
+    </div>    <div id="unit-guide-modal" class="modal guide-modal hidden" role="dialog" aria-modal="true" aria-labelledby="guide-title">
       <section class="guide-card">
         <div class="guide-head"><div><span class="eyebrow">TACTICAL ARCHIVE</span><h2 id="guide-title">UNIT GUIDE</h2></div><button id="unit-guide-close" class="guide-close" aria-label="Einheitenführer schließen">×</button></div>
         <div class="guide-body"><div id="guide-symbol" class="guide-symbol">G</div><div><span id="guide-kicker" class="guide-kicker">FRIENDLY SYSTEM</span><h3 id="guide-name">GOBLIN MK III</h3><div id="guide-role" class="guide-role">HEAVY ASSAULT</div><p id="guide-copy" class="guide-copy"></p><div id="guide-facts" class="guide-facts"></div></div></div>
@@ -157,5 +183,6 @@
     <script src="game.js?v=23"></script>
     <script src="scenario.js?v=3"></script>
     <script src="unit-guide.js?v=3"></script>
+    <script src="quick-start.js?v=1"></script>
   </body>
 </html>

@@ -19,7 +19,7 @@ Enthalten sind:
 - Szenarien `IRON DUST`, `RELAY RUN` und `UNIT TRIAL`
 - Area-Modi `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`
 - optionales Hex-Grid und oberster Feld-Fokusmarker
-- Einheiten-Guide mit Basis- und Erweiterungseinheiten sowie kombinierte Feld- und Einheiteninformationen
+- Quick-Start-Guide, Einheiten-Guide mit Basis- und Erweiterungseinheiten sowie kombinierte Feld- und Einheiteninformationen
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
 ## Lokal starten
