@@ -20,6 +20,7 @@ Enthalten sind:
 - Area-Modi `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`
 - optionales Hex-Grid und oberster Feld-Fokusmarker
 - Quick-Start-Guide, Einheiten-Guide mit Basis- und Erweiterungseinheiten sowie kombinierte Feld- und Einheiteninformationen
+- GEV-PC-Transport im Szenario `UNIT TRIAL`: Combat Engineers können einsteigen, mitfahren und an einem freien Nachbarfeld wieder aussteigen
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
 ## Lokal starten
@@ -62,8 +63,8 @@ Die Tests decken derzeit Einheitengrundwerte, den kanonischen Einheitenkatalog, 
 - Die Feuerergebnisse sind noch zufallsbasiert; ein reproduzierbarer Testwürfel fehlt.
 - Deckung blockiert derzeit die Sichtlinie, verändert aber noch nicht separat die Verteidigungswerte.
 - Die kanonischen Einheitenwerte sind jetzt katalogisiert. Die aktive Mission verwendet weiterhin bewusst eine kleinere Prototypauswahl, bis die jeweiligen Sonderregeln integriert sind.
-- Oger-Komponenten, Transport, Cruise Missiles, Overrun, Engineering, indirektes Feuer und Verstärkungen sind noch nicht vollständig spielbar.
+- Oger-Komponenten, Cruise Missiles, Overrun, Engineering, indirektes Feuer und Verstärkungen sind noch nicht vollständig spielbar; der Transport ist zunächst auf den GEV-PC und einen Ein-/Ausstieg pro Aktion begrenzt.
 
 ## Nächste Ausbaustufe
 
-Als Nächstes werden die katalogisierten Einheiten schrittweise spielbar gemacht: zuerst Verteidigungswerte und unterschiedliche Bewegungsmodi, danach Transport/Infanterie, Oger-Komponenten und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.
+Als Nächstes werden die katalogisierten Einheiten schrittweise vervollständigt: Transport/Infanterie wird um Transportfeuer und weitere Sonderfälle ergänzt, danach folgen Oger-Komponenten, Cruise Missiles, Overrun und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.

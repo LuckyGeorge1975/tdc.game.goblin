@@ -45,7 +45,7 @@ Die Werte unten sind aus der frei verfügbaren SJG-Regelreferenz für die gemein
 | Berg-/Trümmerfeld | 2 | ja | blockiert | implementiert |
 | Belegtes Feld | — | — | — | für Bewegung blockiert; Ziel-/Rammregeln separat |
 
-Das Szenario `UNIT TRIAL` stellt den neuen Katalog mit Heavy Tank, Light Tank, Light GEV und Combat Engineers erstmals im Spielfluss bereit. Sonderregeln dieser Einheiten sind weiterhin bewusst begrenzt.
+Das Szenario `UNIT TRIAL` stellt den neuen Katalog mit Heavy Tank, Light Tank, GEV-PC und Combat Engineers erstmals im Spielfluss bereit. Combat Engineers können im Movement in den benachbarten GEV-PC einsteigen und über die Transport-Schaltfläche an einem freien Nachbarfeld aussteigen. Sonderregeln dieser Einheiten sind weiterhin bewusst begrenzt.
 
 ## 3. Phasen und Aktionen
 
@@ -78,6 +78,7 @@ Eine Einheit darf in einem Zug grundsätzlich bewegen und feuern, sofern die jew
 - Gelände kostet Bewegung und blockiert Sichtlinie. Die Bewegungsvorschau und die tatsächliche Pfadprüfung verwenden dieselbe Pfadlogik.
 - Ein Ziel ist nur beschießbar, wenn es in Reichweite liegt und die Sichtlinie frei ist.
 - Zerstörte Einheiten bleiben als Wracks auf der Karte sichtbar.
+- Der GEV-PC kann bis zu drei Infanterieeinheiten aufnehmen; im aktuellen Prototyp wird jeweils eine Infanterieeinheit pro Ein-/Ausstieg gehandhabt. Eingeschiffte Einheiten werden nicht separat auf der Karte gezeichnet und folgen der Position des Trägers.
 
 ## 6. Anzeigevertrag
 
@@ -92,5 +93,5 @@ Eine Einheit darf in einem Zug grundsätzlich bewegen und feuern, sofern die jew
 1. Oger-Komponenten (Waffen, Raketen, Antipersonenwaffen, Ketten) sind katalogisiert, aber noch nicht als getrennte Schadensobjekte spielbar.
 2. Trefferwürfel und CRT-Ergebnisse sind noch zufallsbasiert und nicht als reproduzierbarer Testmodus verfügbar.
 3. Deckung, indirektes Feuer und die unterschiedlichen Bewegungsmodi sind noch nicht vollständig als Verteidigungs- und Sichtregeln integriert.
-4. Transport, Cruise Missiles, Overrun, Engineering und Verstärkungen fehlen noch in der Spielausführung.
+4. Transportfeuer, Cruise Missiles, Overrun, Engineering und Verstärkungen fehlen noch oder sind nur als Prototyp-Sonderfälle umgesetzt.
 5. KI-Zielprioritäten und Szenario-Verstärkungen sind noch vereinfacht.
