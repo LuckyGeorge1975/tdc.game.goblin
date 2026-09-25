@@ -105,6 +105,19 @@ function renderUnit(u){if(u.embarkedOn)return;
   if(u.moveFrom){const from=hexCenter(u.moveFrom.x,u.moveFrom.y);g.animate([{transform:`translate(${from.x-c.x}px,${from.y-c.y}px)`},{transform:'translate(0,0)'}],{duration:520,easing:'cubic-bezier(.2,.8,.25,1)',fill:'both'});u.moveFrom=null}
 }
 function clearSelection(message='AUSWAHL AUFGEHOBEN'){selected=null;transportLoadMode=null;transportUnloadMode=null;setToast(message);updateSelection();draw()}
+function handleTransportShortcut(event) {
+  if (event.key.toLowerCase() !== 'l' || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.target?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+  if (document.querySelectorAll('.modal:not(.hidden), .phase-confirm.show, .phase-transition.show').length) return;
+  const carrier = selected;
+  if (gameOver || phase !== 'player' || !carrier?.transportCapacity || carrier.team !== 'player' || carrier.hp <= 0 || carrier.disabled) return;
+  event.preventDefault();
+  const cargo = carrierCargo(carrier)[0];
+  if (cargo) activateUnloadMode(carrier, cargo);
+  else activateLoadMode(carrier);
+}
+document.addEventListener('keydown', handleTransportShortcut);
+
 function clearUnitInfo(){$('#unit-intel-kicker').textContent='UNIT INTEL';$('#unit-intel-title').textContent='NO UNIT SELECTED';$('#unit-intel-copy').textContent='Klicke eine Einheit für taktische Informationen.';$('#unit-intel-facts').innerHTML='<div><span>STATUS</span><b>SCANNING</b></div>'}
 function showFieldInfo(x,y){const unit=units.find(u=>u.hp>0&&!u.embarkedOn&&u.x===x&&u.y===y),covered=terrain.has(`${x},${y}`),blocked=selected&&unit?.team==='enemy'&&!lineOfSight(selected,unit),label=`${String.fromCharCode(65+x)}-${String(y+1).padStart(2,'0')}`;$('#intel-kicker').textContent='FIELD INTEL';$('#intel-title').textContent=`SECTOR ${label}`;$('#intel-copy').textContent=blocked?'Feindziel in Reichweite, aber die Sichtlinie ist durch Gelände blockiert.':covered?'Berg-/Trümmerfeld. Begehbar mit Bewegungskosten 2; Einheiten erhalten Deckung, blockieren aber die Sichtlinie.':'Offenes Gelände. Keine Deckung, normale Bewegung.';$('#intel-facts').innerHTML=`<div><span>TERRAIN</span><b>${covered?'COVER / COST 2':'OPEN GROUND'}</b></div><div><span>OCCUPANT</span><b>${unit?unit.name:'NONE'}</b></div><div><span>VISIBILITY</span><b>${blocked?'BLOCKED':'CLEAR'}</b></div>`}function carrierCargo(unit){return units.filter(u=>u.embarkedOn===unit.id&&u.hp>0)}
 function canUnloadTo(carrier,cargo,x,y){return !!carrier&&!!cargo&&turnPhase==='movement'&&carrier.team==='player'&&cargo.embarkedOn===carrier.id&&dist(carrier,{x,y})===1&&x>=0&&x<W&&y>=0&&y<H&&!terrain.has(String(x)+','+String(y))&&!units.some(u=>u.hp>0&&!u.embarkedOn&&u.x===x&&u.y===y)}

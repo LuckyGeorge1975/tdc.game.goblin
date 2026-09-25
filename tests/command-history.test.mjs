@@ -23,6 +23,21 @@ function game() {
   return {run,timers};
 }
 
+test('L opens loading or the first passenger unloading, respecting phase and focus',()=>{
+  const {run}=game();
+  run("selected=units[2];handleTransportShortcut({key:'l',preventDefault(){}})");
+  assert.equal(run('transportLoadMode.id'),'gev-pc');
+  assert.equal(run('phaseCommands.length'),0);
+  run("embark(units[3],units[2]);handleTransportShortcut({key:'L',preventDefault(){}})");
+  assert.equal(run('transportUnloadMode.cargo.id'),'infantry');
+  run("setTurnPhase('fire');handleTransportShortcut({key:'l',preventDefault(){}})");
+  assert.equal(run('transportUnloadMode'),null);
+  run("setTurnPhase('movement');handleTransportShortcut({key:'l',target:{closest(){return true}},preventDefault(){}})");
+  assert.equal(run('transportUnloadMode'),null);
+  run("phase='enemy';handleTransportShortcut({key:'l',preventDefault(){}})");
+  assert.equal(run('transportUnloadMode'),null);
+});
+
 test('movement commands undo in reverse order, restoring log and action budgets',()=>{
   const {run}=game();
   run("selected=units[0]; handleHex(0,6); selected=units[1]; handleHex(2,5)");
