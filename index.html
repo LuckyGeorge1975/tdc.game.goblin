@@ -18,7 +18,7 @@
       .hex.fire-boundary { fill: transparent; stroke: #e36b56; stroke-width: 3; stroke-dasharray: 5 4; }
       .hex.attack { fill: transparent !important; stroke: #ffb09b; stroke-width: 3.5; }
       .target-ring { fill: none; stroke: #ffb09b; stroke-width: 4; filter: drop-shadow(0 0 4px #ff624d); pointer-events: none; }
-      .hex.movement-fill { fill: #79bd6848; }
+      .hex.movement-fill { fill: #79bd6848; }.hex.movement-fill.reference { fill: #79bd6828; }.hex.fire-range.reference { fill: #7a382d28; }.area-boundary.reference { opacity: .48; }
       .area-boundary { fill: none; pointer-events: none; stroke-linecap: round; stroke-linejoin: round; }
       .area-boundary.movement-boundary { stroke: #8ad36f; stroke-width: 4; }
       .area-boundary.fire-boundary { stroke: #ef705b; stroke-width: 4; stroke-dasharray: none; }
@@ -154,7 +154,7 @@
         <div class="guide-nav"><button id="guide-prev">← PREVIOUS</button><span id="guide-count" class="guide-count">01 / 07</span><button id="guide-next">NEXT →</button></div>
       </section>
     </div>
-    <script src="game.js?v=11"></script>
+    <script src="game.js?v=12"></script>
     <script src="scenario.js?v=3"></script>
     <script src="unit-guide.js?v=1"></script>
   </body>
