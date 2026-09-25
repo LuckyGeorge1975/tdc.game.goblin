@@ -9,7 +9,7 @@ Der Prototyp ist spielbar und auf [GitHub Pages](https://luckygeorge1975.github.
 Enthalten sind:
 
 - Hexfeldkarte mit offenem Gelände sowie Berg-/Trümmerfeldern
-- Bewegung mit Gelände- und Belegungskosten
+- Bewegung mit Gelände- und Belegungskosten sowie expliziten Bewegungsmodi für Kettenfahrzeuge, Infanterie, GEVs und stationäre Einheiten
 - getrennte Movement-, Fire- und GEV-Zweitbewegungsphasen
 - Fire Range und Line-of-Sight-Prüfung
 - CRT-Kampfsystem mit NE, D und X sowie expliziten Verteidigungswerten

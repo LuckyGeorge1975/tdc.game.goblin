@@ -56,7 +56,7 @@ Das Szenario `UNIT TRIAL` stellt den neuen Katalog mit Heavy Tank, Light Tank, L
 | GEV Movement | GEV einmal bis zu 2 zusätzliche Bewegungskosten | GEV | optional |
 | Hostile | Gegner feuern, sonst bewegen, danach erneut feuern | — | automatisch |
 
-Eine Einheit darf in einem Zug grundsätzlich bewegen und feuern, sofern die jeweilige Phase und ihr Status dies erlauben. Deaktivierte Einheiten sind nicht handlungsfähig. Phasenwechsel mit noch möglichen Aktionen werden bestätigt, sofern die Bestätigung nicht deaktiviert wurde.
+Eine Einheit darf in einem Zug grundsätzlich bewegen und feuern, sofern die jeweilige Phase und ihr Status dies erlauben. Deaktivierte Einheiten sind nicht handlungsfähig. GEV-Klassen teilen die Zweitbewegung; stationäre Einheiten mit Bewegung 0 bleiben in ihrer Position. Phasenwechsel mit noch möglichen Aktionen werden bestätigt, sofern die Bestätigung nicht deaktiviert wurde.
 
 ## 4. Feuer- und Schadensmodell
 

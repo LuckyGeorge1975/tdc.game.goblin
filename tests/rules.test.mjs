@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { UNIT_CATALOG, UNIT_RULES, OGRE_SYSTEMS, TERRAIN_RULES, applyCombatResult, combatRatio, hexDistance, terrainCost } from '../rules.mjs';
+import { UNIT_CATALOG, UNIT_RULES, OGRE_SYSTEMS, TERRAIN_RULES, applyCombatResult, combatRatio, hexDistance, terrainCost, movementCostForMode } from '../rules.mjs';
 
 test('unit matrix contains the four player archetypes', () => {
   assert.deepEqual(Object.keys(UNIT_RULES), ['goblin', 'gev', 'missile', 'infantry']);
@@ -40,4 +40,10 @@ test('canonical unit catalogue covers core and expansion units', () => {
   assert.equal(UNIT_CATALOG.combatEngineers.engineering, true);
   assert.equal(OGRE_SYSTEMS.mkIII.tread, 45);
   assert.equal(OGRE_SYSTEMS.vulcan.drones, true);
+});
+test('movement modes share terrain costs and block fixed units', () => {
+  assert.equal(movementCostForMode('tracked', false), 1);
+  assert.equal(movementCostForMode('gev', true), 2);
+  assert.equal(movementCostForMode('infantry', true), 2);
+  assert.equal(movementCostForMode('fixed', true), Infinity);
 });

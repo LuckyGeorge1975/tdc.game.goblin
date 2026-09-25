@@ -18,6 +18,12 @@ export function terrainCost(isCover) {
   return isCover ? TERRAIN_RULES.cover.cost : TERRAIN_RULES.open.cost;
 }
 
+export function movementCostForMode(mode, isCover) {
+  if (!isCover) return TERRAIN_RULES.open.cost;
+  if (mode === 'fixed') return Infinity;
+  return TERRAIN_RULES.cover.cost;
+}
+
 export function combatRatio(damage, maxHp) {
   const strength = Math.max(0, damage);
   const defense = Math.max(1, maxHp);
