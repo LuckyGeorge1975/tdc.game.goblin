@@ -24,7 +24,7 @@
       .area-boundary.fire-boundary { stroke: #ef705b; stroke-width: 4; stroke-dasharray: none; }.area-boundary.los-boundary { stroke: #8de5f2; stroke-width: 4; stroke-dasharray: none; }
       .view-toggle { display:flex; gap:4px; margin-top:9px; }
       .view-option { background:#111c20; border:1px solid #34484b; color:#77908b; padding:5px 7px; font:700 9px Rajdhani; letter-spacing:.08em; cursor:pointer; }
-      .view-option:hover,.view-option.active { color:#d1f35a; border-color:#91ad44; background:#263520; }
+      .view-option:hover,.view-option.active { color:#d1f35a; border-color:#91ad44; background:#263520; }.view-option:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
       .unit-svg.acted-unit { opacity: .42; filter: grayscale(.75) saturate(.45); }
       .unit-card.acted { opacity: .42; }
       .unit-card.acted:hover { opacity: .7; }
@@ -180,7 +180,7 @@
         <div class="guide-nav"><button id="guide-prev">← PREVIOUS</button><span id="guide-count" class="guide-count">01 / 20</span><button id="guide-next">NEXT →</button></div>
       </section>
     </div>
-    <script src="game.js?v=32"></script>
+    <script src="game.js?v=33"></script>
     <script src="scenario.js?v=3"></script>
     <script src="unit-guide.js?v=3"></script>
     <script src="quick-start.js?v=1"></script>
