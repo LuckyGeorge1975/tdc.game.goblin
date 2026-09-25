@@ -8,7 +8,7 @@ Stand: 2026-09-25 · Version: 0.1 · Zweck: verbindliche Referenz für Spiel, KI
 |---|---:|---:|---:|---:|---|---|
 | GOBLIN MK III | Spieler | 5 | 1 | 2 | Schwerer Angriff, Rammen | implementiert |
 | GEV SCOUT | Spieler | 3 | 3 | 3 | Schnelles Hovercraft, Zweitbewegung | implementiert |
-| MISSILE TANK | Spieler | 3 | 1 | 4 | Artillerie | implementiert |
+| MISSILE TANK | Spieler | 3 | 1 | 4 | Artillerie | spielbar, Verteidigung separat |
 | INFANTRY PLATOON | Spieler | 2 | 2 | 1 | Mobile Infanterie | implementiert |
 | GUARD TANK | Gegner | 3 | 1 | 2 | Gegnerische Panzerung | implementiert |
 | RAIDER GEV | Gegner | 2 | 2 | 2 | Gegnerisches Hovercraft | implementiert |
@@ -44,6 +44,8 @@ Die Werte unten sind aus der frei verfügbaren SJG-Regelreferenz für die gemein
 | Offenes Gelände | 1 | nein | frei | implementiert |
 | Berg-/Trümmerfeld | 2 | ja | blockiert | implementiert |
 | Belegtes Feld | — | — | — | für Bewegung blockiert; Ziel-/Rammregeln separat |
+
+Das Szenario `UNIT TRIAL` stellt den neuen Katalog mit Heavy Tank, Light Tank, Light GEV und Combat Engineers erstmals im Spielfluss bereit. Sonderregeln dieser Einheiten sind weiterhin bewusst begrenzt.
 
 ## 3. Phasen und Aktionen
 

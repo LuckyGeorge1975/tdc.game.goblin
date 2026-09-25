@@ -12,11 +12,11 @@ Enthalten sind:
 - Bewegung mit Gelände- und Belegungskosten
 - getrennte Movement-, Fire- und GEV-Zweitbewegungsphasen
 - Fire Range und Line-of-Sight-Prüfung
-- CRT-Kampfsystem mit NE, D und X
+- CRT-Kampfsystem mit NE, D und X sowie expliziten Verteidigungswerten
 - Deaktivierung, Wiederherstellung, Zerstörung und sichtbare Wracks
 - Goblin-Ramming gegen gegnerische Fahrzeuge
 - einfache Gegner-KI mit Bewegung und Feuer
-- Szenarien `IRON DUST` und `RELAY RUN`
+- Szenarien `IRON DUST`, `RELAY RUN` und `UNIT TRIAL`
 - Area-Modi `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`
 - optionales Hex-Grid und oberster Feld-Fokusmarker
 - Einheiten-Guide mit Basis- und Erweiterungseinheiten sowie kombinierte Feld- und Einheiteninformationen
