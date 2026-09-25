@@ -20,7 +20,7 @@
       .target-ring { fill: none; stroke: #ffb09b; stroke-width: 4; filter: drop-shadow(0 0 4px #ff624d); pointer-events: none; }
       .hex.movement-fill { fill: #79bd6848; }.hex.movement-fill.reference { fill: #79bd6828; }.hex.fire-range.reference { fill: #7a382d28; }.area-boundary.reference { opacity: .48; }
       .area-boundary { fill: none; pointer-events: none; stroke-linecap: round; stroke-linejoin: round; }
-      .area-boundary.movement-boundary { stroke: #8ad36f; stroke-width: 4; }
+      .area-boundary.movement-boundary { stroke: #8ad36f; stroke-width: 4; }.grid-hex { fill: none; stroke: #80aaa044; stroke-width: 1; pointer-events: none; }.focus-marker { fill: #f4ffcd12; stroke: #f4ffcd; stroke-width: 3; pointer-events: none; filter: drop-shadow(0 0 4px #d1f35a); }
       .area-boundary.fire-boundary { stroke: #ef705b; stroke-width: 4; stroke-dasharray: none; }.area-boundary.los-boundary { stroke: #8de5f2; stroke-width: 4; stroke-dasharray: none; }
       .view-toggle { display:flex; gap:4px; margin-top:9px; }
       .view-option { background:#111c20; border:1px solid #34484b; color:#77908b; padding:5px 7px; font:700 9px Rajdhani; letter-spacing:.08em; cursor:pointer; }
@@ -116,7 +116,7 @@
         <section class="battlefield panel">
           <div class="battlefield-head">
             <div><span class="eyebrow">TACTICAL MAP</span><h2 id="phase-title">MOVEMENT PHASE</h2><span id="phase-ready" class="phase-ready"><b id="movement-ready" class="active">MOVE 4/4</b><b id="fire-ready">FIRE 4/4</b><b id="gev-ready">GEV 1/1</b></span></div>
-            <div class="view-toggle" role="group" aria-label="Reichweitenansicht"><button class="view-option active" data-view="movement">MOVEMENT RANGE</button><button class="view-option" data-view="fire">FIRE RANGE</button><button class="view-option" data-view="los">LINE OF SIGHT</button></div>
+            <div class="view-toggle" role="group" aria-label="Reichweitenansicht"><button class="view-option active" data-view="movement">MOVEMENT RANGE</button><button class="view-option" data-view="fire">FIRE RANGE</button><button class="view-option" data-view="los">LINE OF SIGHT</button><button id="grid-toggle" class="view-option" aria-pressed="false">GRID</button></div>
             <div class="turn-counter"><span>TURN</span><strong id="turn-number">01</strong></div>
           </div>
           <div class="map-frame">
@@ -154,7 +154,7 @@
         <div class="guide-nav"><button id="guide-prev">← PREVIOUS</button><span id="guide-count" class="guide-count">01 / 07</span><button id="guide-next">NEXT →</button></div>
       </section>
     </div>
-    <script src="game.js?v=14"></script>
+    <script src="game.js?v=16"></script>
     <script src="scenario.js?v=3"></script>
     <script src="unit-guide.js?v=1"></script>
   </body>
