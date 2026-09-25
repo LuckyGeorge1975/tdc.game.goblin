@@ -43,6 +43,8 @@ Danach `http://localhost:4173` öffnen.
 - `GRID`: dezentes Hexraster ein-/ausblenden
 - `END TURN`: aktuelle Phase beenden bzw. Gegnerzug starten
 
+Nach Sieg oder Niederlage bleibt die Karte samt Combat Log sichtbar. Der Kampf wird nicht automatisch zurückgesetzt; nur `RESTART` startet die Mission neu.
+
 Gegnerische Fahrzeuge können zur Information und zur Anzeige ihrer Bereiche ausgewählt werden. Ein Angriff wird nur durch ein gültiges Ziel in der Feuerphase ausgelöst.
 
 ## Regelbasis und Tests
