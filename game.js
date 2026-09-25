@@ -23,7 +23,7 @@ const scenarioCatalog={
   ]}
 };
 let currentScenario='iron-dust';
-let selected=null, turn=1, phase='player', turnPhase='movement', gameOver=false, viewMode='combo', phaseConfirmCallback=null;
+let selected=null, turn=1, phase='player', turnPhase='movement', gameOver=false, viewMode='movement', phaseConfirmCallback=null;
 const svg=document.querySelector('#battlefield-map'), logEl=document.querySelector('#combat-log');
 const $=s=>document.querySelector(s);
 function hexCenter(x,y){return {x:58+x*DX+(y%2?DX/2:0),y:48+y*DY}}
@@ -53,13 +53,13 @@ function draw(){
   svg.setAttribute('viewBox','0 0 790 480'); svg.innerHTML=''; const passiveSelection=selected&&selected.hp>0&&!phaseCanAct(selected);
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){
     const p=document.createElementNS(NS,'polygon');p.setAttribute('points',hexPoints(x,y));p.classList.add('hex');p.dataset.x=x;p.dataset.y=y;
-    const unit=units.find(u=>u.hp>0&&u.x===x&&u.y===y); const attackPhase=turnPhase==='fire',canFire=attackPhase||passiveSelection,canMove=turnPhase==='movement'||turnPhase==='gev'||passiveSelection; if(attackPhase&&selected&&selected.hp>0&&unit&&unit.team==='enemy'&&dist(selected,{x,y})<=selected.range&&lineOfSight(selected,{x,y})) p.classList.add('attack');
+    const unit=units.find(u=>u.hp>0&&u.x===x&&u.y===y); const attackPhase=turnPhase==='fire',canFire=!!selected,canMove=!!selected; if(attackPhase&&selected&&selected.hp>0&&unit&&unit.team==='enemy'&&dist(selected,{x,y})<=selected.range&&lineOfSight(selected,{x,y})) p.classList.add('attack');
     if(terrain.has(`${x},${y}`)){p.classList.add('terrain');}
-    if(selected&&selected.hp>0){const distance=dist(selected,{x,y}),moveCost=distance+(terrain.has(`${x},${y}`)?1:0);if(x===selected.x&&y===selected.y)p.classList.add('selected');const moveAllowance=turnPhase==='gev'?2:selected.move;const blockedByUnit=unit&&unit!==selected;if(canMove&&viewMode!=='fire'&&!blockedByUnit&&findMovementPath(selected,{x,y},moveAllowance))p.classList.add('movement-fill');if(canFire&&viewMode==='fire'&&distance<=selected.range)p.classList.add('fire-range');if(attackPhase&&unit&&unit.team==='enemy'&&distance<=selected.range&&lineOfSight(selected,unit))p.classList.add('attack')}
+    if(selected&&selected.hp>0){const distance=dist(selected,{x,y}),moveCost=distance+(terrain.has(`${x},${y}`)?1:0);if(x===selected.x&&y===selected.y)p.classList.add('selected');const moveAllowance=turnPhase==='gev'?2:selected.move;const blockedByUnit=unit&&unit!==selected;if(canMove&&viewMode==='movement'&&!blockedByUnit&&findMovementPath(selected,{x,y},moveAllowance))p.classList.add('movement-fill');if(canFire&&(viewMode==='fire'||viewMode==='los')&&distance<=selected.range){if(viewMode==='fire')p.classList.add('fire-range');else if(lineOfSight(selected,{x,y}))p.classList.add('los-visible');else p.classList.add('los-blocked')}if(attackPhase&&unit&&unit.team==='enemy'&&distance<=selected.range&&lineOfSight(selected,unit))p.classList.add('attack')}
     p.addEventListener('click',()=>handleHex(x,y));svg.appendChild(p);
     if(terrain.has(`${x},${y}`)){const c=hexCenter(x,y);const r=document.createElementNS(NS,'rect');r.setAttribute('x',c.x-11);r.setAttribute('y',c.y-7);r.setAttribute('width',22);r.setAttribute('height',14);r.setAttribute('transform',`rotate(18 ${c.x} ${c.y})`);r.classList.add('ruin');r.addEventListener('click',event=>{event.stopPropagation();handleHex(x,y)});svg.appendChild(r)}
   }
-  if(selected&&selected.hp>0){const movementAllowance=turnPhase==='gev'?2:selected.move;const canMoveCell=(x,y)=>!units.some(u=>u.hp>0&&u!==selected&&u.x===x&&u.y===y)&&!!findMovementPath(selected,{x,y},movementAllowance);drawAreaBoundary(movementAllowance,'movement-boundary'+(passiveSelection?' reference':''),canMoveCell);drawAreaBoundary(selected.range,'fire-boundary'+(passiveSelection?' reference':''))}
+  if(selected&&selected.hp>0){const movementAllowance=turnPhase==='gev'?2:selected.move,areaClass=passiveSelection?' reference':'';const canMoveCell=(x,y)=>!units.some(u=>u.hp>0&&u!==selected&&u.x===x&&u.y===y)&&!!findMovementPath(selected,{x,y},movementAllowance);if(viewMode==='movement')drawAreaBoundary(movementAllowance,'movement-boundary'+areaClass,canMoveCell);if(viewMode==='fire')drawAreaBoundary(selected.range,'fire-boundary'+areaClass);if(viewMode==='los')drawAreaBoundary(selected.range,'los-boundary'+areaClass,(x,y)=>dist(selected,{x,y})<=selected.range&&lineOfSight(selected,{x,y}))}
   units.slice().sort((a,b)=>(a.hp>0?1:0)-(b.hp>0?1:0)).forEach(u=>{try{renderUnit(u)}catch(error){addLog(`Unit render failed: ${error.message}`,true)}}); updateRoster();
 }
 function renderUnit(u){
