@@ -14,6 +14,29 @@ Stand: 2026-09-25 · Version: 0.1 · Zweck: verbindliche Referenz für Spiel, KI
 | RAIDER GEV | Gegner | 2 | 2 | 2 | Gegnerisches Hovercraft | implementiert |
 | COMMAND CORE / RELAY NODE | Gegner | 5 / 4 | 0 | 0 | Missionsziel | implementiert |
 
+## 1.1 Kanonischer Einheitenkatalog
+
+Die Werte unten sind aus der frei verfügbaren SJG-Regelreferenz für die gemeinsame Ogre/G.E.V.-Basis und die genannten Erweiterungen zusammengetragen. `Katalog` bedeutet: im Datenmodell und Unit Guide vorhanden; `spielbar` bedeutet zusätzlich in Bewegung, Feuer, Schaden und KI integriert.
+
+| Einheit | Angriff / Reichweite | Verteidigung | Bewegung | Quelle | Status |
+|---|---:|---:|---:|---|---|
+| Heavy Tank | 4 / 2 | 3 | 3 | Ogre/G.E.V. | Katalog |
+| Missile Tank | 3 / 4 | 2 | 2 | Ogre/G.E.V. | spielbar, Prototypwerte abweichend |
+| Light Tank | 2 / 2 | 2 | 3 | Ogre/G.E.V. | Katalog |
+| Superheavy Tank | 6* / 3 | 5 | 3 | Ogre/G.E.V. | Katalog |
+| Howitzer | 6 / 8 | 1 | 0 | Ogre/G.E.V. | Katalog |
+| Mobile Howitzer | 6 / 6 | 2 | 1 | Shockwave | Katalog |
+| GEV | 2 / 2 | 2 | 4 + 3 | Ogre/G.E.V. | Katalog; Zweitbewegung vorhanden |
+| Light GEV | 1 / 2 | 1 | 4 + 3 | Shockwave | Katalog |
+| GEV-PC | 1 / 2 | 2 | 3 + 2 | Shockwave | Katalog |
+| Missile Crawler | Cruise Missile | 2 | 1 | Shockwave | Katalog |
+| Light Artillery Drone | 2 / 8 | 1 | 0 | Battlefields | Katalog |
+| Infantry / Marines | je Trupp | je Trupp | 2 | Basis / Shockwave | Prototyp-Infanterie spielbar |
+| Combat Engineers | 2 / 1 | 2 | 2 | Reinforcement Pack | Katalog |
+| Militia | 1 / 1 | 1 | 2 | Battlefields | Katalog |
+| Command Post | — | 2 | 0 | Basis | Missionsziel spielbar |
+
+`*` Der Superheavy kann den Angriff auf zwei gleich starke Angriffe aufteilen. Oger werden nicht als ein einzelner HP-Wert behandelt: Mk. III und Mk. V besitzen Waffen- und Kettenkomponenten. Dafür liegt jetzt ein separates `OGRE_SYSTEMS`-Datenmodell vor; die Komponentenlogik folgt als nächster Implementierungsschritt.
 ## 2. Gelände
 
 | Gelände | Bewegungskosten | Deckung | Sichtlinie | Status |
@@ -64,8 +87,8 @@ Eine Einheit darf in einem Zug grundsätzlich bewegen und feuern, sofern die jew
 
 ## 7. Bewusste Lücken für die nächste Ausbaustufe
 
-1. Trefferwürfel und CRT-Ergebnisse sind noch zufallsbasiert und nicht als reproduzierbarer Testmodus verfügbar.
-2. Deckung beeinflusst aktuell die Sichtlinie, aber noch keinen separaten Verteidigungsmodifikator.
-3. Bewegungs- und Feuerwerte sind Prototypwerte und müssen gegen die gewünschte Goblin-Regelbasis validiert werden.
-4. KI-Zielprioritäten und Szenario-Verstärkungen sind noch vereinfacht.
-5. Overrun/Ramming, Transport, Reparatur und weitere Sonderfälle sind noch nicht vollständig modelliert.
+1. Oger-Komponenten (Waffen, Raketen, Antipersonenwaffen, Ketten) sind katalogisiert, aber noch nicht als getrennte Schadensobjekte spielbar.
+2. Trefferwürfel und CRT-Ergebnisse sind noch zufallsbasiert und nicht als reproduzierbarer Testmodus verfügbar.
+3. Deckung, indirektes Feuer und die unterschiedlichen Bewegungsmodi sind noch nicht vollständig als Verteidigungs- und Sichtregeln integriert.
+4. Transport, Cruise Missiles, Overrun, Engineering und Verstärkungen fehlen noch in der Spielausführung.
+5. KI-Zielprioritäten und Szenario-Verstärkungen sind noch vereinfacht.

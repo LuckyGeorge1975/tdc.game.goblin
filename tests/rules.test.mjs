@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { UNIT_RULES, TERRAIN_RULES, applyCombatResult, combatRatio, hexDistance, terrainCost } from '../rules.mjs';
+import { UNIT_CATALOG, UNIT_RULES, OGRE_SYSTEMS, TERRAIN_RULES, applyCombatResult, combatRatio, hexDistance, terrainCost } from '../rules.mjs';
 
 test('unit matrix contains the four player archetypes', () => {
   assert.deepEqual(Object.keys(UNIT_RULES), ['goblin', 'gev', 'missile', 'infantry']);
@@ -31,4 +31,13 @@ test('D disables vehicles, damages infantry, and destroys disabled vehicles', ()
   assert.equal(applyCombatResult({ hp: 2, infantry: true }, 'D').hp, 1);
   assert.equal(applyCombatResult({ hp: 3, disabled: true }, 'D').hp, 0);
   assert.equal(applyCombatResult({ hp: 3 }, 'X').hp, 0);
+});
+test('canonical unit catalogue covers core and expansion units', () => {
+  assert.equal(UNIT_CATALOG.heavyTank.attack, 4);
+  assert.deepEqual(UNIT_CATALOG.gev.movement, [4, 3]);
+  assert.equal(UNIT_CATALOG.gevPc.transportSquads, 3);
+  assert.equal(UNIT_CATALOG.militia.source, 'Battlefields');
+  assert.equal(UNIT_CATALOG.combatEngineers.engineering, true);
+  assert.equal(OGRE_SYSTEMS.mkIII.tread, 45);
+  assert.equal(OGRE_SYSTEMS.vulcan.drones, true);
 });

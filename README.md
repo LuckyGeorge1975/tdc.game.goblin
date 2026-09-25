@@ -19,7 +19,7 @@ Enthalten sind:
 - Szenarien `IRON DUST` und `RELAY RUN`
 - Area-Modi `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`
 - optionales Hex-Grid und oberster Feld-Fokusmarker
-- Einheiten-Guide sowie kombinierte Feld- und Einheiteninformationen
+- Einheiten-Guide mit Basis- und Erweiterungseinheiten sowie kombinierte Feld- und Einheiteninformationen
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
 ## Lokal starten
@@ -55,15 +55,15 @@ Die verbindliche Regelmatrix steht in [RULE_MATRIX.md](RULE_MATRIX.md). Die zent
 node --test tests/rules.test.mjs
 ```
 
-Die Tests decken derzeit Einheitengrundwerte, Hex-Distanzen, Geländekosten, Sichtlinienflags, CRT-Verhältnisse sowie Deaktivierung und Zerstörung ab.
+Die Tests decken derzeit Einheitengrundwerte, den kanonischen Einheitenkatalog, Oger-Systemdaten, Hex-Distanzen, Geländekosten, Sichtlinienflags, CRT-Verhältnisse sowie Deaktivierung und Zerstörung ab.
 
 ## Bekannte Grenzen
 
 - Die Feuerergebnisse sind noch zufallsbasiert; ein reproduzierbarer Testwürfel fehlt.
 - Deckung blockiert derzeit die Sichtlinie, verändert aber noch nicht separat die Verteidigungswerte.
-- Einheitenwerte und Sonderregeln sind eine prototypische Regelbasis und müssen noch vollständig gegen die gewünschte Regelreferenz validiert werden.
-- KI-Zielprioritäten, Verstärkungen und komplexe Szenarioziele sind noch vereinfacht.
+- Die kanonischen Einheitenwerte sind jetzt katalogisiert. Die aktive Mission verwendet weiterhin bewusst eine kleinere Prototypauswahl, bis die jeweiligen Sonderregeln integriert sind.
+- Oger-Komponenten, Transport, Cruise Missiles, Overrun, Engineering, indirektes Feuer und Verstärkungen sind noch nicht vollständig spielbar.
 
 ## Nächste Ausbaustufe
 
-Als Nächstes werden die zentralen Regeln weiter in Bewegung, Sichtlinie, KI und Szenarioauswertung integriert. Danach folgen reproduzierbare Kampf-Tests, bessere KI-Zielprioritäten und zusätzliche Missionsziele.
+Als Nächstes werden die katalogisierten Einheiten schrittweise spielbar gemacht: zuerst Verteidigungswerte und unterschiedliche Bewegungsmodi, danach Transport/Infanterie, Oger-Komponenten und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.
