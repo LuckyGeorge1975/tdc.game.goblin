@@ -6,6 +6,8 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 Der Prototyp ist spielbar und auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) veröffentlicht.
 
+Aktueller Übergabestand: **0.1.5 / Build 5**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md).
+
 Enthalten sind:
 
 - Hexfeldkarte mit offenem Gelände sowie Berg-/Trümmerfeldern
@@ -58,10 +60,17 @@ Gegnerische Fahrzeuge können zur Information und zur Anzeige ihrer Bereiche aus
 Die verbindliche Regelmatrix steht in [RULE_MATRIX.md](RULE_MATRIX.md). Die zentrale, testbare Regelbasis liegt in [rules.mjs](rules.mjs). Die aktuellen Regressionstests werden ausgeführt mit:
 
 ```powershell
-node --test tests/rules.test.mjs
+node scripts/verify-release.mjs
+node --test tests/*.test.mjs
 ```
 
 Die Tests decken derzeit Einheitengrundwerte, den kanonischen Einheitenkatalog, Oger-Systemdaten, Hex-Distanzen, Geländekosten, Sichtlinienflags, CRT-Verhältnisse sowie Deaktivierung und Zerstörung ab.
+
+## Versionierung und Tester-Übergabe
+
+Die Versionslinie lautet vorerst `0.1.<Build>`. Jeder Push auf `main`, der über GitHub Pages veröffentlicht wird, benötigt eine höhere Buildnummer in [release.js](release.js), einen passenden Eintrag in [CHANGELOG.md](CHANGELOG.md) und eine aktualisierte Übergabe in [TEST_HANDOFF.md](TEST_HANDOFF.md). Der Pages-Workflow erzwingt diese Bedingungen und führt vor der Veröffentlichung die vollständige Testsuite aus.
+
+Tester geben die sichtbare Version aus der Kopfzeile in jedem Bericht an. Für strukturierte Rückmeldungen steht die GitHub-Issue-Vorlage **Test Report** bereit.
 
 ## Bekannte Grenzen
 

@@ -1,0 +1,57 @@
+name: Test Report
+description: Tester-Rückmeldung zu einem veröffentlichten G.O.B.L.I.N.-Build
+title: "[TEST 0.1.x] "
+labels: [test-report]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Getestete Version
+      description: Version aus der Kopfzeile, zum Beispiel 0.1.5.
+      placeholder: 0.1.5
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Testumgebung
+      placeholder: Edge 140, Windows 11, 1920×1080
+    validations:
+      required: true
+  - type: input
+    id: scenario
+    attributes:
+      label: Szenario und Phase
+      placeholder: IRON DUST – FIRE PHASE
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Einstufung
+      options: [BLOCKER, MAJOR, MINOR, NOTE]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zur Reproduktion
+      placeholder: "1. …\n2. …\n3. …"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Ergebnis
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Tatsächliches Ergebnis
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots, Video oder Combat Log
