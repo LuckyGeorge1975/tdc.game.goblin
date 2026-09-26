@@ -135,7 +135,7 @@
             <div class="map-corner corner-bl">LIVE TERRAIN SCAN</div>
             <div class="map-corner corner-br">DUST-7</div>
             <svg id="battlefield-map" role="img" aria-label="Hexfeld-Schlachtfeld"></svg><div id="carrier-cargo" class="carrier-cargo hidden" aria-live="polite"></div>
-            <div id="phase-transition" class="phase-transition" aria-live="polite"><div class="phase-transition-card"><small>PHASE TRANSITION</small><strong id="phase-transition-title">MOVEMENT PHASE</strong></div></div><div id="phase-confirm" class="phase-confirm" aria-live="assertive"><div class="phase-confirm-card"><small>CONFIRM PHASE END</small><strong id="phase-confirm-title">END PHASE?</strong><p id="phase-confirm-copy"></p><label><input id="phase-confirm-never" type="checkbox" /> NEVER ASK AGAIN</label><div class="phase-confirm-actions"><button id="phase-confirm-cancel" class="action-button">CANCEL</button><button id="phase-confirm-accept" class="action-button primary">CONTINUE</button></div></div></div><div id="map-toast" class="map-toast">WÄHLE EINE EINHEIT</div>
+            <div id="phase-transition" class="phase-transition" aria-live="polite"><div class="phase-transition-card"><small>PHASE TRANSITION</small><strong id="phase-transition-title">MOVEMENT PHASE</strong></div></div><div id="map-toast" class="map-toast">WÄHLE EINE EINHEIT</div>
           </div>
           <div class="battlefield-footer">
             <div id="selection-readout" class="selection-readout"><span class="selection-icon">+</span><div><b>NO UNIT SELECTED</b><small>Wähle eine Einheit für Befehle</small></div></div>
@@ -180,11 +180,13 @@
         <div class="guide-nav"><button id="guide-prev">← PREVIOUS</button><span id="guide-count" class="guide-count">01 / 20</span><button id="guide-next">NEXT →</button></div>
       </section>
     </div>
-    <script src="game.js?v=34"></script>
-    <script src="scenario.js?v=3"></script>
+    <link rel="stylesheet" href="dialogs.css?v=1" />
+    <script src="dialogs.js?v=1"></script>
+    <script src="game.js?v=35"></script>
+    <script src="scenario.js?v=4"></script>
     <script src="unit-guide.js?v=3"></script>
     <script src="quick-start.js?v=1"></script>
     <style>#undo-command:disabled{opacity:.35;cursor:not-allowed}</style>
-    <script src="command-history.js?v=1"></script>
+    <script src="command-history.js?v=2"></script>
   </body>
 </html>

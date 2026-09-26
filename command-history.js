@@ -91,6 +91,7 @@ unloadAt = reversibleCommand(unloadAt, 'Entladen');
 // Give BACK a short opportunity to cancel the automatic phase change.
 const originalAutoAdvance = maybeAutoAdvancePhase;
 maybeAutoAdvancePhase = function() {
+  if (GameDialogs.isOpen()) return;
   if (!document.querySelector('#auto-end-turn')?.checked || phase !== 'player' || gameOver || phaseReadyUnits().length) return;
   if (!commandDepth && !phaseCommands.length) return originalAutoAdvance();
   clearTimeout(autoPhaseTimer);

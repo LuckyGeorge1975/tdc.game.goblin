@@ -1,0 +1,10 @@
+.game-dialog{width:min(470px,calc(100vw - 40px));box-sizing:border-box;max-height:calc(100dvh - 40px);overflow:auto;padding:26px 28px;border:1px solid #a9c74e;background:#111d20;color:#d7e3da;box-shadow:0 0 45px #000;text-align:center;font:inherit}
+.game-dialog::backdrop{background:#03080acc}
+.game-dialog .dialog-kind{color:#d1f35a;font:700 10px Rajdhani,sans-serif;letter-spacing:.2em}
+.game-dialog h2{color:#f4ffcd;font:700 27px 'Barlow Condensed',sans-serif;letter-spacing:.06em;margin:12px 0}
+.game-dialog p{font-size:14px;line-height:1.5;color:#a9b9b2;white-space:pre-line;overflow-wrap:anywhere}
+.game-dialog .dialog-preference{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:18px;font:700 11px Rajdhani,sans-serif;letter-spacing:.08em}
+.game-dialog input{accent-color:#d1f35a}
+.game-dialog .dialog-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:20px}
+.game-dialog [hidden]{display:none!important}
+.game-dialog button:focus-visible,.game-dialog input:focus-visible{outline:2px solid #f4ffcd;outline-offset:4px}

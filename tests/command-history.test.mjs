@@ -14,7 +14,7 @@ function game() {
   }
   const document = {querySelector(s){if(!nodes.has(s))nodes.set(s,element());return nodes.get(s)},
     querySelectorAll(){return []},createElement:element,createElementNS:element,addEventListener(){}};
-  const context = vm.createContext({document,structuredClone,console,window:{},
+  const context = vm.createContext({document,structuredClone,console,window:{},GameDialogs:{isOpen:()=>false,cancel(){},confirm:async()=>true},
     localStorage:{getItem(){return null}},
     setTimeout(fn){timers.set(++timerId,fn);return timerId},clearTimeout(id){timers.delete(id)}});
   const run = source => vm.runInContext(source,context);
@@ -22,6 +22,21 @@ function game() {
   run("draw=()=>{}; updateSelection=()=>{}; loadScenario('unit-trial');");
   return {run,timers};
 }
+
+test('restart and scenario change wait for approval and preserve canceled commands',async()=>{
+  const {run}=game();run("selected=units[0];handleHex(0,6);GameDialogs.confirm=()=>new Promise(resolve=>globalThis.answer=resolve)");
+  const restart=run('resetScenario()');assert.equal(run('units[0].x'),0);run('answer(false)');await restart;assert.equal(run('units[0].x'),0);
+  run("document.querySelector('#scenario-select').value='iron-dust'");
+  const change=run("document.querySelector('#scenario-select').onchange({target:document.querySelector('#scenario-select')})");
+  assert.equal(run('currentScenario'),'unit-trial');assert.equal(run("document.querySelector('#scenario-select').value"),'unit-trial');
+  run('answer(true)');await change;assert.equal(run('currentScenario'),'iron-dust');assert.equal(run('phaseCommands.length'),0);
+});
+
+test('phase cancellation and open-dialog AUTO guard preserve the phase',async()=>{
+  const {run}=game();run("GameDialogs.confirm=()=>new Promise(resolve=>globalThis.answer=resolve)");
+  const pending=run("confirmPhaseAdvance(()=>setTurnPhase('fire'))");assert.equal(run('turnPhase'),'movement');run('answer(false)');await pending;
+  run("GameDialogs.isOpen=()=>true;document.querySelector('#auto-end-turn').checked=true;units.forEach(u=>u.moved=true);maybeAutoAdvancePhase()");assert.equal(run('turnPhase'),'movement');
+});
 
 test('L opens loading or the first passenger unloading, respecting phase and focus',()=>{
   const {run}=game();

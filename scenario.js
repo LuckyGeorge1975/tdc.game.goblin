@@ -4,7 +4,7 @@ function loadScenario(id){
   currentScenario=id;
   terrain=new Set(config.terrain);
   units.splice(0,units.length,...JSON.parse(JSON.stringify(config.units)).map(unit=>({...unit,moveCount:0,moveFrom:null,acted:false,disabled:false,justHit:false})));
-  selected=null;turn=1;phase='player';turnPhase='movement';gameOver=false;resetActionState();$("#end-turn").disabled=false;
+  selected=null;focusedCell=null;transportLoadMode=null;transportUnloadMode=null;turn=1;phase='player';turnPhase='movement';gameOver=false;resetActionState();$("#end-turn").disabled=false;
   $('#mission-kicker').textContent=config.kicker;
   $('#mission-title').textContent=config.title;
   $('#mission-sub').textContent=config.sub;
@@ -17,16 +17,26 @@ function loadScenario(id){
   draw();
 }
 
-function resetScenario(){loadScenario(currentScenario)}
+function hasScenarioProgress(){return turn>1||units.some(unit=>unit.moveCount>0||unit.moved||unit.fired||unit.secondMoved||unit.embarkedOn||unit.hp<unit.maxHp)}
 
-document.querySelector('#scenario-select').onchange=event=>{
+async function resetScenario(){
+  if(GameDialogs.isOpen())return;
+  if(hasScenarioProgress()&&!await GameDialogs.confirm({id:'restart',title:'MISSION NEU STARTEN?',message:'Der aktuelle Spielstand und die Befehle dieser Mission gehen verloren.',acceptLabel:'NEU STARTEN',cancelLabel:'WEITERSPIELEN'})){
+    maybeAutoAdvancePhase();return;
+  }
+  loadScenario(currentScenario);
+}
+
+document.querySelector('#scenario-select').onchange=async event=>{
   const nextScenario=event.target.value;
-  const hasMovedUnit=units.some(unit=>unit.moveCount>0);
-  if(nextScenario!==currentScenario&&hasMovedUnit&&!window.confirm('Mindestens eine Einheit wurde bereits bewegt. Szenario wirklich wechseln?')){
-    event.target.value=currentScenario;
+  event.target.value=currentScenario;
+  if(nextScenario===currentScenario||!scenarioCatalog[nextScenario]||GameDialogs.isOpen())return;
+  if(hasScenarioProgress()&&!await GameDialogs.confirm({id:'scenario',title:'SZENARIO WECHSELN?',message:'Der aktuelle Spielstand wird verworfen. Neues Szenario: '+scenarioCatalog[nextScenario].kicker,acceptLabel:'WECHSELN',cancelLabel:'WEITERSPIELEN'})){
     setToast('SZENARIOWECHSEL ABGEBROCHEN');
+    maybeAutoAdvancePhase();
     return;
   }
   loadScenario(nextScenario);
+  event.target.value=nextScenario;
 };
 document.querySelector('#reset-game').onclick=resetScenario;
