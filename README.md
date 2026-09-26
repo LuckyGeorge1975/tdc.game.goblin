@@ -25,6 +25,7 @@ Enthalten sind:
 - Quick-Start-Guide, Einheiten-Guide mit Basis- und Erweiterungseinheiten sowie kombinierte Feld- und Einheiteninformationen
 - GEV-PC-Transport im Szenario `UNIT TRIAL`: Kapazität wird in Infanterie-Stärkepunkten geführt; Ein-/Aussteigen verbraucht die Infanteriebewegung, nicht die Bewegung des Trägers
 - Transportierte Infanterie kann aus dem GEV-PC feuern. Angriffe auf die Kombination verwenden einen gemeinsamen Würfelwurf, werden aber getrennt gegen Träger und Passagiere ausgewertet
+- Der GOBLIN MK III besitzt einen eigenen Systemzustand für Hauptbatterie, Sekundärbatterien, Raketen, AP-Systeme und 45 Ketteneinheiten. Gegnerische Treffer werden gegen ein einzelnes System ausgewertet; Kettenschäden reduzieren seine Bewegung bei 30, 15 und 0 verbleibenden Kettenpunkten.
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
 ## Lokal starten
@@ -71,4 +72,4 @@ Die Tests decken derzeit Einheitengrundwerte, den kanonischen Einheitenkatalog, 
 
 ## Nächste Ausbaustufe
 
-Als Nächstes folgen die Oger-Komponenten: einzelne Waffen, Raketen und Ketten werden als getrennte Ziele mit eigener Auswirkung modelliert. Danach folgen Cruise Missiles, Overrun und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.
+Als Nächstes wird das begonnene GOBLIN-Systemmodell um die aktive Waffenauswahl und mehrere Schüsse pro Feuerphase ergänzt. Danach folgen Cruise Missiles, Overrun und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.

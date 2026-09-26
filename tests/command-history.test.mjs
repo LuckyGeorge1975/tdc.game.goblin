@@ -18,7 +18,7 @@ function game() {
     localStorage:{getItem(){return null}},
     setTimeout(fn){timers.set(++timerId,fn);return timerId},clearTimeout(id){timers.delete(id)}});
   const run = source => vm.runInContext(source,context);
-  for(const file of ['game.js','scenario.js','command-history.js'])run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
+  for(const file of ['ogre-systems.js','game.js','ogre-runtime.js','scenario.js','command-history.js'])run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
   run("draw=()=>{}; updateSelection=()=>{}; loadScenario('unit-trial');");
   return {run,timers};
 }
@@ -109,6 +109,22 @@ test('one attack roll is resolved separately against carrier and riders',()=>{
   assert.equal(run('combo.passengers.length'),1);
   assert.equal(run('combo.passengers[0].outcome.result'),run('units[3].lastOutcome'));
   assert.equal(run('combo.roll>=0&&combo.roll<=5'),true);
+});
+
+test('enemy attacks target and destroy individual GOBLIN systems',()=>{
+  const {run}=game();
+  run("loadScenario('iron-dust');Math.random=()=>0.99;globalThis.systemHit=GoblinOgreRuntime.resolveSystemAttack(units[5],units[0])");
+  assert.equal(run('systemHit.system.key'),'missiles');
+  assert.equal(run('systemHit.result'),'X');
+  assert.equal(run('units[0].ogreSystems.weapons.missiles.destroyed'),1);
+  assert.equal(run('units[0].hp'),5);
+});
+
+test('GOBLIN tread damage follows canonical movement thresholds',()=>{
+  const {run}=game();
+  run("loadScenario('iron-dust');units[5].damage=6;Math.random=()=>0.99;GoblinOgreRuntime.resolveSystemAttack(units[5],units[0],'treads');GoblinOgreRuntime.resolveSystemAttack(units[5],units[0],'treads');GoblinOgreRuntime.resolveSystemAttack(units[5],units[0],'treads')");
+  assert.equal(run('units[0].ogreSystems.treads'),27);
+  assert.equal(run('units[0].move'),2);
 });
 
 test('a rider can survive a destroyed carrier and is placed in its hex',()=>{

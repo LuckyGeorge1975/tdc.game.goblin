@@ -2,7 +2,7 @@ const NS='http://www.w3.org/2000/svg';
 const W=12,H=8,S=34,DX=Math.sqrt(3)*S, DY=1.5*S;
 let terrain = new Set(['3,1','8,1','1,4','5,3','9,5','2,6','7,6','10,2']);
 const COMBAT_RULES=Object.freeze({crt:Object.freeze({'1-2':['NE','NE','NE','NE','D','X'],'1-1':['NE','NE','D','D','D','X'],'2-1':['NE','D','D','X','X','X'],'3-1':['D','D','X','X','X','X'],'4-1':['D','X','X','X','X','X']})});const units = [
-  {id:'ogre',name:'GOBLIN MK III',type:'HEAVY ASSAULT',team:'player',x:1,y:5,hp:5,maxHp:5,defense:5,range:2,move:1,damage:3,icon:'G'},
+  {id:'ogre',name:'GOBLIN MK III',type:'HEAVY ASSAULT',team:'player',x:1,y:5,hp:5,maxHp:5,defense:5,range:2,move:3,damage:3,icon:'G',ogreSystems:GoblinSystems.createMarkIII()},
   {id:'gev',name:'GEV SCOUT',type:'HOVERCRAFT',team:'player',x:2,y:6,hp:3,maxHp:3,defense:3,range:3,move:3,damage:1,icon:'G'},
   {id:'missile',name:'MISSILE TANK',type:'ARTILLERY',team:'player',x:3,y:6,hp:3,maxHp:3,defense:3,range:4,move:1,damage:2,icon:'M'},
   {id:'infantry',name:'INFANTRY PLATOON',type:'MOBILE INFANTRY',team:'player',x:1,y:6,hp:2,maxHp:2,defense:2,range:1,move:2,damage:1,icon:'I',infantry:true},
@@ -13,7 +13,7 @@ const COMBAT_RULES=Object.freeze({crt:Object.freeze({'1-2':['NE','NE','NE','NE',
 const scenarioCatalog={
   'iron-dust':{kicker:'MISSION 07 / IRON DUST',title:'Durchbrechen. Ausschalten. Überleben.',sub:'Zerstöre den feindlichen Kommandokern, bevor Verstärkungen eintreffen.',objective:'core',terrain:['3,1','8,1','1,4','5,3','9,5','2,6','7,6','10,2'],units:units.map(u=>({...u}))},
   'relay-run':{kicker:'MISSION 08 / RELAY RUN',title:'Sichern. Halten. Extrahieren.',sub:'Erreiche den östlichen Relaisknoten und schalte seine Eskorte aus.',objective:'core-and-escort',terrain:['4,2','5,2','4,5','7,4','8,6','2,3'],units:[
-    {id:'ogre',name:'GOBLIN MK III',type:'HEAVY ASSAULT',team:'player',x:1,y:6,hp:5,maxHp:5,defense:5,range:2,move:1,damage:3,icon:'G'},
+    {id:'ogre',name:'GOBLIN MK III',type:'HEAVY ASSAULT',team:'player',x:1,y:6,hp:5,maxHp:5,defense:5,range:2,move:3,damage:3,icon:'G',ogreSystems:GoblinSystems.createMarkIII()},
     {id:'gev',name:'GEV SCOUT',type:'HOVERCRAFT',team:'player',x:2,y:6,hp:3,maxHp:3,defense:3,range:3,move:3,damage:1,icon:'G'},
     {id:'missile',name:'MISSILE TANK',type:'ARTILLERY',team:'player',x:3,y:7,hp:3,maxHp:3,defense:3,range:4,move:1,damage:2,icon:'M'},
     {id:'infantry',name:'INFANTRY PLATOON',type:'MOBILE INFANTRY',team:'player',x:1,y:7,hp:2,maxHp:2,defense:2,range:1,move:2,damage:1,icon:'I',infantry:true},

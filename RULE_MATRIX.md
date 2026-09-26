@@ -36,7 +36,7 @@ Die Werte unten sind aus der frei verfügbaren SJG-Regelreferenz für die gemein
 | Militia | 1 / 1 | 1 | 2 | Battlefields | Katalog |
 | Command Post | — | 2 | 0 | Basis | Missionsziel spielbar |
 
-`*` Der Superheavy kann den Angriff auf zwei gleich starke Angriffe aufteilen. Oger werden nicht als ein einzelner HP-Wert behandelt: Mk. III und Mk. V besitzen Waffen- und Kettenkomponenten. Dafür liegt jetzt ein separates `OGRE_SYSTEMS`-Datenmodell vor; die Komponentenlogik folgt als nächster Implementierungsschritt.
+`*` Der Superheavy kann den Angriff auf zwei gleich starke Angriffe aufteilen. Der GOBLIN MK III wird nicht mehr als einzelner HP-Wert behandelt: Hauptbatterie, Sekundärbatterien, Raketen, AP-Systeme und Ketten besitzen getrennte Zustände. Gegnerangriffe zerstören einzelne Systeme; `D` wirkt nicht auf Oger-Waffen, erfolgreiche Kettenangriffe entfernen Kettenpunkte in Höhe der Angriffsstärke.
 ## 2. Gelände
 
 | Gelände | Bewegungskosten | Deckung | Sichtlinie | Status |
@@ -92,7 +92,7 @@ Eine Einheit darf in einem Zug grundsätzlich bewegen und feuern, sofern die jew
 
 ## 7. Bewusste Lücken für die nächste Ausbaustufe
 
-1. Oger-Komponenten (Waffen, Raketen, Antipersonenwaffen, Ketten) sind katalogisiert, aber noch nicht als getrennte Schadensobjekte spielbar.
+1. Oger-Komponenten sind als getrennte Schadensobjekte spielbar; aktive Waffenauswahl und das Abfeuern aller noch intakten Waffen in einer Feuerphase fehlen noch.
 2. Trefferwürfel und CRT-Ergebnisse sind noch zufallsbasiert und nicht als reproduzierbarer Testmodus verfügbar.
 3. Deckung, indirektes Feuer und die unterschiedlichen Bewegungsmodi sind noch nicht vollständig als Verteidigungs- und Sichtregeln integriert.
 4. Weitere Transporttypen, Cruise Missiles, Overrun, Engineering und Verstärkungen fehlen noch oder sind nur als Prototyp-Sonderfälle umgesetzt.
