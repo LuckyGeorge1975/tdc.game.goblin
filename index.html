@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a1015" />
     <title>G.O.B.L.I.N — Field Test</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css?v=3" />
+    <link rel="stylesheet" href="content-brand.css?v=1" />
     <style>
       .unit-svg { pointer-events: all; cursor: pointer; visibility: visible; opacity: 1; }
       .unit-svg.wreck { pointer-events: none; cursor: default; }
@@ -125,7 +123,7 @@
 
         <section class="battlefield panel">
           <div class="battlefield-head">
-            <div><span class="eyebrow">TACTICAL MAP</span><h2 id="phase-title">MOVEMENT PHASE</h2><span id="phase-ready" class="phase-ready"><b id="movement-ready" class="active">MOVE 4/4</b><b id="fire-ready">FIRE 4/4</b><b id="gev-ready">GEV 1/1</b></span></div>
+            <div><span class="eyebrow">TACTICAL MAP</span><h2 id="phase-title">MOVEMENT PHASE</h2><span id="phase-ready" class="phase-ready"><b id="movement-ready" class="active">MOVE 4/4</b><b id="fire-ready">FIRE 4/4</b><b id="gev-ready">SKIMMER 1/1</b></span></div>
             <div class="view-toggle" role="group" aria-label="Reichweitenansicht"><button class="view-option active" data-view="movement">MOVEMENT RANGE</button><button class="view-option" data-view="fire">FIRE RANGE</button><button class="view-option" data-view="los">LINE OF SIGHT</button><button id="grid-toggle" class="view-option" aria-pressed="false">GRID</button></div>
             <div class="turn-counter"><span>TURN</span><strong id="turn-number">01</strong></div>
           </div>
@@ -154,22 +152,22 @@
         </aside>
       </section>
 
-      <footer class="footer-note"><span>UNOFFICIAL BROWSER FIELD TEST · ORIGINAL TACTICAL UI / VECTOR ASSETS</span><span>© 2026 TACTICAL DESIGN CELL</span></footer>
+      <footer class="footer-note"><span>INDEPENDENT ORIGINAL PROTOTYPE · CODE-GENERATED VECTOR UI</span><span>NO AFFILIATION OR ENDORSEMENT · © 2026 TACTICAL DESIGN CELL</span></footer>
     </main>
 
     <div id="quick-start-modal" class="modal guide-modal hidden" role="dialog" aria-modal="true" aria-labelledby="quick-start-title">
       <section class="quick-guide-card">
         <div class="guide-head"><div><span class="eyebrow">FIELD MANUAL</span><h2 id="quick-start-title">QUICK START</h2></div><button id="quick-start-close" class="guide-close" aria-label="Quick Start schließen">×</button></div>
-        <p class="quick-guide-intro">G.O.B.L.I.N ist eine rundenbasierte Hexfeld-Taktikmission. Bewege deine Einheiten, nutze Gelände und schalte den feindlichen Kommandokern aus.</p>
+        <p class="quick-guide-intro">G.O.B.L.I.N ist eine eigenständige, rundenbasierte Hexfeld-Taktikmission. Führe deine Einsatzgruppe durch unübersichtliches Gelände und schalte den feindlichen Kommandokern aus.</p>
         <div class="quick-guide-grid">
           <article class="quick-guide-section"><h3>1 · AUSWÄHLEN</h3><p>Klicke auf ein Feld oder eine Einheit. Bei einer Einheit werden Unit Intel, Feldinformationen und die verfügbaren Bereiche angezeigt. <kbd>ESC</kbd> hebt die Auswahl auf.</p></article>
           <article class="quick-guide-section"><h3>2 · BEWEGEN</h3><p>Wähle eine eigene handlungsfähige Einheit und klicke ein grün markiertes Ziel. Gelände kostet zusätzliche Bewegung. Bereits bewegte Einheiten sind ausgegraut.</p></article>
           <article class="quick-guide-section"><h3>3 · FEUERN</h3><p>In der Fire Phase wählst du ein sichtbares Ziel im roten Bereich. Die Feuerwahrscheinlichkeit folgt dem Verhältnis Angriff zu Verteidigung und kann NE, D oder X ergeben. <kbd>F</kbd> greift das nächste gültige Ziel an.</p></article>
-          <article class="quick-guide-section"><h3>4 · GEV-PHASE</h3><p>GEVs erhalten nach Bewegung und Feuer eine zusätzliche Bewegung. Light GEV und GEV-PC verwenden denselben GEV-Bewegungsmodus.</p></article>
+          <article class="quick-guide-section"><h3>4 · SKIMMER-PHASE</h3><p>Skimmer erhalten nach Bewegung und Feuer ein zusätzliches Manöver. Light Skimmer und Skimmer Carrier verwenden denselben Schwebefahrzeug-Modus.</p></article>
           <article class="quick-guide-section"><h3>5 · GELÄNDE</h3><p>Berg-/Trümmerfelder geben Deckung, kosten mehr Bewegung und blockieren die Sichtlinie. Mit den Schaltern <b>MOVEMENT RANGE</b>, <b>FIRE RANGE</b>, <b>LINE OF SIGHT</b> und <b>GRID</b> kannst du die Karte prüfen.</p></article>
-          <article class="quick-guide-section"><h3>6 · PHASEN</h3><p>Jede Runde besteht aus Movement, Fire, GEV Movement und dem automatischen Hostile Turn. <b>END TURN</b> wechselt die Phase; offene Aktionen werden vorher bestätigt.</p></article>
+          <article class="quick-guide-section"><h3>6 · PHASEN</h3><p>Jede Runde besteht aus Movement, Fire, Skimmer Maneuver und dem automatischen Hostile Turn. <b>END TURN</b> wechselt die Phase; offene Aktionen werden vorher bestätigt.</p></article>
           <article class="quick-guide-section"><h3>7 · KAMPFRESULTATE</h3><p><b>NE</b> bedeutet kein Effekt. <b>D</b> deaktiviert Fahrzeuge vorübergehend oder reduziert Infanterie. <b>X</b> zerstört das Ziel. Wracks bleiben sichtbar.</p></article>
-          <article class="quick-guide-section"><h3>8 · TRANSPORT</h3><p>Wähle Infanterie und klicke einen erreichbaren GEV-PC oder nutze dessen <b>+</b>. Ein-/Aussteigen verbraucht die Infanteriebewegung. In der Fire Phase wählst du Passagiere in der Cargo-Leiste zum Feuern. <kbd>L</kbd> öffnet Laden oder Entladen.</p></article>
+          <article class="quick-guide-section"><h3>8 · TRANSPORT</h3><p>Wähle Infanterie und klicke einen erreichbaren Skimmer Carrier oder nutze dessen <b>+</b>. Ein-/Aussteigen verbraucht die Infanteriebewegung. In der Fire Phase wählst du Passagiere in der Cargo-Leiste zum Feuern. <kbd>L</kbd> öffnet Laden oder Entladen.</p></article>
           <article class="quick-guide-section"><h3>9 · ZIEL</h3><p>Zerstöre den Command Core beziehungsweise Relay Node. Nach Sieg oder Niederlage bleibt der Combat Log sichtbar; <b>RESTART</b> beginnt die Mission neu.</p></article>
         </div>
         <div class="quick-guide-footer">TIPP · Öffne den UNIT GUIDE für Einheitenwerte und Sonderrollen. Die Szenarien UNIT TRIAL und RELAY RUN eignen sich zum Testen einzelner Mechaniken.</div>
@@ -177,7 +175,7 @@
     </div>    <div id="unit-guide-modal" class="modal guide-modal hidden" role="dialog" aria-modal="true" aria-labelledby="guide-title">
       <section class="guide-card">
         <div class="guide-head"><div><span class="eyebrow">TACTICAL ARCHIVE</span><h2 id="guide-title">UNIT GUIDE</h2></div><button id="unit-guide-close" class="guide-close" aria-label="Einheitenführer schließen">×</button></div>
-        <div class="guide-body"><div id="guide-symbol" class="guide-symbol">G</div><div><span id="guide-kicker" class="guide-kicker">FRIENDLY SYSTEM</span><h3 id="guide-name">GOBLIN MK III</h3><div id="guide-role" class="guide-role">HEAVY ASSAULT</div><p id="guide-copy" class="guide-copy"></p><div id="guide-facts" class="guide-facts"></div></div></div>
+        <div class="guide-body"><div id="guide-symbol" class="guide-symbol">G</div><div><span id="guide-kicker" class="guide-kicker">FRIENDLY SYSTEM</span><h3 id="guide-name">GOBLIN SIEGEBREAKER</h3><div id="guide-role" class="guide-role">HEAVY ASSAULT</div><p id="guide-copy" class="guide-copy"></p><div id="guide-facts" class="guide-facts"></div></div></div>
         <div class="guide-nav"><button id="guide-prev">← PREVIOUS</button><span id="guide-count" class="guide-count">01 / 20</span><button id="guide-next">NEXT →</button></div>
       </section>
     </div>

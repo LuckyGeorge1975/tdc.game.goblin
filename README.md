@@ -11,8 +11,8 @@ Aktueller Übergabestand: **0.1.5 / Build 5**. Änderungen stehen im [Changelog]
 Enthalten sind:
 
 - Hexfeldkarte mit offenem Gelände sowie Berg-/Trümmerfeldern
-- Bewegung mit Gelände- und Belegungskosten sowie expliziten Bewegungsmodi für Kettenfahrzeuge, Infanterie, GEVs und stationäre Einheiten
-- getrennte Movement-, Fire- und GEV-Zweitbewegungsphasen
+- Bewegung mit Gelände- und Belegungskosten sowie expliziten Bewegungsmodi für Kettenfahrzeuge, Infanterie, Skimmer und stationäre Einheiten
+- getrennte Movement-, Fire- und Skimmer-Manöverphasen
 - Einheitliche Spiel-Dialoge für Phasenende, Szenariowechsel und Neustart. Escape bricht ab; Tab und Enter bedienen den Dialog. Spielkürzel und AUTO sind währenddessen gesperrt. „Never ask again“ gilt ausschließlich für das Phasenende. Keine Browser-Messageboxen.
 - Taste `L` beim ausgewählten Transporter: ohne Fracht Ladeauswahl wie `+`; mit Fracht Zielfelder zum Entladen der ersten geladenen Einheit anzeigen. Es gelten dieselben Phasenregeln wie beim Klick.
 - `BACK` nimmt Befehle der aktuellen Phase einzeln zurück: Bewegung, Feuer, Rammen und Transport inklusive Aktionsstatus und Kampflog. Phasenwechsel und Spielende schließen die Historie ab. AUTO wartet nach dem letzten Befehl zwei Sekunden; mit AUTO aus bleibt Zeit bis zum manuellen Phasenwechsel. Wiederholte Schüsse verwenden denselben gespeicherten Würfelwurf.
@@ -25,9 +25,9 @@ Enthalten sind:
 - Area-Modi `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`
 - optionales Hex-Grid und oberster Feld-Fokusmarker
 - Quick-Start-Guide, Einheiten-Guide mit Basis- und Erweiterungseinheiten sowie kombinierte Feld- und Einheiteninformationen
-- GEV-PC-Transport im Szenario `UNIT TRIAL`: Kapazität wird in Infanterie-Stärkepunkten geführt; Ein-/Aussteigen verbraucht die Infanteriebewegung, nicht die Bewegung des Trägers
-- Transportierte Infanterie kann aus dem GEV-PC feuern. Angriffe auf die Kombination verwenden einen gemeinsamen Würfelwurf, werden aber getrennt gegen Träger und Passagiere ausgewertet
-- Der GOBLIN MK III besitzt einen eigenen Systemzustand für Hauptbatterie, Sekundärbatterien, Raketen, AP-Systeme und 45 Ketteneinheiten. Gegnerische Treffer werden gegen ein einzelnes System ausgewertet; Kettenschäden reduzieren seine Bewegung bei 30, 15 und 0 verbleibenden Kettenpunkten.
+- Skimmer-Carrier-Transport im Szenario `UNIT TRIAL`: Kapazität wird in Infanterie-Stärkepunkten geführt; Ein-/Aussteigen verbraucht die Infanteriebewegung, nicht die Bewegung des Trägers
+- Transportierte Infanterie kann aus dem Skimmer Carrier feuern. Angriffe auf die Kombination verwenden einen gemeinsamen Würfelwurf, werden aber getrennt gegen Träger und Passagiere ausgewertet
+- Der GOBLIN SIEGEBREAKER besitzt einen eigenen Systemzustand für Hauptbatterie, Sekundärbatterien, Raketen, Nahbereichsschutz und 45 Ketteneinheiten. Gegnerische Treffer werden gegen ein einzelnes System ausgewertet; Kettenschäden reduzieren seine Bewegung bei 30, 15 und 0 verbleibenden Kettenpunkten.
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
 ## Lokal starten
@@ -57,14 +57,16 @@ Gegnerische Fahrzeuge können zur Information und zur Anzeige ihrer Bereiche aus
 
 ## Regelbasis und Tests
 
-Die verbindliche Regelmatrix steht in [RULE_MATRIX.md](RULE_MATRIX.md). Die zentrale, testbare Regelbasis liegt in [rules.mjs](rules.mjs). Die aktuellen Regressionstests werden ausgeführt mit:
+Die verbindliche Regelmatrix steht in [RULE_MATRIX.md](RULE_MATRIX.md). Die zentrale, testbare Regelbasis liegt in [rules.mjs](rules.mjs). Die Content-Abgrenzung, Benennungsstandards und offenen Prüfpunkte für Legal stehen in [CONTENT-CLEARANCE.md](CONTENT-CLEARANCE.md); die öffentlichen Herkunftshinweise in [CONTENT-NOTICES.md](CONTENT-NOTICES.md).
+
+Die aktuellen Regressionstests werden ausgeführt mit:
 
 ```powershell
 node scripts/verify-release.mjs
 node --test tests/*.test.mjs
 ```
 
-Die Tests decken derzeit Einheitengrundwerte, den kanonischen Einheitenkatalog, Oger-Systemdaten, Hex-Distanzen, Geländekosten, Sichtlinienflags, CRT-Verhältnisse sowie Deaktivierung und Zerstörung ab.
+Die Tests decken derzeit Einheitengrundwerte, den G.O.B.L.I.N.-Einheitenkatalog, Plattform-Systemdaten, Hex-Distanzen, Geländekosten, Sichtlinienflags, CRT-Verhältnisse sowie Deaktivierung und Zerstörung ab.
 
 ## Versionierung und Tester-Übergabe
 
@@ -76,9 +78,9 @@ Tester geben die sichtbare Version aus der Kopfzeile in jedem Bericht an. Für s
 
 - Die Feuerergebnisse sind noch zufallsbasiert; ein reproduzierbarer Testwürfel fehlt.
 - Deckung blockiert derzeit die Sichtlinie, verändert aber noch nicht separat die Verteidigungswerte.
-- Die kanonischen Einheitenwerte sind jetzt katalogisiert. Die aktive Mission verwendet weiterhin bewusst eine kleinere Prototypauswahl, bis die jeweiligen Sonderregeln integriert sind.
-- Oger-Komponenten, Cruise Missiles, Overrun, Engineering, indirektes Feuer und Verstärkungen sind noch nicht vollständig spielbar; Transport ist zunächst auf den GEV-PC begrenzt, bildet dessen grundlegende Bewegungs-, Feuer- und Schadensregeln aber ab.
+- Die Einheitenwerte sind jetzt im eigenständigen G.O.B.L.I.N.-Katalog erfasst. Die aktive Mission verwendet weiterhin bewusst eine kleinere Prototypauswahl, bis die jeweiligen Sonderregeln integriert sind.
+- Plattform-Komponenten, strategische Lenkflugkörper, Nahbereichsgefechte, Engineering, indirektes Feuer und Verstärkungen sind noch nicht vollständig spielbar; Transport ist zunächst auf den Skimmer Carrier begrenzt, bildet dessen grundlegende Bewegungs-, Feuer- und Schadensregeln aber ab.
 
 ## Nächste Ausbaustufe
 
-Als Nächstes wird das begonnene GOBLIN-Systemmodell um die aktive Waffenauswahl und mehrere Schüsse pro Feuerphase ergänzt. Danach folgen Cruise Missiles, Overrun und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.
+Als Nächstes wird das begonnene GOBLIN-Systemmodell um die aktive Waffenauswahl und mehrere Schüsse pro Feuerphase ergänzt. Danach folgen strategische Lenkflugkörper, Nahbereichsgefechte und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.

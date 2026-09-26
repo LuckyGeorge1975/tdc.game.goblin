@@ -2,6 +2,16 @@
 
 Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
 
+## [Unreleased]
+
+### Content & Legal
+
+- Sichtbare Einheiten-, Phasen- und Katalogbezeichnungen auf die eigenständige G.O.B.L.I.N.-Nomenklatur umgestellt.
+- Erweiterungs- und Produktbezüge durch die internen Linien `CORE`, `EXPEDITIONARY`, `FRONTIER`, `SUPPORT` und `AUTONOMOUS` ersetzt.
+- Externe Webfonts entfernt und durch lokale Systemschrift-Stacks ersetzt.
+- Footer und Dokumentation um klare Herkunfts- und Unabhängigkeitshinweise ergänzt.
+- Content-Clearance und Drittanbieter-Inventar für die Legal-Prüfung angelegt.
+
 ## [0.1.5] - 2026-09-26
 
 ### Hinzugefügt
@@ -9,7 +19,7 @@ Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversio
 - Zentraler Release- und Übergabemechanismus mit sichtbarer Buildnummer, Changelog und Tester-Checkliste.
 - Automatische Deployment-Sperre, falls die Buildnummer nicht erhöht wurde oder der Changelog-Eintrag fehlt.
 - GOBLIN-Systemmodell mit getrennten Haupt- und Sekundärbatterien, Raketen, AP-Systemen und 45 Kettenpunkten.
-- Regelgerechte Transportzustände, Passagierfeuer und getrennte Schadensauswertung für GEV-PC und transportierte Infanterie.
+- Regelgerechte Transportzustände, Passagierfeuer und getrennte Schadensauswertung für den Skimmer Carrier und transportierte Infanterie.
 - Phasenlokaler `BACK`-Befehl mit stabilen Kampfwürfen.
 - Gemeinsames In-Game-Dialogsystem für Phasenende, Szenariowechsel und Neustart.
 
