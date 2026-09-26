@@ -44,6 +44,8 @@ test('L opens loading or the first passenger unloading, respecting phase and foc
   assert.equal(run('transportLoadMode.id'),'gev-pc');
   assert.equal(run('phaseCommands.length'),0);
   run("embark(units[3],units[2]);handleTransportShortcut({key:'L',preventDefault(){}})");
+  assert.equal(run('transportUnloadMode'),null);
+  run("resetActionState();handleTransportShortcut({key:'L',preventDefault(){}})");
   assert.equal(run('transportUnloadMode.cargo.id'),'infantry');
   run("setTurnPhase('fire');handleTransportShortcut({key:'l',preventDefault(){}})");
   assert.equal(run('transportUnloadMode'),null);
@@ -68,16 +70,56 @@ test('movement commands undo in reverse order, restoring log and action budgets'
   assert.equal(run("document.querySelector('#undo-command').disabled"),true);
 });
 
-test('loading and unloading restore passenger placement and carrier flags',()=>{
+test('loading spends only infantry movement and cannot be reversed by immediate unloading',()=>{
   const {run}=game();
   run('selected=units[2]; embark(units[3],units[2]); unloadAt(units[2],units[3],3,7)');
-  assert.equal(run('phaseCommands.length'),2);
-  run('undoPhaseCommand()');
+  assert.equal(run('phaseCommands.length'),1);
   assert.equal(run('units[3].embarkedOn'),'gev-pc');
+  assert.equal(run('units[3].embarkedThisTurn'),true);
+  assert.equal(run('units[2].moved'),false);
   run('undoPhaseCommand()');
   assert.equal(run('units[3].embarkedOn'),undefined);
   assert.equal(run('units[3].y'),7);
   assert.equal(run('!!units[2].moved'),false);
+});
+
+test('dismounted infantry cannot move or re-embark during the same turn',()=>{
+  const {run}=game();
+  run("units[3].embarkedOn='gev-pc';units[3].x=units[2].x;units[3].y=units[2].y;resetActionState();unloadAt(units[2],units[3],3,7)");
+  assert.equal(run('units[3].embarkedOn'),null);
+  assert.equal(run('units[3].disembarkedThisTurn'),true);
+  assert.equal(run('canMoveUnit(units[3])'),false);
+  assert.equal(run('canEmbark(units[3],units[2])'),false);
+  run('undoPhaseCommand()');
+  assert.equal(run('units[3].embarkedOn'),'gev-pc');
+});
+
+test('mounted infantry may fire but is not an independent movement target',()=>{
+  const {run}=game();
+  run("units[3].embarkedOn='gev-pc';units[3].x=units[2].x;units[3].y=units[2].y;setTurnPhase('fire');terrain.clear();units[5].x=4;units[5].y=6");
+  assert.equal(run("phaseCanAct(units[3],'movement')"),false);
+  assert.equal(run("phaseCanAct(units[3],'fire')"),true);
+  run('attack(units[3],units[5])');
+  assert.equal(run('units[3].fired'),true);
+});
+
+test('one attack roll is resolved separately against carrier and riders',()=>{
+  const {run}=game();
+  run("units[3].embarkedOn='gev-pc';units[3].x=units[2].x;units[3].y=units[2].y;globalThis.combo=combatOutcome(units[5],units[2])");
+  assert.equal(run('combo.passengers.length'),1);
+  assert.equal(run('combo.passengers[0].outcome.result'),run('units[3].lastOutcome'));
+  assert.equal(run('combo.roll>=0&&combo.roll<=5'),true);
+});
+
+test('a rider can survive a destroyed carrier and is placed in its hex',()=>{
+  const {run}=game();
+  run("units[3].embarkedOn='gev-pc';units[3].x=units[2].x;units[3].y=units[2].y;units[2].defense=1;units[3].defense=10;phaseRolls=[0.5];phaseRollCursor=0;globalThis.combo=combatOutcome(units[5],units[2])");
+  assert.equal(run('units[2].hp'),0);
+  assert.ok(run('units[3].hp')>0);
+  assert.equal(run('units[3].embarkedOn'),null);
+  assert.equal(run('units[3].x'),run('units[2].x'));
+  assert.equal(run('units[3].y'),run('units[2].y'));
+  assert.notEqual(run('combo.result'),run('combo.passengers[0].outcome.result'));
 });
 
 test('fire undo restores damage and firing budget; repeating a shot cannot reroll',()=>{

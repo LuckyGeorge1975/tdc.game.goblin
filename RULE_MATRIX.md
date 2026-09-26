@@ -45,7 +45,7 @@ Die Werte unten sind aus der frei verfügbaren SJG-Regelreferenz für die gemein
 | Berg-/Trümmerfeld | 2 | ja | blockiert | implementiert |
 | Belegtes Feld | — | — | — | für Bewegung blockiert; Ziel-/Rammregeln separat |
 
-Das Szenario `UNIT TRIAL` stellt den neuen Katalog mit Heavy Tank, Light Tank, GEV-PC und Combat Engineers erstmals im Spielfluss bereit. Combat Engineers können im Movement in den benachbarten GEV-PC einsteigen und über die Transport-Schaltfläche an einem freien Nachbarfeld aussteigen. Sonderregeln dieser Einheiten sind weiterhin bewusst begrenzt.
+Das Szenario `UNIT TRIAL` stellt den neuen Katalog mit Heavy Tank, Light Tank, GEV-PC und Combat Engineers erstmals im Spielfluss bereit. Combat Engineers können im Movement in den benachbarten GEV-PC einsteigen und über die Transport-Schaltfläche an einem freien Nachbarfeld aussteigen. Die Kapazität des GEV-PC wird in Infanterie-Stärkepunkten gezählt.
 
 ## 3. Phasen und Aktionen
 
@@ -78,7 +78,9 @@ Eine Einheit darf in einem Zug grundsätzlich bewegen und feuern, sofern die jew
 - Gelände kostet Bewegung und blockiert Sichtlinie. Die Bewegungsvorschau und die tatsächliche Pfadprüfung verwenden dieselbe Pfadlogik.
 - Ein Ziel ist nur beschießbar, wenn es in Reichweite liegt und die Sichtlinie frei ist.
 - Zerstörte Einheiten bleiben als Wracks auf der Karte sichtbar.
-- Der GEV-PC kann bis zu drei Infanterieeinheiten aufnehmen; im aktuellen Prototyp wird jeweils eine Infanterieeinheit pro Ein-/Ausstieg gehandhabt. Eingeschiffte Einheiten werden nicht separat auf der Karte gezeichnet und folgen der Position des Trägers.
+- Der GEV-PC kann bis zu drei Infanterie-Stärkepunkte aufnehmen. Einsteigen verbraucht die volle Bewegung der Infanterie; der Träger darf im selben Zug normal fahren. Ausgestiegene Infanterie darf in diesem Zug weder selbständig weiterziehen noch wieder einsteigen.
+- Infanterie darf in dem Zug feuern, in dem sie ein- oder aussteigt, und kann vom GEV-PC aus feuern. Sie wird über dessen Cargo-Leiste ausgewählt.
+- Bei einem Angriff auf Träger und Passagiere gilt ein gemeinsamer Würfelwurf. Die Kampfquote und Wirkung werden für Träger und Infanterie getrennt berechnet; überlebende Passagiere eines zerstörten Trägers verbleiben im Trägerfeld.
 
 ## 6. Anzeigevertrag
 
@@ -93,5 +95,5 @@ Eine Einheit darf in einem Zug grundsätzlich bewegen und feuern, sofern die jew
 1. Oger-Komponenten (Waffen, Raketen, Antipersonenwaffen, Ketten) sind katalogisiert, aber noch nicht als getrennte Schadensobjekte spielbar.
 2. Trefferwürfel und CRT-Ergebnisse sind noch zufallsbasiert und nicht als reproduzierbarer Testmodus verfügbar.
 3. Deckung, indirektes Feuer und die unterschiedlichen Bewegungsmodi sind noch nicht vollständig als Verteidigungs- und Sichtregeln integriert.
-4. Transportfeuer, Cruise Missiles, Overrun, Engineering und Verstärkungen fehlen noch oder sind nur als Prototyp-Sonderfälle umgesetzt.
+4. Weitere Transporttypen, Cruise Missiles, Overrun, Engineering und Verstärkungen fehlen noch oder sind nur als Prototyp-Sonderfälle umgesetzt.
 5. KI-Zielprioritäten und Szenario-Verstärkungen sind noch vereinfacht.
