@@ -168,7 +168,7 @@ test('AUTO waits after last command and BACK cancels its pending phase change',(
   assert.equal(run('turnPhase'),'movement');assert.equal(run('!!units[0].moved'),false);
 });
 
-test('GEV second movement restores only its second-move budget',()=>{
+test('Skimmer second movement restores only its second-move budget',()=>{
   const {run}=game();
   run("units[2].moved=true;setTurnPhase('gev');selected=units[2];handleHex(3,5)");
   assert.equal(run('units[2].secondMoved'),true);

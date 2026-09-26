@@ -7,7 +7,7 @@ const context=vm.createContext({});
 vm.runInContext(readFileSync(new URL('../ogre-systems.js',import.meta.url),'utf8'),context);
 const systems=context.GoblinSystems;
 
-test('Mk III starts with its canonical weapon and tread inventory',()=>{
+test('Siegebreaker starts with its weapon and tread inventory',()=>{
   const state=systems.createMarkIII(),summary=systems.summary(state);
   assert.equal(summary.treads,'45/45');
   assert.deepEqual({...summary.weapons},{main:'1/1',secondary:'4/4',missiles:'2/2',antipersonnel:'8/8'});
@@ -18,7 +18,7 @@ test('tread thresholds reduce movement at 30, 15, and 0',()=>{
   assert.deepEqual([45,31,30,16,15,1,0].map(systems.movementForTreads),[3,3,2,2,1,1,0]);
 });
 
-test('D has no effect on Ogre weapons while X destroys one system',()=>{
+test('D has no effect on platform weapons while X destroys one system',()=>{
   const state=systems.createMarkIII();
   systems.applyHit(state,'secondary','D',6);
   assert.equal(systems.weaponRemaining(state.weapons.secondary),4);

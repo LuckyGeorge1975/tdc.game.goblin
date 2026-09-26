@@ -27,7 +27,7 @@
       const state=unit.hp<=0?'DESTROYED':unit.disabled?'DISABLED':'OPERATIONAL';
       facts.innerHTML=`<div><span>DEFENSE</span><b>${unit.defense??0}</b></div><div><span>DAMAGE STATE</span><b>${unit.disabled?'1/2':'0/2'}</b></div><div><span>STATUS</span><b>${state}</b></div>`+
         (unit.disabled?`<div><span>RECOVERY</span><b>TURN ${unit.disabledUntil}</b></div><div><span>NEXT D / X</span><b>DESTROYS</b></div>`:'');
-      $('#unit-intel-copy').textContent=`${unit.type} · HARDENED COMMAND POST · SECTOR ${String.fromCharCode(65+unit.x)}-${String(unit.y+1).padStart(2,'0')}`;
+      $('#unit-intel-copy').textContent=`${unit.type} · HARDENED COMMAND HUB · SECTOR ${String.fromCharCode(65+unit.x)}-${String(unit.y+1).padStart(2,'0')}`;
     }else if(unit.disabled){
       facts.innerHTML+=`<div><span>RECOVERY</span><b>TURN ${unit.disabledUntil}</b></div><div><span>NEXT D / X</span><b>DESTROYS</b></div>`;
     }

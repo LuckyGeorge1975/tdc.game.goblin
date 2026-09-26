@@ -2,6 +2,16 @@
 
 Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
 
+## [0.1.7] - 2026-09-26
+
+### Content & Legal
+
+- Sichtbare Einheiten-, Phasen- und Katalogbezeichnungen auf die eigenständige G.O.B.L.I.N.-Nomenklatur umgestellt.
+- Erweiterungs- und Produktbezüge durch die internen Linien `CORE`, `EXPEDITIONARY`, `FRONTIER`, `SUPPORT` und `AUTONOMOUS` ersetzt.
+- Externe Webfonts entfernt und durch lokale Systemschrift-Stacks ersetzt.
+- Footer und Dokumentation um klare Herkunfts- und Unabhängigkeitshinweise ergänzt.
+- Versionierte Content-Clearance und ein Drittanbieter-Inventar für die ausstehende Legal-Prüfung angelegt.
+
 ## [0.1.6] - 2026-09-26
 
 ### Hinzugefügt
@@ -11,7 +21,7 @@ Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversio
 
 ### Geändert
 
-- Command Post und Objective zeigen den regelrelevanten Schadenszustand `0/2` beziehungsweise `1/2` statt irreführender Trefferpunkte.
+- Command Hub und Objective zeigen den regelrelevanten Schadenszustand `0/2` beziehungsweise `1/2` statt irreführender Trefferpunkte.
 - Unit Intel und Kampfprotokoll erklären Deaktivierungsdauer sowie die Folge eines weiteren `D`- oder `X`-Treffers.
 - Deaktivierte Einheiten sind in Liste und Karte klar von Einheiten getrennt, die in der aktuellen Phase bereits gehandelt haben.
 
@@ -27,7 +37,7 @@ Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversio
 - Zentraler Release- und Übergabemechanismus mit sichtbarer Buildnummer, Changelog und Tester-Checkliste.
 - Automatische Deployment-Sperre, falls die Buildnummer nicht erhöht wurde oder der Changelog-Eintrag fehlt.
 - GOBLIN-Systemmodell mit getrennten Haupt- und Sekundärbatterien, Raketen, AP-Systemen und 45 Kettenpunkten.
-- Regelgerechte Transportzustände, Passagierfeuer und getrennte Schadensauswertung für GEV-PC und transportierte Infanterie.
+- Regelgerechte Transportzustände, Passagierfeuer und getrennte Schadensauswertung für den Skimmer Carrier und transportierte Infanterie.
 - Phasenlokaler `BACK`-Befehl mit stabilen Kampfwürfen.
 - Gemeinsames In-Game-Dialogsystem für Phasenende, Szenariowechsel und Neustart.
 

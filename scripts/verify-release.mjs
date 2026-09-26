@@ -20,10 +20,10 @@ if(Number(release.version.split('.').at(-1))!==release.build)throw new Error('Bu
 if(!changelog.includes(`## [${release.version}] - ${release.releasedAt}`))throw new Error(`Changelog-Eintrag für ${release.version} fehlt.`);
 if(!handoff.includes(`| Version | \`${release.version}\` |`)||!handoff.includes(`| Build | \`${release.build}\` |`))throw new Error('Tester-Handoff enthält nicht die aktuelle Version.');
 if(!index.includes(`release.js?v=${release.build}`)||!index.includes('id="build-version"'))throw new Error('Versionsanzeige ist nicht korrekt in index.html eingebunden.');
-for(const report of readdirSync('.').filter(name=>/(?:REPORT|REVIEW).*\.md$/i.test(name)&&name!=='REPORTS.md')){
+for(const report of readdirSync('.').filter(name=>/(?:REPORT|REVIEW|CLEARANCE|NOTICES).*\.md$/i.test(name)&&name!=='REPORTS.md')){
   const source=readFileSync(report,'utf8');
   if(!reportsIndex.includes(`](${report})`))throw new Error(`${report} fehlt in REPORTS.md.`);
-  if(!/\*\*(?:Berichtsversion|Report version):\*\*\s+\d+/i.test(source))throw new Error(`${report} besitzt keine Berichtsversion.`);
+  if(!/\*\*(?:Berichtsversion|Report version|Document version):\*\*\s+\d+/i.test(source))throw new Error(`${report} besitzt keine Dokumentversion.`);
 }
 
 const previousArg=process.argv.find(arg=>arg.startsWith('--previous='));

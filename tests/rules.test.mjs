@@ -32,11 +32,11 @@ test('D disables vehicles, damages infantry, and destroys disabled vehicles', ()
   assert.equal(applyCombatResult({ hp: 3, disabled: true }, 'D').hp, 0);
   assert.equal(applyCombatResult({ hp: 3 }, 'X').hp, 0);
 });
-test('canonical unit catalogue covers core and expansion units', () => {
+test('original unit catalogue covers core and specialist units', () => {
   assert.equal(UNIT_CATALOG.heavyTank.attack, 4);
   assert.deepEqual(UNIT_CATALOG.gev.movement, [4, 3]);
   assert.equal(UNIT_CATALOG.gevPc.transportSquads, 3);
-  assert.equal(UNIT_CATALOG.militia.source, 'Battlefields');
+  assert.equal(UNIT_CATALOG.militia.source, 'FRONTIER');
   assert.equal(UNIT_CATALOG.combatEngineers.engineering, true);
   assert.equal(OGRE_SYSTEMS.mkIII.tread, 45);
   assert.equal(OGRE_SYSTEMS.vulcan.drones, true);
