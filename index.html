@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a1015" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1" />
     <title>G.O.B.L.I.N — Field Test</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -92,7 +93,7 @@
         </div>
         <div class="top-status">
           <span class="signal"><b></b> LIVE FEED</span>
-          <span id="build-version" class="build">FIELD TEST 0.1.5</span>
+          <span id="build-version" class="build">FIELD TEST 0.1.6</span>
           <div class="guide-actions"><button id="quick-start-open" class="action-button guide-button">QUICK START</button><button id="unit-guide-open" class="action-button guide-button">UNIT GUIDE</button></div>
         </div>
       </header>
@@ -182,15 +183,21 @@
       </section>
     </div>
     <link rel="stylesheet" href="dialogs.css?v=1" />
-    <script src="release.js?v=5"></script>
+    <script src="release.js?v=6"></script>
     <script src="dialogs.js?v=1"></script>
     <script src="ogre-systems.js?v=1"></script>
 <script src="game.js?v=37"></script>
     <script src="ogre-runtime.js?v=1"></script>
+    <script src="combat-feedback.js?v=1"></script>
     <script src="scenario.js?v=4"></script>
     <script src="unit-guide.js?v=4"></script>
     <script src="quick-start.js?v=1"></script>
-    <style>#undo-command:disabled{opacity:.35;cursor:not-allowed}</style>
+    <style>
+      #undo-command:disabled{opacity:.35;cursor:not-allowed}
+      .unit-card.disabled{opacity:.78;border-color:#9b6b3d;box-shadow:inset 3px 0 #e0a34f}
+      .unit-card.disabled .unit-type{color:#e0a34f}
+      .disabled-unit{opacity:.55!important;filter:grayscale(.85) sepia(.35) drop-shadow(0 0 5px #e0a34f99)!important}
+    </style>
     <script src="command-history.js?v=2"></script>
   </body>
 </html>

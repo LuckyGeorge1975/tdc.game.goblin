@@ -1,4 +1,4 @@
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import vm from 'node:vm';
 
@@ -13,12 +13,18 @@ const release=parseRelease(releaseSource);
 const changelog=readFileSync('CHANGELOG.md','utf8');
 const handoff=readFileSync('TEST_HANDOFF.md','utf8');
 const index=readFileSync('index.html','utf8');
+const reportsIndex=readFileSync('REPORTS.md','utf8');
 
 if(!/^0\.1\.\d+$/.test(release.version))throw new Error(`Ungültige Buildversion: ${release.version}`);
 if(Number(release.version.split('.').at(-1))!==release.build)throw new Error('Buildnummer und Versionssuffix stimmen nicht überein.');
 if(!changelog.includes(`## [${release.version}] - ${release.releasedAt}`))throw new Error(`Changelog-Eintrag für ${release.version} fehlt.`);
 if(!handoff.includes(`| Version | \`${release.version}\` |`)||!handoff.includes(`| Build | \`${release.build}\` |`))throw new Error('Tester-Handoff enthält nicht die aktuelle Version.');
-if(!index.includes('release.js?v=5')||!index.includes('id="build-version"'))throw new Error('Versionsanzeige ist nicht korrekt in index.html eingebunden.');
+if(!index.includes(`release.js?v=${release.build}`)||!index.includes('id="build-version"'))throw new Error('Versionsanzeige ist nicht korrekt in index.html eingebunden.');
+for(const report of readdirSync('.').filter(name=>/(?:REPORT|REVIEW).*\.md$/i.test(name)&&name!=='REPORTS.md')){
+  const source=readFileSync(report,'utf8');
+  if(!reportsIndex.includes(`](${report})`))throw new Error(`${report} fehlt in REPORTS.md.`);
+  if(!/\*\*(?:Berichtsversion|Report version):\*\*\s+\d+/i.test(source))throw new Error(`${report} besitzt keine Berichtsversion.`);
+}
 
 const previousArg=process.argv.find(arg=>arg.startsWith('--previous='));
 if(previousArg){

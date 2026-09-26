@@ -18,7 +18,7 @@ function game() {
     localStorage:{getItem(){return null}},
     setTimeout(fn){timers.set(++timerId,fn);return timerId},clearTimeout(id){timers.delete(id)}});
   const run = source => vm.runInContext(source,context);
-  for(const file of ['ogre-systems.js','game.js','ogre-runtime.js','scenario.js','command-history.js'])run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
+  for(const file of ['ogre-systems.js','game.js','ogre-runtime.js','combat-feedback.js','scenario.js','command-history.js'])run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
   run("draw=()=>{}; updateSelection=()=>{}; loadScenario('unit-trial');");
   return {run,timers};
 }
@@ -188,4 +188,20 @@ test('ramming restores the destroyed target and rejected commands add no history
   assert.equal(run('units[0].x'),1);
   run('selected=units[0];handleHex(11,0)');
   assert.equal(run('phaseCommands.length'),0);
+});
+
+test('hardened core intel reports damage state instead of misleading HP',()=>{
+  const {run}=game();
+  run("globalThis.core=units.find(unit=>unit.core);core.disabled=true;core.disabledUntil=3;showUnitInfo(core);CombatFeedback.updateObjectiveStatus()");
+  assert.equal(run("document.querySelector('#unit-intel-facts').innerHTML.includes('<span>HP</span>')"),false);
+  assert.equal(run("document.querySelector('#unit-intel-facts').innerHTML.includes('DAMAGE STATE')"),true);
+  assert.equal(run("document.querySelector('#unit-intel-facts').innerHTML.includes('NEXT D / X')"),true);
+  assert.equal(run("document.querySelector('#objective-text').textContent"),'CORE DISABLED · DAMAGE 1/2');
+});
+
+test('combat feedback distinguishes first disable from the destroying second D',()=>{
+  const {run}=game();
+  run("globalThis.core=units.find(unit=>unit.core);core.disabled=true;core.disabledUntil=3;globalThis.firstD=CombatFeedback.describeCombatEffect(core,{result:'D'},false);core.hp=0;globalThis.secondD=CombatFeedback.describeCombatEffect(core,{result:'D'},true)");
+  assert.equal(run("firstD.includes('NÄCHSTES D ODER X ZERSTÖRT')"),true);
+  assert.equal(run('secondD'),'ZWEITES D — CORE OFFLINE');
 });
