@@ -2,6 +2,19 @@
 
 Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
 
+## [0.1.9] - 2026-09-26
+
+### Hinzugefügt
+
+- Strategischer Raketenwerfer als fünfte eigene Einheit im Szenario `UNIT TRIAL`.
+- Einmaliger, zielgebundener Flächenschlag in der Feuerphase: Angriff 6 auf das gewählte Feindziel, Angriff 3 auf Einheiten in benachbarten Hexen – inklusive eigener Einheiten und transportierter Passagiere.
+- Munitionsanzeige in Unit Intel und Rücknahme des Raketenstarts über `BACK`.
+- Regeltests für Munition, Flächenschaden, Friendly Fire und Undo.
+
+### Präzisiert
+
+- Unit Guide, Quick Start und Regelmatrix kennzeichnen die derzeitige Sichtlinienpflicht und die einmalige Munition. Freies Zielen auf leere Hexfelder und weitere strategische Sonderregeln sind noch nicht enthalten.
+
 ## [0.1.8] - 2026-09-26
 
 ### Hinzugefügt

@@ -67,6 +67,7 @@
   register('infantry',{shape:'infantry',label:'I',scale:.92});
   register('core',{shape:'objective',label:'X'});
   register('missile',{shape:'tracked',label:'M'});
+  register('missile-crawler',{shape:'tracked',label:'C'});
   register('heavy-tank',{shape:'tracked',label:'A'});
   register('light-tank',{shape:'tracked',label:'R'});
   register('guard',{shape:'tracked',label:'G'});

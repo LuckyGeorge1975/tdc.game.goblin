@@ -29,7 +29,7 @@ Die Werte unten bilden den eigenständigen G.O.B.L.I.N.-Katalog. Die Herkunftssp
 | Combat Skimmer | 2 / 2 | 2 | 4 + 3 | CORE | Katalog; Zusatzmanöver vorhanden |
 | Light Skimmer | 1 / 2 | 1 | 4 + 3 | EXPEDITIONARY | Katalog |
 | Skimmer Carrier | 1 / 2 | 2 | 3 + 2 | EXPEDITIONARY | Katalog |
-| Strategic Missile Carrier | Sonderangriff | 2 | 1 | EXPEDITIONARY | Katalog |
+| Strategic Missile Carrier | 6 direkt / 3 Nachbarhexen, R 8 | 2 | 1 | EXPEDITIONARY | spielbar in UNIT TRIAL |
 | Artillery Drone | 2 / 8 | 1 | 0 | FRONTIER | Katalog |
 | Infantry / Amphibious Infantry | je Trupp | je Trupp | 2 | CORE / EXPEDITIONARY | Prototyp-Infanterie spielbar |
 | Field Engineers | 2 / 1 | 2 | 2 | SUPPORT | Katalog |
@@ -83,6 +83,7 @@ Eine Einheit darf in einem Zug grundsätzlich bewegen und feuern, sofern die jew
 - Der Skimmer Carrier kann bis zu drei Infanterie-Stärkepunkte aufnehmen. Einsteigen verbraucht die volle Bewegung der Infanterie; der Träger darf im selben Zug normal fahren. Ausgestiegene Infanterie darf in diesem Zug weder selbständig weiterziehen noch wieder einsteigen.
 - Infanterie darf in dem Zug feuern, in dem sie ein- oder aussteigt, und kann vom Skimmer Carrier aus feuern. Sie wird über dessen Cargo-Leiste ausgewählt.
 - Bei einem Angriff auf Träger und Passagiere gilt ein gemeinsamer Würfelwurf. Die Kampfquote und Wirkung werden für Träger und Infanterie getrennt berechnet; überlebende Passagiere eines zerstörten Trägers verbleiben im Trägerfeld.
+- Der Strategic Missile Carrier besitzt eine Rakete für das gesamte Szenario. In der Feuerphase kann ein sichtbares feindliches Ziel innerhalb von acht Hexfeldern gewählt werden. Das Ziel wird mit Angriff 6, alle Einheiten auf Nachbarhexen mit Angriff 3 getroffen; Friendly Fire ist möglich. Der Treffer auf Träger und ihre Passagiere folgt der bestehenden Passagierregel. Der Start ist innerhalb der Phase per `BACK` rückgängig zu machen.
 
 ## 6. Anzeigevertrag
 
@@ -97,5 +98,5 @@ Eine Einheit darf in einem Zug grundsätzlich bewegen und feuern, sofern die jew
 1. GOBLIN-Plattformkomponenten sind als getrennte Schadensobjekte spielbar; aktive Waffenauswahl und das Abfeuern aller noch intakten Waffen in einer Feuerphase fehlen noch.
 2. Trefferwürfel und CRT-Ergebnisse sind noch zufallsbasiert und nicht als reproduzierbarer Testmodus verfügbar.
 3. Deckung, indirektes Feuer und die unterschiedlichen Bewegungsmodi sind noch nicht vollständig als Verteidigungs- und Sichtregeln integriert.
-4. Weitere Transporttypen, strategische Lenkflugkörper, Nahbereichsgefechte, Engineering und Verstärkungen fehlen noch oder sind nur als Prototyp-Sonderfälle umgesetzt.
+4. Der strategische Lenkflugkörper ist als einmaliger zielgebundener Flächenschlag umgesetzt; freies Hexziel, weitere Transporttypen, Nahbereichsgefechte, Engineering und Verstärkungen fehlen noch oder sind nur als Prototyp-Sonderfälle umgesetzt.
 5. KI-Zielprioritäten und Szenario-Verstärkungen sind noch vereinfacht.

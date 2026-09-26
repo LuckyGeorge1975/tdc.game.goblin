@@ -6,7 +6,7 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 Der Prototyp ist spielbar und auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) veröffentlicht.
 
-Aktueller Übergabestand: **0.1.8 / Build 8**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
+Aktueller Übergabestand: **0.1.9 / Build 9**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
 
 Enthalten sind:
 
@@ -29,6 +29,7 @@ Enthalten sind:
 - Transportierte Infanterie kann aus dem Skimmer Carrier feuern. Angriffe auf die Kombination verwenden einen gemeinsamen Würfelwurf, werden aber getrennt gegen Träger und Passagiere ausgewertet
 - Der GOBLIN SIEGEBREAKER besitzt einen eigenen Systemzustand für Hauptbatterie, Sekundärbatterien, Raketen, Nahbereichsschutz und 45 Ketteneinheiten. Gegnerische Treffer werden gegen ein einzelnes System ausgewertet; Kettenschäden reduzieren seine Bewegung bei 30, 15 und 0 verbleibenden Kettenpunkten.
 - In der Fire Phase lassen sich die noch verfügbaren Waffensysteme des Siegebreakers einzeln auswählen und abfeuern. Nicht verbrauchte Batterien halten die Einheit handlungsfähig; Raketenmunition bleibt über Runden hinweg verbraucht.
+- Der Strategic Missile Carrier ist in `UNIT TRIAL` spielbar: eine Rakete pro Mission, Angriff 6 auf ein sichtbares Feindziel innerhalb von acht Hexen und Angriff 3 auf alle Einheiten in Nachbarhexen. Friendly Fire ist möglich; `BACK` stellt die Rakete innerhalb der Feuerphase wieder her.
 - Kartenmarker werden zentral über [UNIT_VISUALS.md](UNIT_VISUALS.md) konfiguriert. Lokale SVG-, PNG- oder WebP-Dateien können pro stabiler Einheiten-ID ausgetauscht werden, ohne Regeln oder Szenarien zu ändern.
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
@@ -81,8 +82,8 @@ Tester geben die sichtbare Version aus der Kopfzeile in jedem Bericht an. Für s
 - Die Feuerergebnisse sind noch zufallsbasiert; ein reproduzierbarer Testwürfel fehlt.
 - Deckung blockiert derzeit die Sichtlinie, verändert aber noch nicht separat die Verteidigungswerte.
 - Die Einheitenwerte sind jetzt im eigenständigen G.O.B.L.I.N.-Katalog erfasst. Die aktive Mission verwendet weiterhin bewusst eine kleinere Prototypauswahl, bis die jeweiligen Sonderregeln integriert sind.
-- Plattform-Komponenten, strategische Lenkflugkörper, Nahbereichsgefechte, Engineering, indirektes Feuer und Verstärkungen sind noch nicht vollständig spielbar; Transport ist zunächst auf den Skimmer Carrier begrenzt, bildet dessen grundlegende Bewegungs-, Feuer- und Schadensregeln aber ab.
+- Weitere strategische Raketenregeln (freies Zielen auf leere Hexfelder), Nahbereichsgefechte, Engineering, indirektes Feuer und Verstärkungen sind noch nicht vollständig spielbar; Transport ist zunächst auf den Skimmer Carrier begrenzt, bildet dessen grundlegende Bewegungs-, Feuer- und Schadensregeln aber ab.
 
 ## Nächste Ausbaustufe
 
-Als Nächstes folgen strategische Lenkflugkörper, Nahbereichsgefechte und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.
+Als Nächstes folgen Nahbereichsgefechte und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.

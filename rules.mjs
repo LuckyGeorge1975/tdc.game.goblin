@@ -51,7 +51,7 @@ export const UNIT_CATALOG = Object.freeze({
   gev: Object.freeze({ id: 'gev', name: 'COMBAT SKIMMER', attack: 2, range: 2, defense: 2, movement: [4, 3], mode: 'gev', source: 'CORE' }),
   lightGev: Object.freeze({ id: 'light-gev', name: 'LIGHT SKIMMER', attack: 1, range: 2, defense: 1, movement: [4, 3], mode: 'gev', halfUnit: true, source: 'EXPEDITIONARY' }),
   gevPc: Object.freeze({ id: 'gev-pc', name: 'SKIMMER CARRIER', attack: 1, range: 2, defense: 2, movement: [3, 2], mode: 'gev', transportSquads: 3, source: 'EXPEDITIONARY' }),
-  missileCrawler: Object.freeze({ id: 'missile-crawler', name: 'STRATEGIC MISSILE CARRIER', attack: 0, range: 0, defense: 2, movement: [1], mode: 'tracked', cruiseMissile: true, source: 'EXPEDITIONARY' }),
+  missileCrawler: Object.freeze({ id: 'missile-crawler', name: 'STRATEGIC MISSILE CARRIER', attack: 6, splashAttack: 3, blastRadius: 1, ammunition: 1, range: 8, defense: 2, movement: [1], mode: 'tracked', cruiseMissile: true, source: 'EXPEDITIONARY' }),
   lightArtilleryDrone: Object.freeze({ id: 'light-artillery-drone', name: 'ARTILLERY DRONE', attack: 2, range: 8, defense: 1, movement: [0], mode: 'fixed', transportable: true, source: 'FRONTIER' }),
   infantry: Object.freeze({ id: 'infantry', name: 'INFANTRY SQUAD', attack: 'squads', range: 1, defense: 'squads', movement: [2], mode: 'infantry', maxSquads: 3, source: 'CORE' }),
   marines: Object.freeze({ id: 'marines', name: 'AMPHIBIOUS INFANTRY', attack: 'squads', range: 1, defense: 'squads', movement: [2], mode: 'infantry', maxSquads: 3, waterCombat: true, source: 'EXPEDITIONARY' }),

@@ -28,7 +28,8 @@ const scenarioCatalog={
     {id:'infantry',name:'FIELD ENGINEERS',type:'FIELD ENGINEERING',team:'player',x:3,y:7,hp:2,maxHp:2,defense:2,range:1,move:2,damage:2,icon:'E',infantry:true,engineering:true},
     {id:'core',name:'COMMAND HUB',type:'FORTIFIED TARGET',team:'enemy',x:10,y:1,hp:5,maxHp:5,defense:5,range:0,move:0,damage:0,icon:'X',core:true},
     {id:'guard',name:'SIEGE TANK',type:'TWIN-GUN TANK DESTROYER',team:'enemy',x:8,y:2,hp:5,maxHp:5,defense:5,range:3,move:3,damage:6,icon:'S'},
-    {id:'raider',name:'LIGHT SKIMMER',type:'HOSTILE HOVERCRAFT',team:'enemy',x:9,y:5,hp:1,maxHp:1,defense:1,range:2,move:3,damage:1,icon:'L'}
+    {id:'raider',name:'LIGHT SKIMMER',type:'HOSTILE HOVERCRAFT',team:'enemy',x:9,y:5,hp:1,maxHp:1,defense:1,range:2,move:3,damage:1,icon:'L'},
+    {id:'missile-crawler',name:'STRATEGIC MISSILE CARRIER',type:'ONE-SHOT MISSILE PLATFORM',team:'player',x:0,y:7,hp:2,maxHp:2,defense:2,range:8,move:1,damage:6,icon:'C',strategicMissile:true,missilesRemaining:1}
   ]}
 };
 let currentScenario='iron-dust';

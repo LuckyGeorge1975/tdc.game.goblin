@@ -6,12 +6,12 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
 | Feld | Wert |
 |---|---|
-| Version | `0.1.8` |
-| Build | `8` |
-| Release-Tag | `v0.1.8` |
+| Version | `0.1.9` |
+| Build | `9` |
+| Release-Tag | `v0.1.9` |
 | Datum | 2026-09-26 |
-| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.8> |
-| Änderungen | [CHANGELOG.md](CHANGELOG.md#018---2026-09-26) |
+| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.9> |
+| Änderungen | [CHANGELOG.md](CHANGELOG.md#019---2026-09-26) |
 
 ## Übergabe durch den Developer
 
