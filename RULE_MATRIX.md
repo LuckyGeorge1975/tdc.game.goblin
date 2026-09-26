@@ -37,6 +37,8 @@ Die Werte unten bilden den eigenständigen G.O.B.L.I.N.-Katalog. Die Herkunftssp
 | Command Hub | — | 2 | 0 | CORE | Missionsziel spielbar |
 
 `*` Der Siege Tank kann den Angriff auf zwei gleich starke Angriffe aufteilen. Der GOBLIN SIEGEBREAKER wird nicht als einzelner HP-Wert behandelt: Hauptbatterie, Sekundärbatterien, Raketen, Nahbereichsschutz und Ketten besitzen getrennte Zustände. Gegnerangriffe zerstören einzelne Systeme; `D` wirkt nicht auf Plattformwaffen, erfolgreiche Kettenangriffe entfernen Kettenpunkte in Höhe der Angriffsstärke.
+
+Der Siegebreaker feuert jedes intakte Waffensystem separat. Haupt- und Sekundärbatterien sowie Nahbereichsschutz erhalten zu Beginn einer neuen Runde ihr Feuerbudget zurück. Abgeschossene Raketen bleiben verbraucht. Auswahl, Reichweitenoverlay und Zielprüfung verwenden stets das aktuell gewählte System.
 ## 2. Gelände
 
 | Gelände | Bewegungskosten | Deckung | Sichtlinie | Status |

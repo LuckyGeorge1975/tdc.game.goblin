@@ -2,6 +2,24 @@
 
 Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
 
+## [0.1.8] - 2026-09-26
+
+### Hinzugefügt
+
+- Aktive Waffenauswahl für den GOBLIN SIEGEBREAKER mit getrennten Feuerbudgets für Hauptbatterie, Sekundärbatterien, Raketen und Nahbereichsschutz.
+- Zentraler Visual-Katalog für Einheitengrafiken mit austauschbaren lokalen SVG-, PNG- oder WebP-Assets und stabilen `visualKey`-Schlüsseln.
+- Erweiterungshinweis `UNIT_VISUALS.md` sowie automatische Tests für lokale Assets, Waffenauswahl, Munition und Undo.
+
+### Geändert
+
+- Feuerreichweite, Zielmarkierung und Unit Intel folgen beim Siegebreaker dem aktuell gewählten Waffensystem.
+- Verbrauchte Batterien werden pro Runde zurückgesetzt; abgefeuerte Raketen bleiben verbraucht.
+- Mehrere noch intakte Waffensysteme können innerhalb derselben Fire Phase nacheinander feuern.
+
+### Behoben
+
+- Bereits zerstörte Raketenwerfer können keine Phantommunition mehr erzeugen.
+
 ## [0.1.7] - 2026-09-26
 
 ### Content & Legal

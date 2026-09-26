@@ -8,6 +8,7 @@
     <title>G.O.B.L.I.N — Field Test</title>
     <link rel="stylesheet" href="styles.css?v=3" />
     <link rel="stylesheet" href="content-brand.css?v=1" />
+    <link rel="stylesheet" href="unit-ui.css?v=1" />
     <style>
       .unit-svg { pointer-events: all; cursor: pointer; visibility: visible; opacity: 1; }
       .unit-svg.wreck { pointer-events: none; cursor: default; }
@@ -91,7 +92,7 @@
         </div>
         <div class="top-status">
           <span class="signal"><b></b> LIVE FEED</span>
-          <span id="build-version" class="build">FIELD TEST 0.1.7</span>
+          <span id="build-version" class="build">FIELD TEST 0.1.8</span>
           <div class="guide-actions"><button id="quick-start-open" class="action-button guide-button">QUICK START</button><button id="unit-guide-open" class="action-button guide-button">UNIT GUIDE</button></div>
         </div>
       </header>
@@ -133,7 +134,7 @@
             <div class="map-corner corner-tr">GRID // 12 × 8</div>
             <div class="map-corner corner-bl">LIVE TERRAIN SCAN</div>
             <div class="map-corner corner-br">DUST-7</div>
-            <svg id="battlefield-map" role="img" aria-label="Hexfeld-Schlachtfeld"></svg><div id="carrier-cargo" class="carrier-cargo hidden" aria-live="polite"></div>
+            <svg id="battlefield-map" role="img" aria-label="Hexfeld-Schlachtfeld"></svg><div id="carrier-cargo" class="carrier-cargo hidden" aria-live="polite"></div><div id="weapon-controls" class="weapon-controls hidden" aria-label="Waffenauswahl"></div>
             <div id="phase-transition" class="phase-transition" aria-live="polite"><div class="phase-transition-card"><small>PHASE TRANSITION</small><strong id="phase-transition-title">MOVEMENT PHASE</strong></div></div><div id="map-toast" class="map-toast">WÄHLE EINE EINHEIT</div>
           </div>
           <div class="battlefield-footer">
@@ -163,7 +164,7 @@
         <div class="quick-guide-grid">
           <article class="quick-guide-section"><h3>1 · AUSWÄHLEN</h3><p>Klicke auf ein Feld oder eine Einheit. Bei einer Einheit werden Unit Intel, Feldinformationen und die verfügbaren Bereiche angezeigt. <kbd>ESC</kbd> hebt die Auswahl auf.</p></article>
           <article class="quick-guide-section"><h3>2 · BEWEGEN</h3><p>Wähle eine eigene handlungsfähige Einheit und klicke ein grün markiertes Ziel. Gelände kostet zusätzliche Bewegung. Bereits bewegte Einheiten sind ausgegraut.</p></article>
-          <article class="quick-guide-section"><h3>3 · FEUERN</h3><p>In der Fire Phase wählst du ein sichtbares Ziel im roten Bereich. Die Feuerwahrscheinlichkeit folgt dem Verhältnis Angriff zu Verteidigung und kann NE, D oder X ergeben. <kbd>F</kbd> greift das nächste gültige Ziel an.</p></article>
+          <article class="quick-guide-section"><h3>3 · FEUERN</h3><p>In der Fire Phase wählst du ein sichtbares Ziel im roten Bereich. Beim Siegebreaker wählst du zuvor unter der Karte ein noch verfügbares Waffensystem; dessen Reichweite bestimmt das Overlay. Die Feuerwahrscheinlichkeit folgt dem Verhältnis Angriff zu Verteidigung und kann NE, D oder X ergeben. <kbd>F</kbd> greift das nächste gültige Ziel an.</p></article>
           <article class="quick-guide-section"><h3>4 · SKIMMER-PHASE</h3><p>Skimmer erhalten nach Bewegung und Feuer ein zusätzliches Manöver. Light Skimmer und Skimmer Carrier verwenden denselben Schwebefahrzeug-Modus.</p></article>
           <article class="quick-guide-section"><h3>5 · GELÄNDE</h3><p>Berg-/Trümmerfelder geben Deckung, kosten mehr Bewegung und blockieren die Sichtlinie. Mit den Schaltern <b>MOVEMENT RANGE</b>, <b>FIRE RANGE</b>, <b>LINE OF SIGHT</b> und <b>GRID</b> kannst du die Karte prüfen.</p></article>
           <article class="quick-guide-section"><h3>6 · PHASEN</h3><p>Jede Runde besteht aus Movement, Fire, Skimmer Maneuver und dem automatischen Hostile Turn. <b>END TURN</b> wechselt die Phase; offene Aktionen werden vorher bestätigt.</p></article>
@@ -181,12 +182,14 @@
       </section>
     </div>
     <link rel="stylesheet" href="dialogs.css?v=1" />
-    <script src="release.js?v=7"></script>
+    <script src="release.js?v=8"></script>
     <script src="dialogs.js?v=1"></script>
-    <script src="ogre-systems.js?v=1"></script>
-<script src="game.js?v=38"></script>
+    <script src="unit-visuals.js?v=1"></script>
+    <script src="ogre-systems.js?v=2"></script>
+<script src="game.js?v=39"></script>
     <script src="ogre-runtime.js?v=1"></script>
     <script src="combat-feedback.js?v=1"></script>
+    <script src="siegebreaker-weapons.js?v=1"></script>
     <script src="scenario.js?v=4"></script>
     <script src="unit-guide.js?v=5"></script>
     <script src="quick-start.js?v=1"></script>

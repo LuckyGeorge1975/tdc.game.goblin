@@ -18,7 +18,7 @@ function game() {
     localStorage:{getItem(){return null}},
     setTimeout(fn){timers.set(++timerId,fn);return timerId},clearTimeout(id){timers.delete(id)}});
   const run = source => vm.runInContext(source,context);
-  for(const file of ['ogre-systems.js','game.js','ogre-runtime.js','combat-feedback.js','scenario.js','command-history.js'])run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
+  for(const file of ['unit-visuals.js','ogre-systems.js','game.js','ogre-runtime.js','combat-feedback.js','siegebreaker-weapons.js','scenario.js','command-history.js'])run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
   run("draw=()=>{}; updateSelection=()=>{}; loadScenario('unit-trial');");
   return {run,timers};
 }
@@ -204,4 +204,15 @@ test('combat feedback distinguishes first disable from the destroying second D',
   run("globalThis.core=units.find(unit=>unit.core);core.disabled=true;core.disabledUntil=3;globalThis.firstD=CombatFeedback.describeCombatEffect(core,{result:'D'},false);core.hp=0;globalThis.secondD=CombatFeedback.describeCombatEffect(core,{result:'D'},true)");
   assert.equal(run("firstD.includes('NÄCHSTES D ODER X ZERSTÖRT')"),true);
   assert.equal(run('secondD'),'ZWEITES D — CORE OFFLINE');
+});
+
+test('Siegebreaker fires separate weapon systems and BACK restores the budget',()=>{
+  const {run}=game();
+  run("loadScenario('iron-dust');terrain.clear();setTurnPhase('fire');units[5].x=2;units[5].y=5;selected=units[0];SiegebreakerWeapons.selectWeapon(units[0],'main');attack(units[0],units[5])");
+  assert.equal(run("GoblinSystems.weaponReady(units[0].ogreSystems.weapons.main)"),0);
+  assert.equal(run("GoblinSystems.weaponReady(units[0].ogreSystems.weapons.secondary)"),4);
+  assert.equal(run('units[0].fired'),false);
+  assert.equal(run('phaseCommands.length'),1);
+  run('undoPhaseCommand()');
+  assert.equal(run("GoblinSystems.weaponReady(units[0].ogreSystems.weapons.main)"),1);
 });

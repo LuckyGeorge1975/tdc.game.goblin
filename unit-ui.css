@@ -1,0 +1,6 @@
+.unit-artwork{pointer-events:none}
+.weapon-controls{position:absolute;z-index:6;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:5px;padding:7px;background:#111d20e8;border:1px solid #536c25;box-shadow:0 8px 28px #0009}
+.weapon-controls.hidden{display:none}
+.weapon-control{min-width:90px;padding:6px 8px;background:#152127;border:1px solid #40565c;color:#9eb2ac;font:700 9px var(--body-font,"Segoe UI",Arial,sans-serif);letter-spacing:.08em;cursor:pointer}
+.weapon-control b,.weapon-control small{display:block}.weapon-control small{margin-top:3px;color:#6f8985;font-size:8px}
+.weapon-control.active{border-color:#d1f35a;background:#536c25;color:#f4ffcd}.weapon-control:disabled{opacity:.32;cursor:not-allowed}

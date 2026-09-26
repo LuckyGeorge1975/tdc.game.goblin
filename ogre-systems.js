@@ -7,9 +7,12 @@
   });
 
   function createMarkIII(){
-    return {model:'MK III',maxTreads:45,treads:45,weapons:Object.fromEntries(Object.entries(WEAPONS).map(([key,spec])=>[key,{...spec,destroyed:0,remaining:spec.count}]))};
+    return {model:'SIEGEBREAKER',selectedWeapon:'main',maxTreads:45,treads:45,weapons:Object.fromEntries(Object.entries(WEAPONS).map(([key,spec])=>[key,{...spec,destroyed:0,remaining:spec.count,firedThisPhase:0}]))};
   }
   function weaponRemaining(weapon){return Math.max(0,Math.min(weapon.remaining,weapon.count-weapon.destroyed))}
+  function weaponReady(weapon){return weapon.expendable?weaponRemaining(weapon):Math.max(0,weaponRemaining(weapon)-(weapon.firedThisPhase||0))}
+  function recordFire(weapon){if(weapon.expendable)weapon.remaining=Math.max(0,weaponReady(weapon)-1);else weapon.firedThisPhase=(weapon.firedThisPhase||0)+1}
+  function resetFireState(state){Object.values(state.weapons).forEach(weapon=>{weapon.firedThisPhase=0})}
   function movementForTreads(treads){return treads>=31?3:treads>=16?2:treads>0?1:0}
   function targets(state){
     return [...Object.entries(state.weapons).filter(([,weapon])=>weaponRemaining(weapon)>0).map(([key,weapon])=>({key,label:weapon.label,defense:weapon.defense,type:'weapon'})),{key:'treads',label:'TREADS',defense:null,type:'treads'}];
@@ -34,5 +37,5 @@
   function summary(state){
     return {movement:movementForTreads(state.treads),treads:`${state.treads}/${state.maxTreads}`,weapons:Object.fromEntries(Object.entries(state.weapons).map(([key,weapon])=>[key,`${weaponRemaining(weapon)}/${weapon.count}`]))};
   }
-  root.GoblinSystems=Object.freeze({WEAPONS,createMarkIII,weaponRemaining,movementForTreads,targets,chooseTarget,applyHit,isHelpless,summary});
+  root.GoblinSystems=Object.freeze({WEAPONS,createMarkIII,weaponRemaining,weaponReady,recordFire,resetFireState,movementForTreads,targets,chooseTarget,applyHit,isHelpless,summary});
 })(globalThis);

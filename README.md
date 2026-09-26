@@ -6,7 +6,7 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 Der Prototyp ist spielbar und auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) veröffentlicht.
 
-Aktueller Übergabestand: **0.1.7 / Build 7**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
+Aktueller Übergabestand: **0.1.8 / Build 8**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
 
 Enthalten sind:
 
@@ -28,6 +28,8 @@ Enthalten sind:
 - Skimmer-Carrier-Transport im Szenario `UNIT TRIAL`: Kapazität wird in Infanterie-Stärkepunkten geführt; Ein-/Aussteigen verbraucht die Infanteriebewegung, nicht die Bewegung des Trägers
 - Transportierte Infanterie kann aus dem Skimmer Carrier feuern. Angriffe auf die Kombination verwenden einen gemeinsamen Würfelwurf, werden aber getrennt gegen Träger und Passagiere ausgewertet
 - Der GOBLIN SIEGEBREAKER besitzt einen eigenen Systemzustand für Hauptbatterie, Sekundärbatterien, Raketen, Nahbereichsschutz und 45 Ketteneinheiten. Gegnerische Treffer werden gegen ein einzelnes System ausgewertet; Kettenschäden reduzieren seine Bewegung bei 30, 15 und 0 verbleibenden Kettenpunkten.
+- In der Fire Phase lassen sich die noch verfügbaren Waffensysteme des Siegebreakers einzeln auswählen und abfeuern. Nicht verbrauchte Batterien halten die Einheit handlungsfähig; Raketenmunition bleibt über Runden hinweg verbraucht.
+- Kartenmarker werden zentral über [UNIT_VISUALS.md](UNIT_VISUALS.md) konfiguriert. Lokale SVG-, PNG- oder WebP-Dateien können pro stabiler Einheiten-ID ausgetauscht werden, ohne Regeln oder Szenarien zu ändern.
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
 ## Lokal starten
@@ -83,4 +85,4 @@ Tester geben die sichtbare Version aus der Kopfzeile in jedem Bericht an. Für s
 
 ## Nächste Ausbaustufe
 
-Als Nächstes wird das begonnene GOBLIN-Systemmodell um die aktive Waffenauswahl und mehrere Schüsse pro Feuerphase ergänzt. Danach folgen strategische Lenkflugkörper, Nahbereichsgefechte und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.
+Als Nächstes folgen strategische Lenkflugkörper, Nahbereichsgefechte und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.
