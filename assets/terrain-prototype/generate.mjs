@@ -45,6 +45,26 @@ function sprinkles(seed,kind){
   return bits.join('');
 }
 
+function mountainContours(variant){
+  const rng=random(8101+variant*391),rays=19;
+  const angles=Array.from({length:rays},(_,i)=>i*Math.PI*2/rays);
+  const shape=angles.map(a=>.82+rng()*.34);
+  const contour=(cx,cy,rx,ry,rough)=>{
+    const points=angles.map((a,i)=>`${(cx+Math.cos(a)*rx*(1+(shape[i]-1)*rough)).toFixed(1)} ${(cy+Math.sin(a)*ry*(1+(shape[i]-1)*rough)).toFixed(1)}`);
+    return `M${points.join('L')}Z`;
+  };
+  const x=128+(variant-1)*7,y=128-(variant-1)*4;
+  return `<g transform="rotate(${(variant-1)*13} 128 128)" opacity=".78">
+    ${path(contour(x,y,81,69,1.25),'#46564f')}
+    ${path(contour(x-2,y-5,70,60,1.05),'#667268','#899487',1.1)}
+    ${path(contour(x-7,y-11,55,46,.9),'#818b7b','#b5b8a2',1.5)}
+    ${path(contour(x-11,y-15,39,31,.75),'#9da593','#c6c8ae',1.4)}
+    ${path(contour(x-15,y-18,20,15,.55),'#bdc1a9')}
+    ${line(`M${x-68} ${y+41}q29 34 76 23t69-44`,'#aeb7a2',1.6,'opacity=".65"')}
+    ${line(`M${x-49} ${y-43}q42-38 90-3`,'#c2c4ad',1.5,'opacity=".65"')}
+  </g>`;
+}
+
 function feature(kind,variant){
   const v=variant-1,shift=v*5,rot=v*9;
   if(kind==='open-ground')return `<g opacity=".38">${line('M79 100l15-3m80 52 16 2M101 181l23 1','#8d9b88',2)}${line('M91 138l7-9m9 14 8-8m62-44 7-6','#9ead94',1.5)}</g>`;
@@ -52,16 +72,16 @@ function feature(kind,variant){
     const rng=random(301+variant*471),trees=[];
     for(let i=0;i<15;i++){
       const a=rng()*Math.PI*2,d=Math.sqrt(rng())*81,x=128+Math.cos(a)*d,y=128+Math.sin(a)*d,rr=14+rng()*14;
-      trees.push(poly(`${x.toFixed(1)},${(y-rr).toFixed(1)} ${(x+rr*.78).toFixed(1)},${(y-rr*.57).toFixed(1)} ${(x+rr).toFixed(1)},${(y+rr*.18).toFixed(1)} ${(x+rr*.36).toFixed(1)},${(y+rr*.86).toFixed(1)} ${(x-rr*.44).toFixed(1)},${(y+rr).toFixed(1)} ${(x-rr).toFixed(1)},${(y+rr*.12).toFixed(1)} ${(x-rr*.75).toFixed(1)},${(y-rr*.6).toFixed(1)}`,[ '#365a49','#426751','#53745a','#476b55'][i%4],'#658168',.9,'opacity=".72"'));
+      trees.push(`<g opacity=".77"><circle cx="${(x+3).toFixed(1)}" cy="${(y+4).toFixed(1)}" r="${(rr*.93).toFixed(1)}" fill="#304b3f"/>${poly(`${x.toFixed(1)},${(y-rr).toFixed(1)} ${(x+rr*.78).toFixed(1)},${(y-rr*.57).toFixed(1)} ${(x+rr).toFixed(1)},${(y+rr*.18).toFixed(1)} ${(x+rr*.36).toFixed(1)},${(y+rr*.86).toFixed(1)} ${(x-rr*.44).toFixed(1)},${(y+rr).toFixed(1)} ${(x-rr).toFixed(1)},${(y+rr*.12).toFixed(1)} ${(x-rr*.75).toFixed(1)},${(y-rr*.6).toFixed(1)}`,[ '#365a49','#426751','#53745a','#476b55'][i%4],'#658168',.7)}<circle cx="${(x-rr*.23).toFixed(1)}" cy="${(y-rr*.28).toFixed(1)}" r="${(rr*.35).toFixed(1)}" fill="#849c70" opacity=".32"/></g>`);
     }
     return trees.join('');
   }
   if(kind==='rubble-field')return `<g transform="translate(${shift} ${-shift})" opacity=".77">${poly('65,111 91,84 115,91 118,124 83,139','#85887d','#505c55',2)}${poly('128,86 166,78 183,109 161,132 130,118','#737b73','#a0a396',1.5)}${poly('103,147 137,134 157,161 128,185 93,173','#798177','#4c5b53',2)}${poly('174,139 193,144 183,170 162,167','#909288','#4c5b53',1.5)}${line('M81 106l24 9m43-23 18 19m-59 50 25-11','#b0ad9e',1.3)}</g>`;
-  if(kind==='mountain')return `<g transform="translate(${shift} 0)" opacity=".72">${path('M61 169 102 87 127 127 151 75 199 169Z','#777c70','#a3a89b',2)}${path('M102 87 117 111l-19-5-10 28Z','#c2c1af')}${path('M151 75 169 112l-21-11-14 30Z','#b4b7a8')}${line('M66 180q61-19 129 0','#525f55',2)}</g>`;
-  if(kind==='ridge')return `<g transform="rotate(${rot} 128 128)" opacity=".72">${path('M53 164 80 135l25 10 26-30 28 13 29-37 22 24-25 27-28 1-23 22-32-5-27 24Z','#767d70','#a4ad9b',2)}${line('M59 173 83 149l24 10 25-26 27 11 29-35','#c4c4ae',2)}${line('M71 183l24-13m43 11 21-24','#42564f',1.5)}</g>`;
-  if(kind==='marsh')return `<g opacity=".78">${path('M62 149q16-23 41-12t40-3 46 13q7 24-13 34t-48-5-42 5-24-32Z','#476f68')}${line('M70 161q23-10 43 3t41-2 28 4','#9eb8a3',2,'opacity=".55"')}${[75,101,159,182].map((x,i)=>line(`M${x} ${132+i%2*7}l-4-18m4 18 5-15`,'#9aaa81',2)).join('')}</g>`;
-  if(kind==='water')return `<g opacity=".84">${path('M57 137q5-35 40-43t58 4 42 23q12 33-18 56t-75 4-47-44Z','#3c6d74','#78948c',2)}${line('M72 130q18-8 36 2t35 0 35 0M78 154q18-9 34 1t36 0 29 1','#9ac0b6',2,'opacity=".55"')}</g>`;
-  if(kind==='urban')return `<g opacity=".72">${[[78,90,37,31],[126,85,46,28],[88,141,42,38],[150,135,34,39]].map(([x,y,w,h],i)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${i%2?'#858a7c':'#747e74'}" stroke="#a7aa98" stroke-width="1.4"/>`+line(`M${x+5} ${y+7}h${w-10}`,'#b3b3a2',1)).join('')}${line('M120 77v114m-50-60h128','#4d6058',5)}</g>`;
+  if(kind==='mountain')return mountainContours(variant);
+  if(kind==='ridge')return `<g transform="rotate(${rot} 128 128)" opacity=".76">${path('M53 169Q67 140 97 135T153 102Q181 82 207 88L199 114Q172 122 150 142T97 171L67 187Z','#505f56')}${path('M59 161Q88 138 117 128T174 96L199 94Q176 118 150 133T96 160L68 177Z','#899183')}${line('M60 153Q91 132 122 123T191 94','#bdc0aa',2.2,'opacity=".7"')}${line('M67 179Q99 157 128 148T190 113','#43574f',2,'opacity=".68"')}${line('M57 190Q89 170 118 163T173 133','#a8af9e',1.5,'opacity=".44"')}</g>`;
+  if(kind==='marsh')return `<g opacity=".73">${path('M64 117Q84 99 107 116T144 112Q170 100 192 126T177 152Q157 159 138 148T106 158Q78 163 64 142Z','#486d61')}${path('M76 171Q92 154 110 166T144 165Q164 153 181 171T166 191Q148 198 130 186T98 190Q78 192 76 171Z','#4b7168')}${[[75,105],[101,151],[154,104],[184,144],[71,172],[158,186]].map(([x,y])=>line(`M${x} ${y}l5 2m-2-7 1 5`,'#a9b18a',2)).join('')}${line('M78 124q17-10 36 1m29 9q16-8 31 1','#9ab3a4',1.4,'opacity=".42"')}</g>`;
+  if(kind==='water')return `<g opacity=".82">${path('M54 126Q64 92 98 83T157 91Q190 104 202 132T182 178Q151 196 114 184T61 159Q50 146 54 126Z','#66847b','#a3ab98',3)}${path('M66 127Q73 99 102 96T158 102Q183 114 188 139T166 171Q137 183 111 172T71 151Q62 140 66 127Z','#3e7276')}${path('M89 122Q109 108 137 113T174 132Q154 123 133 124T99 137Z','#76a2a0','none',0,'opacity=".35"')}</g>`;
+  if(kind==='urban')return `<g transform="rotate(${rot*.35} 128 128)" opacity=".75">${[[68,85,43,32],[132,78,45,35],[75,145,54,37],[151,142,35,43]].map(([x,y,w,h],i)=>`<rect x="${x+4}" y="${y+5}" width="${w}" height="${h}" fill="#40554d" opacity=".75"/><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${i%2?'#858b7c':'#777f75'}" stroke="#b0b2a2" stroke-width="1.1"/>`+line(`M${x+6} ${y+7}h${w-12}`,'#c0bfa9',1.3,'opacity=".56"')+line(`M${x+6} ${y+h-7}h${w-12}`,'#5b6860',1,'opacity=".52"')).join('')}${line('M120 78v111M65 131h127','#5b685d',3,'opacity=".48"')}</g>`;
   if(kind==='crater')return `<g opacity=".75">${path('M128 70q46-2 61 42t-15 65-63 20-53-42 5-65 65-20Z','#72796d','#a5aa99',3)}${path('M127 94q29-6 43 22t-6 48-49 10-35-34 12-41 35-5Z','#465b55','#9ca898',2)}${path('M126 114q18-3 22 17t-14 24-28-17 20-24Z','#53675d')}</g>`;
   return '';
 }
