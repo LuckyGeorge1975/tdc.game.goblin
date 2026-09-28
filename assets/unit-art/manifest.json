@@ -3,7 +3,8 @@
   "viewFormats": {
     "icon": "256×256 SVG · transparent · top view",
     "library": "512×384 SVG · transparent · oblique view",
-    "logo": "1024×256 SVG · transparent"
+    "logo": "1024×256 SVG · transparent",
+    "terrain": "256×256 SVG · transparent outside hex · map tile"
   },
   "styles": [
     {
@@ -193,6 +194,102 @@
   "pathPattern": {
     "icon": "sets/{style}/icons/{unit}.svg",
     "library": "sets/{style}/library/{unit}.svg",
-    "logo": "sets/{style}/logo.svg"
-  }
+    "logo": "sets/{style}/logo.svg",
+    "terrain": "sets/{style}/terrain/{terrain}.svg"
+  },
+  "terrain": [
+    {
+      "id": "open-ground",
+      "name": "Open ground",
+      "status": "implemented",
+      "rulesKey": "open",
+      "description": "Freies Gelände ohne Deckung."
+    },
+    {
+      "id": "rubble-field",
+      "name": "Rubble field",
+      "status": "implemented",
+      "rulesKey": "cover",
+      "description": "Trümmer und Deckung; derzeit mit dem Berg-/Trümmerfeld-Regelsatz."
+    },
+    {
+      "id": "mountain",
+      "name": "Mountain",
+      "status": "implemented-as-cover",
+      "rulesKey": "cover",
+      "description": "Fels-/Bergmotiv; derzeit mit dem Berg-/Trümmerfeld-Regelsatz."
+    },
+    {
+      "id": "ridge",
+      "name": "Ridge",
+      "status": "concept",
+      "rulesKey": null,
+      "description": "Höhenrücken; spätere Sicht- und Bewegungsregeln offen."
+    },
+    {
+      "id": "forest",
+      "name": "Forest",
+      "status": "concept",
+      "rulesKey": null,
+      "description": "Dichter Bewuchs; spätere Deckungsregeln offen."
+    },
+    {
+      "id": "marsh",
+      "name": "Marsh",
+      "status": "concept",
+      "rulesKey": null,
+      "description": "Feuchtgebiet; spätere Bewegungsregeln offen."
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "status": "concept",
+      "rulesKey": null,
+      "description": "Gewässer; spätere Fahr- und Infanterieregeln offen."
+    },
+    {
+      "id": "river",
+      "name": "River",
+      "status": "concept",
+      "rulesKey": null,
+      "description": "Flusslauf als Kartenfeld; Querungsregeln offen."
+    },
+    {
+      "id": "road",
+      "name": "Road",
+      "status": "concept",
+      "rulesKey": null,
+      "description": "Befestigter Verkehrsweg; spätere Bewegungsboni offen."
+    },
+    {
+      "id": "bridge",
+      "name": "Bridge",
+      "status": "concept",
+      "rulesKey": null,
+      "description": "Brückensegment; spätere Brücken- und Querungsregeln offen."
+    },
+    {
+      "id": "urban",
+      "name": "Urban",
+      "status": "concept",
+      "rulesKey": null,
+      "description": "Gebautes Gebiet; spätere Kampf- und Deckungsregeln offen."
+    },
+    {
+      "id": "crater",
+      "name": "Crater",
+      "status": "concept",
+      "rulesKey": null,
+      "description": "Einschlagkrater; spätere Geländeregeln offen."
+    }
+  ],
+  "levels": [
+    {
+      "id": "atlas-proving-grounds",
+      "title": "ATLAS / PROVING GROUNDS",
+      "path": "levels/atlas-proving-grounds.json",
+      "preview": "level-preview.html",
+      "status": "content-specification"
+    }
+  ]
 }
