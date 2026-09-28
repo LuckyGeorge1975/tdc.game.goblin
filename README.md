@@ -6,11 +6,11 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 Der Prototyp ist spielbar und auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) veröffentlicht.
 
-Aktueller Übergabestand: **0.1.10 / Build 10**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
+Aktueller Übergabestand: **0.1.11 / Build 11**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
 
 Enthalten sind:
 
-- Hexfeldkarte mit offenem Gelände sowie Berg-/Trümmerfeldern
+- Hexfeldkarte mit offenem Gelände sowie Berg-/Trümmerfeldern; im neuen ATLAS-Showcase zwölf austauschbare Terrainmotive
 - Bewegung mit Gelände- und Belegungskosten sowie expliziten Bewegungsmodi für Kettenfahrzeuge, Infanterie, Skimmer und stationäre Einheiten
 - getrennte Movement-, Fire- und Skimmer-Manöverphasen
 - Einheitliche Spiel-Dialoge für Phasenende, Szenariowechsel und Neustart. Escape bricht ab; Tab und Enter bedienen den Dialog. Spielkürzel und AUTO sind währenddessen gesperrt. „Never ask again“ gilt ausschließlich für das Phasenende. Keine Browser-Messageboxen.
@@ -21,7 +21,7 @@ Enthalten sind:
 - Deaktivierung, Wiederherstellung, Zerstörung und sichtbare Wracks
 - Goblin-Ramming gegen gegnerische Fahrzeuge
 - einfache Gegner-KI mit Bewegung und Feuer
-- Szenarien `IRON DUST`, `RELAY RUN` und `UNIT TRIAL`
+- Szenarien `IRON DUST`, `RELAY RUN`, `UNIT TRIAL` und `ATLAS / PROVING GROUNDS`. ATLAS zeigt alle 26 Einheitentypen; Einheitenwerte und Siegbedingung sind dort vorläufig. Neue Geländemotive außer Berg und Trümmern gelten bis zur Regelimplementierung wie offenes Gelände.
 - Area-Modi `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`
 - optionales Hex-Grid und oberster Feld-Fokusmarker
 - Quick-Start-Guide, Einheiten-Guide mit Basis- und Erweiterungseinheiten sowie kombinierte Feld- und Einheiteninformationen

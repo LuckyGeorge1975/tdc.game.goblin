@@ -2,6 +2,18 @@
 
 Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
 
+## [0.1.11] - 2026-09-28
+
+### Hinzugefügt
+
+- Zwölf Terrainmotive für jedes der fünf Icon-Sets. Der Stilwechsel aktualisiert nun Einheitengrafiken und Gelände gemeinsam.
+- Spielbares Content-Showcase `ATLAS / PROVING GROUNDS` aus der gelieferten JSON-Leveldatei mit 26 platzierten Einheitentypen und allen zwölf Geländemotiven.
+- Terrainbezeichnung und vorläufiger Regelstatus in `FIELD INTEL`; das neue Szenario nutzt die vorhandenen Bewegungs-, Feuer-, Transport- und Phasensysteme.
+
+### Noch offen
+
+- Trümmer und Berge verwenden die vorhandene Deckungsregel. Die zehn übrigen Geländemotive sind visuelle Prototypen ohne eigene Bewegungs- oder Sichtregel. Die ATLAS-Einheitenwerte sind vorläufig; Siegbedingung ist vorerst die Ausschaltung aller Gegner einschließlich Command Core.
+
 ## [0.1.10] - 2026-09-28
 
 ### Hinzugefügt

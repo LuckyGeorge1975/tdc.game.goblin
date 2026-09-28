@@ -1,6 +1,19 @@
 const NS='http://www.w3.org/2000/svg';
 const W=12,H=8,S=34,DX=Math.sqrt(3)*S, DY=1.5*S;
 let terrain = new Set(['3,1','8,1','1,4','5,3','9,5','2,6','7,6','10,2']);
+let terrainTypes = new Map();
+function terrainTypeAt(x,y){const key=`${x},${y}`;return terrainTypes.get(key)||(terrain.has(key)?'rubble-field':'open-ground')}
+function drawTerrainArtwork(x,y){
+  const type=terrainTypeAt(x,y);
+  if(type==='open-ground'&&currentScenario!=='atlas-proving-grounds')return false;
+  const asset=UnitVisuals.terrainAssetFor(type);
+  if(!asset)return false;
+  const c=hexCenter(x,y),image=document.createElementNS(NS,'image');
+  image.setAttribute('href',asset);image.setAttribute('x',c.x-36);image.setAttribute('y',c.y-36);
+  image.setAttribute('width',72);image.setAttribute('height',72);
+  image.classList.add('terrain-artwork');image.setAttribute('pointer-events','none');
+  svg.appendChild(image);return true;
+}
 const COMBAT_RULES=Object.freeze({crt:Object.freeze({'1-2':['NE','NE','NE','NE','D','X'],'1-1':['NE','NE','D','D','D','X'],'2-1':['NE','D','D','X','X','X'],'3-1':['D','D','X','X','X','X'],'4-1':['D','X','X','X','X','X']})});const units = [
   {id:'ogre',name:'GOBLIN SIEGEBREAKER',type:'HEAVY ASSAULT',team:'player',x:1,y:5,hp:5,maxHp:5,defense:5,range:2,move:3,damage:3,icon:'G',ogreSystems:GoblinSystems.createMarkIII()},
   {id:'gev',name:'SKIMMER SCOUT',type:'HOVERCRAFT',team:'player',x:2,y:6,hp:3,maxHp:3,defense:3,range:3,move:3,damage:1,icon:'G'},
@@ -62,12 +75,14 @@ function addLog(text,enemy=false){const t=new Date().toLocaleTimeString('de-DE',
 function drawGrid(){if(!gridVisible)return;for(let y=0;y<H;y++)for(let x=0;x<W;x++){const grid=document.createElementNS(NS,'polygon');grid.setAttribute('points',hexPoints(x,y));grid.classList.add('grid-hex');svg.appendChild(grid)}}function drawFocusMarker(){if(!focusedCell)return;const marker=document.createElementNS(NS,'polygon');marker.setAttribute('points',hexPoints(focusedCell.x,focusedCell.y));marker.classList.add('focus-marker');svg.appendChild(marker)}function draw(){
   svg.setAttribute('viewBox','0 0 790 480'); svg.innerHTML=''; const passiveSelection=selected&&selected.hp>0&&!phaseCanAct(selected);
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const illustrated=drawTerrainArtwork(x,y);
     const p=document.createElementNS(NS,'polygon');p.setAttribute('points',hexPoints(x,y));p.classList.add('hex');p.dataset.x=x;p.dataset.y=y;
+    if(illustrated)p.classList.add('terrain-illustrated');
     const unit=units.find(u=>u.hp>0&&!u.embarkedOn&&u.x===x&&u.y===y); const attackPhase=turnPhase==='fire',canFire=!!selected,canMove=!!selected; if(attackPhase&&selected&&selected.hp>0&&unit&&unit.team==='enemy'&&dist(selected,{x,y})<=selected.range&&lineOfSight(selected,{x,y})&&(typeof canSelectedWeaponTarget!=='function'||canSelectedWeaponTarget(selected,unit))) p.classList.add('attack');
     if(terrain.has(`${x},${y}`)){p.classList.add('terrain');}
     if(selected&&selected.hp>0){const distance=dist(selected,{x,y}),moveCost=distance+(terrain.has(`${x},${y}`)?1:0);if(x===selected.x&&y===selected.y)p.classList.add('selected');const moveAllowance=turnPhase==='gev'?2:selected.move;const blockedByUnit=unit&&unit!==selected;if(canMove&&viewMode==='movement'&&!blockedByUnit&&findMovementPath(selected,{x,y},moveAllowance))p.classList.add('movement-fill');if(canFire&&(viewMode==='fire'||viewMode==='los')&&distance<=selected.range){if(viewMode==='fire')p.classList.add('fire-range');else if(lineOfSight(selected,{x,y}))p.classList.add('los-visible')}if(attackPhase&&unit&&unit.team==='enemy'&&distance<=selected.range&&lineOfSight(selected,unit)&&(typeof canSelectedWeaponTarget!=='function'||canSelectedWeaponTarget(selected,unit)))p.classList.add('attack')}
     p.addEventListener('click',()=>handleHex(x,y));svg.appendChild(p);
-    if(terrain.has(`${x},${y}`)){const c=hexCenter(x,y);const r=document.createElementNS(NS,'rect');r.setAttribute('x',c.x-11);r.setAttribute('y',c.y-7);r.setAttribute('width',22);r.setAttribute('height',14);r.setAttribute('transform',`rotate(18 ${c.x} ${c.y})`);r.classList.add('ruin');r.addEventListener('click',event=>{event.stopPropagation();handleHex(x,y)});svg.appendChild(r)}
+    if(terrain.has(`${x},${y}`)&&!illustrated){const c=hexCenter(x,y);const r=document.createElementNS(NS,'rect');r.setAttribute('x',c.x-11);r.setAttribute('y',c.y-7);r.setAttribute('width',22);r.setAttribute('height',14);r.setAttribute('transform',`rotate(18 ${c.x} ${c.y})`);r.classList.add('ruin');r.addEventListener('click',event=>{event.stopPropagation();handleHex(x,y)});svg.appendChild(r)}
   }
   if(transportUnloadMode){for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(canUnloadTo(transportUnloadMode.carrier,transportUnloadMode.cargo,x,y)){const target=svg.querySelector('.hex[data-x="'+x+'"][data-y="'+y+'"]');if(target)target.classList.add('unload-target')}}} drawGrid(); if(selected&&selected.hp>0&&!transportUnloadMode){const movementAllowance=turnPhase==='gev'?2:selected.move,areaClass=passiveSelection?' reference':'';const canMoveCell=(x,y)=>{const occupant=units.find(u=>u.hp>0&&!u.embarkedOn&&u!==selected&&u.x===x&&u.y===y);const carrier=occupant?.transportCapacity?occupant:null;return !!(selected.team==='player'&&carrier&&canEmbark(selected,carrier))||(!occupant&&!!findMovementPath(selected,{x,y},movementAllowance))};if(viewMode==='movement')drawAreaBoundary(movementAllowance,'movement-boundary'+areaClass,canMoveCell);if(viewMode==='fire')drawAreaBoundary(selected.range,'fire-boundary'+areaClass);if(viewMode==='los')drawAreaBoundary(selected.range,'los-boundary'+areaClass,(x,y)=>dist(selected,{x,y})<=selected.range&&lineOfSight(selected,{x,y}))}
   units.filter(u=>!u.embarkedOn).slice().sort((a,b)=>(a.hp>0?1:0)-(b.hp>0?1:0)).forEach(u=>{try{renderUnit(u)}catch(error){addLog(`Unit render failed: ${error.message}`,true)}}); drawFocusMarker(); updateRoster(); showCarrierCargo();

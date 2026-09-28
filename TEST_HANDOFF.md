@@ -6,18 +6,18 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
 | Feld | Wert |
 |---|---|
-| Version | `0.1.10` |
-| Build | `10` |
-| Release-Tag | `v0.1.10` |
+| Version | `0.1.11` |
+| Build | `11` |
+| Release-Tag | `v0.1.11` |
 | Datum | 2026-09-28 |
-| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.10> |
-| Änderungen | [CHANGELOG.md](CHANGELOG.md#0110---2026-09-28) |
+| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.11> |
+| Änderungen | [CHANGELOG.md](CHANGELOG.md#0111---2026-09-28) |
 
-### Testfokus für 0.1.10
+### Testfokus für 0.1.11
 
-- Alle fünf `ICON SET`-Optionen in `IRON DUST` und `UNIT TRIAL` auf Karte, eigener Einheitenliste und im Unit Guide durchblättern.
-- Nach einer Aktion den Set-Wechsel einmal abbrechen (Spielzustand und Stil bleiben) und einmal bestätigen (gleiches Szenario startet in Runde 1 neu).
-- `FIELD ENGINEERS`, `RELAY NODE` und `SIEGE TANK` auf korrekte Motive prüfen; Karten-Icons müssen weiter anklickbar bleiben.
+- `ATLAS / PROVING GROUNDS` laden: zwölf Geländemotive und 26 Einheiten sichtbar, Einheiten und Hexfelder anklickbar.
+- Alle fünf Icon-Sets im ATLAS-Szenario wechseln; Gelände und Einheiten müssen gemeinsam wechseln und das Szenario neu starten.
+- Movement-/Fire-/Sicht-Overlays, `FIELD INTEL`, Szenariowechsel-Bestätigung und `BACK` auf ATLAS prüfen. Neue Geländetypen außer Trümmer/Berg sind derzeit ausdrücklich nur visuell.
 
 ## Übergabe durch den Developer
 

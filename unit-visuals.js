@@ -34,6 +34,11 @@
     return `assets/unit-art/sets/${activeStyle}/${view}/${key}.svg`;
   }
 
+  const terrainKeys=new Set(['open-ground','rubble-field','mountain','ridge','forest','marsh','water','river','road','bridge','urban','crater']);
+  function terrainAssetFor(type){
+    return activeStyle&&terrainKeys.has(type)?`assets/unit-art/sets/${activeStyle}/terrain/${type}.svg`:null;
+  }
+
   function setStyle(id){
     if(!styles.some(style=>style.id===id))return false;
     activeStyle=id;
@@ -121,5 +126,5 @@
   register('light-tank',{shape:'tracked',label:'R'});
   register('guard',{shape:'tracked',label:'G'});
 
-  root.UnitVisuals=Object.freeze({register,resolve,draw,setAsset,polygonPoints,styles,artKey,assetFor,setStyle,currentStyle});
+  root.UnitVisuals=Object.freeze({register,resolve,draw,setAsset,polygonPoints,styles,artKey,assetFor,terrainAssetFor,setStyle,currentStyle});
 })(globalThis);

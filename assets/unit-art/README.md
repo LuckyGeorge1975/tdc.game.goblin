@@ -16,7 +16,7 @@ Pro Stil gibt es 26 transparente, skizzenhafte SVG-Icons in orthografischer Drau
 
 Zusätzlich enthält jeder Stil 12 Terrain-Icons für Hexfelder (`256 × 256`): offenes Gelände, Trümmerfeld, Berg, Höhenrücken, Wald, Sumpf, Wasser, Fluss, Straße, Brücke, Stadtgebiet und Krater. Damit umfasst das Paket **325 SVG-Dateien**. Ein statisches Showcase-Level namens **ATLAS / PROVING GROUNDS** verwendet alle 12 Terrainmotive und alle 26 Einheitentypen auf einem 12 × 8-Hexraster.
 
-Wichtig: Im Spiel sind derzeit nur `open-ground` und `rubble-field` als eigenständige Regeln umgesetzt. Das Bergmotiv kann den bestehenden Deckungs-/Trümmer-Regelsatz verwenden. Alle weiteren Terrainmotive sind Content-Konzepte; ihre Regeln, Kollisionen und Sichtlinien bleiben für den Developer offen. Das [Level-JSON](levels/atlas-proving-grounds.json) und die Vorschau sind ein Szenario-Entwurf, kein spielbares Level im aktuellen Build.
+Wichtig: ATLAS ist ab Build 0.1.11 als spielbares Content-Showcase auswählbar. Trümmer und Berge verwenden die vorhandene Deckungs-/Trümmerregel; alle anderen neuen Geländemotive werden vorläufig wie offenes Gelände behandelt. Ihre eigenständigen Bewegungs-, Kollisions- und Sichtregeln sind noch offen. Die Einheitenwerte und das Missionsziel im spielbaren Showcase sind vorläufig; [Level-JSON](levels/atlas-proving-grounds.json) und Vorschau bleiben die Content-Quelle.
 
 | Stil-ID | Gestaltung |
 | --- | --- |

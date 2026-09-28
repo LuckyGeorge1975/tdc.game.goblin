@@ -59,3 +59,17 @@ test('explicit local artwork still overrides the active art set',()=>{
   UnitVisuals.setAsset('heavy-tank','assets/custom-tank.svg');
   assert.equal(UnitVisuals.resolve({id:'heavy-tank',name:'ASSAULT TANK'}).asset,'assets/custom-tank.svg');
 });
+
+test('all twelve terrain visuals exist for each runtime style',()=>{
+  const {UnitVisuals}=visualContext();
+  const types=['open-ground','rubble-field','mountain','ridge','forest','marsh','water','river','road','bridge','urban','crater'];
+  for(const style of UnitVisuals.styles){
+    UnitVisuals.setStyle(style.id);
+    for(const type of types){
+      const path=UnitVisuals.terrainAssetFor(type);
+      assert.ok(path?.includes(`/terrain/${type}.svg`));
+      assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),path);
+    }
+  }
+  assert.equal(UnitVisuals.terrainAssetFor('not-terrain'),null);
+});

@@ -22,7 +22,7 @@ function clearPhaseCommands() {
 }
 
 function commandSnapshot(label) {
-  return { label, units: structuredClone(units), terrain: [...terrain],
+  return { label, units: structuredClone(units), terrain: [...terrain], terrainTypes: [...terrainTypes],
     selectedId: selected?.id, focus: focusedCell && {...focusedCell},
     log: logEl.innerHTML, rollCursor: phaseRollCursor };
 }
@@ -56,6 +56,7 @@ function undoPhaseCommand() {
   units.splice(0, units.length, ...structuredClone(before.units));
   units.forEach(unit => { unit.moveFrom = null; unit.justHit = false; });
   terrain = new Set(before.terrain);
+  terrainTypes = new Map(before.terrainTypes);
   selected = units.find(unit => unit.id === before.selectedId) || null;
   focusedCell = before.focus;
   transportLoadMode = null;
