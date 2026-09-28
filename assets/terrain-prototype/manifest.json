@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "style": "Ashland Survey",
+  "geometry": "pointy-top odd-row-offset",
+  "edgeOrder": [
+    "NE",
+    "E",
+    "SE",
+    "SW",
+    "W",
+    "NW"
+  ],
+  "bitRule": "bit i corresponds to edgeOrder[i]",
+  "ground": [
+    {
+      "id": "open-ground",
+      "name": "Open Ground",
+      "status": "implemented"
+    },
+    {
+      "id": "rubble-field",
+      "name": "Rubble Field",
+      "status": "implemented"
+    },
+    {
+      "id": "mountain",
+      "name": "Mountain",
+      "status": "existing-cover-rule"
+    },
+    {
+      "id": "ridge",
+      "name": "Ridge",
+      "status": "concept"
+    },
+    {
+      "id": "forest",
+      "name": "Forest",
+      "status": "concept"
+    },
+    {
+      "id": "marsh",
+      "name": "Marsh",
+      "status": "concept"
+    },
+    {
+      "id": "water",
+      "name": "Water / Pond",
+      "status": "concept"
+    },
+    {
+      "id": "urban",
+      "name": "Urban",
+      "status": "concept"
+    },
+    {
+      "id": "crater",
+      "name": "Crater",
+      "status": "concept"
+    }
+  ],
+  "groundVariants": 3,
+  "roadMasks": 64,
+  "riverMasks": 64,
+  "paths": {
+    "continuousGround": "ashland-ground.png",
+    "ground": "tiles/ground/{terrain}-{variant}.svg",
+    "road": "tiles/road/mask-{mask:02}.svg",
+    "river": "tiles/river/mask-{mask:02}.svg",
+    "bridge": "tiles/special/bridge-deck.svg"
+  },
+  "layerOrder": [
+    "continuousGround",
+    "ground",
+    "river",
+    "road",
+    "bridge",
+    "units"
+  ],
+  "gameIntegration": "prototype only"
+}

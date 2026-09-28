@@ -1,0 +1,1335 @@
+{
+  "schemaVersion": 1,
+  "name": "ASHLAND / Terrain Study 01",
+  "width": 14,
+  "height": 10,
+  "edgeOrder": [
+    "NE",
+    "E",
+    "SE",
+    "SW",
+    "W",
+    "NW"
+  ],
+  "background": "#616d62",
+  "cells": [
+    {
+      "x": 0,
+      "y": 0,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "ground": "water",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 5,
+      "bridge": false
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "ground": "water",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "ground": "mountain",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "ground": "mountain",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "ground": "mountain",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "ground": "forest",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "ground": "forest",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "ground": "forest",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 40,
+      "bridge": false
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "ground": "mountain",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "ground": "mountain",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 11,
+      "y": 1,
+      "ground": "mountain",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 12,
+      "y": 1,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 13,
+      "y": 1,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "ground": "forest",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "ground": "forest",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "ground": "forest",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 5,
+      "bridge": false
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "ground": "ridge",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "ground": "ridge",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 10,
+      "y": 2,
+      "ground": "ridge",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 11,
+      "y": 2,
+      "ground": "ridge",
+      "variant": 0,
+      "roadMask": 8,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 12,
+      "y": 2,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 13,
+      "y": 2,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "ground": "forest",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "ground": "forest",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "ground": "forest",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 40,
+      "bridge": false
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "ground": "ridge",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "ground": "ridge",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 10,
+      "y": 3,
+      "ground": "ridge",
+      "variant": 1,
+      "roadMask": 9,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 11,
+      "y": 3,
+      "ground": "ridge",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 12,
+      "y": 3,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 13,
+      "y": 3,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 5,
+      "bridge": false
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "ground": "rubble-field",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "ground": "rubble-field",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "ground": "rubble-field",
+      "variant": 0,
+      "roadMask": 13,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "ground": "ridge",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 18,
+      "riverMask": 40,
+      "bridge": true
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "ground": "rubble-field",
+      "variant": 0,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 9,
+      "y": 5,
+      "ground": "rubble-field",
+      "variant": 1,
+      "roadMask": 19,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 10,
+      "y": 5,
+      "ground": "rubble-field",
+      "variant": 2,
+      "roadMask": 50,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 11,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 12,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 13,
+      "y": 5,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 18,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 5,
+      "bridge": false
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "ground": "rubble-field",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 9,
+      "y": 6,
+      "ground": "rubble-field",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 10,
+      "y": 6,
+      "ground": "rubble-field",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 11,
+      "y": 6,
+      "ground": "urban",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 12,
+      "y": 6,
+      "ground": "urban",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 13,
+      "y": 6,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "ground": "marsh",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "ground": "marsh",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "ground": "marsh",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "ground": "marsh",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 40,
+      "bridge": false
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 8,
+      "y": 7,
+      "ground": "crater",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 10,
+      "y": 7,
+      "ground": "urban",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 11,
+      "y": 7,
+      "ground": "urban",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 12,
+      "y": 7,
+      "ground": "urban",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 13,
+      "y": 7,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 1,
+      "y": 8,
+      "ground": "marsh",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 2,
+      "y": 8,
+      "ground": "marsh",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 3,
+      "y": 8,
+      "ground": "marsh",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "ground": "marsh",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 5,
+      "y": 8,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 6,
+      "y": 8,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 5,
+      "bridge": false
+    },
+    {
+      "x": 7,
+      "y": 8,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 8,
+      "y": 8,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 9,
+      "y": 8,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 10,
+      "y": 8,
+      "ground": "urban",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 11,
+      "y": 8,
+      "ground": "urban",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 12,
+      "y": 8,
+      "ground": "urban",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 13,
+      "y": 8,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 0,
+      "y": 9,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "ground": "marsh",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 2,
+      "y": 9,
+      "ground": "marsh",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "ground": "marsh",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 4,
+      "y": 9,
+      "ground": "marsh",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 5,
+      "y": 9,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 6,
+      "y": 9,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 40,
+      "bridge": false
+    },
+    {
+      "x": 7,
+      "y": 9,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 8,
+      "y": 9,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 10,
+      "y": 9,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 11,
+      "y": 9,
+      "ground": "open-ground",
+      "variant": 2,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 12,
+      "y": 9,
+      "ground": "open-ground",
+      "variant": 0,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "ground": "open-ground",
+      "variant": 1,
+      "roadMask": 0,
+      "riverMask": 0,
+      "bridge": false
+    }
+  ],
+  "units": [
+    {
+      "assetId": "goblin-siegebreaker",
+      "team": "player",
+      "x": 2,
+      "y": 5,
+      "callsign": "G-1"
+    },
+    {
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 3,
+      "y": 3,
+      "callsign": "S-2"
+    },
+    {
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 4,
+      "y": 6,
+      "callsign": "A-3"
+    },
+    {
+      "assetId": "rocket-artillery",
+      "team": "player",
+      "x": 2,
+      "y": 8,
+      "callsign": "R-4"
+    },
+    {
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 5,
+      "y": 6,
+      "callsign": "I-5"
+    },
+    {
+      "assetId": "guard-tank",
+      "team": "enemy",
+      "x": 10,
+      "y": 4,
+      "callsign": "G-6"
+    },
+    {
+      "assetId": "raider-skimmer",
+      "team": "enemy",
+      "x": 11,
+      "y": 7,
+      "callsign": "R-7"
+    },
+    {
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 12,
+      "y": 2,
+      "callsign": "CORE"
+    }
+  ]
+}
