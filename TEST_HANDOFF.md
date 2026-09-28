@@ -6,12 +6,18 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
 | Feld | Wert |
 |---|---|
-| Version | `0.1.9` |
-| Build | `9` |
-| Release-Tag | `v0.1.9` |
-| Datum | 2026-09-26 |
-| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.9> |
-| Änderungen | [CHANGELOG.md](CHANGELOG.md#019---2026-09-26) |
+| Version | `0.1.10` |
+| Build | `10` |
+| Release-Tag | `v0.1.10` |
+| Datum | 2026-09-28 |
+| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.10> |
+| Änderungen | [CHANGELOG.md](CHANGELOG.md#0110---2026-09-28) |
+
+### Testfokus für 0.1.10
+
+- Alle fünf `ICON SET`-Optionen in `IRON DUST` und `UNIT TRIAL` auf Karte, eigener Einheitenliste und im Unit Guide durchblättern.
+- Nach einer Aktion den Set-Wechsel einmal abbrechen (Spielzustand und Stil bleiben) und einmal bestätigen (gleiches Szenario startet in Runde 1 neu).
+- `FIELD ENGINEERS`, `RELAY NODE` und `SIEGE TANK` auf korrekte Motive prüfen; Karten-Icons müssen weiter anklickbar bleiben.
 
 ## Übergabe durch den Developer
 

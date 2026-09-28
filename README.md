@@ -6,7 +6,7 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 Der Prototyp ist spielbar und auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) veröffentlicht.
 
-Aktueller Übergabestand: **0.1.9 / Build 9**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
+Aktueller Übergabestand: **0.1.10 / Build 10**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
 
 Enthalten sind:
 
@@ -31,6 +31,7 @@ Enthalten sind:
 - In der Fire Phase lassen sich die noch verfügbaren Waffensysteme des Siegebreakers einzeln auswählen und abfeuern. Nicht verbrauchte Batterien halten die Einheit handlungsfähig; Raketenmunition bleibt über Runden hinweg verbraucht.
 - Der Strategic Missile Carrier ist in `UNIT TRIAL` spielbar: eine Rakete pro Mission, Angriff 6 auf ein sichtbares Feindziel innerhalb von acht Hexen und Angriff 3 auf alle Einheiten in Nachbarhexen. Friendly Fire ist möglich; `BACK` stellt die Rakete innerhalb der Feuerphase wieder her.
 - Kartenmarker werden zentral über [UNIT_VISUALS.md](UNIT_VISUALS.md) konfiguriert. Lokale SVG-, PNG- oder WebP-Dateien können pro stabiler Einheiten-ID ausgetauscht werden, ohne Regeln oder Szenarien zu ändern.
+- Fünf vollständige lokale Icon-Sets für Karte, Einheitenliste und Unit Guide. Das Dropdown `ICON SET` steht neben der Szenariowahl. Ein Wechsel startet das aktuelle Szenario neu; bei bereits begonnenem Spiel erscheint vorher eine Bestätigung. Die gewählte Stilrichtung wird im Browser gemerkt.
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
 ## Lokal starten
@@ -52,6 +53,7 @@ Danach `http://localhost:4173` öffnen.
 - `ESC`: aktive Einheitenauswahl aufheben
 - `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`: Overlay wechseln
 - `GRID`: dezentes Hexraster ein-/ausblenden
+- `ICON SET`: Stilrichtung wechseln und das aktuelle Szenario neu starten
 - `END TURN`: aktuelle Phase beenden bzw. Gegnerzug starten
 
 Nach Sieg oder Niederlage bleibt die Karte samt Combat Log sichtbar. Der Kampf wird nicht automatisch zurückgesetzt; nur `RESTART` startet die Mission neu.

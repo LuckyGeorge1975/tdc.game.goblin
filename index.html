@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles.css?v=3" />
     <link rel="stylesheet" href="content-brand.css?v=1" />
     <link rel="stylesheet" href="unit-ui.css?v=1" />
+    <link rel="stylesheet" href="art-theme.css?v=1" />
     <style>
       .unit-svg { pointer-events: all; cursor: pointer; visibility: visible; opacity: 1; }
       .unit-svg.wreck { pointer-events: none; cursor: default; }
@@ -92,7 +93,7 @@
         </div>
         <div class="top-status">
           <span class="signal"><b></b> LIVE FEED</span>
-          <span id="build-version" class="build">FIELD TEST 0.1.8</span>
+          <span id="build-version" class="build">FIELD TEST 0.1.10</span>
           <div class="guide-actions"><button id="quick-start-open" class="action-button guide-button">QUICK START</button><button id="unit-guide-open" class="action-button guide-button">UNIT GUIDE</button></div>
         </div>
       </header>
@@ -108,7 +109,7 @@
           <div class="objective-track"><span id="objective-progress"></span></div>
           <span id="objective-text">0 / 1 CORE</span>
         </div>
-        <label class="scenario-picker"><span>SCENARIO</span><select id="scenario-select"><option value="iron-dust">IRON DUST</option><option value="relay-run">RELAY RUN</option><option value="unit-trial">UNIT TRIAL</option></select></label>
+        <div class="mission-pickers"><label class="scenario-picker"><span>SCENARIO</span><select id="scenario-select"><option value="iron-dust">IRON DUST</option><option value="relay-run">RELAY RUN</option><option value="unit-trial">UNIT TRIAL</option></select></label><label class="scenario-picker"><span>ICON SET</span><select id="art-style-select" aria-label="Icon-Set wählen"></select></label></div>
       </section>
 
       <section class="game-layout">
@@ -182,9 +183,9 @@
       </section>
     </div>
     <link rel="stylesheet" href="dialogs.css?v=1" />
-    <script src="release.js?v=9"></script>
+    <script src="release.js?v=10"></script>
     <script src="dialogs.js?v=1"></script>
-    <script src="unit-visuals.js?v=2"></script>
+    <script src="unit-visuals.js?v=10"></script>
     <script src="ogre-systems.js?v=2"></script>
 <script src="game.js?v=40"></script>
     <script src="ogre-runtime.js?v=1"></script>
@@ -194,6 +195,7 @@
     <script src="scenario.js?v=4"></script>
     <script src="unit-guide.js?v=6"></script>
     <script src="quick-start.js?v=1"></script>
+    <script src="art-theme.js?v=1"></script>
     <style>
       #undo-command:disabled{opacity:.35;cursor:not-allowed}
       .unit-card.disabled{opacity:.78;border-color:#9b6b3d;box-shadow:inset 3px 0 #e0a34f}

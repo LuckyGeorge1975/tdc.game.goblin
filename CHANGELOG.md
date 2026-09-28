@@ -2,6 +2,15 @@
 
 Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
 
+## [0.1.10] - 2026-09-28
+
+### Hinzugefügt
+
+- Fünf vollständige, vom Content Creator erstellte SVG-Icon-Sets mit je 26 Motiven für Karte und Einheitenliste sowie größeren Illustrationen für den Unit Guide.
+- Dropdown `ICON SET` neben der Szenariowahl. Die Auswahl bleibt lokal im Browser gespeichert; ein Wechsel startet das aktuelle Szenario neu und fragt bei Spielfortschritt vorher nach Bestätigung.
+- Automatische Motivzuordnung für Szenario-Varianten wie Field Engineers, Relay Node und Siege Tank; vorhandene individuelle `setAsset`-Overrides bleiben möglich.
+- Asset-Vollständigkeits- und Wechseltests für alle fünf Stile sowie ein lokaler visueller Smoke-Test.
+
 ## [0.1.9] - 2026-09-26
 
 ### Hinzugefügt

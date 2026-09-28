@@ -1,14 +1,54 @@
 (function(root){
   const registry=new Map();
   const defaults=Object.freeze({kind:'vector',shape:'hex',scale:1});
+  const styles=Object.freeze([
+    Object.freeze({id:'01-modular-stealth-geometry',title:'Modular Stealth Geometry'}),
+    Object.freeze({id:'02-industrial-exoframe',title:'Industrial Exoframe'}),
+    Object.freeze({id:'03-monolithic-facet',title:'Monolithic Facet'}),
+    Object.freeze({id:'04-autonomous-drone-corps',title:'Autonomous Drone Corps'}),
+    Object.freeze({id:'05-aerospace-ground-force',title:'Aerospace Ground Force'})
+  ]);
+  const artKeys=new Set([
+    'goblin-siegebreaker','skimmer-scout','rocket-artillery','infantry-squad','assault-tank',
+    'recon-tank','siege-tank','long-range-battery','mobile-siege-gun','combat-skimmer',
+    'light-skimmer','skimmer-carrier','strategic-missile-carrier','artillery-drone',
+    'amphibious-infantry','field-engineers','local-defense','command-hub','goblin-dreadnaught',
+    'forge-engineer','phantom-platform','infantry-platoon','command-core','relay-node',
+    'guard-tank','raider-skimmer'
+  ]);
+  let activeStyle=null;
 
   function register(key,descriptor){
     if(!key||!descriptor)throw new Error('Visual key and descriptor are required.');
     registry.set(key,Object.freeze({...defaults,...descriptor}));
   }
 
+  function artKey(unit){
+    const byName=unit?.name?.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    return [unit?.visualKey,byName,unit?.id].find(key=>artKeys.has(key))||null;
+  }
+
+  function assetFor(unit,view='icons'){
+    const key=artKey(unit);
+    if(!activeStyle||!key||!['icons','library'].includes(view))return null;
+    return `assets/unit-art/sets/${activeStyle}/${view}/${key}.svg`;
+  }
+
+  function setStyle(id){
+    if(!styles.some(style=>style.id===id))return false;
+    activeStyle=id;
+    return true;
+  }
+
+  function currentStyle(){return activeStyle}
+
   function resolve(unit){
-    return registry.get(unit.visualKey)||registry.get(unit.id)||registry.get(unit.type)||defaults;
+    const explicit=unit.visualKey&&registry.get(unit.visualKey);
+    if(explicit)return explicit;
+    const registered=registry.get(unit.id)||registry.get(unit.type);
+    if(registered?.kind==='asset')return registered;
+    const asset=assetFor(unit);
+    return asset?{kind:'asset',asset,size:54}:registered||defaults;
   }
 
   function polygonPoints(shape,c,scale=1){
@@ -26,6 +66,15 @@
   function draw(group,unit,center,{ns,color,selected=false}={}){
     const visual=resolve(unit),namespace=ns||'http://www.w3.org/2000/svg';
     if(visual.asset){
+      if(selected){
+        const ring=document.createElementNS(namespace,'polygon');
+        ring.setAttribute('points',polygonPoints('hex',center,1.26));
+        ring.setAttribute('fill','none');
+        ring.setAttribute('stroke','#d1f35a');
+        ring.setAttribute('stroke-width','3');
+        ring.classList.add('unit-selection-ring');
+        group.appendChild(ring);
+      }
       const size=visual.size||42,image=document.createElementNS(namespace,'image');
       image.setAttribute('href',visual.asset);
       image.setAttribute('x',center.x-size/2);
@@ -72,5 +121,5 @@
   register('light-tank',{shape:'tracked',label:'R'});
   register('guard',{shape:'tracked',label:'G'});
 
-  root.UnitVisuals=Object.freeze({register,resolve,draw,setAsset,polygonPoints});
+  root.UnitVisuals=Object.freeze({register,resolve,draw,setAsset,polygonPoints,styles,artKey,assetFor,setStyle,currentStyle});
 })(globalThis);

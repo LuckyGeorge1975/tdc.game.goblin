@@ -1,4 +1,4 @@
-import {readFileSync,readdirSync} from 'node:fs';
+import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import vm from 'node:vm';
 
@@ -20,7 +20,9 @@ if(Number(release.version.split('.').at(-1))!==release.build)throw new Error('Bu
 if(!changelog.includes(`## [${release.version}] - ${release.releasedAt}`))throw new Error(`Changelog-Eintrag für ${release.version} fehlt.`);
 if(!handoff.includes(`| Version | \`${release.version}\` |`)||!handoff.includes(`| Build | \`${release.build}\` |`))throw new Error('Tester-Handoff enthält nicht die aktuelle Version.');
 if(!index.includes(`release.js?v=${release.build}`)||!index.includes('id="build-version"'))throw new Error('Versionsanzeige ist nicht korrekt in index.html eingebunden.');
-for(const report of readdirSync('.').filter(name=>/(?:REPORT|REVIEW|CLEARANCE|NOTICES).*\.md$/i.test(name)&&name!=='REPORTS.md')){
+const safeDirectory=process.cwd().replaceAll('\\','/');
+const trackedMarkdown=execFileSync('git',['-c',`safe.directory=${safeDirectory}`,'ls-files','--cached','--','*.md'],{encoding:'utf8'}).trim().split(/\r?\n/);
+for(const report of trackedMarkdown.filter(name=>/(?:REPORT|REVIEW|CLEARANCE|NOTICES).*\.md$/i.test(name)&&name!=='REPORTS.md')){
   const source=readFileSync(report,'utf8');
   if(!reportsIndex.includes(`](${report})`))throw new Error(`${report} fehlt in REPORTS.md.`);
   if(!/\*\*(?:Berichtsversion|Report version|Document version):\*\*\s+\d+/i.test(source))throw new Error(`${report} besitzt keine Dokumentversion.`);
@@ -30,7 +32,6 @@ const previousArg=process.argv.find(arg=>arg.startsWith('--previous='));
 if(previousArg){
   const previousRef=previousArg.slice('--previous='.length);
   try{
-    const safeDirectory=process.cwd().replaceAll('\\','/');
     const previousSource=execFileSync('git',['-c',`safe.directory=${safeDirectory}`,'show',`${previousRef}:release.js`],{encoding:'utf8',stdio:['ignore','pipe','pipe']});
     const previous=parseRelease(previousSource);
     if(release.build<=previous.build)throw new Error(`Build ${release.build} ist nicht höher als der veröffentlichte Build ${previous.build}.`);

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,existsSync} from 'node:fs';
 import vm from 'node:vm';
 
 function visualContext(){
@@ -29,4 +29,33 @@ test('a local asset can replace a vector without changing the unit',()=>{
 test('remote artwork URLs are rejected',()=>{
   const {UnitVisuals}=visualContext();
   assert.throws(()=>UnitVisuals.setAsset('gev','https://example.com/unit.svg'),/local project path/);
+});
+
+test('five complete art sets resolve current scenario variants by unit name',()=>{
+  const {UnitVisuals}=visualContext();
+  const manifest=JSON.parse(readFileSync(new URL('../assets/unit-art/manifest.json',import.meta.url),'utf8'));
+  assert.equal(UnitVisuals.styles.length,5);
+  assert.equal(manifest.styles.length,5);
+  for(const style of UnitVisuals.styles){
+    assert.ok(UnitVisuals.setStyle(style.id));
+    assert.ok(existsSync(new URL(`../assets/unit-art/sets/${style.id}/logo.svg`,import.meta.url)));
+    for(const {id,name} of manifest.units){
+      const unit={id:'scenario-alias',name};
+      assert.equal(UnitVisuals.artKey(unit),id);
+      for(const view of ['icons','library']){
+        assert.ok(existsSync(new URL(`../${UnitVisuals.assetFor(unit,view)}`,import.meta.url)),`${style.id}/${view}/${id}`);
+      }
+    }
+    assert.match(UnitVisuals.resolve({id:'infantry',name:'FIELD ENGINEERS'}).asset,/field-engineers\.svg$/);
+    assert.match(UnitVisuals.resolve({id:'core',name:'RELAY NODE'}).asset,/relay-node\.svg$/);
+    assert.match(UnitVisuals.resolve({id:'guard',name:'SIEGE TANK'}).asset,/siege-tank\.svg$/);
+  }
+  assert.equal(UnitVisuals.setStyle('unknown'),false);
+});
+
+test('explicit local artwork still overrides the active art set',()=>{
+  const {UnitVisuals}=visualContext();
+  UnitVisuals.setStyle(UnitVisuals.styles[0].id);
+  UnitVisuals.setAsset('heavy-tank','assets/custom-tank.svg');
+  assert.equal(UnitVisuals.resolve({id:'heavy-tank',name:'ASSAULT TANK'}).asset,'assets/custom-tank.svg');
 });
