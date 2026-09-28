@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "viewFormats": {
+    "icon": "256×256 SVG · transparent · top view",
+    "library": "512×384 SVG · transparent · oblique view",
+    "logo": "1024×256 SVG · transparent"
+  },
+  "styles": [
+    {
+      "id": "01-modular-stealth-geometry",
+      "title": "Modular Stealth Geometry",
+      "directory": "sets/01-modular-stealth-geometry/"
+    },
+    {
+      "id": "02-industrial-exoframe",
+      "title": "Industrial Exoframe",
+      "directory": "sets/02-industrial-exoframe/"
+    },
+    {
+      "id": "03-monolithic-facet",
+      "title": "Monolithic Facet",
+      "directory": "sets/03-monolithic-facet/"
+    },
+    {
+      "id": "04-autonomous-drone-corps",
+      "title": "Autonomous Drone Corps",
+      "directory": "sets/04-autonomous-drone-corps/"
+    },
+    {
+      "id": "05-aerospace-ground-force",
+      "title": "Aerospace Ground Force",
+      "directory": "sets/05-aerospace-ground-force/"
+    }
+  ],
+  "units": [
+    {
+      "id": "goblin-siegebreaker",
+      "name": "GOBLIN SIEGEBREAKER",
+      "kind": "platform",
+      "weapon": "twin"
+    },
+    {
+      "id": "skimmer-scout",
+      "name": "SKIMMER SCOUT",
+      "kind": "hover",
+      "weapon": "sensor"
+    },
+    {
+      "id": "rocket-artillery",
+      "name": "ROCKET ARTILLERY",
+      "kind": "tank",
+      "weapon": "rockets"
+    },
+    {
+      "id": "infantry-squad",
+      "name": "INFANTRY SQUAD",
+      "kind": "infantry",
+      "weapon": "rifles"
+    },
+    {
+      "id": "assault-tank",
+      "name": "ASSAULT TANK",
+      "kind": "tank",
+      "weapon": "cannon"
+    },
+    {
+      "id": "recon-tank",
+      "name": "RECON TANK",
+      "kind": "tank",
+      "weapon": "sensor"
+    },
+    {
+      "id": "siege-tank",
+      "name": "SIEGE TANK",
+      "kind": "tank",
+      "weapon": "twin"
+    },
+    {
+      "id": "long-range-battery",
+      "name": "LONG-RANGE BATTERY",
+      "kind": "emplacement",
+      "weapon": "longgun"
+    },
+    {
+      "id": "mobile-siege-gun",
+      "name": "MOBILE SIEGE GUN",
+      "kind": "tank",
+      "weapon": "longgun"
+    },
+    {
+      "id": "combat-skimmer",
+      "name": "COMBAT SKIMMER",
+      "kind": "hover",
+      "weapon": "cannon"
+    },
+    {
+      "id": "light-skimmer",
+      "name": "LIGHT SKIMMER",
+      "kind": "hover",
+      "weapon": "sensor"
+    },
+    {
+      "id": "skimmer-carrier",
+      "name": "SKIMMER CARRIER",
+      "kind": "carrier",
+      "weapon": "lightgun"
+    },
+    {
+      "id": "strategic-missile-carrier",
+      "name": "STRATEGIC MISSILE CARRIER",
+      "kind": "crawler",
+      "weapon": "missile"
+    },
+    {
+      "id": "artillery-drone",
+      "name": "ARTILLERY DRONE",
+      "kind": "drone",
+      "weapon": "longgun"
+    },
+    {
+      "id": "amphibious-infantry",
+      "name": "AMPHIBIOUS INFANTRY",
+      "kind": "infantry",
+      "weapon": "fins"
+    },
+    {
+      "id": "field-engineers",
+      "name": "FIELD ENGINEERS",
+      "kind": "infantry",
+      "weapon": "tools"
+    },
+    {
+      "id": "local-defense",
+      "name": "LOCAL DEFENSE",
+      "kind": "infantry",
+      "weapon": "rifles"
+    },
+    {
+      "id": "command-hub",
+      "name": "COMMAND HUB",
+      "kind": "structure",
+      "weapon": "antenna"
+    },
+    {
+      "id": "goblin-dreadnaught",
+      "name": "GOBLIN DREADNAUGHT",
+      "kind": "platform",
+      "weapon": "quad"
+    },
+    {
+      "id": "forge-engineer",
+      "name": "FORGE ENGINEER",
+      "kind": "platform",
+      "weapon": "tools"
+    },
+    {
+      "id": "phantom-platform",
+      "name": "PHANTOM PLATFORM",
+      "kind": "platform",
+      "weapon": "sensor"
+    },
+    {
+      "id": "infantry-platoon",
+      "name": "INFANTRY PLATOON",
+      "kind": "infantry",
+      "weapon": "rifles"
+    },
+    {
+      "id": "command-core",
+      "name": "COMMAND CORE",
+      "kind": "structure",
+      "weapon": "core"
+    },
+    {
+      "id": "relay-node",
+      "name": "RELAY NODE",
+      "kind": "structure",
+      "weapon": "antenna"
+    },
+    {
+      "id": "guard-tank",
+      "name": "GUARD TANK",
+      "kind": "tank",
+      "weapon": "cannon"
+    },
+    {
+      "id": "raider-skimmer",
+      "name": "RAIDER SKIMMER",
+      "kind": "hover",
+      "weapon": "twin"
+    }
+  ],
+  "pathPattern": {
+    "icon": "sets/{style}/icons/{unit}.svg",
+    "library": "sets/{style}/library/{unit}.svg",
+    "logo": "sets/{style}/logo.svg"
+  }
+}
