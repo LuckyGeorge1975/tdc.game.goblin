@@ -38,3 +38,21 @@ test('target priority advances as systems are destroyed',()=>{
   systems.applyHit(state,'missiles','X');systems.applyHit(state,'missiles','X');
   assert.equal(systems.chooseTarget(state).key,'main');
 });
+
+test('weapon fire budgets reset while expended missiles stay expended',()=>{
+  const state=systems.createMarkIII();
+  systems.recordFire(state.weapons.main);systems.recordFire(state.weapons.missiles);
+  assert.equal(systems.weaponReady(state.weapons.main),0);
+  assert.equal(systems.weaponReady(state.weapons.missiles),1);
+  systems.resetFireState(state);
+  assert.equal(systems.weaponReady(state.weapons.main),1);
+  assert.equal(systems.weaponReady(state.weapons.missiles),1);
+});
+
+test('destroyed missile racks cannot leave phantom ammunition',()=>{
+  const state=systems.createMarkIII();
+  systems.applyHit(state,'missiles','X');
+  assert.equal(systems.weaponReady(state.weapons.missiles),1);
+  systems.recordFire(state.weapons.missiles);
+  assert.equal(systems.weaponReady(state.weapons.missiles),0);
+});
