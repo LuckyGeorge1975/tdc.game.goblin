@@ -15,7 +15,7 @@ function game(){
     GameDialogs:{isOpen:()=>false,cancel(){},confirm:async()=>true},localStorage:{getItem(){return null}},
     setTimeout(){return 1},clearTimeout(){}});
   const run=source=>vm.runInContext(source,context);
-  for(const file of ['unit-visuals.js','ogre-systems.js','game.js','ogre-runtime.js','combat-feedback.js','siegebreaker-weapons.js','strategic-missile.js','scenario.js','command-history.js'])
+  for(const file of ['unit-visuals.js','terrain-rules.js','ogre-systems.js','game.js','ogre-runtime.js','combat-feedback.js','siegebreaker-weapons.js','strategic-missile.js','scenario.js','command-history.js'])
     run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
   run("draw=()=>{};updateSelection=()=>{};loadScenario('unit-trial');document.querySelector('#auto-end-turn').checked=false");
   return run;

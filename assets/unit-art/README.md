@@ -12,11 +12,11 @@ Fünf eigenständige, vollständige Stilrichtungen für den aktuellen Unit Guide
 
 ## Umfang
 
-Pro Stil gibt es 26 transparente, skizzenhafte SVG-Icons in orthografischer Draufsicht (`256 × 256`), 26 transparente SVG-Illustrationen in schräger Dreiviertelansicht (`512 × 384`) und ein transparentes G.O.B.L.I.N.-Logo (`1024 × 256`). Das sind **53 Dateien je Stil, 265 SVG-Dateien insgesamt**. Die 26 Motive enthalten auch Infanterie, stationäre Einheiten und Szenarioziele, damit alle derzeit sichtbaren Einträge konsistent bebildert werden können. Die zwei Konfigurationen des GOBLIN SIEGEBREAKER im Unit Guide verwenden denselben Motivschlüssel.
+Pro Stil gibt es 26 transparente, skizzenhafte SVG-Icons in orthografischer Draufsicht (`256 × 256`), 26 transparente SVG-Illustrationen in schräger Dreiviertelansicht (`512 × 384`) und ein transparentes G.O.B.L.I.N.-Logo (`1024 × 256`). Das sind **53 Dateien je Stil, 265 SVG-Dateien insgesamt**. Die 26 Motive enthalten auch Infanterie, stationäre Einheiten und Szenarioziele, damit alle sichtbaren Einträge konsistent bebildert werden können.
 
 Zusätzlich enthält jeder Stil 12 Terrain-Icons für Hexfelder (`256 × 256`): offenes Gelände, Trümmerfeld, Berg, Höhenrücken, Wald, Sumpf, Wasser, Fluss, Straße, Brücke, Stadtgebiet und Krater. Damit umfasst das Paket **325 SVG-Dateien**. Ein statisches Showcase-Level namens **ATLAS / PROVING GROUNDS** verwendet alle 12 Terrainmotive und alle 26 Einheitentypen auf einem 12 × 8-Hexraster.
 
-Wichtig: ATLAS ist ab Build 0.1.11 als spielbares Content-Showcase auswählbar. Trümmer und Berge verwenden die vorhandene Deckungs-/Trümmerregel; alle anderen neuen Geländemotive werden vorläufig wie offenes Gelände behandelt. Ihre eigenständigen Bewegungs-, Kollisions- und Sichtregeln sind noch offen. Die Einheitenwerte und das Missionsziel im spielbaren Showcase sind vorläufig; [Level-JSON](levels/atlas-proving-grounds.json) und Vorschau bleiben die Content-Quelle.
+Wichtig: ATLAS ist seit Build 0.1.11 als spielbares Content-Showcase auswählbar. Ab Build 0.1.12 gelten für alle zwölf Geländemotive eigene Bewegungs-, Deckungs- und Sichtregeln laut [Regelmatrix](../../RULE_MATRIX.md). Die Spezialwerte vieler Einheiten und das Missionsziel bleiben vorläufig; [Level-JSON](levels/atlas-proving-grounds.json) und Vorschau sind die Content-Quelle.
 
 | Stil-ID | Gestaltung |
 | --- | --- |

@@ -1,6 +1,6 @@
 # Austauschbare Einheitengrafiken
 
-**Dokumentversion:** 2
+**Dokumentversion:** 3
 
 Die Kartenansicht bezieht ihre Darstellung zentral aus `unit-visuals.js`. Spiellogik und Szenarien verwenden weiterhin stabile interne IDs; ein Austausch der Grafik verändert daher keine Regeln oder Spielstände.
 
@@ -9,6 +9,8 @@ Die Kartenansicht bezieht ihre Darstellung zentral aus `unit-visuals.js`. Spiell
 Das Dropdown `ICON SET` neben `SCENARIO` wählt zwischen `Modular Stealth Geometry`, `Industrial Exoframe`, `Monolithic Facet`, `Autonomous Drone Corps` und `Aerospace Ground Force`. Die Auswahl gilt für Karte, eigene Einheitenliste, Frachtanzeige und Unit Guide. Ein Wechsel startet das aktuelle Szenario neu; bei Spielfortschritt muss der Verlust des Spielstands bestätigt werden. Die Wahl bleibt lokal im Browser gespeichert.
 
 Die Motive liegen unter `assets/unit-art/sets/{style}/icons/{unit}.svg`, `assets/unit-art/sets/{style}/library/{unit}.svg` und `assets/unit-art/sets/{style}/terrain/{terrain}.svg`. Das [Manifest](assets/unit-art/manifest.json) enthält 26 Einheiten- und zwölf Terrainschlüssel. Die Dateien stammen aus dem Content-Creator-Branch `codex/unit-art`; [Vergleich](assets/unit-art/comparison.html), [Einheitengalerie](assets/unit-art/gallery.html) und [Terrain-Galerie](assets/unit-art/terrain-gallery.html) zeigen die Auswahl. `UnitVisuals.terrainAssetFor(type)` liefert den aktuellen lokalen Terrainpfad. Beim Stilwechsel werden Einheiten und Gelände gemeinsam neu gezeichnet.
+
+Die Regeln der Terrainarten stehen getrennt von den SVGs in `terrain-rules.js`. Ein Icon-Set-Wechsel ändert nur die Darstellung, nicht Bewegung, Deckung oder Sicht. Der Unit Guide enthält alle 26 Motive, zeigt Live-Werte der aktuell vorhandenen Einheit und markiert nicht umgesetzte Spezialaktionen als geplant.
 
 ## Lokales Bild zuweisen
 

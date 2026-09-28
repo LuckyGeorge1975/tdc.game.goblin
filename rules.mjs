@@ -1,13 +1,16 @@
+import TerrainRules from './terrain-rules.js';
+
 export const UNIT_RULES = Object.freeze({
-  goblin: Object.freeze({ move: 1, range: 2, damage: 3, ram: true }),
+  goblin: Object.freeze({ move: 3, range: 2, damage: 3, ram: true }),
   gev: Object.freeze({ move: 3, range: 3, damage: 1, secondMove: 2 }),
   missile: Object.freeze({ move: 1, range: 4, damage: 2 }),
   infantry: Object.freeze({ move: 2, range: 1, damage: 1, infantry: true }),
 });
 
 export const TERRAIN_RULES = Object.freeze({
-  open: Object.freeze({ cost: 1, cover: false, blocksLos: false }),
-  cover: Object.freeze({ cost: 2, cover: true, blocksLos: true }),
+  ...TerrainRules.rules,
+  open: TerrainRules.get('open-ground'),
+  cover: TerrainRules.get('rubble-field'),
 });
 
 export function hexDistance(a, b) {
@@ -15,13 +18,11 @@ export function hexDistance(a, b) {
 }
 
 export function terrainCost(isCover) {
-  return isCover ? TERRAIN_RULES.cover.cost : TERRAIN_RULES.open.cost;
+  return TerrainRules.movementCost(isCover?'rubble-field':'open-ground','tracked');
 }
 
 export function movementCostForMode(mode, isCover) {
-  if (!isCover) return TERRAIN_RULES.open.cost;
-  if (mode === 'fixed') return Infinity;
-  return TERRAIN_RULES.cover.cost;
+  return TerrainRules.movementCost(typeof isCover==='string'?isCover:isCover?'rubble-field':'open-ground',mode);
 }
 
 export function combatRatio(damage, maxHp) {

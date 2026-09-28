@@ -18,7 +18,7 @@ function game() {
     localStorage:{getItem(){return null}},
     setTimeout(fn){timers.set(++timerId,fn);return timerId},clearTimeout(id){timers.delete(id)}});
   const run = source => vm.runInContext(source,context);
-  for(const file of ['unit-visuals.js','ogre-systems.js','game.js','ogre-runtime.js','combat-feedback.js','siegebreaker-weapons.js','scenario.js','command-history.js'])run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
+  for(const file of ['unit-visuals.js','terrain-rules.js','ogre-systems.js','game.js','ogre-runtime.js','combat-feedback.js','siegebreaker-weapons.js','scenario.js','command-history.js'])run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
   run("draw=()=>{}; updateSelection=()=>{}; loadScenario('unit-trial');");
   return {run,timers};
 }
@@ -68,6 +68,21 @@ test('movement commands undo in reverse order, restoring log and action budgets'
   assert.equal(run('units[0].moveCount'),0);
   assert.equal(run("logEl.innerHTML.includes('bewegt')"),false);
   assert.equal(run("document.querySelector('#undo-command').disabled"),true);
+});
+
+test('terrain types govern movement, unloading, line of sight, and combat defense',()=>{
+  const {run}=game();
+  run("terrainTypes.set('4,6','water'); terrainTypes.set('2,2','forest')");
+  assert.equal(run("movementCost(units[0],'4,6')"),Infinity);
+  assert.equal(run("movementCost(units[2],'4,6')"),1);
+  assert.equal(run("lineOfSight({x:1,y:2},{x:3,y:2})"),false);
+  run("units[3].embarkedOn=units[2].id; units[3].x=units[2].x; units[3].y=units[2].y");
+  assert.equal(run('canUnloadTo(units[2],units[3],4,6)'),false);
+  run('units[3].amphibious=true');
+  assert.equal(run('canUnloadTo(units[2],units[3],4,6)'),true);
+  run("terrainTypes.set('4,6','crater');globalThis.coverTarget={x:4,y:6,hp:3,maxHp:3,defense:3}");
+  assert.equal(run('effectiveDefense(coverTarget)'),4);
+  assert.equal(run("applyCombatRoll({damage:6,team:'player'},coverTarget,0).ratio"),'1-1');
 });
 
 test('loading spends only infantry movement and cannot be reversed by immediate unloading',()=>{

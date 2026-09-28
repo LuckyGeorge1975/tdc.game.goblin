@@ -4,6 +4,7 @@ function loadScenario(id){
   currentScenario=id;
   terrain=new Set(config.terrain);
   terrainTypes=new Map((config.terrainTypes||[]).map(cell=>[`${cell.x},${cell.y}`,cell.type]));
+  for(const [key,type] of terrainTypes)if(TerrainRules.coverBonus(type))terrain.add(key);
   units.splice(0,units.length,...JSON.parse(JSON.stringify(config.units)).map(unit=>({...unit,moveCount:0,moveFrom:null,acted:false,disabled:false,justHit:false})));
   selected=null;focusedCell=null;transportLoadMode=null;transportUnloadMode=null;turn=1;phase='player';turnPhase='movement';gameOver=false;resetActionState();$("#end-turn").disabled=false;
   $('#mission-kicker').textContent=config.kicker;

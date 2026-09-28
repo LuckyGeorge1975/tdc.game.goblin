@@ -8,7 +8,7 @@ test('ATLAS loads the content JSON as a playable scenario with unique units',asy
   const options=[];
   const context=vm.createContext({
     W:12,H:8,scenarioCatalog:{},GoblinSystems:{createMarkIII:()=>({test:true})},
-    showFieldInfo:()=>{},updateRoster:()=>{},terrainTypeAt:()=>{},terrain:new Set(),currentScenario:'iron-dust',
+    TerrainRules:(await import('../terrain-rules.js')).default,updateRoster:()=>{},terrain:new Set(),currentScenario:'iron-dust',
     $:()=>({appendChild:option=>options.push(option)}),
     document:{createElement:()=>({})},
     fetch:async()=>({ok:true,json:async()=>level}),
@@ -21,8 +21,14 @@ test('ATLAS loads the content JSON as a playable scenario with unique units',asy
   assert.equal(scenario.units.length,26);
   assert.equal(new Set(scenario.units.map(unit=>`${unit.x},${unit.y}`)).size,26);
   assert.equal(new Set(scenario.terrainTypes.map(cell=>cell.type)).size,12);
-  assert.equal(scenario.terrain.length,4);
+  assert.equal(scenario.terrain.length,12);
   assert.ok(scenario.units.find(unit=>unit.id==='core')?.core);
   assert.ok(scenario.units.find(unit=>unit.id==='ogre')?.ogreSystems);
+  assert.ok(scenario.units.find(unit=>unit.name==='AMPHIBIOUS INFANTRY')?.amphibious);
+  const terrainByPosition=new Map(scenario.terrainTypes.map(cell=>[`${cell.x},${cell.y}`,cell.type]));
+  for(const unit of scenario.units){
+    const type=terrainByPosition.get(`${unit.x},${unit.y}`)||'open-ground';
+    if(unit.move>0)assert.ok(Number.isFinite(context.TerrainRules.movementCost(type,unit)),`${unit.name} starts on impassable ${type}`);
+  }
   assert.equal(options[0].value,'atlas-proving-grounds');
 });

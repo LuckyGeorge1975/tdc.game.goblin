@@ -6,18 +6,21 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
 | Feld | Wert |
 |---|---|
-| Version | `0.1.11` |
-| Build | `11` |
-| Release-Tag | `v0.1.11` |
+| Version | `0.1.12` |
+| Build | `12` |
+| Release-Tag | `v0.1.12` |
 | Datum | 2026-09-28 |
-| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.11> |
-| Änderungen | [CHANGELOG.md](CHANGELOG.md#0111---2026-09-28) |
+| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.12> |
+| Änderungen | [CHANGELOG.md](CHANGELOG.md#0112---2026-09-28) |
 
-### Testfokus für 0.1.11
+### Testfokus für 0.1.12
 
-- `ATLAS / PROVING GROUNDS` laden: zwölf Geländemotive und 26 Einheiten sichtbar, Einheiten und Hexfelder anklickbar.
-- Alle fünf Icon-Sets im ATLAS-Szenario wechseln; Gelände und Einheiten müssen gemeinsam wechseln und das Szenario neu starten.
-- Movement-/Fire-/Sicht-Overlays, `FIELD INTEL`, Szenariowechsel-Bestätigung und `BACK` auf ATLAS prüfen. Neue Geländetypen außer Trümmer/Berg sind derzeit ausdrücklich nur visuell.
+- ATLAS: Wasser/Fluss mit Kettenfahrzeug und normaler Infanterie nicht betretbar, mit Skimmer und amphibischer Infanterie erreichbar; Brücke für alle passierbar. Movement Area muss diese Unterschiede zeigen.
+- Wald/Stadt/Berg blockieren die Sichtlinie hinter dem Feld; Krater gibt Deckung ohne Sichtblock. Field Intel zeigt Geländekosten und Deckung passend zur gewählten Einheit.
+- Feuer auf eine gedeckte Einheit: Unit Intel zeigt `+1 DEF`, das Combat Log die daraus resultierende Kampfquote. Rücknahme per `BACK` prüfen.
+- Unit Guide: 26 unterschiedliche Einträge, Live-Werte im aktuellen Szenario, Aktionen und geplanter Status; „AUF KARTE“ fokussiert eine vorhandene Einheit ohne Bewegungs-/Feuerbefehl. Größe des Overlays bleibt beim Blättern gleich.
+
+Automatisierte Übergabeprüfung: 59/59 Tests bestanden. Ein lokaler visueller Browser-Smoke-Test war auf dem Developer-Host wegen einer ausgefallenen Browser-Laufzeit nicht möglich; die obigen UI-Punkte sind deshalb besonders wichtig.
 
 ## Übergabe durch den Developer
 

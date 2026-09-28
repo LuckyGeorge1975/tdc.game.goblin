@@ -6,11 +6,11 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 Der Prototyp ist spielbar und auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) veröffentlicht.
 
-Aktueller Übergabestand: **0.1.11 / Build 11**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
+Aktueller Übergabestand: **0.1.12 / Build 12**. Änderungen stehen im [Changelog](CHANGELOG.md), der verbindliche Ablauf in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
 
 Enthalten sind:
 
-- Hexfeldkarte mit offenem Gelände sowie Berg-/Trümmerfeldern; im neuen ATLAS-Showcase zwölf austauschbare Terrainmotive
+- Hexfeldkarte mit zwölf Terrainarten im ATLAS-Showcase: modusspezifische Bewegung, Deckung +1 auf Verteidigung und unterschiedliche Sichtblocker
 - Bewegung mit Gelände- und Belegungskosten sowie expliziten Bewegungsmodi für Kettenfahrzeuge, Infanterie, Skimmer und stationäre Einheiten
 - getrennte Movement-, Fire- und Skimmer-Manöverphasen
 - Einheitliche Spiel-Dialoge für Phasenende, Szenariowechsel und Neustart. Escape bricht ab; Tab und Enter bedienen den Dialog. Spielkürzel und AUTO sind währenddessen gesperrt. „Never ask again“ gilt ausschließlich für das Phasenende. Keine Browser-Messageboxen.
@@ -21,10 +21,10 @@ Enthalten sind:
 - Deaktivierung, Wiederherstellung, Zerstörung und sichtbare Wracks
 - Goblin-Ramming gegen gegnerische Fahrzeuge
 - einfache Gegner-KI mit Bewegung und Feuer
-- Szenarien `IRON DUST`, `RELAY RUN`, `UNIT TRIAL` und `ATLAS / PROVING GROUNDS`. ATLAS zeigt alle 26 Einheitentypen; Einheitenwerte und Siegbedingung sind dort vorläufig. Neue Geländemotive außer Berg und Trümmern gelten bis zur Regelimplementierung wie offenes Gelände.
+- Szenarien `IRON DUST`, `RELAY RUN`, `UNIT TRIAL` und `ATLAS / PROVING GROUNDS`. ATLAS zeigt alle 26 Einheitentypen; Einheiten-Spezialwerte und Siegbedingung sind dort noch vorläufig. Die Terrainregeln sind implementiert und in der [Regelmatrix](RULE_MATRIX.md) dokumentiert.
 - Area-Modi `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`
 - optionales Hex-Grid und oberster Feld-Fokusmarker
-- Quick-Start-Guide, Einheiten-Guide mit Basis- und Erweiterungseinheiten sowie kombinierte Feld- und Einheiteninformationen
+- Quick-Start-Guide, Einheitenbibliothek mit 26 Typen, Live-Werten, Aktionsprofil und „Auf Karte“-Funktion sowie kombinierte Feld- und Einheiteninformationen
 - Skimmer-Carrier-Transport im Szenario `UNIT TRIAL`: Kapazität wird in Infanterie-Stärkepunkten geführt; Ein-/Aussteigen verbraucht die Infanteriebewegung, nicht die Bewegung des Trägers
 - Transportierte Infanterie kann aus dem Skimmer Carrier feuern. Angriffe auf die Kombination verwenden einen gemeinsamen Würfelwurf, werden aber getrennt gegen Träger und Passagiere ausgewertet
 - Der GOBLIN SIEGEBREAKER besitzt einen eigenen Systemzustand für Hauptbatterie, Sekundärbatterien, Raketen, Nahbereichsschutz und 45 Ketteneinheiten. Gegnerische Treffer werden gegen ein einzelnes System ausgewertet; Kettenschäden reduzieren seine Bewegung bei 30, 15 und 0 verbleibenden Kettenpunkten.
@@ -71,7 +71,7 @@ node scripts/verify-release.mjs
 node --test tests/*.test.mjs
 ```
 
-Die Tests decken derzeit Einheitengrundwerte, den G.O.B.L.I.N.-Einheitenkatalog, Plattform-Systemdaten, Hex-Distanzen, Geländekosten, Sichtlinienflags, CRT-Verhältnisse sowie Deaktivierung und Zerstörung ab.
+Die Tests decken unter anderem Szenariostatus, zwölf Terrainregeln, Wasserpassage, Deckungsbonus, Sichtlinie, Kampf, Transport, Undo und die Einheitenbibliothek ab.
 
 ## Versionierung und Tester-Übergabe
 
@@ -82,10 +82,9 @@ Tester geben die sichtbare Version aus der Kopfzeile in jedem Bericht an. Für s
 ## Bekannte Grenzen
 
 - Die Feuerergebnisse sind noch zufallsbasiert; ein reproduzierbarer Testwürfel fehlt.
-- Deckung blockiert derzeit die Sichtlinie, verändert aber noch nicht separat die Verteidigungswerte.
-- Die Einheitenwerte sind jetzt im eigenständigen G.O.B.L.I.N.-Katalog erfasst. Die aktive Mission verwendet weiterhin bewusst eine kleinere Prototypauswahl, bis die jeweiligen Sonderregeln integriert sind.
+- ATLAS enthält alle 26 Motive, aber viele Spezialisten verwenden vorläufige Werte und noch keine eigene Sonderaktion; der Unit Guide kennzeichnet geplante Fähigkeiten.
 - Weitere strategische Raketenregeln (freies Zielen auf leere Hexfelder), Nahbereichsgefechte, Engineering, indirektes Feuer und Verstärkungen sind noch nicht vollständig spielbar; Transport ist zunächst auf den Skimmer Carrier begrenzt, bildet dessen grundlegende Bewegungs-, Feuer- und Schadensregeln aber ab.
 
 ## Nächste Ausbaustufe
 
-Als Nächstes folgen Nahbereichsgefechte und Engineering. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.
+Als Nächstes folgen geteiltes Feuer, Engineering und differenzierte Fähigkeiten der schweren Plattformen. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="unit-ui.css?v=1" />
       <link rel="stylesheet" href="art-theme.css?v=1" />
       <link rel="stylesheet" href="terrain-ui.css?v=11" />
+      <link rel="stylesheet" href="unit-guide-details.css?v=12" />
     <style>
       .unit-svg { pointer-events: all; cursor: pointer; visibility: visible; opacity: 1; }
       .unit-svg.wreck { pointer-events: none; cursor: default; }
@@ -94,7 +95,7 @@
         </div>
         <div class="top-status">
           <span class="signal"><b></b> LIVE FEED</span>
-          <span id="build-version" class="build">FIELD TEST 0.1.11</span>
+          <span id="build-version" class="build">FIELD TEST 0.1.12</span>
           <div class="guide-actions"><button id="quick-start-open" class="action-button guide-button">QUICK START</button><button id="unit-guide-open" class="action-button guide-button">UNIT GUIDE</button></div>
         </div>
       </header>
@@ -168,34 +169,35 @@
           <article class="quick-guide-section"><h3>2 · BEWEGEN</h3><p>Wähle eine eigene handlungsfähige Einheit und klicke ein grün markiertes Ziel. Gelände kostet zusätzliche Bewegung. Bereits bewegte Einheiten sind ausgegraut.</p></article>
           <article class="quick-guide-section"><h3>3 · FEUERN</h3><p>In der Fire Phase wählst du ein sichtbares Ziel im roten Bereich. Beim Siegebreaker wählst du zuvor unter der Karte ein noch verfügbares Waffensystem; dessen Reichweite bestimmt das Overlay. Die Feuerwahrscheinlichkeit folgt dem Verhältnis Angriff zu Verteidigung und kann NE, D oder X ergeben. <kbd>F</kbd> greift das nächste gültige Ziel an.</p></article>
           <article class="quick-guide-section"><h3>4 · SKIMMER-PHASE</h3><p>Skimmer erhalten nach Bewegung und Feuer ein zusätzliches Manöver. Light Skimmer und Skimmer Carrier verwenden denselben Schwebefahrzeug-Modus.</p></article>
-          <article class="quick-guide-section"><h3>5 · GELÄNDE</h3><p>Berg-/Trümmerfelder geben Deckung, kosten mehr Bewegung und blockieren die Sichtlinie. Mit den Schaltern <b>MOVEMENT RANGE</b>, <b>FIRE RANGE</b>, <b>LINE OF SIGHT</b> und <b>GRID</b> kannst du die Karte prüfen.</p></article>
+          <article class="quick-guide-section"><h3>5 · GELÄNDE</h3><p>Wald, Berge, Stadt und Trümmer geben +1 Verteidigung und blockieren Sichtlinien dahinter; Krater geben Deckung ohne Sichtblock. Wasser und Flüsse sind nur für Skimmer und amphibische Infanterie passierbar. Die genauen Kosten zeigt <b>FIELD INTEL</b>.</p></article>
           <article class="quick-guide-section"><h3>6 · PHASEN</h3><p>Jede Runde besteht aus Movement, Fire, Skimmer Maneuver und dem automatischen Hostile Turn. <b>END TURN</b> wechselt die Phase; offene Aktionen werden vorher bestätigt.</p></article>
           <article class="quick-guide-section"><h3>7 · KAMPFRESULTATE</h3><p><b>NE</b> bedeutet kein Effekt. <b>D</b> deaktiviert Fahrzeuge vorübergehend oder reduziert Infanterie. <b>X</b> zerstört das Ziel. Wracks bleiben sichtbar. Der Strategic Missile Carrier besitzt genau eine Rakete: Ein sichtbares Feindziel anklicken; Nachbarhexen werden ebenfalls getroffen, auch eigene Einheiten.</p></article>
           <article class="quick-guide-section"><h3>8 · TRANSPORT</h3><p>Wähle Infanterie und klicke einen erreichbaren Skimmer Carrier oder nutze dessen <b>+</b>. Ein-/Aussteigen verbraucht die Infanteriebewegung. In der Fire Phase wählst du Passagiere in der Cargo-Leiste zum Feuern. <kbd>L</kbd> öffnet Laden oder Entladen.</p></article>
-          <article class="quick-guide-section"><h3>9 · ZIEL</h3><p>Zerstöre den Command Core beziehungsweise Relay Node. Nach Sieg oder Niederlage bleibt der Combat Log sichtbar; <b>RESTART</b> beginnt die Mission neu.</p></article>
+          <article class="quick-guide-section"><h3>9 · ZIEL</h3><p>IRON DUST verlangt den Command Core; in den anderen Szenarien müssen auch die verbliebenen Gegner ausgeschaltet werden. Nach Sieg oder Niederlage bleibt der Combat Log sichtbar; <b>RESTART</b> beginnt die Mission neu.</p></article>
         </div>
-        <div class="quick-guide-footer">TIPP · Öffne den UNIT GUIDE für Einheitenwerte und Sonderrollen. Die Szenarien UNIT TRIAL und RELAY RUN eignen sich zum Testen einzelner Mechaniken.</div>
+        <div class="quick-guide-footer">TIPP · Der UNIT GUIDE zeigt Live-Werte und Aktionen und springt zur gewählten Einheit. ATLAS enthält alle zwölf Geländearten und 26 Einheitentypen.</div>
       </section>
     </div>    <div id="unit-guide-modal" class="modal guide-modal hidden" role="dialog" aria-modal="true" aria-labelledby="guide-title">
       <section class="guide-card">
         <div class="guide-head"><div><span class="eyebrow">TACTICAL ARCHIVE</span><h2 id="guide-title">UNIT GUIDE</h2></div><button id="unit-guide-close" class="guide-close" aria-label="Einheitenführer schließen">×</button></div>
-        <div class="guide-body"><div id="guide-symbol" class="guide-symbol">G</div><div><span id="guide-kicker" class="guide-kicker">FRIENDLY SYSTEM</span><h3 id="guide-name">GOBLIN SIEGEBREAKER</h3><div id="guide-role" class="guide-role">HEAVY ASSAULT</div><p id="guide-copy" class="guide-copy"></p><div id="guide-facts" class="guide-facts"></div></div></div>
-        <div class="guide-nav"><button id="guide-prev">← PREVIOUS</button><span id="guide-count" class="guide-count">01 / 20</span><button id="guide-next">NEXT →</button></div>
+        <div class="guide-body"><div id="guide-symbol" class="guide-symbol">G</div><div class="guide-information"><span id="guide-kicker" class="guide-kicker">FRIENDLY SYSTEM</span><h3 id="guide-name">GOBLIN SIEGEBREAKER</h3><div id="guide-role" class="guide-role">HEAVY ASSAULT</div><p id="guide-copy" class="guide-copy"></p><div id="guide-facts" class="guide-facts"></div><div class="guide-meta"><div><span>REGELSTATUS</span><b id="guide-status"></b></div><div><span>AKTUELLE PHASE</span><b id="guide-phase-status"></b></div><div><span>SZENARIEN</span><b id="guide-scenarios"></b></div></div><div class="guide-action-section"><span>AKTIONEN</span><ul id="guide-action-list"></ul></div></div></div>
+        <div class="guide-nav"><button id="guide-prev">← PREVIOUS</button><span id="guide-count" class="guide-count">01 / 26</span><button id="guide-find" disabled>AUF KARTE</button><button id="guide-next">NEXT →</button></div>
       </section>
     </div>
     <link rel="stylesheet" href="dialogs.css?v=1" />
-    <script src="release.js?v=11"></script>
+    <script src="release.js?v=12"></script>
     <script src="dialogs.js?v=1"></script>
     <script src="unit-visuals.js?v=11"></script>
+    <script src="terrain-rules.js?v=12"></script>
     <script src="ogre-systems.js?v=2"></script>
-<script src="game.js?v=41"></script>
-    <script src="ogre-runtime.js?v=1"></script>
-    <script src="combat-feedback.js?v=1"></script>
+<script src="game.js?v=42"></script>
+    <script src="ogre-runtime.js?v=2"></script>
+    <script src="combat-feedback.js?v=2"></script>
     <script src="siegebreaker-weapons.js?v=1"></script>
     <script src="strategic-missile.js?v=1"></script>
-    <script src="scenario.js?v=5"></script>
-    <script src="atlas-level.js?v=11"></script>
-    <script src="unit-guide.js?v=6"></script>
+    <script src="scenario.js?v=6"></script>
+    <script src="atlas-level.js?v=12"></script>
+    <script src="unit-guide.js?v=12"></script>
     <script src="quick-start.js?v=1"></script>
     <script src="art-theme.js?v=2"></script>
     <style>

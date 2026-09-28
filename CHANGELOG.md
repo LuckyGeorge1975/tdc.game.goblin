@@ -2,6 +2,19 @@
 
 Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
 
+## [0.1.12] - 2026-09-28
+
+### Hinzugefügt
+
+- Zentrale Spielregeln für alle zwölf ATLAS-Geländearten: Bewegung je Fahrzeugmodus, Wasserpassage für Skimmer und amphibische Infanterie, Sichtblocker und Deckung +1 auf die effektive Verteidigung.
+- Field Intel zeigt Geländetyp, Bewegungskosten der gewählten Einheit und Deckung; Unit Intel zeigt den Deckungsbonus. Pfadsuche, Gegnerbewegung, Entladen und Kampfwürfe verwenden dieselben Regeln.
+- Unit Guide mit allen 26 Motiven, Live-Werten im aktuellen Szenario, Szenarioverfügbarkeit, Phasenstatus, Aktionsprofil und „Auf Karte“-Schaltfläche. Geplante Spezialaktionen sind als solche gekennzeichnet.
+
+### Bereinigt
+
+- Regelmatrix und Quick Start auf den tatsächlichen Spielstand abgeglichen: Siegebreaker-Bewegung, Skimmer-Budget, CRT, Terrains und offene Spezialfähigkeiten.
+- Dokumentation trennt implementierte Playtestregeln von vorläufigen ATLAS-Einheitenwerten und Entwurfswerten des Katalogs.
+
 ## [0.1.11] - 2026-09-28
 
 ### Hinzugefügt

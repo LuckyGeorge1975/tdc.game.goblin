@@ -17,7 +17,7 @@
     if(system.type==='treads'){
       ratio='1-1';result=roll>=4?'X':'NE';
     }else{
-      ratio=combatRatio(attacker.damage,system.defense);
+      ratio=combatRatio(attacker.damage,system.defense+TerrainRules.coverBonus(terrainTypeAt(target.x,target.y)));
       result=ratio==='5-1'?'X':COMBAT_RULES.crt[ratio][roll];
     }
     const applied=GoblinSystems.applyHit(state,system.key,result,attacker.damage);
