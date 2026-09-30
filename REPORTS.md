@@ -16,5 +16,6 @@ Alle Berichte werden unverändert im Repository aufbewahrt und über diese Über
 | [QA-06 Terrain-Vorschau](PLAYTEST-REPORT-QA-06-2026-09-30.md) | `1` | Interne Terrain-Vorschau mit zwei Sets | Geprüfter Zwischenstand; Restmatrix in `goblin-zcz` | offen |
 | [QA-08 responsive UI](PLAYTEST-REPORT-QA-08-2026-09-30.md) | `1` | Interner UI-Checkpoint `f263dff` | 38/41 Browserfälle; drei Defekte, keine Freigabe | `7fef083` |
 | [QA-09 Nachprüfung](PLAYTEST-REPORT-QA-09-2026-09-30.md) | `1` | Interner Fix-Commit `7fef083` | 42/42 Browserfälle; echte Geräteprüfung offen, keine Release-Freigabe | `goblin-wtg` |
+| [Pages-Projektpfad – unabhängige lokale QA](PLAYTEST-REPORT-PAGES-PREVIEW-2026-09-30.md) | `1` | Interner Preview-Commit `42efa87` | 18/18 lokale Browserfälle; kein öffentlicher Deploy, keine Release-Freigabe | offen |
 
 Der Legal-Bericht ist eine Prüfliste und keine Rechtsberatung. Die Berichtsversion in diesem Register versioniert die unveränderte Originaldatei; vorhandene Versionsangaben im Bericht müssen übereinstimmen. Ein versionierter Bericht bedeutet ausschließlich, dass sein Inhalt und Bezugsstand nachvollziehbar gespeichert sind.

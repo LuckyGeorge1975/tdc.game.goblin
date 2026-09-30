@@ -1,0 +1,554 @@
+{
+  "commit": "42efa87",
+  "url": "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1",
+  "checks": [
+    {
+      "id": "route desktop de",
+      "status": "pass",
+      "evidence": {
+        "url": "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=de&run=1",
+        "lang": "de",
+        "mission": "Referenzpartie",
+        "phase": "Bewegungsphase",
+        "scrollWidth": 1440,
+        "action": {
+          "left": 1208,
+          "right": 1428,
+          "top": 844,
+          "bottom": 888
+        },
+        "pause": {
+          "left": 1352.453125,
+          "right": 1424,
+          "top": 76.484375,
+          "bottom": 120.484375
+        },
+        "options": [
+          "hex",
+          "verdant",
+          "dryland",
+          "natural",
+          "field-atlas"
+        ]
+      }
+    },
+    {
+      "id": "route desktop en",
+      "status": "pass",
+      "evidence": {
+        "url": "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=en&run=2",
+        "lang": "en",
+        "mission": "Reference Game",
+        "phase": "Movement Phase",
+        "scrollWidth": 1440,
+        "action": {
+          "left": 1208,
+          "right": 1428,
+          "top": 844,
+          "bottom": 888
+        },
+        "pause": {
+          "left": 1352.453125,
+          "right": 1424,
+          "top": 76.484375,
+          "bottom": 120.484375
+        },
+        "options": [
+          "hex",
+          "verdant",
+          "dryland",
+          "natural",
+          "field-atlas"
+        ]
+      }
+    },
+    {
+      "id": "route desktop es",
+      "status": "pass",
+      "evidence": {
+        "url": "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=es&run=3",
+        "lang": "es",
+        "mission": "Partida de referencia",
+        "phase": "Fase de movimiento",
+        "scrollWidth": 1440,
+        "action": {
+          "left": 1208,
+          "right": 1428,
+          "top": 844,
+          "bottom": 888
+        },
+        "pause": {
+          "left": 1352.671875,
+          "right": 1424,
+          "top": 76.484375,
+          "bottom": 120.484375
+        },
+        "options": [
+          "hex",
+          "verdant",
+          "dryland",
+          "natural",
+          "field-atlas"
+        ]
+      }
+    },
+    {
+      "id": "route desktop fr",
+      "status": "pass",
+      "evidence": {
+        "url": "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=fr&run=4",
+        "lang": "fr",
+        "mission": "Partie de référence",
+        "phase": "Phase de mouvement",
+        "scrollWidth": 1440,
+        "action": {
+          "left": 1208,
+          "right": 1428,
+          "top": 823.21875,
+          "bottom": 888
+        },
+        "pause": {
+          "left": 1352.453125,
+          "right": 1424,
+          "top": 76.484375,
+          "bottom": 120.484375
+        },
+        "options": [
+          "hex",
+          "verdant",
+          "dryland",
+          "natural",
+          "field-atlas"
+        ]
+      }
+    },
+    {
+      "id": "route mobile de",
+      "status": "pass",
+      "evidence": {
+        "url": "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=de&run=5",
+        "lang": "de",
+        "mission": "Referenzpartie",
+        "phase": "Bewegungsphase",
+        "scrollWidth": 390,
+        "action": {
+          "left": 10.390625,
+          "right": 379.609375,
+          "top": 667.203125,
+          "bottom": 711.203125
+        },
+        "pause": {
+          "left": 321.640625,
+          "right": 382,
+          "top": 61.59375,
+          "bottom": 105.59375
+        },
+        "options": [
+          "hex",
+          "verdant",
+          "dryland",
+          "natural",
+          "field-atlas"
+        ]
+      }
+    },
+    {
+      "id": "route mobile en",
+      "status": "pass",
+      "evidence": {
+        "url": "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=en&run=6",
+        "lang": "en",
+        "mission": "Reference Game",
+        "phase": "Movement Phase",
+        "scrollWidth": 390,
+        "action": {
+          "left": 10.390625,
+          "right": 379.609375,
+          "top": 667.203125,
+          "bottom": 711.203125
+        },
+        "pause": {
+          "left": 321.640625,
+          "right": 382,
+          "top": 61.59375,
+          "bottom": 105.59375
+        },
+        "options": [
+          "hex",
+          "verdant",
+          "dryland",
+          "natural",
+          "field-atlas"
+        ]
+      }
+    },
+    {
+      "id": "route mobile es",
+      "status": "pass",
+      "evidence": {
+        "url": "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=es&run=7",
+        "lang": "es",
+        "mission": "Partida de referencia",
+        "phase": "Fase de movimiento",
+        "scrollWidth": 390,
+        "action": {
+          "left": 10.390625,
+          "right": 379.609375,
+          "top": 667.203125,
+          "bottom": 711.203125
+        },
+        "pause": {
+          "left": 321.859375,
+          "right": 382,
+          "top": 61.59375,
+          "bottom": 105.59375
+        },
+        "options": [
+          "hex",
+          "verdant",
+          "dryland",
+          "natural",
+          "field-atlas"
+        ]
+      }
+    },
+    {
+      "id": "route mobile fr",
+      "status": "pass",
+      "evidence": {
+        "url": "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=fr&run=8",
+        "lang": "fr",
+        "mission": "Partie de référence",
+        "phase": "Phase de mouvement",
+        "scrollWidth": 390,
+        "action": {
+          "left": 10.390625,
+          "right": 379.609375,
+          "top": 667.203125,
+          "bottom": 711.203125
+        },
+        "pause": {
+          "left": 321.640625,
+          "right": 382,
+          "top": 61.59375,
+          "bottom": 105.59375
+        },
+        "options": [
+          "hex",
+          "verdant",
+          "dryland",
+          "natural",
+          "field-atlas"
+        ]
+      }
+    },
+    {
+      "id": "style desktop verdant",
+      "status": "pass",
+      "evidence": {
+        "dom": {
+          "value": "verdant",
+          "features": 29,
+          "picks": 96,
+          "images": [
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/verdant-ground-grain.svg",
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/verdant-forest.svg"
+          ]
+        },
+        "assets": [
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/verdant-ground-grain.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 221597
+          },
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/verdant-forest.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 567630
+          }
+        ]
+      }
+    },
+    {
+      "id": "style desktop dryland",
+      "status": "pass",
+      "evidence": {
+        "dom": {
+          "value": "dryland",
+          "features": 29,
+          "picks": 96,
+          "images": [
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/dryland-ground-grain.svg",
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/dryland-forest.svg"
+          ]
+        },
+        "assets": [
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/dryland-ground-grain.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 221599
+          },
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/dryland-forest.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 567632
+          }
+        ]
+      }
+    },
+    {
+      "id": "style desktop natural",
+      "status": "pass",
+      "evidence": {
+        "dom": {
+          "value": "natural",
+          "features": 29,
+          "picks": 96,
+          "images": [
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/natural-ground-grain.png",
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/natural-forest.svg"
+          ]
+        },
+        "assets": [
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/natural-ground-grain.png",
+            "status": 200,
+            "type": "image/png",
+            "bytes": 2728323
+          },
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/natural-forest.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 567634
+          }
+        ]
+      }
+    },
+    {
+      "id": "style desktop field-atlas",
+      "status": "pass",
+      "evidence": {
+        "dom": {
+          "value": "field-atlas",
+          "features": 29,
+          "picks": 96,
+          "images": [
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/field-atlas-ground-grain.png",
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/field-atlas-forest.svg"
+          ]
+        },
+        "assets": [
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/field-atlas-ground-grain.png",
+            "status": 200,
+            "type": "image/png",
+            "bytes": 1508230
+          },
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/field-atlas-forest.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 1604286
+          }
+        ]
+      }
+    },
+    {
+      "id": "style mobile verdant",
+      "status": "pass",
+      "evidence": {
+        "dom": {
+          "value": "verdant",
+          "features": 29,
+          "picks": 96,
+          "images": [
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/verdant-ground-grain.svg",
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/verdant-forest.svg"
+          ]
+        },
+        "assets": [
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/verdant-ground-grain.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 221597
+          },
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/verdant-forest.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 567630
+          }
+        ]
+      }
+    },
+    {
+      "id": "style mobile dryland",
+      "status": "pass",
+      "evidence": {
+        "dom": {
+          "value": "dryland",
+          "features": 29,
+          "picks": 96,
+          "images": [
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/dryland-ground-grain.svg",
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/dryland-forest.svg"
+          ]
+        },
+        "assets": [
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/dryland-ground-grain.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 221599
+          },
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/dryland-forest.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 567632
+          }
+        ]
+      }
+    },
+    {
+      "id": "style mobile natural",
+      "status": "pass",
+      "evidence": {
+        "dom": {
+          "value": "natural",
+          "features": 29,
+          "picks": 96,
+          "images": [
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/natural-ground-grain.png",
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/natural-forest.svg"
+          ]
+        },
+        "assets": [
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/natural-ground-grain.png",
+            "status": 200,
+            "type": "image/png",
+            "bytes": 2728323
+          },
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/natural-forest.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 567634
+          }
+        ]
+      }
+    },
+    {
+      "id": "style mobile field-atlas",
+      "status": "pass",
+      "evidence": {
+        "dom": {
+          "value": "field-atlas",
+          "features": 29,
+          "picks": 96,
+          "images": [
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/field-atlas-ground-grain.png",
+            "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/field-atlas-forest.svg"
+          ]
+        },
+        "assets": [
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/field-atlas-ground-grain.png",
+            "status": 200,
+            "type": "image/png",
+            "bytes": 1508230
+          },
+          {
+            "url": "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/field-atlas-forest.svg",
+            "status": 200,
+            "type": "image/svg+xml",
+            "bytes": 1604286
+          }
+        ]
+      }
+    },
+    {
+      "id": "mobile safe preview then exactly one Move",
+      "status": "pass",
+      "evidence": {
+        "preview": "Move",
+        "command": "Move",
+        "count": 1
+      }
+    },
+    {
+      "id": "network stays inside project prefix without errors",
+      "status": "pass",
+      "evidence": {
+        "requests": 51,
+        "outside": [],
+        "httpErrors": [],
+        "loadErrors": [],
+        "jsErrors": []
+      }
+    }
+  ],
+  "requests": [
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=de&run=1",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.css",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell-design.css",
+    "http://127.0.0.1:4174/tdc.game.goblin/localization.js?v=1",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/ui-copy/content-02.de.json",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/ui-copy/content-02.en.json",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/ui-copy/content-02.es.json",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/ui-copy/content-02.fr.json",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/safe-adapter.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/mock-core.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/presentation.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell-text.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/hex-renderer/renderer.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/terrain-assets.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/qa-probe.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/adapter.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/core/game-core.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/hex-renderer/geometry.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/hex-renderer/visual-map.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/core/hex.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/terrain-rules-bridge.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/core/reference-fixture.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/core/phase-fixture.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/core/phase-expected.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/core/phase-branches.mjs",
+    "http://127.0.0.1:4174/tdc.game.goblin/terrain-rules.js?browser-bridge",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/manifest.json",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/visual-map.json",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/styles/verdant.json",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/styles/dryland.json",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/styles/natural.json",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/styles/field-atlas.json",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=en&run=2",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=es&run=3",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=fr&run=4",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=de&run=5",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=en&run=6",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=es&run=7",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=fr&run=8",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=de&run=9",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/verdant-ground-grain.svg",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/verdant-forest.svg",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/dryland-ground-grain.svg",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/dryland-forest.svg",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/natural-ground-grain.png",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/natural-forest.svg",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/field-atlas-ground-grain.png",
+    "http://127.0.0.1:4174/tdc.game.goblin/assets/terrain-map-study/portable/details/field-atlas-forest.svg",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=de&run=10",
+    "http://127.0.0.1:4174/tdc.game.goblin/src/app/shell.html?qa=1&lang=de&run=11"
+  ],
+  "httpErrors": [],
+  "loadErrors": [],
+  "jsErrors": []
+}
