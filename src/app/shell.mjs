@@ -14,12 +14,12 @@ const missions = ['reference-v1', 'phase-v2'];
 let route = 'start', returnRoute = 'start', mission = 'reference-v1', app = null;
 let terrain = null, terrainMode = 'hex', detail = 'units', rememberPhase = false;
 let preferredTerrainMode = 'hex', preferredGridVisible = false, confirmPhaseEnabled = true;
-let dialogAction = null, dialogOrigin = null, log = [];
+let dialogAction = null, dialogOrigin = null, dialogCopy = null, log = [];
 const qaProbe = new URLSearchParams(location.search).has('qa') ? createQaProbe() : null;
 if (qaProbe) Object.defineProperty(globalThis, '__GOBLIN_QA__', { value: qaProbe, writable: false, configurable: false });
 const map = $('battle-map');
 const viewport = $('map-viewport');
-const renderer = createHexRenderer({ svg: map, onPick: ({ cell }) => { if (route === 'game' && !$('confirm-dialog').open && !$('objective-dialog').open) app?.pickCell(cell); } });
+const renderer = createHexRenderer({ svg: map, onPick: ({ cell }) => { if (route === 'game' && !$('confirm-dialog').open && !$('objective-dialog').open && !$('details-dialog').open) app?.pickCell(cell); } });
 try { terrain = await loadTerrainPackage(); }
 catch (error) { console.warn('Terrain package unavailable; using hex map:', error); }
 
@@ -34,19 +34,39 @@ function show(name) {
 function title(id) { return language.t(`mission.${id}.title`); }
 function missionText(id, part) { return language.t(`mission.${id}.${part}`); }
 function phaseText(phase) { return language.t(`phase.${phase}.label`); }
+function errorText(error) {
+  const key = `ui.error.${error?.code}`;
+  return language.t(key) === key ? t('ui.error.unknown') : t(key);
+}
+function unitType(type) { return t(`ui.unit.${type}`); }
+function teamText(team) { return t(`ui.team.${team}`); }
+function eventText(event) {
+  switch (event.type) {
+    case 'UnitMoved': return t('ui.log.UnitMoved', { unitId: event.unitId, x: event.to.x + 1, y: event.to.y + 1 });
+    case 'PhaseChanged': return t('ui.log.PhaseChanged', { turn: event.turn, team: teamText(event.activeTeam), phase: phaseText(event.to) });
+    case 'ShotResolved': return t('ui.log.ShotResolved', { attackerId: event.attackerId, targetId: event.targetId, result: t(`ui.log.result.${event.result}`) });
+    case 'UnitRecovered': return t('ui.log.UnitRecovered', { unitId: event.unitId });
+    case 'GameEnded': return t('ui.log.GameEnded', { team: teamText(event.winner) });
+    default: return t('ui.error.unknown');
+  }
+}
 function setText() {
+  document.title = t('ui.shell.title');
   document.querySelector('.build').textContent = t('ui.build.internal');
   $('battle-map').setAttribute('aria-label', t('ui.hud.map'));
   $('zoom-in').setAttribute('aria-label', t('ui.hud.zoomIn'));
   $('zoom-out').setAttribute('aria-label', t('ui.hud.zoomOut'));
   $('terrain-set').setAttribute('aria-label', t('ui.hud.terrain'));
   $('terrain-set').querySelector('option[value="hex"]').textContent = t('ui.hud.hex');
+  text('start-eyebrow', t('ui.start.eyebrow'));
   text('start-title', t('ui.start.title')); text('start-subtitle', t('ui.start.subtitle'));
   text('choose-mission', t('ui.start.choose')); text('start-settings', t('ui.nav.settings')); text('start-help', t('ui.nav.help'));
   text('levels-title', t('ui.levels.title')); text('begin-mission', t('ui.briefing.start'));
   text('pause', t('ui.nav.pause')); text('pause-title', t('ui.nav.pause')); text('resume', t('ui.nav.resume'));
   text('objective-toggle', t('ui.hud.objective')); text('objective-title', t('ui.hud.objective'));
   text('objective-close', t('ui.nav.close'));
+  text('details-toggle', t('ui.hud.details')); text('details-close', t('ui.nav.close'));
+  $('details-dialog').setAttribute('aria-label', t('ui.hud.details'));
   text('pause-settings', t('ui.nav.settings')); text('pause-help', t('ui.nav.help'));
   text('restart', t('ui.nav.restart')); text('missions', t('ui.nav.missions'));
   text('settings-title', t('ui.nav.settings')); text('settings-language-label', t('ui.settings.language'));
@@ -101,7 +121,7 @@ function startGame() {
   app.setStyleSet(terrainMode);
   app.setGridVisible(preferredGridVisible);
   app.subscribe(({ events, state }) => {
-    if (events.length) log.unshift(...events.map(event => `${event.type}: ${JSON.stringify(event)}`));
+    if (events.length) log.unshift(...events);
     if (state.victory.status === 'ended' && route === 'game') { show('end'); return; }
     if (route === 'game') renderGame();
   });
@@ -121,10 +141,10 @@ function renderGame() {
   text('game-progress', progress(state)); text('game-phase', `${state.activeTeam === 'enemy' ? language.t('phase.enemy.label') + ' · ' : ''}${phaseText(state.phase)}`);
   if ($('objective-dialog').open) { text('objective-body', missionText(mission, 'objective.full')); text('objective-progress', progress(state)); }
   text('game-turn', t('ui.hud.turn', { turn: state.turn }));
-  text('game-ready', t('ui.hud.ready', { count: presentation.counts.ready }));
+  text('game-ready', t(presentation.counts.ready === 1 ? 'ui.hud.ready.one' : 'ui.hud.ready.other', { count: presentation.counts.ready }));
   text('selection-title', selectedUnit ? t('ui.hud.selected', { unitId: selectedUnit.id, hp: selectedUnit.hp }) : t('ui.hud.noSelection'));
-  text('selection-detail', view.focusedCell ? `${view.focusedCell.x + 1}, ${view.focusedCell.y + 1}${focusedUnit ? ` · ${focusedUnit.id} · ${focusedUnit.hp} HP` : ''}` : t('ui.hud.noIntent'));
-  text('intent-detail', view.pendingIntent ? t(view.pendingIntent.type === 'Move' ? 'ui.hud.intent.move' : 'ui.hud.intent.fire', { x: view.pendingIntent.to?.x + 1, y: view.pendingIntent.to?.y + 1, targetId: view.pendingIntent.targetId }) : view.intentError || error ? t('ui.hud.blocked', { reason: (view.intentError ?? error).code }) : t('ui.hud.noIntent'));
+  text('selection-detail', view.focusedCell ? t(focusedUnit ? 'ui.hud.cellUnit' : 'ui.hud.cell', { x: view.focusedCell.x + 1, y: view.focusedCell.y + 1, unitId: focusedUnit?.id, hp: focusedUnit?.hp }) : t('ui.hud.noIntent'));
+  text('intent-detail', view.pendingIntent ? t(view.pendingIntent.type === 'Move' ? 'ui.hud.intent.move' : 'ui.hud.intent.fire', { x: view.pendingIntent.to?.x + 1, y: view.pendingIntent.to?.y + 1, targetId: view.pendingIntent.targetId }) : view.intentError || error ? t('ui.hud.blocked', { reason: errorText(view.intentError ?? error) }) : t('ui.hud.noIntent'));
   $('confirm-intent').hidden = !view.pendingIntent; $('cancel-intent').hidden = !view.pendingIntent;
   $('end-phase').disabled = !app.actions().endPhase.available;
   const next = app.actions().endPhase.next;
@@ -135,34 +155,43 @@ function renderGame() {
   for (const name of ['units','intel','log']) $(`detail-${name}`).hidden = detail !== name;
   $('detail-units').replaceChildren(...state.units.map(unit => {
     const button = document.createElement('button'); button.type = 'button';
-    button.textContent = `${unit.id} · ${unit.type} · ${unit.hp}/${unit.maxHp} HP`;
+    button.textContent = t('ui.hud.unitSummary', { unitId: unit.id, unitType: unitType(unit.type), hp: unit.hp, maxHp: unit.maxHp });
     button.setAttribute('aria-pressed', String(view.selectedUnitId === unit.id));
-    button.onclick = () => app.selectUnit(unit.id); return button;
+    button.onclick = () => { app.selectUnit(unit.id); if ($('details-dialog').open) $('details-dialog').close(); }; return button;
   }));
-  text('detail-intel', view.focusedCell ? `${view.focusedCell.x + 1}, ${view.focusedCell.y + 1}${focusedUnit ? ` · ${focusedUnit.id}, ${focusedUnit.team}, ${focusedUnit.hp} HP` : ''}` : t('ui.hud.noIntent'));
-  $('detail-log').replaceChildren(...log.map(entry => { const li = document.createElement('li'); li.textContent = entry; return li; }));
+  text('detail-intel', view.focusedCell ? t(focusedUnit ? 'ui.hud.unitIntel' : 'ui.hud.cell', { x: view.focusedCell.x + 1, y: view.focusedCell.y + 1, unitId: focusedUnit?.id, team: focusedUnit && teamText(focusedUnit.team), hp: focusedUnit?.hp }) : t('ui.hud.noIntent'));
+  $('detail-log').replaceChildren(...log.map(entry => { const li = document.createElement('li'); li.textContent = eventText(entry); return li; }));
   $('grid').setAttribute('aria-pressed', String(view.gridVisible)); $('terrain-set').value = terrainMode;
   for (const option of $('terrain-set').options) option.disabled = option.value !== 'hex' && (!terrain || mission !== 'reference-v1');
   renderer.render({ state, view, areas: areas ?? {}, events, visualMap: terrainMode !== 'hex' ? terrain.visualMap : undefined, styleSet: terrainMode !== 'hex' ? terrain.styleSets[terrainMode] : undefined });
   applyTransform(view);
 }
-function openDialog({ title, body, confirm, cancel, action, remember = false }) {
+function renderDialog() {
+  if (!dialogCopy) return;
+  text('dialog-title', t(dialogCopy.titleKey));
+  text('dialog-body', t(dialogCopy.bodyKey, dialogCopy.bodyParams));
+  text('dialog-confirm', t(dialogCopy.confirmKey));
+  text('dialog-cancel', t(dialogCopy.cancelKey));
+}
+function openDialog({ titleKey, bodyKey, bodyParams = {}, confirmKey, cancelKey, action, remember = false }) {
   const dialog = $('confirm-dialog'); if (dialog.open) return;
   dialogOrigin = document.activeElement; dialogAction = action;
-  text('dialog-title', title); text('dialog-body', body);
-  text('dialog-confirm', confirm); text('dialog-cancel', cancel);
+  dialogCopy = { titleKey, bodyKey, bodyParams, confirmKey, cancelKey };
+  renderDialog();
   $('remember-row').hidden = !remember; $('remember-phase').checked = false;
   dialog.showModal(); $('dialog-cancel').focus();
 }
-function closeDialog() { $('confirm-dialog').close(); dialogAction = null; dialogOrigin?.focus(); }
+function closeDialog() { $('confirm-dialog').close(); dialogAction = null; dialogCopy = null; dialogOrigin?.focus(); }
 function confirmPhase() {
   const { pendingUnitIds, next } = app.actions().endPhase;
   const key = next?.phase === 'fire' ? 'toFire' : next?.phase === 'gev' ? 'toGev' : next?.activeTeam === 'enemy' ? 'toEnemy' : 'toMovement';
   if (!confirmPhaseEnabled || rememberPhase) { app.endPhase(); return; }
-  openDialog({ title: language.t('dialog.phaseAdvance.title'), body: language.t('dialog.phaseAdvance.pending', { pendingCount: pendingUnitIds.length }), confirm: language.t(`dialog.phaseAdvance.confirm.${key}`), cancel: language.t('dialog.phaseAdvance.cancel'), remember: true, action: () => { rememberPhase = $('remember-phase').checked; app.endPhase(); } });
+  const pendingCount = pendingUnitIds.length;
+  const bodyKey = pendingCount === 0 ? 'dialog.phaseAdvance.pending.none' : pendingCount === 1 ? 'dialog.phaseAdvance.pending.one' : 'dialog.phaseAdvance.pending.other';
+  openDialog({ titleKey: 'dialog.phaseAdvance.title', bodyKey, bodyParams: { pendingCount }, confirmKey: `dialog.phaseAdvance.confirm.${key}`, cancelKey: 'dialog.phaseAdvance.cancel', remember: true, action: () => { rememberPhase = $('remember-phase').checked; app.endPhase(); } });
 }
-function confirmRestart() { openDialog({ title: language.t('dialog.restart.title'), body: language.t('dialog.restart.body'), confirm: language.t('dialog.restart.confirm'), cancel: language.t('dialog.restart.cancel'), action: startGame }); }
-function confirmMissionChange() { openDialog({ title: language.t('dialog.changeMission.title'), body: t('ui.dialog.leaveMission.body'), confirm: language.t('dialog.changeMission.confirm'), cancel: language.t('dialog.changeMission.cancel'), action: () => { app = null; qaProbe?.attach(null); show('levels'); } }); }
+function confirmRestart() { openDialog({ titleKey: 'dialog.restart.title', bodyKey: 'dialog.restart.body', confirmKey: 'dialog.restart.confirm', cancelKey: 'dialog.restart.cancel', action: startGame }); }
+function confirmMissionChange() { openDialog({ titleKey: 'dialog.changeMission.title', bodyKey: 'ui.dialog.leaveMission.body', confirmKey: 'dialog.changeMission.confirm', cancelKey: 'dialog.changeMission.cancel', action: () => { app = null; qaProbe?.attach(null); show('levels'); } }); }
 
 $('choose-mission').onclick = () => show('levels');
 document.querySelectorAll('[data-route]').forEach(button => { button.onclick = () => show(button.dataset.route); });
@@ -181,6 +210,16 @@ $('objective-toggle').onclick = () => {
 };
 $('objective-close').onclick = () => $('objective-dialog').close();
 $('objective-dialog').addEventListener('close', () => $('objective-toggle').focus());
+$('details-toggle').onclick = () => {
+  $('details-portal').append($('details'));
+  $('details-dialog').showModal();
+  $('details-close').focus();
+};
+$('details-close').onclick = () => $('details-dialog').close();
+$('details-dialog').addEventListener('close', () => {
+  document.querySelector('.game-layout').insertBefore($('details'), document.querySelector('.map-column'));
+  $('details-toggle').focus();
+});
 $('restart').onclick = confirmRestart; $('missions').onclick = confirmMissionChange;
 $('retry').onclick = startGame; $('end-missions').onclick = () => show('levels');
 $('end-log').onclick = () => { detail = 'log'; show('game'); };
@@ -193,7 +232,7 @@ $('settings-terrain').onchange = event => {
 };
 $('settings-grid').onchange = event => { preferredGridVisible = event.target.checked; app?.setGridVisible(preferredGridVisible); };
 $('settings-phase').onchange = event => { confirmPhaseEnabled = event.target.checked; if (confirmPhaseEnabled) rememberPhase = false; };
-window.addEventListener('goblin-language-change', () => { if (route === 'game') renderGame(); else renderScreen(); });
+window.addEventListener('goblin-language-change', () => { if (route === 'game') renderGame(); else renderScreen(); renderDialog(); });
 $('confirm-intent').onclick = () => app.confirmIntent(); $('cancel-intent').onclick = () => app.cancelIntent();
 $('end-phase').onclick = confirmPhase;
 document.querySelectorAll('[data-area]').forEach(button => { button.onclick = () => app.setAreaMode(button.dataset.area); });
@@ -205,10 +244,10 @@ $('zoom-out').onclick = () => { const { view } = app.snapshot(); app.setMapTrans
 $('recenter').onclick = () => app.setMapTransform({ x: 0, y: 0 }, 1);
 $('dialog-cancel').onclick = closeDialog;
 $('dialog-confirm').onclick = () => { const action = dialogAction; closeDialog(); action?.(); };
-$('confirm-dialog').addEventListener('close', () => { dialogAction = null; dialogOrigin?.focus(); });
+$('confirm-dialog').addEventListener('close', () => { dialogAction = null; dialogCopy = null; dialogOrigin?.focus(); });
 
 let drag = null, suppressClick = false;
-viewport.addEventListener('pointerdown', event => { if (event.button !== 0 || route !== 'game' || $('confirm-dialog').open || $('objective-dialog').open || event.target.closest('.map-tools')) return; const { view } = app.snapshot(); drag = { x: event.clientX, y: event.clientY, pan: view.mapPan, moved: false }; });
+viewport.addEventListener('pointerdown', event => { if (event.button !== 0 || route !== 'game' || $('confirm-dialog').open || $('objective-dialog').open || $('details-dialog').open || event.target.closest('.map-tools')) return; const { view } = app.snapshot(); drag = { x: event.clientX, y: event.clientY, pan: view.mapPan, moved: false }; });
 viewport.addEventListener('pointermove', event => { if (!drag) return; const dx = event.clientX - drag.x, dy = event.clientY - drag.y; if (!drag.moved && Math.hypot(dx,dy) > 6) { drag.moved = true; viewport.setPointerCapture(event.pointerId); } if (drag.moved) { viewport.classList.add('dragging'); app.setMapTransform({ x: drag.pan.x + dx, y: drag.pan.y + dy }, app.snapshot().view.mapZoom); } });
 viewport.addEventListener('pointerup', () => { if (drag?.moved) { suppressClick = true; setTimeout(() => { suppressClick = false; }, 0); } drag = null; viewport.classList.remove('dragging'); });
 viewport.addEventListener('pointercancel', () => { drag = null; viewport.classList.remove('dragging'); });
