@@ -20,6 +20,20 @@ export function vertices(cell, layout = DEFAULT_HEX_LAYOUT) {
 export const points = (cell, layout = DEFAULT_HEX_LAYOUT) => vertices(cell, layout).map(p => `${p.x},${p.y}`).join(' ');
 export const cellKey = ({ x, y }) => `${x},${y}`;
 
+// Inclusive edges are shared. Resolve an exact edge/vertex to the cell with
+// the smallest row, then smallest column, regardless of SVG paint order.
+export function pickCellAt(point, map, layout = DEFAULT_HEX_LAYOUT) {
+  const tolerance = layout.radius * layout.radius * 1e-9;
+  for (let y = 0; y < map.height; y++) for (let x = 0; x < map.width; x++) {
+    const corners = vertices({ x, y }, layout);
+    if (corners.every((a, i) => {
+      const b = corners[(i + 1) % corners.length];
+      return (b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x) >= -tolerance;
+    })) return { x, y };
+  }
+  return null;
+}
+
 // Same edge ordering as the established SVG map, used only for outlines.
 function edgeNeighbors({ x, y }) {
   return y & 1

@@ -74,3 +74,16 @@ verschoben oder neu generiert. Benachbarte Viewports verwenden somit dieselben
 Feature-IDs und dieselbe Geometrie. Grid, Areas, Units, Fokus und Effekte
 verwenden denselben `hexLayout`-Transform. `visualLayerOrder` enthält die
 Zeichenebenenfolge; `layerOrder` bleibt die v1-Fallbackfolge.
+
+## Hexkanten-Picking (T-U02)
+
+Für Pointer-Klicks wird der Clientpunkt mit der inversen SVG-`getScreenCTM`
+in Weltkoordinaten umgerechnet. `pickCellAt` prüft die Polygone im gemeinsamen
+Odd-Row-Layout. Liegt ein Punkt exakt auf einer gemeinsamen Kante oder Ecke,
+gewinnt die Zelle mit der kleinsten Zeile (`y`), danach der kleinsten Spalte
+(`x`). Die geometrische Toleranz beträgt `radius² × 10⁻⁹` für das
+Kreuzprodukt der Kantenprüfung. Die Regel hängt weder von DOM-Zeichenfolge,
+Viewport, Stil, Pan noch Zoom ab. Ein Punkt unmittelbar auf einer Seite der
+Kante trifft die jeweilige Nachbarzelle. Tastaturaktivierung einer fokussierten
+Hexfläche meldet direkt deren Zelle. Einheiten behalten als obere Ebene ihren
+eigenen, einmaligen Pick-Callback.

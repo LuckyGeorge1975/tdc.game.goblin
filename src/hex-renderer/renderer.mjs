@@ -1,4 +1,4 @@
-import { center, points, outerBoundary, viewBox, cellKey, DEFAULT_HEX_LAYOUT } from './geometry.mjs';
+import { center, points, outerBoundary, viewBox, cellKey, pickCellAt, DEFAULT_HEX_LAYOUT } from './geometry.mjs';
 import { validateVisualMap, validateStyleSet, validateViewport, visibleFeatures, intersectsBounds } from './visual-map.mjs';
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -39,6 +39,16 @@ export function createHexRenderer({ svg, onPick = () => {}, accessibility = null
   };
   const polygon = (cell, layout, attrs = {}) => element('polygon', { points: points(cell, layout), ...attrs });
   const clipId = `hex-renderer-clip-${++rendererId}`;
+
+  function clickedCell(event, map, layout, fallback) {
+    if (!Number.isFinite(event?.clientX) || !Number.isFinite(event?.clientY)
+      || typeof svg.createSVGPoint !== 'function') return fallback;
+    const matrix = svg.getScreenCTM?.();
+    if (!matrix) return fallback;
+    const point = svg.createSVGPoint();
+    point.x = event.clientX; point.y = event.clientY;
+    return pickCellAt(point.matrixTransform(matrix.inverse()), map, layout) ?? fallback;
+  }
 
   function material(styleSet, feature) {
     const layer = FEATURE_LAYER[feature.layer];
@@ -127,7 +137,7 @@ export function createHexRenderer({ svg, onPick = () => {}, accessibility = null
       const cell = { x, y };
       if (visual) {
         const pick = polygon(cell, layout, { fill: 'transparent', stroke: 'none', 'pointer-events': 'all', 'data-x': x, 'data-y': y, cursor: 'pointer' });
-        const activate = () => onPick({ type: 'hex', cell });
+        const activate = event => onPick({ type: 'hex', cell: clickedCell(event, state.map, layout, cell) });
         pick.addEventListener('click', activate);
         accessible(pick, `cell:${x}:${y}`, accessibility?.cellLabel(cell, { state, view, areas }), cell, activate);
         if (accessibility) pick.setAttribute('aria-pressed', String(view.focusedCell?.x === x && view.focusedCell?.y === y));
@@ -135,7 +145,7 @@ export function createHexRenderer({ svg, onPick = () => {}, accessibility = null
       } else {
         const type = terrain.get(cellKey(cell)) ?? 'open-ground';
         const base = polygon(cell, layout, { fill: COLORS[type] ?? COLORS['open-ground'], stroke: '#19282d', 'stroke-width': 0.6, 'data-x': x, 'data-y': y, 'data-terrain': type, cursor: 'pointer' });
-        const activate = () => onPick({ type: 'hex', cell });
+        const activate = event => onPick({ type: 'hex', cell: clickedCell(event, state.map, layout, cell) });
         base.addEventListener('click', activate);
         accessible(base, `cell:${x}:${y}`, accessibility?.cellLabel(cell, { state, view, areas }), cell, activate);
         if (accessibility) base.setAttribute('aria-pressed', String(view.focusedCell?.x === x && view.focusedCell?.y === y));
