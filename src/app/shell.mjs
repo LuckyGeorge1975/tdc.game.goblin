@@ -19,7 +19,29 @@ const qaProbe = new URLSearchParams(location.search).has('qa') ? createQaProbe()
 if (qaProbe) Object.defineProperty(globalThis, '__GOBLIN_QA__', { value: qaProbe, writable: false, configurable: false });
 const map = $('battle-map');
 const viewport = $('map-viewport');
-const renderer = createHexRenderer({ svg: map, onPick: ({ cell }) => { if (route === 'game' && !$('confirm-dialog').open && !$('objective-dialog').open && !$('details-dialog').open) app?.pickCell(cell); } });
+const sameCell = (a, b) => a?.x === b?.x && a?.y === b?.y;
+const hasCell = (cells, cell) => cells?.some(candidate => sameCell(candidate, cell));
+function mapState(cell, unit, { view, areas }) {
+  const states = [];
+  if (unit?.id === view.selectedUnitId) states.push(t('ui.map.selected'));
+  if (sameCell(cell, view.focusedCell)) states.push(t('ui.map.focused'));
+  if (hasCell(areas?.movementReachable, cell)) states.push(t('ui.map.reachable'));
+  if (unit && areas?.attackableTargets?.includes(unit.id)) states.push(t('ui.map.target'));
+  if (unit?.disabled) states.push(t('ui.map.disabled'));
+  return states.length ? ` · ${states.join(' · ')}` : '';
+}
+const renderer = createHexRenderer({
+  svg: map,
+  onPick: ({ cell }) => { if (route === 'game' && !$('confirm-dialog').open && !$('objective-dialog').open && !$('details-dialog').open) app?.pickCell(cell); },
+  accessibility: {
+    cellLabel: (cell, context) => {
+      const unit = context.state.units.find(candidate => candidate.hp > 0 && !candidate.embarkedOn && sameCell(candidate, cell));
+      const base = unit ? t('ui.hud.cellUnit', { x: cell.x + 1, y: cell.y + 1, unitId: unit.id, hp: unit.hp }) : t('ui.hud.cell', { x: cell.x + 1, y: cell.y + 1 });
+      return base + mapState(cell, unit, context);
+    },
+    unitLabel: (unit, context) => `${t('ui.hud.unitSummary', { unitId: unit.id, unitType: unitType(unit.type), hp: unit.hp, maxHp: unit.maxHp })} · ${teamText(unit.team)} · ${t('ui.hud.cell', { x: unit.x + 1, y: unit.y + 1 })}${mapState(unit, unit, context)}`,
+  },
+});
 try { terrain = await loadTerrainPackage(); }
 catch (error) { console.warn('Terrain package unavailable; using hex map:', error); }
 
@@ -246,11 +268,59 @@ $('dialog-cancel').onclick = closeDialog;
 $('dialog-confirm').onclick = () => { const action = dialogAction; closeDialog(); action?.(); };
 $('confirm-dialog').addEventListener('close', () => { dialogAction = null; dialogCopy = null; dialogOrigin?.focus(); });
 
-let drag = null, suppressClick = false;
-viewport.addEventListener('pointerdown', event => { if (event.button !== 0 || route !== 'game' || $('confirm-dialog').open || $('objective-dialog').open || $('details-dialog').open || event.target.closest('.map-tools')) return; const { view } = app.snapshot(); drag = { x: event.clientX, y: event.clientY, pan: view.mapPan, moved: false }; });
-viewport.addEventListener('pointermove', event => { if (!drag) return; const dx = event.clientX - drag.x, dy = event.clientY - drag.y; if (!drag.moved && Math.hypot(dx,dy) > 6) { drag.moved = true; viewport.setPointerCapture(event.pointerId); } if (drag.moved) { viewport.classList.add('dragging'); app.setMapTransform({ x: drag.pan.x + dx, y: drag.pan.y + dy }, app.snapshot().view.mapZoom); } });
-viewport.addEventListener('pointerup', () => { if (drag?.moved) { suppressClick = true; setTimeout(() => { suppressClick = false; }, 0); } drag = null; viewport.classList.remove('dragging'); });
-viewport.addEventListener('pointercancel', () => { drag = null; viewport.classList.remove('dragging'); });
+const pointers = new Map();
+let gesture = null, suppressClick = false;
+function point(event) { return { x: event.clientX, y: event.clientY }; }
+function pair() {
+  const [a, b] = [...pointers.values()];
+  return { midpoint: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, distance: Math.hypot(a.x - b.x, a.y - b.y) };
+}
+function suppressGestureClick() { suppressClick = true; setTimeout(() => { suppressClick = false; }, 0); }
+viewport.addEventListener('pointerdown', event => {
+  if (event.button !== 0 || route !== 'game' || $('confirm-dialog').open || $('objective-dialog').open || $('details-dialog').open || event.target.closest('.map-tools')) return;
+  pointers.set(event.pointerId, point(event));
+  if (pointers.size === 1) {
+    const { view } = app.snapshot();
+    gesture = { type: 'pan', pointerId: event.pointerId, start: point(event), pan: view.mapPan, moved: false };
+  } else if (pointers.size === 2) {
+    const { view } = app.snapshot(), start = pair();
+    gesture = { type: 'pinch', ...start, pan: view.mapPan, zoom: view.mapZoom };
+    for (const id of pointers.keys()) viewport.setPointerCapture(id);
+    viewport.classList.add('dragging');
+  }
+});
+viewport.addEventListener('pointermove', event => {
+  if (!pointers.has(event.pointerId)) return;
+  pointers.set(event.pointerId, point(event));
+  if (gesture?.type === 'pinch' && pointers.size >= 2) {
+    const current = pair();
+    const zoom = Math.max(.6, Math.min(2.5, gesture.zoom * current.distance / Math.max(1, gesture.distance)));
+    const ratio = zoom / gesture.zoom;
+    const rect = viewport.getBoundingClientRect(), center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    const pan = {
+      x: gesture.pan.x + current.midpoint.x - gesture.midpoint.x + (1 - ratio) * (gesture.midpoint.x - center.x - gesture.pan.x),
+      y: gesture.pan.y + current.midpoint.y - gesture.midpoint.y + (1 - ratio) * (gesture.midpoint.y - center.y - gesture.pan.y),
+    };
+    app.setMapTransform(pan, zoom);
+  } else if (gesture?.type === 'pan' && gesture.pointerId === event.pointerId) {
+    const dx = event.clientX - gesture.start.x, dy = event.clientY - gesture.start.y;
+    if (!gesture.moved && Math.hypot(dx, dy) > 6) {
+      gesture.moved = true;
+      viewport.setPointerCapture(event.pointerId);
+      viewport.classList.add('dragging');
+    }
+    if (gesture.moved) app.setMapTransform({ x: gesture.pan.x + dx, y: gesture.pan.y + dy }, app.snapshot().view.mapZoom);
+  }
+});
+function finishPointer(event) {
+  if (!pointers.has(event.pointerId)) return;
+  if (gesture?.type === 'pinch' || gesture?.moved) suppressGestureClick();
+  pointers.delete(event.pointerId);
+  if (pointers.size < 2) gesture = null;
+  if (!pointers.size) viewport.classList.remove('dragging');
+}
+viewport.addEventListener('pointerup', finishPointer);
+viewport.addEventListener('pointercancel', finishPointer);
 map.addEventListener('click', event => { if (suppressClick) { event.stopImmediatePropagation(); event.preventDefault(); suppressClick = false; } }, true);
 viewport.addEventListener('wheel', event => { if (route !== 'game') return; event.preventDefault(); const { view } = app.snapshot(); app.setMapTransform(view.mapPan, Math.max(.6, Math.min(2.5, view.mapZoom + (event.deltaY < 0 ? .1 : -.1)))); }, { passive: false });
 

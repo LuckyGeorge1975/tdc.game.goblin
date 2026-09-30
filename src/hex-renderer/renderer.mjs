@@ -29,7 +29,7 @@ const AREA_STYLES = Object.freeze({
 export const layerOrder = LAYERS;
 export const visualLayerOrder = VISUAL_LAYERS;
 
-export function createHexRenderer({ svg, onPick = () => {} }) {
+export function createHexRenderer({ svg, onPick = () => {}, accessibility = null }) {
   if (!svg?.ownerDocument || typeof svg.replaceChildren !== 'function') throw new TypeError('svg element required');
   const doc = svg.ownerDocument;
   const element = (tag, attrs = {}) => {
@@ -63,10 +63,30 @@ export function createHexRenderer({ svg, onPick = () => {} }) {
       if (viewport) validateViewport(viewport);
     } else if (styleSet || viewport) throw new TypeError('visualMap required for styleSet or viewport');
     const layout = visual ? visualMap.hexLayout : DEFAULT_HEX_LAYOUT;
+    const active = doc.activeElement;
+    const focused = svg.contains?.(active) ? (active?.dataset?.unitId ? { unitId: active.dataset.unitId } : active?.dataset?.x !== undefined ? { x: active.dataset.x, y: active.dataset.y } : null) : null;
+    const focusTargets = new Map();
     const box = visual ? (viewport ?? visualMap.bounds) : null;
     svg.setAttribute('viewBox', visual ? `${box.x} ${box.y} ${box.width} ${box.height}` : viewBox(state.map));
     const names = visual ? VISUAL_LAYERS : LAYERS;
     const layers = Object.fromEntries(names.map(name => [name, element('g', { 'data-layer': name })]));
+    function accessible(node, key, label, cell, pick) {
+      if (!accessibility) return;
+      node.setAttribute('role', 'button');
+      node.setAttribute('tabindex', '0');
+      node.setAttribute('aria-label', label);
+      focusTargets.set(key, node);
+      node.addEventListener('keydown', event => {
+        if (event.repeat || event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        pick();
+      });
+      node.addEventListener('focus', () => {
+        const ring = polygon(cell, layout, { fill: 'none', stroke: '#f5f7a4', 'stroke-width': 5, 'pointer-events': 'none', 'data-keyboard-focus': 'true' });
+        layers.focus.appendChild(ring);
+      });
+      node.addEventListener('blur', () => layers.focus.querySelector?.('[data-keyboard-focus]')?.remove());
+    }
     let defs;
     if (visual) {
       const mapBox = visualMap.bounds;
@@ -107,12 +127,18 @@ export function createHexRenderer({ svg, onPick = () => {} }) {
       const cell = { x, y };
       if (visual) {
         const pick = polygon(cell, layout, { fill: 'transparent', stroke: 'none', 'pointer-events': 'all', 'data-x': x, 'data-y': y, cursor: 'pointer' });
-        pick.addEventListener('click', () => onPick({ type: 'hex', cell }));
+        const activate = () => onPick({ type: 'hex', cell });
+        pick.addEventListener('click', activate);
+        accessible(pick, `cell:${x}:${y}`, accessibility?.cellLabel(cell, { state, view, areas }), cell, activate);
+        if (accessibility) pick.setAttribute('aria-pressed', String(view.focusedCell?.x === x && view.focusedCell?.y === y));
         layers.picking.appendChild(pick);
       } else {
         const type = terrain.get(cellKey(cell)) ?? 'open-ground';
         const base = polygon(cell, layout, { fill: COLORS[type] ?? COLORS['open-ground'], stroke: '#19282d', 'stroke-width': 0.6, 'data-x': x, 'data-y': y, 'data-terrain': type, cursor: 'pointer' });
-        base.addEventListener('click', () => onPick({ type: 'hex', cell }));
+        const activate = () => onPick({ type: 'hex', cell });
+        base.addEventListener('click', activate);
+        accessible(base, `cell:${x}:${y}`, accessibility?.cellLabel(cell, { state, view, areas }), cell, activate);
+        if (accessibility) base.setAttribute('aria-pressed', String(view.focusedCell?.x === x && view.focusedCell?.y === y));
         layers.terrain.appendChild(base);
       }
       if (view.gridVisible) layers.grid.appendChild(polygon(cell, layout, { fill: 'none', stroke: '#53717a', 'stroke-width': 0.7, opacity: 0.4, 'pointer-events': 'none' }));
@@ -137,7 +163,10 @@ export function createHexRenderer({ svg, onPick = () => {} }) {
       const label = element('text', { x: c.x, y: c.y + 5, 'text-anchor': 'middle', fill: '#f2f5e8', 'font-size': 17, 'font-weight': 700, 'pointer-events': 'none' });
       label.textContent = unit.type === 'core' ? '◆' : unit.type === 'tank' ? 'T' : (unit.icon ?? '●');
       group.appendChild(label);
-      group.addEventListener('click', event => { event.stopPropagation(); onPick({ type: 'unit', unitId: unit.id, cell: { x: unit.x, y: unit.y } }); });
+      const activate = () => onPick({ type: 'unit', unitId: unit.id, cell: { x: unit.x, y: unit.y } });
+      group.addEventListener('click', event => { event.stopPropagation(); activate(); });
+      accessible(group, `unit:${unit.id}`, accessibility?.unitLabel(unit, { state, view, areas }), unit, activate);
+      if (accessibility) group.setAttribute('aria-pressed', String(selected));
       layers.units.appendChild(group);
     }
 
@@ -149,6 +178,7 @@ export function createHexRenderer({ svg, onPick = () => {} }) {
       layers.effects.appendChild(element('circle', { cx: c.x, cy: c.y, r: event.type === 'ShotResolved' ? 17 : 11, fill: 'none', stroke: event.type === 'ShotResolved' ? '#ffb073' : '#bfe685', 'stroke-width': 3, 'pointer-events': 'none', 'data-event': event.type }));
     }
     svg.replaceChildren(...(defs ? [defs] : []), ...names.map(name => layers[name]));
+    if (focused) focusTargets.get(focused.unitId ? `unit:${focused.unitId}` : `cell:${focused.x}:${focused.y}`)?.focus({ preventScroll: true });
   }
 
   return { render };

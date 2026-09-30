@@ -112,7 +112,10 @@ dialog h2 { color: #edf3e9; }
   .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(170px, 34%); grid-template-rows: minmax(0, 1fr); }
   .map-column { grid-column: 1; grid-row: 1; min-height: 0; }
   .map-viewport { min-height: 0; }
-  .action-panel { grid-column: 2; grid-row: 1; overflow: auto; padding: .4rem; }
+  .action-panel { grid-column: 2; grid-row: 1; display: grid; grid-template-rows: minmax(0, 1fr) auto auto; gap: .25rem; overflow: hidden; padding: .4rem; }
+  .action-panel .selection { min-height: 0; overflow: auto; }
+  .action-panel .actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .25rem; }
+  .action-panel #end-phase { grid-column: 1 / -1; padding-block: .25rem; }
   .details { display: none; }
   #details-toggle { display: block; width: 100%; margin: .25rem 0; }
   .map-tools { inset: auto .3rem .3rem .3rem; }
