@@ -7,7 +7,8 @@ Alle Berichte werden unverändert im Repository aufbewahrt und über diese Über
 | [Spieletestbericht 2026-09-26](PLAYTEST-REPORT-2026-09-26.md) | `1` | `0.1.4` | Ausgewertet; verständlichere Treffer-, Deaktivierungs- und Core-Anzeige umgesetzt | `0.1.6` |
 | [Legal Review 2026-09-26](LEGAL-REVIEW.md) | `1` | Repository vor `0.1.5` | Offen; technischer Zugriff war blockiert, daher keine inhaltliche Freigabe | noch offen |
 | [Content Clearance 2026-09-26](CONTENT-CLEARANCE.md) | `1` | Content-Branch auf Basis `0.1.5` | Development Review abgeschlossen; formale Legal-Freigabe ausstehend | `0.1.7` |
-| [Content & Asset Notices](CONTENT-NOTICES.md) | `2` | `0.1.10` | Öffentlicher Herkunfts- und Asset-Hinweis, jetzt einschließlich der fünf lokalen SVG-Sets | `0.1.10` |
+| [Content & Asset Notices](CONTENT-NOTICES.md) | `3` | `0.1.10` und interner Terrain-Previewkandidat | Öffentlicher Herkunfts- und Asset-Hinweis einschließlich vier Terrain-Stilen mit SVG- und PNG-Details; keine Freigabe | offen |
+| [Content-Clearance-Nachtrag Terrain-Preview 2026-09-30](CONTENT-CLEARANCE-TERRAIN-PREVIEW-2026-09-30.md) | `1` | Interner GitHub-Pages-Previewkandidat mit vier Terrain-Stilen | Technische Herkunft und lokale Pfade dokumentiert; Legal- und Gesamtlaufzeitprüfung offen | offen |
 | [Spieletestbericht Build 0.1.7](PLAYTEST-REPORT-0.1.7-2026-09-26.md) | `1` | `0.1.7` | Bestanden; Nomenklatur, Unit Guide, Systemschriften und Herkunftshinweise bestätigt | `0.1.8` |
 | [Spieletestbericht Build 0.1.9](PLAYTEST-REPORT-0.1.9-2026-09-26.md) | `1` | `0.1.9` | Veröffentlichter Field Test; Strategic Missile Carrier gezielt geprüft | `0.1.10` |
 | [QA-02 lokaler Integrationstest](PLAYTEST-REPORT-QA-02-2026-09-29.md) | `1` | Interner modularer Core-Pfad | Referenzpartie reproduzierbar; kein Release | offen |
