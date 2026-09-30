@@ -24,8 +24,12 @@ const safeDirectory=process.cwd().replaceAll('\\','/');
 const trackedMarkdown=execFileSync('git',['-c',`safe.directory=${safeDirectory}`,'ls-files','--cached','--','*.md'],{encoding:'utf8'}).trim().split(/\r?\n/);
 for(const report of trackedMarkdown.filter(name=>/(?:REPORT|REVIEW|CLEARANCE|NOTICES).*\.md$/i.test(name)&&name!=='REPORTS.md')){
   const source=readFileSync(report,'utf8');
-  if(!reportsIndex.includes(`](${report})`))throw new Error(`${report} fehlt in REPORTS.md.`);
-  if(!/\*\*(?:Berichtsversion|Report version|Document version):\*\*\s+\d+/i.test(source))throw new Error(`${report} besitzt keine Dokumentversion.`);
+  const row=reportsIndex.split(/\r?\n/).find(line=>line.includes(`](${report})`));
+  if(!row)throw new Error(`${report} fehlt in REPORTS.md.`);
+  const indexedVersion=row.split('|')[2]?.trim().match(/^`(\d+)`$/)?.[1];
+  if(!indexedVersion)throw new Error(`${report} besitzt keine Berichtsversion in REPORTS.md.`);
+  const sourceVersion=source.match(/\*\*(?:Berichtsversion|Report version|Document version):\*\*\s+(\d+)/i)?.[1];
+  if(sourceVersion&&sourceVersion!==indexedVersion)throw new Error(`${report}: Berichtsversion widerspricht REPORTS.md.`);
 }
 
 const previousArg=process.argv.find(arg=>arg.startsWith('--previous='));

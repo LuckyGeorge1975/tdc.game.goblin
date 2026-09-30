@@ -9,5 +9,11 @@ Alle Berichte werden unverändert im Repository aufbewahrt und über diese Über
 | [Content Clearance 2026-09-26](CONTENT-CLEARANCE.md) | `1` | Content-Branch auf Basis `0.1.5` | Development Review abgeschlossen; formale Legal-Freigabe ausstehend | `0.1.7` |
 | [Content & Asset Notices](CONTENT-NOTICES.md) | `2` | `0.1.10` | Öffentlicher Herkunfts- und Asset-Hinweis, jetzt einschließlich der fünf lokalen SVG-Sets | `0.1.10` |
 | [Spieletestbericht Build 0.1.7](PLAYTEST-REPORT-0.1.7-2026-09-26.md) | `1` | `0.1.7` | Bestanden; Nomenklatur, Unit Guide, Systemschriften und Herkunftshinweise bestätigt | `0.1.8` |
+| [Spieletestbericht Build 0.1.9](PLAYTEST-REPORT-0.1.9-2026-09-26.md) | `1` | `0.1.9` | Veröffentlichter Field Test; Strategic Missile Carrier gezielt geprüft | `0.1.10` |
+| [QA-02 lokaler Integrationstest](PLAYTEST-REPORT-QA-02-2026-09-29.md) | `1` | Interner modularer Core-Pfad | Referenzpartie reproduzierbar; kein Release | offen |
+| [QA-04 modularer Schnitt 2](PLAYTEST-REPORT-QA-04-2026-09-30.md) | `1` | Interner phase-v2-Vergleichspfad | Unabhängiger Integrationstest; kein Release | offen |
+| [QA-06 Terrain-Vorschau](PLAYTEST-REPORT-QA-06-2026-09-30.md) | `1` | Interne Terrain-Vorschau mit zwei Sets | Geprüfter Zwischenstand; Restmatrix in `goblin-zcz` | offen |
+| [QA-08 responsive UI](PLAYTEST-REPORT-QA-08-2026-09-30.md) | `1` | Interner UI-Checkpoint `f263dff` | 38/41 Browserfälle; drei Defekte, keine Freigabe | `7fef083` |
+| [QA-09 Nachprüfung](PLAYTEST-REPORT-QA-09-2026-09-30.md) | `1` | Interner Fix-Commit `7fef083` | 42/42 Browserfälle; echte Geräteprüfung offen, keine Release-Freigabe | `goblin-wtg` |
 
-Der Legal-Bericht ist eine Prüfliste und keine Rechtsberatung. Ein versionierter Bericht bedeutet ausschließlich, dass sein Inhalt und Bezugsstand nachvollziehbar gespeichert sind.
+Der Legal-Bericht ist eine Prüfliste und keine Rechtsberatung. Die Berichtsversion in diesem Register versioniert die unveränderte Originaldatei; vorhandene Versionsangaben im Bericht müssen übereinstimmen. Ein versionierter Bericht bedeutet ausschließlich, dass sein Inhalt und Bezugsstand nachvollziehbar gespeichert sind.
