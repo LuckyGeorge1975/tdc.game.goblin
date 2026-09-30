@@ -9,6 +9,14 @@
     {
       "setId": "dryland",
       "path": "styles/dryland.json"
+    },
+    {
+      "setId": "natural",
+      "path": "styles/natural.json"
+    },
+    {
+      "setId": "field-atlas",
+      "path": "styles/field-atlas.json"
     }
   ]
 }

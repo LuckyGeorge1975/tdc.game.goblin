@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { inflateSync } from 'node:zlib';
 
 const here=dirname(fileURLToPath(import.meta.url));
 const read=async path=>JSON.parse(await readFile(join(here,path),'utf8'));
@@ -48,16 +49,26 @@ for(const entry of packageManifest.styleSets){
   if(!assets||Object.keys(assets).sort().join(',')!=='forest,ground-grain')fail(`Missing detail assets: ${style.setId}`);
   for(const layer of ['ground-grain','forest']){
     const asset=assets[layer],prefix='assets/terrain-map-study/portable/';
-    if(!asset||!asset.path.startsWith(prefix)||!/^assets\/[a-z0-9/-]+\.svg$/.test(asset.path)||asset.path.includes('..'))fail(`Unsafe detail path: ${style.setId}/${layer}`);
+    if(!asset||!asset.path.startsWith(prefix)||!/^assets\/[a-z0-9/-]+\.(svg|png)$/.test(asset.path)||asset.path.includes('..'))fail(`Unsafe detail path: ${style.setId}/${layer}`);
     if(JSON.stringify(asset.bounds)!==JSON.stringify(map.bounds))fail(`Detail bounds differ from map: ${style.setId}/${layer}`);
-    const svg=await readFile(join(here,asset.path.slice(prefix.length)),'utf8');
+    const detailPath=join(here,asset.path.slice(prefix.length));
+    if(asset.path.endsWith('.png')){
+      const png=await readFile(detailPath);
+      if(png.subarray(0,8).toString('hex')!=='89504e470d0a1a0a'||png.readUInt32BE(16)!==map.bounds.width||png.readUInt32BE(20)!==map.bounds.height||png[24]!==8||png[25]!==6)fail(`Detail PNG must be world-size RGBA: ${style.setId}/${layer}`);
+      if(png.toString('ascii',37,41)!=='IDAT')fail(`Detail PNG missing image data: ${style.setId}/${layer}`);
+      const pixels=inflateSync(png.subarray(41,41+png.readUInt32BE(33)));
+      const stride=1+map.bounds.width*4;
+      if(pixels.length!==stride*map.bounds.height||!pixels.some((value,index)=>index%stride>0&&(index%stride-1)%4===3&&value>0&&value<255))fail(`Detail PNG needs transparent pixels: ${style.setId}/${layer}`);
+      continue;
+    }
+    const svg=await readFile(detailPath,'utf8');
     if(!svg.includes(`viewBox="0 0 ${map.bounds.width} ${map.bounds.height}"`)||svg.includes('<rect')||svg.includes('href=')||svg.includes('<image'))fail(`Invalid transparent global detail SVG: ${style.setId}/${layer}`);
     if(layer==='forest'&&(!svg.includes('clip-path="url(#woods)"')||!map.features.filter(f=>f.kind==='forest').every(f=>svg.includes(f.geometry.d))))fail(`Forest detail does not clip to canonical shapes: ${style.setId}`);
-    const positions=[...svg.matchAll(/<circle cx="([^"]+)" cy="([^"]+)" r="([^"]+)"/g)].map(m=>`${m[1]},${m[2]},${m[3]}`).join('|');
-    if(!positions)fail(`No detail points: ${style.setId}/${layer}`);
-    if(detailPositions[layer]&&detailPositions[layer]!==positions)fail(`Sets have different detail positions: ${layer}`);
-    detailPositions[layer]=positions;
+    const positions=[...svg.matchAll(/<circle cx="([^"]+)" cy="([^"]+)" r="([^"]+)"/g)].map(m=>`${m[1]},${m[2]},${m[3]}`);
+    if(!positions.length)fail(`No detail points: ${style.setId}/${layer}`);
+    if(detailPositions[layer]&&positions.slice(0,detailPositions[layer].length).join('|')!==detailPositions[layer].join('|'))fail(`Sets have different canonical detail positions: ${layer}`);
+    if(!detailPositions[layer])detailPositions[layer]=positions;
   }
 }
-if(styleIds.size!==2||!styleIds.has('verdant')||!styleIds.has('dryland'))fail('Expected two style sets');
+if(styleIds.size!==4||!['verdant','dryland','natural','field-atlas'].every(id=>styleIds.has(id)))fail('Expected four style sets');
 console.log(`Valid VisualMap: ${map.features.length} stable features, ${kinds.size} kinds, ${layers.size} layers, ${styleIds.size} interchangeable sets.`);

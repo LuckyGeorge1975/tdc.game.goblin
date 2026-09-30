@@ -135,7 +135,7 @@ test('VisualMap and StyleSet validation rejects malformed schema before renderin
   assert.equal(target.children.length, 0);
 });
 
-test('global detail SVGs share coordinates across viewports and reject nonlocal paths', () => {
+test('global detail assets share coordinates across viewports and reject nonlocal paths', () => {
   const style = structuredClone(verdant);
   style.detailAssets = {
     'ground-grain': { path: 'assets/terrain-map-study/details/verdant-ground-grain.svg', bounds: { x: 0, y: 0, width: 500, height: 400 } },
@@ -158,6 +158,7 @@ test('global detail SVGs share coordinates across viewports and reject nonlocal 
     assert.equal(safeDetailPath(bad), false);
     const invalid = structuredClone(style);
     invalid.detailAssets.forest.path = bad;
-    assert.throws(() => validateStyleSet(invalid, visualMap), /local project-relative SVG path/);
+    assert.throws(() => validateStyleSet(invalid, visualMap), /local project-relative SVG or PNG path/);
   }
+  assert.equal(safeDetailPath('assets/terrain-map-study/portable/details/natural-ground-grain.png'), true);
 });

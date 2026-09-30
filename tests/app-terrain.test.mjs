@@ -7,16 +7,20 @@ import { loadTerrainPackage } from '../src/app/terrain-assets.mjs';
 
 const fileFetch = async (url) => ({ ok: true, json: async () => JSON.parse(await readFile(url, 'utf8')) });
 
-test('local terrain package loads both styles against one validated VisualMap', async () => {
+test('local terrain package loads four styles against one validated VisualMap', async () => {
   const { visualMap, styleSets } = await loadTerrainPackage(fileFetch);
   assert.equal(visualMap.mapId, 'terrain-study-02');
   assert.equal(visualMap.features.length, 29);
-  assert.deepEqual(Object.keys(styleSets), ['verdant', 'dryland']);
+  assert.deepEqual(Object.keys(styleSets), ['verdant', 'dryland', 'natural', 'field-atlas']);
   assert.equal(styleSets.verdant.mapId, visualMap.mapId);
   assert.equal(styleSets.dryland.mapId, visualMap.mapId);
+  assert.equal(styleSets.natural.mapId, visualMap.mapId);
+  assert.equal(styleSets['field-atlas'].mapId, visualMap.mapId);
+  assert.match(styleSets.natural.detailAssets['ground-grain'].path, /\.png$/);
+  assert.match(styleSets['field-atlas'].detailAssets['ground-grain'].path, /\.png$/);
   for (const set of Object.values(styleSets)) {
     for (const detail of Object.values(set.detailAssets)) {
-      assert.match(detail.path, /^assets\/terrain-map-study\/portable\/details\/[^/]+\.svg$/);
+      assert.match(detail.path, /^assets\/terrain-map-study\/portable\/details\/[^/]+\.(svg|png)$/);
       await readFile(new URL(`../${detail.path}`, import.meta.url));
     }
   }

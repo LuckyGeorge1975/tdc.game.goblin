@@ -49,10 +49,10 @@ neutrale Farben zurück. Das optionale `detail` wird als Material-Metadatum
 validiert, erzeugt in CE-05 aber keine prozeduralen Texturpunkte. So bleiben
 Formen und Materialkoordinaten global und unabhängig vom Viewport.
 
-Für offline erzeugte transparente SVG-Details darf ein StyleSet zusätzlich
+Für offline erzeugte transparente SVG- oder RGBA-PNG-Details darf ein StyleSet zusätzlich
 `detailAssets: { 'ground-grain'?: { path, bounds }, forest?: { path, bounds } }`
 enthalten. `path` ist relativ zur **Hauptprojektwurzel** und beginnt mit
-`assets/`; erlaubt sind lokale `.svg`-Pfade mit `/`, ohne Schema, führenden
+`assets/`; erlaubt sind lokale `.svg`- oder `.png`-Pfade mit `/`, ohne Schema, führenden
 Slash, `..`, Query oder Fragment. Der Renderer löst sie relativ zu seiner
 Modul-URL auf. `bounds` stehen in globalen Weltkoordinaten. Die Bilder werden
 in `groundTexture` beziehungsweise `forest` als nicht klickbare SVG-`image`

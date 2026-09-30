@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "setId": "field-atlas",
+  "name": "Field Atlas",
+  "mapId": "terrain-study-02",
+  "tokens": {
+    "layers": {
+      "ground": {
+        "fill": "#a9bb86"
+      },
+      "ground-grain": {
+        "fill": "none"
+      },
+      "elevation": {
+        "stroke": "#876750"
+      },
+      "forest": {
+        "fill": "#252b23"
+      },
+      "water": {
+        "fill": "#83aba2"
+      },
+      "routes": {
+        "stroke": "#ebe5d0"
+      },
+      "objects": {
+        "fill": "#b56b3d"
+      }
+    },
+    "kinds": {
+      "ground": {
+        "fill": "#a9bb86"
+      },
+      "grain": {
+        "fill": "none",
+        "detail": {
+          "color": "#627a4d",
+          "density": 3400,
+          "seedMode": "feature-id+world-coordinate"
+        }
+      },
+      "elevation": {
+        "fill": "#bb8e72",
+        "opacity": 0.79
+      },
+      "contour-low": {
+        "fill": "#a79a79",
+        "stroke": "#876750",
+        "strokeWidth": 2,
+        "opacity": 0.45
+      },
+      "contour-high": {
+        "fill": "#bb8e72",
+        "stroke": "#876750",
+        "strokeWidth": 2,
+        "opacity": 0.45
+      },
+      "forest": {
+        "fill": "#252b23",
+        "opacity": 0.32,
+        "detail": {
+          "crown": "#59634b",
+          "dark": "#252b23",
+          "density": 23200,
+          "seedMode": "feature-id+world-coordinate"
+        }
+      },
+      "river-bank": {
+        "fill": "none",
+        "stroke": "#a8b999",
+        "strokeWidth": 61
+      },
+      "river": {
+        "fill": "none",
+        "stroke": "#83aba2",
+        "strokeWidth": 46
+      },
+      "lake-shore": {
+        "fill": "#a8b999",
+        "stroke": "#a8b999",
+        "strokeWidth": 17
+      },
+      "lake": {
+        "fill": "#83aba2"
+      },
+      "lake-depth": {
+        "fill": "#547f80",
+        "opacity": 0.24
+      },
+      "road-edge": {
+        "fill": "none",
+        "stroke": "#9c8469",
+        "strokeWidth": 16,
+        "opacity": 0.55
+      },
+      "road": {
+        "fill": "none",
+        "stroke": "#ebe5d0",
+        "strokeWidth": 12
+      },
+      "bridge": {
+        "fill": "#ebe5d0",
+        "stroke": "#9c8469",
+        "strokeWidth": 2
+      },
+      "building": {
+        "fill": "#b56b3d",
+        "stroke": "#876750",
+        "strokeWidth": 2
+      }
+    }
+  },
+  "detailAssets": {
+    "ground-grain": {
+      "path": "assets/terrain-map-study/portable/details/field-atlas-ground-grain.png",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      }
+    },
+    "forest": {
+      "path": "assets/terrain-map-study/portable/details/field-atlas-forest.svg",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      }
+    }
+  }
+}

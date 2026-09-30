@@ -65,7 +65,7 @@ export function validateStyleSet(styleSet, visualMap) {
     if (!record(styleSet.detailAssets)) throw new TypeError('StyleSet detailAssets must be an object');
     for (const [layer, asset] of Object.entries(styleSet.detailAssets)) {
       if (!['ground-grain', 'forest'].includes(layer) || !record(asset) || !safeDetailPath(asset.path))
-        throw new TypeError('detail asset must use a local project-relative SVG path');
+        throw new TypeError('detail asset must use a local project-relative SVG or PNG path');
       checkBounds(asset.bounds, `detail asset ${layer} bounds`);
       if (visualMap && !intersectsBounds(asset.bounds, visualMap.bounds))
         throw new TypeError(`detail asset ${layer} lies outside VisualMap bounds`);
@@ -75,7 +75,7 @@ export function validateStyleSet(styleSet, visualMap) {
 }
 
 export function safeDetailPath(path) {
-  return typeof path === 'string' && path.startsWith('assets/') && path.endsWith('.svg')
+  return typeof path === 'string' && path.startsWith('assets/') && /\.(svg|png)$/.test(path)
     && /^[A-Za-z0-9._/-]+$/.test(path)
     && path.split('/').every(part => part !== '' && part !== '.' && part !== '..');
 }
