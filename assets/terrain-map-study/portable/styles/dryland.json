@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "setId": "dryland",
+  "name": "Dryland Survey",
+  "mapId": "terrain-study-02",
+  "tokens": {
+    "layers": {
+      "ground": {
+        "fill": "#b9b18b"
+      },
+      "ground-grain": {
+        "fill": "none"
+      },
+      "elevation": {
+        "stroke": "#99725a"
+      },
+      "forest": {
+        "fill": "#434c3b"
+      },
+      "water": {
+        "fill": "#b3d0cb"
+      },
+      "routes": {
+        "stroke": "#ddd3ba"
+      },
+      "objects": {
+        "fill": "#996b51"
+      }
+    },
+    "kinds": {
+      "ground": {
+        "fill": "#b9b18b"
+      },
+      "grain": {
+        "fill": "none",
+        "detail": {
+          "color": "#806f57",
+          "density": 3400,
+          "seedMode": "feature-id+world-coordinate"
+        }
+      },
+      "elevation": {
+        "fill": "#cda37d",
+        "opacity": 0.79
+      },
+      "contour-low": {
+        "fill": "#a99f77",
+        "stroke": "#99725a",
+        "strokeWidth": 2,
+        "opacity": 0.45
+      },
+      "contour-high": {
+        "fill": "#cda37d",
+        "stroke": "#99725a",
+        "strokeWidth": 2,
+        "opacity": 0.45
+      },
+      "forest": {
+        "fill": "#434c3b",
+        "opacity": 0.32,
+        "detail": {
+          "crown": "#72795a",
+          "dark": "#434c3b",
+          "density": 8200,
+          "seedMode": "feature-id+world-coordinate"
+        }
+      },
+      "river-bank": {
+        "fill": "none",
+        "stroke": "#d9d9aa",
+        "strokeWidth": 61
+      },
+      "river": {
+        "fill": "none",
+        "stroke": "#b3d0cb",
+        "strokeWidth": 46
+      },
+      "lake-shore": {
+        "fill": "#d9d9aa",
+        "stroke": "#d9d9aa",
+        "strokeWidth": 17
+      },
+      "lake": {
+        "fill": "#b3d0cb"
+      },
+      "lake-depth": {
+        "fill": "#83aea9",
+        "opacity": 0.24
+      },
+      "road-edge": {
+        "fill": "none",
+        "stroke": "#9c9074",
+        "strokeWidth": 16,
+        "opacity": 0.55
+      },
+      "road": {
+        "fill": "none",
+        "stroke": "#ddd3ba",
+        "strokeWidth": 12
+      },
+      "bridge": {
+        "fill": "#ddd3ba",
+        "stroke": "#9c9074",
+        "strokeWidth": 2
+      },
+      "building": {
+        "fill": "#996b51",
+        "stroke": "#99725a",
+        "strokeWidth": 2
+      }
+    }
+  },
+  "detailAssets": {
+    "ground-grain": {
+      "path": "assets/terrain-map-study/portable/details/dryland-ground-grain.svg",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      }
+    },
+    "forest": {
+      "path": "assets/terrain-map-study/portable/details/dryland-forest.svg",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      }
+    }
+  }
+}

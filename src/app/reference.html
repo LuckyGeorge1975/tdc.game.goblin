@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>G.O.B.L.I.N · Architektur-Referenzpartie</title><link rel="icon" type="image/svg+xml" href="./favicon.svg"><link rel="stylesheet" href="./reference.css"><link rel="stylesheet" href="./status.css"><link rel="stylesheet" href="./terrain.css"><link rel="stylesheet" href="../../localization.css?v=1"></head>
+<body>
+  <main>
+    <header><p id="scenario" class="eyebrow">ARCH-01 · REFERENZPARTIE</p><h1>G.O.B.L.I.N</h1><p>Interner modularer Spielpfad mit Core-Zustand.</p></header>
+    <section class="layout">
+      <aside><h2>Einheiten</h2><div id="roster"></div><h2>Field / Unit Intel</h2><div id="intel"></div></aside>
+      <section class="battle"><div class="battle-head"><div><span id="phase"></span><small id="turn"></small><small id="phase-count"></small></div><button id="end-phase" type="button">Nächste Phase →</button></div><div class="area-tabs" role="group" aria-label="Gebietsansicht"><button data-area="movement" type="button">Movement</button><button data-area="fire" type="button">Fire</button><button data-area="sight" type="button">LOS</button></div><div id="terrain-controls" class="terrain-controls" hidden><label for="terrain-set">Stilset</label><select id="terrain-set"><option value="verdant">Verdant Atlas</option><option value="dryland">Dryland Survey</option></select><button id="terrain-grid" type="button" aria-pressed="false">Hexraster</button></div><div id="map" class="map" role="grid" aria-label="Referenz-Schlachtfeld"></div><svg id="terrain-map" role="img" aria-label="Zusammenhängende Terrainkarte" hidden></svg><div id="status" role="status"></div></section>
+      <aside><h2>Ereignisse</h2><ol id="events"></ol><p id="instructions" class="hint"></p></aside>
+    </section>
+  </main>
+  <script src="../../localization.js?v=1"></script>
+  <script type="importmap">{"imports":{"/terrain-rules.js":"./terrain-rules-bridge.mjs"}}</script>
+  <script type="module" src="./reference.mjs"></script>
+</body>
+</html>

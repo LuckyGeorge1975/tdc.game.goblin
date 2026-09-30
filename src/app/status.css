@@ -1,0 +1,7 @@
+#phase-count{display:block;margin-top:.2rem}
+.unit.action-spent,.hex.action-spent b{opacity:.55}
+.unit.no-action-this-phase,.hex.no-action-this-phase b{opacity:.72}
+.unit.disabled,.hex.disabled b{filter:grayscale(1);opacity:.55}
+.unit.destroyed,.hex.destroyed b{opacity:.35;text-decoration:line-through}
+.hex.ready b{opacity:1}
+#end-phase:disabled{cursor:not-allowed;opacity:.45}

@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "setId": "verdant",
+  "name": "Verdant Atlas",
+  "mapId": "terrain-study-02",
+  "tokens": {
+    "layers": {
+      "ground": {
+        "fill": "#a7b784"
+      },
+      "ground-grain": {
+        "fill": "none"
+      },
+      "elevation": {
+        "stroke": "#8e725c"
+      },
+      "forest": {
+        "fill": "#314b35"
+      },
+      "water": {
+        "fill": "#b2d9d1"
+      },
+      "routes": {
+        "stroke": "#d6cfb6"
+      },
+      "objects": {
+        "fill": "#a66e4e"
+      }
+    },
+    "kinds": {
+      "ground": {
+        "fill": "#a7b784"
+      },
+      "grain": {
+        "fill": "none",
+        "detail": {
+          "color": "#687c58",
+          "density": 3400,
+          "seedMode": "feature-id+world-coordinate"
+        }
+      },
+      "elevation": {
+        "fill": "#c2a17d",
+        "opacity": 0.79
+      },
+      "contour-low": {
+        "fill": "#96a66f",
+        "stroke": "#8e725c",
+        "strokeWidth": 2,
+        "opacity": 0.45
+      },
+      "contour-high": {
+        "fill": "#c2a17d",
+        "stroke": "#8e725c",
+        "strokeWidth": 2,
+        "opacity": 0.45
+      },
+      "forest": {
+        "fill": "#314b35",
+        "opacity": 0.32,
+        "detail": {
+          "crown": "#5c7144",
+          "dark": "#314b35",
+          "density": 8200,
+          "seedMode": "feature-id+world-coordinate"
+        }
+      },
+      "river-bank": {
+        "fill": "none",
+        "stroke": "#d1dfa9",
+        "strokeWidth": 61
+      },
+      "river": {
+        "fill": "none",
+        "stroke": "#b2d9d1",
+        "strokeWidth": 46
+      },
+      "lake-shore": {
+        "fill": "#d1dfa9",
+        "stroke": "#d1dfa9",
+        "strokeWidth": 17
+      },
+      "lake": {
+        "fill": "#b2d9d1"
+      },
+      "lake-depth": {
+        "fill": "#81b9b1",
+        "opacity": 0.24
+      },
+      "road-edge": {
+        "fill": "none",
+        "stroke": "#958b72",
+        "strokeWidth": 16,
+        "opacity": 0.55
+      },
+      "road": {
+        "fill": "none",
+        "stroke": "#d6cfb6",
+        "strokeWidth": 12
+      },
+      "bridge": {
+        "fill": "#d6cfb6",
+        "stroke": "#958b72",
+        "strokeWidth": 2
+      },
+      "building": {
+        "fill": "#a66e4e",
+        "stroke": "#8e725c",
+        "strokeWidth": 2
+      }
+    }
+  },
+  "detailAssets": {
+    "ground-grain": {
+      "path": "assets/terrain-map-study/portable/details/verdant-ground-grain.svg",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      }
+    },
+    "forest": {
+      "path": "assets/terrain-map-study/portable/details/verdant-forest.svg",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      }
+    }
+  }
+}

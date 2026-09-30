@@ -7,13 +7,15 @@ function game() {
   const nodes = new Map(), timers = new Map();
   let timerId = 0;
   function element() {
+    const classes=new Set();
     return {innerHTML:'',textContent:'',checked:false,disabled:false,style:{},dataset:{},
-      classList:{add(){},remove(){},toggle(){}},setAttribute(){},addEventListener(){},
+      classList:{add(name){classes.add(name)},remove(name){classes.delete(name)},toggle(name,force){if(force===undefined? !classes.has(name):force)classes.add(name);else classes.delete(name)},contains(name){return classes.has(name)}},setAttribute(){},addEventListener(){},
       appendChild(){},before(){},querySelector(){return null},animate(){},
       insertAdjacentHTML(_, html){this.innerHTML=html+this.innerHTML}};
   }
+  const viewButtons=['movement','fire','los'].map(view=>Object.assign(element(),{dataset:{view}}));
   const document = {querySelector(s){if(!nodes.has(s))nodes.set(s,element());return nodes.get(s)},
-    querySelectorAll(){return []},createElement:element,createElementNS:element,addEventListener(){}};
+    querySelectorAll(s){return s==='.view-option:not(#grid-toggle)'?viewButtons:[]},createElement:element,createElementNS:element,addEventListener(){}};
   const context = vm.createContext({document,structuredClone,console,window:{},GameDialogs:{isOpen:()=>false,cancel(){},confirm:async()=>true},
     localStorage:{getItem(){return null}},
     setTimeout(fn){timers.set(++timerId,fn);return timerId},clearTimeout(id){timers.delete(id)}});
@@ -30,6 +32,21 @@ test('restart and scenario change wait for approval and preserve canceled comman
   const change=run("document.querySelector('#scenario-select').onchange({target:document.querySelector('#scenario-select')})");
   assert.equal(run('currentScenario'),'unit-trial');assert.equal(run("document.querySelector('#scenario-select').value"),'unit-trial');
   run('answer(true)');await change;assert.equal(run('currentScenario'),'iron-dust');assert.equal(run('phaseCommands.length'),0);
+});
+
+test('scenario change from Fire resets the active Legacy range overlay to Movement',async()=>{
+  const {run}=game();
+  run("scenarioCatalog['atlas-proving-grounds']=scenarioCatalog['unit-trial'];loadScenario('iron-dust');setTurnPhase('fire');units[0].moved=true");
+  assert.equal(run('viewMode'),'fire');
+  assert.equal(run("document.querySelectorAll('.view-option:not(#grid-toggle)')[1].classList.contains('active')"),true);
+  run("document.querySelector('#scenario-select').value='atlas-proving-grounds'");
+  await run("document.querySelector('#scenario-select').onchange({target:document.querySelector('#scenario-select')})");
+  assert.equal(run('currentScenario'),'atlas-proving-grounds');
+  assert.equal(run('turnPhase'),'movement');
+  assert.equal(run('viewMode'),'movement');
+  assert.equal(run("document.querySelectorAll('.view-option:not(#grid-toggle)')[0].classList.contains('active')"),true);
+  assert.equal(run("document.querySelectorAll('.view-option:not(#grid-toggle)')[1].classList.contains('active')"),false);
+  assert.equal(run('selected'),null);
 });
 
 test('phase cancellation and open-dialog AUTO guard preserve the phase',async()=>{

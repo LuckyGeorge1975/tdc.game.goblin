@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "visualMap": "visual-map.json",
+  "styleSets": [
+    {
+      "setId": "verdant",
+      "path": "styles/verdant.json"
+    },
+    {
+      "setId": "dryland",
+      "path": "styles/dryland.json"
+    }
+  ]
+}

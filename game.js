@@ -71,7 +71,7 @@ function findEnemyStep(foe,target){
   }
   return best;
 }
-function addLog(text,enemy=false){const t=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});logEl.insertAdjacentHTML('afterbegin',`<div class="log-line ${enemy?'enemy':''}"><span class="log-time">${t}</span><strong>${enemy?'HOSTILE':'COMMAND'}</strong> ${text}</div>`)}
+function addLog(text,enemy=false){const lang=globalThis.GoblinLanguage?.current||'de';const t=new Date().toLocaleTimeString(lang,{hour:'2-digit',minute:'2-digit'});logEl.insertAdjacentHTML('afterbegin',`<div class="log-line ${enemy?'enemy':''}"><span class="log-time">${t}</span><strong>${enemy?'HOSTILE':'COMMAND'}</strong> ${text}</div>`);logEl.firstElementChild?.setAttribute('data-l10n-source',text)}
 function drawGrid(){if(!gridVisible)return;for(let y=0;y<H;y++)for(let x=0;x<W;x++){const grid=document.createElementNS(NS,'polygon');grid.setAttribute('points',hexPoints(x,y));grid.classList.add('grid-hex');svg.appendChild(grid)}}function drawFocusMarker(){if(!focusedCell)return;const marker=document.createElementNS(NS,'polygon');marker.setAttribute('points',hexPoints(focusedCell.x,focusedCell.y));marker.classList.add('focus-marker');svg.appendChild(marker)}function draw(){
   svg.setAttribute('viewBox','0 0 790 480'); svg.innerHTML=''; const passiveSelection=selected&&selected.hp>0&&!phaseCanAct(selected);
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){

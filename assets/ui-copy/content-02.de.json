@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "sourceLocale": "de",
+  "status": "content-source-for-localization",
+  "missions": {
+    "iron-dust": {
+      "scope": "legacy-playable",
+      "sourceObjectiveCode": "core",
+      "winCondition": "enemy-core-destroyed-and-player-survives",
+      "keys": {
+        "title": "mission.iron-dust.title",
+        "objectiveShort": "mission.iron-dust.objective.short",
+        "objectiveFull": "mission.iron-dust.objective.full",
+        "briefingShort": "mission.iron-dust.briefing.short",
+        "briefingFull": "mission.iron-dust.briefing.full",
+        "victorySummary": "mission.iron-dust.end.victory"
+      }
+    },
+    "relay-run": {
+      "scope": "legacy-playable",
+      "sourceObjectiveCode": "core-and-escort",
+      "winCondition": "enemy-core-and-all-enemies-destroyed-and-player-survives",
+      "keys": {
+        "title": "mission.relay-run.title",
+        "objectiveShort": "mission.relay-run.objective.short",
+        "objectiveFull": "mission.relay-run.objective.full",
+        "briefingShort": "mission.relay-run.briefing.short",
+        "briefingFull": "mission.relay-run.briefing.full",
+        "victorySummary": "mission.relay-run.end.victory"
+      }
+    },
+    "unit-trial": {
+      "scope": "legacy-playable",
+      "sourceObjectiveCode": "core",
+      "winCondition": "enemy-core-and-all-enemies-destroyed-and-player-survives",
+      "keys": {
+        "title": "mission.unit-trial.title",
+        "objectiveShort": "mission.unit-trial.objective.short",
+        "objectiveFull": "mission.unit-trial.objective.full",
+        "briefingShort": "mission.unit-trial.briefing.short",
+        "briefingFull": "mission.unit-trial.briefing.full",
+        "victorySummary": "mission.unit-trial.end.victory"
+      }
+    },
+    "atlas-proving-grounds": {
+      "scope": "legacy-playable-when-level-loaded",
+      "sourceObjectiveCode": "core-and-escort",
+      "winCondition": "enemy-core-and-all-enemies-destroyed-and-player-survives",
+      "keys": {
+        "title": "mission.atlas-proving-grounds.title",
+        "objectiveShort": "mission.atlas-proving-grounds.objective.short",
+        "objectiveFull": "mission.atlas-proving-grounds.objective.full",
+        "briefingShort": "mission.atlas-proving-grounds.briefing.short",
+        "briefingFull": "mission.atlas-proving-grounds.briefing.full",
+        "victorySummary": "mission.atlas-proving-grounds.end.victory"
+      }
+    },
+    "reference-v1": {
+      "scope": "modular-fixture-not-public-mission",
+      "winCondition": "enemy-core-destroyed-and-player-survives",
+      "keys": {
+        "title": "mission.reference-v1.title",
+        "objectiveShort": "mission.reference-v1.objective.short",
+        "objectiveFull": "mission.reference-v1.objective.full",
+        "briefingShort": "mission.reference-v1.briefing.short",
+        "briefingFull": "mission.reference-v1.briefing.full",
+        "victorySummary": "mission.reference-v1.end.victory",
+        "helpShort": "screen.help.reference-v1.short",
+        "helpFull": "screen.help.reference-v1.full"
+      }
+    },
+    "phase-v2": {
+      "scope": "modular-fixture-not-public-mission",
+      "winCondition": "enemy-core-destroyed-and-player-survives",
+      "keys": {
+        "title": "mission.phase-v2.title",
+        "objectiveShort": "mission.phase-v2.objective.short",
+        "objectiveFull": "mission.phase-v2.objective.full",
+        "briefingShort": "mission.phase-v2.briefing.short",
+        "briefingFull": "mission.phase-v2.briefing.full",
+        "victorySummary": "mission.phase-v2.end.victory",
+        "helpShort": "screen.help.phase-v2.short",
+        "helpFull": "screen.help.phase-v2.full"
+      }
+    }
+  },
+  "messages": {
+    "mission.iron-dust.title": "Iron Dust",
+    "mission.iron-dust.objective.short": "Kommandokern zerstören; mindestens eine eigene Einheit erhalten.",
+    "mission.iron-dust.objective.full": "Zerstöre den feindlichen Kommandokern. Die Mission ist verloren, wenn alle eigenen Einheiten ausgeschaltet sind.",
+    "mission.iron-dust.briefing.short": "Rücke zum Kommandokern vor und schalte ihn aus.",
+    "mission.iron-dust.briefing.full": "Der feindliche Kommandokern ist dein Ziel. Nutze Deckung und Reichweite für den Vorstoß. Der Einsatz endet mit deinem Sieg, sobald der Kern zerstört ist und mindestens eine eigene Einheit überlebt.",
+    "mission.iron-dust.end.victory": "Der feindliche Kommandokern ist ausgeschaltet.",
+    "mission.relay-run.title": "Relay Run",
+    "mission.relay-run.objective.short": "Relaisknoten und alle Feinde ausschalten; eigene Einheit erhalten.",
+    "mission.relay-run.objective.full": "Zerstöre den feindlichen Relaisknoten und schalte alle übrigen feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.relay-run.briefing.short": "Schalte den Relaisknoten und seine gesamte Eskorte aus.",
+    "mission.relay-run.briefing.full": "Der Relaisknoten liegt im Osten des Einsatzgebiets. Zerstöre ihn und schalte alle feindlichen Einheiten aus. Der Einsatz scheitert, wenn keine eigene Einheit überlebt.",
+    "mission.relay-run.end.victory": "Relaisknoten und feindliche Einheiten sind ausgeschaltet.",
+    "mission.unit-trial.title": "Unit Trial",
+    "mission.unit-trial.objective.short": "Kommandozentrum und alle Feinde ausschalten; eigene Einheit erhalten.",
+    "mission.unit-trial.objective.full": "Zerstöre das feindliche Kommandozentrum und schalte alle übrigen feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.unit-trial.briefing.short": "Erprobe deine Einheiten gegen das feindliche Kommandozentrum.",
+    "mission.unit-trial.briefing.full": "Diese Mission stellt verschiedene Einheiten gegen eine gemischte Verteidigung. Zerstöre das Kommandozentrum und schalte alle feindlichen Einheiten aus. Der Einsatz scheitert, wenn alle eigenen Einheiten ausgeschaltet sind.",
+    "mission.unit-trial.end.victory": "Kommandozentrum und feindliche Einheiten sind ausgeschaltet.",
+    "mission.atlas-proving-grounds.title": "Atlas Proving Grounds",
+    "mission.atlas-proving-grounds.objective.short": "Feindlichen Kern und alle Feinde ausschalten; eigene Einheit erhalten.",
+    "mission.atlas-proving-grounds.objective.full": "Zerstöre den feindlichen Kommandokern und schalte alle übrigen feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.atlas-proving-grounds.briefing.short": "Schalte den feindlichen Kern und alle übrigen Gegner aus.",
+    "mission.atlas-proving-grounds.briefing.full": "Das Testfeld zeigt viele Gelände- und Einheitentypen. Zerstöre den feindlichen Kommandokern und schalte alle feindlichen Einheiten aus. Der Einsatz scheitert, wenn alle eigenen Einheiten ausgeschaltet sind.",
+    "mission.atlas-proving-grounds.end.victory": "Der Kommandokern und alle feindlichen Einheiten sind ausgeschaltet.",
+    "mission.reference-v1.title": "Referenzpartie",
+    "mission.reference-v1.objective.short": "Feindlichen Kern zerstören; eigene Einheit erhalten.",
+    "mission.reference-v1.objective.full": "Zerstöre den feindlichen Kern. Mindestens eine eigene Einheit muss überleben.",
+    "mission.reference-v1.briefing.short": "Testpartie: Schalte den feindlichen Kern aus.",
+    "mission.reference-v1.briefing.full": "Diese feste Referenzpartie prüft Bewegung, Feuer und Siegbedingungen des modularen Regelkerns. Zerstöre den feindlichen Kern; der Einsatz scheitert, wenn alle eigenen Einheiten ausgeschaltet sind.",
+    "mission.reference-v1.end.victory": "Der feindliche Kern ist ausgeschaltet.",
+    "mission.phase-v2.title": "Phasenpartie",
+    "mission.phase-v2.objective.short": "Feindlichen Kern zerstören; eigene Einheit erhalten.",
+    "mission.phase-v2.objective.full": "Zerstöre den feindlichen Kern. Mindestens eine eigene Einheit muss überleben.",
+    "mission.phase-v2.briefing.short": "Testpartie: Nutze Bewegung, Feuer und Skimmer-Manöver.",
+    "mission.phase-v2.briefing.full": "Diese feste Testpartie zeigt Bewegung, Feuer und das zweite Skimmer-Manöver. Zerstöre den feindlichen Kern; der Einsatz scheitert, wenn alle eigenen Einheiten ausgeschaltet sind.",
+    "mission.phase-v2.end.victory": "Der feindliche Kern ist ausgeschaltet.",
+    "phase.movement.label": "Bewegungsphase",
+    "phase.fire.label": "Feuerphase",
+    "phase.gev.label": "Skimmer-Manöver",
+    "phase.enemy.label": "Gegnerzug",
+    "hud.objective.progress.core": "Kern: {currentHp}/{maxHp} HP",
+    "hud.objective.progress.enemies": "Feinde: {remainingEnemies}/{totalEnemies}",
+    "dialog.phaseAdvance.title": "Phase beenden?",
+    "dialog.phaseAdvance.pending.one": "{pendingCount} Einheit kann in dieser Phase noch handeln.",
+    "dialog.phaseAdvance.pending.other": "{pendingCount} Einheiten können in dieser Phase noch handeln.",
+    "dialog.phaseAdvance.pending.none": "Keine Einheit kann in dieser Phase noch handeln.",
+    "dialog.phaseAdvance.confirm.toFire": "Feuerphase beginnen",
+    "dialog.phaseAdvance.confirm.toGev": "Skimmer-Manöver beginnen",
+    "dialog.phaseAdvance.confirm.toEnemy": "Gegnerzug starten",
+    "dialog.phaseAdvance.confirm.toMovement": "Bewegungsphase beginnen",
+    "dialog.phaseAdvance.cancel": "In dieser Phase bleiben",
+    "dialog.phaseAdvance.remember": "Bei Phasenwechsel nicht erneut fragen",
+    "dialog.restart.title": "Mission neu starten?",
+    "dialog.restart.body": "Die laufende Mission beginnt von vorn. Bisherige Befehle und Fortschritte gehen verloren.",
+    "dialog.restart.confirm": "Mission neu starten",
+    "dialog.restart.cancel": "Weiterspielen",
+    "dialog.changeMission.title": "Mission wechseln?",
+    "dialog.changeMission.body": "Die laufende Mission endet. Deine Fortschritte gehen verloren. Danach beginnt {nextMissionName}.",
+    "dialog.changeMission.confirm": "Mission wechseln",
+    "dialog.changeMission.cancel": "Weiterspielen",
+    "screen.missionEnd.victory.title": "Mission erfüllt",
+    "screen.missionEnd.defeat.title": "Mission gescheitert",
+    "screen.missionEnd.defeat.allUnits": "Alle eigenen Einheiten wurden ausgeschaltet.",
+    "screen.missionEnd.action.retry": "Erneut spielen",
+    "screen.missionEnd.action.chooseMission": "Zur Missionswahl",
+    "screen.missionEnd.action.log": "Kampfbericht ansehen",
+    "screen.help.title": "So spielst du",
+    "screen.help.reference-v1.short": "Einheit wählen, Ziel markieren und Befehl bestätigen.",
+    "screen.help.reference-v1.full": "Wähle eine eigene Einheit. Markiere ein gültiges Bewegungsfeld oder in der Feuerphase ein gültiges Feindziel und bestätige den Befehl. Die Phasenanzeige zeigt, wann Bewegung und Feuer möglich sind.",
+    "screen.help.phase-v2.short": "Bewegung, Feuer und Skimmer-Manöver nacheinander nutzen.",
+    "screen.help.phase-v2.full": "Wähle eine eigene Einheit und bestätige ein gültiges Ziel. Auf die Bewegungsphase folgt die Feuerphase. Danach dürfen geeignete Skimmer ihr zweites Manöver ausführen. Die Phasenanzeige zeigt den nächsten Schritt."
+  },
+  "parameters": {
+    "hud.objective.progress.core": { "currentHp": "integer >= 0 from Core", "maxHp": "integer > 0 from Core" },
+    "hud.objective.progress.enemies": { "remainingEnemies": "integer >= 0 from Core", "totalEnemies": "integer >= 0 from Core" },
+    "dialog.phaseAdvance.pending.one": { "pendingCount": "integer = 1 from presentation readiness" },
+    "dialog.phaseAdvance.pending.other": { "pendingCount": "integer >= 2 from presentation readiness" },
+    "dialog.phaseAdvance.pending.none": {},
+    "dialog.changeMission.body": { "nextMissionName": "localized mission title from selected scenario" }
+  }
+}

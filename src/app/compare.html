@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>G.O.B.L.I.N · Lokaler Pfadvergleich</title><link rel="icon" type="image/svg+xml" href="./favicon.svg"><link rel="stylesheet" href="./compare.css"><link rel="stylesheet" href="../../localization.css?v=1"></head>
+<body>
+  <header>
+    <div><small>INTERNER SPIELPFAD · KEIN RELEASE</small><h1>G.O.B.L.I.N</h1><p>Core-Referenzpartie und bisheriges Spiel lokal vergleichen. Ein Wechsel startet den jeweiligen Pfad neu.</p></div>
+    <label for="path-select">Spielpfad <select id="path-select"><option value="core">Core-Referenzpartie</option><option value="phase">Core-Phasenpartie</option><option value="terrain">Terrain-Vorschau</option><option value="legacy">Bisheriges Spiel</option></select></label>
+  </header>
+  <main><iframe id="game-frame" title="Ausgewählter G.O.B.L.I.N-Spielpfad"></iframe></main>
+  <script src="../../localization.js?v=1"></script>
+  <script type="module" src="./compare.mjs"></script>
+</body>
+</html>

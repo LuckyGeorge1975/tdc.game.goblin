@@ -1,0 +1,661 @@
+{
+  "schemaVersion": 1,
+  "mapId": "terrain-study-02",
+  "bounds": {
+    "x": 0,
+    "y": 0,
+    "width": 1440,
+    "height": 960
+  },
+  "hexLayout": {
+    "orientation": "pointy-top",
+    "offset": "odd-row",
+    "radius": 62,
+    "origin": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "detailSeed": 91,
+  "features": [
+    {
+      "id": "ground-base",
+      "kind": "ground",
+      "layer": "ground",
+      "zOrder": 0,
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      },
+      "geometry": {
+        "type": "polygon",
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 1440,
+            "y": 0
+          },
+          {
+            "x": 1440,
+            "y": 960
+          },
+          {
+            "x": 0,
+            "y": 960
+          }
+        ]
+      }
+    },
+    {
+      "id": "ground-grain",
+      "kind": "grain",
+      "layer": "ground-grain",
+      "zOrder": 0,
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      },
+      "geometry": {
+        "type": "polygon",
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 1440,
+            "y": 0
+          },
+          {
+            "x": 1440,
+            "y": 960
+          },
+          {
+            "x": 0,
+            "y": 960
+          }
+        ]
+      },
+      "detailSeed": 91
+    },
+    {
+      "id": "elevation-west",
+      "kind": "elevation",
+      "layer": "elevation",
+      "zOrder": 10,
+      "bounds": {
+        "x": 220,
+        "y": 175,
+        "width": 475,
+        "height": 370
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M274 225C330 181 433 203 484 251S559 289 623 276 690 326 670 391 618 423 607 488 526 537 471 496 399 449 329 466 255 405 246 357 226 269 274 225Z"
+      }
+    },
+    {
+      "id": "elevation-east",
+      "kind": "elevation",
+      "layer": "elevation",
+      "zOrder": 10,
+      "bounds": {
+        "x": 860,
+        "y": 260,
+        "width": 485,
+        "height": 355
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M938 297C994 272 1066 312 1103 357S1208 363 1261 415 1325 492 1283 549 1202 548 1164 596 1050 587 1000 557 918 576 883 521 900 445 870 378 938 297Z"
+      }
+    },
+    {
+      "id": "elevation-west-contour-outer",
+      "kind": "contour-low",
+      "layer": "elevation",
+      "zOrder": 20,
+      "bounds": {
+        "x": 250,
+        "y": 215,
+        "width": 425,
+        "height": 275
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M298 251C366 222 431 234 474 275S562 315 623 305 658 346 635 384 575 419 577 461 510 484 466 455 393 415 346 436 281 374 277 332 261 278 298 251Z"
+      }
+    },
+    {
+      "id": "elevation-west-contour-inner",
+      "kind": "contour-high",
+      "layer": "elevation",
+      "zOrder": 20,
+      "bounds": {
+        "x": 285,
+        "y": 245,
+        "width": 355,
+        "height": 220
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M326 276C381 252 429 264 464 298S548 339 605 329 624 357 599 379 550 415 548 442 489 452 458 426 395 391 360 405 310 356 305 326 295 291 326 276Z"
+      }
+    },
+    {
+      "id": "elevation-east-contour-outer",
+      "kind": "contour-low",
+      "layer": "elevation",
+      "zOrder": 20,
+      "bounds": {
+        "x": 895,
+        "y": 300,
+        "width": 410,
+        "height": 280
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M970 326C1018 306 1068 340 1091 384S1186 388 1230 432 1290 496 1252 522 1181 512 1142 567 1057 555 1013 532 930 549 915 507 936 446 902 388 970 326Z"
+      }
+    },
+    {
+      "id": "elevation-east-contour-inner",
+      "kind": "contour-high",
+      "layer": "elevation",
+      "zOrder": 20,
+      "bounds": {
+        "x": 925,
+        "y": 330,
+        "width": 345,
+        "height": 220
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M998 353C1038 338 1070 361 1086 399S1174 414 1210 448 1252 489 1228 500 1173 498 1125 537 1060 526 1024 509 946 520 942 489 960 442 933 394 998 353Z"
+      }
+    },
+    {
+      "id": "forest-northwest",
+      "kind": "forest",
+      "layer": "forest",
+      "zOrder": 10,
+      "bounds": {
+        "x": 0,
+        "y": 15,
+        "width": 590,
+        "height": 240
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M0 35C85 20 97 88 167 90S272 37 330 46 397 100 454 91 542 62 567 107 549 174 509 190 430 166 390 206 283 216 241 185 177 194 121 236 26 218 0 188Z"
+      },
+      "detailSeed": 313
+    },
+    {
+      "id": "forest-southwest",
+      "kind": "forest",
+      "layer": "forest",
+      "zOrder": 11,
+      "bounds": {
+        "x": 0,
+        "y": 395,
+        "width": 625,
+        "height": 410
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M9 527C64 485 133 517 182 466S257 405 317 440 383 506 444 485 531 514 574 549 605 654 555 700 487 681 457 737 359 748 326 707 259 720 224 783 112 750 72 785 0 773Z"
+      },
+      "detailSeed": 313
+    },
+    {
+      "id": "forest-northeast",
+      "kind": "forest",
+      "layer": "forest",
+      "zOrder": 12,
+      "bounds": {
+        "x": 910,
+        "y": 0,
+        "width": 530,
+        "height": 300
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M935 35C1014 0 1108 6 1157 54S1190 120 1265 102 1382 45 1440 73V245C1380 285 1329 242 1260 284S1166 249 1107 234 1021 286 978 228 921 144 935 35Z"
+      },
+      "detailSeed": 313
+    },
+    {
+      "id": "forest-southeast",
+      "kind": "forest",
+      "layer": "forest",
+      "zOrder": 13,
+      "bounds": {
+        "x": 795,
+        "y": 620,
+        "width": 645,
+        "height": 340
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M855 721C904 668 974 696 1026 655S1124 633 1163 673 1228 717 1297 700 1391 695 1440 738V960H807C800 897 851 863 814 816S825 757 855 721Z"
+      },
+      "detailSeed": 313
+    },
+    {
+      "id": "river-main-bank",
+      "kind": "river-bank",
+      "layer": "water",
+      "zOrder": 5,
+      "bounds": {
+        "x": -32,
+        "y": 175,
+        "width": 994,
+        "height": 817
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M0 270C94 258 144 293 204 290S308 244 367 261 443 291 508 261 561 198 609 210M851 395C876 450 840 493 865 538S937 579 925 630 873 692 881 741 915 824 891 869 899 923 930 960"
+      }
+    },
+    {
+      "id": "river-main",
+      "kind": "river",
+      "layer": "water",
+      "zOrder": 10,
+      "bounds": {
+        "x": -32,
+        "y": 175,
+        "width": 994,
+        "height": 817
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M0 270C94 258 144 293 204 290S308 244 367 261 443 291 508 261 561 198 609 210M851 395C876 450 840 493 865 538S937 579 925 630 873 692 881 741 915 824 891 869 899 923 930 960"
+      }
+    },
+    {
+      "id": "lake-central-shore",
+      "kind": "lake-shore",
+      "layer": "water",
+      "zOrder": 19,
+      "bounds": {
+        "x": 540,
+        "y": 138,
+        "width": 400,
+        "height": 350
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M599 186C641 158 676 147 708 171S780 211 812 234 884 257 913 300 926 363 894 397 844 397 822 442 766 475 723 449 674 415 638 422 582 391 575 347 547 299 563 255 599 186Z"
+      }
+    },
+    {
+      "id": "lake-central",
+      "kind": "lake",
+      "layer": "water",
+      "zOrder": 20,
+      "bounds": {
+        "x": 540,
+        "y": 138,
+        "width": 400,
+        "height": 350
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M599 186C641 158 676 147 708 171S780 211 812 234 884 257 913 300 926 363 894 397 844 397 822 442 766 475 723 449 674 415 638 422 582 391 575 347 547 299 563 255 599 186Z"
+      }
+    },
+    {
+      "id": "lake-central-depth",
+      "kind": "lake-depth",
+      "layer": "water",
+      "zOrder": 21,
+      "bounds": {
+        "x": 600,
+        "y": 190,
+        "width": 300,
+        "height": 225
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M638 230C672 201 701 197 732 224S803 271 839 277 885 321 868 358 795 353 775 393 698 408 657 377 606 352 607 308 611 258 638 230Z"
+      }
+    },
+    {
+      "id": "road-west-east-edge",
+      "kind": "road-edge",
+      "layer": "routes",
+      "zOrder": 9,
+      "bounds": {
+        "x": -10,
+        "y": 500,
+        "width": 1460,
+        "height": 175
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M0 642C90 631 120 584 207 590S331 650 405 625 505 559 589 580 710 646 765 630 836 567 904 572 1027 624 1082 585 1156 523 1215 539 1320 610 1440 589"
+      }
+    },
+    {
+      "id": "road-west-east",
+      "kind": "road",
+      "layer": "routes",
+      "zOrder": 10,
+      "bounds": {
+        "x": -10,
+        "y": 500,
+        "width": 1460,
+        "height": 175
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M0 642C90 631 120 584 207 590S331 650 405 625 505 559 589 580 710 646 765 630 836 567 904 572 1027 624 1082 585 1156 523 1215 539 1320 610 1440 589"
+      }
+    },
+    {
+      "id": "road-north-connector-edge",
+      "kind": "road-edge",
+      "layer": "routes",
+      "zOrder": 10,
+      "bounds": {
+        "x": 1010,
+        "y": -10,
+        "width": 165,
+        "height": 620
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M1084 0C1074 92 1030 131 1056 190S1145 255 1120 320 1057 389 1062 446 1134 522 1082 585"
+      }
+    },
+    {
+      "id": "road-north-connector",
+      "kind": "road",
+      "layer": "routes",
+      "zOrder": 11,
+      "bounds": {
+        "x": 1010,
+        "y": -10,
+        "width": 165,
+        "height": 620
+      },
+      "geometry": {
+        "type": "path",
+        "d": "M1084 0C1074 92 1030 131 1056 190S1145 255 1120 320 1057 389 1062 446 1134 522 1082 585"
+      }
+    },
+    {
+      "id": "bridge-main",
+      "kind": "bridge",
+      "layer": "routes",
+      "zOrder": 30,
+      "bounds": {
+        "x": 862.198,
+        "y": 555.988,
+        "width": 67.604,
+        "height": 40.024
+      },
+      "geometry": {
+        "type": "polygon",
+        "points": [
+          {
+            "x": 864.198,
+            "y": 568.407
+          },
+          {
+            "x": 923.287,
+            "y": 557.988
+          },
+          {
+            "x": 927.802,
+            "y": 583.593
+          },
+          {
+            "x": 868.713,
+            "y": 594.012
+          }
+        ]
+      }
+    },
+    {
+      "id": "building-01",
+      "kind": "building",
+      "layer": "objects",
+      "zOrder": 10,
+      "bounds": {
+        "x": 325.905,
+        "y": 556.362,
+        "width": 58.19,
+        "height": 47.276
+      },
+      "geometry": {
+        "type": "polygon",
+        "points": [
+          {
+            "x": 329.905,
+            "y": 573.959
+          },
+          {
+            "x": 371.752,
+            "y": 560.362
+          },
+          {
+            "x": 380.095,
+            "y": 586.041
+          },
+          {
+            "x": 338.248,
+            "y": 599.638
+          }
+        ]
+      }
+    },
+    {
+      "id": "building-02",
+      "kind": "building",
+      "layer": "objects",
+      "zOrder": 11,
+      "bounds": {
+        "x": 374.181,
+        "y": 537.363,
+        "width": 43.638,
+        "height": 37.274
+      },
+      "geometry": {
+        "type": "polygon",
+        "points": [
+          {
+            "x": 383.875,
+            "y": 541.363
+          },
+          {
+            "x": 413.819,
+            "y": 549.387
+          },
+          {
+            "x": 408.125,
+            "y": 570.637
+          },
+          {
+            "x": 378.181,
+            "y": 562.613
+          }
+        ]
+      }
+    },
+    {
+      "id": "building-03",
+      "kind": "building",
+      "layer": "objects",
+      "zOrder": 12,
+      "bounds": {
+        "x": 1167.319,
+        "y": 598.646,
+        "width": 55.362,
+        "height": 42.708
+      },
+      "geometry": {
+        "type": "polygon",
+        "points": [
+          {
+            "x": 1176.471,
+            "y": 602.646
+          },
+          {
+            "x": 1218.681,
+            "y": 610.85
+          },
+          {
+            "x": 1213.529,
+            "y": 637.354
+          },
+          {
+            "x": 1171.319,
+            "y": 629.15
+          }
+        ]
+      }
+    },
+    {
+      "id": "building-04",
+      "kind": "building",
+      "layer": "objects",
+      "zOrder": 13,
+      "bounds": {
+        "x": 1220.565,
+        "y": 629.246,
+        "width": 44.87,
+        "height": 35.508
+      },
+      "geometry": {
+        "type": "polygon",
+        "points": [
+          {
+            "x": 1224.565,
+            "y": 637.978
+          },
+          {
+            "x": 1258.234,
+            "y": 633.246
+          },
+          {
+            "x": 1261.435,
+            "y": 656.022
+          },
+          {
+            "x": 1227.766,
+            "y": 660.754
+          }
+        ]
+      }
+    },
+    {
+      "id": "building-05",
+      "kind": "building",
+      "layer": "objects",
+      "zOrder": 14,
+      "bounds": {
+        "x": 1117.614,
+        "y": 650.926,
+        "width": 50.772,
+        "height": 40.148
+      },
+      "geometry": {
+        "type": "polygon",
+        "points": [
+          {
+            "x": 1128.046,
+            "y": 654.926
+          },
+          {
+            "x": 1164.386,
+            "y": 666.036
+          },
+          {
+            "x": 1157.954,
+            "y": 687.074
+          },
+          {
+            "x": 1121.614,
+            "y": 675.964
+          }
+        ]
+      }
+    },
+    {
+      "id": "building-06",
+      "kind": "building",
+      "layer": "objects",
+      "zOrder": 15,
+      "bounds": {
+        "x": 1002.656,
+        "y": 150.856,
+        "width": 58.688,
+        "height": 46.288
+      },
+      "geometry": {
+        "type": "polygon",
+        "points": [
+          {
+            "x": 1014.795,
+            "y": 154.856
+          },
+          {
+            "x": 1057.344,
+            "y": 169.506
+          },
+          {
+            "x": 1049.205,
+            "y": 193.144
+          },
+          {
+            "x": 1006.656,
+            "y": 178.494
+          }
+        ]
+      }
+    },
+    {
+      "id": "building-07",
+      "kind": "building",
+      "layer": "objects",
+      "zOrder": 16,
+      "bounds": {
+        "x": 972.895,
+        "y": 185.035,
+        "width": 44.21,
+        "height": 33.93
+      },
+      "geometry": {
+        "type": "polygon",
+        "points": [
+          {
+            "x": 976.895,
+            "y": 195.332
+          },
+          {
+            "x": 1009.289,
+            "y": 189.035
+          },
+          {
+            "x": 1013.105,
+            "y": 208.668
+          },
+          {
+            "x": 980.711,
+            "y": 214.965
+          }
+        ]
+      }
+    }
+  ]
+}

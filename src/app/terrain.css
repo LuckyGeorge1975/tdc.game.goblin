@@ -1,0 +1,4 @@
+.terrain-controls { display: flex; align-items: center; gap: .6rem; margin: 0 0 1rem; }
+.terrain-controls[hidden], #terrain-map[hidden], #map[hidden] { display: none; }
+.terrain-controls select { color: inherit; background: #172b32; border: 1px solid #426168; padding: .55rem; }
+#terrain-map { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; background: #a7b784; border: 1px solid #426168; }

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>G.O.B.L.I.N — Core/Renderer Referenz</title>
+  <style>
+    :root{color-scheme:dark;font:15px system-ui;background:#091116;color:#dae9e5}
+    body{margin:0;padding:24px;max-width:1100px;margin-inline:auto}
+    header,nav{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    h1{font-size:1.25rem;margin:0 16px 0 0}
+    button{background:#24393c;color:#e9f2e9;border:1px solid #618079;padding:9px 14px;cursor:pointer}
+    button[aria-pressed=true]{background:#526f27;border-color:#c3da63}
+    svg{display:block;width:100%;height:auto;margin:18px 0;background:#071016;border:1px solid #456064}
+    #status{min-height:2em;color:#c3da63}
+    #log{max-height:140px;overflow:auto;font-size:.85rem;color:#aabeb9}
+  </style>
+</head>
+<body>
+  <header><h1>CORE / RENDERER REFERENZPARTIE</h1><span id="phase"></span><button id="next" type="button">Phase beenden</button></header>
+  <nav aria-label="Kartenansicht"><button data-mode="movement" aria-pressed="true">Movement</button><button data-mode="fire">Fire</button><button data-mode="sight">Line of Sight</button><button id="grid" aria-pressed="false">Grid</button></nav>
+  <p id="status">Einheit wählen.</p>
+  <svg id="map" role="img" aria-label="Hexfeld-Referenzkarte"></svg>
+  <div id="log" aria-live="polite"></div>
+  <script type="module" src="./reference-demo.mjs"></script>
+</body>
+</html>

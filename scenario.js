@@ -1,3 +1,16 @@
+const objectiveFallback = {
+  'iron-dust': 'Kommandokern zerstören; mindestens eine eigene Einheit erhalten.',
+  'relay-run': 'Relaisknoten und alle Feinde ausschalten; eigene Einheit erhalten.',
+  'unit-trial': 'Kommandozentrum und alle Feinde ausschalten; eigene Einheit erhalten.',
+  'atlas-proving-grounds': 'Feindlichen Kern und alle Feinde ausschalten; eigene Einheit erhalten.'
+};
+function renderScenarioObjective(){
+  const key=`mission.${currentScenario}.objective.short`;
+  const translated=globalThis.GoblinLanguage?.t(key);
+  $('#mission-sub').textContent=translated&&translated!==key?translated:objectiveFallback[currentScenario]||scenarioCatalog[currentScenario]?.sub||'';
+}
+globalThis.GoblinLanguage?.ready.then(renderScenarioObjective);
+globalThis.addEventListener?.('goblin-language-change',renderScenarioObjective);
 function loadScenario(id){
   const config=scenarioCatalog[id];
   if(!config)return;
@@ -9,14 +22,14 @@ function loadScenario(id){
   selected=null;focusedCell=null;transportLoadMode=null;transportUnloadMode=null;turn=1;phase='player';turnPhase='movement';gameOver=false;resetActionState();$("#end-turn").disabled=false;
   $('#mission-kicker').textContent=config.kicker;
   $('#mission-title').textContent=config.title;
-  $('#mission-sub').textContent=config.sub;
+  renderScenarioObjective();
   $('#turn-number').textContent='01';
   $('#phase-title').textContent='MOVEMENT PHASE';updatePhaseControls();
   $('#log-status').textContent='STANDBY';
   logEl.innerHTML='';
   addLog(`${config.kicker} online. Awaiting command.`);
   updateSelection();
-  draw();
+  setViewMode('movement');
 }
 
 function hasScenarioProgress(){return turn>1||units.some(unit=>unit.moveCount>0||unit.moved||unit.fired||unit.secondMoved||unit.embarkedOn||unit.hp<unit.maxHp)}
