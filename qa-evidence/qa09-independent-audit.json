@@ -1,0 +1,1279 @@
+{
+  "checkpoint": "7fef083",
+  "browser": "goblin-local",
+  "results": [
+    {
+      "id": "N01/L01/I01 de PC",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "scrollWidth": 1440,
+        "route": "screen-game",
+        "lang": "de",
+        "map": {
+          "top": 141.96875,
+          "bottom": 900,
+          "width": 965,
+          "height": 758.03125
+        },
+        "action": {
+          "top": 844,
+          "bottom": 888,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 316.65625,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 de PC-small",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "scrollWidth": 1280,
+        "route": "screen-game",
+        "lang": "de",
+        "map": {
+          "top": 141.96875,
+          "bottom": 720,
+          "width": 805,
+          "height": 578.03125
+        },
+        "action": {
+          "top": 664,
+          "bottom": 708,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 316.65625,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 de Tablet-landscape",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1024,
+        "innerHeight": 768,
+        "scrollWidth": 1024,
+        "route": "screen-game",
+        "lang": "de",
+        "map": {
+          "top": 141.96875,
+          "bottom": 768,
+          "width": 549,
+          "height": 626.03125
+        },
+        "action": {
+          "top": 712,
+          "bottom": 756,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 316.65625,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 de Tablet-portrait",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 768,
+        "innerHeight": 1024,
+        "scrollWidth": 768,
+        "route": "screen-game",
+        "lang": "de",
+        "map": {
+          "top": 141.96875,
+          "bottom": 664.90625,
+          "width": 523,
+          "height": 522.9375
+        },
+        "action": {
+          "top": 608.90625,
+          "bottom": 652.90625,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 316.65625,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 de Mobile-landscape",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 844,
+        "innerHeight": 390,
+        "scrollWidth": 844,
+        "route": "screen-game",
+        "lang": "de",
+        "map": {
+          "top": 121.59375,
+          "bottom": 390,
+          "width": 557.046875,
+          "height": 268.40625
+        },
+        "action": {
+          "top": 339.609375,
+          "bottom": 383.609375,
+          "width": 191.46875,
+          "height": 44
+        },
+        "pause": {
+          "top": 66.296875,
+          "bottom": 110.296875,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 66.296875,
+          "bottom": 110.296875,
+          "width": 56.03125,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 de Mobile-portrait",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "scrollWidth": 390,
+        "route": "screen-game",
+        "lang": "de",
+        "map": {
+          "top": 115.1875,
+          "bottom": 588.625,
+          "width": 390,
+          "height": 473.4375
+        },
+        "action": {
+          "top": 667.203125,
+          "bottom": 711.203125,
+          "width": 369.21875,
+          "height": 44
+        },
+        "pause": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 60.359375,
+          "height": 44
+        },
+        "objective": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 44.84375,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 de Mobile-min",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 320,
+        "innerHeight": 568,
+        "scrollWidth": 320,
+        "route": "screen-game",
+        "lang": "de",
+        "map": {
+          "top": 115.1875,
+          "bottom": 312.625,
+          "width": 320,
+          "height": 197.4375
+        },
+        "action": {
+          "top": 391.203125,
+          "bottom": 435.203125,
+          "width": 299.21875,
+          "height": 44
+        },
+        "pause": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 60.359375,
+          "height": 44
+        },
+        "objective": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 44.84375,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 en PC",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "scrollWidth": 1440,
+        "route": "screen-game",
+        "lang": "en",
+        "map": {
+          "top": 141.96875,
+          "bottom": 900,
+          "width": 965,
+          "height": 758.03125
+        },
+        "action": {
+          "top": 844,
+          "bottom": 888,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 309.59375,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 en PC-small",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "scrollWidth": 1280,
+        "route": "screen-game",
+        "lang": "en",
+        "map": {
+          "top": 141.96875,
+          "bottom": 720,
+          "width": 805,
+          "height": 578.03125
+        },
+        "action": {
+          "top": 664,
+          "bottom": 708,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 309.59375,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 en Tablet-landscape",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1024,
+        "innerHeight": 768,
+        "scrollWidth": 1024,
+        "route": "screen-game",
+        "lang": "en",
+        "map": {
+          "top": 141.96875,
+          "bottom": 768,
+          "width": 549,
+          "height": 626.03125
+        },
+        "action": {
+          "top": 712,
+          "bottom": 756,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 309.59375,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 en Tablet-portrait",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 768,
+        "innerHeight": 1024,
+        "scrollWidth": 768,
+        "route": "screen-game",
+        "lang": "en",
+        "map": {
+          "top": 141.96875,
+          "bottom": 664.90625,
+          "width": 523,
+          "height": 522.9375
+        },
+        "action": {
+          "top": 608.90625,
+          "bottom": 652.90625,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 309.59375,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 en Mobile-landscape",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 844,
+        "innerHeight": 390,
+        "scrollWidth": 844,
+        "route": "screen-game",
+        "lang": "en",
+        "map": {
+          "top": 121.59375,
+          "bottom": 390,
+          "width": 557.046875,
+          "height": 268.40625
+        },
+        "action": {
+          "top": 339.609375,
+          "bottom": 383.609375,
+          "width": 147.671875,
+          "height": 44
+        },
+        "pause": {
+          "top": 66.296875,
+          "bottom": 110.296875,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 66.296875,
+          "bottom": 110.296875,
+          "width": 97.21875,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 en Mobile-portrait",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "scrollWidth": 390,
+        "route": "screen-game",
+        "lang": "en",
+        "map": {
+          "top": 115.1875,
+          "bottom": 588.625,
+          "width": 390,
+          "height": 473.4375
+        },
+        "action": {
+          "top": 667.203125,
+          "bottom": 711.203125,
+          "width": 369.21875,
+          "height": 44
+        },
+        "pause": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 60.359375,
+          "height": 44
+        },
+        "objective": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 86.03125,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 en Mobile-min",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 320,
+        "innerHeight": 568,
+        "scrollWidth": 320,
+        "route": "screen-game",
+        "lang": "en",
+        "map": {
+          "top": 115.1875,
+          "bottom": 312.625,
+          "width": 320,
+          "height": 197.4375
+        },
+        "action": {
+          "top": 391.203125,
+          "bottom": 435.203125,
+          "width": 299.21875,
+          "height": 44
+        },
+        "pause": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 60.359375,
+          "height": 44
+        },
+        "objective": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 86.03125,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 es PC",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "scrollWidth": 1440,
+        "route": "screen-game",
+        "lang": "es",
+        "map": {
+          "top": 141.96875,
+          "bottom": 900,
+          "width": 965,
+          "height": 758.03125
+        },
+        "action": {
+          "top": 844,
+          "bottom": 888,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.328125,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 352.796875,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 es PC-small",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "scrollWidth": 1280,
+        "route": "screen-game",
+        "lang": "es",
+        "map": {
+          "top": 141.96875,
+          "bottom": 720,
+          "width": 805,
+          "height": 578.03125
+        },
+        "action": {
+          "top": 664,
+          "bottom": 708,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.328125,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 352.796875,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 es Tablet-landscape",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1024,
+        "innerHeight": 768,
+        "scrollWidth": 1024,
+        "route": "screen-game",
+        "lang": "es",
+        "map": {
+          "top": 141.96875,
+          "bottom": 768,
+          "width": 549,
+          "height": 626.03125
+        },
+        "action": {
+          "top": 712,
+          "bottom": 756,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.328125,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 352.796875,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 es Tablet-portrait",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 768,
+        "innerHeight": 1024,
+        "scrollWidth": 768,
+        "route": "screen-game",
+        "lang": "es",
+        "map": {
+          "top": 141.96875,
+          "bottom": 664.90625,
+          "width": 523,
+          "height": 522.9375
+        },
+        "action": {
+          "top": 608.90625,
+          "bottom": 652.90625,
+          "width": 220,
+          "height": 44
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.328125,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 352.796875,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 es Mobile-landscape",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 844,
+        "innerHeight": 390,
+        "scrollWidth": 844,
+        "route": "screen-game",
+        "lang": "es",
+        "map": {
+          "top": 121.59375,
+          "bottom": 390,
+          "width": 557.046875,
+          "height": 268.40625
+        },
+        "action": {
+          "top": 339.609375,
+          "bottom": 383.609375,
+          "width": 198.8125,
+          "height": 44
+        },
+        "pause": {
+          "top": 66.296875,
+          "bottom": 110.296875,
+          "width": 71.328125,
+          "height": 44
+        },
+        "objective": {
+          "top": 66.296875,
+          "bottom": 110.296875,
+          "width": 90.828125,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 es Mobile-portrait",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "scrollWidth": 390,
+        "route": "screen-game",
+        "lang": "es",
+        "map": {
+          "top": 115.1875,
+          "bottom": 588.625,
+          "width": 390,
+          "height": 473.4375
+        },
+        "action": {
+          "top": 667.203125,
+          "bottom": 711.203125,
+          "width": 369.21875,
+          "height": 44
+        },
+        "pause": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 60.140625,
+          "height": 44
+        },
+        "objective": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 79.640625,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 es Mobile-min",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 320,
+        "innerHeight": 568,
+        "scrollWidth": 320,
+        "route": "screen-game",
+        "lang": "es",
+        "map": {
+          "top": 115.1875,
+          "bottom": 312.625,
+          "width": 320,
+          "height": 197.4375
+        },
+        "action": {
+          "top": 391.203125,
+          "bottom": 435.203125,
+          "width": 299.21875,
+          "height": 44
+        },
+        "pause": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 60.140625,
+          "height": 44
+        },
+        "objective": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 79.640625,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 fr PC",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1440,
+        "innerHeight": 900,
+        "scrollWidth": 1440,
+        "route": "screen-game",
+        "lang": "fr",
+        "map": {
+          "top": 141.96875,
+          "bottom": 900,
+          "width": 965,
+          "height": 758.03125
+        },
+        "action": {
+          "top": 823.21875,
+          "bottom": 888,
+          "width": 220,
+          "height": 64.78125
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 351,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 fr PC-small",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "scrollWidth": 1280,
+        "route": "screen-game",
+        "lang": "fr",
+        "map": {
+          "top": 141.96875,
+          "bottom": 720,
+          "width": 805,
+          "height": 578.03125
+        },
+        "action": {
+          "top": 643.21875,
+          "bottom": 708,
+          "width": 220,
+          "height": 64.78125
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 351,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 fr Tablet-landscape",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 1024,
+        "innerHeight": 768,
+        "scrollWidth": 1024,
+        "route": "screen-game",
+        "lang": "fr",
+        "map": {
+          "top": 141.96875,
+          "bottom": 768,
+          "width": 549,
+          "height": 626.03125
+        },
+        "action": {
+          "top": 691.21875,
+          "bottom": 756,
+          "width": 220,
+          "height": 64.78125
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 351,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 fr Tablet-portrait",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 768,
+        "innerHeight": 1024,
+        "scrollWidth": 768,
+        "route": "screen-game",
+        "lang": "fr",
+        "map": {
+          "top": 141.96875,
+          "bottom": 664.90625,
+          "width": 523,
+          "height": 522.9375
+        },
+        "action": {
+          "top": 588.125,
+          "bottom": 652.90625,
+          "width": 220,
+          "height": 64.78125
+        },
+        "pause": {
+          "top": 76.484375,
+          "bottom": 120.484375,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 88.984375,
+          "bottom": 107.984375,
+          "width": 351,
+          "height": 19
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 fr Mobile-landscape",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 844,
+        "innerHeight": 390,
+        "scrollWidth": 844,
+        "route": "screen-game",
+        "lang": "fr",
+        "map": {
+          "top": 121.59375,
+          "bottom": 390,
+          "width": 557.046875,
+          "height": 268.40625
+        },
+        "action": {
+          "top": 339.609375,
+          "bottom": 383.609375,
+          "width": 231.8125,
+          "height": 44
+        },
+        "pause": {
+          "top": 66.296875,
+          "bottom": 110.296875,
+          "width": 71.546875,
+          "height": 44
+        },
+        "objective": {
+          "top": 66.296875,
+          "bottom": 110.296875,
+          "width": 86.1875,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 fr Mobile-portrait",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 390,
+        "innerHeight": 844,
+        "scrollWidth": 390,
+        "route": "screen-game",
+        "lang": "fr",
+        "map": {
+          "top": 115.1875,
+          "bottom": 588.625,
+          "width": 390,
+          "height": 473.4375
+        },
+        "action": {
+          "top": 667.203125,
+          "bottom": 711.203125,
+          "width": 369.21875,
+          "height": 44
+        },
+        "pause": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 60.359375,
+          "height": 44
+        },
+        "objective": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 75,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01/L01/I01 fr Mobile-min",
+      "status": "pass",
+      "evidence": {
+        "innerWidth": 320,
+        "innerHeight": 568,
+        "scrollWidth": 320,
+        "route": "screen-game",
+        "lang": "fr",
+        "map": {
+          "top": 115.1875,
+          "bottom": 312.625,
+          "width": 320,
+          "height": 197.4375
+        },
+        "action": {
+          "top": 391.203125,
+          "bottom": 435.203125,
+          "width": 299.21875,
+          "height": 44
+        },
+        "pause": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 60.359375,
+          "height": 44
+        },
+        "objective": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "width": 75,
+          "height": 44
+        },
+        "actionVisible": true,
+        "pauseVisible": true,
+        "clipped": []
+      }
+    },
+    {
+      "id": "N01 route, pause, settings and help preserve state",
+      "status": "pass",
+      "evidence": {
+        "route": "screen-game",
+        "commands": 0
+      }
+    },
+    {
+      "id": "I02 SVG cells and units have accessible names and keyboard focus",
+      "status": "pass",
+      "evidence": {
+        "map": {
+          "tag": "svg",
+          "role": "group",
+          "name": "Karte",
+          "tabindex": null
+        },
+        "cell": {
+          "tag": "polygon",
+          "role": "button",
+          "name": "Feld 1, 1",
+          "tabindex": "0"
+        },
+        "unit": {
+          "tag": "g",
+          "role": "button",
+          "name": "p-1 · Panzer · 3/3 LP · Eigene · Feld 2, 4",
+          "tabindex": "0"
+        }
+      }
+    },
+    {
+      "id": "I02 trusted Enter and Space preserve state until confirmation",
+      "status": "pass",
+      "evidence": {
+        "selected": "p-1",
+        "pending": "Move",
+        "commands": 1
+      }
+    },
+    {
+      "id": "A01/M01/M02/D01 touch safe action and modal",
+      "status": "pass",
+      "evidence": {
+        "pending": {
+          "type": "Move",
+          "playerId": "player",
+          "unitId": "p-1",
+          "to": {
+            "x": 2,
+            "y": 4
+          }
+        },
+        "pan": {
+          "x": 0,
+          "y": 0
+        },
+        "commands": 1
+      }
+    },
+    {
+      "id": "D02/I01 language switch in modal",
+      "status": "pass",
+      "evidence": {
+        "lang": "fr",
+        "title": "Terminer la phase ?",
+        "body": "2 unités peuvent encore agir durant cette phase.",
+        "focus": "dialog-cancel"
+      }
+    },
+    {
+      "id": "L02 landscape details access",
+      "status": "pass",
+      "evidence": {
+        "focus": "details-toggle",
+        "commands": 0
+      }
+    },
+    {
+      "id": "D02 phase preference does not suppress restart dialog",
+      "status": "pass",
+      "evidence": {
+        "title": "Mission neu starten?",
+        "body": "Die laufende Mission beginnt von vorn. Bisherige Befehle und Fortschritte gehen verloren."
+      }
+    },
+    {
+      "id": "A02 phase-v2 fixture starts separately",
+      "status": "pass",
+      "evidence": {
+        "text": {
+          "mission": "Partida por fases",
+          "phase": "Fase de movimiento",
+          "progress": "Núcleo: 3/3 PV"
+        },
+        "phase": "movement",
+        "units": 4
+      }
+    },
+    {
+      "id": "M02 two-finger pinch zooms without commands",
+      "status": "pass",
+      "evidence": {
+        "from": 1,
+        "to": 2.5,
+        "pan": {
+          "x": 0,
+          "y": 0
+        },
+        "picked": {
+          "x": 6,
+          "y": 4,
+          "px": 213.0958251953125,
+          "py": 383.7921447753906
+        }
+      }
+    },
+    {
+      "id": "H01 Mobile-portrait 40 safe taps",
+      "status": "pass",
+      "evidence": {
+        "taps": 40,
+        "commands": 0,
+        "pending": null
+      }
+    },
+    {
+      "id": "H01 Mobile-landscape 40 safe taps",
+      "status": "pass",
+      "evidence": {
+        "taps": 40,
+        "commands": 0,
+        "pending": null
+      }
+    },
+    {
+      "id": "H01 Tablet-portrait 40 safe taps",
+      "status": "pass",
+      "evidence": {
+        "taps": 40,
+        "commands": 0,
+        "pending": null
+      }
+    },
+    {
+      "id": "I01 2x long text Mobile-min",
+      "status": "pass",
+      "evidence": {
+        "overflow": false,
+        "clipped": [],
+        "action": {
+          "top": 370.421875,
+          "bottom": 435.203125,
+          "left": 10.390625,
+          "right": 309.609375
+        },
+        "pause": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "left": 251.640625,
+          "right": 312
+        },
+        "objective": {
+          "top": 61.59375,
+          "bottom": 105.59375,
+          "left": 170.25,
+          "right": 245.25
+        },
+        "map": {
+          "top": 132.1875,
+          "bottom": 312.1875,
+          "left": 0,
+          "right": 320
+        }
+      }
+    },
+    {
+      "id": "I01 2x long text Mobile-landscape",
+      "status": "pass",
+      "evidence": {
+        "overflow": false,
+        "clipped": [],
+        "action": {
+          "top": 331.609375,
+          "bottom": 383.609375,
+          "left": 564.4375,
+          "right": 837.609375
+        },
+        "pause": {
+          "top": 66.296875,
+          "bottom": 110.296875,
+          "left": 764.453125,
+          "right": 836
+        },
+        "objective": {
+          "top": 66.296875,
+          "bottom": 110.296875,
+          "left": 529.359375,
+          "right": 615.546875
+        },
+        "map": {
+          "top": 121.59375,
+          "bottom": 390,
+          "left": 0,
+          "right": 557.046875
+        }
+      }
+    }
+  ]
+}
