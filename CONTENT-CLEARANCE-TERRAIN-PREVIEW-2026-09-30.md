@@ -1,9 +1,9 @@
 # Content Clearance – Terrain-Preview-Nachtrag
 
-**Berichtsversion:** 1
-**Stand:** 2026-09-30
-**Bezugsstand:** interner GitHub-Pages-Previewkandidat mit vier Terrain-Stilen; kein Release
-**Status:** Herkunft und lokale Pfade dokumentiert; formale Legal-Freigabe ausstehend.
+**Berichtsversion:** 2
+**Stand:** 2026-10-01
+**Bezugsstand:** lokaler GitHub-Pages-Previewkandidat Build 0.1.13 mit vier Terrain-Stilen; kein Release
+**Status:** Herkunft, Nutzerangaben und Legal-Risikoeinschätzung für eine nichtkommerzielle Vorschau dokumentiert; keine verbindliche Rechtsfreigabe.
 
 Dieser Nachtrag ergänzt den historischen [Content-Clearance-Bericht zu Build 0.1.7](CONTENT-CLEARANCE.md), ohne dessen damaligen Befund zu ändern. Insbesondere galt die dortige Aussage zu fehlenden Rasterbildern für den älteren Spielauftritt. Der aktuelle Terrain-Previewkandidat enthält zwei lokal erzeugte PNG-Detailgrafiken. Die neuen Unit-Art-Konzepttafeln unter `tdc.game.ogre-unit-art/assets/unit-art/proposals/` gehören nicht zu diesem Previewkandidaten.
 
@@ -18,7 +18,7 @@ Dieser Nachtrag ergänzt den historischen [Content-Clearance-Bericht zu Build 0.
 
 Alle vier Stile verwenden die 29 Features der einen `assets/terrain-map-study/portable/visual-map.json`. Die Generatoren importieren dafür nur projektlokalen Code und Node-Bordmittel. Die acht Detailgrafiken und vier StyleSet-JSONs sind im Hauptcheckout unter `assets/terrain-map-study/portable/` vorhanden. Für das Terrainpaket werden keine fremden Grafikdateien oder Netzwerk-Assets referenziert.
 
-Field Atlas orientiert sich an der vom Nutzer beigefügten Hexkarte: helles Grasland, sandige Höhen, dunkler Wald, gelbe Felder und helle Wege. Die Referenzdatei liegt nicht im Terrainpaket. Formen und Texturen wurden mit projektlokalen Pfaden, Paletten und deterministischen Algorithmen erstellt; Referenzpixel wurden nicht als Asset übernommen. Diese technische Herkunftsdokumentation bewertet weder die Rechte an der Referenz noch die rechtliche Zulässigkeit einer ähnlichen Bildsprache.
+Field Atlas orientiert sich an allgemeinen Motiven der vom Nutzer beigefügten Hexkarte: helles Grasland, sandige Höhen, dunkler Wald, gelbe Felder und helle Wege. Die Referenzdatei liegt nicht im Terrainpaket. Formen und Texturen wurden mit projektlokalen Pfaden, Paletten und deterministischen Algorithmen erstellt; Referenzpixel wurden nicht als Asset übernommen. Am 01.10.2026 erklärte der Nutzer nach einem direkten Vergleich, die generierte Grafik weise keine konkrete Ähnlichkeit mit der Referenz auf. Er bestätigte außerdem, dass seine Eingaben für die generierten Grafiken autorisiert waren und keine fremden Referenzbilder ohne Nutzungsrecht enthielten. Legal zog daraufhin den allein aus der fehlenden eigenen Vergleichsmöglichkeit abgeleiteten Field-Atlas-Blocker zurück und schätzte das Urheberrechtsrisiko für eine nichtkommerzielle Vorschau unter diesen Voraussetzungen als niedrig ein. Legal konnte den Bildvergleich nicht selbst nachvollziehen; dies ist eine Risikoeinschätzung, keine verbindliche anwaltliche Freigabe.
 
 ## Geprüfte Laufzeitpfade
 
@@ -26,9 +26,9 @@ Field Atlas orientiert sich an der vom Nutzer beigefügten Hexkarte: helles Gras
 
 Am 30.09.2026 wurden die acht im Manifest referenzierten Detailpfade gegen Dateien im Hauptcheckout geprüft: Verdant, Dryland, Natural und Field Atlas besitzen jeweils `ground-grain` und `forest`; alle acht Dateien waren vorhanden. Der Paketvalidator bestätigte 29 Features und vier StyleSets. Diese statische Prüfung belegt nicht, dass im gesamten Preview zur Laufzeit keine weiteren externen Ressourcen geladen werden.
 
-## Vor einem öffentlichen Preview offen
+## Grenzen und weitere Prüfungen
 
-1. **Referenzbild:** Legal benötigt die vom Nutzer bereitgestellte Karte für eine eigenständige Prüfung von Herkunft, Nutzungsbefugnis und visueller Nähe. Sie ist nicht im Repository archiviert; die technische Feststellung, dass keine Pixel übernommen wurden, ersetzt diese Prüfung nicht.
-2. **Namen und Spielkonzept:** Die im historischen Clearance-Bericht offenen Fragen zu `G.O.B.L.I.N.`, Einzelnamen, Regeln und Szenariostruktur bleiben offen. Dieser Nachtrag prüft sie nicht erneut.
-3. **Gesamter Laufzeitbestand:** Development muss den konkreten GitHub-Pages-Previewstand einschließlich Netzwerkabrufen, übriger Einheiten- und UI-Assets, Schriften und Abhängigkeiten prüfen. Die obige Pfadprüfung deckt nur das Terrainpaket ab.
-4. **Freigabe:** Weder dieser Nachtrag noch die [öffentlichen Herkunftshinweise](CONTENT-NOTICES.md) sind eine formale Legal-Freigabe. Eine solche Entscheidung ist weiterhin ausstehend.
+1. **Referenzbild:** Die Originalreferenz ist nicht im Repository archiviert. Der Nutzer hat den direkten Vergleich vorgenommen; Legal konnte seine Aussage nicht unabhängig anhand der beiden Bilder prüfen. Die Bewertung setzt voraus, dass keine konkreten Formen, Anordnungen oder sonstigen geschützten Gestaltungselemente übernommen wurden.
+2. **Namen und Spielkonzept:** Für eine nichtkommerzielle technische Vorschau bewertet Legal die eigenständig formulierten funktionalen Regeln und die bereinigten sichtbaren Bezeichnungen als geringes Risiko. Eine aktuelle professionelle Markenprüfung für `G.O.B.L.I.N.` in Deutschland und der EU bleibt vor einer kommerziellen Veröffentlichung offen.
+3. **Gesamter Laufzeitbestand:** Die unabhängige lokale Pages-Pfad-Prüfung in [PLAYTEST-REPORT-PAGES-PREVIEW-2026-09-30.md](PLAYTEST-REPORT-PAGES-PREVIEW-2026-09-30.md) erfasste 51 Anfragen unter dem Projektpfad ohne HTTP- oder JavaScript-Fehler. Sie ersetzt keinen Test des erst nach Freigabe veröffentlichten Builds und keine echte Geräteprobe.
+4. **Freigabe:** Dieser Nachtrag und die [öffentlichen Herkunftshinweise](CONTENT-NOTICES.md) dokumentieren eine bedingte Legal-Risikoeinschätzung und die Nutzerangaben, aber keine verbindliche anwaltliche Freigabe oder Produktfreigabe.

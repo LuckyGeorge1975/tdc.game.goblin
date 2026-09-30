@@ -19,14 +19,14 @@ test('the shared phase fixture drives movement, fire and GEV displays', () => {
   assert.equal(display(app).byUnitId['p-gev'].status, UNIT_STATUS.spent);
   assert.equal(display(app).counts.ready, 1);
   assert.equal(app.endPhase().events[0].type, 'PhaseChanged');
-  assert.equal(display(app).phaseButton.label, 'Zur GEV Phase →');
+  assert.equal(display(app).phaseButton.label, 'Zum Skimmer-Manöver →');
   assert.equal(app.snapshot().view.areaMode, 'fire');
 
   app.selectUnit('p-tank');
   assert.equal(app.clickCell({ x: 4, y: 4 }).events[0].type, 'ShotResolved');
   assert.equal(display(app).byUnitId['e-tank'].status, UNIT_STATUS.disabled);
   app.endPhase();
-  assert.match(display(app).phaseLabel, /gev phase/);
+  assert.match(display(app).phaseLabel, /Skimmer-Manöver/);
   assert.equal(display(app).byUnitId['p-gev'].status, UNIT_STATUS.ready);
   assert.equal(display(app).byUnitId['p-tank'].status, UNIT_STATUS.unavailable);
   assert.deepEqual([display(app).counts.ready, display(app).counts.total], [1, 2]);

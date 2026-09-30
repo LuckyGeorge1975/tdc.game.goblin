@@ -6,14 +6,23 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
 | Feld | Wert |
 |---|---|
-| Version | `0.1.12` |
-| Build | `12` |
-| Release-Tag | `v0.1.12` |
-| Datum | 2026-09-28 |
-| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.12> |
-| Änderungen | [CHANGELOG.md](CHANGELOG.md#0112---2026-09-28) |
+| Version | `0.1.13` |
+| Build | `13` |
+| Release-Tag | `v0.1.13` (geplant; noch nicht erstellt) |
+| Datum | 2026-10-01 |
+| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.13> (erst nach einem freigegebenen Deployment) |
+| Änderungen | [CHANGELOG.md](CHANGELOG.md#0113---2026-10-01) |
 
-### Testfokus für 0.1.12
+### Testfokus für 0.1.13
+
+- Pages-Projektpfad `/tdc.game.goblin/src/app/shell.html` mit allen vier Sprachen und Terrain-Stilen prüfen. Auswahl und Stilwechsel dürfen keinen Core-Befehl auslösen.
+- Karten-Picking an Hexkanten und sichere Move-Vorschau prüfen; erst ausdrückliche Bestätigung darf den Befehl ausführen.
+- Auf echten Tablets und Smartphones Touch-Bedienung und Lesbarkeit prüfen. Die bisherigen mobilen Browserfälle waren emuliert.
+- Herkunftshinweise und formale Legal-Freigabe vor öffentlicher Bereitstellung abschließen.
+
+Lokaler Kandidatenstand: unabhängige UI-Nachprüfung 42/42 Browserfälle, unabhängige Pages-Pfad-Prüfung 18/18 Fälle und 115/115 Node-Tests; die sichtbaren Phasenbegriffe sind in vier Sprachen neutral formuliert. Die Belege stehen in der [Berichtsübersicht](REPORTS.md). Es gab bisher weder ein Deployment dieses Builds noch echte Geräteproben oder eine formale Legal-Freigabe.
+
+### Vorheriger Testfokus für 0.1.12
 
 - ATLAS: Wasser/Fluss mit Kettenfahrzeug und normaler Infanterie nicht betretbar, mit Skimmer und amphibischer Infanterie erreichbar; Brücke für alle passierbar. Movement Area muss diese Unterschiede zeigen.
 - Wald/Stadt/Berg blockieren die Sichtlinie hinter dem Feld; Krater gibt Deckung ohne Sichtblock. Field Intel zeigt Geländekosten und Deckung passend zur gewählten Einheit.

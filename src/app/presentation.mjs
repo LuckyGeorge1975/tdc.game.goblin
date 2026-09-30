@@ -14,7 +14,7 @@ export const AREA_MODE = Object.freeze({
 });
 
 const nextPhaseLabel = (next) => next?.phase === 'fire' ? 'Zur Fire Phase →'
-  : next?.phase === 'gev' ? 'Zur GEV Phase →'
+  : next?.phase === 'gev' ? 'Zum Skimmer-Manöver →'
     : next ? `Zur ${next.activeTeam === 'player' ? 'Player' : 'Enemy'} Movement →` : 'Partie beendet';
 
 export function derivePresentation(state, core) {
@@ -46,7 +46,7 @@ export function derivePresentation(state, core) {
   return {
     byUnitId,
     counts,
-    phaseLabel: `${state.activeTeam === 'player' ? 'Player' : 'Enemy'} · ${state.phase} phase`,
+    phaseLabel: `${state.activeTeam === 'player' ? 'Player' : 'Enemy'} · ${state.phase === 'gev' ? 'Skimmer-Manöver' : `${state.phase} phase`}`,
     phaseButton: {
       label: nextPhaseLabel(actionSummary.endPhase.next),
       disabled: !actionSummary.endPhase.available,

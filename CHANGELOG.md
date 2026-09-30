@@ -2,6 +2,24 @@
 
 Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
 
+## [0.1.13] - 2026-10-01
+
+### Hinzugefügt
+
+- Modulare Spieloberfläche mit lokalisierter Bedienung in Deutsch, Englisch, Spanisch und Französisch, Terrain-Vorschau und sicherer Vorschau vor einem Bewegungsbefehl.
+- Vier umschaltbare Terrain-Stile (Verdant Atlas, Dryland Survey, Natural Terrain und Field Atlas) auf derselben validierten VisualMap; Herkunft und offene Freigabefragen sind dokumentiert.
+- Statischer GitHub-Pages-Projektpfad für die modulare Oberfläche und reproduzierbare Browser-Prüfung des Unterpfads.
+
+### Geprüft
+
+- Unabhängige UI-Nachprüfung: 42/42 Browserfälle. Unabhängige Pages-Pfad-Prüfung: 18/18 Fälle, vier Sprachen und vier Terrain-Stile; 115/115 Node-Tests.
+- Terrain-Geometrie, Hexkanten-Picking und Spielzustand bei Stilwechseln sind mit festen Prüffällen abgesichert.
+- Herkunft der Terrain-Assets, Nutzerangaben zu Grafik-Eingaben und die Grenzen der Legal-Risikoeinschätzung für eine nichtkommerzielle Vorschau sind dokumentiert.
+
+### Noch offen
+
+- Echte Tablet- und Smartphone-Fingerproben sowie formale Legal-Freigabe des neuen Terrain-Auftritts. Dieser lokale Kandidat ist noch nicht veröffentlicht.
+
 ## [0.1.12] - 2026-09-28
 
 ### Hinzugefügt

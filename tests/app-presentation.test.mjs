@@ -18,7 +18,7 @@ test('phase counters and unit statuses are derived from Core state', () => {
   app.endPhase();
   assert.equal(show(app).byUnitId['p-1'].status, UNIT_STATUS.ready);
   assert.equal(show(app).counts.ready, 2);
-  assert.equal(show(app).phaseButton.label, 'Zur GEV Phase →');
+  assert.equal(show(app).phaseButton.label, 'Zum Skimmer-Manöver →');
   assert.equal(app.snapshot().view.areaMode, 'fire');
   app.clickCell({ x: 4, y: 3 });
   assert.equal(show(app).byUnitId['p-1'].status, UNIT_STATUS.spent);

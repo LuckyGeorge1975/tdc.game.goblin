@@ -42,7 +42,7 @@ $('scenario').textContent = terrainStudy ? 'ARCH-03 · TERRAIN-VORSCHAU' : phase
 $('instructions').textContent = terrainStudy
   ? 'Gleiche Core-v1-Partie, zwei Materialsets. Stilset und Hexraster ändern nur die Ansicht. Einheit oder Feld auf der Karte wählen.'
   : phaseFixture
-  ? 'Beide Teams werden von Hand gesteuert. Skimmer wählen → bewegen → Fire Phase → GEV Phase → erneut bewegen. Das deaktivierte Fahrzeug erholt sich zu seinem festgelegten Teamstart.'
+  ? 'Beide Teams werden von Hand gesteuert. Skimmer wählen → bewegen → Fire Phase → Skimmer-Manöver → erneut bewegen. Das deaktivierte Fahrzeug erholt sich zu seinem festgelegten Teamstart.'
   : 'Einheit wählen → erreichbares Feld anklicken → Phase wechseln → Ziel anklicken.';
 
 function eventLabel(event) {
