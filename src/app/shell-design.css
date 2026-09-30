@@ -1,0 +1,114 @@
+:root {
+  color: #edf3e9;
+  background: #0b1518;
+}
+
+body { background: #0b1518; }
+button, select { border-radius: 0; border-color: #344b4c; background: #142529; }
+button:hover, select:hover { background: #22383a; }
+.primary { color: #102017; background: #d5f65e; border-color: #d5f65e; }
+.primary:hover { background: #e6ff8a; }
+.topbar { background: #0b1518; border-top: 3px solid #d5f65e; border-bottom-color: #233b3d; }
+.brand { color: #edf3e9; }
+.build, .eyebrow { color: #d5f65e !important; }
+.screen h1 { text-transform: uppercase; letter-spacing: .025em; }
+.landing { max-width: 1100px; }
+.landing .primary { min-width: 13rem; }
+.mission-card { background: #122126; border-left: 3px solid #6ec7d0; }
+.mission-card:first-child { border-left-color: #d5f65e; }
+.mission-card:hover { border-color: #d5f65e; }
+.missionbar { background: #0f2022; border-bottom-color: #314b4c; }
+.missionbar strong { text-transform: uppercase; }
+.missionbar p { max-width: 52ch; }
+.missionbar small { color: #d5f65e; }
+.phase { min-width: 10rem; }
+.phase strong { color: #d5f65e; }
+#objective-toggle { display: none; }
+.game-layout { background: #102024; grid-template-columns: minmax(180px, 230px) minmax(0, 1fr) minmax(190px, 245px); }
+.details, .action-panel { background: #102024; }
+.details { border-right-color: #304c4d; }
+.action-panel { border-left-color: #304c4d; }
+.detail-tabs button { flex: 1; }
+.detail-tabs button[aria-pressed=true], .segments button[aria-pressed=true] { color: #d5f65e; border-color: #d5f65e; }
+.map-column { background: #102024; }
+.map-viewport { position: relative; min-height: 280px; background: #0d1c1e; }
+#battle-map { display: block; width: 100%; height: 100%; }
+.map-tools { position: absolute; z-index: 2; inset: .5rem .5rem auto .5rem; display: flex; flex-wrap: nowrap; align-items: flex-start; padding: 0; background: transparent; pointer-events: none; }
+.map-tools button, .map-tools select { pointer-events: auto; background: #102326ec; border-color: #527273; }
+.map-tools button:hover, .map-tools select:hover { background: #274143; }
+.map-tools .segments { flex-wrap: nowrap; }
+.map-tools .map-options { justify-content: flex-end; margin-left: auto; }
+.map-options select { max-width: 10rem; }
+.selection strong { color: #d5f65e; }
+.actions button { min-height: 44px; }
+.settings-screen { max-width: 1024px; }
+.settings-content { margin-top: 1.5rem; padding: 1.25rem; background: #102024; border: 1px solid #294143; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 2rem; }
+.settings-field { display: flex; flex-direction: column; gap: .5rem; }
+.settings-field label, .settings-toggle span { color: #d5f65e; font-size: .76rem; text-transform: uppercase; font-weight: 700; letter-spacing: .08em; }
+.settings-field select { width: 100%; }
+.settings-toggle { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; border-bottom: 1px solid #294143; }
+.settings-toggle input { width: 1.35rem; height: 1.35rem; accent-color: #d5f65e; }
+#settings-note { grid-column: 1 / -1; margin: 0; }
+dialog { background: #102024; border-color: #d5f65e; border-radius: 0; }
+dialog::backdrop { background: #020b0dd9; }
+dialog h2 { color: #edf3e9; }
+#objective-dialog { width: min(90vw, 28rem); }
+
+@media (max-width: 1000px) {
+  .game-layout { grid-template-columns: minmax(0, 1fr) minmax(190px, 245px); }
+  .details { max-height: 9rem; }
+}
+
+@media (max-width: 700px) {
+  .topbar { height: 3.5rem; min-height: 3.5rem; padding: .2rem .65rem; }
+  .brand { font-size: .9rem; }
+  .language-picker { font-size: .7rem; }
+  .language-picker select { max-width: 5.7rem; min-height: 44px; }
+  .game { height: calc(100dvh - 3.5rem); }
+  .missionbar { padding: .35rem .5rem; gap: .4rem; }
+  .mission-summary { display: none; }
+  .phase { flex: 1; min-width: 0; }
+  .phase strong { font-size: .8rem; }
+  .phase span { display: inline; font-size: .68rem; }
+  #objective-toggle { display: inline-block; }
+  #objective-toggle, #pause { min-height: 44px; padding: .35rem .55rem; }
+  .game-layout { display: flex; flex-direction: column; }
+  .map-column { order: 1; flex: 1; min-height: 0; }
+  .map-viewport { min-height: 180px; }
+  .map-tools { inset: auto .4rem .4rem .4rem; flex-direction: column-reverse; gap: .35rem; }
+  .map-tools .segments { width: 100%; gap: .2rem; }
+  .map-tools .segments button { flex: 1; }
+  .map-tools .map-options { display: flex; flex-direction: column; align-self: flex-end; margin-left: 0; gap: .2rem; }
+  .map-tools .map-options select, .map-tools #grid { display: none; }
+  .map-tools button, .map-tools select { min-height: 44px; }
+  .action-panel { order: 2; flex: none; border-left: 0; border-top: 1px solid #304c4d; padding: .55rem .65rem; }
+  .selection strong { font-size: .95rem; }
+  .actions { margin-top: .35rem; padding-bottom: max(.25rem, env(safe-area-inset-bottom)); }
+  .actions button { min-height: 44px; }
+  .details { order: 3; flex: none; max-height: 7.5rem; border-right: 0; border-top: 1px solid #304c4d; padding: .35rem .55rem; }
+  .details .detail-body { margin-top: .35rem; max-height: none; overflow: visible; }
+  .settings-screen { margin: .5rem auto; }
+  .settings-content { display: flex; flex-direction: column; padding: .8rem; gap: .85rem; }
+}
+
+@media (max-width: 700px) and (orientation: landscape) {
+  .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(170px, 34%); grid-template-rows: minmax(0, 1fr); }
+  .map-column { grid-column: 1; grid-row: 1; }
+  .action-panel { grid-column: 2; grid-row: 1; overflow: auto; }
+  .details { display: none; }
+}
+
+@media (max-width: 900px) and (max-height: 500px) {
+  .game { height: calc(100dvh - 3.5rem); min-height: 0; }
+  .missionbar { padding: .3rem .5rem; }
+  .mission-summary { display: none; }
+  #objective-toggle { display: inline-block; }
+  .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(170px, 34%); grid-template-rows: minmax(0, 1fr); }
+  .map-column { grid-column: 1; grid-row: 1; min-height: 0; }
+  .map-viewport { min-height: 0; }
+  .action-panel { grid-column: 2; grid-row: 1; overflow: auto; padding: .4rem; }
+  .details { display: none; }
+  .map-tools { inset: auto .3rem .3rem .3rem; }
+  .map-tools .map-options select, .map-tools #grid { display: none; }
+  .map-tools button { min-height: 44px; }
+}
