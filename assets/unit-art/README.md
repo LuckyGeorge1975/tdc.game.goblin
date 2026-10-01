@@ -1,50 +1,24 @@
 # G.O.B.L.I.N. · austauschbare Grafiksets
 
-## Ausgewählte Unit-Art-Integration
+## Sechs im Spiel wählbare Sets
 
-`06-technical-illustration` ergänzt die fünf generierten Stile als reguläres Karten- und Listen-Icon-Set. Seine 26 SVGs unter `sets/06-technical-illustration/icons/` stammen aus `tdc.game.ogre-unit-art` Commit `c9013d9`, dort `assets/unit-art/proposals/content-06/selected-icons/`. Die Einheitenbibliothek verwendet unabhängig vom gewählten Kartenstil die 26 großen 1024 × 768 SVGs unter `library/military-symbols/` aus demselben Quellcommit (`content-07/library/`). Herkunft und Eingabegrenzen stehen dort in `assets/unit-art/proposals/PROVENANCE.md`.
+Die Combobox schaltet Karten- und Listenicons sowie die zugehörige große Ansicht im Unit Guide gemeinsam um. Anfänglich ist `02-technical-illustration` gewählt; eine spätere Wahl bleibt lokal im Browser gespeichert. Jedes Set enthält für alle 26 Einheiten ein transparentes `icons/{unit}.svg` mit 256 × 256 und ein `library/{unit}.svg` mit 1024 × 768. Der Guide zeigt die große Ansicht vollständig mit `object-fit: contain` und ohne sechseckigen Beschnitt.
 
-Der neue Stil verwendet die zwölf vorhandenen Terrainmotive und das Logo von `01-modular-stealth-geometry` als dokumentierten Fallback. `build-art.mjs` erzeugt weiterhin die fünf ursprünglichen Stile und erhält den Eintrag des ausgewählten Sets im Manifest; die kuratierten SVGs werden nicht aus diesem Generator neu erzeugt. `build-terrain.mjs` erzeugt Terrain nur für die fünf ursprünglichen Paletten. Die Galerie unten zeigt weiterhin diese fünf vollständigen Ursprungssets.
+| Set | Stil | Quelle im Unit-Art-Checkout |
+| --- | --- | --- |
+| `01-tabletop-miniatures` | Tabletop-Miniaturen | `content-06/sets/01-tabletop-miniatures/` |
+| `02-technical-illustration` | Technische Illustration | `content-06/sets/02-technical-illustration/` |
+| `03-industrial-realism` | Industrieller Realismus | `content-06/sets/03-industrial-realism/` |
+| `04-pixel-strategy` | Pixel-Strategie | `content-06/sets/04-pixel-strategy/` |
+| `05-cel-shaded-comic` | Cel-Shading / Comic | `content-06/sets/05-cel-shaded-comic/` |
+| `06-military-symbols` | Militärische Kartensymbole | `content-07/icons/` und `content-07/library/` |
 
-Fünf eigenständige, vollständige Stilrichtungen für den aktuellen Unit Guide und die Szenarioeinheiten. Alle Motive sind eigens gezeichnete SVG-Vektorgrafiken ohne Fremdmaterial. Die Spielmechanik und das bestehende UI werden durch dieses Content-Paket nicht verändert.
+Alle 312 SVGs stammen aus `tdc.game.ogre-unit-art` Commit `4bc3c7ce8c7dc25cddff20024f4c4bfb9361779f`, dort unter `assets/unit-art/proposals/`. `UNIT-ART-HANDOFF.md` und `PROVENANCE.md` im Quellcheckout beschreiben die Paarung sowie Eingabe- und Herkunftsgrenzen. Das Spiel lädt nur die SVGs, keine Proposal-PNGs.
 
-## Anschauen
+Alle sechs Laufzeit-Sets verwenden die zwölf vorhandenen Terrainmotive und das Logo von `01-modular-stealth-geometry` als dokumentierten Fallback. Die Geländeregeln bleiben in `terrain-rules.js`, unabhängig von den Motiven. Stabile Einheiten- und Pfadschlüssel stehen im [Manifest](manifest.json).
 
-- [Stilvergleich](comparison.html): fünf Logos und repräsentative Einheiten nebeneinander.
-- [Vollständige Galerie](gallery.html): alle 26 Motive in jedem Stil, jeweils Draufsicht und Schrägansicht.
-- [Manifest](manifest.json): stabile Asset-Schlüssel und Pfadmuster für die spätere Integration.
-- [Terrain-Galerie](terrain-gallery.html): zwölf Hexfeldmotive in allen fünf Stilen.
-- [ATLAS-Levelvorschau](level-preview.html): alle Terrain- und Einheitentypen auf einer Karte.
+## Ältere Galerie-Sets und Generatoren
 
-## Umfang
+Die fünf früheren Sets `01-modular-stealth-geometry` bis `05-aerospace-ground-force` bleiben für [Stilvergleich](comparison.html), [Einheitengalerie](gallery.html), [Terrain-Galerie](terrain-gallery.html) und [ATLAS-Levelvorschau](level-preview.html) erhalten. Sie sind im Manifest unter `legacyStyles` aufgeführt und erscheinen nicht in der Spiel-Combobox. Die zuvor integrierten Einzelkopien unter `sets/06-technical-illustration/` und `library/military-symbols/` bleiben als lokale historische Assets erhalten, werden aber vom Spiel nicht mehr gewählt.
 
-Pro Stil gibt es 26 transparente, skizzenhafte SVG-Icons in orthografischer Draufsicht (`256 × 256`), 26 transparente SVG-Illustrationen in schräger Dreiviertelansicht (`512 × 384`) und ein transparentes G.O.B.L.I.N.-Logo (`1024 × 256`). Das sind **53 Dateien je Stil, 265 SVG-Dateien insgesamt**. Die 26 Motive enthalten auch Infanterie, stationäre Einheiten und Szenarioziele, damit alle sichtbaren Einträge konsistent bebildert werden können.
-
-Zusätzlich enthält jeder Stil 12 Terrain-Icons für Hexfelder (`256 × 256`): offenes Gelände, Trümmerfeld, Berg, Höhenrücken, Wald, Sumpf, Wasser, Fluss, Straße, Brücke, Stadtgebiet und Krater. Damit umfasst das Paket **325 SVG-Dateien**. Ein statisches Showcase-Level namens **ATLAS / PROVING GROUNDS** verwendet alle 12 Terrainmotive und alle 26 Einheitentypen auf einem 12 × 8-Hexraster.
-
-Wichtig: ATLAS ist seit Build 0.1.11 als spielbares Content-Showcase auswählbar. Ab Build 0.1.12 gelten für alle zwölf Geländemotive eigene Bewegungs-, Deckungs- und Sichtregeln laut [Regelmatrix](../../RULE_MATRIX.md). Die Spezialwerte vieler Einheiten und das Missionsziel bleiben vorläufig; [Level-JSON](levels/atlas-proving-grounds.json) und Vorschau sind die Content-Quelle.
-
-| Stil-ID | Gestaltung |
-| --- | --- |
-| `01-modular-stealth-geometry` | Dunkle, modulare Tarngeometrie mit Limette/Cyan |
-| `02-industrial-exoframe` | Sichtbarer Exorahmen, Schienen und Orange |
-| `03-monolithic-facet` | Monolithische Facetten und Korallakzente |
-| `04-autonomous-drone-corps` | Helle, technische Drohnenoptik mit Sensorblau |
-| `05-aerospace-ground-force` | Geradlinige Luftfahrtformen, Elfenbein und Signalrot |
-
-## Austauschvertrag für den Developer
-
-Die Dateinamen sind in allen fünf Stilordnern identisch. Beim Stilwechsel muss nur `{style}` ersetzt werden:
-
-```text
-sets/{style}/icons/{unit}.svg
-sets/{style}/library/{unit}.svg
-sets/{style}/terrain/{terrain}.svg
-sets/{style}/logo.svg
-```
-
-Beispiel: `sets/03-monolithic-facet/icons/assault-tank.svg` und `sets/03-monolithic-facet/library/assault-tank.svg`. Das vollständige Vokabular steht im Manifest. Die SVGs besitzen transparente Hintergründe, `viewBox`, semantische Titel und keine externen Abhängigkeiten.
-
-## Content-Workflow
-
-Zuerst `node assets/unit-art/build-art.mjs`, danach `node assets/unit-art/build-terrain.mjs` ausführen. Diese Reihenfolge generiert alle Sets, das vollständige Manifest und die Vorschauen reproduzierbar. Die Generatoren dienen nur der Asset-Produktion; das Spiel lädt sie nicht. Die früheren PNGs unter `studies/` sind Konzeptstudien und nicht Teil der vollständigen Sets.
+`build-art.mjs` regeneriert ausschließlich die fünf älteren Galerie-Sets und bewahrt im Manifest die sechs Laufzeit-Sets. Danach ergänzt `build-terrain.mjs` die zwölf Terrainmotive für die älteren Paletten. Die 312 Laufzeit-SVGs werden aus den Generatoren im Unit-Art-Quellcheckout gepflegt und hier nicht von `build-art.mjs` überschrieben.

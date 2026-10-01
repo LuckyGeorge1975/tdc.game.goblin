@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="ARTILLERY DRONE — COMIC / GRAPHIC NOVEL icon"><style>
+  .paper{fill:#f6ead6} .ink{fill:#19322f} .accent-fill{fill:#e66f5c}
+  .card{fill:#f6ead6;stroke:#19322f;stroke-width:1.4} .rule{fill:none;stroke:#19322f;stroke-width:1}
+  .title,.subtitle,.label,.index,.footer{fill:#19322f;font-family:Arial,Helvetica,sans-serif}
+  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
+  .unit{stroke:#19322f;stroke-width:3.3;stroke-linecap:round;stroke-linejoin:round}
+  .unit *{vector-effect:non-scaling-stroke}
+  .body{fill:#f6ead6} .shell{fill:#4d8b7e} .turret{fill:#f6ead6} .track{fill:#19322f} .port{fill:#f6ead6} .accent{fill:#e66f5c}
+  .detail{fill:none;stroke:#19322f;stroke-width:1.5}.accent-line{fill:none;stroke:#e66f5c;stroke-width:4}
+  .inf-figure{fill:#4d8b7e;stroke:#19322f;stroke-width:2.4;stroke-linejoin:round}
+  .inf-head,.inf-rifle{fill:#19322f;stroke:#19322f;stroke-width:1.5;stroke-linejoin:round}
+  .inf-detail{fill:none;stroke:#19322f;stroke-width:1.6;stroke-linecap:round}
+  .inf-marker{fill:#19322f;stroke:#f6ead6;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
+</style><g transform="translate(24 24) scale(2.08)"><g class="unit" aria-label="ARTILLERY DRONE"><path class="shell" d="M50 22L61 38L75 33L88 46L75 61L61 58L50 76L39 58L25 61L12 46L25 33L39 38Z"/><circle class="port" cx="22" cy="45" r="8"/><circle class="accent" cx="22" cy="45" r="3"/><circle class="port" cx="78" cy="45" r="8"/><circle class="accent" cx="78" cy="45" r="3"/><rect class="body" x="48" y="3" width="4" height="37" rx="1"/><rect class="track" x="47" y="3" width="6" height="3" rx="0"/><circle class="turret" cx="50" cy="49" r="10"/></g></g></svg>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="SIEGE TANK — TABLETOP / TACTICAL MINIATURES icon"><style>
+  .paper{fill:#e9e1c7} .ink{fill:#232a23} .accent-fill{fill:#b99658}
+  .card{fill:#e9e1c7;stroke:#232a23;stroke-width:1.4} .rule{fill:none;stroke:#232a23;stroke-width:1}
+  .title,.subtitle,.label,.index,.footer{fill:#232a23;font-family:Arial,Helvetica,sans-serif}
+  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
+  .unit{stroke:#232a23;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .unit *{vector-effect:non-scaling-stroke}
+  .body{fill:#e9e1c7} .shell{fill:#69765a} .turret{fill:#e9e1c7} .track{fill:#232a23} .port{fill:#e9e1c7} .accent{fill:#b99658}
+  .detail{fill:none;stroke:#232a23;stroke-width:1.5}.accent-line{fill:none;stroke:#b99658;stroke-width:3}
+  .inf-figure{fill:#69765a;stroke:#232a23;stroke-width:2.4;stroke-linejoin:round}
+  .inf-head,.inf-rifle{fill:#232a23;stroke:#232a23;stroke-width:1.5;stroke-linejoin:round}
+  .inf-detail{fill:none;stroke:#232a23;stroke-width:1.6;stroke-linecap:round}
+  .inf-marker{fill:#232a23;stroke:#e9e1c7;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
+</style><g transform="translate(24 24) scale(2.08)"><g class="unit" aria-label="SIEGE TANK"><g transform="translate(50 0) scale(0.67 1) translate(-50 0)"><rect class="track" x="11" y="14" width="17" height="74" rx="5"/><rect class="track" x="72" y="14" width="17" height="74" rx="5"/><polygon class="shell" points="34,10 66,10 77,24 76,77 69,87 31,87 24,77 23,24"/><path class="detail" d="M30 26L50 19L70 26M31 78L50 84L69 78"/><path class="body" d="M28 34L39 32V54L30 60Z"/><path class="body" d="M61 34L72 32V54L63 60Z"/><rect class="accent" x="39" y="76" width="22" height="4" rx="0"/><path class="accent" d="M31 27L39 24L41 33L33 36ZM69 27L61 24L59 33L67 36Z"/><rect class="body" x="39" y="7" width="6" height="37" rx="1"/><rect class="track" x="38" y="7" width="8" height="3" rx="0"/><rect class="body" x="55" y="7" width="6" height="37" rx="1"/><rect class="track" x="54" y="7" width="8" height="3" rx="0"/><path class="turret" d="M31 45L36 35L44 31H56L64 35L69 45V58L61 68H39L31 58Z"/><rect class="port" x="45" y="47" width="10" height="10" rx="2"/></g></g></g></svg>

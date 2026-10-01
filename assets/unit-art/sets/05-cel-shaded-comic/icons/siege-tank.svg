@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="SIEGE TANK — COMIC / GRAPHIC NOVEL icon"><style>
+  .paper{fill:#f6ead6} .ink{fill:#19322f} .accent-fill{fill:#e66f5c}
+  .card{fill:#f6ead6;stroke:#19322f;stroke-width:1.4} .rule{fill:none;stroke:#19322f;stroke-width:1}
+  .title,.subtitle,.label,.index,.footer{fill:#19322f;font-family:Arial,Helvetica,sans-serif}
+  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
+  .unit{stroke:#19322f;stroke-width:3.3;stroke-linecap:round;stroke-linejoin:round}
+  .unit *{vector-effect:non-scaling-stroke}
+  .body{fill:#f6ead6} .shell{fill:#4d8b7e} .turret{fill:#f6ead6} .track{fill:#19322f} .port{fill:#f6ead6} .accent{fill:#e66f5c}
+  .detail{fill:none;stroke:#19322f;stroke-width:1.5}.accent-line{fill:none;stroke:#e66f5c;stroke-width:4}
+  .inf-figure{fill:#4d8b7e;stroke:#19322f;stroke-width:2.4;stroke-linejoin:round}
+  .inf-head,.inf-rifle{fill:#19322f;stroke:#19322f;stroke-width:1.5;stroke-linejoin:round}
+  .inf-detail{fill:none;stroke:#19322f;stroke-width:1.6;stroke-linecap:round}
+  .inf-marker{fill:#19322f;stroke:#f6ead6;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
+</style><g transform="translate(24 24) scale(2.08)"><g class="unit" aria-label="SIEGE TANK"><g transform="translate(50 0) scale(0.67 1) translate(-50 0)"><rect class="track" x="11" y="14" width="17" height="74" rx="2"/><rect class="track" x="72" y="14" width="17" height="74" rx="2"/><polygon class="shell" points="50,7 72,16 76,27 77,76 68,87 32,87 23,76 24,27 28,16"/><path class="detail" d="M30 26L50 19L70 26M31 78L50 84L69 78"/><path class="body" d="M28 34L39 32V54L30 60Z"/><path class="body" d="M61 34L72 32V54L63 60Z"/><rect class="accent" x="39" y="76" width="22" height="4" rx="0"/><rect class="body" x="39" y="7" width="6" height="37" rx="1"/><rect class="track" x="38" y="7" width="8" height="3" rx="0"/><rect class="body" x="55" y="7" width="6" height="37" rx="1"/><rect class="track" x="54" y="7" width="8" height="3" rx="0"/><path class="turret" d="M27 48L40 31H60L73 48L65 65H35Z"/><path class="accent-line" d="M32 46L40 37M68 46L60 37"/><rect class="port" x="45" y="47" width="10" height="10" rx="2"/><path class="accent-line" d="M29 29L36 24M71 29L64 24"/></g></g></g></svg>

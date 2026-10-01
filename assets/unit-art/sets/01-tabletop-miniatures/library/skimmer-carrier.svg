@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 512 384" role="img" aria-label="SKIMMER CARRIER — TABLETOP / TACTICAL MINIATURES library view"><style>
+  .paper{fill:#e9e1c7} .ink{fill:#232a23} .accent-fill{fill:#b99658}
+  .card{fill:#e9e1c7;stroke:#232a23;stroke-width:1.4} .rule{fill:none;stroke:#232a23;stroke-width:1}
+  .title,.subtitle,.label,.index,.footer{fill:#232a23;font-family:Arial,Helvetica,sans-serif}
+  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
+  .unit{stroke:#232a23;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .unit *{vector-effect:non-scaling-stroke}
+  .body{fill:#e9e1c7} .shell{fill:#69765a} .turret{fill:#e9e1c7} .track{fill:#232a23} .port{fill:#e9e1c7} .accent{fill:#b99658}
+  .detail{fill:none;stroke:#232a23;stroke-width:1.5}.accent-line{fill:none;stroke:#b99658;stroke-width:3}
+  .inf-figure{fill:#69765a;stroke:#232a23;stroke-width:2.4;stroke-linejoin:round}
+  .inf-head,.inf-rifle{fill:#232a23;stroke:#232a23;stroke-width:1.5;stroke-linejoin:round}
+  .inf-detail{fill:none;stroke:#232a23;stroke-width:1.6;stroke-linecap:round}
+  .inf-marker{fill:#232a23;stroke:#e9e1c7;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
+</style><g transform="translate(91 26) scale(3.4)"><g class="unit" aria-label="SKIMMER CARRIER"><g transform="translate(50 0) scale(0.76 1) translate(-50 0)"><polygon class="shell" points="50,5 59,21 62,34 72,40 94,52 92,68 76,67 68,78 55,78 50,91 45,78 32,78 24,67 8,68 6,52 28,40 38,34 41,21"/><path class="body" d="M50 8L57 26L60 56L55 77L50 87L45 77L40 56L43 26Z"/><path class="port" d="M50 22L56 34L55 49L50 53L45 49L44 34Z"/><path class="turret" d="M10 51L13 46H25L28 51V70L24 75H14L10 70Z"/><ellipse class="track" cx="19" cy="60" rx="7.89" ry="6"/><path class="turret" d="M72 51L75 46H87L90 51V70L86 75H76L72 70Z"/><ellipse class="track" cx="81" cy="60" rx="7.89" ry="6"/><path class="turret" d="M35 58H65V74H35Z"/><path class="detail" d="M39 66L61 66"/><path class="accent" d="M29 43L37 39L38 45L32 48ZM71 43L63 39L62 45L68 48Z"/></g></g></g></svg>

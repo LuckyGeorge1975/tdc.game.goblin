@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 512 384" role="img" aria-label="ROCKET ARTILLERY — PIXEL / STRATEGY DISPLAY library view"><style>
+  .paper{fill:#e6dfb8} .ink{fill:#1b2930} .accent-fill{fill:#e7a947}
+  .card{fill:#e6dfb8;stroke:#1b2930;stroke-width:1.4} .rule{fill:none;stroke:#1b2930;stroke-width:1}
+  .title,.subtitle,.label,.index,.footer{fill:#1b2930;font-family:Arial,Helvetica,sans-serif}
+  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
+  .unit{stroke:#1b2930;stroke-width:2.5;stroke-linecap:square;stroke-linejoin:miter}
+  .unit *{vector-effect:non-scaling-stroke}
+  .body{fill:#e6dfb8} .shell{fill:#6c8175} .turret{fill:#e6dfb8} .track{fill:#1b2930} .port{fill:#e6dfb8} .accent{fill:#e7a947}
+  .detail{fill:none;stroke:#1b2930;stroke-width:1.5}.accent-line{fill:none;stroke:#e7a947;stroke-width:3}
+  .inf-figure{fill:#6c8175;stroke:#1b2930;stroke-width:2.4;stroke-linejoin:round}
+  .inf-head,.inf-rifle{fill:#1b2930;stroke:#1b2930;stroke-width:1.5;stroke-linejoin:round}
+  .inf-detail{fill:none;stroke:#1b2930;stroke-width:1.6;stroke-linecap:round}
+  .inf-marker{fill:#1b2930;stroke:#e6dfb8;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
+</style><g transform="translate(91 26) scale(3.4)"><g class="unit" aria-label="ROCKET ARTILLERY"><g transform="translate(50 0) scale(0.67 1) translate(-50 0)"><rect class="track" x="11" y="14" width="17" height="74" rx="0"/><rect class="track" x="72" y="14" width="17" height="74" rx="0"/><polygon class="shell" points="35,10 65,10 65,16 74,16 76,25 76,80 69,87 31,87 24,80 24,25 26,16 35,16"/><path class="detail" d="M30 26L50 19L70 26M31 78L50 84L69 78"/><path class="body" d="M28 34L39 32V54L30 60Z"/><path class="body" d="M61 34L72 32V54L63 60Z"/><rect class="accent" x="39" y="76" width="22" height="4" rx="0"/><rect class="accent" x="29" y="26" width="7" height="5" rx="0"/><rect class="accent" x="64" y="26" width="7" height="5" rx="0"/><path class="turret" d="M31 25L38 20H62L69 25V53H31Z"/><rect class="track" x="37" y="27" width="8" height="8" rx="0"/><rect class="track" x="37" y="39" width="8" height="8" rx="0"/><rect class="track" x="55" y="27" width="8" height="8" rx="0"/><rect class="track" x="55" y="39" width="8" height="8" rx="0"/></g></g></g></svg>

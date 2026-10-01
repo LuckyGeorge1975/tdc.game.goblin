@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 512 384" role="img" aria-label="GOBLIN DREADNAUGHT — TECHNICAL / SYSTEM DRAWING library view"><style>
+  .paper{fill:#f2f0e8} .ink{fill:#243640} .accent-fill{fill:#d37c43}
+  .card{fill:#f2f0e8;stroke:#243640;stroke-width:1.4} .rule{fill:none;stroke:#243640;stroke-width:1}
+  .title,.subtitle,.label,.index,.footer{fill:#243640;font-family:Arial,Helvetica,sans-serif}
+  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
+  .unit{stroke:#243640;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .unit *{vector-effect:non-scaling-stroke}
+  .body{fill:#f2f0e8} .shell{fill:#b9cdd0} .turret{fill:#f2f0e8} .track{fill:#243640} .port{fill:#f2f0e8} .accent{fill:#d37c43}
+  .detail{fill:none;stroke:#243640;stroke-width:1.5}.accent-line{fill:none;stroke:#d37c43;stroke-width:3}
+  .inf-figure{fill:#b9cdd0;stroke:#243640;stroke-width:2.4;stroke-linejoin:round}
+  .inf-head,.inf-rifle{fill:#243640;stroke:#243640;stroke-width:1.5;stroke-linejoin:round}
+  .inf-detail{fill:none;stroke:#243640;stroke-width:1.6;stroke-linecap:round}
+  .inf-marker{fill:#243640;stroke:#f2f0e8;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
+</style><g transform="translate(91 26) scale(3.4)"><g class="unit" aria-label="GOBLIN DREADNAUGHT"><g transform="translate(50 0) scale(0.76 1) translate(-50 0)"><rect class="track" x="6" y="14" width="18" height="74" rx="2"/><rect class="track" x="76" y="14" width="18" height="74" rx="2"/><polygon class="shell" points="30,10 70,10 81,24 80,77 73,87 27,87 20,77 19,24"/><path class="detail" d="M26 26L50 19L74 26M27 78L50 84L73 78"/><path class="body" d="M24 34L35 32V54L26 60Z"/><path class="body" d="M65 34L76 32V54L67 60Z"/><rect class="accent" x="35" y="76" width="30" height="4" rx="0"/><path class="accent-line" d="M25 19L30 17M75 19L70 17"/><rect class="body" x="35" y="7" width="4" height="37" rx="1"/><rect class="track" x="34" y="7" width="6" height="3" rx="0"/><rect class="body" x="44" y="7" width="4" height="37" rx="1"/><rect class="track" x="43" y="7" width="6" height="3" rx="0"/><rect class="body" x="52" y="7" width="4" height="37" rx="1"/><rect class="track" x="51" y="7" width="6" height="3" rx="0"/><rect class="body" x="61" y="7" width="4" height="37" rx="1"/><rect class="track" x="60" y="7" width="6" height="3" rx="0"/><path class="turret" d="M32 45L39 34H61L68 45L65 61L58 68H42L35 61Z"/><rect class="port" x="45" y="47" width="10" height="10" rx="2"/></g></g></g></svg>

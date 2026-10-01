@@ -11,13 +11,13 @@
 
   let saved=null;
   try{saved=localStorage.getItem('goblin-art-style')}catch{/* Storage is optional. */}
-  const initial=UnitVisuals.styles.some(style=>style.id===saved)?saved:UnitVisuals.styles[0].id;
+  const initial=UnitVisuals.styles.some(style=>style.id===saved)?saved:'02-technical-illustration';
   UnitVisuals.setStyle(initial);
   picker.value=initial;
 
   function replaceWithArt(container,unit,view='icons'){
     const asset=view==='icons'?(UnitVisuals.resolve(unit).asset||null)
-      :view==='military-library'?UnitVisuals.librarySymbolFor(unit):UnitVisuals.assetFor(unit,view);
+      :UnitVisuals.assetFor(unit,view);
     if(!asset||!container)return;
     const picture=document.createElement('img');
     picture.src=asset;
@@ -56,7 +56,7 @@
     baseRenderUnitGuide();
     const symbol=document.querySelector('#guide-symbol');
     symbol.classList.add('art-active');
-    replaceWithArt(symbol,unitGuideEntries[guideIndex],'military-library');
+    replaceWithArt(symbol,unitGuideEntries[guideIndex],'library');
   };
 
   let changing=false;

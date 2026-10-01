@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="LIGHT SKIMMER — PIXEL / STRATEGY DISPLAY icon"><style>
+  .paper{fill:#e6dfb8} .ink{fill:#1b2930} .accent-fill{fill:#e7a947}
+  .card{fill:#e6dfb8;stroke:#1b2930;stroke-width:1.4} .rule{fill:none;stroke:#1b2930;stroke-width:1}
+  .title,.subtitle,.label,.index,.footer{fill:#1b2930;font-family:Arial,Helvetica,sans-serif}
+  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
+  .unit{stroke:#1b2930;stroke-width:2.5;stroke-linecap:square;stroke-linejoin:miter}
+  .unit *{vector-effect:non-scaling-stroke}
+  .body{fill:#e6dfb8} .shell{fill:#6c8175} .turret{fill:#e6dfb8} .track{fill:#1b2930} .port{fill:#e6dfb8} .accent{fill:#e7a947}
+  .detail{fill:none;stroke:#1b2930;stroke-width:1.5}.accent-line{fill:none;stroke:#e7a947;stroke-width:3}
+  .inf-figure{fill:#6c8175;stroke:#1b2930;stroke-width:2.4;stroke-linejoin:round}
+  .inf-head,.inf-rifle{fill:#1b2930;stroke:#1b2930;stroke-width:1.5;stroke-linejoin:round}
+  .inf-detail{fill:none;stroke:#1b2930;stroke-width:1.6;stroke-linecap:round}
+  .inf-marker{fill:#1b2930;stroke:#e6dfb8;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
+</style><g transform="translate(24 24) scale(2.08)"><g class="unit" aria-label="LIGHT SKIMMER"><g transform="translate(50 0) scale(0.7 1) translate(-50 0)"><polygon class="shell" points="46,7 54,7 54,19 60,19 60,34 72,40 72,46 90,54 90,66 76,66 70,76 58,77 54,89 46,89 42,77 30,76 24,66 10,66 10,54 28,46 28,40 40,34 40,19 46,19"/><path class="body" d="M50 8L57 26L60 56L55 77L50 87L45 77L40 56L43 26Z"/><path class="port" d="M50 22L56 34L55 49L50 53L45 49L44 34Z"/><path class="turret" d="M10 51L13 46H25L28 51V70L24 75H14L10 70Z"/><rect class="track" x="14" y="55" width="10" height="10" rx="0"/><path class="turret" d="M72 51L75 46H87L90 51V70L86 75H76L72 70Z"/><rect class="track" x="76" y="55" width="10" height="10" rx="0"/><rect class="accent" x="47" y="14" width="6" height="5" rx="0"/><path class="accent-line" d="M12 52L4 41M88 52L96 41"/></g></g></g></svg>

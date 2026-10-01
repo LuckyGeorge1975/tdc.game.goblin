@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="RELAY NODE — COMIC / GRAPHIC NOVEL icon"><style>
+  .paper{fill:#f6ead6} .ink{fill:#19322f} .accent-fill{fill:#e66f5c}
+  .card{fill:#f6ead6;stroke:#19322f;stroke-width:1.4} .rule{fill:none;stroke:#19322f;stroke-width:1}
+  .title,.subtitle,.label,.index,.footer{fill:#19322f;font-family:Arial,Helvetica,sans-serif}
+  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
+  .unit{stroke:#19322f;stroke-width:3.3;stroke-linecap:round;stroke-linejoin:round}
+  .unit *{vector-effect:non-scaling-stroke}
+  .body{fill:#f6ead6} .shell{fill:#4d8b7e} .turret{fill:#f6ead6} .track{fill:#19322f} .port{fill:#f6ead6} .accent{fill:#e66f5c}
+  .detail{fill:none;stroke:#19322f;stroke-width:1.5}.accent-line{fill:none;stroke:#e66f5c;stroke-width:4}
+  .inf-figure{fill:#4d8b7e;stroke:#19322f;stroke-width:2.4;stroke-linejoin:round}
+  .inf-head,.inf-rifle{fill:#19322f;stroke:#19322f;stroke-width:1.5;stroke-linejoin:round}
+  .inf-detail{fill:none;stroke:#19322f;stroke-width:1.6;stroke-linecap:round}
+  .inf-marker{fill:#19322f;stroke:#f6ead6;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
+</style><g transform="translate(24 24) scale(2.08)"><g class="unit" aria-label="RELAY NODE"><path class="shell" d="M18 25L50 12L82 25V77L50 88L18 77Z"/><path class="detail" d="M18 25L50 38L82 25M18 77L50 64L82 77M50 38V64"/><rect class="port" x="22" y="41" width="8" height="20" rx="1"/><rect class="port" x="70" y="41" width="8" height="20" rx="1"/><circle class="turret" cx="50" cy="51" r="10"/><path class="accent-line" d="M50 42L50 10"/><circle class="accent" cx="50" cy="10" r="3"/><path class="accent-line" d="M31 33L21 20M69 33L79 20"/><path class="accent-line" d="M17 83L28 78M72 78L83 83"/></g></g></svg>

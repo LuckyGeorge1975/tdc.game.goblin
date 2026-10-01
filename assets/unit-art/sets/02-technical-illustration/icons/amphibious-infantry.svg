@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="AMPHIBIOUS INFANTRY — TECHNICAL / SYSTEM DRAWING icon"><style>
+  .paper{fill:#f2f0e8} .ink{fill:#243640} .accent-fill{fill:#d37c43}
+  .card{fill:#f2f0e8;stroke:#243640;stroke-width:1.4} .rule{fill:none;stroke:#243640;stroke-width:1}
+  .title,.subtitle,.label,.index,.footer{fill:#243640;font-family:Arial,Helvetica,sans-serif}
+  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
+  .unit{stroke:#243640;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .unit *{vector-effect:non-scaling-stroke}
+  .body{fill:#f2f0e8} .shell{fill:#b9cdd0} .turret{fill:#f2f0e8} .track{fill:#243640} .port{fill:#f2f0e8} .accent{fill:#d37c43}
+  .detail{fill:none;stroke:#243640;stroke-width:1.5}.accent-line{fill:none;stroke:#d37c43;stroke-width:3}
+  .inf-figure{fill:#b9cdd0;stroke:#243640;stroke-width:2.4;stroke-linejoin:round}
+  .inf-head,.inf-rifle{fill:#243640;stroke:#243640;stroke-width:1.5;stroke-linejoin:round}
+  .inf-detail{fill:none;stroke:#243640;stroke-width:1.6;stroke-linecap:round}
+  .inf-marker{fill:#243640;stroke:#f2f0e8;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
+</style><g transform="translate(24 24) scale(2.08)"><g class="unit" aria-label="AMPHIBIOUS INFANTRY"><g transform="translate(50 30) scale(0.55)"><path class="inf-figure" d="M-16 -9L-11 -14L-7 -16H7L11 -14L16 -9L18 0L17 12L14 17L10 16L9 10L8 21H-8L-9 10L-10 16L-14 17L-17 12L-18 0Z"/><path class="inf-figure" d="M-8 20L-8 34L-10 42L-9 46H-2L-1 34L0 26L1 34L2 46H9L10 42L8 34L8 20Z"/><path class="inf-head" d="M-7 -26L-4 -31H4L7 -26L9 -20L7 -16H-7L-9 -20Z"/><path class="inf-rifle" d="M-21 -48H-17L-14 -24L-12 -20L-11 8H-16L-18 -18Z"/><path class="inf-detail" d="M-14 -17L-8 -7M-6 19H6"/></g><g transform="translate(30 66) scale(0.55)"><path class="inf-figure" d="M-16 -9L-11 -14L-7 -16H7L11 -14L16 -9L18 0L17 12L14 17L10 16L9 10L8 21H-8L-9 10L-10 16L-14 17L-17 12L-18 0Z"/><path class="inf-figure" d="M-8 20L-8 34L-10 42L-9 46H-2L-1 34L0 26L1 34L2 46H9L10 42L8 34L8 20Z"/><path class="inf-head" d="M-7 -26L-4 -31H4L7 -26L9 -20L7 -16H-7L-9 -20Z"/><path class="inf-rifle" d="M-21 -48H-17L-14 -24L-12 -20L-11 8H-16L-18 -18Z"/><path class="inf-detail" d="M-14 -17L-8 -7M-6 19H6"/></g><g transform="translate(70 66) scale(0.55)"><path class="inf-figure" d="M-16 -9L-11 -14L-7 -16H7L11 -14L16 -9L18 0L17 12L14 17L10 16L9 10L8 21H-8L-9 10L-10 16L-14 17L-17 12L-18 0Z"/><path class="inf-figure" d="M-8 20L-8 34L-10 42L-9 46H-2L-1 34L0 26L1 34L2 46H9L10 42L8 34L8 20Z"/><path class="inf-head" d="M-7 -26L-4 -31H4L7 -26L9 -20L7 -16H-7L-9 -20Z"/><path class="inf-rifle" d="M-21 -48H-17L-14 -24L-12 -20L-11 8H-16L-18 -18Z"/><path class="inf-detail" d="M-14 -17L-8 -7M-6 19H6"/></g><text class="inf-marker" x="90" y="41">A</text></g></g></svg>

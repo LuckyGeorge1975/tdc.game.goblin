@@ -63,29 +63,42 @@ try {
   await send('Page.navigate', { url: 'http://127.0.0.1:4174/tdc.game.goblin/index.html?lang=de&unitArtAudit=1' });
   for (let n = 0; n < 50 && !await js('!!window.UnitVisuals && document.querySelectorAll("#art-style-select option").length===6'); n++) await new Promise(resolve => setTimeout(resolve, 100));
   assert.equal(await js('document.querySelectorAll("#art-style-select option").length'), 6);
+  await js("localStorage.removeItem('goblin-art-style')");
+  await send('Page.reload');
+  for (let n = 0; n < 50 && !await js('!!window.UnitVisuals && document.querySelectorAll("#art-style-select option").length===6'); n++) await new Promise(resolve => setTimeout(resolve, 100));
+  assert.equal(await js('UnitVisuals.currentStyle()'), '02-technical-illustration');
   await js("document.querySelector('#unit-guide-open').click()");
   for (let n = 0; n < 30 && !await js('document.querySelector("#guide-symbol img")?.complete'); n++) await new Promise(resolve => setTimeout(resolve, 100));
   const first = await measure();
-  assert.match(first.src, /library\/military-symbols\/goblin-siegebreaker\.svg$/);
+  assert.match(first.src, /sets\/02-technical-illustration\/library\/goblin-siegebreaker\.svg$/);
   assert.deepEqual(first.natural, { width: 1024, height: 768 });
   assert.equal(first.fit, 'contain');
   assert.equal(first.clip, 'none');
   assert.ok(first.symbol.width >= 240 && first.symbol.height >= 180, JSON.stringify(first));
-  await screenshot('ur8-guide-desktop');
+  await screenshot('q0o-guide-desktop');
   console.log('desktop', JSON.stringify(first));
 
-  await js("document.querySelector('#unit-guide-close').click(); const s=document.querySelector('#art-style-select'); s.value='06-technical-illustration'; s.dispatchEvent(new Event('change',{bubbles:true}))");
-  for (let n = 0; n < 30 && await js("UnitVisuals.currentStyle()!=='06-technical-illustration'"); n++) await new Promise(resolve => setTimeout(resolve, 100));
-  assert.equal(await js('UnitVisuals.currentStyle()'), '06-technical-illustration');
-  const art = await js("({roster:document.querySelector('#unit-roster .unit-art-image')?.getAttribute('src'),map:document.querySelector('.unit-svg image.unit-artwork')?.getAttribute('href'),terrain:document.querySelector('image.terrain-art')?.getAttribute('href')})");
-  assert.match(art.roster, /06-technical-illustration\/icons\/goblin-siegebreaker\.svg$/);
-  assert.match(art.map, /06-technical-illustration\/icons\/goblin-siegebreaker\.svg$/);
-  await js("document.querySelector('#unit-guide-open').click()");
-  const second = await measure();
-  assert.equal(second.src, first.src);
-  console.log('style switch', JSON.stringify({ art, guide: second.src }));
+  const styles=['01-tabletop-miniatures','02-technical-illustration','03-industrial-realism','04-pixel-strategy','05-cel-shaded-comic','06-military-symbols'];
+  for(const style of styles){
+    await js("document.querySelector('#unit-guide-close').click()");
+    await js(`(() => { const picker=document.querySelector('#art-style-select'); picker.value='${style}'; picker.dispatchEvent(new Event('change',{bubbles:true})); })()`);
+    for(let n=0;n<30&&await js(`UnitVisuals.currentStyle()!=='${style}'`);n++) await new Promise(resolve=>setTimeout(resolve,100));
+    assert.equal(await js('UnitVisuals.currentStyle()'),style);
+    const art=await js("({roster:document.querySelector('#unit-roster .unit-art-image')?.getAttribute('src'),map:document.querySelector('.unit-svg image.unit-artwork')?.getAttribute('href'),terrain:UnitVisuals.terrainAssetFor('forest')})");
+    assert.equal(art.roster,`assets/unit-art/sets/${style}/icons/goblin-siegebreaker.svg`);
+    assert.equal(art.map,art.roster);
+    assert.match(art.terrain,/sets\/01-modular-stealth-geometry\/terrain\//);
+    await js("document.querySelector('#unit-guide-open').click()");
+    for(let n=0;n<30&&!await js('document.querySelector("#guide-symbol img")?.complete');n++) await new Promise(resolve=>setTimeout(resolve,100));
+    const guide=await measure();
+    assert.equal(guide.src,`assets/unit-art/sets/${style}/library/goblin-siegebreaker.svg`);
+    assert.deepEqual(guide.natural,{width:1024,height:768});
+    assert.equal(guide.fit,'contain'); assert.equal(guide.clip,'none');
+    console.log('style switch',JSON.stringify({style,art,guide:guide.src}));
+  }
+  await screenshot('q0o-guide-military-desktop');
 
-  for (const [width, height, name] of [[390, 844, 'ur8-guide-mobile'], [320, 568, 'ur8-guide-mobile-min']]) {
+  for (const [width, height, name] of [[390, 844, 'q0o-guide-mobile'], [320, 568, 'q0o-guide-mobile-min']]) {
     await viewport(width, height, true);
     await js("document.querySelector('.guide-body').scrollTop=0");
     const layout = await measure();

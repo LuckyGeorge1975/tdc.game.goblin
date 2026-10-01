@@ -31,7 +31,7 @@ test('remote artwork URLs are rejected',()=>{
   assert.throws(()=>UnitVisuals.setAsset('gev','https://example.com/unit.svg'),/local project path/);
 });
 
-test('six art sets resolve current scenario variants by unit name',()=>{
+test('six art sets resolve all 26 icon and guide pairs by unit name',()=>{
   const {UnitVisuals}=visualContext();
   const manifest=JSON.parse(readFileSync(new URL('../assets/unit-art/manifest.json',import.meta.url),'utf8'));
   assert.equal(UnitVisuals.styles.length,6);
@@ -40,14 +40,18 @@ test('six art sets resolve current scenario variants by unit name',()=>{
     assert.ok(UnitVisuals.setStyle(style.id));
     const metadata=manifest.styles.find(entry=>entry.id===style.id);
     assert.ok(metadata);
+    assert.equal(metadata.terrainFallback,'01-modular-stealth-geometry');
     assert.ok(existsSync(new URL(`../assets/unit-art/${metadata.logoFallback||`sets/${style.id}/logo.svg`}`,import.meta.url)));
     for(const {id,name} of manifest.units){
       const unit={id:'scenario-alias',name};
       assert.equal(UnitVisuals.artKey(unit),id);
       for(const view of ['icons','library']){
         const path=UnitVisuals.assetFor(unit,view);
+        assert.equal(path,`assets/unit-art/sets/${style.id}/${view}/${id}.svg`);
         assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),`${style.id}/${view}/${id}`);
-        if(style.id==='06-technical-illustration'&&view==='icons')assert.match(path,/06-technical-illustration\/icons/);
+        const svg=readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
+        assert.match(svg,new RegExp(`width="${view==='icons'?'256':'1024'}"`),path);
+        assert.match(svg,new RegExp(`height="${view==='icons'?'256':'768'}"`),path);
       }
     }
     assert.match(UnitVisuals.resolve({id:'infantry',name:'FIELD ENGINEERS'}).asset,/field-engineers\.svg$/);
@@ -57,14 +61,14 @@ test('six art sets resolve current scenario variants by unit name',()=>{
   assert.equal(UnitVisuals.setStyle('unknown'),false);
 });
 
-test('large military library symbol is independent of map style for all 26 units',()=>{
+test('guide artwork follows each map style for all 26 units',()=>{
   const {UnitVisuals}=visualContext();
   const manifest=JSON.parse(readFileSync(new URL('../assets/unit-art/manifest.json',import.meta.url),'utf8'));
   for(const style of UnitVisuals.styles){
     UnitVisuals.setStyle(style.id);
     for(const unit of manifest.units){
-      const path=UnitVisuals.librarySymbolFor(unit);
-      assert.equal(path,`assets/unit-art/library/military-symbols/${unit.id}.svg`);
+      const path=UnitVisuals.assetFor(unit,'library');
+      assert.equal(path,`assets/unit-art/sets/${style.id}/library/${unit.id}.svg`);
       assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),path);
     }
   }
@@ -85,7 +89,7 @@ test('all twelve terrain visuals exist for each runtime style',()=>{
     for(const type of types){
       const path=UnitVisuals.terrainAssetFor(type);
       assert.ok(path?.includes(`/terrain/${type}.svg`));
-      if(style.id==='06-technical-illustration')assert.ok(path.includes('/01-modular-stealth-geometry/'));
+      assert.ok(path.includes('/01-modular-stealth-geometry/'));
       assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),path);
     }
   }

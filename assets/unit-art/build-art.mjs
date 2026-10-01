@@ -12,15 +12,20 @@ const styles = [
   { id: '04-autonomous-drone-corps', title: 'Autonomous Drone Corps', body: '#6f7b78', plate: '#c7d1c7', light: '#f1f3e8', dark: '#202c30', accent: '#40b9ff', second: '#94e0ff', line: '#e8f1e8', mode: 'drone' },
   { id: '05-aerospace-ground-force', title: 'Aerospace Ground Force', body: '#293239', plate: '#d5d9d4', light: '#faf7ea', dark: '#131c24', accent: '#ff605b', second: '#ffc3ad', line: '#e8ece5', mode: 'aero' },
 ];
-// Integrated from the separately versioned Unit-Art proposal; this source generator
-// keeps its manifest entry but does not regenerate the selected SVG files.
-const curatedStyle = {
-  id: '06-technical-illustration', title: 'Technische Illustration',
-  directory: 'sets/06-technical-illustration/',
-  librarySource: 'library/military-symbols/',
+// Runtime SVGs come from the separately versioned Unit-Art proposal. This
+// generator preserves their manifest entries but only regenerates legacy art.
+const runtimeStyles = [
+  ['01-tabletop-miniatures', 'Tabletop-Miniaturen'],
+  ['02-technical-illustration', 'Technische Illustration'],
+  ['03-industrial-realism', 'Industrieller Realismus'],
+  ['04-pixel-strategy', 'Pixel-Strategie'],
+  ['05-cel-shaded-comic', 'Cel-Shading / Comic'],
+  ['06-military-symbols', 'Militärische Kartensymbole'],
+].map(([id, title]) => ({
+  id, title, directory: `sets/${id}/`,
   terrainFallback: '01-modular-stealth-geometry',
   logoFallback: 'sets/01-modular-stealth-geometry/logo.svg',
-};
+}));
 
 // Every visible vehicle, catalog unit, scenario opponent, and objective has a stable asset key.
 const units = [
@@ -316,7 +321,7 @@ function comparisonHtml() {
   return `<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>G.O.B.L.I.N. · Stilvergleich</title><style>body{margin:0;background:#0a1217;color:#dce8e5;font:13px system-ui,sans-serif}main{max-width:1700px;margin:auto;padding:24px}h1{letter-spacing:.08em}section{display:grid;grid-template-columns:250px 1fr;gap:18px;margin:17px 0;padding:14px;border:1px solid #31464b;background:#111f25}header img{width:230px}h2{font-size:16px;letter-spacing:.06em}.examples{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}figure{margin:0;background:#1a2b32;display:flex;align-items:center;justify-content:center;position:relative;min-height:150px}figure img:first-child{width:68px}figure img:nth-child(2){width:132px}figcaption{position:absolute;bottom:5px;left:8px;color:#adbfbb;text-transform:uppercase;font-size:10px;letter-spacing:.06em}@media(max-width:900px){section{display:block}.examples{grid-template-columns:repeat(2,1fr)}}</style><main><h1>G.O.B.L.I.N. · Fünf Stilrichtungen</h1>${rows}</main></html>`;
 }
 
-const manifest = { schemaVersion: 1, viewFormats: { icon: '256×256 SVG · transparent · top view', library: '512×384 SVG · transparent · oblique view', librarySymbol: '1024×768 SVG · transparent · military symbol', logo: '1024×256 SVG · transparent' }, styles: [...styles.map(({id,title}) => ({id,title,directory:`sets/${id}/`})), curatedStyle], units: units.map(({id,name,kind,weapon}) => ({id,name,kind,weapon})), pathPattern: {icon:'sets/{style}/icons/{unit}.svg',library:'sets/{style}/library/{unit}.svg',librarySymbol:'library/military-symbols/{unit}.svg',logo:'sets/{style}/logo.svg'} };
+const manifest = { schemaVersion: 1, viewFormats: { icon: '256×256 SVG · transparent · unit icon', library: '1024×768 SVG · transparent · unit guide view', logo: '1024×256 SVG · transparent' }, styles: runtimeStyles, legacyStyles: styles.map(({id,title}) => ({id,title,directory:`sets/${id}/`})), units: units.map(({id,name,kind,weapon}) => ({id,name,kind,weapon})), pathPattern: {icon:'sets/{style}/icons/{unit}.svg',library:'sets/{style}/library/{unit}.svg',logo:'sets/{style}/logo.svg'} };
 for (const style of styles) {
   const base = join(root,'sets',style.id);
   await mkdir(join(base,'icons'),{recursive:true});
