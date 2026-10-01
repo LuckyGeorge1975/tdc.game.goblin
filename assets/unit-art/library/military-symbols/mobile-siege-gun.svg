@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 512 384" role="img" aria-label="MOBILE SIEGE GUN — military library symbol"><style>
+.frame{fill:#f4f2e9;stroke:#20343b;stroke-width:4}.divider{fill:none;stroke:#20343b;stroke-width:2}
+.main{fill:none;stroke:#20343b;stroke-width:8;stroke-linecap:square;stroke-linejoin:miter}
+.minor{fill:none;stroke:#b96945;stroke-width:5;stroke-linecap:square;stroke-linejoin:miter}
+.thin{fill:none;stroke:#20343b;stroke-width:3}.solid{fill:#20343b}
+.category,.code{fill:#20343b;font-family:Arial,Helvetica,sans-serif;font-weight:800}
+.category{font-size:13px;letter-spacing:1px}.code{font-size:20px;text-anchor:end}
+.register{fill:none;stroke:#c9d7d4;stroke-width:3}
+</style><g transform="translate(0 -50) scale(2.1)"><g class="unit" data-id="mobile-siege-gun">
+  <rect x="25" y="61" width="206" height="120" rx="3" class="frame"/>
+  <path d="M26 86H230M26 155H230M174 87V155" class="divider"/>
+  <text x="38" y="79" class="category">ARTILLERY</text>
+  <text x="216" y="81" class="code">MG</text>
+  <circle cx="118" cy="121" r="18" class="solid"/><path d="M74 121H95M141 121H162" class="main"/><path d="M179 130H214M183 137H210" class="minor"/>
+  <path d="M37 171H84M172 171H219" class="register"/>
+  </g></g></svg>

@@ -4,6 +4,7 @@
 .unit-token .unit-art-image{width:34px;height:34px}
 .selection-icon .unit-art-image{width:27px;height:27px}
 .cargo-slot .unit-art-image{width:28px;height:28px}
-.guide-symbol.art-active{clip-path:none;background:#10191d;width:120px;height:112px;padding:4px}
+.guide-symbol.art-active{clip-path:none;background:#10191d;width:280px;height:210px;max-width:100%;box-sizing:border-box;padding:6px}
 .guide-symbol.art-active .unit-art-image{width:100%;height:100%}
+@media(max-width:560px){.guide-symbol.art-active{width:min(280px,100%);height:auto;aspect-ratio:4/3}}
 @media(max-width:760px){.mission-pickers{align-items:stretch}.mission-pickers .scenario-picker{flex:1 1 170px}.mission-pickers select{width:100%;max-width:none!important}}

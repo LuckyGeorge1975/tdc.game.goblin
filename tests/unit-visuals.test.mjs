@@ -31,19 +31,23 @@ test('remote artwork URLs are rejected',()=>{
   assert.throws(()=>UnitVisuals.setAsset('gev','https://example.com/unit.svg'),/local project path/);
 });
 
-test('five complete art sets resolve current scenario variants by unit name',()=>{
+test('six art sets resolve current scenario variants by unit name',()=>{
   const {UnitVisuals}=visualContext();
   const manifest=JSON.parse(readFileSync(new URL('../assets/unit-art/manifest.json',import.meta.url),'utf8'));
-  assert.equal(UnitVisuals.styles.length,5);
-  assert.equal(manifest.styles.length,5);
+  assert.equal(UnitVisuals.styles.length,6);
+  assert.equal(manifest.styles.length,6);
   for(const style of UnitVisuals.styles){
     assert.ok(UnitVisuals.setStyle(style.id));
-    assert.ok(existsSync(new URL(`../assets/unit-art/sets/${style.id}/logo.svg`,import.meta.url)));
+    const metadata=manifest.styles.find(entry=>entry.id===style.id);
+    assert.ok(metadata);
+    assert.ok(existsSync(new URL(`../assets/unit-art/${metadata.logoFallback||`sets/${style.id}/logo.svg`}`,import.meta.url)));
     for(const {id,name} of manifest.units){
       const unit={id:'scenario-alias',name};
       assert.equal(UnitVisuals.artKey(unit),id);
       for(const view of ['icons','library']){
-        assert.ok(existsSync(new URL(`../${UnitVisuals.assetFor(unit,view)}`,import.meta.url)),`${style.id}/${view}/${id}`);
+        const path=UnitVisuals.assetFor(unit,view);
+        assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),`${style.id}/${view}/${id}`);
+        if(style.id==='06-technical-illustration'&&view==='icons')assert.match(path,/06-technical-illustration\/icons/);
       }
     }
     assert.match(UnitVisuals.resolve({id:'infantry',name:'FIELD ENGINEERS'}).asset,/field-engineers\.svg$/);
@@ -51,6 +55,19 @@ test('five complete art sets resolve current scenario variants by unit name',()=
     assert.match(UnitVisuals.resolve({id:'guard',name:'SIEGE TANK'}).asset,/siege-tank\.svg$/);
   }
   assert.equal(UnitVisuals.setStyle('unknown'),false);
+});
+
+test('large military library symbol is independent of map style for all 26 units',()=>{
+  const {UnitVisuals}=visualContext();
+  const manifest=JSON.parse(readFileSync(new URL('../assets/unit-art/manifest.json',import.meta.url),'utf8'));
+  for(const style of UnitVisuals.styles){
+    UnitVisuals.setStyle(style.id);
+    for(const unit of manifest.units){
+      const path=UnitVisuals.librarySymbolFor(unit);
+      assert.equal(path,`assets/unit-art/library/military-symbols/${unit.id}.svg`);
+      assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),path);
+    }
+  }
 });
 
 test('explicit local artwork still overrides the active art set',()=>{
@@ -68,6 +85,7 @@ test('all twelve terrain visuals exist for each runtime style',()=>{
     for(const type of types){
       const path=UnitVisuals.terrainAssetFor(type);
       assert.ok(path?.includes(`/terrain/${type}.svg`));
+      if(style.id==='06-technical-illustration')assert.ok(path.includes('/01-modular-stealth-geometry/'));
       assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),path);
     }
   }

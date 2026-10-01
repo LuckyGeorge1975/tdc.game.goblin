@@ -6,7 +6,8 @@
     Object.freeze({id:'02-industrial-exoframe',title:'Industrial Exoframe'}),
     Object.freeze({id:'03-monolithic-facet',title:'Monolithic Facet'}),
     Object.freeze({id:'04-autonomous-drone-corps',title:'Autonomous Drone Corps'}),
-    Object.freeze({id:'05-aerospace-ground-force',title:'Aerospace Ground Force'})
+    Object.freeze({id:'05-aerospace-ground-force',title:'Aerospace Ground Force'}),
+    Object.freeze({id:'06-technical-illustration',title:'Technische Illustration'})
   ]);
   const artKeys=new Set([
     'goblin-siegebreaker','skimmer-scout','rocket-artillery','infantry-squad','assault-tank',
@@ -17,6 +18,8 @@
     'guard-tank','raider-skimmer'
   ]);
   let activeStyle=null;
+  const technicalStyle='06-technical-illustration';
+  const terrainFallback='01-modular-stealth-geometry';
 
   function register(key,descriptor){
     if(!key||!descriptor)throw new Error('Visual key and descriptor are required.');
@@ -31,12 +34,19 @@
   function assetFor(unit,view='icons'){
     const key=artKey(unit);
     if(!activeStyle||!key||!['icons','library'].includes(view))return null;
+    if(activeStyle===technicalStyle&&view==='library')return librarySymbolFor(unit);
     return `assets/unit-art/sets/${activeStyle}/${view}/${key}.svg`;
+  }
+
+  function librarySymbolFor(unit){
+    const key=artKey(unit);
+    return key?`assets/unit-art/library/military-symbols/${key}.svg`:null;
   }
 
   const terrainKeys=new Set(['open-ground','rubble-field','mountain','ridge','forest','marsh','water','river','road','bridge','urban','crater']);
   function terrainAssetFor(type){
-    return activeStyle&&terrainKeys.has(type)?`assets/unit-art/sets/${activeStyle}/terrain/${type}.svg`:null;
+    const style=activeStyle===technicalStyle?terrainFallback:activeStyle;
+    return style&&terrainKeys.has(type)?`assets/unit-art/sets/${style}/terrain/${type}.svg`:null;
   }
 
   function setStyle(id){
@@ -126,5 +136,5 @@
   register('light-tank',{shape:'tracked',label:'R'});
   register('guard',{shape:'tracked',label:'G'});
 
-  root.UnitVisuals=Object.freeze({register,resolve,draw,setAsset,polygonPoints,styles,artKey,assetFor,terrainAssetFor,setStyle,currentStyle});
+  root.UnitVisuals=Object.freeze({register,resolve,draw,setAsset,polygonPoints,styles,artKey,assetFor,librarySymbolFor,terrainAssetFor,setStyle,currentStyle});
 })(globalThis);

@@ -16,7 +16,8 @@
   picker.value=initial;
 
   function replaceWithArt(container,unit,view='icons'){
-    const asset=view==='icons'?(UnitVisuals.resolve(unit).asset||null):UnitVisuals.assetFor(unit,view);
+    const asset=view==='icons'?(UnitVisuals.resolve(unit).asset||null)
+      :view==='military-library'?UnitVisuals.librarySymbolFor(unit):UnitVisuals.assetFor(unit,view);
     if(!asset||!container)return;
     const picture=document.createElement('img');
     picture.src=asset;
@@ -55,7 +56,7 @@
     baseRenderUnitGuide();
     const symbol=document.querySelector('#guide-symbol');
     symbol.classList.add('art-active');
-    replaceWithArt(symbol,unitGuideEntries[guideIndex],'library');
+    replaceWithArt(symbol,unitGuideEntries[guideIndex],'military-library');
   };
 
   let changing=false;

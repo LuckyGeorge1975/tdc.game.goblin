@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="LONG-RANGE BATTERY"><style>
+  .paper{fill:#f2f0e8} .ink{fill:#243640} .accent-fill{fill:#d37c43}
+  .card{fill:#f2f0e8;stroke:#243640;stroke-width:1.4} .rule{fill:none;stroke:#243640;stroke-width:1}
+  .title,.subtitle,.label,.index,.footer{fill:#243640;font-family:Arial,Helvetica,sans-serif}
+  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
+  .unit{stroke:#243640;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .unit *{vector-effect:non-scaling-stroke}
+  .body{fill:#f2f0e8} .shell{fill:#b9cdd0} .turret{fill:#f2f0e8} .track{fill:#243640} .port{fill:#f2f0e8} .accent{fill:#d37c43}
+  .detail{fill:none;stroke:#243640;stroke-width:1.5}.accent-line{fill:none;stroke:#d37c43;stroke-width:3}
+  .inf-figure{fill:#b9cdd0;stroke:#243640;stroke-width:2.4;stroke-linejoin:round}
+  .inf-head,.inf-rifle{fill:#243640;stroke:#243640;stroke-width:1.5;stroke-linejoin:round}
+  .inf-detail{fill:none;stroke:#243640;stroke-width:1.6;stroke-linecap:round}
+  .inf-marker{fill:#243640;stroke:#f2f0e8;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
+</style><g transform="translate(24 24) scale(2.08)"><g class="unit" aria-label="LONG-RANGE BATTERY"><path class="shell" d="M18 26H82V76H18Z"/><path class="detail" d="M18 26L30 38H70L82 26M18 76L30 65H70L82 76"/><rect class="port" x="22" y="44" width="8" height="18" rx="0"/><rect class="port" x="70" y="44" width="8" height="18" rx="0"/><rect class="body" x="47" y="0" width="6" height="44" rx="1"/><rect class="track" x="46" y="0" width="8" height="3" rx="0"/><path class="turret" d="M32 45L39 34H61L68 45L65 61L58 68H42L35 61Z"/><rect class="port" x="45" y="47" width="10" height="10" rx="2"/></g></g></svg>

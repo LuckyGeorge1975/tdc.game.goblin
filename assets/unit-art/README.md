@@ -1,5 +1,11 @@
 # G.O.B.L.I.N. · austauschbare Grafiksets
 
+## Ausgewählte Unit-Art-Integration
+
+`06-technical-illustration` ergänzt die fünf generierten Stile als reguläres Karten- und Listen-Icon-Set. Seine 26 SVGs unter `sets/06-technical-illustration/icons/` stammen aus `tdc.game.ogre-unit-art` Commit `c9013d9`, dort `assets/unit-art/proposals/content-06/selected-icons/`. Die Einheitenbibliothek verwendet unabhängig vom gewählten Kartenstil die 26 großen 1024 × 768 SVGs unter `library/military-symbols/` aus demselben Quellcommit (`content-07/library/`). Herkunft und Eingabegrenzen stehen dort in `assets/unit-art/proposals/PROVENANCE.md`.
+
+Der neue Stil verwendet die zwölf vorhandenen Terrainmotive und das Logo von `01-modular-stealth-geometry` als dokumentierten Fallback. `build-art.mjs` erzeugt weiterhin die fünf ursprünglichen Stile und erhält den Eintrag des ausgewählten Sets im Manifest; die kuratierten SVGs werden nicht aus diesem Generator neu erzeugt. `build-terrain.mjs` erzeugt Terrain nur für die fünf ursprünglichen Paletten. Die Galerie unten zeigt weiterhin diese fünf vollständigen Ursprungssets.
+
 Fünf eigenständige, vollständige Stilrichtungen für den aktuellen Unit Guide und die Szenarioeinheiten. Alle Motive sind eigens gezeichnete SVG-Vektorgrafiken ohne Fremdmaterial. Die Spielmechanik und das bestehende UI werden durch dieses Content-Paket nicht verändert.
 
 ## Anschauen

@@ -48,12 +48,13 @@
       .unit-svg.wreck { filter: grayscale(.35); opacity: .78; }
       .guide-button { padding: 7px 10px; font-size: 10px; }
       .guide-modal { z-index: 25; }
-      .guide-card { width: min(620px, calc(100% - 32px)); height: 470px; padding: 22px; background: linear-gradient(145deg,#152328,#0d171b); border: 1px solid #536d55; box-shadow: 0 0 90px #000; }
+      .guide-card { width: min(760px, calc(100% - 32px)); height: min(540px, calc(100vh - 32px)); padding: 22px; display:flex; flex-direction:column; background: linear-gradient(145deg,#152328,#0d171b); border: 1px solid #536d55; box-shadow: 0 0 90px #000; }
       .guide-head { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; border-bottom:1px solid #304348; padding-bottom:14px; }
       .guide-head h2 { color:#d1f35a; font-size:30px; margin-top:5px; }
       .guide-close { background:transparent; border:1px solid #40565c; color:#9eb0aa; width:30px; height:30px; cursor:pointer; font:700 16px Rajdhani; }
       .guide-close:hover { border-color:#d1f35a; color:#d1f35a; }
-      .guide-body { display:grid; grid-template-columns:120px 1fr; gap:20px; padding:22px 0; height:304px; }
+      .guide-body { display:grid; grid-template-columns:280px minmax(0,1fr); gap:20px; padding:22px 0; flex:1; min-height:0; }
+      .guide-information { min-width:0; overflow:auto; }
       .guide-symbol { display:grid; place-items:center; align-self:start; width:112px; height:112px; border:1px solid #4d6f70; color:#72d0de; background:#102226; clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); font:700 38px Barlow Condensed; }
       .guide-symbol.enemy { color:#ef705b; border-color:#89534a; background:#2b1c1c; }
       .guide-kicker { color:#ef705b; font:700 10px Rajdhani; letter-spacing:.18em; }
@@ -64,7 +65,7 @@
       .guide-fact { border-top:1px solid #395052; padding-top:6px; }
       .guide-fact span { display:block; color:#6f8984; font-size:9px; }
       .guide-fact b { display:block; color:#d1f35a; font:700 17px Barlow Condensed; margin-top:2px; }
-      .guide-nav { display:flex; align-items:center; justify-content:space-between; border-top:1px solid #304348; padding-top:14px; }
+      .guide-nav { display:flex; align-items:center; justify-content:space-between; border-top:1px solid #304348; padding-top:14px; flex:none; }
       .guide-nav button { background:#18272b; border:1px solid #40565c; color:#c8d4ce; padding:8px 12px; cursor:pointer; font:700 10px Rajdhani; letter-spacing:.12em; }
       .guide-nav button:hover { border-color:#d1f35a; color:#d1f35a; }
       .guide-count { color:#78928e; font:700 11px Rajdhani; letter-spacing:.15em; }
@@ -80,7 +81,7 @@
       @media(max-width:620px){.guide-actions{gap:3px}.quick-guide-grid{grid-template-columns:1fr}.quick-guide-card{padding:18px}}
       .auto-turn { display:flex; align-items:center; gap:6px; color:#8fa7a2; font:700 10px Rajdhani; letter-spacing:.08em; cursor:pointer; white-space:nowrap; }
       .auto-turn input { accent-color:#d1f35a; width:14px; height:14px; cursor:pointer; }
-      @media(max-width:560px){.guide-card{height:min(620px,calc(100vh - 32px));overflow:auto}.guide-body{grid-template-columns:1fr;height:auto;min-height:420px}.guide-symbol{width:78px;height:78px;font-size:28px}.guide-facts{grid-template-columns:repeat(2,1fr)}}
+      @media(max-width:560px){.guide-card{height:min(680px,calc(100vh - 32px));overflow:auto}.guide-head{gap:8px}.guide-head>div{min-width:0}.guide-head h2{font-size:clamp(20px,6vw,26px);letter-spacing:.04em;overflow-wrap:anywhere}.guide-close{flex:none}.guide-body{grid-template-columns:minmax(0,1fr);height:auto;min-height:0;flex:none}.guide-information{overflow:visible}.guide-symbol{width:78px;height:78px;font-size:28px}.guide-facts{grid-template-columns:repeat(2,1fr)}}
       @keyframes hit-flash { 0%,100% { filter: brightness(1); } 18% { filter: brightness(3.2) saturate(1.9); } 42% { filter: brightness(.7); } 70% { filter: brightness(2.2); } }
           .phase-ready{display:flex;gap:9px;color:#6c858a;font:700 9px Rajdhani;letter-spacing:.16em;margin-top:5px}.phase-ready b{font-weight:700}.phase-ready b.active{color:#d1f35a}.phase-transition{position:absolute;z-index:4;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0;background:transparent;transition:opacity .18s}.phase-transition.show{opacity:1}.phase-transition-card{width:calc(100% - 28px);text-align:center;border:1px solid #a9c74e;padding:18px 30px;background:#536c25;box-shadow:0 0 35px #0008}.phase-transition-card small{display:block;color:#d1e59a;font:700 10px Rajdhani;letter-spacing:.2em;margin-bottom:8px}.phase-transition-card strong{display:block;color:#f4ffcd;font:700 28px Barlow Condensed;letter-spacing:.12em}.phase-confirm{position:absolute;z-index:5;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0;background:#03080acc;transition:opacity .18s}.phase-confirm.show{opacity:1;pointer-events:auto}.phase-confirm-card{width:min(470px,calc(100% - 28px));text-align:center;border:1px solid #a9c74e;padding:22px 28px;background:#111d20;box-shadow:0 0 45px #000}.phase-confirm-card small{display:block;color:#d1f35a;font:700 10px Rajdhani;letter-spacing:.2em;margin-bottom:10px}.phase-confirm-card strong{display:block;color:#f4ffcd;font:700 27px Barlow Condensed;letter-spacing:.1em}.phase-confirm-card p{margin:10px 0 16px;color:#a9b9b2;font-size:12px}.phase-confirm-card label{display:flex;justify-content:center;align-items:center;gap:8px;color:#c8d4ce;font:700 10px Rajdhani;letter-spacing:.1em}.phase-confirm-card input{accent-color:#d1f35a}.phase-confirm-actions{display:flex;justify-content:center;gap:8px;margin-top:18px}.carrier-cargo{position:absolute;z-index:4;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #66884c;background:#111d20e8;box-shadow:0 0 18px #0008}.carrier-cargo.hidden{display:none}.carrier-cargo-label{color:#9cb49a;font:700 9px Rajdhani;letter-spacing:.12em;margin-right:3px}.cargo-slot,.transport-slot{border:1px solid #78994c;background:#263520;color:#d1f35a;cursor:pointer;font:700 11px Rajdhani}.cargo-slot{min-width:32px;height:28px}.cargo-slot:hover,.transport-slot:hover{border-color:#f4ffcd;color:#fff}.transport-slot{font-size:14px;pointer-events:all}.unit-svg.transport-candidate{filter:drop-shadow(0 0 5px #d1f35a)}.unit-svg.transport-target{cursor:copy;filter:drop-shadow(0 0 7px #d1f35a)}.unit-svg.transport-unavailable{opacity:.22;filter:grayscale(1)}.hex.unload-target{fill:#d1f35a55;stroke:#f4ffcd;stroke-width:3}</style>
   </head>

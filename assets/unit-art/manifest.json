@@ -3,6 +3,7 @@
   "viewFormats": {
     "icon": "256×256 SVG · transparent · top view",
     "library": "512×384 SVG · transparent · oblique view",
+    "librarySymbol": "1024×768 SVG · transparent · military symbol",
     "logo": "1024×256 SVG · transparent",
     "terrain": "256×256 SVG · transparent outside hex · map tile"
   },
@@ -31,6 +32,14 @@
       "id": "05-aerospace-ground-force",
       "title": "Aerospace Ground Force",
       "directory": "sets/05-aerospace-ground-force/"
+    },
+    {
+      "id": "06-technical-illustration",
+      "title": "Technische Illustration",
+      "directory": "sets/06-technical-illustration/",
+      "librarySource": "library/military-symbols/",
+      "terrainFallback": "01-modular-stealth-geometry",
+      "logoFallback": "sets/01-modular-stealth-geometry/logo.svg"
     }
   ],
   "units": [
@@ -194,6 +203,7 @@
   "pathPattern": {
     "icon": "sets/{style}/icons/{unit}.svg",
     "library": "sets/{style}/library/{unit}.svg",
+    "librarySymbol": "library/military-symbols/{unit}.svg",
     "logo": "sets/{style}/logo.svg",
     "terrain": "sets/{style}/terrain/{terrain}.svg"
   },
