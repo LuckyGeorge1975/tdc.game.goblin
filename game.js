@@ -23,6 +23,7 @@ const COMBAT_RULES=Object.freeze({crt:Object.freeze({'1-2':['NE','NE','NE','NE',
   {id:'guard',name:'GUARD TANK',type:'HOSTILE ARMOR',team:'enemy',x:8,y:3,hp:3,maxHp:3,defense:3,range:2,move:1,damage:1,icon:'G'},
   {id:'raider',name:'RAIDER SKIMMER',type:'HOSTILE HOVER',team:'enemy',x:9,y:5,hp:2,maxHp:2,defense:2,range:2,move:2,damage:1,icon:'R'}
 ];
+// objective describes the mission for catalogs; checkVictory is authoritative.
 const scenarioCatalog={
   'iron-dust':{kicker:'MISSION 07 / IRON DUST',title:'Durchbrechen. Ausschalten. Überleben.',sub:'Zerstöre den feindlichen Kommandokern, bevor Verstärkungen eintreffen.',objective:'core',terrain:['3,1','8,1','1,4','5,3','9,5','2,6','7,6','10,2'],units:units.map(u=>({...u}))},
   'relay-run':{kicker:'MISSION 08 / RELAY RUN',title:'Sichern. Halten. Extrahieren.',sub:'Erreiche den östlichen Relaisknoten und schalte seine Eskorte aus.',objective:'core-and-escort',terrain:['4,2','5,2','4,5','7,4','8,6','2,3'],units:[
@@ -34,7 +35,7 @@ const scenarioCatalog={
     {id:'guard',name:'GUARD TANK',type:'HOSTILE ARMOR',team:'enemy',x:8,y:2,hp:3,maxHp:3,defense:3,range:2,move:1,damage:1,icon:'G'},
     {id:'raider',name:'RAIDER SKIMMER',type:'HOSTILE HOVER',team:'enemy',x:9,y:4,hp:2,maxHp:2,defense:2,range:2,move:2,damage:1,icon:'R'}
   ]},
-  'unit-trial':{kicker:'MISSION 09 / UNIT TRIAL',title:'Katalog testen. Linie halten.',sub:'Erprobe die neuen Einheiten gegen eine gemischte Verteidigung.',objective:'core',terrain:['3,1','5,2','2,4','7,4','9,5','4,6'],units:[
+  'unit-trial':{kicker:'MISSION 09 / UNIT TRIAL',title:'Katalog testen. Linie halten.',sub:'Erprobe die neuen Einheiten gegen eine gemischte Verteidigung.',objective:'core-and-escort',terrain:['3,1','5,2','2,4','7,4','9,5','4,6'],units:[
     {id:'heavy-tank',name:'ASSAULT TANK',type:'FRONTLINE ARMOR',team:'player',x:1,y:6,hp:3,maxHp:3,defense:3,range:2,move:3,damage:4,icon:'H'},
     {id:'light-tank',name:'RECON TANK',type:'SCOUT ARMOR',team:'player',x:2,y:6,hp:2,maxHp:2,defense:2,range:2,move:3,damage:2,icon:'L'},
     {id:'gev-pc',name:'SKIMMER CARRIER',type:'PERSONNEL CARRIER',team:'player',x:3,y:6,hp:2,maxHp:2,defense:2,range:2,move:3,damage:1,icon:'P',movementMode:'gev',gev:true,transportCapacity:3},

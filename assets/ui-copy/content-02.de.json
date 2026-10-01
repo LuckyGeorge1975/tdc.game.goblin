@@ -31,7 +31,7 @@
     },
     "unit-trial": {
       "scope": "legacy-playable",
-      "sourceObjectiveCode": "core",
+      "sourceObjectiveCode": "core-and-escort",
       "winCondition": "enemy-core-and-all-enemies-destroyed-and-player-survives",
       "keys": {
         "title": "mission.unit-trial.title",
