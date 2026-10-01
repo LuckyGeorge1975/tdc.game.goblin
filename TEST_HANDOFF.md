@@ -6,29 +6,32 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
 | Feld | Wert |
 |---|---|
-| Version | `0.1.13` |
-| Build | `13` |
-| Release-Tag | `v0.1.13` (geplant; noch nicht erstellt) |
+| Version | `0.1.14` |
+| Build | `14` |
+| Release-Tag | `v0.1.14` (geplant; noch nicht erstellt) |
 | Datum | 2026-10-01 |
-| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.13> (erst nach einem freigegebenen Deployment) |
-| Änderungen | [CHANGELOG.md](CHANGELOG.md#0113---2026-10-01) |
+| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.14> (erst nach einem freigegebenen Deployment) |
+| Änderungen | [CHANGELOG.md](CHANGELOG.md#0114---2026-10-01) |
 
-### Testfokus für 0.1.13
+### Testfokus für 0.1.14
 
-- Pages-Projektpfad `/tdc.game.goblin/src/app/shell.html` mit allen vier Sprachen und Terrain-Stilen prüfen. Auswahl und Stilwechsel dürfen keinen Core-Befehl auslösen.
-- Karten-Picking an Hexkanten und sichere Move-Vorschau prüfen; erst ausdrückliche Bestätigung darf den Befehl ausführen.
-- Auf echten Tablets und Smartphones Touch-Bedienung und Lesbarkeit prüfen. Die bisherigen mobilen Browserfälle waren emuliert.
-- Herkunftshinweise und formale Legal-Freigabe vor öffentlicher Bereitstellung abschließen.
+- Alle sechs `ICON SET`-Stile mit je 26 kleinen Karten-/Listenicons und 26 großen Unit-Guide-Ansichten prüfen. Der Wechsel muss beide Ansichten gemeinsam ändern; Technische Illustration ist nach leerem Browser-Stilspeicher anfänglich gewählt.
+- Militärisches Set: kleine Kartensymbole und vollständig sichtbare rechteckige 1024 × 768-Ansichten im Guide. Auf Desktop sowie bei 390 × 844 und 320 × 568 px dürfen weder Symbol noch Kopfzeile beschnitten werden; die letzte Aktion bleibt durch Scrollen erreichbar.
+- Szenariowechsel, Guide-Navigation, Rückwechsel zu grafischen Stilen, Terrain-/Logo-Fallback und gespeicherte Stilwahl auf fehlende Assets oder unbeabsichtigte Spielbefehle prüfen. Bei `UNIT TRIAL` beendet der Kern allein die Mission nicht; die unveränderte `checkVictory()`-Siegpriorität ist eine offene Produktentscheidung (`goblin-93j`).
+- Die modulare Oberfläche unter `/tdc.game.goblin/src/app/shell.html` weiterhin mit vier Sprachen und Terrain-Stilen, Hexkanten-Picking und sicherer Bewegungs-Vorschau prüfen. Nach einem freigegebenen Deploy den Pages-Einstieg am tatsächlich veröffentlichten Commit testen.
 
-Lokaler Kandidatenstand: unabhängige UI-Nachprüfung 42/42 Browserfälle, unabhängige Pages-Pfad-Prüfung 18/18 Fälle und 115/115 Node-Tests; die sichtbaren Phasenbegriffe sind in vier Sprachen neutral formuliert. Die Belege stehen in der [Berichtsübersicht](REPORTS.md). Es gab bisher weder ein Deployment dieses Builds noch echte Geräteproben oder eine formale Legal-Freigabe.
+Ausgangsbasis vor der Versionssetzung: 312/312 quellgleiche SVGs, 119/119 Node-Tests, 24/24 unabhängige Browserprüfblöcke und 346 fehlerfreie Projektpräfix-Requests auf dem sechs-Stil-Integrationscommit `3b8917a` (`goblin-28c`). Diese Prüfung ist kein Nachweis für den neuen Release-Metadatencommit. Release-Gate, vollständige Node-Suite und ein lokaler Pages-Prefix-Smoke werden am Build-0.1.14-Kandidaten erneut ausgeführt; die unabhängige finale QA auf genau diesem Commit folgt durch Koordination. Es gab keinen Push, Deploy oder Tag für 0.1.14.
 
-### Vorbereitung einer späteren Unit-Art-Übergabe (nicht Teil des Build-13-Teststands)
+### Veröffentlichungsgrenzen
 
-- In allen sechs `ICON SET`-Stilen je 26 kleine Karten-/Listenicons und 26 große Unit-Guide-Ansichten prüfen; der Wechsel muss beide Ansichten zusammen ändern und die zuletzt gewählte Stilrichtung wie vorgesehen speichern.
-- Für das militärische Set kleine Symbole auf der Karte und große, vollständig sichtbare Rechtecksymbole im Guide prüfen. Die Guide-Ansicht darf weder beschnitten noch mit einem anderen Stil gemischt werden.
-- Nach Szenariowechsel, Guide-Navigation und Wechsel zurück auf einen grafischen Stil auf fehlende Assets und ungewollte Spielbefehle prüfen. Den dokumentierten Terrain-/Logo-Fallback der sechs Sets beachten.
-- Lokale Integrationsprüfung als Ausgangspunkt: 312/312 SVGs vorhanden, 119/119 Node-Tests, 24/24 unabhängige Browserfälle und 346 Projektpräfix-Requests ohne Fehler (`goblin-28c`). Diese Werte sind **kein** Build-13- oder öffentlicher Release-Nachweis.
-- Vor einem späteren Release Versions-/Builddaten, Changelog, Tester-URL und Freigaben für genau den zu veröffentlichenden Commit aktualisieren. [Content & Asset Notices](CONTENT-NOTICES.md) nennt KI-Konzepttafeln, die Nutzerreferenz und den inoffiziellen Status der militärischen Symbole.
+- Auf echten Tablets und Smartphones Touch-Bedienung und Lesbarkeit prüfen; alle bisherigen mobilen Browserfälle waren emuliert.
+- [Content & Asset Notices](CONTENT-NOTICES.md) nennt die KI-Konzepttafeln, die Nutzerreferenz und den inoffiziellen Status der militärischen Symbole ohne APP-6-/MIL-STD-2525-Konformitätsbehauptung. Die begrenzte Prüfung (`goblin-x44`) sah kein konkretes Hindernis für genau diese sechs Assetsets in einer nichtkommerziellen Vorschau, ist aber keine Produkt-, Regel-, Marken-, kommerzielle oder verbindliche Rechtsfreigabe. Eine professionelle Markenprüfung für `G.O.B.L.I.N.` in Deutschland und der EU steht vor kommerzieller Nutzung aus.
+- Die gesonderte Nutzerentscheidung über Veröffentlichung bleibt erforderlich. Bis dahin bleibt die öffentliche Version `main`/`v0.1.12` der Rückfallpunkt; der geprüfte, aber unveröffentlichte Build-13-Vorläufer liegt auf Commit `8b0db47` im Branch.
+
+### Vorheriger Testfokus für 0.1.13
+
+- Pages-Projektpfad `/tdc.game.goblin/src/app/shell.html` in vier Sprachen und vier Terrain-Stilen, Hexkanten-Picking und sichere Bewegungs-Vorschau.
+- Unabhängige UI-Nachprüfung 42/42 Browserfälle, unabhängige Pages-Pfad-Prüfung 18/18 Fälle und 115/115 Node-Tests. Echte Geräteprobe und formale Freigabe lagen für diesen unveröffentlichten Vorläufer nicht vor. Die historischen Belege stehen in der [Berichtsübersicht](REPORTS.md).
 
 ### Vorheriger Testfokus für 0.1.12
 
@@ -41,14 +44,14 @@ Automatisierte Übergabeprüfung: 59/59 Tests bestanden. Ein lokaler visueller B
 
 ## Übergabe durch den Developer
 
-Vor jedem Push auf `main`, der über GitHub Pages veröffentlicht wird:
+Vor einem freigegebenen Push auf `main`, der über GitHub Pages veröffentlicht wird:
 
 1. Buildnummer in `release.js` um genau eins erhöhen.
 2. Neuen Abschnitt in `CHANGELOG.md` anlegen und alle Änderungen dieses Builds aufführen.
 3. Version, Build, Datum, Tag und Test-URL in diesem Dokument aktualisieren.
-4. Alle automatisierten Tests ausführen.
-5. Commit mit Release-Tag `v<Version>` pushen.
-6. Nach erfolgreichem Pages-Deployment die Test-URL an den Tester übergeben.
+4. Lokalen Kandidaten committen, Release-Gate und automatisierte Tests ausführen und unabhängige QA auf genau diesem Commit abschließen.
+5. Nach konkreter Nutzerfreigabe den freigegebenen Commit auf `main` veröffentlichen und genau diesen Commit mit dem eindeutigen Tag `v<Version>` versehen.
+6. Nach erfolgreichem Pages-Deployment den Einstieg prüfen und die Test-URL an den Tester übergeben; die vorige funktionsfähige Version als Rückfallpunkt behalten.
 
 Der Pages-Workflow prüft Version, Changelog und Tests. Ohne erhöhte Buildnummer wird nicht veröffentlicht.
 

@@ -1,12 +1,23 @@
 # Changelog
 
-Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Ein noch nicht veröffentlichter lokaler Kandidat steht separat davor. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
+Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Unveröffentlichte lokale Kandidaten bleiben als solche gekennzeichnet: Build 0.1.14 ist der aktuelle Kandidat, Build 0.1.13 sein historischer Vorläufer. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
 
-## Vorgemerkt · lokaler Unit-Art-Integrationsstand, noch nicht veröffentlicht
+## [0.1.14] - 2026-10-01
 
-- Sechs auswählbare Unit-Art-Stile mit je 26 kleinen Icons für Karte und Listen sowie 26 großen Ansichten für den Unit Guide. Die Combobox schaltet beide Größen gemeinsam um; Technische Illustration ist anfänglich gewählt.
-- Fünf grafische Stilrichtungen und ein inoffizielles militärisches Symbolset. Beim militärischen Set erscheinen kleine Symbole auf der Karte und große Symbole im Unit Guide. Die fünf KI-generierten Konzepttafeln sind Stilreferenzen mit je vier Beispielen und keine Laufzeitansichten.
-- SVG-Herkunft, Nutzerreferenz und Grenzen der nichtkommerziellen Asset-Einschätzung sind in [Content & Asset Notices](CONTENT-NOTICES.md) dokumentiert. Technische und unabhängige QA des lokalen Kandidaten sind erfolgt; dies ist keine Veröffentlichungsfreigabe. Die Angaben zu Version, Build, Tag und Release-Teststand folgen erst bei einer gesonderten Übergabe.
+### Hinzugefügt
+
+- Sechs auswählbare Unit-Art-Stile mit je 26 kleinen Icons für Karte und Listen sowie 26 großen Ansichten für den Unit Guide. Die Combobox schaltet beide Größen gemeinsam um; Technische Illustration ist anfänglich gewählt. Fünf Stile sind grafische Varianten, das sechste ist ein inoffizielles militärisches Symbolset.
+- Breite Guide-Ansicht mit vollständig sichtbaren 1024 × 768-SVGs und scrollbar nutzbarer Mobilansicht. Die zwölf Terrainmotive und das Logo des früheren Stilsets 01 dienen für die neuen Sets als Fallback.
+- Herkunft, Nutzerreferenz, fünf KI-generierte Konzepttafeln und Grenzen der nichtkommerziellen Asset-Einschätzung sind in [Content & Asset Notices](CONTENT-NOTICES.md) dokumentiert. Die Tafeln zeigen je vier Stilbeispiele und sind keine Laufzeitansichten.
+
+### Präzisiert
+
+- Der beschreibende Zielcode von `UNIT TRIAL` nennt nun Kommandokern und alle Gegner. `checkVictory()` und die bisherige Priorität bei gleichzeitiger vollständiger Ausschaltung bleiben unverändert; eine andere Siegpriorität erfordert eine gesonderte Produktentscheidung.
+
+### Geprüft und offen
+
+- Die sechs gekoppelten Stile wurden vor dieser Versionssetzung unabhängig geprüft: 312/312 quellgleiche SVGs, 24/24 Browserprüfblöcke auf Desktop und zwei emulierten Mobilgrößen sowie 119/119 Node-Tests (`goblin-28c`). Die finale Prüfung des exakt versionierten Build-0.1.14-Kandidaten folgt separat.
+- Echte Tablet-/Smartphone-Fingerproben, eine Produkt- und Veröffentlichungsentscheidung sowie eine professionelle Markenprüfung für kommerzielle Nutzung bleiben offen. Die begrenzte Asset-Einschätzung ist keine pauschale Rechtsfreigabe. Dieser Kandidat ist noch nicht veröffentlicht; das öffentliche Pages bleibt auf 0.1.12.
 
 ## [0.1.13] - 2026-10-01
 
