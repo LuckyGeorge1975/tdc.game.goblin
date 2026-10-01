@@ -22,6 +22,14 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
 Lokaler Kandidatenstand: unabhängige UI-Nachprüfung 42/42 Browserfälle, unabhängige Pages-Pfad-Prüfung 18/18 Fälle und 115/115 Node-Tests; die sichtbaren Phasenbegriffe sind in vier Sprachen neutral formuliert. Die Belege stehen in der [Berichtsübersicht](REPORTS.md). Es gab bisher weder ein Deployment dieses Builds noch echte Geräteproben oder eine formale Legal-Freigabe.
 
+### Vorbereitung einer späteren Unit-Art-Übergabe (nicht Teil des Build-13-Teststands)
+
+- In allen sechs `ICON SET`-Stilen je 26 kleine Karten-/Listenicons und 26 große Unit-Guide-Ansichten prüfen; der Wechsel muss beide Ansichten zusammen ändern und die zuletzt gewählte Stilrichtung wie vorgesehen speichern.
+- Für das militärische Set kleine Symbole auf der Karte und große, vollständig sichtbare Rechtecksymbole im Guide prüfen. Die Guide-Ansicht darf weder beschnitten noch mit einem anderen Stil gemischt werden.
+- Nach Szenariowechsel, Guide-Navigation und Wechsel zurück auf einen grafischen Stil auf fehlende Assets und ungewollte Spielbefehle prüfen. Den dokumentierten Terrain-/Logo-Fallback der sechs Sets beachten.
+- Lokale Integrationsprüfung als Ausgangspunkt: 312/312 SVGs vorhanden, 119/119 Node-Tests, 24/24 unabhängige Browserfälle und 346 Projektpräfix-Requests ohne Fehler (`goblin-28c`). Diese Werte sind **kein** Build-13- oder öffentlicher Release-Nachweis.
+- Vor einem späteren Release Versions-/Builddaten, Changelog, Tester-URL und Freigaben für genau den zu veröffentlichenden Commit aktualisieren. [Content & Asset Notices](CONTENT-NOTICES.md) nennt KI-Konzepttafeln, die Nutzerreferenz und den inoffiziellen Status der militärischen Symbole.
+
 ### Vorheriger Testfokus für 0.1.12
 
 - ATLAS: Wasser/Fluss mit Kettenfahrzeug und normaler Infanterie nicht betretbar, mit Skimmer und amphibischer Infanterie erreichbar; Brücke für alle passierbar. Movement Area muss diese Unterschiede zeigen.

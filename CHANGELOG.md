@@ -1,6 +1,12 @@
 # Changelog
 
-Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
+Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Ein noch nicht veröffentlichter lokaler Kandidat steht separat davor. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
+
+## Vorgemerkt · lokaler Unit-Art-Integrationsstand, noch nicht veröffentlicht
+
+- Sechs auswählbare Unit-Art-Stile mit je 26 kleinen Icons für Karte und Listen sowie 26 großen Ansichten für den Unit Guide. Die Combobox schaltet beide Größen gemeinsam um; Technische Illustration ist anfänglich gewählt.
+- Fünf grafische Stilrichtungen und ein inoffizielles militärisches Symbolset. Beim militärischen Set erscheinen kleine Symbole auf der Karte und große Symbole im Unit Guide. Die fünf KI-generierten Konzepttafeln sind Stilreferenzen mit je vier Beispielen und keine Laufzeitansichten.
+- SVG-Herkunft, Nutzerreferenz und Grenzen der nichtkommerziellen Asset-Einschätzung sind in [Content & Asset Notices](CONTENT-NOTICES.md) dokumentiert. Technische und unabhängige QA des lokalen Kandidaten sind erfolgt; dies ist keine Veröffentlichungsfreigabe. Die Angaben zu Version, Build, Tag und Release-Teststand folgen erst bei einer gesonderten Übergabe.
 
 ## [0.1.13] - 2026-10-01
 

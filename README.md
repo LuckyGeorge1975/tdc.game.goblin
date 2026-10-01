@@ -31,7 +31,7 @@ Enthalten sind:
 - In der Fire Phase lassen sich die noch verfügbaren Waffensysteme des Siegebreakers einzeln auswählen und abfeuern. Nicht verbrauchte Batterien halten die Einheit handlungsfähig; Raketenmunition bleibt über Runden hinweg verbraucht.
 - Der Strategic Missile Carrier ist in `UNIT TRIAL` spielbar: eine Rakete pro Mission, Angriff 6 auf ein sichtbares Feindziel innerhalb von acht Hexen und Angriff 3 auf alle Einheiten in Nachbarhexen. Friendly Fire ist möglich; `BACK` stellt die Rakete innerhalb der Feuerphase wieder her.
 - Kartenmarker werden zentral über [UNIT_VISUALS.md](UNIT_VISUALS.md) konfiguriert. Lokale SVG-, PNG- oder WebP-Dateien können pro stabiler Einheiten-ID ausgetauscht werden, ohne Regeln oder Szenarien zu ändern.
-- Fünf vollständige lokale Icon-Sets für Karte, Einheitenliste und Unit Guide. Das Dropdown `ICON SET` steht neben der Szenariowahl. Ein Wechsel startet das aktuelle Szenario neu; bei bereits begonnenem Spiel erscheint vorher eine Bestätigung. Die gewählte Stilrichtung wird im Browser gemerkt.
+- Im lokalen, noch unveröffentlichten [Unit-Art-Integrationsstand](assets/unit-art/README.md): sechs wählbare Grafiksets mit je 26 kleinen Karten- und Listenicons und 26 großen Ansichten im Unit Guide. `ICON SET` schaltet beide Größen gemeinsam um. Ein Wechsel startet das aktuelle Szenario neu; bei bereits begonnenem Spiel erscheint vorher eine Bestätigung. Die Wahl wird im Browser gemerkt. Die Herkunft und Grenzen dieser Assets stehen in [Content & Asset Notices](CONTENT-NOTICES.md).
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
 ## Lokal starten
@@ -53,7 +53,7 @@ Danach `http://localhost:4173` öffnen.
 - `ESC`: aktive Einheitenauswahl aufheben
 - `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`: Overlay wechseln
 - `GRID`: dezentes Hexraster ein-/ausblenden
-- `ICON SET`: Stilrichtung wechseln und das aktuelle Szenario neu starten
+- `ICON SET`: Stilrichtung für Karte, Listen und Unit Guide gemeinsam wechseln und das aktuelle Szenario neu starten
 - `END TURN`: aktuelle Phase beenden bzw. Gegnerzug starten
 
 Nach Sieg oder Niederlage bleibt die Karte samt Combat Log sichtbar. Der Kampf wird nicht automatisch zurückgesetzt; nur `RESTART` startet die Mission neu.

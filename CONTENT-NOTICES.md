@@ -1,10 +1,16 @@
 # Content & Asset Notices
 
-**Document version:** 4
+**Document version:** 5
 
 G.O.B.L.I.N. is an independent original prototype by Tactical Design Cell. It is not affiliated with, endorsed by, or presented as an official adaptation of any third-party game or product line.
 
 The published Field Test uses code-generated SVG and CSS artwork plus five original, locally hosted SVG unit-art sets created for this project. The active unit-art set can be changed in the game. Locally available system fonts are used; no third-party image, audio, or webfont package is required by that content layer.
+
+The **local, unreleased unit-art integration candidate** adds six selectable styles. Each style contains 26 small transparent SVG icons for the map and unit lists and 26 larger transparent SVG views for the Unit Guide. The style selector changes both views together. Five styles are project-authored graphical designs; the sixth uses military map-symbol vocabulary. Their SVG paths were drawn by local generators from the project's unit manifest and design instructions. The larger views reuse the corresponding local motifs; they are not crops of reference images. The game loads the SVGs from local project paths.
+
+Five separate, AI-generated PNG concept sheets helped compare the graphical styles. Each sheet shows four example units. The concept sheets and their prompts are documented in the Unit-Art source checkout; they are not the 26 per-unit views loaded by this candidate. If the source proposal files are later published or served as static files, their AI origin and review-only role remain relevant. The user supplied a standing soldier silhouette as a visual reference for the five graphical SVG styles. The source image and its pixels are not bundled in these unit-art sets. The user stated that their inputs were authorized and, after comparing the selected technical style with the reference, reported no concrete similarity. The other four styles share locally drawn vector geometry and were reviewed as part of the asset assessment; the source image's rights were not independently verified here.
+
+The sixth style is an **unofficial original symbol set** inspired by familiar tactical-map conventions. It is not an official NATO symbol library and makes no APP-6 or MIL-STD-2525 conformance claim. The limited asset review found no specific obstacle to a noncommercial preview of these six sets and concept sheets, but it is not a product, trademark, rules, commercial-use, or release clearance. Publication still depends on the separate technical, content, and legal decisions for the full game.
 
 The modular terrain preview offers four interchangeable styles: Verdant Atlas, Dryland Survey, Natural Terrain, and Field Atlas. They share one locally authored VisualMap. Their world-aligned forest details are locally generated transparent SVG files; Verdant and Dryland also use SVG ground details, while Natural and Field Atlas use locally generated transparent RGBA-PNG ground details. These terrain files are bundled under `assets/terrain-map-study/portable/` and are loaded through local project paths.
 
