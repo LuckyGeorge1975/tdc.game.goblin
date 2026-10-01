@@ -8,3 +8,4 @@
 .guide-symbol.art-active .unit-art-image{width:100%;height:100%}
 @media(max-width:560px){.guide-symbol.art-active{width:min(280px,100%);height:auto;aspect-ratio:4/3}}
 @media(max-width:760px){.mission-pickers{align-items:stretch}.mission-pickers .scenario-picker{flex:1 1 170px}.mission-pickers select{width:100%;max-width:none!important}}
+@media(max-width:440px){.mission-pickers .scenario-picker{flex-basis:100%;min-width:0}}

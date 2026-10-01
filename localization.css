@@ -17,4 +17,4 @@ body:has(#game-frame) iframe{height:auto;min-height:65vh;flex:1}
 .area-tabs,.battle-head{flex-wrap:wrap}
 .layout>*{min-width:0}
 .battle{overflow-x:auto}
-@media(max-width:760px){.top-status{display:flex;justify-content:flex-start;margin-top:.75rem}.topbar{align-items:flex-start;flex-wrap:wrap}.top-status .signal,.top-status .build{display:none}.top-status .guide-actions{display:flex;flex-wrap:wrap;order:2;width:100%}.language-picker{margin-left:auto}.mission-pickers{display:flex;flex-wrap:wrap}.battlefield-head{align-items:flex-start}.view-toggle{flex-wrap:wrap}.action-row{flex-wrap:wrap}}
+@media(max-width:760px){.top-status{display:flex;justify-content:flex-start;margin-top:.75rem;width:100%}.topbar{align-items:flex-start;flex-wrap:wrap}.top-status .signal,.top-status .build{display:none}.top-status .guide-actions{display:flex;flex-wrap:wrap;order:2;width:100%}.language-picker{margin-left:auto}.mission-pickers{display:flex;flex-wrap:wrap}.battlefield-head{align-items:flex-start}.view-toggle{flex-wrap:wrap}.action-row{flex-wrap:wrap}}
