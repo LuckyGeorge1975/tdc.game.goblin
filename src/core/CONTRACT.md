@@ -26,10 +26,9 @@ der Aufrufer auch das feindliche Team mit Befehlen; KI gehört nicht zum Core.
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im
   vereinbarten Zwei-Typen-Schnitt mit `UNSUPPORTED_COMMAND` abgelehnt. Eine
   spätere Erweiterung braucht Frachtdaten und Phasenregeln im Vertrag.
-- Die Legacy-Funktion `dist` verwendet `x+y` und widerspricht an ungeraden
-  Zeilen den tatsächlichen `hexNeighbors` des Kartenrasters. Der Core nutzt
-  deshalb korrekte odd-row-Hexdistanz; diese Abweichung kann Area-/Feuervergleiche
-  mit dem Legacy-Pfad ändern und sollte vor Integration explizit akzeptiert werden.
+- Legacy-`dist`, `rules.mjs` und Core verwenden dieselbe odd-row-Hexdistanz.
+  Legacy-LOS tastet weiter eine Pixelgerade ab; ihre historische Abtastzahl
+  bleibt bis zur Entscheidung über Grenzlinien zwischen zwei Hexfeldern erhalten.
 - Falls die UI auch für gegnerische oder bereits bewegte Einheiten eine
   hypothetische Bewegungsfläche anzeigen soll, braucht sie einen getrennten
   Preview-Modus. `movementReachable` bleibt gemäß ARCH-01 bei legalen Zielen.

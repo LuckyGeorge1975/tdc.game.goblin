@@ -1,4 +1,5 @@
 import TerrainRules from './terrain-rules.js';
+import { hexDistance as coreHexDistance } from './src/core/hex.mjs';
 
 export const UNIT_RULES = Object.freeze({
   goblin: Object.freeze({ move: 3, range: 2, damage: 3, ram: true }),
@@ -13,9 +14,7 @@ export const TERRAIN_RULES = Object.freeze({
   cover: TerrainRules.get('rubble-field'),
 });
 
-export function hexDistance(a, b) {
-  return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs((a.x + a.y) - (b.x + b.y)));
-}
+export const hexDistance = coreHexDistance;
 
 export function terrainCost(isCover) {
   return TerrainRules.movementCost(isCover?'rubble-field':'open-ground','tracked');

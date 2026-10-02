@@ -27,6 +27,9 @@ test('catalogue and trial expose the one-use missile carrier',()=>{
   const run=game();
   assert.equal(run("units.find(u=>u.id==='missile-crawler').missilesRemaining"),1);
   run("setTurnPhase('fire')");
+  assert.equal(run("phaseCanAct(units.find(u=>u.id==='missile-crawler'),'fire')"),false,
+    'the opening targets are outside the corrected eight-hex radius');
+  run("terrain.clear();units.find(u=>u.id==='guard').x=2;units.find(u=>u.id==='guard').y=7");
   assert.equal(run("phaseCanAct(units.find(u=>u.id==='missile-crawler'),'fire')"),true);
 });
 
