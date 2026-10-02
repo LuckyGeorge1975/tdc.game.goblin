@@ -11,10 +11,12 @@ Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion doku
 - Mobile Ansicht startet mit sichtbarer Karte. Truppe und Lage/Protokoll sind über eine Ansichtsleiste erreichbar; die Hauptaktion bleibt unten sichtbar. „Auf Karte“ im Unit Guide öffnet und fokussiert die gewählte Kartenansicht.
 - Der Guide kennzeichnet die Artillery Drone im aktuellen Field Test mit Bewegung 2. Die stationäre Katalogregel mit Bewegung 0 ist als zukünftiges Ziel abgegrenzt.
 - Bei gleichzeitiger vollständiger Ausschaltung beider Seiten gilt Niederlage; ein Sieg setzt mindestens eine überlebende eigene Einheit voraus. Das eigenständige Kern-Siegziel von IRON DUST bleibt bestehen.
+- Die Legacy-Reichweitenberechnung folgt jetzt den tatsächlichen Nachbarn des versetzten Hexrasters. Feuerreichweite, Ein- und Aussteigen beim Transport sowie Nachbarfelder des Raketensplashs verwenden dieselbe odd-row-Distanz wie der Core. Beim Raketenwerfer in `UNIT TRIAL` können dadurch bisher scheinbar erreichbare Ziele abgelehnt und tatsächlich erreichbare Ziele angenommen werden; Friendly Fire trifft nur wirkliche Nachbarfelder.
 
 ### Grenzen und Prüfung
 
 - Katalogwerte und noch nicht implementierte Sonderregeln sind keine Zusage für den Legacy Field Test. Die vier Showcases verwenden dessen historischen Regel- und Wertestand.
+- Die Reichweitenkorrektur ändert nicht die historische Pixelabtastung für Sichtlinien an Hex-Grenzen. Die Grenzlinienwahl bleibt eine gesonderte Regelentscheidung (`goblin-9bj.27`).
 - Echte Fingerproben auf Tablet/Smartphone (`goblin-wtg`) und die unabhängige finale QA auf dem exakt versionierten Kandidatencommit stehen aus. Ein Push, Tag oder Deployment dieses Kandidaten ist noch nicht erfolgt.
 - Herkunft und begrenzte Legal-/Content-Einschätzung der bereits veröffentlichten Assets gelten weiter; die neuen Guide-Ansichten der fünf grafischen Stile und die Leveltexte sind im Projekt entstanden. Eine kommerzielle oder verbindliche rechtliche Freigabe liegt nicht vor.
 
