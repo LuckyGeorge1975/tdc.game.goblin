@@ -6,7 +6,7 @@ Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion doku
 
 ### Lokaler Kandidat – hinzugefügt und geändert
 
-- Für alle sechs Grafikstile eigene dreiviertelperspektivische Unit-Guide-Ansichten, getrennt von den kleinen Karten- und Listenicons. Die sechs Stile und ihre jeweils 26 Einheitentypen bleiben wählbar.
+- Für die fünf grafischen Stile neue räumliche Dreiviertel-Ansichten im Unit Guide, getrennt von den kleinen Karten- und Listenicons. Der sechste Stil (Military) zeigt dasselbe taktische Symbolmotiv in getrennten kleinen und großen Asset-Dateien. Alle sechs Stile mit jeweils 26 Einheitentypen bleiben wählbar.
 - Vier auswählbare Legacy-Showcases: Geländeparcours K sowie U1 Vorstoß, U2 Belagerung und U3 Spezialkräfte. Die Level werden aus validierten lokalen JSON-Daten geladen; Szenarioziele und Briefings sind in Deutsch, Englisch, Spanisch und Französisch verfügbar.
 - Mobile Ansicht startet mit sichtbarer Karte. Truppe und Lage/Protokoll sind über eine Ansichtsleiste erreichbar; die Hauptaktion bleibt unten sichtbar. „Auf Karte“ im Unit Guide öffnet und fokussiert die gewählte Kartenansicht.
 - Der Guide kennzeichnet die Artillery Drone im aktuellen Field Test mit Bewegung 2. Die stationäre Katalogregel mit Bewegung 0 ist als zukünftiges Ziel abgegrenzt.
@@ -16,7 +16,7 @@ Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion doku
 
 - Katalogwerte und noch nicht implementierte Sonderregeln sind keine Zusage für den Legacy Field Test. Die vier Showcases verwenden dessen historischen Regel- und Wertestand.
 - Echte Fingerproben auf Tablet/Smartphone (`goblin-wtg`) und die unabhängige finale QA auf dem exakt versionierten Kandidatencommit stehen aus. Ein Push, Tag oder Deployment dieses Kandidaten ist noch nicht erfolgt.
-- Herkunft und begrenzte Legal-/Content-Einschätzung der bereits veröffentlichten Assets gelten weiter; neue eigenständige Guide-Grafiken und Leveltexte sind im Projekt entstanden. Eine kommerzielle oder verbindliche rechtliche Freigabe liegt nicht vor.
+- Herkunft und begrenzte Legal-/Content-Einschätzung der bereits veröffentlichten Assets gelten weiter; die neuen Guide-Ansichten der fünf grafischen Stile und die Leveltexte sind im Projekt entstanden. Eine kommerzielle oder verbindliche rechtliche Freigabe liegt nicht vor.
 
 ## [0.1.14] - 2026-10-01
 
