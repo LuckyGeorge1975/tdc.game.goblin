@@ -6,27 +6,37 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
 | Feld | Wert |
 |---|---|
-| Version | `0.1.14` |
-| Build | `14` |
-| Release-Tag | `v0.1.14` (geplant; noch nicht erstellt) |
-| Datum | 2026-10-01 |
-| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.14> (erst nach einem freigegebenen Deployment) |
-| Änderungen | [CHANGELOG.md](CHANGELOG.md#0114---2026-10-01) |
+| Version | `0.1.15` |
+| Build | `15` |
+| Release-Tag | `v0.1.15` (reservierter Name; nicht erstellt) |
+| Datum | 2026-10-02 |
+| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.15> (erst nach gesondert freigegebenem Deployment; derzeit zeigt Pages 0.1.14) |
+| Änderungen | [CHANGELOG.md](CHANGELOG.md#0115---2026-10-02) |
 
-### Testfokus für 0.1.14
+### Testfokus für 0.1.15
+
+- Auf dem exakten Kandidatencommit die vier neuen Showcases K/U1/U2/U3 auswählen, starten und Ziele, Einheiten, Terrain sowie Sieg-/Niederlage-Enden prüfen. Bei simultaner vollständiger Ausschaltung gilt Niederlage; IRON DUST behält sein Kern-Siegziel bei überlebendem Spieler.
+- Kleine Karten-/Listenicons und getrennte dreiviertelperspektivische große Guide-Ansichten in allen sechs Stilen prüfen. Der Stilwechsel darf keine Regeln oder Missionsdaten verändern.
+- Mobile 390 × 844, 320 × 568 und Querformat: Karte direkt sichtbar, Truppe und Intel/Log erreichbar, Hauptaktion nutzbar, „Auf Karte“ zeigt und fokussiert die gewählte Einheit. Desktop-Layout und DE/FR besonders prüfen.
+- Artillery Drone in U3: Live-MOVE 2 und passende Aktionen in DE/EN/ES/FR; ohne Live-Einheit ist die stationäre Katalogregel MOVE 0 als geplantes Ziel gekennzeichnet.
+- Historische Legacy-Field-Test-Werte von den noch nicht vollständig implementierten Katalogwerten und Sonderregeln trennen. Echte Geräte-Fingerproben (`goblin-wtg`) sind weiterhin offen.
+
+Der veröffentlichte Ausgangspunkt ist `v0.1.14` auf Commit `750941134f610ba7a75bbb11d8011e5714139e21`; `v0.1.12` bleibt ein früherer Rückfallpunkt. Die genaue Kandidaten-Commit-ID und Gate-/Browserbelege stehen nach dem Commit in `goblin-isr`. Finale unabhängige QA ist auf genau dieser ID erforderlich. Für 0.1.15 gab es bisher keinen Push, Tag oder Deploy.
+
+### Vorheriger Testfokus für 0.1.14
 
 - Alle sechs `ICON SET`-Stile mit je 26 kleinen Karten-/Listenicons und 26 großen Unit-Guide-Ansichten prüfen. Der Wechsel muss beide Ansichten gemeinsam ändern; Technische Illustration ist nach leerem Browser-Stilspeicher anfänglich gewählt.
 - Militärisches Set: kleine Kartensymbole und vollständig sichtbare rechteckige 1024 × 768-Ansichten im Guide. Auf Desktop sowie bei 390 × 844 und 320 × 568 px dürfen weder Symbol noch Kopfzeile beschnitten werden; die letzte Aktion bleibt durch Scrollen erreichbar.
-- Szenariowechsel, Guide-Navigation, Rückwechsel zu grafischen Stilen, Terrain-/Logo-Fallback und gespeicherte Stilwahl auf fehlende Assets oder unbeabsichtigte Spielbefehle prüfen. Bei `UNIT TRIAL` beendet der Kern allein die Mission nicht; die unveränderte `checkVictory()`-Siegpriorität ist eine offene Produktentscheidung (`goblin-93j`).
+- Szenariowechsel, Guide-Navigation, Rückwechsel zu grafischen Stilen, Terrain-/Logo-Fallback und gespeicherte Stilwahl auf fehlende Assets oder unbeabsichtigte Spielbefehle prüfen. Bei `UNIT TRIAL` beendet der Kern allein die Mission nicht. Die damalige `checkVictory()`-Priorität wurde erst für den Kandidaten 0.1.15 geändert (`goblin-93j`).
 - Die modulare Oberfläche unter `/tdc.game.goblin/src/app/shell.html` weiterhin mit vier Sprachen und Terrain-Stilen, Hexkanten-Picking und sicherer Bewegungs-Vorschau prüfen. Nach einem freigegebenen Deploy den Pages-Einstieg am tatsächlich veröffentlichten Commit testen.
 
-Ausgangsbasis vor der Versionssetzung: 312/312 quellgleiche SVGs, 119/119 Node-Tests, 24/24 unabhängige Browserprüfblöcke und 346 fehlerfreie Projektpräfix-Requests auf dem sechs-Stil-Integrationscommit `3b8917a` (`goblin-28c`). Diese Prüfung ist kein Nachweis für den neuen Release-Metadatencommit. Release-Gate, vollständige Node-Suite und ein lokaler Pages-Prefix-Smoke werden am Build-0.1.14-Kandidaten erneut ausgeführt; die unabhängige finale QA auf genau diesem Commit folgt durch Koordination. Es gab keinen Push, Deploy oder Tag für 0.1.14.
+Ausgangsbasis vor der damaligen Versionssetzung: 312/312 SVGs, 119/119 Node-Tests, 24/24 unabhängige Browserprüfblöcke und 346 fehlerfreie Projektpräfix-Requests auf Integrationscommit `3b8917a` (`goblin-28c`). Build 0.1.14 wurde danach am 01.10.2026 mit gesonderter Nutzerfreigabe auf Commit `750941134f610ba7a75bbb11d8011e5714139e21` veröffentlicht und als `v0.1.14` getaggt.
 
 ### Veröffentlichungsgrenzen
 
 - Auf echten Tablets und Smartphones Touch-Bedienung und Lesbarkeit prüfen; alle bisherigen mobilen Browserfälle waren emuliert.
 - [Content & Asset Notices](CONTENT-NOTICES.md) nennt die KI-Konzepttafeln, die Nutzerreferenz und den inoffiziellen Status der militärischen Symbole ohne APP-6-/MIL-STD-2525-Konformitätsbehauptung. Die begrenzte Prüfung (`goblin-x44`) sah kein konkretes Hindernis für genau diese sechs Assetsets in einer nichtkommerziellen Vorschau, ist aber keine Produkt-, Regel-, Marken-, kommerzielle oder verbindliche Rechtsfreigabe. Eine professionelle Markenprüfung für `G.O.B.L.I.N.` in Deutschland und der EU steht vor kommerzieller Nutzung aus.
-- Die gesonderte Nutzerentscheidung über Veröffentlichung bleibt erforderlich. Bis dahin bleibt die öffentliche Version `main`/`v0.1.12` der Rückfallpunkt; der geprüfte, aber unveröffentlichte Build-13-Vorläufer liegt auf Commit `8b0db47` im Branch.
+- Die gesonderte Nutzerentscheidung über die Veröffentlichung von 0.1.15 bleibt erforderlich. Bis dahin bleibt die öffentliche Version `main`/`v0.1.14` verfügbar; `v0.1.12` ist ein früherer Rückfallpunkt. Der unveröffentlichte Build-13-Vorläufer liegt auf Commit `8b0db47` im Branch.
 
 ### Vorheriger Testfokus für 0.1.13
 

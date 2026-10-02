@@ -4,9 +4,9 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-Der Prototyp ist spielbar. Auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) ist weiterhin **0.1.12 / Build 12** veröffentlicht.
+Der Prototyp ist spielbar. Auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) ist **0.1.14 / Build 14** veröffentlicht (Commit `750941134f610ba7a75bbb11d8011e5714139e21`, Tag `v0.1.14`).
 
-Aktueller lokaler Releasekandidat: **0.1.14 / Build 14**, noch ohne Push, Tag oder Deployment. Der unveröffentlichte Build-13-Vorläufer bleibt im Branch erhalten. Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
+Aktueller lokaler Releasekandidat: **0.1.15 / Build 15**, noch ohne Push, Tag oder Deployment. Der unveröffentlichte Build-13-Vorläufer bleibt im Branch erhalten. Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
 
 Enthalten sind:
 
@@ -31,7 +31,8 @@ Enthalten sind:
 - In der Fire Phase lassen sich die noch verfügbaren Waffensysteme des Siegebreakers einzeln auswählen und abfeuern. Nicht verbrauchte Batterien halten die Einheit handlungsfähig; Raketenmunition bleibt über Runden hinweg verbraucht.
 - Der Strategic Missile Carrier ist in `UNIT TRIAL` spielbar: eine Rakete pro Mission, Angriff 6 auf ein sichtbares Feindziel innerhalb von acht Hexen und Angriff 3 auf alle Einheiten in Nachbarhexen. Friendly Fire ist möglich; `BACK` stellt die Rakete innerhalb der Feuerphase wieder her.
 - Kartenmarker werden zentral über [UNIT_VISUALS.md](UNIT_VISUALS.md) konfiguriert. Lokale SVG-, PNG- oder WebP-Dateien können pro stabiler Einheiten-ID ausgetauscht werden, ohne Regeln oder Szenarien zu ändern.
-- Im lokalen Build-14-Kandidaten [sechs wählbare Grafiksets](assets/unit-art/README.md) mit je 26 kleinen Karten- und Listenicons und 26 großen Ansichten im Unit Guide. `ICON SET` schaltet beide Größen gemeinsam um. Ein Wechsel startet das aktuelle Szenario neu; bei bereits begonnenem Spiel erscheint vorher eine Bestätigung. Die Wahl wird im Browser gemerkt. Die Herkunft und Grenzen dieser Assets stehen in [Content & Asset Notices](CONTENT-NOTICES.md).
+- [Sechs wählbare Grafiksets](assets/unit-art/README.md) mit je 26 kleinen Karten- und Listenicons und getrennten großen dreiviertelperspektivischen Ansichten im Unit Guide. `ICON SET` schaltet beide Größen gemeinsam um. Ein Wechsel startet das aktuelle Szenario neu; bei bereits begonnenem Spiel erscheint vorher eine Bestätigung. Die Wahl wird im Browser gemerkt. Die Herkunft und Grenzen dieser Assets stehen in [Content & Asset Notices](CONTENT-NOTICES.md).
+- Im lokalen Build-15-Kandidaten vier auswählbare Legacy-Showcases K/U1/U2/U3, mobile Karten-/Truppen-/Intel-Navigation und die Niederlage bei simultaner vollständiger Ausschaltung. Die Showcases nutzen historische Field-Test-Werte; Katalog-Sonderregeln sind nicht vollständig umgesetzt.
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
 ## Lokal starten

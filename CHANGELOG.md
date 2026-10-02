@@ -1,6 +1,22 @@
 # Changelog
 
-Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversion dokumentiert. Unveröffentlichte lokale Kandidaten bleiben als solche gekennzeichnet: Build 0.1.14 ist der aktuelle Kandidat, Build 0.1.13 sein historischer Vorläufer. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
+Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion dokumentiert. Build 0.1.14 ist seit dem 01.10.2026 auf GitHub Pages veröffentlicht; Build 0.1.15 ist ein lokaler Kandidat. Build 0.1.13 blieb ein unveröffentlichter Vorläufer. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
+
+## [0.1.15] - 2026-10-02
+
+### Lokaler Kandidat – hinzugefügt und geändert
+
+- Für alle sechs Grafikstile eigene dreiviertelperspektivische Unit-Guide-Ansichten, getrennt von den kleinen Karten- und Listenicons. Die sechs Stile und ihre jeweils 26 Einheitentypen bleiben wählbar.
+- Vier auswählbare Legacy-Showcases: Geländeparcours K sowie U1 Vorstoß, U2 Belagerung und U3 Spezialkräfte. Die Level werden aus validierten lokalen JSON-Daten geladen; Szenarioziele und Briefings sind in Deutsch, Englisch, Spanisch und Französisch verfügbar.
+- Mobile Ansicht startet mit sichtbarer Karte. Truppe und Lage/Protokoll sind über eine Ansichtsleiste erreichbar; die Hauptaktion bleibt unten sichtbar. „Auf Karte“ im Unit Guide öffnet und fokussiert die gewählte Kartenansicht.
+- Der Guide kennzeichnet die Artillery Drone im aktuellen Field Test mit Bewegung 2. Die stationäre Katalogregel mit Bewegung 0 ist als zukünftiges Ziel abgegrenzt.
+- Bei gleichzeitiger vollständiger Ausschaltung beider Seiten gilt Niederlage; ein Sieg setzt mindestens eine überlebende eigene Einheit voraus. Das eigenständige Kern-Siegziel von IRON DUST bleibt bestehen.
+
+### Grenzen und Prüfung
+
+- Katalogwerte und noch nicht implementierte Sonderregeln sind keine Zusage für den Legacy Field Test. Die vier Showcases verwenden dessen historischen Regel- und Wertestand.
+- Echte Fingerproben auf Tablet/Smartphone (`goblin-wtg`) und die unabhängige finale QA auf dem exakt versionierten Kandidatencommit stehen aus. Ein Push, Tag oder Deployment dieses Kandidaten ist noch nicht erfolgt.
+- Herkunft und begrenzte Legal-/Content-Einschätzung der bereits veröffentlichten Assets gelten weiter; neue eigenständige Guide-Grafiken und Leveltexte sind im Projekt entstanden. Eine kommerzielle oder verbindliche rechtliche Freigabe liegt nicht vor.
 
 ## [0.1.14] - 2026-10-01
 
@@ -12,12 +28,12 @@ Alle auf GitHub Pages veröffentlichten Änderungen werden hier nach Buildversio
 
 ### Präzisiert
 
-- Der beschreibende Zielcode von `UNIT TRIAL` nennt nun Kommandokern und alle Gegner. `checkVictory()` und die bisherige Priorität bei gleichzeitiger vollständiger Ausschaltung bleiben unverändert; eine andere Siegpriorität erfordert eine gesonderte Produktentscheidung.
+- Der beschreibende Zielcode von `UNIT TRIAL` nennt nun Kommandokern und alle Gegner. Die damalige `checkVictory()`-Priorität bei gleichzeitiger vollständiger Ausschaltung blieb in 0.1.14 unverändert; sie wird erst mit dem lokalen Kandidaten 0.1.15 geändert.
 
 ### Geprüft und offen
 
-- Die sechs gekoppelten Stile wurden vor dieser Versionssetzung unabhängig geprüft: 312/312 quellgleiche SVGs, 24/24 Browserprüfblöcke auf Desktop und zwei emulierten Mobilgrößen sowie 119/119 Node-Tests (`goblin-28c`). Die finale Prüfung des exakt versionierten Build-0.1.14-Kandidaten folgt separat.
-- Echte Tablet-/Smartphone-Fingerproben, eine Produkt- und Veröffentlichungsentscheidung sowie eine professionelle Markenprüfung für kommerzielle Nutzung bleiben offen. Die begrenzte Asset-Einschätzung ist keine pauschale Rechtsfreigabe. Dieser Kandidat ist noch nicht veröffentlicht; das öffentliche Pages bleibt auf 0.1.12.
+- Die sechs gekoppelten Stile wurden vor der damaligen Versionssetzung unabhängig geprüft: 312/312 SVGs, 24/24 Browserprüfblöcke auf Desktop und zwei emulierten Mobilgrößen sowie 119/119 Node-Tests (`goblin-28c`). Build 0.1.14 wurde nach gesonderter Nutzerfreigabe am 01.10.2026 auf Commit `750941134f610ba7a75bbb11d8011e5714139e21` mit Tag `v0.1.14` veröffentlicht.
+- Echte Tablet-/Smartphone-Fingerproben und eine professionelle Markenprüfung für kommerzielle Nutzung bleiben offen. Die begrenzte Asset-Einschätzung ist keine pauschale Rechtsfreigabe.
 
 ## [0.1.13] - 2026-10-01
 
