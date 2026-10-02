@@ -84,6 +84,7 @@
       @media(max-width:560px){.guide-card{height:min(680px,calc(100vh - 32px));overflow:auto}.guide-head{gap:8px}.guide-head>div{min-width:0}.guide-head h2{font-size:clamp(20px,6vw,26px);letter-spacing:.04em;overflow-wrap:anywhere}.guide-close{flex:none}.guide-body{grid-template-columns:minmax(0,1fr);height:auto;min-height:0;flex:none}.guide-information{overflow:visible}.guide-symbol{width:78px;height:78px;font-size:28px}.guide-facts{grid-template-columns:repeat(2,1fr)}}
       @keyframes hit-flash { 0%,100% { filter: brightness(1); } 18% { filter: brightness(3.2) saturate(1.9); } 42% { filter: brightness(.7); } 70% { filter: brightness(2.2); } }
           .phase-ready{display:flex;gap:9px;color:#6c858a;font:700 9px Rajdhani;letter-spacing:.16em;margin-top:5px}.phase-ready b{font-weight:700}.phase-ready b.active{color:#d1f35a}.phase-transition{position:absolute;z-index:4;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0;background:transparent;transition:opacity .18s}.phase-transition.show{opacity:1}.phase-transition-card{width:calc(100% - 28px);text-align:center;border:1px solid #a9c74e;padding:18px 30px;background:#536c25;box-shadow:0 0 35px #0008}.phase-transition-card small{display:block;color:#d1e59a;font:700 10px Rajdhani;letter-spacing:.2em;margin-bottom:8px}.phase-transition-card strong{display:block;color:#f4ffcd;font:700 28px Barlow Condensed;letter-spacing:.12em}.phase-confirm{position:absolute;z-index:5;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0;background:#03080acc;transition:opacity .18s}.phase-confirm.show{opacity:1;pointer-events:auto}.phase-confirm-card{width:min(470px,calc(100% - 28px));text-align:center;border:1px solid #a9c74e;padding:22px 28px;background:#111d20;box-shadow:0 0 45px #000}.phase-confirm-card small{display:block;color:#d1f35a;font:700 10px Rajdhani;letter-spacing:.2em;margin-bottom:10px}.phase-confirm-card strong{display:block;color:#f4ffcd;font:700 27px Barlow Condensed;letter-spacing:.1em}.phase-confirm-card p{margin:10px 0 16px;color:#a9b9b2;font-size:12px}.phase-confirm-card label{display:flex;justify-content:center;align-items:center;gap:8px;color:#c8d4ce;font:700 10px Rajdhani;letter-spacing:.1em}.phase-confirm-card input{accent-color:#d1f35a}.phase-confirm-actions{display:flex;justify-content:center;gap:8px;margin-top:18px}.carrier-cargo{position:absolute;z-index:4;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #66884c;background:#111d20e8;box-shadow:0 0 18px #0008}.carrier-cargo.hidden{display:none}.carrier-cargo-label{color:#9cb49a;font:700 9px Rajdhani;letter-spacing:.12em;margin-right:3px}.cargo-slot,.transport-slot{border:1px solid #78994c;background:#263520;color:#d1f35a;cursor:pointer;font:700 11px Rajdhani}.cargo-slot{min-width:32px;height:28px}.cargo-slot:hover,.transport-slot:hover{border-color:#f4ffcd;color:#fff}.transport-slot{font-size:14px;pointer-events:all}.unit-svg.transport-candidate{filter:drop-shadow(0 0 5px #d1f35a)}.unit-svg.transport-target{cursor:copy;filter:drop-shadow(0 0 7px #d1f35a)}.unit-svg.transport-unavailable{opacity:.22;filter:grayscale(1)}.hex.unload-target{fill:#d1f35a55;stroke:#f4ffcd;stroke-width:3}</style>
+    <link rel="stylesheet" href="mobile-views.css?v=1" />
   </head>
   <body>
     <main class="app-shell">
@@ -116,8 +117,13 @@
         <div class="mission-pickers"><label class="scenario-picker"><span>SCENARIO</span><select id="scenario-select"><option value="iron-dust">IRON DUST</option><option value="relay-run">RELAY RUN</option><option value="unit-trial">UNIT TRIAL</option></select></label><label class="scenario-picker"><span>ICON SET</span><select id="art-style-select" aria-label="Icon-Set wählen"></select></label></div>
       </section>
 
+      <nav class="mobile-views" aria-label="Spielbereiche">
+        <button type="button" data-mobile-view="map" aria-pressed="true">TACTICAL MAP</button>
+        <button type="button" data-mobile-view="force" aria-pressed="false">YOUR FORCE</button>
+        <button type="button" data-mobile-view="intel" aria-pressed="false">INTEL / LOG</button>
+      </nav>
       <section class="game-layout">
-        <aside class="left-rail panel">
+        <aside class="left-rail panel" data-mobile-panel="force">
           <div class="panel-heading"><span>YOUR FORCE</span><span class="count" id="force-count">04</span></div>
           <div id="unit-roster" class="unit-roster"></div>
           <div class="legend-block">
@@ -128,7 +134,7 @@
           </div>
         </aside>
 
-        <section class="battlefield panel">
+        <section class="battlefield panel" data-mobile-panel="map">
           <div class="battlefield-head">
             <div><span class="eyebrow">TACTICAL MAP</span><h2 id="phase-title">MOVEMENT PHASE</h2><span id="phase-ready" class="phase-ready"><b id="movement-ready" class="active">MOVE 4/4</b><b id="fire-ready">FIRE 4/4</b><b id="gev-ready">SKIMMER 1/1</b></span></div>
             <div class="view-toggle" role="group" aria-label="Reichweitenansicht"><button class="view-option active" data-view="movement">MOVEMENT RANGE</button><button class="view-option" data-view="fire">FIRE RANGE</button><button class="view-option" data-view="los">LINE OF SIGHT</button><button id="grid-toggle" class="view-option" aria-pressed="false">GRID</button></div>
@@ -139,7 +145,7 @@
             <div class="map-corner corner-tr">GRID // 12 × 8</div>
             <div class="map-corner corner-bl">LIVE TERRAIN SCAN</div>
             <div class="map-corner corner-br">DUST-7</div>
-            <svg id="battlefield-map" role="img" aria-label="Hexfeld-Schlachtfeld"></svg><div id="carrier-cargo" class="carrier-cargo hidden" aria-live="polite"></div><div id="weapon-controls" class="weapon-controls hidden" aria-label="Waffenauswahl"></div>
+            <svg id="battlefield-map" role="img" aria-label="Hexfeld-Schlachtfeld" tabindex="-1"></svg><div id="carrier-cargo" class="carrier-cargo hidden" aria-live="polite"></div><div id="weapon-controls" class="weapon-controls hidden" aria-label="Waffenauswahl"></div>
             <div id="phase-transition" class="phase-transition" aria-live="polite"><div class="phase-transition-card"><small>PHASE TRANSITION</small><strong id="phase-transition-title">MOVEMENT PHASE</strong></div></div><div id="map-toast" class="map-toast">WÄHLE EINE EINHEIT</div>
           </div>
           <div class="battlefield-footer">
@@ -148,7 +154,7 @@
           </div>
         </section>
 
-        <aside class="right-rail panel">
+        <aside class="right-rail panel" data-mobile-panel="intel">
           <div class="panel-heading"><span>COMBAT LOG</span><span id="log-status" class="status-pill">STANDBY</span></div>
           <div id="combat-log" class="combat-log"></div>
           <div class="divider"></div>
@@ -187,7 +193,7 @@
       </section>
     </div>
     <link rel="stylesheet" href="dialogs.css?v=1" />
-    <script src="localization.js?v=1"></script>
+    <script src="localization.js?v=2"></script>
     <script src="release.js?v=14"></script>
     <script src="dialogs.js?v=1"></script>
     <script src="unit-visuals.js?v=14"></script>
@@ -200,7 +206,8 @@
     <script src="strategic-missile.js?v=1"></script>
     <script src="scenario.js?v=7"></script>
     <script src="atlas-level.js?v=13"></script>
-    <script src="unit-guide.js?v=12"></script>
+    <script src="unit-guide.js?v=13"></script>
+    <script src="mobile-views.js?v=1"></script>
     <script src="quick-start.js?v=1"></script>
     <script src="art-theme.js?v=14"></script>
     <style>

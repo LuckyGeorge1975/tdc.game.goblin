@@ -1,0 +1,17 @@
+.mobile-views{display:none}
+@media (max-width:760px), (max-height:500px) and (pointer:coarse){
+  .mobile-views{display:flex;position:sticky;top:0;z-index:20;gap:4px;padding:6px;background:#101a1d;border-bottom:1px solid #506548}
+  .mobile-views button{flex:1;min-width:0;min-height:40px;padding:5px 2px;border:1px solid #536751;background:#19282a;color:#c4d2c6;font:700 11px Rajdhani,sans-serif;letter-spacing:.04em;cursor:pointer}
+  .mobile-views button[aria-pressed="true"]{background:#d1f35a;color:#172116;border-color:#d1f35a}
+  .game-layout{display:block}
+  [data-mobile-view="map"] [data-mobile-panel]:not([data-mobile-panel="map"]),
+  [data-mobile-view="force"] [data-mobile-panel]:not([data-mobile-panel="force"]),
+  [data-mobile-view="intel"] [data-mobile-panel]:not([data-mobile-panel="intel"]){display:none!important}
+  .game-layout>[data-mobile-panel]{width:100%;max-width:none;margin:0}
+  .game-layout>[data-mobile-panel]{scroll-margin-top:55px}
+  .battlefield-head{gap:8px}
+  .battlefield{padding-bottom:62px}
+  .battlefield-footer .action-row{position:fixed;left:0;right:0;bottom:0;z-index:12;justify-content:center;background:#142024;border-top:1px solid #506548;padding:6px}
+  [data-mobile-view="force"] .battlefield-footer .action-row,
+  [data-mobile-view="intel"] .battlefield-footer .action-row{display:none}
+}

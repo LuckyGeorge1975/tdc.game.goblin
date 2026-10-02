@@ -12,7 +12,7 @@ const unitGuideEntries=[
   {name:'LIGHT SKIMMER',role:'LIGHT HOVERCRAFT',team:'EXPEDITIONARY',icon:'L',hp:'1',move:'4 + 3',range:'2',attack:'1',defense:'1',copy:'Sehr schnelles, leicht bewaffnetes Schwebefahrzeug für Aufklärung und Störangriffe.'},
   {name:'SKIMMER CARRIER',role:'PERSONNEL CARRIER',team:'EXPEDITIONARY',icon:'P',hp:'2',move:'3 + 2',range:'2',attack:'1',defense:'2',copy:'Transportiert bis zu drei Infanterietrupps und folgt den Manöverregeln der Schwebefahrzeuge.'},
   {name:'STRATEGIC MISSILE CARRIER',role:'ONE-SHOT MISSILE PLATFORM',team:'EXPEDITIONARY',icon:'C',hp:'2',move:'1',range:'8',attack:'6 / 3 BLAST',defense:'2',copy:'Mobiler Träger mit einem Lenkflugkörper. In der Feuerphase ein sichtbares Feindziel innerhalb von acht Hexfeldern wählen: Angriff 6 auf das Ziel, Angriff 3 auf Einheiten in benachbarten Hexen – auch eigene. Nach dem Start ist die Munition verbraucht.'},
-  {name:'ARTILLERY DRONE',role:'AUTONOMOUS ARTILLERY',team:'FRONTIER',icon:'D',hp:'1',move:'0',range:'8',attack:'2',defense:'1',copy:'Unbemannte leichte Artillerie ohne Eigenbewegung. Für eine Verlegung benötigt sie einen Transporter.'},
+  {name:'ARTILLERY DRONE',role:'AUTONOMOUS ARTILLERY',team:'FRONTIER',icon:'D',hp:'1',move:'0',range:'8',attack:'2',defense:'1',copy:'Katalogregel: keine Eigenbewegung; eine Verlegung erfordert Transport. Im aktuellen Field Test gilt eine abweichende Szenarioregel.'},
   {name:'AMPHIBIOUS INFANTRY',role:'RIVER ASSAULT TROOPS',team:'EXPEDITIONARY',icon:'R',hp:'1–3',move:'2',range:'1',attack:'1 / squad',defense:'1 / squad',copy:'Spezialisierte Infanterie für Gewässer, Uferzonen und Nahbereichsoperationen.'},
   {name:'FIELD ENGINEERS',role:'COMBAT ENGINEERING',team:'SUPPORT',icon:'E',hp:'1–3',move:'2',range:'1',attack:'2',defense:'2',copy:'Unterstützungstrupps für Übergänge, Hindernisse und Feldstellungen. Erweiterte Bauaktionen folgen in einer späteren Ausbaustufe.'},
   {name:'LOCAL DEFENSE',role:'RESERVE INFANTRY',team:'FRONTIER',icon:'M',hp:'1',move:'2',range:'1',attack:'1',defense:'1',copy:'Leicht ausgerüstete lokale Kräfte für Sicherungsaufgaben und die Verteidigung von Missionszielen.'},
@@ -40,7 +40,7 @@ const guideActions={
   'LIGHT SKIMMER':['Bewegen und feuern','Zusätzliches Skimmer-Manöver'],
   'SKIMMER CARRIER':['Bewegen, feuern und Skimmer-Manöver','Infanterie per Karte laden/entladen; Fracht in der Leiste wählen'],
   'STRATEGIC MISSILE CARRIER':['Bewegen','Einmaliger Lenkflugkörper mit Flächenschaden; auch Friendly Fire'],
-  'ARTILLERY DRONE':['Fernfeuer; keine Eigenbewegung','Transportverlegung: geplant'],
+  'ARTILLERY DRONE':['Fernfeuer; Katalogregel ohne Eigenbewegung','Transportverlegung: geplant'],
   'AMPHIBIOUS INFANTRY':['Bewegen und feuern','Wasser und Flüsse betreten'],
   'FIELD ENGINEERS':['Bewegen, feuern und transportieren','Bau- und Räumaktionen: geplant'],
   'LOCAL DEFENSE':['Stellung halten und feuern','Keine Eigenbewegung im ATLAS-Teststand'],
@@ -64,7 +64,8 @@ function renderUnitGuide(){
   document.querySelector('#guide-kicker').textContent=live?(live.team==='player'?'FRIENDLY · LIVE':'HOSTILE · LIVE'):unit.team+' · CATALOG';
   document.querySelector('#guide-name').textContent=unit.name;
   document.querySelector('#guide-role').textContent=unit.role;
-  document.querySelector('#guide-copy').textContent=unit.copy;
+  const liveDrone=unit.name==='ARTILLERY DRONE'&&live;
+  document.querySelector('#guide-copy').textContent=liveDrone?'Field-Test-Regel: Diese Artilleriedrohne kann sich selbstständig bewegen. Die stationäre Katalogregel ist noch nicht aktiv.':unit.copy;
   const hp=live?(live.ogreSystems?`${live.ogreSystems.treads} TREADS`:`${Math.max(0,live.hp)}/${live.maxHp}`):unit.hp;
   const move=live?`${live.move}${isGevUnit(live)?' + 2':''}`:unit.move;
   const range=live?(live.ogreSystems?'BY WEAPON':live.range):unit.range;
@@ -76,7 +77,7 @@ function renderUnitGuide(){
   document.querySelector('#guide-status').textContent=live?(live.hp<=0?'DESTROYED':live.disabled?'DISABLED':currentScenario==='atlas-proving-grounds'?'ATLAS · PROTOTYPE STATS':'LIVE IN CURRENT SCENARIO'):'NOT IN CURRENT SCENARIO';
   document.querySelector('#guide-phase-status').textContent=!live?'—':live.hp<=0?'DESTROYED':live.team==='enemy'?'HOSTILE AI':phaseCanAct(live)?'READY':live.disabled?'DISABLED':'NO ACTION NOW';
   const list=document.querySelector('#guide-action-list');list.replaceChildren();
-  for(const action of guideActions[unit.name]||[]){const item=document.createElement('li');item.textContent=action;list.appendChild(item)}
+  for(const action of liveDrone?['Im Field Test bewegen und fernfeuern','Stationäre Katalogregel: geplant']:guideActions[unit.name]||[]){const item=document.createElement('li');item.textContent=action;list.appendChild(item)}
   document.querySelector('#guide-find').disabled=!live;
   document.querySelector('#guide-count').textContent=`${String(guideIndex+1).padStart(2,'0')} / ${String(unitGuideEntries.length).padStart(2,'0')}`;
 }
@@ -86,6 +87,6 @@ document.querySelector('#unit-guide-open').onclick=openUnitGuide;
 document.querySelector('#unit-guide-close').onclick=closeUnitGuide;
 document.querySelector('#guide-prev').onclick=()=>{guideIndex=(guideIndex+unitGuideEntries.length-1)%unitGuideEntries.length;renderUnitGuide()};
 document.querySelector('#guide-next').onclick=()=>{guideIndex=(guideIndex+1)%unitGuideEntries.length;renderUnitGuide()};
-document.querySelector('#guide-find').onclick=()=>{const unit=units.find(item=>item.name===unitGuideEntries[guideIndex].name);if(!unit)return;closeUnitGuide();selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);updateSelection();draw()};
+document.querySelector('#guide-find').onclick=()=>{const unit=units.find(item=>item.name===unitGuideEntries[guideIndex].name);if(!unit)return;closeUnitGuide();selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);updateSelection();draw();globalThis.GoblinMobileViews?.show('map',{focus:true})};
 guideModal.addEventListener('click',event=>{if(event.target===guideModal)closeUnitGuide()});
 document.addEventListener('keydown',event=>{if(guideModal.classList.contains('hidden'))return;if(event.key==='Escape')closeUnitGuide();if(event.key==='ArrowLeft')document.querySelector('#guide-prev').click();if(event.key==='ArrowRight')document.querySelector('#guide-next').click()});
