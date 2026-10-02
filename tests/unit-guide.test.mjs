@@ -5,13 +5,14 @@ import vm from 'node:vm';
 
 function guide(units=[{id:'ogre',name:'GOBLIN SIEGEBREAKER',team:'player',x:1,y:5,hp:5,maxHp:5,move:3,range:2,damage:3,defense:5,ogreSystems:{treads:45}}]){
   const nodes=new Map();
-  function element(){return {textContent:'',innerHTML:'',disabled:false,scrollTop:0,children:[],
+  function element(){return {textContent:'',innerHTML:'',disabled:false,scrollTop:0,children:[],attributes:{},
     classList:{add(){},remove(){},toggle(){},contains(){return false}},
-    addEventListener(){},appendChild(child){this.children.push(child)},replaceChildren(){this.children=[]}}}
+    addEventListener(){},setAttribute(key,value){this.attributes[key]=value},appendChild(child){this.children.push(child)},replaceChildren(){this.children=[]}}}
   const document={querySelector(key){if(!nodes.has(key))nodes.set(key,element());return nodes.get(key)},createElement:element,addEventListener(){}};
   const context=vm.createContext({document,units,
     scenarioCatalog:{'iron-dust':{units:[{name:'GOBLIN SIEGEBREAKER'}]}},currentScenario:'iron-dust',
     isGevUnit:()=>false,phaseCanAct:()=>true,effectiveDefense:unit=>unit.defense,showUnitInfo(){},showFieldInfo(){},updateSelection(){},draw(){}});
+  vm.runInContext(readFileSync(new URL('../unit-guide-range.js',import.meta.url),'utf8'),context);
   vm.runInContext(readFileSync(new URL('../unit-guide.js',import.meta.url),'utf8'),context);
   return {context,document};
 }
@@ -57,4 +58,36 @@ test('artillery drone describes live Field Test movement separately from catalog
   vm.runInContext('renderUnitGuide()',context);
   assert.match(document.querySelector('#guide-facts').innerHTML,/MOVE<\/span><b>0<\/b>/);
   assert.match(document.querySelector('#guide-copy').textContent,/Katalogregel/);
+});
+
+test('each of 26 units has a schematic hex preview with movement and attack modes',()=>{
+  const {context,document}=guide([]);
+  for(let i=0;i<26;i++){
+    vm.runInContext(`guideIndex=${i};renderUnitGuide()`,context);
+    assert.match(document.querySelector('#guide-range-map').innerHTML,/<svg/);
+    assert.equal(document.querySelector('#guide-range-move').attributes['aria-pressed'],'true');
+    document.querySelector('#guide-range-attack').onclick();
+    assert.equal(document.querySelector('#guide-range-attack').attributes['aria-pressed'],'true');
+    assert.match(document.querySelector('#guide-range-map').innerHTML,/guide-range-cell/);
+    document.querySelector('#guide-range-move').onclick();
+  }
+});
+
+test('preview distinguishes stationary, skimmer, weapon and spent missile reach',()=>{
+  const {context,document}=guide([]);
+  const profile=name=>vm.runInContext(`UnitGuideRange.profile(unitGuideEntries.find(item=>item.name==='${name}'),null)`,context);
+  assert.equal(profile('LONG-RANGE BATTERY').movement,0);
+  assert.equal(profile('LONG-RANGE BATTERY').range,8);
+  assert.equal(profile('COMMAND HUB').range,0);
+  assert.equal(profile('COMBAT SKIMMER').bonus,3);
+  assert.equal(profile('RAIDER SKIMMER').bonus,0);
+  assert.equal(profile('GOBLIN SIEGEBREAKER').range,5);
+  const liveSkimmer={name:'COMBAT SKIMMER',move:4,range:2};
+  context.liveSkimmer=liveSkimmer;
+  assert.equal(vm.runInContext('UnitGuideRange.profile(unitGuideEntries.find(item=>item.name===\'COMBAT SKIMMER\'),liveSkimmer)',context).bonus,2);
+  context.units=[{name:'STRATEGIC MISSILE CARRIER',move:1,range:8,missilesRemaining:0,hp:2,maxHp:2,team:'player',damage:6,defense:2}];
+  vm.runInContext("guideIndex=unitGuideEntries.findIndex(item=>item.name==='STRATEGIC MISSILE CARRIER');renderUnitGuide()",context);
+  document.querySelector('#guide-range-attack').onclick();
+  assert.match(document.querySelector('#guide-range-summary').textContent,/Kein Angriff/);
+  assert.match(document.querySelector('#guide-range-note').textContent,/Rakete verbraucht/);
 });

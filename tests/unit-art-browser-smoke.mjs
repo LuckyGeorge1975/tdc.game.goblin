@@ -76,6 +76,7 @@ try {
   assert.equal(first.clip, 'none');
   assert.ok(first.symbol.width >= 240 && first.symbol.height >= 180, JSON.stringify(first));
   await screenshot('q0o-guide-desktop');
+  assert.equal(await js("document.querySelector('#guide-range-map svg')?.querySelectorAll('polygon').length"),217);
   console.log('desktop', JSON.stringify(first));
 
   const styles=['01-tabletop-miniatures','02-technical-illustration','03-industrial-realism','04-pixel-strategy','05-cel-shaded-comic','06-military-symbols'];
@@ -102,6 +103,8 @@ try {
     await viewport(width, height, true);
     await js("document.querySelector('.guide-body').scrollTop=0");
     const layout = await measure();
+    const miniMap=await js(`(() => { const rect=s=>document.querySelector(s).getBoundingClientRect();return {visualBottom:rect('.guide-visual').bottom,informationTop:rect('.guide-information').top,mapBottom:rect('.guide-range-svg').bottom,summaryTop:rect('#guide-range-summary').top}; })()`);
+    assert.ok(miniMap.visualBottom<=miniMap.informationTop+1 && miniMap.mapBottom<=miniMap.summaryTop+1,JSON.stringify(miniMap));
     assert.ok(layout.card.left >= 0 && layout.card.right <= width && layout.card.bottom <= height, JSON.stringify(layout));
     assert.ok(layout.header.scrollWidth <= layout.header.rect.width + 1, JSON.stringify(layout));
     assert.ok(layout.symbol.width <= layout.card.width && layout.image.width <= layout.symbol.width, JSON.stringify(layout));

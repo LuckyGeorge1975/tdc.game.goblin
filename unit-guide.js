@@ -72,6 +72,7 @@ function renderUnitGuide(){
   const attack=live?(live.ogreSystems?'BY WEAPON':live.damage):unit.attack;
   const defense=live?(live.ogreSystems?'BY SYSTEM':effectiveDefense(live)):unit.defense;
   document.querySelector('#guide-facts').innerHTML=`<div class="guide-fact"><span>ARMOR / HP</span><b>${hp}</b></div><div class="guide-fact"><span>MOVE</span><b>${move}</b></div><div class="guide-fact"><span>RANGE</span><b>${range}</b></div><div class="guide-fact"><span>ATTACK / DEF</span><b>${attack} / ${defense}</b></div>`;
+  globalThis.UnitGuideRange.render(unit,live);
   const scenarios=Object.entries(scenarioCatalog).filter(([,config])=>config.units.some(item=>item.name===unit.name)).map(([id])=>id.toUpperCase().replaceAll('-',' '));
   document.querySelector('#guide-scenarios').textContent=scenarios.join(' · ')||'CATALOG ONLY';
   document.querySelector('#guide-status').textContent=live?(live.hp<=0?'DESTROYED':live.disabled?'DISABLED':currentScenario==='atlas-proving-grounds'?'ATLAS · PROTOTYPE STATS':'LIVE IN CURRENT SCENARIO'):'NOT IN CURRENT SCENARIO';
