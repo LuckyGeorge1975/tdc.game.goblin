@@ -44,6 +44,16 @@ test('missile strike affects the target and adjacent units of both teams, then s
   assert.equal(run("units.find(u=>u.id==='guard').hp"),5);
 });
 
+test('missile splash that eliminates both forces ends in defeat',()=>{
+  const run=game();
+  run("terrain.clear();units.forEach(unit=>unit.hp=0);const carrier=units.find(unit=>unit.id==='missile-crawler');const core=units.find(unit=>unit.core);carrier.hp=1;carrier.defense=1;carrier.x=1;carrier.y=4;core.hp=1;core.defense=1;core.x=2;core.y=4;Math.random=()=>0.5;setTurnPhase('fire');attack(carrier,core)");
+  assert.equal(run("units.find(unit=>unit.core).hp"),0);
+  assert.equal(run("units.find(unit=>unit.id==='missile-crawler').hp"),0);
+  assert.equal(run('gameOver'),true);
+  assert.equal(run("document.querySelector('#phase-title').textContent"),'MISSION FAILED');
+  assert.match(run('logEl.innerHTML'),/EIGENE EINHEIT/);
+});
+
 test('spent missile does not reload on a new turn',()=>{
   const run=game();
   run("const carrier=units.find(u=>u.id==='missile-crawler');carrier.missilesRemaining=0;resetActionState()");

@@ -45,16 +45,31 @@ test('Unit Trial objective metadata describes core plus escorts; core alone neve
   assert.equal(run("document.querySelector('#phase-title').textContent"), 'MISSION COMPLETE');
 });
 
-test('Legacy checkVictory precedence remains unchanged for defeat and simultaneous elimination', () => {
+test('player elimination takes precedence over victory, including simultaneous elimination', () => {
   const defeat = legacyTrial();
   defeat.run("units.filter(unit => unit.team === 'player').forEach(unit => unit.hp = 0)");
   assert.equal(defeat.run('checkVictory()'), true);
   assert.equal(defeat.run("document.querySelector('#phase-title').textContent"), 'MISSION FAILED');
 
-  // Existing rule checks complete enemy elimination before friendly survival.
-  // This edge case needs a separate product decision if the rule is to change.
-  const simultaneous = legacyTrial();
-  simultaneous.run('units.forEach(unit => unit.hp = 0)');
-  assert.equal(simultaneous.run('checkVictory()'), true);
-  assert.equal(simultaneous.run("document.querySelector('#phase-title').textContent"), 'MISSION COMPLETE');
+  for (const scenario of ['iron-dust', 'relay-run', 'unit-trial', 'atlas-proving-grounds',
+    'showcase-terrain-course', 'showcase-advance', 'showcase-siege', 'showcase-specialists']) {
+    const simultaneous = legacyTrial();
+    simultaneous.run(`currentScenario=${JSON.stringify(scenario)};units.forEach(unit => unit.hp = 0)`);
+    assert.equal(simultaneous.run('checkVictory()'), true, scenario);
+    assert.equal(simultaneous.run("document.querySelector('#phase-title').textContent"), 'MISSION FAILED', scenario);
+  }
+});
+
+test('Iron Dust keeps its core-only objective when a player survives', () => {
+  const ironDust = legacyTrial();
+  ironDust.run("loadScenario('iron-dust');units.find(unit => unit.core).hp = 0");
+  assert.ok(ironDust.run("units.some(unit => unit.team === 'enemy' && unit.hp > 0)"));
+  assert.ok(ironDust.run("units.some(unit => unit.team === 'player' && unit.hp > 0)"));
+  assert.equal(ironDust.run('checkVictory()'), true);
+  assert.equal(ironDust.run("document.querySelector('#phase-title').textContent"), 'MISSION COMPLETE');
+
+  const relayRun = legacyTrial();
+  relayRun.run("loadScenario('relay-run');units.find(unit => unit.core).hp = 0");
+  assert.equal(relayRun.run('checkVictory()'), false);
+  assert.equal(relayRun.run('gameOver'), false);
 });
