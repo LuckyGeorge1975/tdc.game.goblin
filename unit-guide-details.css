@@ -16,6 +16,9 @@
 .guide-range-center{fill:#23322b}
 .guide-range-summary{display:block;color:#dceabb;font:700 12px Rajdhani;line-height:1.3}
 .guide-range-note{color:#8ea6a0;font:500 11px Rajdhani;line-height:1.35;margin:4px 0 0}
+.guide-voice{border-left:2px solid #b6c86c;background:#1c2a28;padding:9px 11px;margin:0 0 15px}
+.guide-voice span{display:block;color:#bdce86;font:700 10px system-ui,sans-serif;letter-spacing:.1em}
+.guide-voice p{color:#d3ddd0;font:400 12px system-ui,sans-serif;line-height:1.4;margin:4px 0 0}
 .guide-information{min-width:0;min-height:0;overflow-y:auto;padding-right:8px;scrollbar-color:#53716a #102025}
 .guide-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;padding-top:10px;border-top:1px solid #304348}
 .guide-meta span,.guide-action-section>span{display:block;color:#78928e;font:700 10px Rajdhani;letter-spacing:.13em}

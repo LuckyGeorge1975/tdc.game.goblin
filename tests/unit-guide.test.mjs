@@ -13,6 +13,7 @@ function guide(units=[{id:'ogre',name:'GOBLIN SIEGEBREAKER',team:'player',x:1,y:
     scenarioCatalog:{'iron-dust':{units:[{name:'GOBLIN SIEGEBREAKER'}]}},currentScenario:'iron-dust',
     isGevUnit:()=>false,phaseCanAct:()=>true,effectiveDefense:unit=>unit.defense,showUnitInfo(){},showFieldInfo(){},updateSelection(){},draw(){}});
   vm.runInContext(readFileSync(new URL('../unit-guide-range.js',import.meta.url),'utf8'),context);
+  vm.runInContext(readFileSync(new URL('../unit-guide-voice.js',import.meta.url),'utf8'),context);
   vm.runInContext(readFileSync(new URL('../unit-guide.js',import.meta.url),'utf8'),context);
   return {context,document};
 }
@@ -90,4 +91,26 @@ test('preview distinguishes stationary, skimmer, weapon and spent missile reach'
   document.querySelector('#guide-range-attack').onclick();
   assert.match(document.querySelector('#guide-range-summary').textContent,/Kein Angriff/);
   assert.match(document.querySelector('#guide-range-note').textContent,/Rakete verbraucht/);
+});
+
+test('every guide entry has a distinct general note in all supported languages',()=>{
+  const {context,document}=guide([]);
+  const entries=vm.runInContext('unitGuideEntries.map(item=>item.name)',context);
+  const notes=vm.runInContext('UnitGuideVoice.lines',context);
+  assert.deepEqual(Object.keys(notes).sort(),[...entries].sort());
+  for(const lang of ['de','en','es','fr']){
+    context.GoblinLanguage={current:lang};
+    const seen=new Set();
+    for(let i=0;i<entries.length;i++){
+      vm.runInContext(`guideIndex=${i};renderUnitGuide()`,context);
+      const note=document.querySelector('#guide-voice-copy').textContent;
+      assert.ok(note.length>=40,`${lang}: ${entries[i]}`);
+      seen.add(note);
+    }
+    assert.equal(seen.size,26,lang);
+  }
+  context.GoblinLanguage={current:'de'};
+  vm.runInContext("guideIndex=unitGuideEntries.findIndex(item=>item.name==='SKIMMER SCOUT');renderUnitGuide()",context);
+  assert.match(document.querySelector('#guide-voice-copy').textContent,/bevor der Gegner an der Reihe ist/);
+  assert.match(document.querySelector('#guide-copy').textContent,/zusätzlicher Manöverschritt/);
 });

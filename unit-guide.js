@@ -66,6 +66,7 @@ function renderUnitGuide(){
   document.querySelector('#guide-role').textContent=unit.role;
   const liveDrone=unit.name==='ARTILLERY DRONE'&&live;
   document.querySelector('#guide-copy').textContent=liveDrone?'Field-Test-Regel: Diese Artilleriedrohne kann sich selbstständig bewegen. Die stationäre Katalogregel ist noch nicht aktiv.':unit.copy;
+  globalThis.UnitGuideVoice.render(unit.name);
   const hp=live?(live.ogreSystems?`${live.ogreSystems.treads} TREADS`:`${Math.max(0,live.hp)}/${live.maxHp}`):unit.hp;
   const move=live?`${live.move}${isGevUnit(live)?' + 2':''}`:unit.move;
   const range=live?(live.ogreSystems?'BY WEAPON':live.range):unit.range;
