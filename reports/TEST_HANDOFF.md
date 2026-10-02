@@ -2,18 +2,29 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## Aktueller Teststand
+## Lokaler Kandidat für unabhängige QA
 
 | Feld | Wert |
 |---|---|
-| Version | `0.1.15` |
-| Build | `15` |
-| Release-Tag | `v0.1.15` auf Commit `f40ddfb9a8ba86b3409960f6ab3a1332340678c8` |
+| Version | `0.1.16` |
+| Build | `16` |
+| Kandidaten-Commit | Nach diesem lokalen Vorbereitungsschritt in `goblin-6q6` festzuhalten; Content-08-Integrationsbasis `5a069a6c5a1169f7f03345cfb217c15db3f8dbe4` |
+| Release-Tag | `v0.1.16` vorgesehen; noch nicht erstellt |
 | Datum | 2026-10-02 |
-| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.15> (Einstieg nach Deploy geprüft) |
-| Änderungen | [CHANGELOG.md](../CHANGELOG.md#0115---2026-10-02) |
+| Test-URL | Lokaler Pages-Prefix-Einstieg `/tdc.game.goblin/index.html?build=0.1.16`; öffentliche URL erst nach Freigabe und Deploy zu prüfen |
+| Änderungen | [CHANGELOG.md](../CHANGELOG.md#0116---2026-10-02) |
 
-### Testfokus für 0.1.15
+### Testfokus für 0.1.16
+
+- In allen fünf grafischen `ICON SET`-Stilen für alle 26 Guide-Einträge die jeweilige Content-08-PNG-Ansicht prüfen: richtige Einheit, Stil, vollständige Silhouette, transparenter Hintergrund und kein Beschnitt. Testbasis: 130/130 kopierte PNGs sind SHA-256-identisch zum Content-Quellcommit `10131dc16ede760f2338b6605e10675f0cd81d29`.
+- Karte, Truppenliste, Auswahl und Transport zeigen weiterhin die kleinen SVG-Icons des gewählten Stils. Military nutzt getrennte SVG-Dateien für Icon und Guide mit demselben Symbolmotiv. Stilwechsel, gespeicherte Wahl und Szenario-Neustart/Bestätigung prüfen.
+- Guide auf Desktop und emulierten Mobilgrößen 390 × 844, 320 × 568 sowie Querformat bedienen: großes Bild vollständig sichtbar, Mini-Map, General-Text, Navigation, „Werte & Randnotiz“ und „Auf Karte“ nutzbar. Vier lokale Screenshot-Belege liegen unter `qa-evidence/bvh-guide-*.png`; sie ersetzen keine unabhängige QA.
+- Content Notice v8 gegen die eingebundenen 130 PNGs prüfen: KI-Ursprung, interne Content-05-Tafeln als Stilvorlagen, Neuinterpretation statt Crops, menschliche Prüfung, mögliche Nicht-Einzigartigkeit und begrenzte nichtkommerzielle Asset-Einschätzung. Produkt-/Marken-/Regel- und kommerzielle Freigabe bleiben gesondert.
+- Die 0.1.15-Spiel- und Release-Regression nach Bedarf wiederholen. Auf dem Content-08-Integrationscommit bestanden 137/137 Node-Tests und die lokale Browserprobe aller sechs Stile ohne Lade- oder Laufzeitfehler (`goblin-bvh`). Die unabhängige Prüfung muss den finalen Kandidatencommit nennen.
+
+Der derzeit veröffentlichte Stand ist weiterhin `v0.1.15` auf `f40ddfb9a8ba86b3409960f6ab3a1332340678c8` mit <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.15>. Für 0.1.16 gibt es noch keinen Push, kein Tag und kein Deploy. `v0.1.15` bleibt Rückfallpunkt. Vor der Veröffentlichung sind unabhängige QA, Build-/Changelog-Gate, Content-/Legal-Grenzen, gesonderte Nutzerfreigabe, eindeutiges Tag am tatsächlich veröffentlichten Commit und anschließende Pages-Einstiegsprüfung erforderlich (`goblin-6q6`).
+
+### Vorheriger Testfokus für 0.1.15
 
 - Auf dem exakten Kandidatencommit die vier neuen Showcases K/U1/U2/U3 auswählen, starten und Ziele, Einheiten, Terrain sowie Sieg-/Niederlage-Enden prüfen. Bei simultaner vollständiger Ausschaltung gilt Niederlage; IRON DUST behält sein Kern-Siegziel bei überlebendem Spieler.
 - Kleine Karten-/Listenicons und getrennte dreiviertelperspektivische große Guide-Ansichten in allen sechs Stilen prüfen. Der Stilwechsel darf keine Regeln oder Missionsdaten verändern.
@@ -23,7 +34,7 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 - Die historische Sichtlinien-Pixelabtastung ist von dieser Reichweitenkorrektur getrennt und bleibt bis zur Entscheidung `goblin-9bj.27` bestehen. Die zuvor auf `1cf3861` bestandenen Browserprüfungen ersetzen keine vollständige unabhängige QA auf dem neuen Kandidatencommit.
 - Historische Legacy-Field-Test-Werte von den noch nicht vollständig implementierten Katalogwerten und Sonderregeln trennen. Echte Geräte-Fingerproben (`goblin-wtg`) sind weiterhin offen.
 
-Der veröffentlichte Build 0.1.15 ist `v0.1.15` auf Commit `f40ddfb9a8ba86b3409960f6ab3a1332340678c8`; `v0.1.14` auf `750941134f610ba7a75bbb11d8011e5714139e21` und `v0.1.12` bleiben Rückfallpunkte. Die vollständige unabhängige Regel- und Browser-QA auf dem Spielstand `279a16d` steht in `goblin-0lk`; der folgende Commit `f40ddfb` änderte nur Workflow und Dokumentation. Der erste Actions-Lauf scheiterte am Vergleich mit einem unveröffentlichten Build-15-Commit. Der korrigierte [Pages-Lauf 37005851568](https://github.com/LuckyGeorge1975/tdc.game.goblin/actions/runs/37005851568) bestand; Tag und öffentlicher Einstieg wurden geprüft (`goblin-8ay`). Die vom Nutzer bemängelte Differenz zwischen generierten Guide-SVGs und den hochwertigen Content-Konzeptansichten wird in `goblin-bvh` bearbeitet. Build 0.1.15 gilt deshalb grafisch nicht als abgenommen.
+Der veröffentlichte Build 0.1.15 ist `v0.1.15` auf Commit `f40ddfb9a8ba86b3409960f6ab3a1332340678c8`; `v0.1.14` auf `750941134f610ba7a75bbb11d8011e5714139e21` und `v0.1.12` bleiben ältere Rückfallpunkte. Die vollständige unabhängige Regel- und Browser-QA auf dem Spielstand `279a16d` steht in `goblin-0lk`; der folgende Commit `f40ddfb` änderte nur Workflow und Dokumentation. Der erste Actions-Lauf scheiterte am Vergleich mit einem unveröffentlichten Build-15-Commit. Der korrigierte [Pages-Lauf 37005851568](https://github.com/LuckyGeorge1975/tdc.game.goblin/actions/runs/37005851568) bestand; Tag und öffentlicher Einstieg wurden geprüft (`goblin-8ay`). Die vom Nutzer bemängelte Differenz zwischen generierten Guide-SVGs und den hochwertigen Content-Konzeptansichten wurde lokal in `goblin-bvh` behoben. Build 0.1.15 gilt deshalb grafisch nicht als abgenommen.
 
 ### Vorheriger Testfokus für 0.1.14
 

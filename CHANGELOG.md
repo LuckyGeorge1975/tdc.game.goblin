@@ -1,6 +1,19 @@
 # Changelog
 
-Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion dokumentiert. Build 0.1.14 wurde am 01.10.2026 auf GitHub Pages veröffentlicht; Build 0.1.15 umfasst die unten beschriebenen Änderungen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
+Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion dokumentiert. Build 0.1.15 ist auf GitHub Pages veröffentlicht; Build 0.1.16 ist ein lokaler Kandidat ohne Tag oder Deploy. Build 0.1.13 blieb ein unveröffentlichter Vorläufer. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
+
+## [0.1.16] - 2026-10-02
+
+### Lokaler Kandidat · Content-08
+
+- Der Unit Guide lädt für die fünf grafischen Stile je 26 große, freigestellte Content-08-PNG-Einzelansichten (insgesamt 130, 1536 × 1024 RGBA) statt der generierten 2.5D-SVG-Ersatzansichten. Die gewählte Stilvariante bestimmt weiterhin gleichzeitig Guide, Karten- und Listenmotive.
+- Karte und Listen verwenden unverändert die kleinen SVG-Icons. Das militärische Set verwendet weiterhin getrennte Icon- und Guide-SVGs mit demselben Symbolmotiv. Mini-Map und General-Texte im Guide bleiben erhalten.
+- Manifest, Asset-Dokumentation und [Content & Asset Notices](docs/CONTENT-NOTICES.md) dokumentieren Zuordnung, Herkunft, KI-Ursprung, menschliche Prüfung und Grenzen der Content-08-Bilder.
+
+### Prüfung und Veröffentlichungsstand
+
+- Quellenstand `tdc.game.ogre-unit-art` `10131dc16ede760f2338b6605e10675f0cd81d29`: 130/130 PNGs wurden mit den Quelldateien per SHA-256 abgeglichen. Auf dem Integrationscommit `5a069a6c5a1169f7f03345cfb217c15db3f8dbe4` bestanden 137/137 Node-Tests und lokale Browserprüfungen der sechs Stile auf Desktop und emulierten Mobilgrößen ohne Ladefehler; vier Screenshots liegen unter `qa-evidence/bvh-guide-*.png`.
+- Unabhängige Regression, Bedien- und Release-QA auf dem finalen Kandidatencommit stehen aus. Der veröffentlichte Build bleibt `v0.1.15` auf `f40ddfb9a8ba86b3409960f6ab3a1332340678c8`. Für 0.1.16 gibt es noch keinen Push, kein Tag und kein Pages-Deployment; Veröffentlichung erfordert gesonderte Nutzerfreigabe und die dokumentierten Release-Gates (`goblin-6q6`).
 
 ## [0.1.15] - 2026-10-02
 
