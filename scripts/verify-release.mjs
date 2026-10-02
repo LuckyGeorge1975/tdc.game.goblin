@@ -1,5 +1,6 @@
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
+import {relative} from 'node:path';
 import vm from 'node:vm';
 
 function parseRelease(source){
@@ -11,9 +12,9 @@ function parseRelease(source){
 const releaseSource=readFileSync('release.js','utf8');
 const release=parseRelease(releaseSource);
 const changelog=readFileSync('CHANGELOG.md','utf8');
-const handoff=readFileSync('TEST_HANDOFF.md','utf8');
+const handoff=readFileSync('reports/TEST_HANDOFF.md','utf8');
 const index=readFileSync('index.html','utf8');
-const reportsIndex=readFileSync('REPORTS.md','utf8');
+const reportsIndex=readFileSync('reports/REPORTS.md','utf8');
 
 if(!/^0\.1\.\d+$/.test(release.version))throw new Error(`Ungültige Buildversion: ${release.version}`);
 if(Number(release.version.split('.').at(-1))!==release.build)throw new Error('Buildnummer und Versionssuffix stimmen nicht überein.');
@@ -22,14 +23,15 @@ if(!handoff.includes(`| Version | \`${release.version}\` |`)||!handoff.includes(
 if(!index.includes(`release.js?v=${release.build}`)||!index.includes('id="build-version"'))throw new Error('Versionsanzeige ist nicht korrekt in index.html eingebunden.');
 const safeDirectory=process.cwd().replaceAll('\\','/');
 const trackedMarkdown=execFileSync('git',['-c',`safe.directory=${safeDirectory}`,'ls-files','--cached','--','*.md'],{encoding:'utf8'}).trim().split(/\r?\n/);
-for(const report of trackedMarkdown.filter(name=>/(?:REPORT|REVIEW|CLEARANCE|NOTICES).*\.md$/i.test(name)&&name!=='REPORTS.md')){
+for(const report of trackedMarkdown.filter(name=>/(?:REPORT|REVIEW|CLEARANCE|NOTICES).*\.md$/i.test(name.split('/').at(-1))&&name!=='reports/REPORTS.md')){
   const source=readFileSync(report,'utf8');
-  const row=reportsIndex.split(/\r?\n/).find(line=>line.includes(`](${report})`));
-  if(!row)throw new Error(`${report} fehlt in REPORTS.md.`);
+  const reportLink=relative('reports',report).replaceAll('\\','/');
+  const row=reportsIndex.split(/\r?\n/).find(line=>line.includes(`](${reportLink})`));
+  if(!row)throw new Error(`${report} fehlt in reports/REPORTS.md.`);
   const indexedVersion=row.split('|')[2]?.trim().match(/^`(\d+)`$/)?.[1];
-  if(!indexedVersion)throw new Error(`${report} besitzt keine Berichtsversion in REPORTS.md.`);
+  if(!indexedVersion)throw new Error(`${report} besitzt keine Berichtsversion in reports/REPORTS.md.`);
   const sourceVersion=source.match(/\*\*(?:Berichtsversion|Report version|Document version):\*\*\s+(\d+)/i)?.[1];
-  if(sourceVersion&&sourceVersion!==indexedVersion)throw new Error(`${report}: Berichtsversion widerspricht REPORTS.md.`);
+  if(sourceVersion&&sourceVersion!==indexedVersion)throw new Error(`${report}: Berichtsversion widerspricht reports/REPORTS.md.`);
 }
 
 const previousArg=process.argv.find(arg=>arg.startsWith('--previous='));

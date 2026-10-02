@@ -8,7 +8,7 @@ test('release metadata, UI, changelog, and handoff use the same build',()=>{
   vm.runInContext(readFileSync(new URL('../release.js',import.meta.url),'utf8'),context);
   const release=context.globalThis.GOBLIN_RELEASE;
   const changelog=readFileSync(new URL('../CHANGELOG.md',import.meta.url),'utf8');
-  const handoff=readFileSync(new URL('../TEST_HANDOFF.md',import.meta.url),'utf8');
+  const handoff=readFileSync(new URL('../reports/TEST_HANDOFF.md',import.meta.url),'utf8');
   const index=readFileSync(new URL('../index.html',import.meta.url),'utf8');
   assert.equal(release.version,`0.1.${release.build}`);
   assert.match(changelog,new RegExp(`## \\[${release.version.replaceAll('.','\\.')}\\] - ${release.releasedAt}`));

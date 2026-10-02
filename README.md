@@ -4,9 +4,9 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-Der Prototyp ist spielbar. Auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) ist **0.1.14 / Build 14** veröffentlicht (Commit `750941134f610ba7a75bbb11d8011e5714139e21`, Tag `v0.1.14`).
+Der Prototyp ist spielbar. Auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) ist **0.1.15 / Build 15** veröffentlicht (Commit `f40ddfb9a8ba86b3409960f6ab3a1332340678c8`, Tag `v0.1.15`). `v0.1.14` bleibt als vorheriger Teststand erhalten.
 
-Aktueller lokaler Releasekandidat: **0.1.15 / Build 15**, noch ohne Push, Tag oder Deployment. Der unveröffentlichte Build-13-Vorläufer bleibt im Branch erhalten. Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](REPORTS.md) versioniert.
+Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](reports/TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](reports/REPORTS.md) versioniert. Die vollständige Guide-Bildkorrektur ist unter `goblin-bvh` offen; die derzeitigen fünf grafischen Guide-Sets zeigen noch generierte SVG-Ansichten statt der hochwertigen Content-Konzeptmotive.
 
 Enthalten sind:
 
@@ -16,12 +16,12 @@ Enthalten sind:
 - Einheitliche Spiel-Dialoge für Phasenende, Szenariowechsel und Neustart. Escape bricht ab; Tab und Enter bedienen den Dialog. Spielkürzel und AUTO sind währenddessen gesperrt. „Never ask again“ gilt ausschließlich für das Phasenende. Keine Browser-Messageboxen.
 - Taste `L` beim ausgewählten Transporter: ohne Fracht Ladeauswahl wie `+`; mit Fracht Zielfelder zum Entladen der ersten geladenen Einheit anzeigen. Es gelten dieselben Phasenregeln wie beim Klick.
 - `BACK` nimmt Befehle der aktuellen Phase einzeln zurück: Bewegung, Feuer, Rammen und Transport inklusive Aktionsstatus und Kampflog. Phasenwechsel und Spielende schließen die Historie ab. AUTO wartet nach dem letzten Befehl zwei Sekunden; mit AUTO aus bleibt Zeit bis zum manuellen Phasenwechsel. Wiederholte Schüsse verwenden denselben gespeicherten Würfelwurf.
-- Fire Range und Line-of-Sight-Prüfung. Der lokale Build-15-Kandidat berechnet Feuer- und Transportreichweite sowie Raketensplash-Nachbarschaft nach dem tatsächlichen versetzten Hexraster; die historische Sichtlinien-Pixelabtastung bleibt bis zur gesonderten Grenzlinienentscheidung unverändert.
+- Fire Range und Line-of-Sight-Prüfung. Build 15 berechnet Feuer- und Transportreichweite sowie Raketensplash-Nachbarschaft nach dem tatsächlichen versetzten Hexraster; die historische Sichtlinien-Pixelabtastung bleibt bis zur gesonderten Grenzlinienentscheidung unverändert.
 - CRT-Kampfsystem mit NE, D und X sowie expliziten Verteidigungswerten
 - Deaktivierung, Wiederherstellung, Zerstörung und sichtbare Wracks
 - Goblin-Ramming gegen gegnerische Fahrzeuge
 - einfache Gegner-KI mit Bewegung und Feuer
-- Szenarien `IRON DUST`, `RELAY RUN`, `UNIT TRIAL` und `ATLAS / PROVING GROUNDS`. ATLAS zeigt alle 26 Einheitentypen; Einheiten-Spezialwerte und Siegbedingung sind dort noch vorläufig. Die Terrainregeln sind implementiert und in der [Regelmatrix](RULE_MATRIX.md) dokumentiert.
+- Szenarien `IRON DUST`, `RELAY RUN`, `UNIT TRIAL` und `ATLAS / PROVING GROUNDS`. ATLAS zeigt alle 26 Einheitentypen; Einheiten-Spezialwerte und Siegbedingung sind dort noch vorläufig. Die Terrainregeln sind implementiert und in der [Regelmatrix](docs/RULE_MATRIX.md) dokumentiert.
 - Area-Modi `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`
 - optionales Hex-Grid und oberster Feld-Fokusmarker
 - Quick-Start-Guide, Einheitenbibliothek mit 26 Typen, Live-Werten, Aktionsprofil und „Auf Karte“-Funktion sowie kombinierte Feld- und Einheiteninformationen
@@ -30,9 +30,9 @@ Enthalten sind:
 - Der GOBLIN SIEGEBREAKER besitzt einen eigenen Systemzustand für Hauptbatterie, Sekundärbatterien, Raketen, Nahbereichsschutz und 45 Ketteneinheiten. Gegnerische Treffer werden gegen ein einzelnes System ausgewertet; Kettenschäden reduzieren seine Bewegung bei 30, 15 und 0 verbleibenden Kettenpunkten.
 - In der Fire Phase lassen sich die noch verfügbaren Waffensysteme des Siegebreakers einzeln auswählen und abfeuern. Nicht verbrauchte Batterien halten die Einheit handlungsfähig; Raketenmunition bleibt über Runden hinweg verbraucht.
 - Der Strategic Missile Carrier ist in `UNIT TRIAL` spielbar: eine Rakete pro Mission, Angriff 6 auf ein sichtbares Feindziel innerhalb von acht Hexen und Angriff 3 auf alle Einheiten in Nachbarhexen. Friendly Fire ist möglich; `BACK` stellt die Rakete innerhalb der Feuerphase wieder her.
-- Kartenmarker werden zentral über [UNIT_VISUALS.md](UNIT_VISUALS.md) konfiguriert. Lokale SVG-, PNG- oder WebP-Dateien können pro stabiler Einheiten-ID ausgetauscht werden, ohne Regeln oder Szenarien zu ändern.
-- [Sechs wählbare Grafiksets](assets/unit-art/README.md) mit je 26 kleinen Karten- und Listenicons und getrennten großen dreiviertelperspektivischen Ansichten im Unit Guide. `ICON SET` schaltet beide Größen gemeinsam um. Ein Wechsel startet das aktuelle Szenario neu; bei bereits begonnenem Spiel erscheint vorher eine Bestätigung. Die Wahl wird im Browser gemerkt. Die Herkunft und Grenzen dieser Assets stehen in [Content & Asset Notices](CONTENT-NOTICES.md).
-- Im lokalen Build-15-Kandidaten vier auswählbare Legacy-Showcases K/U1/U2/U3, mobile Karten-/Truppen-/Intel-Navigation und die Niederlage bei simultaner vollständiger Ausschaltung. Die Showcases nutzen historische Field-Test-Werte; Katalog-Sonderregeln sind nicht vollständig umgesetzt.
+- Kartenmarker werden zentral über [docs/UNIT_VISUALS.md](docs/UNIT_VISUALS.md) konfiguriert. Lokale SVG-, PNG- oder WebP-Dateien können pro stabiler Einheiten-ID ausgetauscht werden, ohne Regeln oder Szenarien zu ändern.
+- [Sechs wählbare Grafiksets](assets/unit-art/README.md) mit je 26 kleinen Karten- und Listenicons und getrennten großen Ansichten im Unit Guide. `ICON SET` schaltet beide Größen gemeinsam um. Die fünf grafischen Guide-Sets enthalten derzeit generierte SVG-Ansichten; die vom Nutzer gewünschten Content-Ansichten werden unter `goblin-bvh` nachgeliefert. Ein Wechsel startet das aktuelle Szenario neu; bei bereits begonnenem Spiel erscheint vorher eine Bestätigung. Die Wahl wird im Browser gemerkt. Die Herkunft und Grenzen dieser Assets stehen in [Content & Asset Notices](docs/CONTENT-NOTICES.md).
+- Vier auswählbare Legacy-Showcases K/U1/U2/U3, mobile Karten-/Truppen-/Intel-Navigation und die Niederlage bei simultaner vollständiger Ausschaltung. Die Showcases nutzen historische Field-Test-Werte; Katalog-Sonderregeln sind nicht vollständig umgesetzt.
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
 ## Lokal starten
@@ -63,7 +63,9 @@ Gegnerische Fahrzeuge können zur Information und zur Anzeige ihrer Bereiche aus
 
 ## Regelbasis und Tests
 
-Die verbindliche Regelmatrix steht in [RULE_MATRIX.md](RULE_MATRIX.md). Die zentrale, testbare Regelbasis liegt in [rules.mjs](rules.mjs). Die Content-Abgrenzung, Benennungsstandards und offenen Prüfpunkte für Legal stehen in [CONTENT-CLEARANCE.md](CONTENT-CLEARANCE.md); die öffentlichen Herkunftshinweise in [CONTENT-NOTICES.md](CONTENT-NOTICES.md).
+Die [Dokumentationsübersicht](docs/README.md) bündelt Regeln, Architektur, Gestaltung und Testplanung. Die [Berichtsübersicht](reports/REPORTS.md) führt Playtest-, QA-, Content- und Legal-Befunde.
+
+Die verbindliche Regelmatrix steht in [docs/RULE_MATRIX.md](docs/RULE_MATRIX.md). Die zentrale, testbare Regelbasis liegt in [rules.mjs](rules.mjs). Die Content-Abgrenzung, Benennungsstandards und offenen Prüfpunkte für Legal stehen in [reports/CONTENT-CLEARANCE.md](reports/CONTENT-CLEARANCE.md); die öffentlichen Herkunftshinweise in [docs/CONTENT-NOTICES.md](docs/CONTENT-NOTICES.md).
 
 Die aktuellen Regressionstests werden ausgeführt mit:
 
@@ -76,7 +78,7 @@ Die Tests decken unter anderem Szenariostatus, zwölf Terrainregeln, Wasserpassa
 
 ## Versionierung und Tester-Übergabe
 
-Die Versionslinie lautet vorerst `0.1.<Build>`. Jeder Push auf `main`, der über GitHub Pages veröffentlicht wird, benötigt eine höhere Buildnummer in [release.js](release.js), einen passenden Eintrag in [CHANGELOG.md](CHANGELOG.md) und eine aktualisierte Übergabe in [TEST_HANDOFF.md](TEST_HANDOFF.md). Der Pages-Workflow erzwingt diese Bedingungen und führt vor der Veröffentlichung die vollständige Testsuite aus.
+Die Versionslinie lautet vorerst `0.1.<Build>`. Jeder Push auf `main`, der über GitHub Pages veröffentlicht wird, benötigt eine höhere Buildnummer in [release.js](release.js), einen passenden Eintrag in [CHANGELOG.md](CHANGELOG.md) und eine aktualisierte Übergabe in [reports/TEST_HANDOFF.md](reports/TEST_HANDOFF.md). Der Pages-Workflow erzwingt diese Bedingungen und führt vor der Veröffentlichung die vollständige Testsuite aus.
 
 Tester geben die sichtbare Version aus der Kopfzeile in jedem Bericht an. Für strukturierte Rückmeldungen steht die GitHub-Issue-Vorlage **Test Report** bereit.
 

@@ -27,7 +27,7 @@ Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion doku
 
 - Sechs auswählbare Unit-Art-Stile mit je 26 kleinen Icons für Karte und Listen sowie 26 großen Ansichten für den Unit Guide. Die Combobox schaltet beide Größen gemeinsam um; Technische Illustration ist anfänglich gewählt. Fünf Stile sind grafische Varianten, das sechste ist ein inoffizielles militärisches Symbolset.
 - Breite Guide-Ansicht mit vollständig sichtbaren 1024 × 768-SVGs und scrollbar nutzbarer Mobilansicht. Die zwölf Terrainmotive und das Logo des früheren Stilsets 01 dienen für die neuen Sets als Fallback.
-- Herkunft, Nutzerreferenz, fünf KI-generierte Konzepttafeln und Grenzen der nichtkommerziellen Asset-Einschätzung sind in [Content & Asset Notices](CONTENT-NOTICES.md) dokumentiert. Die Tafeln zeigen je vier Stilbeispiele und sind keine Laufzeitansichten.
+- Herkunft, Nutzerreferenz, fünf KI-generierte Konzepttafeln und Grenzen der nichtkommerziellen Asset-Einschätzung sind in [Content & Asset Notices](docs/CONTENT-NOTICES.md) dokumentiert. Die Tafeln zeigen je vier Stilbeispiele und sind keine Laufzeitansichten.
 
 ### Präzisiert
 
@@ -109,7 +109,7 @@ Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion doku
 
 - Aktive Waffenauswahl für den GOBLIN SIEGEBREAKER mit getrennten Feuerbudgets für Hauptbatterie, Sekundärbatterien, Raketen und Nahbereichsschutz.
 - Zentraler Visual-Katalog für Einheitengrafiken mit austauschbaren lokalen SVG-, PNG- oder WebP-Assets und stabilen `visualKey`-Schlüsseln.
-- Erweiterungshinweis `UNIT_VISUALS.md` sowie automatische Tests für lokale Assets, Waffenauswahl, Munition und Undo.
+- Erweiterungshinweis `docs/UNIT_VISUALS.md` sowie automatische Tests für lokale Assets, Waffenauswahl, Munition und Undo.
 
 ### Geändert
 

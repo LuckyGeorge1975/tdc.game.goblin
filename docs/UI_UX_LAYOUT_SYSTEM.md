@@ -107,4 +107,4 @@ Gewöhnliche Einheiten- und Feldinformationen sind nicht modal. Für kurzlebige 
 - **Getroffene Produktentscheidung:** „Fortsetzen“ erscheint erst mit verlässlich speicherbarem Spielstand; aktuell entfällt es. Die Touch-Zielgröße beträgt als Mindestentwurfswert 44 × 44 CSS px.
 - **Offene Messwerte:** Mindestkartengröße und Schwelle für zweistufige Hex-Bestätigung werden durch PC-, Tablet- und Mobile-Geräteproben festgelegt. Vorher keine festen Pixelwerte als Abnahmegrenze setzen.
 
-**Quellen im Projekt:** `README.md`, `RULE_MATRIX.md`, `TEST_HANDOFF.md`, `ARCHITECTURE_HANDOFF.md`, `index.html`, `src/app/reference.html` (Stand 30.09.2026). Der Entwurf beschreibt Zielverhalten; er behauptet keine bereits vorhandene Umsetzung der neuen Screens.
+**Quellen im Projekt:** `README.md`, `RULE_MATRIX.md`, `../reports/TEST_HANDOFF.md`, `ARCHITECTURE_HANDOFF.md`, `index.html`, `src/app/reference.html` (Stand 30.09.2026). Der Entwurf beschreibt Zielverhalten; er behauptet keine bereits vorhandene Umsetzung der neuen Screens.

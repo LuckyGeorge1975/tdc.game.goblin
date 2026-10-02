@@ -1,6 +1,6 @@
 # QA-04 – Unabhängiger Testbericht: modularer Schnitt 2
 
-Stand: 2026-09-30 · Aufgabe `goblin-4gi.5` · Testumgebung: lokaler Server `http://127.0.0.1:4173`, BrowserAct 1.4.2 mit bestehendem `goblin-local`-Chrome. **Interner Vergleichspfad, kein Release.** Grundlage: `ARCHITECTURE_SLICE_2.md` und `QA-03-TESTMATRIX.md`.
+Stand: 2026-09-30 · Aufgabe `goblin-4gi.5` · Testumgebung: lokaler Server `http://127.0.0.1:4173`, BrowserAct 1.4.2 mit bestehendem `goblin-local`-Chrome. **Interner Vergleichspfad, kein Release.** Grundlage: `../docs/ARCHITECTURE_SLICE_2.md` und `../docs/QA-03-TESTMATRIX.md`.
 
 ## Ergebnis
 

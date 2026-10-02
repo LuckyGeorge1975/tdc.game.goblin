@@ -1,6 +1,6 @@
 # CONTENT-01 · Portable VisualMap v1
 
-Dieses Verzeichnis ist das kopierbare Content-Paket zur Terrain-Studie. Es folgt `ARCHITECTURE_TERRAIN.md` im Hauptcheckout und enthält **keine** Spielregeln, Core- oder App-Dateien. Die angeschlossene Studie mit SVG- und PNG-Vorschauen liegt eine Ebene höher.
+Dieses Verzeichnis ist das kopierbare Content-Paket zur Terrain-Studie. Es folgt `../../../docs/ARCHITECTURE_TERRAIN.md` im Hauptcheckout und enthält **keine** Spielregeln, Core- oder App-Dateien. Die angeschlossene Studie mit SVG- und PNG-Vorschauen liegt eine Ebene höher.
 
 `natural` ergänzt die beiden kartografischen Sets um gedeckte Naturfarben und eine fein strukturierte Bodenfläche. `field-atlas` nimmt die Bildsprache der beigefügten Hexkarte auf: helles Grasland, sandige Höhen, dichten Wald, gelbe Felder und helle Wege. Beide neuen Boden-Detailgrafiken sind offline erzeugte **RGBA-PNGs mit Alphakanal**. Alle vier Sets nutzen exakt dieselbe `visual-map.json`; die PNGs enthalten keine Regel- oder Picking-Daten.
 

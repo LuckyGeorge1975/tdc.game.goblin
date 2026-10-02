@@ -3,7 +3,7 @@
 Stand: 2026-09-29 · Vertrag v1
 
 Diese Datei ist die gemeinsame Schnittstelle zwischen **Core / Engine** und
-**Developer**. Sie ersetzt weder `RULE_MATRIX.md` noch `TEST_HANDOFF.md`.
+**Developer**. Sie ersetzt weder `RULE_MATRIX.md` noch `../reports/TEST_HANDOFF.md`.
 Architektur- und Vertragsänderungen werden hier begründet dokumentiert, bevor
 beide Arbeitsstränge sie übernehmen. Für diesen Schnitt wird kein Build
 veröffentlicht, bevor die Integrationskriterien erfüllt sind.

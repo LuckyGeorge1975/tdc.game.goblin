@@ -8,10 +8,10 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 |---|---|
 | Version | `0.1.15` |
 | Build | `15` |
-| Release-Tag | `v0.1.15` (nach erfolgreichem Deploy am veröffentlichten Commit zu prüfen) |
+| Release-Tag | `v0.1.15` auf Commit `f40ddfb9a8ba86b3409960f6ab3a1332340678c8` |
 | Datum | 2026-10-02 |
-| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.15> (nach erfolgreichem Deploy und öffentlicher Einstiegskontrolle) |
-| Änderungen | [CHANGELOG.md](CHANGELOG.md#0115---2026-10-02) |
+| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.15> (Einstieg nach Deploy geprüft) |
+| Änderungen | [CHANGELOG.md](../CHANGELOG.md#0115---2026-10-02) |
 
 ### Testfokus für 0.1.15
 
@@ -23,7 +23,7 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 - Die historische Sichtlinien-Pixelabtastung ist von dieser Reichweitenkorrektur getrennt und bleibt bis zur Entscheidung `goblin-9bj.27` bestehen. Die zuvor auf `1cf3861` bestandenen Browserprüfungen ersetzen keine vollständige unabhängige QA auf dem neuen Kandidatencommit.
 - Historische Legacy-Field-Test-Werte von den noch nicht vollständig implementierten Katalogwerten und Sonderregeln trennen. Echte Geräte-Fingerproben (`goblin-wtg`) sind weiterhin offen.
 
-Der veröffentlichte Ausgangspunkt ist `v0.1.14` auf Commit `750941134f610ba7a75bbb11d8011e5714139e21`; `v0.1.12` bleibt ein früherer Rückfallpunkt. Die vollständige unabhängige Regel- und Browser-QA auf dem Spielstand `279a16d` steht in `goblin-0lk`. Ein erster Push nach `main` löste einen fehlgeschlagenen Actions-Lauf aus, weil der Workflow gegen den unmittelbar vorherigen unveröffentlichten Build-15-Commit prüfte. Der Workflow-Fix vergleicht nun mit dem letzten Vorgänger-Release-Tag; sein exakter Commit, erfolgreicher Deploy und das Tag sind im Release-Issue `goblin-8ay` zu belegen.
+Der veröffentlichte Build 0.1.15 ist `v0.1.15` auf Commit `f40ddfb9a8ba86b3409960f6ab3a1332340678c8`; `v0.1.14` auf `750941134f610ba7a75bbb11d8011e5714139e21` und `v0.1.12` bleiben Rückfallpunkte. Die vollständige unabhängige Regel- und Browser-QA auf dem Spielstand `279a16d` steht in `goblin-0lk`; der folgende Commit `f40ddfb` änderte nur Workflow und Dokumentation. Der erste Actions-Lauf scheiterte am Vergleich mit einem unveröffentlichten Build-15-Commit. Der korrigierte [Pages-Lauf 37005851568](https://github.com/LuckyGeorge1975/tdc.game.goblin/actions/runs/37005851568) bestand; Tag und öffentlicher Einstieg wurden geprüft (`goblin-8ay`). Die vom Nutzer bemängelte Differenz zwischen generierten Guide-SVGs und den hochwertigen Content-Konzeptansichten wird in `goblin-bvh` bearbeitet. Build 0.1.15 gilt deshalb grafisch nicht als abgenommen.
 
 ### Vorheriger Testfokus für 0.1.14
 
@@ -37,7 +37,7 @@ Ausgangsbasis vor der damaligen Versionssetzung: 312/312 SVGs, 119/119 Node-Test
 ### Veröffentlichungsgrenzen
 
 - Auf echten Tablets und Smartphones Touch-Bedienung und Lesbarkeit prüfen; alle bisherigen mobilen Browserfälle waren emuliert.
-- [Content & Asset Notices](CONTENT-NOTICES.md) nennt die KI-Konzepttafeln, die Nutzerreferenz und den inoffiziellen Status der militärischen Symbole ohne APP-6-/MIL-STD-2525-Konformitätsbehauptung. Die begrenzte Prüfung (`goblin-x44`) sah kein konkretes Hindernis für genau diese sechs Assetsets in einer nichtkommerziellen Vorschau, ist aber keine Produkt-, Regel-, Marken-, kommerzielle oder verbindliche Rechtsfreigabe. Eine professionelle Markenprüfung für `G.O.B.L.I.N.` in Deutschland und der EU steht vor kommerzieller Nutzung aus.
+- [Content & Asset Notices](../docs/CONTENT-NOTICES.md) nennt die KI-Konzepttafeln, die Nutzerreferenz und den inoffiziellen Status der militärischen Symbole ohne APP-6-/MIL-STD-2525-Konformitätsbehauptung. Die begrenzte Prüfung (`goblin-x44`) sah kein konkretes Hindernis für genau diese sechs Assetsets in einer nichtkommerziellen Vorschau, ist aber keine Produkt-, Regel-, Marken-, kommerzielle oder verbindliche Rechtsfreigabe. Eine professionelle Markenprüfung für `G.O.B.L.I.N.` in Deutschland und der EU steht vor kommerzieller Nutzung aus.
 - Die gesonderte Nutzerfreigabe für Build 0.1.15 wurde am 02.10.2026 erteilt. `v0.1.14` und `v0.1.12` bleiben Rückfallpunkte; veröffentlichter Commit, `v0.1.15`-Tag und geprüfte URL werden in `goblin-8ay` dokumentiert. Der unveröffentlichte Build-13-Vorläufer liegt auf Commit `8b0db47` im Branch.
 
 ### Vorheriger Testfokus für 0.1.13

@@ -26,7 +26,7 @@ Screenshots: `qa-evidence/qa08-pc.png`, `qa08-tablet-portrait.png`, `qa08-mobile
 
 ## Sieben UX-Kriterien: Soll/Ist
 
-| Kriterium aus `UI_UX_LAYOUT_SYSTEM.md` / QA-07 | Soll | Ist und Beleg |
+| Kriterium aus `../docs/UI_UX_LAYOUT_SYSTEM.md` / QA-07 | Soll | Ist und Beleg |
 | --- | --- | --- |
 | 1. Screen-Fluss | Start → Levelwahl → Briefing → Spiel; Pause/Einstellungen/Hilfe mit Rückweg, ohne Regelbefehl | **Bestanden.** N01 durchlief den Fluss auf Mobile hoch; Pause, Einstellungen und Hilfe kehrten zur Partie zurück. GameState blieb gleich, 0 Commands. Nur die zwei modularen Fixtures sind startbar. |
 | 2. Responsives HUD | Ziel, Phase, Auswahl, Hauptaktion und Pause auf PC/Tablet/Mobile erreichbar | **Teilweise bestanden.** 28/28 Kombinationen mit gelieferten Texten bestanden. Bei testweise verdoppeltem FR-HUD-/Aktionslabel im 844×390-Querformat endet die Hauptaktion bei y=392,55 statt innerhalb von 390 CSS px (`goblin-tne`). Auf 320×568 bestand derselbe Langtextansatz. |

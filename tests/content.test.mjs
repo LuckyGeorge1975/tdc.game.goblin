@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
-const publicContent=['index.html','unit-guide.js','README.md','RULE_MATRIX.md']
+const publicContent=['index.html','unit-guide.js','README.md','docs/RULE_MATRIX.md']
   .map(file=>readFileSync(new URL('../'+file,import.meta.url),'utf8'))
   .join('\n');
 

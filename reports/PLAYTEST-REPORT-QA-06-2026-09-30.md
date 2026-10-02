@@ -1,6 +1,6 @@
 # QA-06 – Unabhängiger Testbericht: integrierte Terrain-Vorschau
 
-Stand: 2026-09-30 · Beads `goblin-qws.6` · lokaler Vergleichspfad `http://127.0.0.1:4173/src/app/compare.html?path=terrain` · BrowserAct 1.4.2, bestehender lokaler Chrome. Grundlage: `QA-05-TERRAIN-TESTMATRIX.md`. **Interner Teststand, kein Release.** Die Freigabe zum Test erfolgte nach der Nutzerbegutachtung des Zwischenstands und dem abgeschlossenen REVIEW-01.
+Stand: 2026-09-30 · Beads `goblin-qws.6` · lokaler Vergleichspfad `http://127.0.0.1:4173/src/app/compare.html?path=terrain` · BrowserAct 1.4.2, bestehender lokaler Chrome. Grundlage: `../docs/QA-05-TERRAIN-TESTMATRIX.md`. **Interner Teststand, kein Release.** Die Freigabe zum Test erfolgte nach der Nutzerbegutachtung des Zwischenstands und dem abgeschlossenen REVIEW-01.
 
 ## Ergebnis
 

@@ -10,7 +10,7 @@ test('all twelve artwork terrain types have explicit gameplay rules',()=>{
     assert.equal(typeof rule.blocksLos,'boolean',type);
     assert.equal(typeof rule.cover,'number',type);
   }
-  const matrix=readFileSync(new URL('../RULE_MATRIX.md',import.meta.url),'utf8');
+  const matrix=readFileSync(new URL('../docs/RULE_MATRIX.md',import.meta.url),'utf8');
   const normalized=text=>text.toLocaleLowerCase('de-DE').replaceAll('ß','ss');
   for(const rule of Object.values(TerrainRules.rules))assert.ok(normalized(matrix).includes(normalized(rule.label)),rule.label);
 });
