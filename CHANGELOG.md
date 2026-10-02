@@ -1,10 +1,10 @@
 # Changelog
 
-Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion dokumentiert. Build 0.1.14 ist seit dem 01.10.2026 auf GitHub Pages veröffentlicht; Build 0.1.15 ist ein lokaler Kandidat. Build 0.1.13 blieb ein unveröffentlichter Vorläufer. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
+Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion dokumentiert. Build 0.1.14 wurde am 01.10.2026 auf GitHub Pages veröffentlicht; Build 0.1.15 umfasst die unten beschriebenen Änderungen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
 
 ## [0.1.15] - 2026-10-02
 
-### Lokaler Kandidat – hinzugefügt und geändert
+### Hinzugefügt und geändert
 
 - Für die fünf grafischen Stile neue räumliche Dreiviertel-Ansichten im Unit Guide, getrennt von den kleinen Karten- und Listenicons. Der sechste Stil (Military) zeigt dasselbe taktische Symbolmotiv in getrennten kleinen und großen Asset-Dateien. Alle sechs Stile mit jeweils 26 Einheitentypen bleiben wählbar.
 - Vier auswählbare Legacy-Showcases: Geländeparcours K sowie U1 Vorstoß, U2 Belagerung und U3 Spezialkräfte. Die Level werden aus validierten lokalen JSON-Daten geladen; Szenarioziele und Briefings sind in Deutsch, Englisch, Spanisch und Französisch verfügbar.
@@ -12,12 +12,13 @@ Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion doku
 - Der Guide kennzeichnet die Artillery Drone im aktuellen Field Test mit Bewegung 2. Die stationäre Katalogregel mit Bewegung 0 ist als zukünftiges Ziel abgegrenzt.
 - Bei gleichzeitiger vollständiger Ausschaltung beider Seiten gilt Niederlage; ein Sieg setzt mindestens eine überlebende eigene Einheit voraus. Das eigenständige Kern-Siegziel von IRON DUST bleibt bestehen.
 - Die Legacy-Reichweitenberechnung folgt jetzt den tatsächlichen Nachbarn des versetzten Hexrasters. Feuerreichweite, Ein- und Aussteigen beim Transport sowie Nachbarfelder des Raketensplashs verwenden dieselbe odd-row-Distanz wie der Core. Beim Raketenwerfer in `UNIT TRIAL` können dadurch bisher scheinbar erreichbare Ziele abgelehnt und tatsächlich erreichbare Ziele angenommen werden; Friendly Fire trifft nur wirkliche Nachbarfelder.
+- Das Pages-Release-Gate vergleicht die Buildnummer mit dem letzten veröffentlichten Vorgänger-Tag. Unveröffentlichte Zwischencommits mit derselben Buildnummer verhindern das Deployment damit nicht mehr.
 
 ### Grenzen und Prüfung
 
 - Katalogwerte und noch nicht implementierte Sonderregeln sind keine Zusage für den Legacy Field Test. Die vier Showcases verwenden dessen historischen Regel- und Wertestand.
 - Die Reichweitenkorrektur ändert nicht die historische Pixelabtastung für Sichtlinien an Hex-Grenzen. Die Grenzlinienwahl bleibt eine gesonderte Regelentscheidung (`goblin-9bj.27`).
-- Echte Fingerproben auf Tablet/Smartphone (`goblin-wtg`) und die unabhängige finale QA auf dem exakt versionierten Kandidatencommit stehen aus. Ein Push, Tag oder Deployment dieses Kandidaten ist noch nicht erfolgt.
+- Die unabhängige QA auf dem Regelstand `279a16d` bestand 130 Node-Tests und zwölf vollständige Desktop-/Mobil-Endläufe unter dem Pages-Projektpfad (`goblin-0lk`). Der spätere Workflow- und Dokumentations-Fix verändert den Spielcode und die Assets nicht; sein exakter Veröffentlichungscommit wird mit Release-Gate und gezielter Browserprüfung gesondert abgesichert. Echte Fingerproben auf Tablet/Smartphone (`goblin-wtg`) bleiben offen.
 - Herkunft und begrenzte Legal-/Content-Einschätzung der bereits veröffentlichten Assets gelten weiter; die neuen Guide-Ansichten der fünf grafischen Stile und die Leveltexte sind im Projekt entstanden. Eine kommerzielle oder verbindliche rechtliche Freigabe liegt nicht vor.
 
 ## [0.1.14] - 2026-10-01

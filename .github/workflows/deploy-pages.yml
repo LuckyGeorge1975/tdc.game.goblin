@@ -24,9 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Verify release handoff
-        run: node scripts/verify-release.mjs --previous=HEAD^
+        run: |
+          previous_tag="$(git describe --tags --abbrev=0 HEAD^)"
+          node scripts/verify-release.mjs --previous="$previous_tag"
       - name: Run regression tests
         run: node --test tests/*.test.mjs
       - name: Configure Pages
