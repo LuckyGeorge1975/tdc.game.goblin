@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 512 384" role="img" aria-label="ASSAULT TANK — COMIC / GRAPHIC NOVEL library view"><style>
-  .paper{fill:#f6ead6} .ink{fill:#19322f} .accent-fill{fill:#e66f5c}
-  .card{fill:#f6ead6;stroke:#19322f;stroke-width:1.4} .rule{fill:none;stroke:#19322f;stroke-width:1}
-  .title,.subtitle,.label,.index,.footer{fill:#19322f;font-family:Arial,Helvetica,sans-serif}
-  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
-  .unit{stroke:#19322f;stroke-width:3.3;stroke-linecap:round;stroke-linejoin:round}
-  .unit *{vector-effect:non-scaling-stroke}
-  .body{fill:#f6ead6} .shell{fill:#4d8b7e} .turret{fill:#f6ead6} .track{fill:#19322f} .port{fill:#f6ead6} .accent{fill:#e66f5c}
-  .detail{fill:none;stroke:#19322f;stroke-width:1.5}.accent-line{fill:none;stroke:#e66f5c;stroke-width:4}
-  .inf-figure{fill:#4d8b7e;stroke:#19322f;stroke-width:2.4;stroke-linejoin:round}
-  .inf-head,.inf-rifle{fill:#19322f;stroke:#19322f;stroke-width:1.5;stroke-linejoin:round}
-  .inf-detail{fill:none;stroke:#19322f;stroke-width:1.6;stroke-linecap:round}
-  .inf-marker{fill:#19322f;stroke:#f6ead6;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
-</style><g transform="translate(91 26) scale(3.4)"><g class="unit" aria-label="ASSAULT TANK"><g transform="translate(50 0) scale(0.67 1) translate(-50 0)"><rect class="track" x="11" y="14" width="17" height="74" rx="2"/><rect class="track" x="72" y="14" width="17" height="74" rx="2"/><polygon class="shell" points="50,7 72,16 76,27 77,76 68,87 32,87 23,76 24,27 28,16"/><path class="detail" d="M30 26L50 19L70 26M31 78L50 84L69 78"/><path class="body" d="M28 34L39 32V54L30 60Z"/><path class="body" d="M61 34L72 32V54L63 60Z"/><rect class="accent" x="39" y="76" width="22" height="4" rx="0"/><rect class="body" x="47" y="7" width="6" height="37" rx="1"/><rect class="track" x="46" y="7" width="8" height="3" rx="0"/><path class="turret" d="M27 48L40 31H60L73 48L65 65H35Z"/><path class="accent-line" d="M32 46L40 37M68 46L60 37"/><rect class="port" x="45" y="47" width="10" height="10" rx="2"/><path class="accent-line" d="M29 29L36 24M71 29L64 24"/></g></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 512 384" role="img" aria-label="ASSAULT TANK — COMIC / GRAPHIC NOVEL three-quarter view">
+  <style>
+  .ground-shadow{fill:#19322f;opacity:.17}.person-shadow{fill:#19322f;opacity:.22}
+  .right-face{fill:#4d8b7e;stroke:#19322f;stroke-width:3}.rear-face{fill:#19322f;stroke:#19322f;stroke-width:3}
+  .track-side,.track-rear{fill:#19322f;stroke:#19322f;stroke-width:2}.track-line{fill:none;stroke:#f6ead6;stroke-width:1.5;opacity:.65}
+  .upper-top{fill:#f6ead6;stroke:#19322f;stroke-width:3}.upper-side{fill:#4d8b7e;stroke:#19322f;stroke-width:3}
+  .hover-glow,.thruster{fill:none;stroke:#e66f5c;stroke-width:4;stroke-linecap:round}
+  .projected-top{stroke:#19322f;stroke-width:2.4;stroke-linejoin:round}.projected-top *{vector-effect:non-scaling-stroke}
+  .body{fill:#f6ead6}.shell{fill:#4d8b7e}.turret{fill:#f6ead6}.track{fill:#19322f}.port{fill:#f6ead6}.accent{fill:#e66f5c}
+  .detail{fill:none;stroke:#19322f;stroke-width:1.6}.accent-line{fill:none;stroke:#e66f5c;stroke-width:3}
+  .inf-figure{fill:#4d8b7e;stroke:#19322f;stroke-width:2.4}.inf-head,.inf-rifle{fill:#19322f;stroke:#19322f;stroke-width:1.5}
+  .inf-detail{fill:none;stroke:#19322f;stroke-width:1.6}.person-depth .inf-figure{fill:#19322f}.person-depth .inf-head,.person-depth .inf-rifle{fill:#19322f}
+  .library-marker{fill:#19322f;stroke:#f6ead6;stroke-width:3;paint-order:stroke fill;font:800 78px Arial,Helvetica,sans-serif;text-anchor:middle}
+  </style><ellipse class="ground-shadow" cx="263" cy="326" rx="174" ry="22"/><polygon class="right-face" points="355.2,134.8 289.2,247.0 289.2,290.0 355.2,177.8"/><polygon class="rear-face" points="289.2,247.0 122.8,223.6 122.8,266.6 289.2,290.0"/><polygon class="track-side" points="217.4,139.3 165.4,227.8 165.4,270.8 217.4,182.3"/><polygon class="track-rear" points="165.4,227.8 123.8,221.9 123.8,264.9 165.4,270.8"/><path class="track-line" d="M205.4 159.8L200.4 168.3m0 0v43"/><path class="track-line" d="M190.4 185.3L185.4 193.8m0 0v43"/><path class="track-line" d="M175.4 210.8L170.4 219.3m0 0v43"/><polygon class="track-side" points="342.2,156.9 290.2,245.3 290.2,288.3 342.2,199.9"/><polygon class="track-rear" points="290.2,245.3 248.6,239.4 248.6,282.4 290.2,288.3"/><path class="track-line" d="M330.2 177.3L325.2 185.8m0 0v43"/><path class="track-line" d="M315.2 202.8L310.2 211.3m0 0v43"/><path class="track-line" d="M300.2 228.3L295.2 236.8m0 0v43"/><g class="projected-top" transform="matrix(3.2 .45 -1 1.7 130 70)"><g class="unit" aria-label="ASSAULT TANK"><g transform="translate(50 0) scale(0.67 1) translate(-50 0)"><rect class="track" x="11" y="14" width="17" height="74" rx="2"/><rect class="track" x="72" y="14" width="17" height="74" rx="2"/><polygon class="shell" points="50,7 72,16 76,27 77,76 68,87 32,87 23,76 24,27 28,16"/><path class="detail" d="M30 26L50 19L70 26M31 78L50 84L69 78"/><path class="body" d="M28 34L39 32V54L30 60Z"/><path class="body" d="M61 34L72 32V54L63 60Z"/><rect class="accent" x="39" y="76" width="22" height="4" rx="0"/><rect class="body" x="47" y="7" width="6" height="37" rx="1"/><rect class="track" x="46" y="7" width="8" height="3" rx="0"/><path class="turret" d="M27 48L40 31H60L73 48L65 65H35Z"/><path class="accent-line" d="M32 46L40 37M68 46L60 37"/><rect class="port" x="45" y="47" width="10" height="10" rx="2"/><path class="accent-line" d="M29 29L36 24M71 29L64 24"/></g></g></g></svg>

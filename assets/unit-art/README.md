@@ -2,7 +2,7 @@
 
 ## Sechs im Spiel wählbare Sets
 
-Die Combobox schaltet Karten- und Listenicons sowie die zugehörige große Ansicht im Unit Guide gemeinsam um. Anfänglich ist `02-technical-illustration` gewählt; eine spätere Wahl bleibt lokal im Browser gespeichert. Jedes Set enthält für alle 26 Einheiten ein transparentes `icons/{unit}.svg` mit 256 × 256 und ein `library/{unit}.svg` mit 1024 × 768. Der Guide zeigt die große Ansicht vollständig mit `object-fit: contain` und ohne sechseckigen Beschnitt.
+Die Combobox schaltet Karten- und Listenicons sowie die zugehörige Ansicht im Unit Guide gemeinsam um. Anfänglich ist `02-technical-illustration` gewählt; eine spätere Wahl bleibt lokal im Browser gespeichert. Jedes Set enthält für alle 26 Einheiten ein transparentes `icons/{unit}.svg` mit 256 × 256 und ein getrenntes `library/{unit}.svg` mit 1024 × 768. Die fünf grafischen Sets zeigen im Guide eigenständige räumliche Dreiviertelzeichnungen mit sichtbaren Seitenflächen; die Karte und alle Listen zeigen weiter die kleinen Draufsicht-Icons. Das militärische Set zeigt in beiden Ansichten dasselbe Symbolmotiv, speichert die kleine und große Fassung aber getrennt. Der Guide zeigt die Ansicht vollständig mit `object-fit: contain` und ohne sechseckigen Beschnitt. Die lokalen Guide-Korrekturen stammen aus dem Unit-Art-Quellcommit `966b93a80cc384f58a3ae0347936a1762987281c` und sind noch kein neuer veröffentlichter Build.
 
 | Set | Stil | Quelle im Unit-Art-Checkout |
 | --- | --- | --- |

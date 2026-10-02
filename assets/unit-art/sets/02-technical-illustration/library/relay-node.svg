@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 512 384" role="img" aria-label="RELAY NODE — TECHNICAL / SYSTEM DRAWING library view"><style>
-  .paper{fill:#f2f0e8} .ink{fill:#243640} .accent-fill{fill:#d37c43}
-  .card{fill:#f2f0e8;stroke:#243640;stroke-width:1.4} .rule{fill:none;stroke:#243640;stroke-width:1}
-  .title,.subtitle,.label,.index,.footer{fill:#243640;font-family:Arial,Helvetica,sans-serif}
-  .title{font-size:35px;font-weight:800;letter-spacing:2px}.subtitle{font-size:16px;letter-spacing:2px}.label{font-size:15px;font-weight:700;letter-spacing:.7px}.index{font-size:15px;font-weight:800}.footer{font-size:14px;letter-spacing:1px}
-  .unit{stroke:#243640;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-  .unit *{vector-effect:non-scaling-stroke}
-  .body{fill:#f2f0e8} .shell{fill:#b9cdd0} .turret{fill:#f2f0e8} .track{fill:#243640} .port{fill:#f2f0e8} .accent{fill:#d37c43}
-  .detail{fill:none;stroke:#243640;stroke-width:1.5}.accent-line{fill:none;stroke:#d37c43;stroke-width:3}
-  .inf-figure{fill:#b9cdd0;stroke:#243640;stroke-width:2.4;stroke-linejoin:round}
-  .inf-head,.inf-rifle{fill:#243640;stroke:#243640;stroke-width:1.5;stroke-linejoin:round}
-  .inf-detail{fill:none;stroke:#243640;stroke-width:1.6;stroke-linecap:round}
-  .inf-marker{fill:#243640;stroke:#f2f0e8;stroke-width:2.5;paint-order:stroke fill;font-family:Arial,Helvetica,sans-serif;font-size:48px;font-weight:800;text-anchor:middle}
-</style><g transform="translate(91 26) scale(3.4)"><g class="unit" aria-label="RELAY NODE"><path class="shell" d="M18 25L50 12L82 25V77L50 88L18 77Z"/><path class="detail" d="M18 25L50 38L82 25M18 77L50 64L82 77M50 38V64"/><rect class="port" x="22" y="41" width="8" height="20" rx="1"/><rect class="port" x="70" y="41" width="8" height="20" rx="1"/><circle class="turret" cx="50" cy="51" r="10"/><path class="accent-line" d="M50 42L50 10"/><circle class="accent" cx="50" cy="10" r="3"/><path class="accent-line" d="M31 33L21 20M69 33L79 20"/></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 512 384" role="img" aria-label="RELAY NODE — TECHNICAL / SYSTEM DRAWING three-quarter view">
+  <style>
+  .ground-shadow{fill:#243640;opacity:.17}.person-shadow{fill:#243640;opacity:.22}
+  .right-face{fill:#b9cdd0;stroke:#243640;stroke-width:3}.rear-face{fill:#243640;stroke:#243640;stroke-width:3}
+  .track-side,.track-rear{fill:#243640;stroke:#243640;stroke-width:2}.track-line{fill:none;stroke:#f2f0e8;stroke-width:1.5;opacity:.65}
+  .upper-top{fill:#f2f0e8;stroke:#243640;stroke-width:3}.upper-side{fill:#b9cdd0;stroke:#243640;stroke-width:3}
+  .hover-glow,.thruster{fill:none;stroke:#d37c43;stroke-width:4;stroke-linecap:round}
+  .projected-top{stroke:#243640;stroke-width:2.4;stroke-linejoin:round}.projected-top *{vector-effect:non-scaling-stroke}
+  .body{fill:#f2f0e8}.shell{fill:#b9cdd0}.turret{fill:#f2f0e8}.track{fill:#243640}.port{fill:#f2f0e8}.accent{fill:#d37c43}
+  .detail{fill:none;stroke:#243640;stroke-width:1.6}.accent-line{fill:none;stroke:#d37c43;stroke-width:3}
+  .inf-figure{fill:#b9cdd0;stroke:#243640;stroke-width:2.4}.inf-head,.inf-rifle{fill:#243640;stroke:#243640;stroke-width:1.5}
+  .inf-detail{fill:none;stroke:#243640;stroke-width:1.6}.person-depth .inf-figure{fill:#243640}.person-depth .inf-head,.person-depth .inf-rifle{fill:#243640}
+  .library-marker{fill:#243640;stroke:#f2f0e8;stroke-width:3;paint-order:stroke fill;font:800 78px Arial,Helvetica,sans-serif;text-anchor:middle}
+  </style><ellipse class="ground-shadow" cx="263" cy="326" rx="174" ry="22"/><polygon class="right-face" points="374.4,137.5 313.4,241.2 313.4,295.2 374.4,191.5"/><polygon class="rear-face" points="313.4,241.2 108.6,212.4 108.6,266.4 313.4,295.2"/><polygon class="upper-top" points="220.8,145.3 300.8,156.6 267.8,212.7 187.8,201.4"/><polygon class="upper-side" points="300.8,156.6 267.8,212.7 267.8,266.7 300.8,210.6"/><g class="projected-top" transform="matrix(3.2 .45 -1 1.7 130 70)"><g class="unit" aria-label="RELAY NODE"><path class="shell" d="M18 25L50 12L82 25V77L50 88L18 77Z"/><path class="detail" d="M18 25L50 38L82 25M18 77L50 64L82 77M50 38V64"/><rect class="port" x="22" y="41" width="8" height="20" rx="1"/><rect class="port" x="70" y="41" width="8" height="20" rx="1"/><circle class="turret" cx="50" cy="51" r="10"/><path class="accent-line" d="M50 42L50 10"/><circle class="accent" cx="50" cy="10" r="3"/><path class="accent-line" d="M31 33L21 20M69 33L79 20"/></g></g></svg>
