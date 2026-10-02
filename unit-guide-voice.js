@@ -61,7 +61,7 @@
     'SKIMMER CARRIER':{
       de:'Drei Plätze für Infanterie. In der Logistik heißt das Fürsorge.',
       en:'Three seats for infantry. Logistics calls that care.',
-      es:'Tres plazas para infantería. Logística lo llama atención al personal.',
+      es:'Tres plazas para infantería. En Logística lo llaman cuidar del personal.',
       fr:'Trois places pour l’infanterie. La logistique appelle cela de la sollicitude.'},
     'STRATEGIC MISSILE CARRIER':{
       de:'Eine Rakete, ein großer Radius und unangenehm viele Nachbarn. Die Nachbesprechung wird kurz.',
@@ -70,9 +70,9 @@
       fr:'Un missile, une large explosion et beaucoup trop de voisins. Le débriefing sera bref.'},
     'ARTILLERY DRONE':{
       de:'Die Drohne spart Besatzung. Die Verantwortung hat noch niemand eingespart.',
-      en:'The drone saves a crew. Nobody has worked out how to save the responsibility.',
-      es:'El dron ahorra una tripulación. Nadie ha conseguido ahorrar la responsabilidad.',
-      fr:'Le drone épargne un équipage. Personne n’a encore trouvé comment épargner la responsabilité.'},
+      en:'The drone keeps a crew out of danger. Responsibility stays right where it was.',
+      es:'El dron evita poner a una tripulación en peligro. La responsabilidad sigue donde estaba.',
+      fr:'Le drone évite d’exposer un équipage. La responsabilité, elle, reste entière.'},
     'AMPHIBIOUS INFANTRY':{
       de:'Wasser hält sie nicht auf. Die Frage, wer sie zurückholt, steht in einem anderen Formular.',
       en:'Water will not stop them. Who brings them back is covered by another form.',
@@ -92,17 +92,17 @@
       de:'Hier werden Befehle beschlossen. Die Folgen liegen außerhalb des Kartenraums.',
       en:'Orders are decided here. The consequences lie beyond the map room.',
       es:'Aquí se deciden las órdenes. Las consecuencias quedan fuera de la sala de mapas.',
-      fr:'C’est ici que les ordres sont décidés. Leurs conséquences dépassent la salle des cartes.'},
+      fr:'C’est ici que l’on donne les ordres. Leurs conséquences dépassent la salle des cartes.'},
     'GOBLIN DREADNAUGHT':{
       de:'Groß, laut und schwer zu übersehen. Die Beschaffung nennt das Abschreckung.',
       en:'Big, loud and impossible to miss. Procurement calls that deterrence.',
-      es:'Grande, ruidoso e imposible de pasar por alto. Compras lo llama disuasión.',
+      es:'Grande, ruidoso e imposible de ignorar. En Compras lo llaman disuasión.',
       fr:'Grand, bruyant et impossible à manquer. L’Intendance appelle cela de la dissuasion.'},
     'PHANTOM PLATFORM':{
-      de:'Phantom ist ein guter Name. Man bemerkt es leider trotzdem, sobald es schießt.',
-      en:'Phantom is a fine name. People still notice it once it fires.',
-      es:'Fantasma es un buen nombre. Por desgracia, se nota en cuanto dispara.',
-      fr:'Fantôme est un joli nom. On le remarque tout de même dès qu’il tire.'},
+      de:'Phantom ist ein guter Name. Für die Tarnung hat das Budget leider nicht gereicht.',
+      en:'Phantom is a fine name. The budget never stretched to actual camouflage.',
+      es:'Fantasma es un buen nombre. El presupuesto no alcanzó para camuflarlo de verdad.',
+      fr:'Fantôme est un joli nom. Le budget n’a pas suivi pour le camouflage.'},
     'INFANTRY PLATOON':{
       de:'Mehr Stiefel auf der Karte. Weniger Platz für einfache Antworten.',
       en:'More boots on the map. Less room for easy answers.',
@@ -127,12 +127,12 @@
       de:'Er gleitet übers Wasser. Vor der Verantwortung gleitet niemand davon.',
       en:'It glides over water. Nobody glides away from responsibility.',
       es:'Se desliza sobre el agua. De la responsabilidad no se escapa nadie.',
-      fr:'Il glisse sur l’eau. Personne ne glisse hors de sa responsabilité.'},
+      fr:'Il glisse sur l’eau. Les responsabilités, elles, ne s’évanouissent pas dans son sillage.'},
     'FORGE ENGINEER':{
-      de:'Reparieren klingt friedlich. Bis die Maschine wieder schießen kann.',
-      en:'Repair sounds peaceful. Until the machine can fire again.',
-      es:'Reparar suena pacífico. Hasta que la máquina puede volver a disparar.',
-      fr:'Réparer semble pacifique. Jusqu’à ce que la machine puisse tirer à nouveau.'}
+      de:'Reparieren klingt friedlich. Vorerst steht es nur im Pflichtenheft. Schießen kann die Maschine schon.',
+      en:'Repair sounds peaceful. So far it is only in the spec. The machine can already fire.',
+      es:'Reparar suena pacífico. De momento solo figura en el proyecto. Disparar, la máquina ya puede.',
+      fr:'Réparer semble pacifique. Pour l’instant, c’est sur le papier. La machine sait déjà tirer.'}
   };
   let currentName;
   function render(name){
