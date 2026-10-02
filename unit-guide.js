@@ -56,6 +56,9 @@ const guideActions={
 };
 let guideIndex=0;
 const guideModal=document.querySelector('#unit-guide-modal');
+const guideOpener=document.querySelector('#unit-guide-open');
+const guideBackground=[document.querySelector('.app-shell'),document.querySelector('#quick-start-modal')];
+let guideReturnFocus=null,guidePreviousInert=[];
 function renderUnitGuide(){
   const unit=unitGuideEntries[guideIndex],live=units.find(item=>item.name===unit.name);
   document.querySelector('.guide-information').scrollTop=0;
@@ -83,13 +86,46 @@ function renderUnitGuide(){
   document.querySelector('#guide-find').disabled=!live;
   document.querySelector('#guide-count').textContent=`${String(guideIndex+1).padStart(2,'0')} / ${String(unitGuideEntries.length).padStart(2,'0')}`;
 }
-function openUnitGuide(){renderUnitGuide();guideModal.classList.remove('hidden');}
-function closeUnitGuide(){guideModal.classList.add('hidden');}
-document.querySelector('#unit-guide-open').onclick=openUnitGuide;
+function openUnitGuide(){
+  if(!guideModal.classList.contains('hidden')||GameDialogs.isOpen())return;
+  guideReturnFocus=document.activeElement;
+  renderUnitGuide();
+  guidePreviousInert=guideBackground.map(node=>node.inert);
+  guideBackground.forEach(node=>{node.inert=true});
+  guideModal.classList.remove('hidden');
+  document.querySelector('#unit-guide-close').focus();
+}
+function closeUnitGuide(){
+  if(guideModal.classList.contains('hidden'))return;
+  guideModal.classList.add('hidden');
+  guideBackground.forEach((node,index)=>{node.inert=guidePreviousInert[index]});
+  if(guideReturnFocus?.isConnected)guideReturnFocus.focus();
+  guideReturnFocus=null;
+}
+guideOpener.onclick=openUnitGuide;
 document.querySelector('#unit-guide-close').onclick=closeUnitGuide;
-document.querySelector('#guide-details-jump').onclick=()=>{const heading=document.querySelector('#guide-name');heading.tabIndex=-1;heading.scrollIntoView({block:'start'});heading.focus({preventScroll:true})};
+document.querySelector('#guide-details-jump').onclick=()=>{const heading=document.querySelector('#guide-voice-label');heading.tabIndex=-1;heading.scrollIntoView({block:'start'});heading.focus({preventScroll:true})};
 document.querySelector('#guide-prev').onclick=()=>{guideIndex=(guideIndex+unitGuideEntries.length-1)%unitGuideEntries.length;renderUnitGuide()};
 document.querySelector('#guide-next').onclick=()=>{guideIndex=(guideIndex+1)%unitGuideEntries.length;renderUnitGuide()};
 document.querySelector('#guide-find').onclick=()=>{const unit=units.find(item=>item.name===unitGuideEntries[guideIndex].name);if(!unit)return;closeUnitGuide();selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);updateSelection();draw();globalThis.GoblinMobileViews?.show('map',{focus:true})};
 guideModal.addEventListener('click',event=>{if(event.target===guideModal)closeUnitGuide()});
-document.addEventListener('keydown',event=>{if(guideModal.classList.contains('hidden'))return;if(event.key==='Escape')closeUnitGuide();if(event.key==='ArrowLeft')document.querySelector('#guide-prev').click();if(event.key==='ArrowRight')document.querySelector('#guide-next').click()});
+document.addEventListener('keydown',event=>{
+  if(guideModal.classList.contains('hidden'))return;
+  event.stopImmediatePropagation();
+  if(event.key==='Escape'){event.preventDefault();closeUnitGuide();return}
+  if(event.key==='Tab'){
+    event.preventDefault();
+    const controls=[...guideModal.querySelectorAll('button:not(:disabled),a[href],select:not(:disabled),input:not(:disabled)')].filter(node=>node.getClientRects().length);
+    if(!controls.length)return;
+    const index=controls.indexOf(document.activeElement);
+    controls[index<0?0:(index+(event.shiftKey?-1:1)+controls.length)%controls.length].focus();
+    return;
+  }
+  if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
+    event.preventDefault();document.querySelector(event.key==='ArrowLeft'?'#guide-prev':'#guide-next').click();return;
+  }
+  if((event.key==='Enter'||event.key===' ')&&!event.repeat&&guideModal.contains(document.activeElement)&&document.activeElement.tagName==='BUTTON'){
+    event.preventDefault();document.activeElement.click();
+  }
+},true);
+document.addEventListener('focusin',event=>{if(!guideModal.classList.contains('hidden')&&!guideModal.contains(event.target))document.querySelector('#unit-guide-close').focus()},true);

@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="unit-ui.css?v=1" />
       <link rel="stylesheet" href="art-theme.css?v=14" />
       <link rel="stylesheet" href="terrain-ui.css?v=11" />
-      <link rel="stylesheet" href="unit-guide-details.css?v=18" />
+      <link rel="stylesheet" href="unit-guide-details.css?v=19" />
     <style>
       .unit-svg { pointer-events: all; cursor: pointer; visibility: visible; opacity: 1; }
       .unit-svg.wreck { pointer-events: none; cursor: default; }
@@ -188,7 +188,8 @@
     </div>    <div id="unit-guide-modal" class="modal guide-modal hidden" role="dialog" aria-modal="true" aria-labelledby="guide-title">
       <section class="guide-card">
         <div class="guide-head"><div><span class="eyebrow">TACTICAL ARCHIVE</span><h2 id="guide-title">UNIT GUIDE</h2></div><button id="unit-guide-close" class="guide-close" aria-label="Einheitenführer schließen">×</button></div>
-        <button id="guide-details-jump" class="guide-details-jump" type="button" aria-controls="guide-name">WERTE & RANDNOTIZ ↓</button>
+        <button id="guide-details-jump" class="guide-details-jump" type="button" aria-controls="guide-voice-label">WERTE & RANDNOTIZ ↓</button>
+        <span id="guide-schematic-label" class="guide-schematic-label">SCHEMA · FREIES GELÄNDE · OHNE SICHTLINIE</span>
         <div class="guide-body"><div class="guide-visual"><div id="guide-symbol" class="guide-symbol">G</div><section class="guide-range-panel" aria-label="Reichweitenvorschau"><div class="guide-range-switch" role="group" aria-label="Reichweitenansicht"><button id="guide-range-move" type="button" aria-pressed="true">BEWEGUNG</button><button id="guide-range-attack" type="button" aria-pressed="false">ANGRIFF</button></div><div id="guide-range-map" class="guide-range-map"></div><strong id="guide-range-summary" class="guide-range-summary"></strong><p id="guide-range-note" class="guide-range-note"></p></section></div><div class="guide-information"><span id="guide-kicker" class="guide-kicker">FRIENDLY SYSTEM</span><h3 id="guide-name">GOBLIN SIEGEBREAKER</h3><div id="guide-role" class="guide-role">HEAVY ASSAULT</div><p id="guide-copy" class="guide-copy"></p><aside class="guide-voice" aria-labelledby="guide-voice-label"><span id="guide-voice-label"></span><p id="guide-voice-copy"></p></aside><div id="guide-facts" class="guide-facts"></div><div class="guide-meta"><div><span>REGELSTATUS</span><b id="guide-status"></b></div><div><span>AKTUELLE PHASE</span><b id="guide-phase-status"></b></div><div><span>SZENARIEN</span><b id="guide-scenarios"></b></div></div><div class="guide-action-section"><span>AKTIONEN</span><ul id="guide-action-list"></ul></div></div></div>
         <div class="guide-nav"><button id="guide-prev">← PREVIOUS</button><span id="guide-count" class="guide-count">01 / 26</span><button id="guide-find" disabled>AUF KARTE</button><button id="guide-next">NEXT →</button></div>
       </section>
@@ -207,9 +208,9 @@
     <script src="strategic-missile.js?v=1"></script>
     <script src="scenario.js?v=7"></script>
     <script src="atlas-level.js?v=13"></script>
-    <script src="unit-guide-range.js?v=2"></script>
+    <script src="unit-guide-range.js?v=3"></script>
     <script src="unit-guide-voice.js?v=2"></script>
-    <script src="unit-guide.js?v=16"></script>
+    <script src="unit-guide.js?v=17"></script>
     <script src="mobile-views.js?v=1"></script>
     <script src="quick-start.js?v=1"></script>
     <script src="art-theme.js?v=14"></script>

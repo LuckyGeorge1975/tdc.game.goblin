@@ -11,7 +11,7 @@ function guide(units=[{id:'ogre',name:'GOBLIN SIEGEBREAKER',team:'player',x:1,y:
   const document={querySelector(key){if(!nodes.has(key))nodes.set(key,element());return nodes.get(key)},createElement:element,addEventListener(){}};
   const context=vm.createContext({document,units,
     scenarioCatalog:{'iron-dust':{units:[{name:'GOBLIN SIEGEBREAKER'}]}},currentScenario:'iron-dust',
-    isGevUnit:()=>false,phaseCanAct:()=>true,effectiveDefense:unit=>unit.defense,showUnitInfo(){},showFieldInfo(){},updateSelection(){},draw(){}});
+    GameDialogs:{isOpen:()=>false},isGevUnit:()=>false,phaseCanAct:()=>true,effectiveDefense:unit=>unit.defense,showUnitInfo(){},showFieldInfo(){},updateSelection(){},draw(){}});
   vm.runInContext(readFileSync(new URL('../unit-guide-range.js',import.meta.url),'utf8'),context);
   vm.runInContext(readFileSync(new URL('../unit-guide-voice.js',import.meta.url),'utf8'),context);
   vm.runInContext(readFileSync(new URL('../unit-guide.js',import.meta.url),'utf8'),context);
@@ -127,9 +127,30 @@ test('mobile details jump exposes the facts and general note without changing th
   const {context,document}=guide();
   vm.runInContext('renderUnitGuide()',context);
   document.querySelector('#guide-details-jump').onclick();
-  assert.equal(document.querySelector('#guide-name').scrolled,true);
-  assert.equal(document.querySelector('#guide-name').focused,true);
+  assert.equal(document.querySelector('#guide-voice-label').scrolled,true);
+  assert.equal(document.querySelector('#guide-voice-label').focused,true);
   assert.equal(vm.runInContext('guideIndex',context),0);
+});
+
+test('one hex uses singular forms in movement and attack previews',()=>{
+  const {context,document}=guide([]);
+  for(const [lang,singular,plural] of [['de','Hex',''],['en','hex','hexes'],['es','hexágono','hexágonos'],['fr','hexagone','hexagones']]){
+    context.GoblinLanguage={current:lang};
+    vm.runInContext("guideIndex=unitGuideEntries.findIndex(item=>item.name==='STRATEGIC MISSILE CARRIER');renderUnitGuide()",context);
+    const movement=document.querySelector('#guide-range-summary').textContent;
+    assert.match(movement,new RegExp(`1 ${singular}(?!\\w)`),lang);
+    if(plural)assert.doesNotMatch(movement,new RegExp(`1 ${plural}`),lang);
+    vm.runInContext("guideIndex=unitGuideEntries.findIndex(item=>item.name==='FIELD ENGINEERS');renderUnitGuide()",context);
+    document.querySelector('#guide-range-attack').onclick();
+    const attack=document.querySelector('#guide-range-summary').textContent;
+    assert.match(attack,new RegExp(`1 ${singular}(?!\\w)`),lang);
+    if(plural)assert.doesNotMatch(attack,new RegExp(`1 ${plural}`),lang);
+    document.querySelector('#guide-range-move').onclick();
+    vm.runInContext("guideIndex=unitGuideEntries.findIndex(item=>item.name==='COMMAND HUB');renderUnitGuide()",context);
+    assert.doesNotMatch(document.querySelector('#guide-range-summary').textContent,/0 (?:hex|Hex)/,lang);
+    vm.runInContext("guideIndex=unitGuideEntries.findIndex(item=>item.name==='ROCKET ARTILLERY');renderUnitGuide()",context);
+    assert.match(document.querySelector('#guide-range-summary').textContent,new RegExp(`2 ${plural||singular}(?!\\w)`),lang);
+  }
 });
 
 test('every guide entry has a distinct general note in all supported languages',()=>{
