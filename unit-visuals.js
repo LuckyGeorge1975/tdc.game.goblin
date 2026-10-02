@@ -33,7 +33,8 @@
   function assetFor(unit,view='icons'){
     const key=artKey(unit);
     if(!activeStyle||!key||!['icons','library'].includes(view))return null;
-    return `assets/unit-art/sets/${activeStyle}/${view}/${key}.svg`;
+    const extension=view==='library'&&activeStyle!=='06-military-symbols'?'png':'svg';
+    return `assets/unit-art/sets/${activeStyle}/${view}/${key}.${extension}`;
   }
 
   const terrainKeys=new Set(['open-ground','rubble-field','mountain','ridge','forest','marsh','water','river','road','bridge','urban','crater']);

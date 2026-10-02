@@ -40,7 +40,7 @@ test('guide uses the large view paired with the chosen icon style',()=>{
   const state=theme();
   state.context.renderUnitGuide();
   const initial=state.symbol.image.src;
-  assert.equal(initial,'assets/unit-art/sets/02-technical-illustration/library/assault-tank.svg');
+  assert.equal(initial,'assets/unit-art/sets/02-technical-illustration/library/assault-tank.png');
   state.context.UnitVisuals.setStyle('06-military-symbols');
   state.context.renderUnitGuide();
   assert.equal(state.symbol.image.src,'assets/unit-art/sets/06-military-symbols/library/assault-tank.svg');

@@ -47,11 +47,20 @@ test('six art sets resolve all 26 icon and guide pairs by unit name',()=>{
       assert.equal(UnitVisuals.artKey(unit),id);
       for(const view of ['icons','library']){
         const path=UnitVisuals.assetFor(unit,view);
-        assert.equal(path,`assets/unit-art/sets/${style.id}/${view}/${id}.svg`);
+        const isPng=view==='library'&&style.id!=='06-military-symbols';
+        assert.equal(path,`assets/unit-art/sets/${style.id}/${view}/${id}.${isPng?'png':'svg'}`);
         assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),`${style.id}/${view}/${id}`);
-        const svg=readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
-        assert.match(svg,new RegExp(`width="${view==='icons'?'256':'1024'}"`),path);
-        assert.match(svg,new RegExp(`height="${view==='icons'?'256':'768'}"`),path);
+        if(isPng){
+          const png=readFileSync(new URL(`../${path}`,import.meta.url));
+          assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a',path);
+          assert.equal(png.readUInt32BE(16),1536,path);
+          assert.equal(png.readUInt32BE(20),1024,path);
+          assert.equal(png[25],6,path);
+        }else{
+          const svg=readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
+          assert.match(svg,new RegExp(`width="${view==='icons'?'256':'1024'}"`),path);
+          assert.match(svg,new RegExp(`height="${view==='icons'?'256':'768'}"`),path);
+        }
       }
     }
     assert.match(UnitVisuals.resolve({id:'infantry',name:'FIELD ENGINEERS'}).asset,/field-engineers\.svg$/);
@@ -68,7 +77,7 @@ test('guide artwork follows each map style for all 26 units',()=>{
     UnitVisuals.setStyle(style.id);
     for(const unit of manifest.units){
       const path=UnitVisuals.assetFor(unit,'library');
-      assert.equal(path,`assets/unit-art/sets/${style.id}/library/${unit.id}.svg`);
+      assert.equal(path,`assets/unit-art/sets/${style.id}/library/${unit.id}.${style.id==='06-military-symbols'?'svg':'png'}`);
       assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),path);
     }
   }

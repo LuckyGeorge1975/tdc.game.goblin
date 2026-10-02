@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "viewFormats": {
     "icon": "256×256 SVG · transparent · unit icon",
-    "library": "1024×768 SVG · transparent · unit guide view",
+    "library": "1536×1024 RGBA PNG for the five graphical styles; 1024×768 SVG for military symbols · unit guide view",
     "logo": "1024×256 SVG · transparent",
     "terrain": "256×256 SVG · transparent outside hex · map tile"
   },
@@ -217,7 +217,7 @@
   ],
   "pathPattern": {
     "icon": "sets/{style}/icons/{unit}.svg",
-    "library": "sets/{style}/library/{unit}.svg",
+    "library": "sets/{style}/library/{unit}.png (graphical styles); sets/06-military-symbols/library/{unit}.svg",
     "logo": "sets/{style}/logo.svg",
     "terrain": "sets/{style}/terrain/{terrain}.svg"
   },

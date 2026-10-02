@@ -70,12 +70,12 @@ try {
   await js("document.querySelector('#unit-guide-open').click()");
   for (let n = 0; n < 30 && !await js('document.querySelector("#guide-symbol img")?.complete'); n++) await new Promise(resolve => setTimeout(resolve, 100));
   const first = await measure();
-  assert.match(first.src, /sets\/02-technical-illustration\/library\/goblin-siegebreaker\.svg$/);
-  assert.deepEqual(first.natural, { width: 1024, height: 768 });
+  assert.match(first.src, /sets\/02-technical-illustration\/library\/goblin-siegebreaker\.png$/);
+  assert.deepEqual(first.natural, { width: 1536, height: 1024 });
   assert.equal(first.fit, 'contain');
   assert.equal(first.clip, 'none');
   assert.ok(first.symbol.width >= 240 && first.symbol.height >= 180, JSON.stringify(first));
-  await screenshot('q0o-guide-desktop');
+  await screenshot('bvh-guide-desktop');
   assert.equal(await js("document.querySelector('#guide-range-map svg')?.querySelectorAll('polygon').length"),217);
   console.log('desktop', JSON.stringify(first));
 
@@ -92,14 +92,18 @@ try {
     await js("document.querySelector('#unit-guide-open').click()");
     for(let n=0;n<30&&!await js('document.querySelector("#guide-symbol img")?.complete');n++) await new Promise(resolve=>setTimeout(resolve,100));
     const guide=await measure();
-    assert.equal(guide.src,`assets/unit-art/sets/${style}/library/goblin-siegebreaker.svg`);
-    assert.deepEqual(guide.natural,{width:1024,height:768});
+    const military=style==='06-military-symbols';
+    assert.equal(guide.src,`assets/unit-art/sets/${style}/library/goblin-siegebreaker.${military?'svg':'png'}`);
+    assert.deepEqual(guide.natural,military?{width:1024,height:768}:{width:1536,height:1024});
     assert.equal(guide.fit,'contain'); assert.equal(guide.clip,'none');
     console.log('style switch',JSON.stringify({style,art,guide:guide.src}));
   }
-  await screenshot('q0o-guide-military-desktop');
+  await screenshot('bvh-guide-military-desktop');
+  await js("document.querySelector('#unit-guide-close').click()");
+  await js("(() => { const picker=document.querySelector('#art-style-select'); picker.value='02-technical-illustration'; picker.dispatchEvent(new Event('change',{bubbles:true})); })()");
+  await js("document.querySelector('#unit-guide-open').click()");
 
-  for (const [width, height, name] of [[390, 844, 'q0o-guide-mobile'], [320, 568, 'q0o-guide-mobile-min']]) {
+  for (const [width, height, name] of [[390, 844, 'bvh-guide-mobile'], [320, 568, 'bvh-guide-mobile-min']]) {
     await viewport(width, height, true);
     await js("document.querySelector('.guide-body').scrollTop=0");
     const layout = await measure();
@@ -108,6 +112,8 @@ try {
     assert.ok(layout.card.left >= 0 && layout.card.right <= width && layout.card.bottom <= height, JSON.stringify(layout));
     assert.ok(layout.header.scrollWidth <= layout.header.rect.width + 1, JSON.stringify(layout));
     assert.ok(layout.symbol.width <= layout.card.width && layout.image.width <= layout.symbol.width, JSON.stringify(layout));
+    assert.match(layout.src,/\/02-technical-illustration\/library\/goblin-siegebreaker\.png$/);
+    assert.deepEqual(layout.natural,{width:1536,height:1024});
     assert.equal(layout.fit, 'contain'); assert.equal(layout.clip, 'none');
     await screenshot(name);
     const nav = await js(`(() => { const card=document.querySelector('.guide-card'),body=document.querySelector('.guide-body'); body.scrollTop=body.scrollHeight; const r=document.querySelector('.guide-nav').getBoundingClientRect(),c=card.getBoundingClientRect(),last=document.querySelector('#guide-action-list').getBoundingClientRect(); return {top:r.top,bottom:r.bottom,cardBottom:c.bottom,lastActionBottom:last.bottom,bodyBottom:body.getBoundingClientRect().bottom}; })()`);
