@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "levels": [
+    {
+      "schemaVersion": 1,
+      "id": "showcase-terrain-course",
+      "title": "TERRAIN COURSE",
+      "kicker": "SHOWCASE 01 / TERRAIN COURSE",
+      "objective": "core-and-escort",
+      "width": 12,
+      "height": 8,
+      "defaultTerrain": "open-ground",
+      "terrain": [
+        {"x":3,"y":3,"type":"rubble-field"},
+        {"x":4,"y":2,"type":"mountain"},
+        {"x":7,"y":2,"type":"ridge"},
+        {"x":4,"y":4,"type":"forest"},
+        {"x":5,"y":5,"type":"marsh"},
+        {"x":6,"y":0,"type":"water"},
+        {"x":7,"y":0,"type":"water"},
+        {"x":6,"y":1,"type":"river"},
+        {"x":6,"y":2,"type":"river"},
+        {"x":6,"y":4,"type":"river"},
+        {"x":6,"y":5,"type":"river"},
+        {"x":4,"y":3,"type":"road"},
+        {"x":5,"y":3,"type":"road"},
+        {"x":7,"y":3,"type":"road"},
+        {"x":8,"y":3,"type":"road"},
+        {"x":6,"y":3,"type":"bridge"},
+        {"x":9,"y":3,"type":"urban"},
+        {"x":8,"y":5,"type":"crater"}
+      ],
+      "units": [
+        {"assetId":"assault-tank","team":"player","x":1,"y":3},
+        {"assetId":"skimmer-scout","team":"player","x":2,"y":2},
+        {"assetId":"amphibious-infantry","team":"player","x":1,"y":5},
+        {"assetId":"rocket-artillery","team":"player","x":2,"y":5},
+        {"assetId":"guard-tank","team":"enemy","x":8,"y":2},
+        {"assetId":"raider-skimmer","team":"enemy","x":9,"y":6},
+        {"assetId":"command-core","team":"enemy","x":10,"y":3}
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "id": "showcase-advance",
+      "title": "ADVANCE",
+      "kicker": "SHOWCASE 02 / ADVANCE",
+      "objective": "core-and-escort",
+      "width": 12,
+      "height": 8,
+      "defaultTerrain": "open-ground",
+      "terrain": [
+        {"x":5,"y":2,"type":"rubble-field"},
+        {"x":6,"y":5,"type":"crater"}
+      ],
+      "units": [
+        {"assetId":"goblin-siegebreaker","team":"player","x":1,"y":3},
+        {"assetId":"skimmer-scout","team":"player","x":2,"y":1},
+        {"assetId":"rocket-artillery","team":"player","x":1,"y":5},
+        {"assetId":"infantry-squad","team":"player","x":2,"y":5},
+        {"assetId":"assault-tank","team":"player","x":3,"y":3},
+        {"assetId":"recon-tank","team":"player","x":3,"y":1},
+        {"assetId":"guard-tank","team":"enemy","x":8,"y":2},
+        {"assetId":"raider-skimmer","team":"enemy","x":8,"y":5},
+        {"assetId":"command-core","team":"enemy","x":10,"y":3}
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "id": "showcase-siege",
+      "title": "SIEGE AND TRANSPORT",
+      "kicker": "SHOWCASE 03 / SIEGE AND TRANSPORT",
+      "objective": "core-and-escort",
+      "width": 12,
+      "height": 8,
+      "defaultTerrain": "open-ground",
+      "terrain": [
+        {"x":4,"y":3,"type":"road"},
+        {"x":5,"y":3,"type":"road"},
+        {"x":6,"y":3,"type":"road"},
+        {"x":7,"y":3,"type":"road"},
+        {"x":7,"y":4,"type":"rubble-field"}
+      ],
+      "units": [
+        {"assetId":"siege-tank","team":"player","x":2,"y":3},
+        {"assetId":"long-range-battery","team":"player","x":4,"y":2},
+        {"assetId":"mobile-siege-gun","team":"player","x":2,"y":5},
+        {"assetId":"combat-skimmer","team":"player","x":3,"y":4},
+        {"assetId":"light-skimmer","team":"player","x":1,"y":6},
+        {"assetId":"skimmer-carrier","team":"player","x":3,"y":5},
+        {"assetId":"infantry-squad","team":"player","x":3,"y":6},
+        {"assetId":"command-hub","team":"enemy","x":9,"y":1},
+        {"assetId":"goblin-dreadnaught","team":"enemy","x":8,"y":4},
+        {"assetId":"infantry-platoon","team":"enemy","x":9,"y":5},
+        {"assetId":"command-core","team":"enemy","x":10,"y":3}
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "id": "showcase-specialists",
+      "title": "SPECIALISTS",
+      "kicker": "SHOWCASE 04 / SPECIALISTS",
+      "objective": "core-and-escort",
+      "width": 12,
+      "height": 8,
+      "defaultTerrain": "open-ground",
+      "terrain": [
+        {"x":6,"y":4,"type":"river"},
+        {"x":6,"y":5,"type":"river"},
+        {"x":6,"y":3,"type":"bridge"},
+        {"x":4,"y":3,"type":"road"},
+        {"x":5,"y":3,"type":"road"},
+        {"x":7,"y":3,"type":"road"},
+        {"x":8,"y":2,"type":"urban"}
+      ],
+      "units": [
+        {"assetId":"strategic-missile-carrier","team":"player","x":1,"y":1},
+        {"assetId":"artillery-drone","team":"player","x":1,"y":3},
+        {"assetId":"amphibious-infantry","team":"player","x":2,"y":6},
+        {"assetId":"field-engineers","team":"player","x":2,"y":4},
+        {"assetId":"local-defense","team":"player","x":0,"y":5},
+        {"assetId":"forge-engineer","team":"player","x":3,"y":5},
+        {"assetId":"skimmer-carrier","team":"player","x":2,"y":5},
+        {"assetId":"phantom-platform","team":"enemy","x":9,"y":2},
+        {"assetId":"relay-node","team":"enemy","x":9,"y":5},
+        {"assetId":"command-core","team":"enemy","x":10,"y":3}
+      ]
+    }
+  ]
+}

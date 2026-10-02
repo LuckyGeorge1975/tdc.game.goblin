@@ -2,12 +2,24 @@ const objectiveFallback = {
   'iron-dust': 'Kommandokern zerstören; mindestens eine eigene Einheit erhalten.',
   'relay-run': 'Relaisknoten und alle Feinde ausschalten; eigene Einheit erhalten.',
   'unit-trial': 'Kommandozentrum und alle Feinde ausschalten; eigene Einheit erhalten.',
-  'atlas-proving-grounds': 'Feindlichen Kern und alle Feinde ausschalten; eigene Einheit erhalten.'
+  'atlas-proving-grounds': 'Feindlichen Kern und alle Feinde ausschalten; eigene Einheit erhalten.',
+  'showcase-terrain-course': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
+  'showcase-advance': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
+  'showcase-siege': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
+  'showcase-specialists': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.'
 };
 function renderScenarioObjective(){
   const key=`mission.${currentScenario}.objective.short`;
   const translated=globalThis.GoblinLanguage?.t(key);
   $('#mission-sub').textContent=translated&&translated!==key?translated:objectiveFallback[currentScenario]||scenarioCatalog[currentScenario]?.sub||'';
+  if(scenarioCatalog[currentScenario]?.showAllEnemiesProgress){
+    const titleKey=`mission.${currentScenario}.title`,title=globalThis.GoblinLanguage?.t(titleKey);
+    $('#mission-title').textContent=title&&title!==titleKey?title:scenarioCatalog[currentScenario].title;
+  }
+  for(const option of document.querySelectorAll('#scenario-select option[data-title-key]')){
+    const title=globalThis.GoblinLanguage?.t(option.dataset.titleKey);
+    option.textContent=title&&title!==option.dataset.titleKey?title:scenarioCatalog[option.value]?.title||option.textContent;
+  }
 }
 globalThis.GoblinLanguage?.ready.then(renderScenarioObjective);
 globalThis.addEventListener?.('goblin-language-change',renderScenarioObjective);
