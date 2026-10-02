@@ -64,10 +64,10 @@
       es:'Tres plazas para infantería. En Logística lo llaman cuidar del personal.',
       fr:'Trois places pour l’infanterie. La logistique appelle cela de la sollicitude.'},
     'STRATEGIC MISSILE CARRIER':{
-      de:'Eine Rakete, ein großer Radius und unangenehm viele Nachbarn. Die Nachbesprechung wird kurz.',
-      en:'One missile, a wide blast and far too many neighbors. The debrief will be short.',
-      es:'Un misil, una gran explosión y demasiados vecinos. La reunión posterior será breve.',
-      fr:'Un missile, une large explosion et beaucoup trop de voisins. Le débriefing sera bref.'},
+      de:'Eine Rakete. Das Ziel ist klar; wer daneben steht, kann ebenfalls getroffen werden. Im Bericht gibt es dafür eine Spalte.',
+      en:'One missile. The target is clear; anyone next to it may be hit as well. The report has a column for that.',
+      es:'Un misil. El objetivo está claro; quienes estén al lado también pueden recibir el impacto. Para eso hay una columna en el informe.',
+      fr:'Un missile. La cible est claire ; ceux qui se trouvent à côté peuvent aussi être touchés. Le rapport a une colonne pour ça.'},
     'ARTILLERY DRONE':{
       de:'Die Drohne spart Besatzung. Die Verantwortung hat noch niemand eingespart.',
       en:'The drone keeps a crew out of danger. Responsibility stays right where it was.',
