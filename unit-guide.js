@@ -87,6 +87,7 @@ function openUnitGuide(){renderUnitGuide();guideModal.classList.remove('hidden')
 function closeUnitGuide(){guideModal.classList.add('hidden');}
 document.querySelector('#unit-guide-open').onclick=openUnitGuide;
 document.querySelector('#unit-guide-close').onclick=closeUnitGuide;
+document.querySelector('#guide-details-jump').onclick=()=>{const heading=document.querySelector('#guide-name');heading.tabIndex=-1;heading.scrollIntoView({block:'start'});heading.focus({preventScroll:true})};
 document.querySelector('#guide-prev').onclick=()=>{guideIndex=(guideIndex+unitGuideEntries.length-1)%unitGuideEntries.length;renderUnitGuide()};
 document.querySelector('#guide-next').onclick=()=>{guideIndex=(guideIndex+1)%unitGuideEntries.length;renderUnitGuide()};
 document.querySelector('#guide-find').onclick=()=>{const unit=units.find(item=>item.name===unitGuideEntries[guideIndex].name);if(!unit)return;closeUnitGuide();selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);updateSelection();draw();globalThis.GoblinMobileViews?.show('map',{focus:true})};

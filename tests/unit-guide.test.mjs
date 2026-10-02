@@ -7,7 +7,7 @@ function guide(units=[{id:'ogre',name:'GOBLIN SIEGEBREAKER',team:'player',x:1,y:
   const nodes=new Map();
   function element(){return {textContent:'',innerHTML:'',disabled:false,scrollTop:0,children:[],attributes:{},
     classList:{add(){},remove(){},toggle(){},contains(){return false}},
-    addEventListener(){},setAttribute(key,value){this.attributes[key]=value},appendChild(child){this.children.push(child)},replaceChildren(){this.children=[]}}}
+    addEventListener(){},setAttribute(key,value){this.attributes[key]=value},appendChild(child){this.children.push(child)},replaceChildren(){this.children=[]},scrollIntoView(){this.scrolled=true},focus(){this.focused=true}}}
   const document={querySelector(key){if(!nodes.has(key))nodes.set(key,element());return nodes.get(key)},createElement:element,addEventListener(){}};
   const context=vm.createContext({document,units,
     scenarioCatalog:{'iron-dust':{units:[{name:'GOBLIN SIEGEBREAKER'}]}},currentScenario:'iron-dust',
@@ -91,6 +91,45 @@ test('preview distinguishes stationary, skimmer, weapon and spent missile reach'
   document.querySelector('#guide-range-attack').onclick();
   assert.match(document.querySelector('#guide-range-summary').textContent,/Kein Angriff/);
   assert.match(document.querySelector('#guide-range-note').textContent,/Rakete verbraucht/);
+});
+
+test('destroyed Siegebreaker systems no longer contribute to live attack preview',()=>{
+  const {context,document}=guide([]);
+  const entry="unitGuideEntries.find(item=>item.name==='GOBLIN SIEGEBREAKER')";
+  const weapons={
+    missiles:{range:5,count:2,remaining:2,destroyed:2},
+    main:{range:3,count:1,remaining:1,destroyed:0},
+    secondary:{range:2,count:4,remaining:4,destroyed:0},
+  };
+  context.siegebreaker={name:'GOBLIN SIEGEBREAKER',move:3,ogreSystems:{weapons}};
+  assert.equal(vm.runInContext(`UnitGuideRange.profile(${entry},siegebreaker).range`,context),3);
+  context.units=[context.siegebreaker];
+  vm.runInContext("guideIndex=unitGuideEntries.findIndex(item=>item.name==='GOBLIN SIEGEBREAKER');renderUnitGuide()",context);
+  document.querySelector('#guide-range-attack').onclick();
+  assert.match(document.querySelector('#guide-range-summary').textContent,/Max\. Reichweite intakter Waffen: 3 Hex/);
+  weapons.main.destroyed=1;
+  assert.equal(vm.runInContext(`UnitGuideRange.profile(${entry},siegebreaker).range`,context),2);
+  weapons.secondary.destroyed=4;
+  assert.equal(vm.runInContext(`UnitGuideRange.profile(${entry},siegebreaker).range`,context),0);
+});
+
+test('missile preview explains target cells and splash beyond them in every language',()=>{
+  const {context,document}=guide([]);
+  for(const [lang,fragment] of [['de','außerhalb des roten Bereichs'],['en','outside the red area'],['es','fuera de la zona roja'],['fr','hors de la zone rouge']]){
+    context.GoblinLanguage={current:lang};
+    vm.runInContext("guideIndex=unitGuideEntries.findIndex(item=>item.name==='STRATEGIC MISSILE CARRIER');renderUnitGuide()",context);
+    document.querySelector('#guide-range-attack').onclick();
+    assert.match(document.querySelector('#guide-range-note').textContent,new RegExp(fragment),lang);
+  }
+});
+
+test('mobile details jump exposes the facts and general note without changing the guide entry',()=>{
+  const {context,document}=guide();
+  vm.runInContext('renderUnitGuide()',context);
+  document.querySelector('#guide-details-jump').onclick();
+  assert.equal(document.querySelector('#guide-name').scrolled,true);
+  assert.equal(document.querySelector('#guide-name').focused,true);
+  assert.equal(vm.runInContext('guideIndex',context),0);
 });
 
 test('every guide entry has a distinct general note in all supported languages',()=>{

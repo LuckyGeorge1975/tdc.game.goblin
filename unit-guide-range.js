@@ -1,12 +1,14 @@
 (function(root){
   'use strict';
   const labels={
-    de:{move:'BEWEGUNG',attack:'ANGRIFF',hex:'Hex',none:'Keine Eigenbewegung',unarmed:'Kein Angriff',bonus:'Zusatzmanöver',weapon:'Je nach intakter Waffe',missile:'Ein Raketenangriff; Einschlag trifft auch Nachbarfelder.',spent:'Rakete verbraucht.',preview:'Schematisch: freies Gelände, ohne Belegung, Sichtlinie und Phasenstatus.',catalog:'Katalogwert',live:'Aktueller Wert'},
-    en:{move:'MOVEMENT',attack:'ATTACK',hex:'hexes',none:'No independent movement',unarmed:'No attack',bonus:'Extra maneuver',weapon:'Depends on intact weapon',missile:'One missile; impact also hits adjacent hexes.',spent:'Missile spent.',preview:'Diagram: open terrain; occupancy, line of sight and phase status excluded.',catalog:'Catalog value',live:'Current value'},
-    es:{move:'MOVIMIENTO',attack:'ATAQUE',hex:'hexágonos',none:'Sin movimiento propio',unarmed:'Sin ataque',bonus:'Maniobra adicional',weapon:'Depende del arma intacta',missile:'Un misil; el impacto alcanza hexágonos vecinos.',spent:'Misil agotado.',preview:'Esquema: terreno libre, sin ocupación, línea de visión ni estado de fase.',catalog:'Valor de catálogo',live:'Valor actual'},
-    fr:{move:'DÉPLACEMENT',attack:'ATTAQUE',hex:'hexagones',none:'Aucun déplacement autonome',unarmed:'Aucune attaque',bonus:'Manœuvre supplémentaire',weapon:'Selon l’arme intacte',missile:'Un missile ; l’impact touche aussi les hexagones voisins.',spent:'Missile épuisé.',preview:'Schéma : terrain libre, sans occupation, ligne de vue ni état de phase.',catalog:'Valeur du catalogue',live:'Valeur actuelle'}
+    de:{move:'BEWEGUNG',attack:'ANGRIFF',hex:'Hex',none:'Keine Eigenbewegung',unarmed:'Kein Angriff',bonus:'Zusatzmanöver',maxWeapon:'Max. Reichweite intakter Waffen:',noWeapon:'Keine intakte Waffe',weapon:'Die gewählte Waffe kann kürzer reichen.',missile:'Rote Felder sind mögliche Einschlagziele; der Splash trifft Nachbarfelder des gewählten Ziels, auch außerhalb des roten Bereichs.',spent:'Rakete verbraucht.',preview:'Schematisch: freies Gelände, ohne Belegung, Sichtlinie und Phasenstatus.',catalog:'Katalogwert',live:'Aktueller Wert'},
+    en:{move:'MOVEMENT',attack:'ATTACK',hex:'hexes',none:'No independent movement',unarmed:'No attack',bonus:'Extra maneuver',maxWeapon:'Max. range of intact weapons:',noWeapon:'No intact weapon',weapon:'The selected weapon may have shorter range.',missile:'Red hexes are possible impact targets; the blast hits neighbors of the chosen target, even outside the red area.',spent:'Missile spent.',preview:'Diagram: open terrain; occupancy, line of sight and phase status excluded.',catalog:'Catalog value',live:'Current value'},
+    es:{move:'MOVIMIENTO',attack:'ATAQUE',hex:'hexágonos',none:'Sin movimiento propio',unarmed:'Sin ataque',bonus:'Maniobra adicional',maxWeapon:'Alcance máx. de armas intactas:',noWeapon:'Sin armas intactas',weapon:'El arma seleccionada puede tener menos alcance.',missile:'Los hexágonos rojos son posibles objetivos; la explosión alcanza a los vecinos del objetivo elegido, también fuera de la zona roja.',spent:'Misil agotado.',preview:'Esquema: terreno libre, sin ocupación, línea de visión ni estado de fase.',catalog:'Valor de catálogo',live:'Valor actual'},
+    fr:{move:'DÉPLACEMENT',attack:'ATTAQUE',hex:'hexagones',none:'Aucun déplacement autonome',unarmed:'Aucune attaque',bonus:'Manœuvre supplémentaire',maxWeapon:'Portée max. des armes intactes :',noWeapon:'Aucune arme intacte',weapon:'L’arme choisie peut avoir une portée plus courte.',missile:'Les hexagones rouges sont des cibles possibles ; l’explosion touche les voisins de la cible choisie, même hors de la zone rouge.',spent:'Missile épuisé.',preview:'Schéma : terrain libre, sans occupation, ligne de vue ni état de phase.',catalog:'Valeur du catalogue',live:'Valeur actuelle'}
   };
   const language=()=>labels[root.GoblinLanguage?.current]||labels.de;
+  const detailsLabels={de:'WERTE & RANDNOTIZ ↓',en:'STATS & MARGIN NOTE ↓',es:'DATOS Y NOTA AL MARGEN ↓',fr:'DONNÉES ET NOTE EN MARGE ↓'};
+  const previewLabels={de:'Reichweitenvorschau',en:'Range preview',es:'Vista previa del alcance',fr:'Aperçu des portées'};
   const number=value=>Math.max(0,Number.parseInt(String(value),10)||0);
   function profile(entry,live){
     const movement=live?number(live.move):number(entry.move);
@@ -17,7 +19,7 @@
     if(entry.name==='GOBLIN SIEGEBREAKER'){
       weapon=true;
       if(live?.ogreSystems){
-        const available=Object.values(live.ogreSystems.weapons||{}).filter(item=>item.remaining>0).map(item=>number(item.range));
+        const available=Object.values(live.ogreSystems.weapons||{}).filter(item=>Math.min(item.remaining,item.count-item.destroyed)>0).map(item=>number(item.range));
         range=available.length?Math.max(...available):0;
       }
     }
@@ -42,12 +44,15 @@
   function render(entry,live){
     current={entry,live};
     const p=profile(entry,live),l=language();
+    const lang=root.GoblinLanguage?.current||'de';
+    document.querySelector('#guide-details-jump').textContent=detailsLabels[lang]||detailsLabels.de;
+    document.querySelector('.guide-range-panel').setAttribute('aria-label',previewLabels[lang]||previewLabels.de);
     for(const [key,label] of [['move',l.move],['attack',l.attack]]){
       const button=document.querySelector(`#guide-range-${key}`);
       button.textContent=label;
       button.setAttribute('aria-pressed',String(mode===key));
     }
-    const summary=mode==='move'?(p.movement?`${p.movement} ${l.hex}`:l.none)+(p.bonus?` + ${p.bonus} ${l.hex} ${l.bonus.toLowerCase()}`:''):(p.range?`${p.range} ${l.hex}`:l.unarmed);
+    const summary=mode==='move'?(p.movement?`${p.movement} ${l.hex}`:l.none)+(p.bonus?` + ${p.bonus} ${l.hex} ${l.bonus.toLowerCase()}`:''):p.weapon?(p.range?`${l.maxWeapon} ${p.range} ${l.hex}`:l.noWeapon):(p.range?`${p.range} ${l.hex}`:l.unarmed);
     const note=mode==='attack'&&p.spent?l.spent:mode==='attack'&&p.missile?l.missile:mode==='attack'&&p.weapon?l.weapon:'';
     document.querySelector('#guide-range-map').innerHTML=mapSvg(p,mode);
     document.querySelector('#guide-range-summary').textContent=`${p.live?l.live:l.catalog} · ${summary}`;
