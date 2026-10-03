@@ -35,6 +35,8 @@ Die Tabelle nennt Legacy als `HP/D/R/M/A` und das Ziel als `A/R/D/M`; `S` verwei
 
 Die Zielwerte brauchen vor Aktivierung eigene Regeln für Skimmer-Budget, halfUnit, Infanterie-Stärkepunkte, Artillerie, Systeme und Tarnung sowie Level-Balance, Siegroute, Replay-Version, Guide-Live-Anzeige und Browser-QA. Diese Arbeit gehört zu den Folgeabschnitten von `goblin-9bj.10` und den Spezialthemen `.11`–`.19`. Für neue Partien ist ein eigener Rule-/Scenario-Versionswechsel erforderlich; der Legacy-Snapshot bleibt erhalten.
 
+`skimmer-budget.mjs` liest als isolierter Helfer die Bewegungsbudgets der vier Spieler-Skimmer aus einer ausdrücklich benannten Datenprofil-Version. Das Legacy-Datenprofil liefert 3+2; der inaktive Zielentwurf liefert U10/U11 4+3 und U02/U12 3+2. Der Helfer ist **keine aktive Spielmechanik**: Weder Missionsstart noch Legacy-Spiel, modularer Core, Guide oder Replay rufen ihn auf. Die Produktprofile `FIELD_TEST_LEGACY_v1` und `FULL_CATALOG_v1` sind keine Datenprofil-Kennungen; ihre Bindung und eine neue ausführbare Regelversion bleiben Teil von `goblin-9bj.19` und der vollständigen Zielprofil-Abnahme.
+
 ## Szenario- und Produktprofilvertrag
 
 `scenario-profile-manifest.js` ist das synchrone, versionierte Manifest (`schemaVersion: 1`) für **neue** Legacy-Partien. Die Produktkennung `FIELD_TEST_LEGACY_v1` ist von der 26er-Datenkennung `field-test-atlas-v1` getrennt. Letztere gilt nur für die fünf nachgeladenen Level; die drei eingebauten Level bewahren ihre eigenen bisherigen Werte. Jede Paarung hat `scenarioVersion: 1` und `objectiveVersion: 1`.
