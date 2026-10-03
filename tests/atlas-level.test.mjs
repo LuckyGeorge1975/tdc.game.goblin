@@ -6,6 +6,7 @@ import vm from 'node:vm';
 const atlas=JSON.parse(readFileSync(new URL('../assets/unit-art/levels/atlas-proving-grounds.json',import.meta.url),'utf8'));
 const showcase=JSON.parse(readFileSync(new URL('../assets/unit-art/levels/showcase-levels.json',import.meta.url),'utf8'));
 const profiles=JSON.parse(readFileSync(new URL('../assets/unit-art/rules/unit-profiles.v1.json',import.meta.url),'utf8'));
+const manifestSource=readFileSync(new URL('../scenario-profile-manifest.js',import.meta.url),'utf8');
 const source=readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8');
 
 async function load(bundle=showcase,search='',registry=profiles){
@@ -19,6 +20,7 @@ async function load(bundle=showcase,search='',registry=profiles){
     console:{error:(...items)=>errors.push(items)},addLog:()=>{},
     location:{search},loadScenario:id=>loaded.push(id),URLSearchParams
   });
+  vm.runInContext(manifestSource,context);
   vm.runInContext(source,context);
   await new Promise(resolve=>setImmediate(resolve));
   return {context,options,errors,loaded};
@@ -31,6 +33,8 @@ test('ATLAS and four smaller scenarios load with complete roster and terrain cov
   const atlasScenario=context.scenarioCatalog['atlas-proving-grounds'];
   assert.equal(atlasScenario.objectiveVersion,1);
   assert.equal(atlasScenario.ruleProfile,'field-test-atlas-v1');
+  assert.equal(atlasScenario.ruleProfileId,'FIELD_TEST_LEGACY_v1');
+  assert.equal(atlasScenario.scenarioVersion,1);
   assert.equal(atlasScenario.objective,'core-and-escort');
   assert.equal(atlasScenario.units.length,26);
   assert.equal(new Set(atlasScenario.units.map(unit=>unit.visualKey)).size,26);
@@ -40,6 +44,8 @@ test('ATLAS and four smaller scenarios load with complete roster and terrain cov
   assert.equal(new Set(['open-ground',...small[0].terrainTypes.map(cell=>cell.type)]).size,12);
   for(const scenario of small){
     assert.equal(scenario.objectiveVersion,1);
+    assert.equal(scenario.ruleProfileId,'FIELD_TEST_LEGACY_v1');
+    assert.equal(scenario.scenarioVersion,1);
     assert.equal(scenario.objective,'core-and-escort');
     assert.equal(scenario.units.filter(unit=>unit.core&&unit.team==='enemy').length,1);
     assert.equal(new Set(scenario.units.map(unit=>`${unit.x},${unit.y}`)).size,scenario.units.length);
@@ -51,6 +57,23 @@ test('ATLAS and four smaller scenarios load with complete roster and terrain cov
   assert.ok(small[3].units.find(unit=>unit.visualKey==='strategic-missile-carrier')?.strategicMissile);
   assert.ok(small[3].units.find(unit=>unit.visualKey==='amphibious-infantry')?.amphibious);
   assert.equal(small[3].units.find(unit=>unit.visualKey==='skimmer-carrier')?.transportCapacity,3);
+});
+
+test('asset levels reject missing, unknown and mismatched product profiles before registration',async()=>{
+  for(const mutation of [
+    level=>delete level.ruleProfileId,
+    level=>{level.ruleProfileId='FULL_CATALOG_v1'},
+    level=>{level.scenarioVersion=2},
+    level=>{level.objective='core'}
+  ]){
+    const invalid=structuredClone(showcase);
+    mutation(invalid.levels[0]);
+    const {context,errors,options}=await load(invalid);
+    assert.ok(context.scenarioCatalog['atlas-proving-grounds']);
+    assert.equal(context.scenarioCatalog['showcase-terrain-course'],undefined);
+    assert.equal(options.length,1);
+    assert.match(String(errors[0]?.[1]),/UNSUPPORTED_RULE_PROFILE|SCENARIO_PROFILE_MISMATCH/);
+  }
 });
 
 test('the inactive catalog target leaves all 26 live ATLAS values at the versioned Legacy snapshot',async()=>{
@@ -72,6 +95,14 @@ test('the inactive catalog target leaves all 26 live ATLAS values at the version
 test('a malformed rule register prevents all five levels from loading',async()=>{
   const invalid=structuredClone(profiles);
   invalid.units['assault-tank'].legacy[0]=-1;
+  const {context,errors}=await load(showcase,'',invalid);
+  assert.equal(Object.keys(context.scenarioCatalog).length,0);
+  assert.match(String(errors[0]?.[1]),/Unit rule profile invalid/);
+});
+
+test('a mistakenly activated full-catalog draft blocks all asset levels',async()=>{
+  const invalid=structuredClone(profiles);
+  invalid.targetActive=true;
   const {context,errors}=await load(showcase,'',invalid);
   assert.equal(Object.keys(context.scenarioCatalog).length,0);
   assert.match(String(errors[0]?.[1]),/Unit rule profile invalid/);

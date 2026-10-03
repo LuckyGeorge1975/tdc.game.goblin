@@ -1,6 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "atlas-proving-grounds",
+  "scenarioVersion": 1,
+  "ruleProfileId": "FIELD_TEST_LEGACY_v1",
   "title": "ATLAS / PROVING GROUNDS",
   "description": "Content-Showcase auf 12 × 8 Hexfeldern: jeder Terrain-Typ und jeder aktuelle Asset-Typ ist mindestens einmal zu sehen. Die erweiterten Geländeregeln und mehrere Einheiten sind noch nicht vollständig implementiert.",
   "width": 12,

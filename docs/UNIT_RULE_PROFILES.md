@@ -34,3 +34,20 @@ Die Tabelle nennt Legacy als `HP/D/R/M/A` und das Ziel als `A/R/D/M`; `S` verwei
 | U26 | Raider Skimmer | 2/2/2/2/1 | 1/2/2/2 | Guide/Legacy, Gegner-KI separat |
 
 Die Zielwerte brauchen vor Aktivierung eigene Regeln für Skimmer-Budget, halfUnit, Infanterie-Stärkepunkte, Artillerie, Systeme und Tarnung sowie Level-Balance, Siegroute, Replay-Version, Guide-Live-Anzeige und Browser-QA. Diese Arbeit gehört zu den Folgeabschnitten von `goblin-9bj.10` und den Spezialthemen `.11`–`.19`. Für neue Partien ist ein eigener Rule-/Scenario-Versionswechsel erforderlich; der Legacy-Snapshot bleibt erhalten.
+
+## Szenario- und Produktprofilvertrag
+
+`scenario-profile-manifest.js` ist das synchrone, versionierte Manifest (`schemaVersion: 1`) für **neue** Legacy-Partien. Die Produktkennung `FIELD_TEST_LEGACY_v1` ist von der 26er-Datenkennung `field-test-atlas-v1` getrennt. Letztere gilt nur für die fünf nachgeladenen Level; die drei eingebauten Level bewahren ihre eigenen bisherigen Werte. Jede Paarung hat `scenarioVersion: 1` und `objectiveVersion: 1`.
+
+| Szenario-ID | Produktprofil | Zielregel | 26er-Datenprofil |
+| --- | --- | --- | --- |
+| `iron-dust` | `FIELD_TEST_LEGACY_v1` | `core` | eigener Built-in-Snapshot |
+| `relay-run` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | eigener Built-in-Snapshot |
+| `unit-trial` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | eigener Built-in-Snapshot |
+| `atlas-proving-grounds` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | `field-test-atlas-v1` |
+| `showcase-terrain-course` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | `field-test-atlas-v1` |
+| `showcase-advance` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | `field-test-atlas-v1` |
+| `showcase-siege` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | `field-test-atlas-v1` |
+| `showcase-specialists` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | `field-test-atlas-v1` |
+
+Der synchrone Built-in-Start, jeder spätere `loadScenario`-Aufruf und die Registrierung der fünf Asset-Level prüfen diese Paarung vor dem Start beziehungsweise vor der Registrierung. Fehlende oder unbekannte Produktkennungen ergeben `UNSUPPORTED_RULE_PROFILE`; falsche Szenario-Versionen, Zielregeln oder Datenprofile `SCENARIO_PROFILE_MISMATCH`. Die Fehlermeldung wird angezeigt oder im Spielprotokoll ausgegeben. `full-catalog-v1-draft` bleibt inaktiv. Dieser erste Vertragsschnitt enthält keine Speicherung und kein Replay; deren sichere Snapshot-Grenze folgt in `goblin-9bj.19`.

@@ -23,7 +23,7 @@ function legacyTrial() {
     localStorage: { getItem() { return null; } }, setTimeout() { return 1; }, clearTimeout() {},
   });
   const run = source => vm.runInContext(source, context);
-  for (const file of ['unit-visuals.js', 'terrain-rules.js', 'ogre-systems.js', 'game.js', 'ogre-runtime.js',
+  for (const file of ['unit-visuals.js', 'terrain-rules.js', 'ogre-systems.js', 'scenario-profile-manifest.js', 'game.js', 'ogre-runtime.js',
     'combat-feedback.js', 'siegebreaker-weapons.js', 'scenario.js', 'command-history.js']) {
     run(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'));
   }
@@ -49,6 +49,14 @@ test('versioned objective profiles cover every Legacy level and reject unknown c
   assert.throws(() => run("victoryProfile({objectiveVersion:2,objective:'core'})"), /Unsupported objective contract version/);
   assert.throws(() => run("victoryProfile({objectiveVersion:1,objective:'unknown'})"), /Unsupported objective/);
   assert.throws(() => run("victoryProfile({objective:'core'})"), /Unsupported objective contract version/);
+});
+
+test('a later scenario start rejects profile mismatch before changing the active party', () => {
+  const { run } = legacyTrial();
+  const before=run("JSON.stringify({scenario:currentScenario,units:units.map(u=>[u.id,u.x,u.y,u.hp])})");
+  run("scenarioCatalog['relay-run'].scenarioVersion=2");
+  assert.throws(()=>run("loadScenario('relay-run')"),/SCENARIO_PROFILE_MISMATCH/);
+  assert.equal(run("JSON.stringify({scenario:currentScenario,units:units.map(u=>[u.id,u.x,u.y,u.hp])})"),before);
 });
 
 test('objective profiles distinguish core-only and escort without changing defeat priority', () => {

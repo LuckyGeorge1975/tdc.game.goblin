@@ -30,6 +30,8 @@
     return unit;
   }
   function validateLevel(level){
+    ScenarioRuleProfiles.validate(level.id,{...level,objectiveVersion:level.schemaVersion,
+      ruleProfile:profile.legacyProfile,objective:level.id==='atlas-proving-grounds'?'core-and-escort':level.objective});
     if(level.schemaVersion!==1||!/^[-a-z0-9]+$/.test(level.id||'')||!level.title?.trim()||!level.kicker?.trim()||level.width!==W||level.height!==H||
       level.defaultTerrain!=='open-ground'||level.objective!=='core-and-escort'||
       !Array.isArray(level.units)||!Array.isArray(level.terrain)||level.units.length<2)throw new Error('Showcase level schema invalid');
@@ -57,7 +59,8 @@
     scenarioCatalog[level.id]={
       kicker:level.kicker,title:level.title,
       sub:'Feindlichen Kern und alle übrigen Gegner ausschalten; eigene Einheit erhalten.',
-      objectiveVersion:level.schemaVersion,objective:level.objective,ruleProfile:profile.legacyProfile,showAllEnemiesProgress:true,
+      objectiveVersion:level.schemaVersion,objective:level.objective,scenarioVersion:level.scenarioVersion,
+      ruleProfileId:level.ruleProfileId,ruleProfile:profile.legacyProfile,showAllEnemiesProgress:true,
       terrain:level.terrain.filter(cell=>TerrainRules.coverBonus(cell.type)>0).map(cell=>`${cell.x},${cell.y}`),
       terrainTypes:level.terrain,units:level.units.map(makeUnit)
     };
@@ -81,7 +84,7 @@
       if(!response.ok)throw new Error(`HTTP ${response.status}`);
       const level=await response.json();
       register({...level,kicker:'MISSION 10 / ATLAS PROVING GROUNDS',title:'ATLAS / Proving Grounds',objective:'core-and-escort'});
-    }catch(error){console.error('ATLAS level unavailable:',error);addLog('ATLAS-Level konnte nicht geladen werden.',true)}
+    }catch(error){console.error('ATLAS level unavailable:',error);addLog(`ATLAS-Level konnte nicht geladen werden: ${error.message}`,true)}
     try{
       const response=await fetch('assets/unit-art/levels/showcase-levels.json');
       if(!response.ok)throw new Error(`HTTP ${response.status}`);
@@ -91,6 +94,6 @@
       if(expected.some((id,index)=>bundle.levels[index]?.id!==id))throw new Error('Showcase level IDs invalid');
       for(const level of bundle.levels)validateLevel(level);
       for(const level of bundle.levels)register(level);
-    }catch(error){console.error('Showcase levels unavailable:',error);addLog('Showcase-Level konnten nicht geladen werden.',true)}
+    }catch(error){console.error('Showcase levels unavailable:',error);addLog(`Showcase-Level konnten nicht geladen werden: ${error.message}`,true)}
   })();
 })();

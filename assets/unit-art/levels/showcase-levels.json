@@ -4,6 +4,8 @@
     {
       "schemaVersion": 1,
       "id": "showcase-terrain-course",
+      "scenarioVersion": 1,
+      "ruleProfileId": "FIELD_TEST_LEGACY_v1",
       "title": "TERRAIN COURSE",
       "kicker": "SHOWCASE 01 / TERRAIN COURSE",
       "objective": "core-and-escort",
@@ -43,6 +45,8 @@
     {
       "schemaVersion": 1,
       "id": "showcase-advance",
+      "scenarioVersion": 1,
+      "ruleProfileId": "FIELD_TEST_LEGACY_v1",
       "title": "ADVANCE",
       "kicker": "SHOWCASE 02 / ADVANCE",
       "objective": "core-and-escort",
@@ -68,6 +72,8 @@
     {
       "schemaVersion": 1,
       "id": "showcase-siege",
+      "scenarioVersion": 1,
+      "ruleProfileId": "FIELD_TEST_LEGACY_v1",
       "title": "SIEGE AND TRANSPORT",
       "kicker": "SHOWCASE 03 / SIEGE AND TRANSPORT",
       "objective": "core-and-escort",
@@ -98,6 +104,8 @@
     {
       "schemaVersion": 1,
       "id": "showcase-specialists",
+      "scenarioVersion": 1,
+      "ruleProfileId": "FIELD_TEST_LEGACY_v1",
       "title": "SPECIALISTS",
       "kicker": "SHOWCASE 04 / SPECIALISTS",
       "objective": "core-and-escort",

@@ -25,8 +25,8 @@ const COMBAT_RULES=Object.freeze({crt:Object.freeze({'1-2':['NE','NE','NE','NE',
 ];
 // objective describes the mission for catalogs; checkVictory is authoritative.
 const scenarioCatalog={
-  'iron-dust':{kicker:'MISSION 07 / IRON DUST',title:'Durchbrechen. Ausschalten. Überleben.',sub:'Zerstöre den feindlichen Kommandokern, bevor Verstärkungen eintreffen.',objectiveVersion:1,objective:'core',terrain:['3,1','8,1','1,4','5,3','9,5','2,6','7,6','10,2'],units:units.map(u=>({...u}))},
-  'relay-run':{kicker:'MISSION 08 / RELAY RUN',title:'Sichern. Halten. Extrahieren.',sub:'Erreiche den östlichen Relaisknoten und schalte seine Eskorte aus.',objectiveVersion:1,objective:'core-and-escort',terrain:['4,2','5,2','4,5','7,4','8,6','2,3'],units:[
+  'iron-dust':{kicker:'MISSION 07 / IRON DUST',title:'Durchbrechen. Ausschalten. Überleben.',sub:'Zerstöre den feindlichen Kommandokern, bevor Verstärkungen eintreffen.',scenarioVersion:1,ruleProfileId:'FIELD_TEST_LEGACY_v1',objectiveVersion:1,objective:'core',terrain:['3,1','8,1','1,4','5,3','9,5','2,6','7,6','10,2'],units:units.map(u=>({...u}))},
+  'relay-run':{kicker:'MISSION 08 / RELAY RUN',title:'Sichern. Halten. Extrahieren.',sub:'Erreiche den östlichen Relaisknoten und schalte seine Eskorte aus.',scenarioVersion:1,ruleProfileId:'FIELD_TEST_LEGACY_v1',objectiveVersion:1,objective:'core-and-escort',terrain:['4,2','5,2','4,5','7,4','8,6','2,3'],units:[
     {id:'ogre',name:'GOBLIN SIEGEBREAKER',type:'HEAVY ASSAULT',team:'player',x:1,y:6,hp:5,maxHp:5,defense:5,range:2,move:3,damage:3,icon:'G',ogreSystems:GoblinSystems.createMarkIII()},
     {id:'gev',name:'SKIMMER SCOUT',type:'HOVERCRAFT',team:'player',x:2,y:6,hp:3,maxHp:3,defense:3,range:3,move:3,damage:1,icon:'G'},
     {id:'missile',name:'ROCKET ARTILLERY',type:'ARTILLERY',team:'player',x:3,y:7,hp:3,maxHp:3,defense:3,range:4,move:1,damage:2,icon:'M'},
@@ -35,7 +35,7 @@ const scenarioCatalog={
     {id:'guard',name:'GUARD TANK',type:'HOSTILE ARMOR',team:'enemy',x:8,y:2,hp:3,maxHp:3,defense:3,range:2,move:1,damage:1,icon:'G'},
     {id:'raider',name:'RAIDER SKIMMER',type:'HOSTILE HOVER',team:'enemy',x:9,y:4,hp:2,maxHp:2,defense:2,range:2,move:2,damage:1,icon:'R'}
   ]},
-  'unit-trial':{kicker:'MISSION 09 / UNIT TRIAL',title:'Katalog testen. Linie halten.',sub:'Erprobe die neuen Einheiten gegen eine gemischte Verteidigung.',objectiveVersion:1,objective:'core-and-escort',terrain:['3,1','5,2','2,4','7,4','9,5','4,6'],units:[
+  'unit-trial':{kicker:'MISSION 09 / UNIT TRIAL',title:'Katalog testen. Linie halten.',sub:'Erprobe die neuen Einheiten gegen eine gemischte Verteidigung.',scenarioVersion:1,ruleProfileId:'FIELD_TEST_LEGACY_v1',objectiveVersion:1,objective:'core-and-escort',terrain:['3,1','5,2','2,4','7,4','9,5','4,6'],units:[
     {id:'heavy-tank',name:'ASSAULT TANK',type:'FRONTLINE ARMOR',team:'player',x:1,y:6,hp:3,maxHp:3,defense:3,range:2,move:3,damage:4,icon:'H'},
     {id:'light-tank',name:'RECON TANK',type:'SCOUT ARMOR',team:'player',x:2,y:6,hp:2,maxHp:2,defense:2,range:2,move:3,damage:2,icon:'L'},
     {id:'gev-pc',name:'SKIMMER CARRIER',type:'PERSONNEL CARRIER',team:'player',x:3,y:6,hp:2,maxHp:2,defense:2,range:2,move:3,damage:1,icon:'P',movementMode:'gev',gev:true,transportCapacity:3},
@@ -46,6 +46,15 @@ const scenarioCatalog={
     {id:'missile-crawler',name:'STRATEGIC MISSILE CARRIER',type:'ONE-SHOT MISSILE PLATFORM',team:'player',x:0,y:7,hp:2,maxHp:2,defense:2,range:8,move:1,damage:6,icon:'C',strategicMissile:true,missilesRemaining:1}
   ]}
 };
+try{
+  for(const id of ['iron-dust','relay-run','unit-trial'])ScenarioRuleProfiles.validate(id,scenarioCatalog[id]);
+}catch(error){
+  document.querySelector('#mission-sub').textContent=error.message;
+  document.querySelector('#scenario-select').disabled=true;
+  document.querySelector('#end-turn').disabled=true;
+  document.querySelector('#reset-game').disabled=true;
+  throw error;
+}
 function victoryProfile(config){
   if(config?.objectiveVersion!==1)throw new Error('Unsupported objective contract version');
   if(config.objective!=='core'&&config.objective!=='core-and-escort')throw new Error('Unsupported objective');

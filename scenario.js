@@ -27,6 +27,7 @@ globalThis.addEventListener?.('goblin-language-change',renderScenarioObjective);
 function loadScenario(id){
   const config=scenarioCatalog[id];
   if(!config)return;
+  try{ScenarioRuleProfiles.validate(id,config)}catch(error){addLog(error.message,true);throw error}
   currentScenario=id;
   terrain=new Set(config.terrain);
   terrainTypes=new Map((config.terrainTypes||[]).map(cell=>[`${cell.x},${cell.y}`,cell.type]));
