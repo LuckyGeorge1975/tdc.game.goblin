@@ -1,4 +1,5 @@
 (function(){
+  if(globalThis.goblinBootProfileError)return;
   const picker=document.querySelector('#art-style-select');
   if(!picker)return;
 

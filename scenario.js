@@ -9,6 +9,7 @@ const objectiveFallback = {
   'showcase-specialists': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.'
 };
 function renderScenarioObjective(){
+  if(globalThis.goblinBootProfileError)return;
   const config=scenarioCatalog[currentScenario],profile=victoryProfile(config);
   const key=`mission.${currentScenario}.objective.short`;
   const translated=globalThis.GoblinLanguage?.t(key);
@@ -25,6 +26,7 @@ function renderScenarioObjective(){
 globalThis.GoblinLanguage?.ready.then(renderScenarioObjective);
 globalThis.addEventListener?.('goblin-language-change',renderScenarioObjective);
 function loadScenario(id){
+  if(globalThis.goblinBootProfileError)throw globalThis.goblinBootProfileError;
   const config=scenarioCatalog[id];
   if(!config)return;
   try{ScenarioRuleProfiles.validate(id,config)}catch(error){addLog(error.message,true);throw error}

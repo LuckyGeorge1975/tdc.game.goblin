@@ -74,6 +74,7 @@
     }
   }
   (async()=>{
+    if(globalThis.goblinBootProfileError)return;
     try{
       const response=await fetch('assets/unit-art/rules/unit-profiles.v1.json');
       if(!response.ok)throw new Error(`HTTP ${response.status}`);
