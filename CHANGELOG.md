@@ -1,10 +1,15 @@
 # Changelog
 
-Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion dokumentiert. Build 0.1.15 ist auf GitHub Pages veröffentlicht; Build 0.1.16 ist ein lokaler Kandidat ohne Tag oder Deploy. Build 0.1.13 blieb ein unveröffentlichter Vorläufer. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Übergabe wird ausschließlich die letzte Stelle erhöht.
+Veröffentlichte Builds und lokale Kandidaten werden hier getrennt dokumentiert. Build 0.1.16 ist auf GitHub Pages veröffentlicht; die folgende Payload-Optimierung ist ein lokaler, noch nicht versionierter Kandidat. Build 0.1.13 blieb ein unveröffentlichter Vorläufer. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Veröffentlichung wird ausschließlich die letzte Stelle erhöht.
+
+## Unveröffentlicht · Guide-Payload-Optimierung
+
+- Die 130 grafischen Content-08-Guide-Ansichten werden lokal als 1024 × 683 WebP Q85 mit transparentem, optimiertem 768 × 512-PNG-Fallback geladen. Die 1536 × 1024-Master bleiben im getrennten Unit-Art-Quellcheckout; der Pages-Checkout enthält sie nicht mehr. Karte-/Listenicons und Military-Guide-SVGs bleiben separat.
+- Der vollständige Export verkleinert die 130 WebP-Dateien auf 16.053.262 Bytes; alle 130 PNG-Fallbacks belegen 48.653.184 Bytes. Zusammen sind das 64.706.446 statt 256.085.118 Bytes für die früheren Runtime-PNGs. Qualität, Browser-Fallback und Regression sind vor einer Veröffentlichung unabhängig zu prüfen (`goblin-0t0.1`).
 
 ## [0.1.16] - 2026-10-02
 
-### Lokaler Kandidat · Content-08
+### Content-08
 
 - Der Unit Guide lädt für die fünf grafischen Stile je 26 große, freigestellte Content-08-PNG-Einzelansichten (insgesamt 130, 1536 × 1024 RGBA) statt der generierten 2.5D-SVG-Ersatzansichten. Die gewählte Stilvariante bestimmt weiterhin gleichzeitig Guide, Karten- und Listenmotive.
 - Karte und Listen verwenden unverändert die kleinen SVG-Icons. Das militärische Set verwendet weiterhin getrennte Icon- und Guide-SVGs mit demselben Symbolmotiv. Mini-Map und General-Texte im Guide bleiben erhalten.
@@ -13,7 +18,7 @@ Veröffentlichte Builds und lokale Kandidaten werden hier nach Buildversion doku
 ### Prüfung und Veröffentlichungsstand
 
 - Quellenstand `tdc.game.ogre-unit-art` `10131dc16ede760f2338b6605e10675f0cd81d29`: 130/130 PNGs wurden mit den Quelldateien per SHA-256 abgeglichen. Auf dem Integrationscommit `5a069a6c5a1169f7f03345cfb217c15db3f8dbe4` bestanden 137/137 Node-Tests und lokale Browserprüfungen der sechs Stile auf Desktop und emulierten Mobilgrößen ohne Ladefehler; vier Screenshots liegen unter `qa-evidence/bvh-guide-*.png`.
-- Unabhängige Regression, Bedien- und Release-QA auf dem finalen Kandidatencommit stehen aus. Der veröffentlichte Build bleibt `v0.1.15` auf `f40ddfb9a8ba86b3409960f6ab3a1332340678c8`. Für 0.1.16 gibt es noch keinen Push, kein Tag und kein Pages-Deployment; Veröffentlichung erfordert gesonderte Nutzerfreigabe und die dokumentierten Release-Gates (`goblin-6q6`).
+- Build 0.1.16 wurde nach unabhängiger QA und gesonderter Nutzerfreigabe unter `v0.1.16` auf `ff3bcc448f2580035aad2b6cea0681434d98617a` veröffentlicht (`goblin-6q6`). `v0.1.15` bleibt Rückfallpunkt. Die oben beschriebene Payload-Optimierung gehört nicht zu diesem veröffentlichten Build.
 
 ## [0.1.15] - 2026-10-02
 

@@ -6,12 +6,12 @@ import vm from 'node:vm';
 function theme(){
   const picker={value:'',options:[],appendChild(option){this.options.push(option)},
     addEventListener(type,listener){this[type]=listener}};
-  const symbol={classList:{add(){}},replaceChildren(node){this.image=node}};
+  const symbol={classList:{add(){}},replaceChildren(node){this.art=node;this.image=node.tag==='picture'?node.children[1]:node}};
   const storage=new Map();
   let progress=false,accept=true,restarts=0;
   const context=vm.createContext({
     document:{querySelector(selector){return selector==='#art-style-select'?picker:selector==='#guide-symbol'?symbol:null},querySelectorAll(){return []},
-      createElement(tag){return {tag,value:'',textContent:''}}},
+      createElement(tag){return {tag,value:'',textContent:'',children:[],append(...nodes){this.children.push(...nodes)}}}},
     localStorage:{getItem(key){return storage.get(key)||null},setItem(key,value){storage.set(key,value)}},
     GameDialogs:{isOpen(){return false},confirm:async()=>accept},
     units:[],selected:null,unitGuideEntries:[{name:'ASSAULT TANK'}],guideIndex:0,currentScenario:'iron-dust',gameOver:false,
@@ -40,9 +40,13 @@ test('guide uses the large view paired with the chosen icon style',()=>{
   const state=theme();
   state.context.renderUnitGuide();
   const initial=state.symbol.image.src;
-  assert.equal(initial,'assets/unit-art/sets/02-technical-illustration/library/assault-tank.png');
+  assert.equal(initial,'assets/unit-art/sets/02-technical-illustration/library/assault-tank@768.png');
+  assert.equal(state.symbol.art.tag,'picture');
+  assert.equal(state.symbol.art.children[0].type,'image/webp');
+  assert.equal(state.symbol.art.children[0].srcset,'assets/unit-art/sets/02-technical-illustration/library/assault-tank@1024.webp');
   state.context.UnitVisuals.setStyle('06-military-symbols');
   state.context.renderUnitGuide();
+  assert.equal(state.symbol.art.tag,'img');
   assert.equal(state.symbol.image.src,'assets/unit-art/sets/06-military-symbols/library/assault-tank.svg');
   assert.notEqual(state.symbol.image.src,initial);
 });

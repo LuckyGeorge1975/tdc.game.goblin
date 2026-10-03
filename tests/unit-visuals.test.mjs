@@ -48,14 +48,20 @@ test('six art sets resolve all 26 icon and guide pairs by unit name',()=>{
       for(const view of ['icons','library']){
         const path=UnitVisuals.assetFor(unit,view);
         const isPng=view==='library'&&style.id!=='06-military-symbols';
-        assert.equal(path,`assets/unit-art/sets/${style.id}/${view}/${id}.${isPng?'png':'svg'}`);
+        assert.equal(path,`assets/unit-art/sets/${style.id}/${view}/${id}${isPng?'@768':''}.${isPng?'png':'svg'}`);
         assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),`${style.id}/${view}/${id}`);
         if(isPng){
           const png=readFileSync(new URL(`../${path}`,import.meta.url));
           assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a',path);
-          assert.equal(png.readUInt32BE(16),1536,path);
-          assert.equal(png.readUInt32BE(20),1024,path);
+          assert.equal(png.readUInt32BE(16),768,path);
+          assert.equal(png.readUInt32BE(20),512,path);
           assert.equal(png[25],6,path);
+          const webpPath=UnitVisuals.assetFor(unit,view,'webp');
+          assert.equal(webpPath,`assets/unit-art/sets/${style.id}/${view}/${id}@1024.webp`);
+          const webp=readFileSync(new URL(`../${webpPath}`,import.meta.url));
+          assert.equal(webp.toString('ascii',0,4),'RIFF',webpPath);
+          assert.equal(webp.toString('ascii',8,12),'WEBP',webpPath);
+          assert.equal(existsSync(new URL(`../assets/unit-art/sets/${style.id}/${view}/${id}.png`,import.meta.url)),false);
         }else{
           const svg=readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
           assert.match(svg,new RegExp(`width="${view==='icons'?'256':'1024'}"`),path);
@@ -77,7 +83,9 @@ test('guide artwork follows each map style for all 26 units',()=>{
     UnitVisuals.setStyle(style.id);
     for(const unit of manifest.units){
       const path=UnitVisuals.assetFor(unit,'library');
-      assert.equal(path,`assets/unit-art/sets/${style.id}/library/${unit.id}.${style.id==='06-military-symbols'?'svg':'png'}`);
+      assert.equal(path,style.id==='06-military-symbols'
+        ?`assets/unit-art/sets/${style.id}/library/${unit.id}.svg`
+        :`assets/unit-art/sets/${style.id}/library/${unit.id}@768.png`);
       assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),path);
     }
   }
