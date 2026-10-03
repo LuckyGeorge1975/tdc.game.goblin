@@ -13,6 +13,7 @@
   }
 
   function updateObjectiveStatus(){
+    if(root.goblinBootProfileError||!legacySession)return;
     const profile=victoryProfile(legacySession.effectiveRules),objective=objectiveSnapshot(profile,units);
     const text=$('#objective-text'),progress=$('#objective-progress');
     if(!text||!progress)return;

@@ -5,6 +5,7 @@ import vm from 'node:vm';
 
 const source=readFileSync(new URL('../scenario-profile-manifest.js',import.meta.url),'utf8');
 const gameSource=readFileSync(new URL('../game.js',import.meta.url),'utf8');
+const combatFeedbackSource=readFileSync(new URL('../combat-feedback.js',import.meta.url),'utf8');
 const scenarioSource=readFileSync(new URL('../scenario.js',import.meta.url),'utf8');
 const ids=['iron-dust','relay-run','unit-trial','atlas-proving-grounds',
   'showcase-terrain-course','showcase-advance','showcase-siege','showcase-specialists'];
@@ -96,6 +97,10 @@ test('an invalid built-in profile stops initial boot before gameplay handlers or
   assert.deepEqual(listeners,[],'gameplay keyboard handler must not be installed');
   vm.runInContext(scenarioSource,context);
   vm.runInContext('renderScenarioObjective()',context);
+  assert.doesNotThrow(()=>vm.runInContext(combatFeedbackSource,context),
+    'combat feedback must not inspect a rejected boot without a session');
+  assert.doesNotThrow(()=>vm.runInContext('CombatFeedback.updateObjectiveStatus()',context));
+  assert.equal(vm.runInContext('legacySession',context),null);
   assert.match(document.querySelector('#mission-sub').textContent,/Partie wurde nicht geladen/);
   assert.throws(()=>vm.runInContext("loadScenario('relay-run')",context),/UNSUPPORTED_RULE_PROFILE/);
 });
