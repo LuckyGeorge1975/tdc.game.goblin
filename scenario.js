@@ -9,10 +9,11 @@ const objectiveFallback = {
   'showcase-specialists': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.'
 };
 function renderScenarioObjective(){
+  const config=scenarioCatalog[currentScenario],profile=victoryProfile(config);
   const key=`mission.${currentScenario}.objective.short`;
   const translated=globalThis.GoblinLanguage?.t(key);
-  $('#mission-sub').textContent=translated&&translated!==key?translated:objectiveFallback[currentScenario]||scenarioCatalog[currentScenario]?.sub||'';
-  if(scenarioCatalog[currentScenario]?.showAllEnemiesProgress){
+  $('#mission-sub').textContent=translated&&translated!==key?translated:objectiveFallback[currentScenario]||config.sub||'';
+  if(profile.requiresAllEnemies){
     const titleKey=`mission.${currentScenario}.title`,title=globalThis.GoblinLanguage?.t(titleKey);
     $('#mission-title').textContent=title&&title!==titleKey?title:scenarioCatalog[currentScenario].title;
   }

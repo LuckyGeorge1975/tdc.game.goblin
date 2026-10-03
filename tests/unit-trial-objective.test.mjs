@@ -64,6 +64,64 @@ test('objective profiles distinguish core-only and escort without changing defea
   }
 });
 
+test('all eight Legacy profiles keep the mission active until their own goal is met', () => {
+  const { run } = legacyTrial();
+  const ids = Object.entries(content.missions).filter(([, mission]) => mission.scope.startsWith('legacy-playable')).map(([id]) => id);
+  for (const id of ids) {
+    const profile = `victoryProfile(scenarioCatalog[${JSON.stringify(id)}])`;
+    const roster = (player, core, escort) => `[{team:'player',hp:${player}},{team:'enemy',core:true,hp:${core},maxHp:2},{team:'enemy',hp:${escort}}]`;
+    const escortGoal = id !== 'iron-dust';
+    assert.equal(run(`objectiveSnapshot(${profile},${roster(1, 0, 1)}).outcome`), escortGoal ? null : true, id);
+    assert.equal(run(`objectiveSnapshot(${profile},${roster(1, 0, 1)}).remaining`), escortGoal ? 1 : 0, id);
+    assert.equal(run(`objectiveSnapshot(${profile},${roster(1, 0, 0)}).outcome`), true, id);
+    assert.equal(run(`objectiveSnapshot(${profile},${roster(0, 0, 0)}).outcome`), false, id);
+  }
+});
+
+test('Legacy objective counters use the same profile and roster as the end condition', () => {
+  const trial = legacyTrial();
+  trial.run("loadScenario('unit-trial');updateRoster()");
+  assert.equal(trial.run("document.querySelector('#objective-text').textContent"), 'HOSTILES 3/3');
+  assert.equal(trial.run("document.querySelector('#objective-progress').style.width"), '0%');
+  trial.run("units.find(unit => unit.core).hp=0;updateRoster()");
+  assert.equal(trial.run("document.querySelector('#objective-text').textContent"), 'HOSTILES 2/3');
+  assert.equal(trial.run("document.querySelector('#objective-progress').style.width"), '33%');
+  assert.equal(trial.run('checkVictory()'), false);
+  trial.run("units.filter(unit => unit.team==='enemy').forEach(unit => unit.hp=0);updateRoster()");
+  assert.equal(trial.run("document.querySelector('#objective-text').textContent"), 'HOSTILES 0/3');
+  assert.equal(trial.run("document.querySelector('#objective-progress').style.width"), '100%');
+  assert.equal(trial.run('checkVictory()'), true);
+  assert.equal(trial.run("document.querySelector('#phase-title').textContent"), 'MISSION COMPLETE');
+
+  const iron = legacyTrial();
+  iron.run("loadScenario('iron-dust');updateRoster()");
+  assert.equal(iron.run("document.querySelector('#objective-text').textContent"), 'CORE OPERATIONAL · DAMAGE 0/2');
+  iron.run("units.find(unit => unit.core).disabled=true;updateRoster()");
+  assert.equal(iron.run("document.querySelector('#objective-text').textContent"), 'CORE DISABLED · DAMAGE 1/2');
+  assert.equal(iron.run("document.querySelector('#objective-progress').style.width"), '50%');
+  iron.run("units.find(unit => unit.core).hp=0;updateRoster()");
+  assert.equal(iron.run("document.querySelector('#objective-text').textContent"), 'CORE OFFLINE');
+  assert.equal(iron.run("document.querySelector('#objective-progress').style.width"), '100%');
+  assert.equal(iron.run('checkVictory()'), true);
+});
+
+test('all four Legacy language catalogs and source metadata match objective profiles', () => {
+  const { run } = legacyTrial();
+  for (const [id, mission] of Object.entries(content.missions).filter(([, value]) => value.scope.startsWith('legacy-playable'))) {
+    const profile = run(`victoryProfile(scenarioCatalog[${JSON.stringify(id)}])`);
+    assert.equal(mission.sourceObjectiveCode, profile.objectiveCode, id);
+    assert.equal(mission.winCondition, profile.requiresAllEnemies
+      ? 'enemy-core-and-all-enemies-destroyed-and-player-survives'
+      : 'enemy-core-destroyed-and-player-survives', id);
+    for (const locale of ['de', 'en', 'fr', 'es']) {
+      const catalog = JSON.parse(readFileSync(new URL(`../assets/ui-copy/content-02.${locale}.json`, import.meta.url), 'utf8'));
+      for (const key of [mission.keys.objectiveShort, mission.keys.objectiveFull, mission.keys.victorySummary]) {
+        assert.ok(catalog.messages[key]?.trim(), `${locale}: ${key}`);
+      }
+    }
+  }
+});
+
 test('Unit Trial objective metadata describes core plus escorts; core alone never ends the mission', () => {
   const { run } = legacyTrial();
   assert.equal(run("scenarioCatalog['unit-trial'].objective"), 'core-and-escort');

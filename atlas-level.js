@@ -66,14 +66,6 @@
       if(unit.move>0&&!Number.isFinite(TerrainRules.movementCost(type,unit)))throw new Error(`${level.id}: impassable start for ${entry.assetId}`);
     }
   }
-  const baseUpdateRoster=updateRoster;
-  updateRoster=function(){
-    baseUpdateRoster();
-    if(!scenarioCatalog[currentScenario]?.showAllEnemiesProgress)return;
-    const enemies=units.filter(unit=>unit.team==='enemy'),remaining=enemies.filter(unit=>unit.hp>0).length;
-    $('#objective-text').textContent=`HOSTILES ${remaining}/${enemies.length}`;
-    $('#objective-progress').style.width=`${Math.round((enemies.length-remaining)/enemies.length*100)}%`;
-  };
   function register(level){
     validateLevel(level);
     if(scenarioCatalog[level.id])throw new Error(`Duplicate scenario: ${level.id}`);

@@ -228,7 +228,7 @@ test('hardened core intel reports damage state instead of misleading HP',()=>{
   assert.equal(run("document.querySelector('#unit-intel-facts').innerHTML.includes('<span>HP</span>')"),false);
   assert.equal(run("document.querySelector('#unit-intel-facts').innerHTML.includes('DAMAGE STATE')"),true);
   assert.equal(run("document.querySelector('#unit-intel-facts').innerHTML.includes('NEXT D / X')"),true);
-  assert.equal(run("document.querySelector('#objective-text').textContent"),'CORE DISABLED · DAMAGE 1/2');
+  assert.equal(run("document.querySelector('#objective-text').textContent"),'HOSTILES 3/3');
 });
 
 test('combat feedback distinguishes first disable from the destroying second D',()=>{

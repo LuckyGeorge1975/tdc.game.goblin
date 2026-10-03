@@ -13,11 +13,12 @@
   }
 
   function updateObjectiveStatus(){
-    const core=units.find(unit=>unit.core),text=$('#objective-text'),progress=$('#objective-progress');
-    if(!core||!text||!progress)return;
-    if(core.hp<=0){text.textContent='CORE OFFLINE';progress.style.width='100%';return}
-    if(core.disabled){text.textContent='CORE DISABLED · DAMAGE 1/2';progress.style.width='50%';return}
-    text.textContent='CORE OPERATIONAL · DAMAGE 0/2';progress.style.width='0%';
+    const profile=victoryProfile(scenarioCatalog[currentScenario]),objective=objectiveSnapshot(profile,units);
+    const text=$('#objective-text'),progress=$('#objective-progress');
+    if(!text||!progress)return;
+    text.textContent=profile.requiresAllEnemies?`HOSTILES ${objective.remaining}/${objective.total}`
+      :objective.remaining===0?'CORE OFFLINE':`CORE ${objective.remaining===1?'DISABLED':'OPERATIONAL'} · DAMAGE ${objective.total-objective.remaining}/${objective.total}`;
+    progress.style.width=`${objective.progress}%`;
   }
 
   function renderStatusIntel(unit){
