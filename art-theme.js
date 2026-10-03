@@ -19,11 +19,19 @@
     const asset=view==='icons'?(UnitVisuals.resolve(unit).asset||null)
       :UnitVisuals.assetFor(unit,view);
     if(!asset||!container)return;
-    const picture=document.createElement('img');
-    picture.src=asset;
-    picture.alt='';
-    picture.className='unit-art-image';
-    container.replaceChildren(picture);
+    const image=document.createElement('img');
+    image.src=asset;
+    image.alt='';
+    image.className='unit-art-image';
+    if(view==='library'&&UnitVisuals.currentStyle()!=='06-military-symbols'){
+      const picture=document.createElement('picture');
+      picture.className='unit-art-picture';
+      const source=document.createElement('source');
+      source.type='image/webp';
+      source.srcset=UnitVisuals.assetFor(unit,view,'webp');
+      picture.append(source,image);
+      container.replaceChildren(picture);
+    }else container.replaceChildren(image);
   }
 
   const baseUpdateRoster=updateRoster;

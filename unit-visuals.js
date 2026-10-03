@@ -30,11 +30,14 @@
     return [unit?.visualKey,byName,unit?.id].find(key=>artKeys.has(key))||null;
   }
 
-  function assetFor(unit,view='icons'){
+  function assetFor(unit,view='icons',format='png'){
     const key=artKey(unit);
     if(!activeStyle||!key||!['icons','library'].includes(view))return null;
-    const extension=view==='library'&&activeStyle!=='06-military-symbols'?'png':'svg';
-    return `assets/unit-art/sets/${activeStyle}/${view}/${key}.${extension}`;
+    if(view==='library'&&activeStyle!=='06-military-symbols'){
+      if(!['png','webp'].includes(format))return null;
+      return `assets/unit-art/sets/${activeStyle}/${view}/${key}@${format==='webp'?'1024':'768'}.${format}`;
+    }
+    return `assets/unit-art/sets/${activeStyle}/${view}/${key}.svg`;
   }
 
   const terrainKeys=new Set(['open-ground','rubble-field','mountain','ridge','forest','marsh','water','river','road','bridge','urban','crater']);

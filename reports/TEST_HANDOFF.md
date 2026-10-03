@@ -2,17 +2,19 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## Lokaler Kandidat für unabhängige QA
+## Veröffentlichter Teststand und lokaler Payload-Kandidat
 
 | Feld | Wert |
 |---|---|
 | Version | `0.1.16` |
 | Build | `16` |
-| Kandidaten-Commit | Nach diesem lokalen Vorbereitungsschritt in `goblin-6q6` festzuhalten; Content-08-Integrationsbasis `5a069a6c5a1169f7f03345cfb217c15db3f8dbe4` |
-| Release-Tag | `v0.1.16` vorgesehen; noch nicht erstellt |
+| Veröffentlichter Commit | `ff3bcc448f2580035aad2b6cea0681434d98617a` |
+| Release-Tag | `v0.1.16` auf diesem veröffentlichten Commit |
 | Datum | 2026-10-02 |
-| Test-URL | Lokaler Pages-Prefix-Einstieg `/tdc.game.goblin/index.html?build=0.1.16`; öffentliche URL erst nach Freigabe und Deploy zu prüfen |
+| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.16> |
 | Änderungen | [CHANGELOG.md](../CHANGELOG.md#0116---2026-10-02) |
+
+Der noch unveröffentlichte Payload-Kandidat nach Build 0.1.16 ersetzt die 130 großen Runtime-PNGs der fünf grafischen Guide-Stile durch 1024 × 683 WebP mit optimiertem 768 × 512-PNG-Fallback. Er erhält vor unabhängiger QA einen eigenen lokalen Commit in `goblin-0t0.1`; `v0.1.16` bleibt der veröffentlichte Rückfallpunkt. Prüffokus: 130/130 Quellen- und Assetpfade, transparente Kanten und Pixel-Stil auf hell/dunkel, Browserauswahl ohne Doppel-Download, Fallback bei nicht unterstütztem WebP, Desktop/Mobil-Layout sowie Military und Karten-/Listenicons unverändert. Ein neues Release erfordert Versionsanhebung, Release-Gate, unabhängige QA und gesonderte Freigabe.
 
 ### Testfokus für 0.1.16
 
@@ -22,7 +24,7 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 - Content Notice v8 gegen die eingebundenen 130 PNGs prüfen: KI-Ursprung, interne Content-05-Tafeln als Stilvorlagen, Neuinterpretation statt Crops, menschliche Prüfung, mögliche Nicht-Einzigartigkeit und begrenzte nichtkommerzielle Asset-Einschätzung. Produkt-/Marken-/Regel- und kommerzielle Freigabe bleiben gesondert.
 - Die 0.1.15-Spiel- und Release-Regression nach Bedarf wiederholen. Auf dem Content-08-Integrationscommit bestanden 137/137 Node-Tests und die lokale Browserprobe aller sechs Stile ohne Lade- oder Laufzeitfehler (`goblin-bvh`). Die unabhängige Prüfung muss den finalen Kandidatencommit nennen.
 
-Der derzeit veröffentlichte Stand ist weiterhin `v0.1.15` auf `f40ddfb9a8ba86b3409960f6ab3a1332340678c8` mit <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.15>. Für 0.1.16 gibt es noch keinen Push, kein Tag und kein Deploy. `v0.1.15` bleibt Rückfallpunkt. Vor der Veröffentlichung sind unabhängige QA, Build-/Changelog-Gate, Content-/Legal-Grenzen, gesonderte Nutzerfreigabe, eindeutiges Tag am tatsächlich veröffentlichten Commit und anschließende Pages-Einstiegsprüfung erforderlich (`goblin-6q6`).
+Build `v0.1.16` ist auf `ff3bcc448f2580035aad2b6cea0681434d98617a` veröffentlicht; `v0.1.15` bleibt Rückfallpunkt. Die lokale Payload-Optimierung ist noch nicht veröffentlicht. Vor ihrem Release sind Versionsanhebung, unabhängige QA, Build-/Changelog-Gate, Content-/Legal-Grenzen, gesonderte Nutzerfreigabe, eindeutiges Tag am tatsächlich veröffentlichten Commit und anschließende Pages-Einstiegsprüfung erforderlich.
 
 ### Vorheriger Testfokus für 0.1.15
 
