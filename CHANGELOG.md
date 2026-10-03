@@ -1,11 +1,11 @@
 # Changelog
 
-Veröffentlichte Builds und lokale Kandidaten werden hier getrennt dokumentiert. Build 0.1.16 ist auf GitHub Pages veröffentlicht; Build 0.1.17 ist ein lokaler Release-Kandidat. Build 0.1.13 blieb ein unveröffentlichter Vorläufer. Die Versionslinie bleibt vorerst bei `0.1`; mit jeder Veröffentlichung wird ausschließlich die letzte Stelle erhöht.
+Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden in `goblin-hr7` nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
-## [0.1.17] - 2026-10-03 · lokaler Kandidat
+## [0.1.17] - 2026-10-03
 
-- Die 130 grafischen Content-08-Guide-Ansichten werden lokal als 1024 × 683 WebP Q85 mit transparentem, optimiertem 768 × 512-PNG-Fallback geladen. Die 1536 × 1024-Master bleiben im getrennten Unit-Art-Quellcheckout; der Pages-Checkout enthält sie nicht mehr. Karte-/Listenicons und Military-Guide-SVGs bleiben separat.
-- Der vollständige Export verkleinert die 130 WebP-Dateien auf 16.053.262 Bytes; alle 130 PNG-Fallbacks belegen 48.653.184 Bytes. Zusammen sind das 64.706.446 statt 256.085.118 Bytes für die früheren Runtime-PNGs. Der Browser fordert pro Guide-Ansicht das WebP an; die gesamte primär geladene Bildmenge ist damit um 93,7 % kleiner. Qualität, Browser-Fallback und Regression sind vor einer Veröffentlichung unabhängig zu prüfen (`goblin-hr7`).
+- Die 130 grafischen Content-08-Guide-Ansichten werden als 1024 × 683 WebP Q85 mit transparentem, optimiertem 768 × 512-PNG-Fallback geladen. Die 1536 × 1024-Master bleiben im getrennten Unit-Art-Quellcheckout; der Pages-Checkout enthält sie nicht mehr. Karten-/Listenicons und Military-Guide-SVGs bleiben separat.
+- Der vollständige Export verkleinert die 130 WebP-Dateien auf 16.053.262 Bytes; alle 130 PNG-Fallbacks belegen 48.653.184 Bytes. Zusammen sind das 64.706.446 statt 256.085.118 Bytes für die früheren Runtime-PNGs. Der Browser fordert pro Guide-Ansicht das WebP an; die gesamte primär geladene Bildmenge ist damit um 93,7 % kleiner. Prüfbelege, Freigabe und Deployment-Stand werden in `goblin-hr7` festgehalten.
 
 ## [0.1.16] - 2026-10-02
 
