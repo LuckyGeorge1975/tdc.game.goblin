@@ -21,6 +21,30 @@ zusätzlich `unitId`. `EndPhase` läuft movement → fire → gev → anderes Te
 nach dessen gev-Phase beginnt die nächste Zugnummer. Im ersten Schnitt steuert
 der Aufrufer auch das feindliche Team mit Befehlen; KI gehört nicht zum Core.
 
+## Profilgebundener Startvertrag (Slice 3a)
+
+Neue Core-Partien haben zunächst genau eine erlaubte Vertragskombination:
+`rulesVersion: core-v3-profile-v1`, `scenarioId: core-profile-probe`,
+`scenarioVersion: profile-probe-v1`, `ruleProfileId: FIELD_TEST_LEGACY_v1`.
+Der zugehörige `effectiveRules`-Snapshot enthält `schemaVersion: 1`,
+`objective: enemy-core` und `movement.gevSecondMove: 2`. Diese Probe verwendet
+die vorhandene Core-Mechanik und ist kein neues Browser-Level oder ein
+Vollkatalogstart. `createGame` validiert den vollständigen Kopf und alle
+Snapshot-Felder vor dem Anlegen eines Zustands, klont den Snapshot und friert
+ihn rekursiv ein. Jeder `dispatch`-Vorcheck validiert erneut; ausgegebene
+Folgezustände tragen wieder einen eingefrorenen Snapshot. Unbekannte oder
+fehlende Regel-/Produktprofile melden `UNSUPPORTED_RULE_PROFILE`, eine
+unzulässige Szenariopaarung `SCENARIO_PROFILE_MISMATCH`, veränderte
+Regelparameter `RULE_SNAPSHOT_MISMATCH`. Beim Start werden diese Codes als
+Exception-Eigenschaft `code` geliefert, bei Befehlen als `{error:{code,details}}`.
+
+Die sechs ausdrücklich historischen Fixture-Paare von `core-v1/reference-v1`
+und `core-v2/phase-v2` samt vier benannten Ablegern bleiben ohne neue
+Pflichtfelder und unveränderter Mechanik erhalten. Die Probe bindet noch keinen
+Save-/Replay-Import, kein Legacy-`game.js`, keinen Live-Guide und keinen
+Skimmer-Zielentwurf. Weitere Produkt-/Szenariopaare benötigen einen eigenen
+Vertrags- und Testabschnitt; `FULL_CATALOG_v1` bleibt inaktiv.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im

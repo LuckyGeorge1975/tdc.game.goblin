@@ -2,6 +2,7 @@ import { hasLineOfSight, hexDistance, inside, movementPaths, queryAreas, terrain
 import TerrainRules from '../../terrain-rules.js';
 import { referenceScenario, referenceCommands, REFERENCE_SEED } from './reference-fixture.mjs';
 import { phaseScenario, phaseCommands, PHASE_SEED, expectedPhaseTrace } from './phase-fixture.mjs';
+import { profileContractError, freezeEffectiveRules } from './profile-contract.mjs';
 
 export { queryAreas } from './hex.mjs';
 export { referenceScenario, referenceCommands, REFERENCE_SEED } from './reference-fixture.mjs';
@@ -26,14 +27,19 @@ const reject = (code, details = {}) => ({ error: { code, details } });
 const findUnit = (state, id) => state.units.find(u => u.id === id);
 
 export function createGame(scenario, seed) {
+  const profileError = profileContractError(scenario);
+  if (profileError) throw Object.assign(new Error(profileError.code), profileError);
   if (!Number.isInteger(seed)) throw new TypeError('seed must be an integer');
   if (!scenario?.map || !Array.isArray(scenario?.units)) throw new TypeError('invalid scenario');
   const map = clone(scenario.map), units = clone(scenario.units).map(u => ({ ...u, moved: false, fired: false, secondMoved: false, disabled: false, disabledUntil: 0 }));
   if (!Number.isInteger(map.width) || !Number.isInteger(map.height) || map.width < 1 || map.height < 1 || !Array.isArray(map.terrain)) throw new TypeError('invalid map');
   if (new Set(units.map(u => u.id)).size !== units.length || units.some(u => !inside(map, u))) throw new TypeError('invalid units');
-  return { rulesVersion: scenario.rulesVersion, scenarioVersion: scenario.scenarioVersion, map, units,
+  return freezeEffectiveRules({ rulesVersion: scenario.rulesVersion, scenarioVersion: scenario.scenarioVersion,
+    ...(scenario.scenarioId ? {scenarioId: scenario.scenarioId} : {}),
+    ...(scenario.ruleProfileId ? {ruleProfileId: scenario.ruleProfileId} : {}),
+    ...(scenario.effectiveRules ? {effectiveRules: clone(scenario.effectiveRules)} : {}), map, units,
     activeTeam: 'player', phase: 'movement', turn: 1, victory: { status: 'ongoing', winner: null },
-    rng: { seed: seed >>> 0, state: seed >>> 0 } };
+    rng: { seed: seed >>> 0, state: seed >>> 0 } });
 }
 
 function nextRoll(rng) {
@@ -74,6 +80,8 @@ function nextPhaseInfo(state) {
 // One non-mutating preflight for both the UI query and the authoritative command.
 function preflight(state, command) {
   if (!state || !command || typeof command.type !== 'string') return reject('INVALID_COMMAND');
+  const profileError = profileContractError(state);
+  if (profileError) return {error: profileError};
   if (state.victory.status !== 'ongoing') return reject('GAME_ENDED');
   if (command.playerId !== state.activeTeam) return reject('NOT_ACTIVE_TEAM', { activeTeam: state.activeTeam });
   if (command.type === 'Load' || command.type === 'Unload') return reject('UNSUPPORTED_COMMAND', { type: command.type, rulesVersion: state.rulesVersion });
@@ -148,7 +156,7 @@ export function dispatch(state, command) {
   if (check.error) return check;
 
   if (command.type === 'EndPhase') {
-    const next = clone(state), previous = next.phase, events = [];
+    const next = freezeEffectiveRules(clone(state)), previous = next.phase, events = [];
     const transition = nextPhaseInfo(state);
     next.phase = transition.phase;
     next.activeTeam = transition.activeTeam;
@@ -170,14 +178,14 @@ export function dispatch(state, command) {
   const unit = check.unit;
   if (command.type === 'Move') {
     const path = check.path;
-    const next = clone(state), moving = findUnit(next, unit.id), from = { x: moving.x, y: moving.y };
+    const next = freezeEffectiveRules(clone(state)), moving = findUnit(next, unit.id), from = { x: moving.x, y: moving.y };
     moving.x = command.to.x; moving.y = command.to.y;
     if (state.phase === 'gev') moving.secondMoved = true; else moving.moved = true;
     return { state: next, events: [{ type: 'UnitMoved', unitId: unit.id, from, to: clone(command.to), path, phase: state.phase }] };
   }
 
   const target = check.target;
-  const next = clone(state), attacker = findUnit(next, unit.id), defender = findUnit(next, target.id), events = [];
+  const next = freezeEffectiveRules(clone(state)), attacker = findUnit(next, unit.id), defender = findUnit(next, target.id), events = [];
   attacker.fired = true;
   const defense = defender.defense + TerrainRules.coverBonus(terrainAt(next, defender));
   const ratio = combatRatio(attacker.damage, defense);
