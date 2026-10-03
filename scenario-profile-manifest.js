@@ -24,5 +24,41 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
       reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} und Regelprofil ${config.ruleProfileId} sind nicht kompatibel; Partie wurde nicht geladen.`);
     return expected;
   }
-  return {schemaVersion:1,product,entries,validate};
+  const freeze=value=>{
+    if(value&&typeof value==='object'){
+      Object.values(value).forEach(freeze);
+      Object.freeze(value);
+    }
+    return value;
+  };
+  let nextSessionId=1;
+  function beginSession(id,config){
+    validate(id,config);
+    if(!Array.isArray(config.units)||!Array.isArray(config.terrain)||
+      config.terrainTypes!==undefined&&!Array.isArray(config.terrainTypes))
+      reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} hat keine gültigen effektiven Regeln; Partie wurde nicht geladen.`);
+    const unitIds=new Set();
+    for(const unit of config.units){
+      if(!unit||typeof unit.id!=='string'||!unit.id||unitIds.has(unit.id)||
+        !['player','enemy'].includes(unit.team)||
+        !Number.isInteger(unit.x)||unit.x<0||unit.x>=12||!Number.isInteger(unit.y)||unit.y<0||unit.y>=8||
+        !Number.isInteger(unit.hp)||unit.hp<1||!Number.isInteger(unit.maxHp)||unit.maxHp<unit.hp||
+        !Number.isInteger(unit.defense)||unit.defense<1||
+        !Number.isInteger(unit.range)||unit.range<0||!Number.isInteger(unit.move)||unit.move<0||
+        !Number.isInteger(unit.damage)||unit.damage<0)
+        reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} hat ungültige Einheitenwerte; Partie wurde nicht geladen.`);
+      unitIds.add(unit.id);
+    }
+    if(!config.units.some(unit=>unit.team==='player')||
+      config.units.filter(unit=>unit.team==='enemy'&&unit.core).length!==1)
+      reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} hat keine gültige Parteien- oder Kernbelegung; Partie wurde nicht geladen.`);
+    const source=JSON.parse(JSON.stringify(config));
+    const session=freeze({schemaVersion:1,sessionId:nextSessionId++,scenarioId:id,
+      scenarioVersion:source.scenarioVersion,ruleProfileId:source.ruleProfileId,
+      effectiveRules:{objectiveVersion:source.objectiveVersion,objective:source.objective,
+        unitDataProfile:source.ruleProfile??null,terrain:source.terrain,
+        terrainTypes:source.terrainTypes??[],units:source.units},config:source});
+    return session;
+  }
+  return {schemaVersion:1,product,entries,validate,beginSession};
 })());

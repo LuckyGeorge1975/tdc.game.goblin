@@ -45,6 +45,37 @@ test('unknown profiles, missing IDs and incompatible scenario pairs fail closed'
   }
 });
 
+test('a session owns a frozen copy of validated effective rules',()=>{
+  const context=vm.createContext({});
+  vm.runInContext(source,context);
+  const config={scenarioVersion:1,objectiveVersion:1,ruleProfileId:'FIELD_TEST_LEGACY_v1',objective:'core',
+    title:'Iron Dust',terrain:['1,1'],units:[
+      {id:'core',team:'enemy',x:2,y:2,hp:5,maxHp:5,defense:5,range:0,move:0,damage:0,core:true},
+      {id:'player',team:'player',x:1,y:1,hp:2,maxHp:2,defense:2,range:1,move:1,damage:1}]};
+  context.config=config;
+  const first=vm.runInContext("ScenarioRuleProfiles.beginSession('iron-dust',config)",context);
+  assert.equal(first.schemaVersion,1);
+  assert.equal(first.ruleProfileId,'FIELD_TEST_LEGACY_v1');
+  assert.equal(first.effectiveRules.objective,'core');
+  assert.equal(first.effectiveRules.units[0].hp,5);
+  assert.ok(Object.isFrozen(first)&&Object.isFrozen(first.config.units[0]));
+  config.objective='core-and-escort';config.units[0].hp=0;config.terrain.push('2,2');
+  assert.equal(first.effectiveRules.objective,'core');
+  assert.equal(first.effectiveRules.units[0].hp,5);
+  assert.deepEqual([...first.effectiveRules.terrain],['1,1']);
+  for(const bad of [
+    {...config,ruleProfileId:undefined},
+    {...config,ruleProfileId:'FULL_CATALOG_v1'},
+    {...config,scenarioVersion:2},
+    {...config,objective:'core',units:undefined},
+    {...config,objective:'core',terrain:undefined},
+    {...config,objective:'core',units:[{...config.units[0],defense:-1},config.units[1]]}
+  ]){
+    assert.throws(()=>vm.runInContext(`ScenarioRuleProfiles.beginSession('iron-dust',${JSON.stringify(bad)})`,context),
+      /UNSUPPORTED_RULE_PROFILE|SCENARIO_PROFILE_MISMATCH/);
+  }
+});
+
 test('an invalid built-in profile stops initial boot before gameplay handlers or first draw',()=>{
   const nodes=new Map(),classes=new Set(),listeners=[];
   const document={body:{classList:{add(name){classes.add(name)}}},querySelector(selector){

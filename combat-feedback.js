@@ -13,7 +13,7 @@
   }
 
   function updateObjectiveStatus(){
-    const profile=victoryProfile(scenarioCatalog[currentScenario]),objective=objectiveSnapshot(profile,units);
+    const profile=victoryProfile(legacySession.effectiveRules),objective=objectiveSnapshot(profile,units);
     const text=$('#objective-text'),progress=$('#objective-progress');
     if(!text||!progress)return;
     text.textContent=profile.requiresAllEnemies?`HOSTILES ${objective.remaining}/${objective.total}`

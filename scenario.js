@@ -10,13 +10,13 @@ const objectiveFallback = {
 };
 function renderScenarioObjective(){
   if(globalThis.goblinBootProfileError)return;
-  const config=scenarioCatalog[currentScenario],profile=victoryProfile(config);
+  const config=legacySession.config,profile=victoryProfile(legacySession.effectiveRules);
   const key=`mission.${currentScenario}.objective.short`;
   const translated=globalThis.GoblinLanguage?.t(key);
   $('#mission-sub').textContent=translated&&translated!==key?translated:objectiveFallback[currentScenario]||config.sub||'';
   if(profile.requiresAllEnemies){
     const titleKey=`mission.${currentScenario}.title`,title=globalThis.GoblinLanguage?.t(titleKey);
-    $('#mission-title').textContent=title&&title!==titleKey?title:scenarioCatalog[currentScenario].title;
+    $('#mission-title').textContent=title&&title!==titleKey?title:config.title;
   }
   for(const option of document.querySelectorAll('#scenario-select option[data-title-key]')){
     const title=globalThis.GoblinLanguage?.t(option.dataset.titleKey);
@@ -29,21 +29,24 @@ function loadScenario(id){
   if(globalThis.goblinBootProfileError)throw globalThis.goblinBootProfileError;
   const config=scenarioCatalog[id];
   if(!config)return;
-  try{ScenarioRuleProfiles.validate(id,config)}catch(error){addLog(error.message,true);throw error}
+  let nextSession;
+  try{nextSession=ScenarioRuleProfiles.beginSession(id,config)}catch(error){addLog(error.message,true);throw error}
+  legacySession=nextSession;
+  const active=nextSession.config;
   currentScenario=id;
-  terrain=new Set(config.terrain);
-  terrainTypes=new Map((config.terrainTypes||[]).map(cell=>[`${cell.x},${cell.y}`,cell.type]));
+  terrain=new Set(active.terrain);
+  terrainTypes=new Map((active.terrainTypes||[]).map(cell=>[`${cell.x},${cell.y}`,cell.type]));
   for(const [key,type] of terrainTypes)if(TerrainRules.coverBonus(type))terrain.add(key);
-  units.splice(0,units.length,...JSON.parse(JSON.stringify(config.units)).map(unit=>({...unit,moveCount:0,moveFrom:null,acted:false,disabled:false,justHit:false})));
+  units.splice(0,units.length,...JSON.parse(JSON.stringify(active.units)).map(unit=>({...unit,moveCount:0,moveFrom:null,acted:false,disabled:false,justHit:false})));
   selected=null;focusedCell=null;transportLoadMode=null;transportUnloadMode=null;turn=1;phase='player';turnPhase='movement';gameOver=false;resetActionState();$("#end-turn").disabled=false;
-  $('#mission-kicker').textContent=config.kicker;
-  $('#mission-title').textContent=config.title;
+  $('#mission-kicker').textContent=active.kicker;
+  $('#mission-title').textContent=active.title;
   renderScenarioObjective();
   $('#turn-number').textContent='01';
   $('#phase-title').textContent='MOVEMENT PHASE';updatePhaseControls();
   $('#log-status').textContent='STANDBY';
   logEl.innerHTML='';
-  addLog(`${config.kicker} online. Awaiting command.`);
+  addLog(`${active.kicker} online. Awaiting command.`);
   updateSelection();
   setViewMode('movement');
 }

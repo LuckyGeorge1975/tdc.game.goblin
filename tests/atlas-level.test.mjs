@@ -40,6 +40,14 @@ test('ATLAS and four smaller scenarios load with complete roster and terrain cov
   assert.equal(new Set(atlasScenario.units.map(unit=>unit.visualKey)).size,26);
   assert.equal(new Set(atlasScenario.terrainTypes.map(cell=>cell.type)).size,12);
   const small=showcase.levels.map(level=>context.scenarioCatalog[level.id]);
+  for(const id of ['atlas-proving-grounds',...showcase.levels.map(level=>level.id)]){
+    const session=vm.runInContext(`ScenarioRuleProfiles.beginSession(${JSON.stringify(id)},scenarioCatalog[${JSON.stringify(id)}])`,context);
+    assert.equal(session.scenarioId,id);
+    assert.equal(session.ruleProfileId,'FIELD_TEST_LEGACY_v1');
+    assert.equal(session.effectiveRules.unitDataProfile,'field-test-atlas-v1');
+    assert.equal(session.effectiveRules.units.length,context.scenarioCatalog[id].units.length);
+    assert.ok(Object.isFrozen(session.effectiveRules.units[0]));
+  }
   assert.equal(new Set(small.flatMap(scenario=>scenario.units.map(unit=>unit.visualKey))).size,26);
   assert.equal(new Set(['open-ground',...small[0].terrainTypes.map(cell=>cell.type)]).size,12);
   for(const scenario of small){

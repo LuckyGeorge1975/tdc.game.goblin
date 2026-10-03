@@ -86,6 +86,28 @@ test('all eight Legacy profiles keep the mission active until their own goal is 
   }
 });
 
+test('Legacy session survives catalog changes and resets only on a new start', () => {
+  const { run } = legacyTrial();
+  const sessionId = run('legacySession.sessionId');
+  assert.equal(run('legacySession.scenarioId'), 'unit-trial');
+  assert.equal(run('legacySession.ruleProfileId'), 'FIELD_TEST_LEGACY_v1');
+  run("scenarioCatalog['unit-trial'].objective='core';scenarioCatalog['unit-trial'].units[0].hp=0");
+  run("units.find(unit=>unit.core).hp=0;updateRoster();renderScenarioObjective()");
+  assert.equal(run("document.querySelector('#objective-text').textContent"), 'HOSTILES 2/3');
+  assert.equal(run('checkVictory()'), false, 'the bound escort goal remains active');
+  assert.equal(run('legacySession.effectiveRules.objective'), 'core-and-escort');
+  assert.ok(run('Object.isFrozen(legacySession.effectiveRules.units[0])'));
+  assert.throws(()=>run("loadScenario('unit-trial')"), /SCENARIO_PROFILE_MISMATCH/);
+  assert.equal(run('legacySession.sessionId'), sessionId, 'rejected start preserves the active session');
+  run("loadScenario('relay-run')");
+  assert.ok(run('legacySession.sessionId') > sessionId);
+  assert.equal(run('legacySession.scenarioId'), 'relay-run');
+  const switchedId = run('legacySession.sessionId');
+  run('reset()');
+  assert.ok(run('legacySession.sessionId') > switchedId, 'restart creates a fresh session');
+  assert.equal(run('legacySession.scenarioId'), 'relay-run');
+});
+
 test('Legacy objective counters use the same profile and roster as the end condition', () => {
   const trial = legacyTrial();
   trial.run("loadScenario('unit-trial');updateRoster()");
