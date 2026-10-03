@@ -1,36 +1,21 @@
 // The content JSON files own ATLAS and the smaller showcase maps and placements.
-// Specialist values remain provisional until their individual rules are implemented.
+// The versioned register keeps live Field Test values separate from the inactive target profile.
 (function(){
-  const stats={
-    'goblin-siegebreaker':[5,5,2,3,3,'G','HEAVY ASSAULT'],
-    'skimmer-scout':[3,3,3,3,1,'S','HOVERCRAFT'],
-    'rocket-artillery':[3,3,4,1,2,'M','ARTILLERY'],
-    'infantry-squad':[2,2,1,2,1,'I','INFANTRY'],
-    'assault-tank':[3,3,2,3,4,'A','FRONTLINE ARMOR'],
-    'recon-tank':[2,2,2,3,2,'R','SCOUT ARMOR'],
-    'siege-tank':[5,5,3,3,6,'S','SIEGE ARMOR'],
-    'long-range-battery':[2,2,6,0,3,'B','FIXED ARTILLERY'],
-    'mobile-siege-gun':[3,3,4,1,3,'M','MOBILE ARTILLERY'],
-    'combat-skimmer':[2,2,2,3,2,'C','HOVERCRAFT'],
-    'light-skimmer':[1,1,2,3,1,'L','HOVERCRAFT'],
-    'skimmer-carrier':[2,2,2,3,1,'P','PERSONNEL CARRIER'],
-    'strategic-missile-carrier':[2,2,8,1,6,'C','MISSILE PLATFORM'],
-    'artillery-drone':[2,2,4,2,2,'D','ARTILLERY DRONE'],
-    'amphibious-infantry':[2,2,1,2,1,'I','AMPHIBIOUS INFANTRY'],
-    'field-engineers':[2,2,1,2,2,'E','FIELD ENGINEERING'],
-    'local-defense':[2,2,2,0,2,'L','STATIC DEFENSE'],
-    'forge-engineer':[2,2,1,2,2,'F','FIELD ENGINEERING'],
-    'command-hub':[5,5,0,0,0,'H','FORTIFIED TARGET'],
-    'goblin-dreadnaught':[6,6,3,2,4,'G','HEAVY ASSAULT'],
-    'phantom-platform':[3,3,3,2,2,'P','MOBILE PLATFORM'],
-    'infantry-platoon':[2,2,1,2,1,'I','INFANTRY'],
-    'command-core':[5,5,0,0,0,'X','FORTIFIED TARGET'],
-    'relay-node':[4,4,0,0,0,'R','FORTIFIED TARGET'],
-    'guard-tank':[3,3,2,1,1,'G','HOSTILE ARMOR'],
-    'raider-skimmer':[2,2,2,2,1,'R','HOVERCRAFT']
-  };
+  let profile;
+  function validateProfile(value){
+    if(value?.schemaVersion!==1||value.legacyProfile!=='field-test-atlas-v1'||value.targetProfile!=='full-catalog-v1-draft'||value.targetActive!==false||
+      !value.units||Object.keys(value.units).length!==26)throw new Error('Unit rule profile invalid');
+    for(const [id,record] of Object.entries(value.units)){
+      const stats=record?.legacy;
+      if(!/^[-a-z0-9]+$/.test(id)||!Array.isArray(stats)||stats.length!==7||
+        stats.slice(0,5).some(number=>!Number.isInteger(number)||number<0)||
+        stats[0]<1||stats[1]<1||typeof stats[5]!=='string'||typeof stats[6]!=='string'||
+        !record.target?.source)throw new Error(`Unit rule profile invalid: ${id}`);
+    }
+    return value;
+  }
   function makeUnit(entry){
-    const [hp,defense,range,move,damage,icon,type]=stats[entry.assetId];
+    const [hp,defense,range,move,damage,icon,type]=profile.units[entry.assetId].legacy;
     const unit={id:entry.assetId==='goblin-siegebreaker'?'ogre':entry.assetId==='command-core'?'core':entry.assetId,
       visualKey:entry.assetId,name:entry.name||entry.assetId.replaceAll('-',' ').toUpperCase(),type,team:entry.team,x:entry.x,y:entry.y,
       hp,maxHp:hp,defense,range,move,damage,icon};
@@ -50,7 +35,7 @@
       !Array.isArray(level.units)||!Array.isArray(level.terrain)||level.units.length<2)throw new Error('Showcase level schema invalid');
     const positions=new Set(),assetIds=new Set(),teams=new Set();
     for(const unit of level.units){
-      if(!stats[unit.assetId]||!['player','enemy'].includes(unit.team)||!Number.isInteger(unit.x)||!Number.isInteger(unit.y)||unit.x<0||unit.x>=W||unit.y<0||unit.y>=H)throw new Error(`${level.id}: unit invalid`);
+      if(!profile.units[unit.assetId]||!['player','enemy'].includes(unit.team)||!Number.isInteger(unit.x)||!Number.isInteger(unit.y)||unit.x<0||unit.x>=W||unit.y<0||unit.y>=H)throw new Error(`${level.id}: unit invalid`);
       const key=`${unit.x},${unit.y}`;if(positions.has(key)||assetIds.has(unit.assetId))throw new Error(`${level.id}: duplicate unit or position: ${key}`);
       positions.add(key);assetIds.add(unit.assetId);teams.add(unit.team);
     }
@@ -72,7 +57,7 @@
     scenarioCatalog[level.id]={
       kicker:level.kicker,title:level.title,
       sub:'Feindlichen Kern und alle übrigen Gegner ausschalten; eigene Einheit erhalten.',
-      objectiveVersion:level.schemaVersion,objective:level.objective,showAllEnemiesProgress:true,
+      objectiveVersion:level.schemaVersion,objective:level.objective,ruleProfile:profile.legacyProfile,showAllEnemiesProgress:true,
       terrain:level.terrain.filter(cell=>TerrainRules.coverBonus(cell.type)>0).map(cell=>`${cell.x},${cell.y}`),
       terrainTypes:level.terrain,units:level.units.map(makeUnit)
     };
@@ -86,6 +71,11 @@
     }
   }
   (async()=>{
+    try{
+      const response=await fetch('assets/unit-art/rules/unit-profiles.v1.json');
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      profile=validateProfile(await response.json());
+    }catch(error){console.error('Unit rule profile unavailable:',error);addLog('Einheiten-Regelprofil konnte nicht geladen werden.',true);return}
     try{
       const response=await fetch('assets/unit-art/levels/atlas-proving-grounds.json');
       if(!response.ok)throw new Error(`HTTP ${response.status}`);

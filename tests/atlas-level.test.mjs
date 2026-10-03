@@ -5,16 +5,17 @@ import vm from 'node:vm';
 
 const atlas=JSON.parse(readFileSync(new URL('../assets/unit-art/levels/atlas-proving-grounds.json',import.meta.url),'utf8'));
 const showcase=JSON.parse(readFileSync(new URL('../assets/unit-art/levels/showcase-levels.json',import.meta.url),'utf8'));
+const profiles=JSON.parse(readFileSync(new URL('../assets/unit-art/rules/unit-profiles.v1.json',import.meta.url),'utf8'));
 const source=readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8');
 
-async function load(bundle=showcase,search=''){
+async function load(bundle=showcase,search='',registry=profiles){
   const options=[],errors=[],loaded=[];
   const context=vm.createContext({
     W:12,H:8,scenarioCatalog:{},GoblinSystems:{createMarkIII:()=>({test:true})},
     TerrainRules:(await import('../terrain-rules.js')).default,updateRoster:()=>{},terrain:new Set(),currentScenario:'iron-dust',
     $:()=>({appendChild:option=>options.push(option)}),renderScenarioObjective:()=>{},
     document:{createElement:()=>({dataset:{}})},
-    fetch:async url=>({ok:true,json:async()=>url.includes('showcase-levels')?bundle:atlas}),
+    fetch:async url=>({ok:true,json:async()=>url.includes('unit-profiles')?registry:url.includes('showcase-levels')?bundle:atlas}),
     console:{error:(...items)=>errors.push(items)},addLog:()=>{},
     location:{search},loadScenario:id=>loaded.push(id),URLSearchParams
   });
@@ -29,6 +30,7 @@ test('ATLAS and four smaller scenarios load with complete roster and terrain cov
   assert.deepEqual(options.map(option=>option.value),['atlas-proving-grounds',...showcase.levels.map(level=>level.id)]);
   const atlasScenario=context.scenarioCatalog['atlas-proving-grounds'];
   assert.equal(atlasScenario.objectiveVersion,1);
+  assert.equal(atlasScenario.ruleProfile,'field-test-atlas-v1');
   assert.equal(atlasScenario.objective,'core-and-escort');
   assert.equal(atlasScenario.units.length,26);
   assert.equal(new Set(atlasScenario.units.map(unit=>unit.visualKey)).size,26);
@@ -49,6 +51,30 @@ test('ATLAS and four smaller scenarios load with complete roster and terrain cov
   assert.ok(small[3].units.find(unit=>unit.visualKey==='strategic-missile-carrier')?.strategicMissile);
   assert.ok(small[3].units.find(unit=>unit.visualKey==='amphibious-infantry')?.amphibious);
   assert.equal(small[3].units.find(unit=>unit.visualKey==='skimmer-carrier')?.transportCapacity,3);
+});
+
+test('the inactive catalog target leaves all 26 live ATLAS values at the versioned Legacy snapshot',async()=>{
+  const {context,errors}=await load();
+  assert.equal(errors.length,0);
+  assert.equal(profiles.targetActive,false);
+  const units=context.scenarioCatalog['atlas-proving-grounds'].units;
+  assert.equal(Object.keys(profiles.units).length,26);
+  assert.deepEqual(new Set(units.map(unit=>unit.visualKey)),new Set(Object.keys(profiles.units)));
+  for(const unit of units){
+    const [hp,defense,range,move,damage,icon,type]=profiles.units[unit.visualKey].legacy;
+    assert.deepEqual([unit.maxHp,unit.defense,unit.range,unit.move,unit.damage,unit.icon,unit.type],
+      [hp,defense,range,move,damage,icon,type],unit.visualKey);
+  }
+  assert.equal(units.find(unit=>unit.visualKey==='local-defense').move,0);
+  assert.equal(profiles.units['local-defense'].target.movement[0],2);
+});
+
+test('a malformed rule register prevents all five levels from loading',async()=>{
+  const invalid=structuredClone(profiles);
+  invalid.units['assault-tank'].legacy[0]=-1;
+  const {context,errors}=await load(showcase,'',invalid);
+  assert.equal(Object.keys(context.scenarioCatalog).length,0);
+  assert.match(String(errors[0]?.[1]),/Unit rule profile invalid/);
 });
 
 test('loader rejects malformed starts before adding a selectable level',async()=>{
