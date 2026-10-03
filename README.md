@@ -4,9 +4,9 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-Der Prototyp ist spielbar. Auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) ist **0.1.16 / Build 16** veröffentlicht (Commit `ff3bcc448f2580035aad2b6cea0681434d98617a`, Tag `v0.1.16`). `v0.1.15` bleibt als Rückfallpunkt erhalten.
+Der Prototyp ist spielbar. Auf [GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) ist **0.1.16 / Build 16** veröffentlicht (Commit `ff3bcc448f2580035aad2b6cea0681434d98617a`, Tag `v0.1.16`). **0.1.17 / Build 17** ist ein lokaler Kandidat mit kleineren Guide-Bildern; `v0.1.16` bleibt nach seiner Veröffentlichung als Rückfallpunkt erhalten.
 
-Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](reports/TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](reports/REPORTS.md) versioniert. Der veröffentlichte Build 0.1.16 zeigt die 130 Content-08-Einzelbilder. Der lokale, noch unveröffentlichte Optimierungsstand liefert diese Motive als kleine WebP-Dateien mit PNG-Fallback; seine unabhängige QA und Versionssetzung stehen aus.
+Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](reports/TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](reports/REPORTS.md) versioniert. Der veröffentlichte Build 0.1.16 zeigt die 130 Content-08-Einzelbilder. Der lokale Kandidat 0.1.17 liefert diese Motive als kleinere WebP-Dateien mit PNG-Fallback; seine unabhängige QA steht aus.
 
 Enthalten sind:
 

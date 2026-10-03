@@ -2,19 +2,20 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## Veröffentlichter Teststand und lokaler Payload-Kandidat
+## Lokaler Build-0.1.17-Kandidat
 
 | Feld | Wert |
 |---|---|
-| Version | `0.1.16` |
-| Build | `16` |
-| Veröffentlichter Commit | `ff3bcc448f2580035aad2b6cea0681434d98617a` |
-| Release-Tag | `v0.1.16` auf diesem veröffentlichten Commit |
-| Datum | 2026-10-02 |
-| Test-URL | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.16> |
-| Änderungen | [CHANGELOG.md](../CHANGELOG.md#0116---2026-10-02) |
+| Version | `0.1.17` |
+| Build | `17` |
+| Basis | Veröffentlichter Commit `ff3bcc448f2580035aad2b6cea0681434d98617a` (`v0.1.16`) |
+| Kandidaten-Commit | Im Beads-Issue `goblin-hr7` nach lokalem Commit einzutragen |
+| Vorgesehenes Tag | `v0.1.17`, erst am tatsächlich veröffentlichten Commit setzen |
+| Datum | 2026-10-03 |
+| Veröffentlichter Teststand | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.16> |
+| Änderungen | [CHANGELOG.md](../CHANGELOG.md#0117---2026-10-03--lokaler-kandidat) |
 
-Der noch unveröffentlichte Payload-Kandidat nach Build 0.1.16 ersetzt die 130 großen Runtime-PNGs der fünf grafischen Guide-Stile durch 1024 × 683 WebP mit optimiertem 768 × 512-PNG-Fallback. Er erhält vor unabhängiger QA einen eigenen lokalen Commit in `goblin-0t0.1`; `v0.1.16` bleibt der veröffentlichte Rückfallpunkt. Prüffokus: 130/130 Quellen- und Assetpfade, transparente Kanten und Pixel-Stil auf hell/dunkel, Browserauswahl ohne Doppel-Download, Fallback bei nicht unterstütztem WebP, Desktop/Mobil-Layout sowie Military und Karten-/Listenicons unverändert. Ein neues Release erfordert Versionsanhebung, Release-Gate, unabhängige QA und gesonderte Freigabe.
+Der Kandidat ersetzt die 130 großen Runtime-PNGs der fünf grafischen Guide-Stile durch 1024 × 683 WebP mit optimiertem 768 × 512-PNG-Fallback. `v0.1.16` bleibt veröffentlicht. Prüffokus: 130/130 Quellen- und Assetpfade, transparente Kanten und Pixel-Stil auf hell/dunkel, Browserauswahl ohne Doppel-Download, Fallback bei nicht unterstütztem WebP, Desktop/Mobil-Layout sowie Military und Karten-/Listenicons unverändert. Vor einem Deploy sind Release-Gate, unabhängige Regression und Browser-QA, Content-/Legal-Grenzen, Pages-Einstiegsprüfung und ein eindeutiges Tag am Deploy-Commit erforderlich. Die Nutzerfreigabe für diesen Release-Auftrag liegt in `goblin-hr7` vor.
 
 ### Testfokus für 0.1.16
 
@@ -24,7 +25,7 @@ Der noch unveröffentlichte Payload-Kandidat nach Build 0.1.16 ersetzt die 130 g
 - Content Notice v8 gegen die eingebundenen 130 PNGs prüfen: KI-Ursprung, interne Content-05-Tafeln als Stilvorlagen, Neuinterpretation statt Crops, menschliche Prüfung, mögliche Nicht-Einzigartigkeit und begrenzte nichtkommerzielle Asset-Einschätzung. Produkt-/Marken-/Regel- und kommerzielle Freigabe bleiben gesondert.
 - Die 0.1.15-Spiel- und Release-Regression nach Bedarf wiederholen. Auf dem Content-08-Integrationscommit bestanden 137/137 Node-Tests und die lokale Browserprobe aller sechs Stile ohne Lade- oder Laufzeitfehler (`goblin-bvh`). Die unabhängige Prüfung muss den finalen Kandidatencommit nennen.
 
-Build `v0.1.16` ist auf `ff3bcc448f2580035aad2b6cea0681434d98617a` veröffentlicht; `v0.1.15` bleibt Rückfallpunkt. Die lokale Payload-Optimierung ist noch nicht veröffentlicht. Vor ihrem Release sind Versionsanhebung, unabhängige QA, Build-/Changelog-Gate, Content-/Legal-Grenzen, gesonderte Nutzerfreigabe, eindeutiges Tag am tatsächlich veröffentlichten Commit und anschließende Pages-Einstiegsprüfung erforderlich.
+Build `v0.1.16` ist auf `ff3bcc448f2580035aad2b6cea0681434d98617a` veröffentlicht; `v0.1.15` bleibt sein Rückfallpunkt. Die lokale Payload-Optimierung in 0.1.17 ist noch nicht veröffentlicht.
 
 ### Vorheriger Testfokus für 0.1.15
 
