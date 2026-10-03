@@ -3,6 +3,8 @@
 const ScenarioRuleProfiles=Object.freeze((()=>{
   const product='FIELD_TEST_LEGACY_v1';
   const atlasData='field-test-atlas-v1';
+  const losProbe=Object.freeze({id:'los-supercover-probe',scenarioVersion:1,
+    objective:'core',ruleProfileId:'LEGACY_SUPERCOVER_PROBE_v1',losMode:'strict-supercover'});
   const entries=Object.freeze({
     'iron-dust':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:product}),
     'relay-run':Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:product}),
@@ -15,12 +17,12 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   });
   function reject(code,message){const error=new Error(`${code}: ${message}`);error.code=code;throw error}
   function validate(id,config){
-    if(!config?.ruleProfileId||config.ruleProfileId!==product)
+    const expected=id===losProbe.id?losProbe:entries[id];
+    if(!config?.ruleProfileId||config.ruleProfileId!==expected?.ruleProfileId)
       reject('UNSUPPORTED_RULE_PROFILE',`Unbekanntes Regelprofil ${config?.ruleProfileId??'(fehlt)'}; Partie wurde nicht geladen.`);
-    const expected=entries[id];
     if(!expected||config.scenarioVersion!==expected.scenarioVersion||config.objectiveVersion!==1||
       config.objective!==expected.objective||config.ruleProfileId!==expected.ruleProfileId||
-      config.ruleProfile!==expected.unitDataProfile)
+      config.ruleProfile!==expected.unitDataProfile||config.losMode!==expected.losMode)
       reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} und Regelprofil ${config.ruleProfileId} sind nicht kompatibel; Partie wurde nicht geladen.`);
     return expected;
   }
@@ -56,6 +58,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     const session=freeze({schemaVersion:1,sessionId:nextSessionId++,scenarioId:id,
       scenarioVersion:source.scenarioVersion,ruleProfileId:source.ruleProfileId,
       effectiveRules:{objectiveVersion:source.objectiveVersion,objective:source.objective,
+        ...(source.losMode?{losMode:source.losMode}:{}),
         unitDataProfile:source.ruleProfile??null,terrain:source.terrain,
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;
