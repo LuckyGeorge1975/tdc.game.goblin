@@ -64,6 +64,28 @@ ist weder Default noch Browser-Level; eine Übernahme in neue produktive
 Szenarien sowie Replay-Import/Export erfordern einen gesonderten versionierten
 Vertrag und QA.
 
+## Profilgebundener Replay-Umschlag (Slice 3b.1)
+
+`src/core/replay-contract.mjs` unterstützt ausschließlich die exakte
+`core-v3-profile-v1`-/`core-profile-probe`-/`profile-probe-v1`-/
+`FIELD_TEST_LEGACY_v1`-Kombination. Der JSON-Umschlag enthält eine eigene
+`replaySchemaVersion: 1`, den vollständigen Profilkopf mit `effectiveRules`,
+einen tief kopierten Anfangsszenario-Snapshot (`map`, `units`), einen
+32-Bit-Seed und geordnete Befehle. Ein FNV-1a-64-Fingerabdruck des kanonisch
+serialisierten Szenarios erkennt versehentliche Snapshot-Drift; er ist keine
+Echtheitssignatur. Kein Replay lädt Regeln aus dem aktuellen Katalog nach.
+
+`validateProfileReplay` prüft den gesamten Umschlag vor `createGame`,
+`dispatch` oder RNG-Verbrauch. Fehlende/abweichende Profil- und Snapshotdaten,
+ungültige Seeds/Befehle sowie Core-v4/FULL_CATALOG werden mit
+`REPLAY_PROFILE_MISMATCH` abgewiesen; unbekannte Replay-Schemaversionen mit
+`UNSUPPORTED_REPLAY_VERSION`. `recordProfileReplay` erstellt eine eingefrorene
+Kopie, `playProfileReplay` liefert `{initialState,steps,finalState}` mit
+deterministischen Ereignissen und regelkonformen Ablehnungen. Das Modul
+verändert weder `replayReference`/`replayPhase` noch deren historischen
+Core-v1/v2-Vertrag. Es gibt keinen Browser-Import, kein Savegame und keine
+produktive Levelzuordnung; weitere Profilpaare brauchen eigene Zulassung.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im
