@@ -12,6 +12,23 @@ export const CORE_PROFILE_CONTRACT = Object.freeze({
   })
 });
 
+// An isolated Core test profile. Browser levels and Legacy sessions do not
+// advertise this product ID, so it cannot become the default game profile.
+export const CORE_SUPERCOVER_CONTRACT = Object.freeze({
+  rulesVersion: 'core-v4-supercover-v1',
+  scenarioId: 'core-supercover-probe',
+  scenarioVersion: 'supercover-probe-v1',
+  ruleProfileId: 'CORE_SUPERCOVER_PROBE_v1',
+  effectiveRules: Object.freeze({
+    schemaVersion: 1,
+    objective: 'enemy-core',
+    movement: Object.freeze({gevSecondMove: 2}),
+    losMode: 'strict-supercover'
+  })
+});
+
+const profileContracts = [CORE_PROFILE_CONTRACT, CORE_SUPERCOVER_CONTRACT];
+
 const historicalPairs = new Set([
   'core-v1/reference-v1',
   'core-v2/phase-v2',
@@ -30,12 +47,11 @@ const same = (actual, expected) => {
 };
 
 export function profileContractError(value) {
-  const contract = CORE_PROFILE_CONTRACT;
   if (value && historicalPairs.has(`${value.rulesVersion}/${value.scenarioVersion}`) &&
       !['scenarioId', 'ruleProfileId', 'effectiveRules'].some(key => own(value, key)))
     return null;
-  if (value?.rulesVersion !== contract.rulesVersion ||
-      value?.ruleProfileId !== contract.ruleProfileId)
+  const contract = profileContracts.find(item => item.rulesVersion === value?.rulesVersion);
+  if (!contract || value?.ruleProfileId !== contract.ruleProfileId)
     return {code: 'UNSUPPORTED_RULE_PROFILE', details: {
       rulesVersion: value?.rulesVersion ?? null,
       ruleProfileId: value?.ruleProfileId ?? null
@@ -52,7 +68,7 @@ export function profileContractError(value) {
 }
 
 export function freezeEffectiveRules(state) {
-  if (state.rulesVersion !== CORE_PROFILE_CONTRACT.rulesVersion) return state;
+  if (!profileContracts.some(item => item.rulesVersion === state.rulesVersion)) return state;
   Object.freeze(state.effectiveRules.movement);
   Object.freeze(state.effectiveRules);
   return state;

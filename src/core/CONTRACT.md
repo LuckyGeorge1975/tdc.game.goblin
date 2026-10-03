@@ -45,6 +45,25 @@ Save-/Replay-Import, kein Legacy-`game.js`, keinen Live-Guide und keinen
 Skimmer-Zielentwurf. Weitere Produkt-/Szenariopaare benötigen einen eigenen
 Vertrags- und Testabschnitt; `FULL_CATALOG_v1` bleibt inaktiv.
 
+## Supercover-Probe (goblin-9bj.28, Stufe B)
+
+Die zusätzliche, ausschließlich im Core-Test erzeugte Kombination
+`core-v4-supercover-v1` / `core-supercover-probe` /
+`supercover-probe-v1` / `CORE_SUPERCOVER_PROBE_v1` verlangt im effektiven
+Snapshot `losMode: strict-supercover`. Nur diese Regelversion prüft Sichtlinien
+mit `supercoverIntermediateHexes` aus `supercover-line.mjs`: alle berührten
+Zwischenhexe zählen, auch beide Seiten einer exakten Grenzkante; Start und
+Ziel sind ausgenommen. `queryAreas` und `Fire` verwenden dieselbe
+`hasLineOfSight`-Auswahl. Die unveränderte Reichweite bleibt eine separate
+Prüfung. Der Profilvertrag weist fehlende oder abweichende Kopf-/Snapshotdaten
+vor Spielstart beziehungsweise Befehlsausführung zurück.
+
+`core-v1`, `core-v2` und `core-v3-profile-v1` behalten ihre bisherige
+Rundungs-LOS-Semantik und ihre vorhandenen Fixture-/Replay-Daten. Die Probe
+ist weder Default noch Browser-Level; eine Übernahme in neue produktive
+Szenarien sowie Replay-Import/Export erfordern einen gesonderten versionierten
+Vertrag und QA.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im

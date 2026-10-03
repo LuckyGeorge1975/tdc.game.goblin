@@ -1,4 +1,6 @@
 import TerrainRules from '../../terrain-rules.js';
+import {supercoverIntermediateHexes} from './supercover-line.mjs';
+import {CORE_SUPERCOVER_CONTRACT} from './profile-contract.mjs';
 
 export const key = ({ x, y }) => `${x},${y}`;
 export const inside = (map, p) => Number.isInteger(p?.x) && Number.isInteger(p?.y) && p.x >= 0 && p.y >= 0 && p.x < map.width && p.y < map.height;
@@ -28,6 +30,9 @@ function roundHex(q, r) {
 }
 export function hasLineOfSight(state, from, to) {
   if (!inside(state.map, from) || !inside(state.map, to)) return false;
+  if (state.rulesVersion === CORE_SUPERCOVER_CONTRACT.rulesVersion)
+    return supercoverIntermediateHexes(from, to)
+      .every(cell => !TerrainRules.blocksLos(terrainAt(state, cell)));
   const distance = hexDistance(from, to), a = axial(from), b = axial(to);
   for (let step = 1; step < distance; step++) {
     const t = step / distance;
