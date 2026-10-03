@@ -80,7 +80,7 @@
     scenarioCatalog[level.id]={
       kicker:level.kicker,title:level.title,
       sub:'Feindlichen Kern und alle übrigen Gegner ausschalten; eigene Einheit erhalten.',
-      objective:level.objective,showAllEnemiesProgress:true,
+      objectiveVersion:level.schemaVersion,objective:level.objective,showAllEnemiesProgress:true,
       terrain:level.terrain.filter(cell=>TerrainRules.coverBonus(cell.type)>0).map(cell=>`${cell.x},${cell.y}`),
       terrainTypes:level.terrain,units:level.units.map(makeUnit)
     };

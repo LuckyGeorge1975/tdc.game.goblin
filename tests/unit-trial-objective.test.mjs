@@ -28,8 +28,41 @@ function legacyTrial() {
     run(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'));
   }
   run("draw=()=>{}; updateSelection=()=>{}; loadScenario('unit-trial');");
+  const atlas = JSON.parse(readFileSync(new URL('../assets/unit-art/levels/atlas-proving-grounds.json', import.meta.url), 'utf8'));
+  const showcases = JSON.parse(readFileSync(new URL('../assets/unit-art/levels/showcase-levels.json', import.meta.url), 'utf8')).levels;
+  for (const level of [atlas, ...showcases]) {
+    const objective = level.id === 'atlas-proving-grounds' ? 'core-and-escort' : level.objective;
+    run(`scenarioCatalog[${JSON.stringify(level.id)}]={objectiveVersion:${level.schemaVersion},objective:${JSON.stringify(objective)}}`);
+  }
   return { run };
 }
+
+test('versioned objective profiles cover every Legacy level and reject unknown contracts', () => {
+  const { run } = legacyTrial();
+  const ids = ['iron-dust', 'relay-run', 'unit-trial', 'atlas-proving-grounds',
+    'showcase-terrain-course', 'showcase-advance', 'showcase-siege', 'showcase-specialists'];
+  for (const id of ids) {
+    assert.equal(run(`victoryProfile(scenarioCatalog[${JSON.stringify(id)}]).version`), 1, id);
+    assert.equal(run(`victoryProfile(scenarioCatalog[${JSON.stringify(id)}]).requiresAllEnemies`), id !== 'iron-dust', id);
+    assert.equal(run(`victoryProfile(scenarioCatalog[${JSON.stringify(id)}]).requiresPlayerSurvival`), true, id);
+  }
+  assert.throws(() => run("victoryProfile({objectiveVersion:2,objective:'core'})"), /Unsupported objective contract version/);
+  assert.throws(() => run("victoryProfile({objectiveVersion:1,objective:'unknown'})"), /Unsupported objective/);
+  assert.throws(() => run("victoryProfile({objective:'core'})"), /Unsupported objective contract version/);
+});
+
+test('objective profiles distinguish core-only and escort without changing defeat priority', () => {
+  const { run } = legacyTrial();
+  for (const [id, withEscort] of [['iron-dust', false], ['unit-trial', true]]) {
+    const profile = `victoryProfile(scenarioCatalog['${id}'])`;
+    const roster = (player, core, escort) => `[{team:'player',hp:${player}},{team:'enemy',core:true,hp:${core}},{team:'enemy',hp:${escort}}]`;
+    assert.equal(run(`victoryOutcome(${profile},${roster(1, 0, 1)})`), withEscort ? null : true);
+    assert.equal(run(`victoryOutcome(${profile},${roster(1, 0, 0)})`), true);
+    assert.equal(run(`victoryOutcome(${profile},${roster(1, 1, 0)})`), null);
+    assert.equal(run(`victoryOutcome(${profile},${roster(0, 0, 0)})`), false);
+    assert.equal(run(`victoryOutcome(${profile},${roster(0, 1, 1)})`), false);
+  }
+});
 
 test('Unit Trial objective metadata describes core plus escorts; core alone never ends the mission', () => {
   const { run } = legacyTrial();

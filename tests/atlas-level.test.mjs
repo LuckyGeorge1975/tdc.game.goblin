@@ -28,6 +28,8 @@ test('ATLAS and four smaller scenarios load with complete roster and terrain cov
   assert.equal(errors.length,0);
   assert.deepEqual(options.map(option=>option.value),['atlas-proving-grounds',...showcase.levels.map(level=>level.id)]);
   const atlasScenario=context.scenarioCatalog['atlas-proving-grounds'];
+  assert.equal(atlasScenario.objectiveVersion,1);
+  assert.equal(atlasScenario.objective,'core-and-escort');
   assert.equal(atlasScenario.units.length,26);
   assert.equal(new Set(atlasScenario.units.map(unit=>unit.visualKey)).size,26);
   assert.equal(new Set(atlasScenario.terrainTypes.map(cell=>cell.type)).size,12);
@@ -35,6 +37,7 @@ test('ATLAS and four smaller scenarios load with complete roster and terrain cov
   assert.equal(new Set(small.flatMap(scenario=>scenario.units.map(unit=>unit.visualKey))).size,26);
   assert.equal(new Set(['open-ground',...small[0].terrainTypes.map(cell=>cell.type)]).size,12);
   for(const scenario of small){
+    assert.equal(scenario.objectiveVersion,1);
     assert.equal(scenario.objective,'core-and-escort');
     assert.equal(scenario.units.filter(unit=>unit.core&&unit.team==='enemy').length,1);
     assert.equal(new Set(scenario.units.map(unit=>`${unit.x},${unit.y}`)).size,scenario.units.length);
