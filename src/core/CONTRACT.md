@@ -161,6 +161,22 @@ Die Probe prüft keine Entfernung, Sichtlinie, Feuerphase oder Angriffserlaubnis
 Sie ist kein Core-`Fire`, kein Replay-Profil und kein Levelstart; Rammen und
 Produktentscheidungen zu Siege-Tank/Artillerie bleiben gesondert.
 
+## Technische IRON-DUST-Rammprobe (goblin-9bj.19.10)
+
+`iron-dust-siegebreaker-ram-v1` bildet nur den bestehenden Rammzweig des
+Legacy-Klickpfads ab. Ein ausgewählter, noch nicht bewegter Siegebreaker darf
+in der Spieler-Bewegungsphase einen lebenden Nicht-Kerngegner auf einem mit
+seinem Bewegungsbudget erreichbaren Hex rammen. Danach steht er auf dem Zielhex,
+ist bewegt und hat gehandelt; das Ziel hat HP 0. Der Rammstoß verbraucht keinen
+Zufallswert. Tests vergleichen Weg und Einheitenfolgen mit den tatsächlichen
+`game.js`-Funktionen. Feste Diagnoseaufstellungen bringen Guard, Raider oder
+Core neben den Siegebreaker; der versionierte IRON-DUST-Quellsnapshot bleibt
+unverändert.
+
+Die Probe ist inaktiv und trifft keine Sieg-/Niederlagenentscheidung. Sie
+aktiviert weder Core-`Move`/`Fire` noch Level, Replay oder Oberfläche.
+UI-Auswahl und Hinweise des Klickpfads sind nicht Teil ihres Zustandsvertrags.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im
