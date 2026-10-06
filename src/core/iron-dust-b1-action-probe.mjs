@@ -1,6 +1,7 @@
 import TerrainRules from '../../terrain-rules.js';
 import {inside, movementPaths} from './hex.mjs';
-import {validateIronDustUnifiedStateProbe, queryIronDustUnifiedUnit} from './iron-dust-unified-state-probe.mjs';
+import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, validateIronDustUnifiedStateProbe,
+  queryIronDustUnifiedUnit} from './iron-dust-unified-state-probe.mjs';
 
 export const IRON_DUST_B1_ACTION_VERSION = 'iron-dust-explicit-phase-move-ram-v1';
 const actors = ['guard', 'raider'];
@@ -51,7 +52,8 @@ function ramPath(state, actor, target) {
 
 export function queryIronDustB1Action(state, command) {
   validateIronDustUnifiedStateProbe(state);
-  if (!['source', 'adjacent'].includes(state.fixture)) return deny('B1_FIXTURE_UNSUPPORTED');
+  if (!['source', 'adjacent', IRON_DUST_NEAR_CORE_FIXTURE_VERSION].includes(state.fixture))
+    return deny('B1_FIXTURE_UNSUPPORTED');
   if (!command || typeof command.type !== 'string') return deny('B1_COMMAND_INVALID');
   const keys = command.type === 'EndPhase' ? ['type', 'playerId'] :
     command.type === 'EnemyPass' ? ['type', 'playerId', 'actorId'] :

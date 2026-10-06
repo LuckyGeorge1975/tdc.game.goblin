@@ -4,12 +4,14 @@ import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1} from '../levels/iron
 import {IRON_DUST_LEGACY_LOS_PROBE_V1, hasIronDustLegacyLineOfSight} from './iron-dust-legacy-los-probe.mjs';
 
 export const IRON_DUST_UNIFIED_STATE_VERSION = 'iron-dust-unified-state-probe-v1';
+export const IRON_DUST_NEAR_CORE_FIXTURE_VERSION = 'iron-dust-near-core-fixture-v1';
 const source = validateIronDustCoreDataV1(IRON_DUST_CORE_DATA_V1);
 const sourceOgre = source.units.find(unit => unit.id === 'ogre');
 const ids = source.units.map(unit => unit.id);
 const enemyActors = ['guard', 'raider'];
 const weaponKeys = Object.keys(sourceOgre.ogreSystems.weapons);
 const fixtures = Object.freeze({source: {}, adjacent: {guard: {x: 2, y: 5}},
+  [IRON_DUST_NEAR_CORE_FIXTURE_VERSION]: {ogre: {x: 10, y: 1}},
   boundary: {ogre: {x: 2, y: 0}, guard: {x: 6, y: 1}}});
 const clone = value => JSON.parse(JSON.stringify(value));
 const freeze = value => {
