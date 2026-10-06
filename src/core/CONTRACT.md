@@ -146,6 +146,21 @@ kein Levelstart. Systemabwehr, Laufwerke, tatsächliche Treffer und Siegziel
 bleiben getrennte Gates. Die globale Siege-Tank-/Artillerie-Regel und
 `FULL_CATALOG_v1` werden nicht berührt.
 
+## Technische IRON-DUST-Systemtrefferprobe (goblin-9bj.19.9)
+
+`iron-dust-siegebreaker-systems-v1` führt für den festen, inaktiven
+IRON-DUST-Datensnapshot genau die Legacy-Systemauflösung nach einem bereits
+angenommenen Angriff aus: Systemzielwahl, Würfel/CRT, `D` ohne Systemverlust,
+`X` auf Waffen oder Laufwerke, die Laufwerksschwellen 31/16/1/0 sowie die
+Synchronisation von Bewegung und HP bei Hilflosigkeit. Der feste Seed nutzt
+die deterministische Core-Zufallsfolge; Tests speisen denselben Wurf in
+`ogre-runtime.js` und vergleichen die Ergebnisse direkt. Abgelehnte Befehle
+verbrauchen keinen Zufallswert und verändern den Zustand nicht.
+
+Die Probe prüft keine Entfernung, Sichtlinie, Feuerphase oder Angriffserlaubnis.
+Sie ist kein Core-`Fire`, kein Replay-Profil und kein Levelstart; Rammen und
+Produktentscheidungen zu Siege-Tank/Artillerie bleiben gesondert.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im
