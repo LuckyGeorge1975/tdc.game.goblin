@@ -86,6 +86,25 @@ verändert weder `replayReference`/`replayPhase` noch deren historischen
 Core-v1/v2-Vertrag. Es gibt keinen Browser-Import, kein Savegame und keine
 produktive Levelzuordnung; weitere Profilpaare brauchen eigene Zulassung.
 
+## Technische IRON-DUST-GEV-Probe (goblin-9bj.19.5)
+
+`core-v5-iron-dust-gev-probe-v1` / `core-iron-dust-gev-probe` /
+`iron-dust-gev-probe-v1` / `CORE_IRON_DUST_GEV_PROBE_v1` ist nur eine
+Bewegungsprobe. `makeIronDustGevProbeScenario()` übernimmt die unveränderte
+IRON-DUST-v1-Karte und ausschließlich den Quell-Skimmer `id: gev` sowie einen
+inerten feindlichen Kern aus dem validierten, inaktiven Datensnapshot. Nur bei
+diesem exakten Szenario und Profil leitet `createGame` im geklonten Zustand
+`movementMode: gev` ab. Die Quell-Unit bleibt unverändert. Die Probe erlaubt
+Bewegung nur für `gev` und Phasenwechsel; `Fire` und Bewegungen anderer Units
+melden `UNSUPPORTED_COMMAND`. Das Gelände enthält acht `rubble-field`-Zellen
+mit Kosten 2 und sonst `open-ground` mit Kosten 1. Der Skimmer erhält 3 Felder
+in der Bewegungs- und 2 in der GEV-Phase. Kopf und Quellsnapshot werden vor
+Spielstart geprüft; `dispatch` prüft den Kopf erneut vor jeder Aktion.
+
+Diese Probe ist kein `FIELD_TEST_LEGACY_v1`-Core-Level, kein Replay-Profil und
+kein Browser-Start. Sie aktiviert weder Siegebreaker-/LOS-/Zielregeln noch
+FULL_CATALOG. Historische v1/v2-Fixtures und v3/v4-Probes bleiben getrennt.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im

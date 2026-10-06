@@ -27,7 +27,26 @@ export const CORE_SUPERCOVER_CONTRACT = Object.freeze({
   })
 });
 
-const profileContracts = [CORE_PROFILE_CONTRACT, CORE_SUPERCOVER_CONTRACT];
+// Movement-only probe derived from the inactive Iron Dust data snapshot.
+// Its profile ID is deliberately separate from the playable Legacy product.
+export const CORE_IRON_DUST_GEV_PROBE_CONTRACT = Object.freeze({
+  rulesVersion: 'core-v5-iron-dust-gev-probe-v1',
+  scenarioId: 'core-iron-dust-gev-probe',
+  scenarioVersion: 'iron-dust-gev-probe-v1',
+  ruleProfileId: 'CORE_IRON_DUST_GEV_PROBE_v1',
+  effectiveRules: Object.freeze({
+    schemaVersion: 1,
+    capability: 'gev-movement-only',
+    sourceDataVersion: 'iron-dust-core-data-v1',
+    sourceScenarioId: 'iron-dust',
+    sourceUnitId: 'gev',
+    terrainVersion: 'iron-dust-v1',
+    movement: Object.freeze({gevFirstMove: 3, gevSecondMove: 2})
+  })
+});
+
+const profileContracts = [CORE_PROFILE_CONTRACT, CORE_SUPERCOVER_CONTRACT,
+  CORE_IRON_DUST_GEV_PROBE_CONTRACT];
 
 const historicalPairs = new Set([
   'core-v1/reference-v1',

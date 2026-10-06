@@ -2,7 +2,9 @@ import { hasLineOfSight, hexDistance, inside, movementPaths, queryAreas, terrain
 import TerrainRules from '../../terrain-rules.js';
 import { referenceScenario, referenceCommands, REFERENCE_SEED } from './reference-fixture.mjs';
 import { phaseScenario, phaseCommands, PHASE_SEED, expectedPhaseTrace } from './phase-fixture.mjs';
-import { profileContractError, freezeEffectiveRules } from './profile-contract.mjs';
+import {profileContractError, freezeEffectiveRules,
+  CORE_IRON_DUST_GEV_PROBE_CONTRACT} from './profile-contract.mjs';
+import {ironDustGevProbeScenarioError} from './iron-dust-gev-probe.mjs';
 
 export { queryAreas } from './hex.mjs';
 export { referenceScenario, referenceCommands, REFERENCE_SEED } from './reference-fixture.mjs';
@@ -29,9 +31,15 @@ const findUnit = (state, id) => state.units.find(u => u.id === id);
 export function createGame(scenario, seed) {
   const profileError = profileContractError(scenario);
   if (profileError) throw Object.assign(new Error(profileError.code), profileError);
+  const gevProbe = scenario.rulesVersion === CORE_IRON_DUST_GEV_PROBE_CONTRACT.rulesVersion;
+  if (gevProbe) {
+    const scenarioError = ironDustGevProbeScenarioError(scenario);
+    if (scenarioError) throw Object.assign(new Error(scenarioError.code), scenarioError);
+  }
   if (!Number.isInteger(seed)) throw new TypeError('seed must be an integer');
   if (!scenario?.map || !Array.isArray(scenario?.units)) throw new TypeError('invalid scenario');
   const map = clone(scenario.map), units = clone(scenario.units).map(u => ({ ...u, moved: false, fired: false, secondMoved: false, disabled: false, disabledUntil: 0 }));
+  if (gevProbe) units.find(u => u.id === 'gev').movementMode = 'gev';
   if (!Number.isInteger(map.width) || !Number.isInteger(map.height) || map.width < 1 || map.height < 1 || !Array.isArray(map.terrain)) throw new TypeError('invalid map');
   if (new Set(units.map(u => u.id)).size !== units.length || units.some(u => !inside(map, u))) throw new TypeError('invalid units');
   return freezeEffectiveRules({ rulesVersion: scenario.rulesVersion, scenarioVersion: scenario.scenarioVersion,
@@ -82,6 +90,9 @@ function preflight(state, command) {
   if (!state || !command || typeof command.type !== 'string') return reject('INVALID_COMMAND');
   const profileError = profileContractError(state);
   if (profileError) return {error: profileError};
+  if (state.rulesVersion === CORE_IRON_DUST_GEV_PROBE_CONTRACT.rulesVersion &&
+      (command.type === 'Fire' || command.type === 'Move' && command.unitId !== 'gev'))
+    return reject('UNSUPPORTED_COMMAND', {type: command.type, rulesVersion: state.rulesVersion});
   if (state.victory.status !== 'ongoing') return reject('GAME_ENDED');
   if (command.playerId !== state.activeTeam) return reject('NOT_ACTIVE_TEAM', { activeTeam: state.activeTeam });
   if (command.type === 'Load' || command.type === 'Unload') return reject('UNSUPPORTED_COMMAND', { type: command.type, rulesVersion: state.rulesVersion });
