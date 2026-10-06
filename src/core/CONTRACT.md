@@ -105,6 +105,27 @@ Diese Probe ist kein `FIELD_TEST_LEGACY_v1`-Core-Level, kein Replay-Profil und
 kein Browser-Start. Sie aktiviert weder Siegebreaker-/LOS-/Zielregeln noch
 FULL_CATALOG. Historische v1/v2-Fixtures und v3/v4-Probes bleiben getrennt.
 
+## Technische IRON-DUST-Pixel-LOS-Probe (goblin-9bj.19.6)
+
+`iron-dust-legacy-pixel-los-v1` ist ein eigener, nicht ausführbarer
+Sichtlinien-Selektor für die exakt validierte IRON-DUST-v1-Karte. Er kopiert die
+12×8-Karte mit acht `rubble-field`-Zellen aus dem inaktiven Datensnapshot,
+prüft Version, Profilquelle, Modus und Karte und verwendet die heutige
+`FIELD_TEST_LEGACY_v1`-Abtastung aus `game.js`: Hexmitten mit Radius 34,
+8-fache Schrittzahl, nächstes Hex per Pixelabstand und
+`TerrainRules.blocksLos` nur für Zwischenhexe. Start- und Zielhex blockieren
+nicht. Ungültige Koordinaten werden vor der Abtastung abgewiesen. Die
+bidirektionalen Testvektoren vergleichen die neue reine Funktion direkt mit
+den ausgeführten Legacy-Funktionen, einschließlich einer Grenzlinie, die das
+separate strenge Supercover anders beurteilt.
+
+Die Probe hat keinen `rulesVersion`-/`effectiveRules`-Kopf und ist nicht in
+`createGame`, `queryAreas`, `Fire` oder Replay eingehängt. Die GEV-Bewegungsprobe
+weist `Fire` weiterhin ohne State-/RNG-Änderung ab. Ein gemeinsamer Fire- und
+Query-Preflight wartet auf den Siegebreaker-, Ziel- und Profilvertrag. Die
+Supercover-Probe v4 und die offene Produktentscheidung zu Grenzkanten werden
+nicht umgedeutet.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im
