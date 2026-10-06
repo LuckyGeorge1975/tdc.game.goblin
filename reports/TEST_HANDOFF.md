@@ -21,7 +21,7 @@ Sichtbare Änderung: `ICON SET` zeichnet beim Wechsel die bereits vorhandenen Mo
 - Auf Produktcommit `4d316868` bestanden 137/137 Node-Tests und die unabhängige Regression (`goblin-rfe.2`). Spielzustand, Runde/Phase, HP, Befehls-/Undo-Stand und Auswahl blieben beim Wechsel aller sechs Sets erhalten.
 - Die unabhängige Browser-/Release-QA prüfte Desktop, emuliertes Mobilgerät und Querformat, Karte/Liste/Auswahl/Guide, Persistenz, offenen Dialog und den lokalen Pages-Pfad (`goblin-rfe.3`). Das Release-Gate `node scripts/verify-release.mjs --previous=v0.1.17` bestand dort.
 - Das unveränderte Asset-Delta und die Grenzen der nichtkommerziellen Vorschau wurden von Content und Legal geprüft (`goblin-rfe.4`). Diese Prüfung erweitert keine Bildrechte und gibt nicht das vollständige Spiel frei.
-- Nach dieser redaktionellen Korrektur folgt eine unabhängige Delta-Nachprüfung. Tag, Push und Pages-Deploy erfolgen erst nach allen Gates durch Koordination; den öffentlichen Einstieg anschließend prüfen und in `goblin-rfe` dokumentieren.
+- Die unabhängige Delta-Nachprüfung zu Commit `0cba9f8` ist in `goblin-rfe` belegt. Tag, Push und Pages-Deploy erfolgen erst nach allen Gates durch Koordination; den öffentlichen Einstieg anschließend prüfen und in `goblin-rfe` dokumentieren.
 
 ## Build 0.1.17
 
