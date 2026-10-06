@@ -194,6 +194,23 @@ nicht. Beobachtungen verbrauchen keinen Zufallswert; abgelehnte Beobachtungen
 Die Probe führt weder Kampf-, Ramm- noch Phasenbefehle aus. Sie ist kein
 `FIELD_TEST_LEGACY_v1`-Spielpfad, kein Core-/Replay-Profil und kein Levelstart.
 
+## Technische IRON-DUST-Gegnerphasenprobe (goblin-9bj.19.12)
+
+`iron-dust-explicit-enemy-pass-v1` bildet nur den Legacy-Phasenrahmen ab:
+Spieler-Bewegung, Feuer, Skimmer, danach ein Gegnerzug und der nächste
+Spielerzug. Der Gegnerzug ist im Legacy-Spiel ein automatischer Block. Diese
+inaktive Probe verlangt deshalb für Guard und Raider je einen ausdrücklich
+vorgegebenen `EnemyPass`-Befehl, bevor sie den Gegnerzug abschließt. Das ist
+der kontrollierbare Zweig ohne Gegneraktion; der Kern ist kein handelnder
+Gegner. Tests vergleichen Anfang, Phasenwechsel und Zugzähler mit den echten
+`game.js`-Funktionen bei vorgegebenem No-Action-Zweig.
+
+`EnemyPass` trifft keine Zielwahl und führt weder `Move` noch `Fire` aus.
+Beide Befehle bleiben ausdrücklich gesperrt, bis Siegebreaker-, LOS- und
+Zielverträge integriert sind. Die Probe aktiviert kein
+`FIELD_TEST_LEGACY_v1`-Core-/Replay-Profil, kein Level und keine Oberfläche.
+Bei Ablehnung bleiben Zustand und RNG unverändert.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im
