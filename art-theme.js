@@ -67,23 +67,16 @@
     replaceWithArt(symbol,unitGuideEntries[guideIndex],'library');
   };
 
-  let changing=false;
-  picker.addEventListener('change',async()=>{
+  picker.addEventListener('change',()=>{
     const requested=picker.value,previous=UnitVisuals.currentStyle();
     picker.value=previous;
-    if(changing||requested===previous||!UnitVisuals.styles.some(style=>style.id===requested)||GameDialogs.isOpen())return;
-    changing=true;
-    try{
-      if((hasScenarioProgress()||gameOver)&&!await GameDialogs.confirm({
-        id:'art-style',title:'ICON-SET WECHSELN?',
-        message:'Der aktuelle Spielstand wird verworfen und das Szenario neu gestartet.',
-        acceptLabel:'WECHSELN',cancelLabel:'WEITERSPIELEN'
-      }))return;
-      UnitVisuals.setStyle(requested);
-      picker.value=requested;
-      try{localStorage.setItem('goblin-art-style',requested)}catch{/* Session still works. */}
-      loadScenario(currentScenario);
-    }finally{changing=false}
+    if(requested===previous||!UnitVisuals.styles.some(style=>style.id===requested)||GameDialogs.isOpen())return;
+    UnitVisuals.setStyle(requested);
+    picker.value=requested;
+    try{localStorage.setItem('goblin-art-style',requested)}catch{/* Session still works. */}
+    draw();
+    updateSelection();
+    renderUnitGuide();
   });
 
   draw();

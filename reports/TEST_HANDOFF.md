@@ -2,6 +2,27 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## Build 0.1.18 · lokaler Kandidat
+
+| Feld | Wert |
+|---|---|
+| Version | `0.1.18` |
+| Build | `18` |
+| Basis | Veröffentlichter Commit `5c7ed3eb537eabd22e673f588fc8cbe0f17a38e9` (`v0.1.17`) |
+| Kandidat | Branch `codex/release-0.1.18-icon-set`; exakter Commit und QA-Belege in `goblin-rfe.1` |
+| Datum | 2026-10-06 |
+| Pages-Einstieg nach Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.18> |
+| Änderungen | [CHANGELOG.md](../CHANGELOG.md#0118---2026-10-06) |
+
+Sichtbare Änderung: `ICON SET` zeichnet beim Wechsel die bereits vorhandenen Motive für Karte, Truppenliste, Auswahl und Unit Guide neu. Die laufende Mission wird dabei nicht zurückgesetzt; die Stilwahl bleibt im Browser gespeichert. Keine neuen Bilder, Regeln, Level oder Layouts. `v0.1.17` bleibt während der Kandidatenprüfung öffentlich verfügbar, `v0.1.16` ist der ältere Rückfallpunkt.
+
+### Unabhängiger Prüffokus für 0.1.18
+
+- Auf dem exakten Kandidatencommit eine begonnene Mission mit geänderter Runde/Phase, beschädigter Einheit und gewählter Einheit zwischen allen sechs Sets umschalten. Runde, Phase, HP, Befehls-/Undo-Stand, Auswahl, Karte und Combat Log müssen erhalten bleiben; kein Szenario-Neustart oder zusätzlicher Spielbefehl.
+- Karten-/Listen-/Auswahlicons und große Unit-Guide-Ansicht wechseln zum selben Set. Grafische Stile verwenden weiterhin WebP mit PNG-Fallback; Military behält getrennte SVGs. Bei offenem Spiel-Dialog wird ein Stilwechsel zurückgestellt.
+- Gespeicherte Stilwahl nach Neuladen prüfen. Desktop und emulierte Mobilgrößen einschließlich Querformat sowie bestehende Szenario-/Guide-Bedienung gegen `v0.1.17` regressieren.
+- Release-Gate `node scripts/verify-release.mjs --previous=v0.1.17`, volle Node-Suite, unabhängige Regression, Bedien-/Release-QA sowie Content-/Legal-Clearance auf demselben Commit nachweisen. Tag, Push und Pages-Deploy erfolgen erst nach diesen Gates durch Koordination; den öffentlichen Einstieg anschließend prüfen.
+
 ## Build 0.1.17
 
 | Feld | Wert |

@@ -1,10 +1,12 @@
 # Content & Asset Notices
 
-**Document version:** 9
+**Document version:** 10
 
 G.O.B.L.I.N. is an independent original prototype by Tactical Design Cell. It is not affiliated with, endorsed by, or presented as an official adaptation of any third-party game or product line.
 
 Build 0.1.17 uses code-generated SVG and CSS artwork plus six original, locally hosted unit-art styles created for this project. Five styles serve smaller Content-08 WebP Unit Guide views with PNG fallback; the sixth uses larger SVG symbols. The active style can be changed in the game. Locally available system fonts are used; no third-party image, audio, or webfont package is required by that content layer.
+
+The local Build 0.1.18 candidate retains those six styles and all artwork files unchanged. Its style selector updates the active game's icons and Guide view without restarting the mission. This behavior change adds no new image source or asset rights claim; release-specific Content and Legal checks remain pending.
 
 Each of the six styles contains 26 small transparent SVG icons for the map and unit lists. The style selector changes icons and Guide views together. Five styles are project-authored graphical designs with 26 Content-08 Guide views each; the sixth uses military map-symbol vocabulary and presents the same tactical symbol motif in separate small and large SVG files. The icons and military symbols were drawn by local generators from the project's unit manifest and design instructions. None of the Content-08 per-unit Guide views are pixel-identical crops of the concept sheets. The game loads assets from local project paths.
 
