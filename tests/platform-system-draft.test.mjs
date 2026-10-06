@@ -68,3 +68,22 @@ test('version, profile, missing inventories and invented system data fail closed
     assert.deepEqual(candidate, before);
   }
 });
+
+test('hidden string keys, symbols and non-enumerable fields fail closed at every depth', () => {
+  for (const change of [
+    value => Object.defineProperty(value, 'hidden', {value: true}),
+    value => Object.defineProperty(value.platforms, 'hidden', {value: true}),
+    value => Object.defineProperty(value.platforms['forge-engineer'], 'hidden', {value: true}),
+    value => Object.defineProperty(value.platforms['goblin-dreadnaught'].movement, 'hidden', {value: true}),
+    value => {value[Symbol('hidden')] = true},
+    value => {value.platforms['forge-engineer'][Symbol('hidden')] = true},
+    value => {value.platforms['goblin-dreadnaught'].movement[Symbol('hidden')] = true},
+    value => Object.defineProperty(value.platforms['forge-engineer'], 'drones', {value: true, enumerable: false})
+  ]) {
+    const candidate = structuredClone(PLATFORM_SYSTEM_DRAFT_V1);
+    change(candidate);
+    const keysBefore = Reflect.ownKeys(candidate);
+    assert.throws(() => validatePlatformSystemDraftV1(candidate), {message: 'PLATFORM_DRAFT_MISMATCH'});
+    assert.deepEqual(Reflect.ownKeys(candidate), keysBefore);
+  }
+});

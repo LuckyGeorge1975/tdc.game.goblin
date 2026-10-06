@@ -27,9 +27,13 @@ export const PLATFORM_SYSTEM_DRAFT_V1 = freeze({
 const same = (actual, expected) => {
   if (expected === null || typeof expected !== 'object') return actual === expected;
   if (!actual || typeof actual !== 'object' || Array.isArray(actual) !== Array.isArray(expected)) return false;
-  const keys = Object.keys(expected);
-  return Object.keys(actual).length === keys.length &&
-    keys.every(key => Object.hasOwn(actual, key) && same(actual[key], expected[key]));
+  const keys = Reflect.ownKeys(expected);
+  return Reflect.ownKeys(actual).length === keys.length && keys.every(key => {
+    const property = Object.getOwnPropertyDescriptor(actual, key);
+    return property && Object.hasOwn(property, 'value') &&
+      (Array.isArray(actual) && key === 'length' || property.enumerable) &&
+      same(property.value, expected[key]);
+  });
 };
 
 export function validatePlatformSystemDraftV1(value) {
