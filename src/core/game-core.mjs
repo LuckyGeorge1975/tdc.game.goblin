@@ -192,7 +192,7 @@ export function dispatch(state, command) {
   const roll = nextRoll(next.rng), result = ratio === '5-1' ? 'X' : CRT[ratio][roll];
   if (result === 'X') defender.hp = 0;
   else if (result === 'D') {
-    if (defender.type === 'infantry') defender.hp = Math.max(0, defender.hp - 1);
+    if (defender.infantry === true || defender.type === 'infantry') defender.hp = Math.max(0, defender.hp - 1);
     else if (defender.disabled) defender.hp = 0;
     else {
       defender.disabled = true;
