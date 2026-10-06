@@ -126,6 +126,26 @@ Query-Preflight wartet auf den Siegebreaker-, Ziel- und Profilvertrag. Die
 Supercover-Probe v4 und die offene Produktentscheidung zu Grenzkanten werden
 nicht umgedeutet.
 
+## Technische IRON-DUST-Waffenprobe (goblin-9bj.19.8)
+
+`iron-dust-siegebreaker-weapons-v1` inventarisiert ausschließlich die vier
+Siegebreaker-Waffen aus dem validierten, inaktiven IRON-DUST-v1-Datensnapshot.
+Die reine Probe prüft Attacke, Reichweite, Infanterieziel, Auswahl und
+Bereitschaft, zählt Feuerbudget pro Waffe, verbraucht Raketen dauerhaft und
+setzt die Phasenbudgets zurück. Sie verwendet die getrennt geprüfte
+Legacy-Pixel-Sichtlinienprobe für hypothetische Zielabfragen.
+`SpendWeaponBudget` verbraucht **nur Inventar**, löst keinen Kampf, Treffer,
+Systemschaden oder RNG-Wurf aus. Eingabezustände werden vor jedem Schritt
+validiert; abgelehnte Befehle verändern weder Zustand noch Seed. Tests
+vergleichen Inventar- und Zielregeln direkt mit den benannten Funktionen aus
+`ogre-systems.js` und `siegebreaker-weapons.js`.
+
+Die Probe ist nicht ausführbar und hat keinen `rulesVersion`-/
+`effectiveRules`-Kopf. Sie ist kein `Fire`-Befehl, kein Core-/Replay-Profil und
+kein Levelstart. Systemabwehr, Laufwerke, tatsächliche Treffer und Siegziel
+bleiben getrennte Gates. Die globale Siege-Tank-/Artillerie-Regel und
+`FULL_CATALOG_v1` werden nicht berührt.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im
