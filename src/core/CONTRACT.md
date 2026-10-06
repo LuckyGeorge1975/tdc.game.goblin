@@ -211,6 +211,22 @@ Zielverträge integriert sind. Die Probe aktiviert kein
 `FIELD_TEST_LEGACY_v1`-Core-/Replay-Profil, kein Level und keine Oberfläche.
 Bei Ablehnung bleiben Zustand und RNG unverändert.
 
+## Technische IRON-DUST-Angriffsabfrage (goblin-9bj.19.7.1)
+
+`iron-dust-siegebreaker-attack-preflight-v1` verbindet die inaktive
+Siegebreaker-Waffenprobe mit der geprüften Legacy-Pixel-Sichtlinie und dem
+Terrain-Snapshot. `queryIronDustAttackSurface`, `queryIronDustAttackProbe` und
+`preflightIronDustFireProbe` verwenden denselben Prüfpfad für gewählte Waffe,
+Bereitschaft, Zielart, Reichweite und Sichtlinie. Feste Diagnosepositionen
+decken auch die Grenzlinie `(2,0) → (6,1)` ab: Legacy erlaubt den Schuss mit
+Raketen auf Reichweite 5, während strenges Supercover dort blockiert.
+
+Alle Abfragen sind rein lesend. Es gibt keinen Fire-Dispatch, keinen
+Budgetverbrauch, Treffer, Systemschaden oder RNG-Wurf. Die Probe ist kein
+ausführbares `FIELD_TEST_LEGACY_v1`-Core-/Replay-Profil und aktiviert weder
+Level noch Oberfläche. Echter Dispatch und End-to-End-Prüfung bleiben im
+Eltern-Issue `goblin-9bj.19.7` offen.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im
