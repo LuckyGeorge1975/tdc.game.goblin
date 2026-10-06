@@ -2,26 +2,26 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## Build 0.1.18 · lokaler Kandidat
+## Build 0.1.18 · Veröffentlichung vorbereitet
 
 | Feld | Wert |
 |---|---|
 | Version | `0.1.18` |
 | Build | `18` |
 | Basis | Veröffentlichter Commit `5c7ed3eb537eabd22e673f588fc8cbe0f17a38e9` (`v0.1.17`) |
-| Kandidat | Branch `codex/release-0.1.18-icon-set`; exakter Commit und QA-Belege in `goblin-rfe.1` |
+| Geprüfter Produktstand | Commit `4d3168681de76da3f2db783e0ed96524ef71a391`; Regression `goblin-rfe.2`, Bedien-/Release-QA `goblin-rfe.3`, Content-/Legal-Delta `goblin-rfe.4` |
 | Datum | 2026-10-06 |
 | Pages-Einstieg nach Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.18> |
 | Änderungen | [CHANGELOG.md](../CHANGELOG.md#0118---2026-10-06) |
 
-Sichtbare Änderung: `ICON SET` zeichnet beim Wechsel die bereits vorhandenen Motive für Karte, Truppenliste, Auswahl und Unit Guide neu. Die laufende Mission wird dabei nicht zurückgesetzt; die Stilwahl bleibt im Browser gespeichert. Keine neuen Bilder, Regeln, Level oder Layouts. `v0.1.17` bleibt während der Kandidatenprüfung öffentlich verfügbar, `v0.1.16` ist der ältere Rückfallpunkt.
+Sichtbare Änderung: `ICON SET` zeichnet beim Wechsel die bereits vorhandenen Motive für Karte, Truppenliste, Auswahl und Unit Guide neu. Die laufende Mission wird dabei nicht zurückgesetzt; die Stilwahl bleibt im Browser gespeichert. Keine neuen Bilder, Regeln, Level oder Layouts. `v0.1.17` bleibt bis zur Veröffentlichung von 0.1.18 öffentlich verfügbar, `v0.1.16` ist der ältere Rückfallpunkt.
 
-### Unabhängiger Prüffokus für 0.1.18
+### Prüfbelege und verbleibende Release-Schritte für 0.1.18
 
-- Auf dem exakten Kandidatencommit eine begonnene Mission mit geänderter Runde/Phase, beschädigter Einheit und gewählter Einheit zwischen allen sechs Sets umschalten. Runde, Phase, HP, Befehls-/Undo-Stand, Auswahl, Karte und Combat Log müssen erhalten bleiben; kein Szenario-Neustart oder zusätzlicher Spielbefehl.
-- Karten-/Listen-/Auswahlicons und große Unit-Guide-Ansicht wechseln zum selben Set. Grafische Stile verwenden weiterhin WebP mit PNG-Fallback; Military behält getrennte SVGs. Bei offenem Spiel-Dialog wird ein Stilwechsel zurückgestellt.
-- Gespeicherte Stilwahl nach Neuladen prüfen. Desktop und emulierte Mobilgrößen einschließlich Querformat sowie bestehende Szenario-/Guide-Bedienung gegen `v0.1.17` regressieren.
-- Release-Gate `node scripts/verify-release.mjs --previous=v0.1.17`, volle Node-Suite, unabhängige Regression, Bedien-/Release-QA sowie Content-/Legal-Clearance auf demselben Commit nachweisen. Tag, Push und Pages-Deploy erfolgen erst nach diesen Gates durch Koordination; den öffentlichen Einstieg anschließend prüfen.
+- Auf Produktcommit `4d316868` bestanden 137/137 Node-Tests und die unabhängige Regression (`goblin-rfe.2`). Spielzustand, Runde/Phase, HP, Befehls-/Undo-Stand und Auswahl blieben beim Wechsel aller sechs Sets erhalten.
+- Die unabhängige Browser-/Release-QA prüfte Desktop, emuliertes Mobilgerät und Querformat, Karte/Liste/Auswahl/Guide, Persistenz, offenen Dialog und den lokalen Pages-Pfad (`goblin-rfe.3`). Das Release-Gate `node scripts/verify-release.mjs --previous=v0.1.17` bestand dort.
+- Das unveränderte Asset-Delta und die Grenzen der nichtkommerziellen Vorschau wurden von Content und Legal geprüft (`goblin-rfe.4`). Diese Prüfung erweitert keine Bildrechte und gibt nicht das vollständige Spiel frei.
+- Nach dieser redaktionellen Korrektur folgt eine unabhängige Delta-Nachprüfung. Tag, Push und Pages-Deploy erfolgen erst nach allen Gates durch Koordination; den öffentlichen Einstieg anschließend prüfen und in `goblin-rfe` dokumentieren.
 
 ## Build 0.1.17
 

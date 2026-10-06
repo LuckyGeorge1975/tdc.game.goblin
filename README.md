@@ -4,9 +4,9 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-Der Prototyp ist spielbar. **0.1.18 / Build 18** ist ein lokaler Release-Kandidat: `ICON SET` wechselt die vorhandenen Grafiken ohne Neustart der Partie. Öffentlich geprüft bleibt [Build 0.1.17 auf GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) (`v0.1.17`, Commit `5c7ed3eb537eabd22e673f588fc8cbe0f17a38e9`); `v0.1.16` bleibt Rückfallpunkt. Die Abnahme des Kandidaten steht in `goblin-rfe`.
+Der Prototyp ist spielbar. **0.1.18 / Build 18** ist für die Veröffentlichung vorbereitet: `ICON SET` wechselt die vorhandenen Grafiken ohne Neustart der Partie. Die Produktänderung auf Commit `4d316868` wurde unabhängig geprüft (`goblin-rfe.2`, `goblin-rfe.3`, `goblin-rfe.4`). Öffentlich geprüft bleibt [Build 0.1.17 auf GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) (`v0.1.17`, Commit `5c7ed3eb537eabd22e673f588fc8cbe0f17a38e9`); `v0.1.16` bleibt Rückfallpunkt. Die Veröffentlichung und ihr öffentlicher Einstieg werden in `goblin-rfe` nachgewiesen.
 
-Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](reports/TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](reports/REPORTS.md) versioniert. Die 130 kleineren Content-08-WebP-Bilder mit PNG-Fallback aus 0.1.17 bleiben im Kandidaten unverändert.
+Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](reports/TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](reports/REPORTS.md) versioniert. Die 130 kleineren Content-08-WebP-Bilder mit PNG-Fallback aus 0.1.17 bleiben in 0.1.18 unverändert.
 
 Enthalten sind:
 
@@ -31,7 +31,7 @@ Enthalten sind:
 - In der Fire Phase lassen sich die noch verfügbaren Waffensysteme des Siegebreakers einzeln auswählen und abfeuern. Nicht verbrauchte Batterien halten die Einheit handlungsfähig; Raketenmunition bleibt über Runden hinweg verbraucht.
 - Der Strategic Missile Carrier ist in `UNIT TRIAL` spielbar: eine Rakete pro Mission, Angriff 6 auf ein sichtbares Feindziel innerhalb von acht Hexen und Angriff 3 auf alle Einheiten in Nachbarhexen. Friendly Fire ist möglich; `BACK` stellt die Rakete innerhalb der Feuerphase wieder her.
 - Kartenmarker werden zentral über [docs/UNIT_VISUALS.md](docs/UNIT_VISUALS.md) konfiguriert. Lokale SVG-, PNG- oder WebP-Dateien können pro stabiler Einheiten-ID ausgetauscht werden, ohne Regeln oder Szenarien zu ändern.
-- [Sechs wählbare Grafiksets](assets/unit-art/README.md) mit je 26 kleinen Karten- und Listenicons und getrennten großen Ansichten im Unit Guide. `ICON SET` schaltet beide Größen gemeinsam um. Die fünf grafischen Guide-Sets laden 130 Content-08-WebP-Bilder mit PNG-Fallback; Military nutzt weiterhin getrennte kleine und große SVGs. Im Kandidaten 0.1.18 bleibt die laufende Partie beim Wechsel erhalten. Die Wahl wird im Browser gemerkt. Herkunft und Grenzen der Motive stehen im [Unit-Art-Handoff](assets/unit-art/README.md) und in den [Content & Asset Notices](docs/CONTENT-NOTICES.md).
+- [Sechs wählbare Grafiksets](assets/unit-art/README.md) mit je 26 kleinen Karten- und Listenicons und getrennten großen Ansichten im Unit Guide. `ICON SET` schaltet beide Größen gemeinsam um. Die fünf grafischen Guide-Sets laden 130 Content-08-WebP-Bilder mit PNG-Fallback; Military nutzt weiterhin getrennte kleine und große SVGs. In 0.1.18 bleibt die laufende Partie beim Wechsel erhalten. Die Wahl wird im Browser gemerkt. Herkunft und Grenzen der Motive stehen im [Unit-Art-Handoff](assets/unit-art/README.md) und in den [Content & Asset Notices](docs/CONTENT-NOTICES.md).
 - Vier auswählbare Legacy-Showcases K/U1/U2/U3, mobile Karten-/Truppen-/Intel-Navigation und die Niederlage bei simultaner vollständiger Ausschaltung. Die Showcases nutzen historische Field-Test-Werte; Katalog-Sonderregeln sind nicht vollständig umgesetzt.
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 

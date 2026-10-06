@@ -5,7 +5,7 @@ Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließli
 ## [0.1.18] - 2026-10-06
 
 - `ICON SET` wechselt die sechs vorhandenen Grafiksets während einer laufenden Partie. Karte, Listen, Auswahl und Unit Guide zeichnen die gewählten Motive neu; Runde, Phase, Einheitenzustand und Auswahl bleiben erhalten. Die Wahl wird weiterhin im Browser gemerkt.
-- Dieser lokale Kandidat enthält keine neuen Motive oder Spielregeln. Unabhängige Regression, Bedienprüfung und Content-/Legal-Abnahme stehen vor einer Veröffentlichung aus (`goblin-rfe`).
+- Build 0.1.18 enthält keine neuen Motive oder Spielregeln. Unabhängige Regression, Bedienprüfung sowie die Content-/Legal-Deltaprüfung auf Produktcommit `4d316868` sind bestanden (`goblin-rfe.2`, `goblin-rfe.3`, `goblin-rfe.4`). Veröffentlichung und öffentlicher Einstieg werden gesondert in `goblin-rfe` nachgewiesen.
 
 ## [0.1.17] - 2026-10-03
 
