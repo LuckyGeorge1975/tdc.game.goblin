@@ -177,6 +177,23 @@ Die Probe ist inaktiv und trifft keine Sieg-/Niederlagenentscheidung. Sie
 aktiviert weder Core-`Move`/`Fire` noch Level, Replay oder Oberfläche.
 UI-Auswahl und Hinweise des Klickpfads sind nicht Teil ihres Zustandsvertrags.
 
+## Technische IRON-DUST-Zielprobe (goblin-9bj.19.11)
+
+`iron-dust-core-objective-v1` wertet ausschließlich den validierten
+IRON-DUST-Datensnapshot mit `objectiveVersion: 1` und `objective: core` aus.
+Die reine Beobachtungsprobe übernimmt HP-Fakten atomar und vergleicht danach
+mit `victoryProfile`, `objectiveSnapshot` und `checkVictory` des Legacy-Pfads.
+Ein toter Feindkern führt nur bei mindestens einer lebenden Spielereinheit zum
+Sieg; sind alle Spielereinheiten tot, ist das Ergebnis auch bei gleichzeitigem
+Kerntod eine Niederlage. Andere lebende Gegner hindern den Kernsieg nicht.
+Eine hilflose Siegebreaker-Einheit zählt nach Legacy-Systemsynchronisation mit
+HP 0 nicht mehr als lebend. Ein bloßes Phasenereignis ändert das Zielergebnis
+nicht. Beobachtungen verbrauchen keinen Zufallswert; abgelehnte Beobachtungen
+ändern den Zustand nicht.
+
+Die Probe führt weder Kampf-, Ramm- noch Phasenbefehle aus. Sie ist kein
+`FIELD_TEST_LEGACY_v1`-Spielpfad, kein Core-/Replay-Profil und kein Levelstart.
+
 ## Vertragsklärung vor Integration
 
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im
