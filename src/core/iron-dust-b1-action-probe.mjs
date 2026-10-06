@@ -166,7 +166,7 @@ export function dispatchIronDustB1Action(state, command) {
 }
 
 function recover(state, team, events) {
-  for (const item of state.units.filter(unit => unit.team === team &&
+  for (const item of state.units.filter(unit => unit.team === team && unit.hp > 0 &&
       unit.disabled && unit.disabledUntil <= state.turn)) {
     item.disabled = false;
     item.disabledUntil = 0;
