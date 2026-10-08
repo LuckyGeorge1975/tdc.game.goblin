@@ -1,5 +1,5 @@
 import { hasLineOfSight, hexDistance, inside, movementPaths, queryAreas, terrainAt } from './hex.mjs';
-import TerrainRules from '../../terrain-rules.js';
+import TerrainRules from '../legacy/scripts/terrain-rules.js';
 import { referenceScenario, referenceCommands, REFERENCE_SEED } from './reference-fixture.mjs';
 import { phaseScenario, phaseCommands, PHASE_SEED, expectedPhaseTrace } from './phase-fixture.mjs';
 

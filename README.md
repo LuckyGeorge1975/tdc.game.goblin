@@ -4,7 +4,7 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-Der Prototyp ist spielbar. **0.1.18 / Build 18** ist für die Veröffentlichung vorbereitet: `ICON SET` wechselt die vorhandenen Grafiken ohne Neustart der Partie. Die Produktänderung auf Commit `4d316868` wurde unabhängig geprüft (`goblin-rfe.2`, `goblin-rfe.3`, `goblin-rfe.4`). Öffentlich geprüft bleibt [Build 0.1.17 auf GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) (`v0.1.17`, Commit `5c7ed3eb537eabd22e673f588fc8cbe0f17a38e9`); `v0.1.16` bleibt Rückfallpunkt. Die Veröffentlichung und ihr öffentlicher Einstieg werden in `goblin-rfe` nachgewiesen.
+Der Prototyp ist spielbar. **0.1.18 / Build 18** wurde unter `v0.1.18` veröffentlicht und öffentlich geprüft: `ICON SET` wechselt die vorhandenen Grafiken ohne Neustart der Partie. Die Produktänderung auf Commit `4d316868` wurde unabhängig geprüft (`goblin-rfe.2`, `goblin-rfe.3`, `goblin-rfe.4`). [Build 0.1.18 auf GitHub Pages](https://luckygeorge1975.github.io/tdc.game.goblin/) liegt auf Commit `3eeaaa542f6e1adaaf4114d1c026bca07ef0e635`; `v0.1.17` bleibt Rückfallpunkt. Die Veröffentlichung und ihr öffentlicher Einstieg werden in `goblin-rfe` nachgewiesen.
 
 Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](reports/TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](reports/REPORTS.md) versioniert. Die 130 kleineren Content-08-WebP-Bilder mit PNG-Fallback aus 0.1.17 bleiben in 0.1.18 unverändert.
 
@@ -44,6 +44,8 @@ node server.mjs
 ```
 
 Danach `http://localhost:4173` öffnen.
+
+`index.html`, `release.js` und `server.mjs` liegen im Projektroot. Die klassischen Spielskripte stehen unter `src/legacy/scripts/`, ihre Stylesheets unter `src/legacy/styles/`. Der interne modulare Pfad bleibt unter `src/app/`, `src/core/` und `src/hex-renderer/`. Browser-URLs werden relativ zum jeweiligen HTML-Einstieg aufgelöst; ein zusätzlicher Checkout oder ein lokaler absoluter Pfad ist nicht erforderlich.
 
 ## Steuerung
 

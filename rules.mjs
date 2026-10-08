@@ -1,4 +1,4 @@
-import TerrainRules from './terrain-rules.js';
+import TerrainRules from './src/legacy/scripts/terrain-rules.js';
 import { hexDistance as coreHexDistance } from './src/core/hex.mjs';
 
 export const UNIT_RULES = Object.freeze({

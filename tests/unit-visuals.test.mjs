@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 function visualContext(){
   const context=vm.createContext({document:{createElementNS(_ns,name){return {name,attributes:{},classList:{add(){}},setAttribute(key,value){this.attributes[key]=String(value)}}}}});
-  vm.runInContext(readFileSync(new URL('../unit-visuals.js',import.meta.url),'utf8'),context);
+  vm.runInContext(readFileSync(new URL('../src/legacy/scripts/unit-visuals.js',import.meta.url),'utf8'),context);
   return context;
 }
 

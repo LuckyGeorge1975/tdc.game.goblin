@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 
 const context=vm.createContext({});
-vm.runInContext(readFileSync(new URL('../ogre-systems.js',import.meta.url),'utf8'),context);
+vm.runInContext(readFileSync(new URL('../src/legacy/scripts/ogre-systems.js',import.meta.url),'utf8'),context);
 const systems=context.GoblinSystems;
 
 test('Siegebreaker starts with its weapon and tread inventory',()=>{

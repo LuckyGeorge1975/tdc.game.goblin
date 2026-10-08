@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
-const publicContent=['index.html','unit-guide.js','README.md','docs/RULE_MATRIX.md']
+const publicContent=['index.html','src/legacy/scripts/unit-guide.js','README.md','docs/RULE_MATRIX.md']
   .map(file=>readFileSync(new URL('../'+file,import.meta.url),'utf8'))
   .join('\n');
 
@@ -13,7 +13,7 @@ test('public content uses the independent G.O.B.L.I.N. nomenclature',()=>{
   for(const current of ['GOBLIN SIEGEBREAKER','SKIMMER CARRIER','FIELD ENGINEERS']){
     assert.equal(publicContent.includes(current),true,`current public name missing: ${current}`);
   }
-  const runtime=readFileSync(new URL('../game.js',import.meta.url),'utf8');
+  const runtime=readFileSync(new URL('../src/legacy/scripts/game.js',import.meta.url),'utf8');
   assert.equal(runtime.includes("gev:'SKIMMER MANEUVER'"),true);
 });
 

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import TerrainRules from '../terrain-rules.js';
+import TerrainRules from '../src/legacy/scripts/terrain-rules.js';
 import {readFileSync} from 'node:fs';
 
 test('all twelve artwork terrain types have explicit gameplay rules',()=>{

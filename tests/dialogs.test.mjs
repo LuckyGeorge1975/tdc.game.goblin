@@ -8,7 +8,7 @@ function setup(){
   function element(){const children=new Map();return {hidden:false,checked:false,isConnected:true,open:false,setAttribute(){},querySelector(s){if(!children.has(s))children.set(s,element());return children.get(s)},addEventListener(t,fn){this[t]=fn},showModal(){this.open=true},close(){this.open=false},focus(){document.activeElement=this}}}
   const trigger=element();document.activeElement=trigger;
   const context=vm.createContext({document,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}});
-  vm.runInContext(readFileSync(new URL('../dialogs.js',import.meta.url),'utf8'),context);
+  vm.runInContext(readFileSync(new URL('../src/legacy/scripts/dialogs.js',import.meta.url),'utf8'),context);
   return {api:vm.runInContext('GameDialogs',context),dialog,document,trigger,listeners,storage};
 }
 test('cancel restores focus; messages use literal text',async()=>{

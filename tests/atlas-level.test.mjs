@@ -5,13 +5,13 @@ import vm from 'node:vm';
 
 const atlas=JSON.parse(readFileSync(new URL('../assets/unit-art/levels/atlas-proving-grounds.json',import.meta.url),'utf8'));
 const showcase=JSON.parse(readFileSync(new URL('../assets/unit-art/levels/showcase-levels.json',import.meta.url),'utf8'));
-const source=readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8');
+const source=readFileSync(new URL('../src/legacy/scripts/atlas-level.js',import.meta.url),'utf8');
 
 async function load(bundle=showcase,search=''){
   const options=[],errors=[],loaded=[];
   const context=vm.createContext({
     W:12,H:8,scenarioCatalog:{},GoblinSystems:{createMarkIII:()=>({test:true})},
-    TerrainRules:(await import('../terrain-rules.js')).default,updateRoster:()=>{},terrain:new Set(),currentScenario:'iron-dust',
+    TerrainRules:(await import('../src/legacy/scripts/terrain-rules.js')).default,updateRoster:()=>{},terrain:new Set(),currentScenario:'iron-dust',
     $:()=>({appendChild:option=>options.push(option)}),renderScenarioObjective:()=>{},
     document:{createElement:()=>({dataset:{}})},
     fetch:async url=>({ok:true,json:async()=>url.includes('showcase-levels')?bundle:atlas}),

@@ -3,7 +3,7 @@
 
   const languages = ['de', 'en', 'es', 'fr'];
   const names = { de: 'Deutsch', en: 'English', es: 'Español', fr: 'Français' };
-  const catalogBase = new URL('assets/ui-copy/', document.currentScript?.src || root.location.href);
+  const catalogBase = new URL('../../../assets/ui-copy/', document.currentScript?.src || root.location.href);
   const contentCatalogs = {};
   const ready = Promise.all(languages.map(async (lang) => {
     const response = await fetch(new URL(`content-02.${lang}.json`, catalogBase));

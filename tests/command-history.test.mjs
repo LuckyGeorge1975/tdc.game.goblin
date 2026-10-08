@@ -20,7 +20,7 @@ function game() {
     localStorage:{getItem(){return null}},
     setTimeout(fn){timers.set(++timerId,fn);return timerId},clearTimeout(id){timers.delete(id)}});
   const run = source => vm.runInContext(source,context);
-  for(const file of ['unit-visuals.js','terrain-rules.js','ogre-systems.js','game.js','ogre-runtime.js','combat-feedback.js','siegebreaker-weapons.js','scenario.js','command-history.js'])run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
+  for(const file of ['unit-visuals.js','terrain-rules.js','ogre-systems.js','game.js','ogre-runtime.js','combat-feedback.js','siegebreaker-weapons.js','scenario.js','command-history.js'])run(readFileSync(new URL('../src/legacy/scripts/'+file,import.meta.url),'utf8'));
   run("draw=()=>{}; updateSelection=()=>{}; loadScenario('unit-trial');");
   return {run,timers};
 }

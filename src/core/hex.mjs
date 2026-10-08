@@ -1,4 +1,4 @@
-import TerrainRules from '../../terrain-rules.js';
+import TerrainRules from '../legacy/scripts/terrain-rules.js';
 
 export const key = ({ x, y }) => `${x},${y}`;
 export const inside = (map, p) => Number.isInteger(p?.x) && Number.isInteger(p?.y) && p.x >= 0 && p.y >= 0 && p.x < map.width && p.y < map.height;

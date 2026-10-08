@@ -21,7 +21,7 @@ function theme(){
     loadScenario(){restarts++},draw(){draws++}
   });
   for(const file of ['unit-visuals.js','art-theme.js'])
-    vm.runInContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
+    vm.runInContext(readFileSync(new URL('../src/legacy/scripts/'+file,import.meta.url),'utf8'),context);
   return {picker,symbol,context,storage,setDialogOpen(value){dialogOpen=value},
     restarts:()=>restarts,draws:()=>draws,guideRenders:()=>guideRenders,
     selectionRenders:()=>selectionRenders};

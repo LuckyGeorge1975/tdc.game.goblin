@@ -15,7 +15,7 @@ Die Combobox schaltet Karten- und Listenicons sowie die zugehörige Ansicht im U
 
 Die 130 Guide-Master-PNGs stammen aus `tdc.game.ogre-unit-art` Commit `10131dc16ede760f2338b6605e10675f0cd81d29`, weiterhin vorhanden auf Quellstand `36463eb3777ade16f63a4392ea80889564a346a7`, dort unter `assets/unit-art/proposals/content-08/sets/`. Der reproduzierbare Export in [export-guide-art.py](../../scripts/export-guide-art.py) erstellt aus ihnen 1024 × 683 WebP Q85 und optimierte 768 × 512-PNG-Fallbacks. `content-08/README.md` dokumentiert Prompts und Bildprüfung; `UNIT-ART-HANDOFF.md` beschreibt die Stilzuordnung. Die 312 Icon- und früheren Guide-SVGs stammen aus Quellcommit `4bc3c7ce8c7dc25cddff20024f4c4bfb9361779f`; die späteren Korrekturen aus `966b93a80cc384f58a3ae0347936a1762987281c`. Die früheren grafischen Guide-SVGs bleiben im Checkout als historische Assets, werden vom Spiel aber nicht geladen. Herkunft und Grenzen stehen in `PROVENANCE.md` des Quellcheckouts.
 
-Alle sechs Laufzeit-Sets verwenden die zwölf vorhandenen Terrainmotive und das Logo von `01-modular-stealth-geometry` als dokumentierten Fallback. Die Geländeregeln bleiben in `terrain-rules.js`, unabhängig von den Motiven. Stabile Einheiten- und Pfadschlüssel stehen im [Manifest](manifest.json).
+Alle sechs Laufzeit-Sets verwenden die zwölf vorhandenen Terrainmotive und das Logo von `01-modular-stealth-geometry` als dokumentierten Fallback. Die Geländeregeln bleiben in `src/legacy/scripts/terrain-rules.js`, unabhängig von den Motiven. Stabile Einheiten- und Pfadschlüssel stehen im [Manifest](manifest.json).
 
 ## Ältere Galerie-Sets und Generatoren
 

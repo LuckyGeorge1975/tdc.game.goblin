@@ -35,7 +35,7 @@ der Aufrufer auch das feindliche Team mit Befehlen; KI gehört nicht zum Core.
 - Renderer-Picking ist in ARCH-01 nur als Hex/Einheiten-ID beschrieben. Vor CE-03
   sind Priorität bei überlagernden Markern und die ViewState-Eingabe zu klären.
 - Der zeitgleich entstandene `src/app/mock-core.mjs` benutzt derzeit
-  Spalten-Parität für Nachbarn statt der Zeilen-Parität aus `game.js`, nur zwei
+  Spalten-Parität für Nachbarn statt der Zeilen-Parität aus `src/legacy/scripts/game.js`, nur zwei
   Phasen, `winner` statt `victory` und eine skalare `rng` statt `{seed,state}`.
   Der Adapter benötigt vor Core-Austausch einen Abgleich; die gemeinsame
   Fixture-Datei selbst ist bereits importiert.

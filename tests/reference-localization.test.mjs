@@ -4,9 +4,9 @@ import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 
 test('phase fixture instructions and Skimmer phase displays translate without visible GEV jargon', () => {
-  const source = readFileSync(new URL('../localization.js', import.meta.url), 'utf8');
+  const source = readFileSync(new URL('../src/legacy/scripts/localization.js', import.meta.url), 'utf8');
   const document = {
-    currentScript: { src: 'http://127.0.0.1/localization.js' },
+    currentScript: { src: 'http://127.0.0.1/src/legacy/scripts/localization.js' },
     readyState: 'loading', title: '',
     addEventListener() {},
   };

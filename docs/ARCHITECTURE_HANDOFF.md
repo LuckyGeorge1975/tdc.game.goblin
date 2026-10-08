@@ -71,7 +71,7 @@ Areas, Wracks, Einheiten, Fokusmarker, Effekte. Der Renderer validiert keine
 Spielzüge und greift nicht auf interne Core-Variablen zu.
 
 **CE-Abnahme:** Node-Tests für Replay/Seed und Abfragen; Mock-Partie kann
-ohne `game.js`, DOM und globale Funktionsüberschreibung durchlaufen werden.
+ohne `src/legacy/scripts/game.js`, DOM und globale Funktionsüberschreibung durchlaufen werden.
 
 ### Developer — Eigentümer: Task „Developer“
 
@@ -89,7 +89,7 @@ Aktion“ und „Aktion verbraucht“ unterscheidbar halten.
 **DEV-03 · Integrationsschalter (P2).** Einen internen Umschalter für den
 neuen Partieweg vorsehen. Bestehenden Pfad nicht entfernen; lokal müssen
 beide Wege vergleichbar bleiben. Erst nach gemeinsamer Integrationsprüfung
-dürfen `index.html`, `game.js` oder andere Legacy-Dateien für den neuen Pfad
+dürfen `index.html`, `src/legacy/scripts/game.js` oder andere Legacy-Dateien für den neuen Pfad
 umgestellt werden.
 
 **DEV-Abnahme:** Die Mock-Partie ist in der UI bedienbar; Selektion löst

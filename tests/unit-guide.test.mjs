@@ -12,9 +12,9 @@ function guide(units=[{id:'ogre',name:'GOBLIN SIEGEBREAKER',team:'player',x:1,y:
   const context=vm.createContext({document,units,
     scenarioCatalog:{'iron-dust':{units:[{name:'GOBLIN SIEGEBREAKER'}]}},currentScenario:'iron-dust',
     GameDialogs:{isOpen:()=>false},isGevUnit:()=>false,phaseCanAct:()=>true,effectiveDefense:unit=>unit.defense,showUnitInfo(){},showFieldInfo(){},updateSelection(){},draw(){}});
-  vm.runInContext(readFileSync(new URL('../unit-guide-range.js',import.meta.url),'utf8'),context);
-  vm.runInContext(readFileSync(new URL('../unit-guide-voice.js',import.meta.url),'utf8'),context);
-  vm.runInContext(readFileSync(new URL('../unit-guide.js',import.meta.url),'utf8'),context);
+  vm.runInContext(readFileSync(new URL('../src/legacy/scripts/unit-guide-range.js',import.meta.url),'utf8'),context);
+  vm.runInContext(readFileSync(new URL('../src/legacy/scripts/unit-guide-voice.js',import.meta.url),'utf8'),context);
+  vm.runInContext(readFileSync(new URL('../src/legacy/scripts/unit-guide.js',import.meta.url),'utf8'),context);
   return {context,document};
 }
 

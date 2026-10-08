@@ -4,7 +4,7 @@
 
 ## Laufzeit-Schnittstelle
 
-`localization.js` stellt `globalThis.GoblinLanguage` bereit. Neue Screens warten vor dem ersten Rendern auf `await GoblinLanguage.ready` und lesen Texte mit `GoblinLanguage.t(key, params)`. Beispiel: `GoblinLanguage.t('dialog.changeMission.body', { nextMissionName })`. Platzhalter haben die Form `{name}`; Werte kommen aus Zustand und Präsentationsprojektion. Für `dialog.phaseAdvance.pending` wählt `t` bei `pendingCount` 0, 1 oder mehr automatisch `.none`, `.one` oder `.other`. Die expliziten Schlüssel können ebenfalls direkt verwendet werden.
+`src/legacy/scripts/localization.js` stellt `globalThis.GoblinLanguage` bereit. Neue Screens warten vor dem ersten Rendern auf `await GoblinLanguage.ready` und lesen Texte mit `GoblinLanguage.t(key, params)`. Beispiel: `GoblinLanguage.t('dialog.changeMission.body', { nextMissionName })`. Platzhalter haben die Form `{name}`; Werte kommen aus Zustand und Präsentationsprojektion. Für `dialog.phaseAdvance.pending` wählt `t` bei `pendingCount` 0, 1 oder mehr automatisch `.none`, `.one` oder `.other`. Die expliziten Schlüssel können ebenfalls direkt verwendet werden.
 
 `GoblinLanguage.choose('de' | 'en' | 'es' | 'fr')` wechselt die Sprache ohne Spielzustand zu verändern, setzt `document.documentElement.lang`, speichert die Wahl lokal und aktualisiert `?lang=`. Die Oberfläche kann auf `goblin-language-change` hören und nur ihre Anzeige neu rendern. `GoblinLanguage.current` liefert die aktive Sprache. Die Vergleichsseite reicht den Wechsel ohne Neustart an ihren eingebetteten Spielpfad weiter.
 
@@ -15,7 +15,7 @@ Die bestehende Legacy-Oberfläche nutzt vorerst `GoblinLanguage.translate(source
 `sourceObjectiveCode` spiegelt den beschreibenden `scenarioCatalog.objective`-Code
 der Legacy-Mission. Für `unit-trial` lautet er `core-and-escort`: Der Kern und
 alle übrigen Feinde müssen ausgeschaltet sein. Der Code ist keine Regelquelle;
-`checkVictory()` in `game.js` entscheidet den Spielausgang. Die längeren
+`checkVictory()` in `src/legacy/scripts/game.js` entscheidet den Spielausgang. Die längeren
 `winCondition`- und Anzeigetexte nennen zusätzlich das Überleben einer eigenen
 Einheit. Im gegenwärtigen Legacy-Code wird ein vollständiger Sieg jedoch vor
 der Niederlage geprüft. Wenn in demselben Prüfzeitpunkt alle Feinde **und** alle
