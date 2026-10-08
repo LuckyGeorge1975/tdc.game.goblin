@@ -89,6 +89,7 @@ try {
       `horizontal overflow at ${width}x${height}: ${JSON.stringify(state)}`);
     assert.equal(state.units, 7);
     assert.equal(state.roster, 4);
+    await js("GoblinMobileViews.show('map')");
     await assertMobileView('map');
     await js("document.querySelector('button[data-mobile-view=force]').click()");
     await assertMobileView('force');
