@@ -31,6 +31,11 @@ function validState(state) {
     typeof state.fired === 'boolean' && state.forceBudgetValue === 2;
 }
 
+export function validateArtillerySpotterProbe(state) {
+  if (!validState(state)) reject('INVALID_ARTILLERY_STATE');
+  return true;
+}
+
 export function createArtillerySpotterProbe(registry, dataProfileId, unitId, turn = 1) {
   if (dataProfileId !== DATA_PROFILE || registry?.schemaVersion !== 1 ||
       registry.legacyProfile !== 'field-test-atlas-v1' ||

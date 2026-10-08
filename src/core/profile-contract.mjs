@@ -62,8 +62,25 @@ export const CORE_SIEGE_TANK_PROBE_CONTRACT = Object.freeze({
   })
 });
 
+// Internal two-actor artillery probe; not a playable product profile.
+export const CORE_ARTILLERY_SPOTTER_PROBE_CONTRACT = Object.freeze({
+  rulesVersion: 'core-v7-artillery-spotter-probe-v1',
+  scenarioId: 'core-artillery-spotter-probe',
+  scenarioVersion: 'artillery-spotter-probe-v1',
+  ruleProfileId: 'CORE_ARTILLERY_SPOTTER_PROBE_v1',
+  effectiveRules: Object.freeze({
+    schemaVersion: 1, capability: 'two-artillery-spotter-fire',
+    sourceDataProfile: 'full-catalog-v1-draft', sourceTargetActive: false,
+    artillerySpotterVersion: 'artillery-spotter-v1',
+    losMode: 'core-odd-row-v1', forceBudgetValue: 2,
+    batteryAttack: 6, batteryRange: 8, batteryDefense: 1, batteryMove: 0,
+    mobileAttack: 6, mobileRange: 6, mobileDefense: 2, mobileMove: 1
+  })
+});
+
 const profileContracts = [CORE_PROFILE_CONTRACT, CORE_SUPERCOVER_CONTRACT,
-  CORE_IRON_DUST_GEV_PROBE_CONTRACT, CORE_SIEGE_TANK_PROBE_CONTRACT];
+  CORE_IRON_DUST_GEV_PROBE_CONTRACT, CORE_SIEGE_TANK_PROBE_CONTRACT,
+  CORE_ARTILLERY_SPOTTER_PROBE_CONTRACT];
 
 const historicalPairs = new Set([
   'core-v1/reference-v1',
