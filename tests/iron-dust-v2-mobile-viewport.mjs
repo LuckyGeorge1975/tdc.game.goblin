@@ -49,10 +49,10 @@ try {
       const names = ['map', 'force', 'intel'];
       return {view:document.documentElement.dataset.mobileView,
         pressed:Object.fromEntries(names.map(name => [name,
-          document.querySelector('[data-mobile-view=' + name + ']')
+          document.querySelector('button[data-mobile-view=' + name + ']')
             .getAttribute('aria-pressed')])),
         visible:Object.fromEntries(names.map(name => {
-          const panel = document.querySelector('[data-mobile-panel=' + name + ']');
+          const panel = document.querySelector('.game-layout > [data-mobile-panel=' + name + ']');
           return [name, getComputedStyle(panel).display !== 'none' &&
             panel.getClientRects().length > 0];
         }))};
@@ -90,11 +90,11 @@ try {
     assert.equal(state.units, 7);
     assert.equal(state.roster, 4);
     await assertMobileView('map');
-    await js("document.querySelector('[data-mobile-view=force]').click()");
+    await js("document.querySelector('button[data-mobile-view=force]').click()");
     await assertMobileView('force');
-    await js("document.querySelector('[data-mobile-view=intel]').click()");
+    await js("document.querySelector('button[data-mobile-view=intel]').click()");
     await assertMobileView('intel');
-    await js("document.querySelector('[data-mobile-view=map]').click()");
+    await js("document.querySelector('button[data-mobile-view=map]').click()");
     await assertMobileView('map');
     assert.equal(await js('JSON.stringify(IronDustBrowserV2.session.projection)'), original);
     console.log(`${width}x${height}: ${JSON.stringify(state)}`);
