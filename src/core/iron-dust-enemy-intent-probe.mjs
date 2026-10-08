@@ -1,12 +1,14 @@
 import TerrainRules from '../../terrain-rules.js';
 import {hexDistance, terrainAt} from './hex.mjs';
-import {validateIronDustUnifiedStateProbe, queryIronDustFireGeometry} from
+import {validateIronDustUnifiedStateProbe, queryIronDustFireGeometry,
+  IRON_DUST_ZERO_TREADS_POLICY_VERSION} from
   './iron-dust-unified-state-probe.mjs';
 import {queryIronDustStandardFireAction} from './iron-dust-standard-fire-action-probe.mjs';
 
 // Read-only Legacy decision on the inactive seven-unit probe. No scheduler,
 // state transition, event, or random draw is exposed here.
 export const IRON_DUST_ENEMY_INTENT_VERSION = 'iron-dust-enemy-intent-v1';
+export const IRON_DUST_ZERO_TREADS_ENEMY_INTENT_VERSION = 'iron-dust-enemy-intent-v2';
 const actors = ['guard', 'raider'];
 const stages = ['first-fire', 'move', 'retry-fire'];
 const systemPriority = ['missiles', 'main', 'secondary', 'treads', 'antipersonnel'];
@@ -20,8 +22,9 @@ const neighbors = ({x, y}) => y % 2 === 0
   : [{x: x + 1, y: y + 1}, {x, y: y + 1}, {x: x - 1, y},
     {x, y: y - 1}, {x: x + 1, y: y - 1}, {x: x + 1, y}];
 const remaining = weapon => Math.max(0, Math.min(weapon.remaining, weapon.count - weapon.destroyed));
-const systemTarget = systems => systemPriority.find(name => name === 'treads' ||
-  remaining(systems.weapons[name]) > 0);
+const systemTarget = (systems, corrected) => systemPriority.find(name =>
+  name === 'treads' ? !corrected || systems.treads > 0 :
+    remaining(systems.weapons[name]) > 0);
 const candidates = (state, actor, excludeEmbarked) => state.units
   .filter(unit => unit.team === 'player' && unit.hp > 0 &&
     (!excludeEmbarked || !unit.embarkedOn))
@@ -34,7 +37,8 @@ function firstFire(state, actor) {
     if (!geometry.available) continue;
     const command = target.id === 'ogre'
       ? {type: 'EnemySystemAttack', playerId: 'enemy', attackerId: actor.id,
-        targetId: 'ogre', targetKey: systemTarget(target.ogreSystems)}
+        targetId: 'ogre', targetKey: systemTarget(target.ogreSystems,
+          state.targetPolicyVersion === IRON_DUST_ZERO_TREADS_POLICY_VERSION)}
       : {type: 'EnemyUnitAttack', playerId: 'enemy', attackerId: actor.id,
         targetId: target.id};
     if (!queryIronDustStandardFireAction(state, command).available) continue;
@@ -74,6 +78,8 @@ function legacyStep(state, actor, target) {
 
 export function queryIronDustEnemyIntent(state, request) {
   validateIronDustUnifiedStateProbe(state);
+  const resolverVersion = state.targetPolicyVersion === IRON_DUST_ZERO_TREADS_POLICY_VERSION
+    ? IRON_DUST_ZERO_TREADS_ENEMY_INTENT_VERSION : IRON_DUST_ENEMY_INTENT_VERSION;
   if (!exact(request, ['type', 'playerId', 'actorId', 'stage', 'claim']) ||
       request.type !== 'EnemyIntent' || !stages.includes(request.stage) ||
       !['auto', 'pass'].includes(request.claim)) return deny('ENEMY_INTENT_REQUEST_INVALID');
@@ -88,7 +94,7 @@ export function queryIronDustEnemyIntent(state, request) {
     return deny('ACTION_SPENT');
   if (actor.disabled) {
     if (request.stage !== 'first-fire') return deny('STALE_STAGE');
-    return {available: true, resolverVersion: IRON_DUST_ENEMY_INTENT_VERSION,
+    return {available: true, resolverVersion,
       kind: 'pass', actorId: actor.id, reason: 'DISABLED',
       command: {type: 'EnemyPass', playerId: 'enemy', actorId: actor.id}};
   }
@@ -109,5 +115,5 @@ export function queryIronDustEnemyIntent(state, request) {
     reason: request.stage === 'move' ? 'HOLD' : 'NO_TARGET',
     command: {type: 'EnemyPass', playerId: 'enemy', actorId: actor.id}};
   if (request.claim === 'pass' && intent.kind !== 'pass') return deny('PASS_FORBIDDEN');
-  return {available: true, resolverVersion: IRON_DUST_ENEMY_INTENT_VERSION, ...intent};
+  return {available: true, resolverVersion, ...intent};
 }

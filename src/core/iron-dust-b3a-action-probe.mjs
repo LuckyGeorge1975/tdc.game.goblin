@@ -2,6 +2,7 @@ import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_REST_OGRE_FIXTURE_VERSION
   IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION,
   IRON_DUST_INFANTRY_FIRE_FIXTURE_VERSION, IRON_DUST_CORE_ROSTER_FIRE_FIXTURE_VERSION,
   IRON_DUST_BLOCKED_GEV_FIRE_FIXTURE_VERSION,
+  IRON_DUST_ZERO_TREADS_POLICY_VERSION,
   validateIronDustUnifiedStateProbe,
   queryIronDustFireGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB2Action, dispatchIronDustB2Action} from './iron-dust-b2-action-probe.mjs';
@@ -78,6 +79,9 @@ export function queryIronDustB3aAction(state, command) {
   const target = unit(state, 'ogre');
   if (target.hp <= 0 || target.embarkedOn) return deny('SYSTEM_ACTOR_OR_TARGET_UNAVAILABLE');
   const systems = target.ogreSystems;
+  const corrected = state.targetPolicyVersion === IRON_DUST_ZERO_TREADS_POLICY_VERSION;
+  if (command.targetKey === 'treads' && corrected && systems.treads === 0)
+    return deny('SYSTEM_TARGET_INVALID');
   if (command.targetKey !== 'treads' &&
       (!Object.hasOwn(systems.weapons, command.targetKey) ||
         remaining(systems.weapons[command.targetKey]) <= 0))
@@ -88,7 +92,8 @@ export function queryIronDustB3aAction(state, command) {
   return {available: true, direction: 'enemy-to-system', attackerId: actorId,
     targetId: 'ogre', targetKey: command.targetKey, turn: state.turn,
     availableSystemTargets: [...Object.keys(systems.weapons).filter(key =>
-      remaining(systems.weapons[key]) > 0), 'treads']};
+      remaining(systems.weapons[key]) > 0),
+      ...(!corrected || systems.treads > 0 ? ['treads'] : [])]};
 }
 
 export function preflightIronDustB3aAction(state, command) {

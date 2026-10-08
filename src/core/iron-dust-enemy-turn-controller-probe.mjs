@@ -1,4 +1,5 @@
-import {validateIronDustUnifiedStateProbe} from './iron-dust-unified-state-probe.mjs';
+import {validateIronDustUnifiedStateProbe, IRON_DUST_ZERO_TREADS_POLICY_VERSION}
+  from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustEnemyIntent} from './iron-dust-enemy-intent-probe.mjs';
 import {queryIronDustEnemyMoveAction, dispatchIronDustEnemyMoveAction} from
   './iron-dust-enemy-move-action-probe.mjs';
@@ -8,6 +9,12 @@ import {queryIronDustStandardFireAction, dispatchIronDustStandardFireAction} fro
 // A diagnostic scheduler, separate from Core product profiles and Replay.
 // Legacy performs a whole first pass before any actor's retry pass.
 export const IRON_DUST_ENEMY_TURN_CONTROLLER_VERSION = 'iron-dust-enemy-turn-controller-v1';
+export const IRON_DUST_ZERO_TREADS_ENEMY_TURN_CONTROLLER_VERSION =
+  'iron-dust-enemy-turn-controller-v2';
+const controllerVersionFor = state => state?.targetPolicyVersion ===
+  IRON_DUST_ZERO_TREADS_POLICY_VERSION
+  ? IRON_DUST_ZERO_TREADS_ENEMY_TURN_CONTROLLER_VERSION
+  : IRON_DUST_ENEMY_TURN_CONTROLLER_VERSION;
 const actors = ['guard', 'raider'];
 const clone = value => JSON.parse(JSON.stringify(value));
 const freeze = value => {
@@ -59,13 +66,13 @@ export function createIronDustEnemyTurnController(state) {
       const actor = unit(copy, id);
       return actor.hp > 0 && !actor.disabled;
     })};
-  return freeze({controllerVersion: IRON_DUST_ENEMY_TURN_CONTROLLER_VERSION,
+  return freeze({controllerVersion: controllerVersionFor(copy),
     executable: false, state: copy, cursor, digest: stamp(copy, cursor)});
 }
 
 export function validateIronDustEnemyTurnController(value) {
   if (!exact(value, ['controllerVersion', 'executable', 'state', 'cursor', 'digest']) ||
-      value.controllerVersion !== IRON_DUST_ENEMY_TURN_CONTROLLER_VERSION ||
+      value.controllerVersion !== controllerVersionFor(value.state) ||
       value.executable !== false ||
       !exact(value.cursor, ['turn', 'pass', 'index', 'eligibleActorIds']) ||
       !['first', 'retry', 'finish', 'complete'].includes(value.cursor.pass) ||
@@ -159,7 +166,7 @@ export function queryIronDustEnemyTurnController(controller, request) {
   if (controller.cursor.pass === 'complete') return deny('ENEMY_TURN_COMPLETE');
   const action = nextAction(controller);
   if (action.error) return {available: false, error: action.error};
-  return {available: true, controllerVersion: IRON_DUST_ENEMY_TURN_CONTROLLER_VERSION,
+  return {available: true, controllerVersion: controller.controllerVersion,
     cursor: clone(controller.cursor), action};
 }
 
@@ -186,7 +193,7 @@ export function dispatchIronDustEnemyTurnController(controller, request) {
   }
   cursor.turn = result.state.turn;
   const state = clone(result.state);
-  const next = freeze({controllerVersion: IRON_DUST_ENEMY_TURN_CONTROLLER_VERSION,
+  const next = freeze({controllerVersion: controller.controllerVersion,
     executable: false, state, cursor, digest: stamp(state, cursor)});
   validateIronDustEnemyTurnController(next);
   return {controller: next, events: result.events};

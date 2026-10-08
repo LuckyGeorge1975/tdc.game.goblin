@@ -4,6 +4,8 @@ import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1} from '../levels/iron
 import {IRON_DUST_LEGACY_LOS_PROBE_V1, hasIronDustLegacyLineOfSight} from './iron-dust-legacy-los-probe.mjs';
 
 export const IRON_DUST_UNIFIED_STATE_VERSION = 'iron-dust-unified-state-probe-v1';
+export const IRON_DUST_ZERO_TREADS_STATE_VERSION = 'iron-dust-unified-state-probe-v2';
+export const IRON_DUST_ZERO_TREADS_POLICY_VERSION = 'skip-depleted-treads-v1';
 export const IRON_DUST_NEAR_CORE_FIXTURE_VERSION = 'iron-dust-near-core-fixture-v1';
 export const IRON_DUST_REST_OGRE_FIXTURE_VERSION = 'iron-dust-rest-ogre-fixture-v1';
 export const IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION = 'iron-dust-blocked-fire-fixture-v1';
@@ -117,14 +119,18 @@ function validUnit(unit, baseline, fixture) {
 const validActors = values => Array.isArray(values) &&
   same(values, enemyActors.filter(id => values.includes(id)));
 
-export function createIronDustUnifiedStateProbe(seed, {fixture = 'source'} = {}) {
-  if (!u32(seed) || !Object.hasOwn(fixtures, fixture)) reject('UNIFIED_STATE_SETUP_INVALID');
+function createState(seed, fixture, corrected) {
+  if (!u32(seed) || !Object.hasOwn(fixtures, fixture) ||
+      corrected && fixture !== 'source') reject('UNIFIED_STATE_SETUP_INVALID');
   return freeze({
-    capabilityVersion: IRON_DUST_UNIFIED_STATE_VERSION,
+    capabilityVersion: corrected ? IRON_DUST_ZERO_TREADS_STATE_VERSION :
+      IRON_DUST_UNIFIED_STATE_VERSION,
     executable: false,
     scenarioId: 'core-iron-dust-state-probe',
-    scenarioVersion: 'state-probe-v1',
-    ruleProfileId: 'CORE_IRON_DUST_STATE_PROBE_v1',
+    scenarioVersion: corrected ? 'state-probe-v2' : 'state-probe-v1',
+    ruleProfileId: corrected ? 'CORE_IRON_DUST_ZERO_TREADS_PROBE_v2' :
+      'CORE_IRON_DUST_STATE_PROBE_v1',
+    ...(corrected ? {targetPolicyVersion: IRON_DUST_ZERO_TREADS_POLICY_VERSION} : {}),
     sourceScenarioId: source.scenarioId,
     sourceDataVersion: source.dataContractVersion,
     sourceRuleProfileId: source.ruleProfileId,
@@ -140,12 +146,25 @@ export function createIronDustUnifiedStateProbe(seed, {fixture = 'source'} = {})
   });
 }
 
+export function createIronDustUnifiedStateProbe(seed, {fixture = 'source'} = {}) {
+  return createState(seed, fixture, false);
+}
+
+export function createIronDustZeroTreadsUnifiedStateProbe(seed) {
+  return createState(seed, 'source', true);
+}
+
 export function validateIronDustUnifiedStateProbe(state) {
-  if (!state || Object.keys(state).length !== 20 ||
-      state.capabilityVersion !== IRON_DUST_UNIFIED_STATE_VERSION || state.executable !== false ||
+  const corrected = state?.capabilityVersion === IRON_DUST_ZERO_TREADS_STATE_VERSION;
+  if (!state || Object.keys(state).length !== (corrected ? 21 : 20) ||
+      ![IRON_DUST_UNIFIED_STATE_VERSION, IRON_DUST_ZERO_TREADS_STATE_VERSION]
+        .includes(state.capabilityVersion) || state.executable !== false ||
       state.scenarioId !== 'core-iron-dust-state-probe' ||
-      state.scenarioVersion !== 'state-probe-v1' ||
-      state.ruleProfileId !== 'CORE_IRON_DUST_STATE_PROBE_v1' ||
+      state.scenarioVersion !== (corrected ? 'state-probe-v2' : 'state-probe-v1') ||
+      state.ruleProfileId !== (corrected ? 'CORE_IRON_DUST_ZERO_TREADS_PROBE_v2' :
+        'CORE_IRON_DUST_STATE_PROBE_v1') ||
+      corrected && (state.fixture !== 'source' ||
+        state.targetPolicyVersion !== IRON_DUST_ZERO_TREADS_POLICY_VERSION) ||
       state.sourceScenarioId !== source.scenarioId ||
       state.sourceDataVersion !== source.dataContractVersion ||
       state.sourceRuleProfileId !== source.ruleProfileId ||
