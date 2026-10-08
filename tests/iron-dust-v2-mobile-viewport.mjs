@@ -44,6 +44,25 @@ try {
   assert.equal(await js('globalThis.IronDustBrowserV2?.mode'), 'ready',
     'select IRON DUST v2 in the approved session before running this check');
   const original = await js('JSON.stringify(IronDustBrowserV2.session.projection)');
+  async function assertMobileView(expected) {
+    const tabs = await js(`(() => {
+      const names = ['map', 'force', 'intel'];
+      return {view:document.documentElement.dataset.mobileView,
+        pressed:Object.fromEntries(names.map(name => [name,
+          document.querySelector('[data-mobile-view=' + name + ']')
+            .getAttribute('aria-pressed')])),
+        visible:Object.fromEntries(names.map(name => {
+          const panel = document.querySelector('[data-mobile-panel=' + name + ']');
+          return [name, getComputedStyle(panel).display !== 'none' &&
+            panel.getClientRects().length > 0];
+        }))};
+    })()`);
+    assert.equal(tabs.view, expected, JSON.stringify(tabs));
+    for (const name of ['map', 'force', 'intel']) {
+      assert.equal(tabs.pressed[name], String(name === expected), JSON.stringify(tabs));
+      assert.equal(tabs.visible[name], name === expected, JSON.stringify(tabs));
+    }
+  }
   for (const [width, height] of [[390, 844], [320, 568]]) {
     await send('Emulation.setDeviceMetricsOverride',
       {width, height, screenWidth:width, screenHeight:height,
@@ -53,6 +72,8 @@ try {
     await new Promise(resolve => setTimeout(resolve, 100));
     const state = await js(`({width:innerWidth,height:innerHeight,
       mobile:matchMedia('(max-width:760px)').matches,
+      coarse:matchMedia('(pointer:coarse)').matches,
+      touchPoints:navigator.maxTouchPoints,
       nav:getComputedStyle(document.querySelector('.mobile-views')).display,
       view:document.documentElement.dataset.mobileView,
       units:document.querySelectorAll('#battlefield-map .unit-svg').length,
@@ -61,15 +82,20 @@ try {
     assert.equal(state.width, width, JSON.stringify(state));
     assert.equal(state.height, height, JSON.stringify(state));
     assert.equal(state.mobile, true, JSON.stringify(state));
+    assert.equal(state.coarse, true, JSON.stringify(state));
+    assert.ok(state.touchPoints > 0, JSON.stringify(state));
     assert.notEqual(state.nav, 'none', JSON.stringify(state));
+    assert.ok(state.scrollWidth <= width,
+      `horizontal overflow at ${width}x${height}: ${JSON.stringify(state)}`);
     assert.equal(state.units, 7);
     assert.equal(state.roster, 4);
+    await assertMobileView('map');
     await js("document.querySelector('[data-mobile-view=force]').click()");
-    assert.equal(await js('document.documentElement.dataset.mobileView'), 'force');
+    await assertMobileView('force');
     await js("document.querySelector('[data-mobile-view=intel]').click()");
-    assert.equal(await js('document.documentElement.dataset.mobileView'), 'intel');
+    await assertMobileView('intel');
     await js("document.querySelector('[data-mobile-view=map]').click()");
-    assert.equal(await js('document.documentElement.dataset.mobileView'), 'map');
+    await assertMobileView('map');
     assert.equal(await js('JSON.stringify(IronDustBrowserV2.session.projection)'), original);
     console.log(`${width}x${height}: ${JSON.stringify(state)}`);
   }
