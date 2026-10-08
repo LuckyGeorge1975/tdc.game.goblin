@@ -1,7 +1,6 @@
-import TerrainRules from '../../terrain-rules.js';
-import {IRON_DUST_LEGACY_LOS_PROBE_V1} from './iron-dust-legacy-los-probe.mjs';
-import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, validateIronDustUnifiedStateProbe,
-  queryIronDustUnifiedGeometry} from './iron-dust-unified-state-probe.mjs';
+import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_FIRE_GEOMETRY_VERSION,
+  validateIronDustUnifiedStateProbe,
+  queryIronDustFireGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB3aAction, dispatchIronDustB3aAction} from './iron-dust-b3a-action-probe.mjs';
 
 export const IRON_DUST_B3B_ACTION_VERSION = 'iron-dust-explicit-near-core-victory-v1';
@@ -55,18 +54,28 @@ export function queryIronDustB3bAction(state, command) {
   const weapon = systems.weapons[command.weaponKey];
   if (ready(weapon) === 0) return deny('WEAPON_NOT_READY');
   if (target.hp <= 0) return deny('WEAPON_TARGET_INVALID');
-  const geometry = queryIronDustUnifiedGeometry(state, 'ogre', 'core');
-  if (geometry.distance > weapon.range) return deny('WEAPON_OUT_OF_RANGE');
-  if (!geometry.lineOfSight) return deny('WEAPON_SIGHT_BLOCKED');
+  const geometry = queryIronDustFireGeometry(state, 'ogre', 'core', weapon.range,
+    {outOfRange: 'WEAPON_OUT_OF_RANGE', sightBlocked: 'WEAPON_SIGHT_BLOCKED'});
+  if (!geometry.available) return geometry;
   if (weapon.infantryOnly) return deny('WEAPON_INFANTRY_ONLY');
   return {available: true, attack: weapon.attack, range: weapon.range,
-    ready: ready(weapon), losMode: IRON_DUST_LEGACY_LOS_PROBE_V1.losMode,
+    ready: ready(weapon), losMode: geometry.losMode,
     direction: 'player-to-unit', targetId: 'core', defense: target.defense,
     turn: state.turn, passengerIds: target.passengerIds};
 }
 
 export function preflightIronDustB3bAction(state, command) {
   return queryIronDustB3bAction(state, command);
+}
+
+export function queryIronDustB3bAttackSurface(state, commands) {
+  validateIronDustUnifiedStateProbe(state);
+  if (!Array.isArray(commands) || commands.some(command =>
+    !['PlayerFire', 'EnemySystemAttack'].includes(command?.type)))
+    return {error: {code: 'B3B_ATTACK_SURFACE_INVALID'}};
+  return {resolverVersion: IRON_DUST_FIRE_GEOMETRY_VERSION,
+    entries: commands.map((command, index) =>
+      ({index, ...queryIronDustB3bAction(state, command)}))};
 }
 
 // Only the versioned diagnostic fixture can destroy the core here.
@@ -80,8 +89,9 @@ export function dispatchIronDustB3bAction(state, command) {
   const readyBefore = ready(weapon);
   next.rng.state = (Math.imul(1664525, next.rng.state) + 1013904223) >>> 0;
   const roll = next.rng.state % 6;
-  const geometry = queryIronDustUnifiedGeometry(next, 'ogre', 'core');
-  const effectiveDefense = target.defense + TerrainRules.coverBonus(geometry.terrain);
+  const geometry = queryIronDustFireGeometry(next, 'ogre', 'core', weapon.range,
+    {outOfRange: 'WEAPON_OUT_OF_RANGE', sightBlocked: 'WEAPON_SIGHT_BLOCKED'});
+  const effectiveDefense = target.defense + geometry.cover;
   const combatRatio = ratio(query.attack, effectiveDefense);
   const result = combatRatio === '5-1' ? 'X' : crt[combatRatio][roll];
   if (result === 'D') {

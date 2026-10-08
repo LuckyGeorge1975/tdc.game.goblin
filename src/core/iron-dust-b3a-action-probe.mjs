@@ -1,12 +1,12 @@
-import TerrainRules from '../../terrain-rules.js';
 import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_REST_OGRE_FIXTURE_VERSION,
+  IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION,
   validateIronDustUnifiedStateProbe,
-  queryIronDustUnifiedGeometry} from './iron-dust-unified-state-probe.mjs';
+  queryIronDustFireGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB2Action, dispatchIronDustB2Action} from './iron-dust-b2-action-probe.mjs';
 
 export const IRON_DUST_B3A_ACTION_VERSION = 'iron-dust-explicit-enemy-system-turn-v1';
 const fixtures = ['source', 'adjacent', IRON_DUST_NEAR_CORE_FIXTURE_VERSION,
-  IRON_DUST_REST_OGRE_FIXTURE_VERSION];
+  IRON_DUST_REST_OGRE_FIXTURE_VERSION, 'boundary', IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION];
 const actors = ['guard', 'raider'];
 const crt = {
   '1-2': ['NE', 'NE', 'NE', 'NE', 'D', 'X'],
@@ -78,9 +78,9 @@ export function queryIronDustB3aAction(state, command) {
       (!Object.hasOwn(systems.weapons, command.targetKey) ||
         remaining(systems.weapons[command.targetKey]) <= 0))
     return deny('SYSTEM_TARGET_INVALID');
-  const geometry = queryIronDustUnifiedGeometry(state, actorId, 'ogre');
-  if (geometry.distance > actor.range) return deny('SYSTEM_OUT_OF_RANGE');
-  if (!geometry.lineOfSight) return deny('SYSTEM_SIGHT_BLOCKED');
+  const geometry = queryIronDustFireGeometry(state, actorId, 'ogre', actor.range,
+    {outOfRange: 'SYSTEM_OUT_OF_RANGE', sightBlocked: 'SYSTEM_SIGHT_BLOCKED'});
+  if (!geometry.available) return geometry;
   return {available: true, direction: 'enemy-to-system', attackerId: actorId,
     targetId: 'ogre', targetKey: command.targetKey, turn: state.turn,
     availableSystemTargets: [...Object.keys(systems.weapons).filter(key =>
@@ -130,9 +130,10 @@ export function dispatchIronDustB3aAction(state, command) {
     const systems = target.ogreSystems, treadHit = command.targetKey === 'treads';
     next.rng.state = (Math.imul(1664525, next.rng.state) + 1013904223) >>> 0;
     const roll = next.rng.state % 6;
-    const geometry = queryIronDustUnifiedGeometry(next, actor.id, 'ogre');
+    const geometry = queryIronDustFireGeometry(next, actor.id, 'ogre', actor.range,
+      {outOfRange: 'SYSTEM_OUT_OF_RANGE', sightBlocked: 'SYSTEM_SIGHT_BLOCKED'});
     const combatRatio = treadHit ? '1-1' : ratio(actor.damage,
-      systems.weapons[command.targetKey].defense + TerrainRules.coverBonus(geometry.terrain));
+      systems.weapons[command.targetKey].defense + geometry.cover);
     const result = treadHit ? (roll >= 4 ? 'X' : 'NE') :
       (combatRatio === '5-1' ? 'X' : crt[combatRatio][roll]);
     const loss = result === 'X' ? (treadHit ? Math.min(systems.treads, actor.damage) : 1) : 0;

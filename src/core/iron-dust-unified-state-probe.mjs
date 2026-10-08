@@ -6,6 +6,8 @@ import {IRON_DUST_LEGACY_LOS_PROBE_V1, hasIronDustLegacyLineOfSight} from './iro
 export const IRON_DUST_UNIFIED_STATE_VERSION = 'iron-dust-unified-state-probe-v1';
 export const IRON_DUST_NEAR_CORE_FIXTURE_VERSION = 'iron-dust-near-core-fixture-v1';
 export const IRON_DUST_REST_OGRE_FIXTURE_VERSION = 'iron-dust-rest-ogre-fixture-v1';
+export const IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION = 'iron-dust-blocked-fire-fixture-v1';
+export const IRON_DUST_FIRE_GEOMETRY_VERSION = 'iron-dust-legacy-fire-geometry-v1';
 const source = validateIronDustCoreDataV1(IRON_DUST_CORE_DATA_V1);
 const sourceOgre = source.units.find(unit => unit.id === 'ogre');
 const ids = source.units.map(unit => unit.id);
@@ -15,7 +17,8 @@ const fixtures = Object.freeze({source: {}, adjacent: {guard: {x: 2, y: 5}},
   [IRON_DUST_NEAR_CORE_FIXTURE_VERSION]: {ogre: {x: 10, y: 1}},
   [IRON_DUST_REST_OGRE_FIXTURE_VERSION]: {ogre: {x: 8, y: 4},
     gev: {hp: 0}, missile: {hp: 0}, infantry: {hp: 0}},
-  boundary: {ogre: {x: 2, y: 0}, guard: {x: 6, y: 1}}});
+  boundary: {ogre: {x: 2, y: 0}, guard: {x: 6, y: 1}},
+  [IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION]: {ogre: {x: 3, y: 0}, guard: {x: 4, y: 1}}});
 const clone = value => JSON.parse(JSON.stringify(value));
 const freeze = value => {
   if (value && typeof value === 'object') {
@@ -193,4 +196,19 @@ export function queryIronDustUnifiedGeometry(state, fromId, toId) {
     lineOfSight: hasIronDustLegacyLineOfSight(IRON_DUST_LEGACY_LOS_PROBE_V1, from, to),
     terrain: targetTerrain, cover: TerrainRules.coverBonus(targetTerrain),
     entryCost: TerrainRules.movementCost(targetTerrain, from)};
+}
+
+// Shared, read-only Legacy fire geometry for the inactive technical fixtures.
+// Range precedes LOS, as in the historical attack preflight.
+export function queryIronDustFireGeometry(state, fromId, toId, range, codes) {
+  const geometry = queryIronDustUnifiedGeometry(state, fromId, toId);
+  if (geometry.error) return geometry;
+  if (!Number.isInteger(range) || range < 0 ||
+      !codes || typeof codes.outOfRange !== 'string' || typeof codes.sightBlocked !== 'string')
+    throw new TypeError('Invalid fire geometry contract');
+  if (geometry.distance > range) return {available: false, error: {code: codes.outOfRange}};
+  if (!geometry.lineOfSight) return {available: false, error: {code: codes.sightBlocked}};
+  return {available: true, resolverVersion: IRON_DUST_FIRE_GEOMETRY_VERSION,
+    distance: geometry.distance, terrain: geometry.terrain, cover: geometry.cover,
+    losMode: IRON_DUST_LEGACY_LOS_PROBE_V1.losMode};
 }

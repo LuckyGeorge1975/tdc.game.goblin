@@ -1,13 +1,12 @@
-import TerrainRules from '../../terrain-rules.js';
-import {IRON_DUST_LEGACY_LOS_PROBE_V1} from './iron-dust-legacy-los-probe.mjs';
 import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_REST_OGRE_FIXTURE_VERSION,
+  IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION,
   validateIronDustUnifiedStateProbe,
-  queryIronDustUnifiedGeometry} from './iron-dust-unified-state-probe.mjs';
+  queryIronDustFireGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB1Action, dispatchIronDustB1Action} from './iron-dust-b1-action-probe.mjs';
 
 export const IRON_DUST_B2_ACTION_VERSION = 'iron-dust-explicit-ogre-fire-v1';
 const fixtures = ['source', 'adjacent', IRON_DUST_NEAR_CORE_FIXTURE_VERSION,
-  IRON_DUST_REST_OGRE_FIXTURE_VERSION];
+  IRON_DUST_REST_OGRE_FIXTURE_VERSION, 'boundary', IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION];
 const targets = ['guard', 'raider'];
 const crt = {
   '1-2': ['NE', 'NE', 'NE', 'NE', 'D', 'X'],
@@ -45,13 +44,13 @@ function fireTarget(state, weaponKey, targetId) {
   if (!targets.includes(targetId)) return deny('B2_TARGET_UNSUPPORTED');
   const target = unit(state, targetId), weapon = weapons(state)[weaponKey];
   if (target.hp <= 0 || target.embarkedOn) return deny('WEAPON_TARGET_INVALID');
-  const geometry = queryIronDustUnifiedGeometry(state, 'ogre', targetId);
-  if (geometry.distance > weapon.range) return deny('WEAPON_OUT_OF_RANGE');
-  if (!geometry.lineOfSight) return deny('WEAPON_SIGHT_BLOCKED');
+  const geometry = queryIronDustFireGeometry(state, 'ogre', targetId, weapon.range,
+    {outOfRange: 'WEAPON_OUT_OF_RANGE', sightBlocked: 'WEAPON_SIGHT_BLOCKED'});
+  if (!geometry.available) return geometry;
   if (weapon.infantryOnly && target.infantry !== true && target.engineering !== true)
     return deny('WEAPON_INFANTRY_ONLY');
   return {available: true, attack: weapon.attack, range: weapon.range,
-    ready: ready(weapon), losMode: IRON_DUST_LEGACY_LOS_PROBE_V1.losMode,
+    ready: ready(weapon), losMode: geometry.losMode,
     direction: 'player-to-unit', targetId, defense: target.defense,
     turn: state.turn, passengerIds: target.passengerIds};
 }
@@ -59,6 +58,8 @@ function fireTarget(state, weaponKey, targetId) {
 export function queryIronDustB2Action(state, command) {
   validateIronDustUnifiedStateProbe(state);
   if (!fixtures.includes(state.fixture)) return deny('B2_FIXTURE_UNSUPPORTED');
+  if (['boundary', IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION].includes(state.fixture) &&
+      state.phase !== 'fire') return deny('B2_FIXTURE_UNSUPPORTED');
   if (!command || typeof command.type !== 'string') return deny('B2_COMMAND_INVALID');
   if (!['SelectWeapon', 'PlayerFire'].includes(command.type)) {
     // B1 has a fixed two-actor pass trace. A destroyed actor cannot execute that trace.
@@ -110,8 +111,9 @@ export function dispatchIronDustB2Action(state, command) {
     const readyBefore = ready(weapon);
     next.rng.state = (Math.imul(1664525, next.rng.state) + 1013904223) >>> 0;
     const roll = next.rng.state % 6;
-    const effectiveDefense = target.defense + TerrainRules.coverBonus(
-      queryIronDustUnifiedGeometry(next, 'ogre', target.id).terrain);
+    const geometry = queryIronDustFireGeometry(next, 'ogre', target.id, weapon.range,
+      {outOfRange: 'WEAPON_OUT_OF_RANGE', sightBlocked: 'WEAPON_SIGHT_BLOCKED'});
+    const effectiveDefense = target.defense + geometry.cover;
     const combatRatio = ratio(query.attack, effectiveDefense);
     const result = combatRatio === '5-1' ? 'X' : crt[combatRatio][roll];
     if (result === 'D') {
