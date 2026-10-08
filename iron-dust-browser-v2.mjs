@@ -2,6 +2,8 @@ import {
   createIronDustProfile, validateIronDustProfile, projectIronDustProfile,
   IRON_DUST_PROFILE_HEADER
 } from './src/core/iron-dust-executable-profile.mjs';
+import {buildIronDustV2View, renderIronDustV2View,
+  resetIronDustV2View} from './iron-dust-v2-view.mjs';
 
 // This bridge only opens the validated profile. Rendering and actions follow in later slices.
 export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';
@@ -28,8 +30,19 @@ if (typeof document !== 'undefined') {
 
   let session = null;
   let mode = 'inactive';
+  function renderCurrent() {
+    if (mode !== 'ready' || !session) return;
+    renderIronDustV2View(buildIronDustV2View(session.projection,
+      session.profile.header.ruleProfileId));
+  }
+  const legacyDraw = draw;
+  draw = function(...args) {
+    if (mode === 'ready') return renderCurrent();
+    return legacyDraw(...args);
+  };
   function showGate(message) {
     document.body.classList.add('iron-dust-v2-gated');
+    document.body.classList.remove('iron-dust-v2-ready');
     document.querySelector('.map-frame').dataset.v2Message = message;
     document.querySelector('#mission-kicker').textContent = 'IRON DUST v2 / INTERNAL TEST';
     document.querySelector('#mission-title').textContent = 'Profil-Anbindung in Arbeit';
@@ -57,6 +70,9 @@ if (typeof document !== 'undefined') {
       session = createIronDustBrowserSession(profile);
       mode = 'ready';
       showGate('V2-Profil validiert. Spielfläche bis zum vollständigen Browser-Gate gesperrt.');
+      resetIronDustV2View();
+      renderCurrent();
+      document.body.classList.add('iron-dust-v2-ready');
     } catch (error) {
       session = null;
       mode = 'error';
@@ -68,6 +84,8 @@ if (typeof document !== 'undefined') {
     session = null;
     mode = 'inactive';
     document.body.classList.remove('iron-dust-v2-gated');
+    document.body.classList.remove('iron-dust-v2-ready');
+    resetIronDustV2View();
     document.querySelector('.map-frame').removeAttribute('data-v2-message');
     document.querySelector('#auto-end-turn').disabled = false;
     document.querySelector('#undo-command').disabled = false;
