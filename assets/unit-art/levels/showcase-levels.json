@@ -125,6 +125,34 @@
         {"assetId":"relay-node","team":"enemy","x":9,"y":5},
         {"assetId":"command-core","team":"enemy","x":10,"y":3}
       ]
+    },
+    {
+      "schemaVersion": 1,
+      "id": "los-supercover-showcase",
+      "scenarioVersion": 1,
+      "ruleProfileId": "FIELD_TEST_SUPERCOVER_v1",
+      "title": "SUPERCOVER / Boundary Line",
+      "kicker": "SHOWCASE 05 / SUPERCOVER",
+      "objective": "core-and-escort",
+      "width": 12,
+      "height": 8,
+      "defaultTerrain": "open-ground",
+      "terrain": [
+        {"x":1,"y":1,"type":"rubble-field"},
+        {"x":5,"y":4,"type":"forest"},
+        {"x":7,"y":2,"type":"ridge"},
+        {"x":6,"y":3,"type":"road"},
+        {"x":7,"y":3,"type":"road"}
+      ],
+      "units": [
+        {"assetId":"siege-tank","team":"player","x":2,"y":2},
+        {"assetId":"assault-tank","team":"player","x":1,"y":4},
+        {"assetId":"rocket-artillery","team":"player","x":2,"y":5},
+        {"assetId":"skimmer-scout","team":"player","x":3,"y":5},
+        {"assetId":"guard-tank","team":"enemy","x":2,"y":0},
+        {"assetId":"raider-skimmer","team":"enemy","x":8,"y":5},
+        {"assetId":"command-core","team":"enemy","x":10,"y":3}
+      ]
     }
   ]
 }

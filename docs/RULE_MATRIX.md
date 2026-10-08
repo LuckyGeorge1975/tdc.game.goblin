@@ -53,6 +53,8 @@ Der Siegebreaker feuert jedes intakte Waffensystem separat. Haupt- und Sekundär
 
 Kosten gelten für das **Betreten** eines Feldes. `—` bedeutet unpassierbar. Stationäre Einheiten können nicht ziehen. Deckung erhöht die effektive Verteidigung um **+1**. Nur Zwischenfelder blockieren eine Sichtlinie; eine Einheit im Start- oder Zielfeld darf sehen bzw. gesehen werden.
 
+Das separat auswählbare `los-supercover-showcase` bindet `FIELD_TEST_SUPERCOVER_v1` mit Szenarioversion 1. Hier zählt jedes von der Zentrumslinie berührte Zwischenhex: Läuft sie genau auf einer Hexgrenze, sperrt bereits eines der beiden blockierenden Nachbarhexe. Vorschau, Spielerfeuer und Gegnerfeuer nutzen denselben Sichtlinienpfad. Die acht historischen `FIELD_TEST_LEGACY_v1`-Missionen und ihre Sichtlinienentscheidung bleiben unverändert; andere Katalogregeln werden durch dieses Showcase nicht aktiviert.
+
 | Gelände | Ketten / Infanterie | Skimmer | Amphibische Infanterie | Deckung | Sichtblocker |
 |---|---:|---:|---:|---:|---|
 | Offenes Gelände | 1 | 1 | 1 | 0 | nein |

@@ -76,11 +76,15 @@
   };
   function register(level){
     validateLevel(level);
+    if(level.id==='los-supercover-showcase'){
+      if(level.scenarioVersion!==1||level.ruleProfileId!=='FIELD_TEST_SUPERCOVER_v1')throw new Error('Supercover scenario profile invalid');
+    }else if(level.ruleProfileId||level.scenarioVersion)throw new Error('Legacy scenario profile changed');
     if(scenarioCatalog[level.id])throw new Error(`Duplicate scenario: ${level.id}`);
     scenarioCatalog[level.id]={
       kicker:level.kicker,title:level.title,
       sub:'Feindlichen Kern und alle übrigen Gegner ausschalten; eigene Einheit erhalten.',
       objective:level.objective,showAllEnemiesProgress:true,
+      scenarioVersion:level.scenarioVersion||1,ruleProfileId:level.ruleProfileId||'FIELD_TEST_LEGACY_v1',
       terrain:level.terrain.filter(cell=>TerrainRules.coverBonus(cell.type)>0).map(cell=>`${cell.x},${cell.y}`),
       terrainTypes:level.terrain,units:level.units.map(makeUnit)
     };
@@ -101,11 +105,11 @@
       register({...level,kicker:'MISSION 10 / ATLAS PROVING GROUNDS',title:'ATLAS / Proving Grounds',objective:'core-and-escort'});
     }catch(error){console.error('ATLAS level unavailable:',error);addLog('ATLAS-Level konnte nicht geladen werden.',true)}
     try{
-      const response=await fetch('assets/unit-art/levels/showcase-levels.json');
+      const response=await fetch('assets/unit-art/levels/showcase-levels.json?showcase=supercover-v1');
       if(!response.ok)throw new Error(`HTTP ${response.status}`);
       const bundle=await response.json();
-      if(bundle.schemaVersion!==1||!Array.isArray(bundle.levels)||bundle.levels.length!==4)throw new Error('Showcase bundle schema invalid');
-      const expected=['showcase-terrain-course','showcase-advance','showcase-siege','showcase-specialists'];
+      if(bundle.schemaVersion!==1||!Array.isArray(bundle.levels)||bundle.levels.length!==5)throw new Error('Showcase bundle schema invalid');
+      const expected=['showcase-terrain-course','showcase-advance','showcase-siege','showcase-specialists','los-supercover-showcase'];
       if(expected.some((id,index)=>bundle.levels[index]?.id!==id))throw new Error('Showcase level IDs invalid');
       for(const level of bundle.levels)validateLevel(level);
       for(const level of bundle.levels)register(level);

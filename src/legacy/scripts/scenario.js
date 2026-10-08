@@ -6,7 +6,8 @@ const objectiveFallback = {
   'showcase-terrain-course': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
   'showcase-advance': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
   'showcase-siege': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
-  'showcase-specialists': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.'
+  'showcase-specialists': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
+  'los-supercover-showcase': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.'
 };
 function renderScenarioObjective(){
   const key=`mission.${currentScenario}.objective.short`;
@@ -26,7 +27,13 @@ globalThis.addEventListener?.('goblin-language-change',renderScenarioObjective);
 function loadScenario(id){
   const config=scenarioCatalog[id];
   if(!config)return;
+  const supercover=id==='los-supercover-showcase';
+  if(config.scenarioVersion!=null&&config.scenarioVersion!==1||
+     (supercover ? config.ruleProfileId!=='FIELD_TEST_SUPERCOVER_v1'||config.scenarioVersion!==1 :
+       config.ruleProfileId&&config.ruleProfileId!=='FIELD_TEST_LEGACY_v1'))throw new Error('SCENARIO_PROFILE_MISMATCH');
+  const nextProfile=Object.freeze({id:supercover?'FIELD_TEST_SUPERCOVER_v1':'FIELD_TEST_LEGACY_v1',scenarioVersion:supercover?1:config.scenarioVersion||1,losMode:supercover?'strict-supercover':'legacy-pixel'});
   currentScenario=id;
+  activeRuleProfile=nextProfile;
   terrain=new Set(config.terrain);
   terrainTypes=new Map((config.terrainTypes||[]).map(cell=>[`${cell.x},${cell.y}`,cell.type]));
   for(const [key,type] of terrainTypes)if(TerrainRules.coverBonus(type))terrain.add(key);

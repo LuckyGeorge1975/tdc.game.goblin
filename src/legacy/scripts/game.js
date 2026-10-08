@@ -2,6 +2,7 @@ const NS='http://www.w3.org/2000/svg';
 const W=12,H=8,S=34,DX=Math.sqrt(3)*S, DY=1.5*S;
 let terrain = new Set(['3,1','8,1','1,4','5,3','9,5','2,6','7,6','10,2']);
 let terrainTypes = new Map();
+let activeRuleProfile=Object.freeze({id:'FIELD_TEST_LEGACY_v1',scenarioVersion:1,losMode:'legacy-pixel'});
 function terrainTypeAt(x,y){const key=`${x},${y}`;return terrainTypes.get(key)||(terrain.has(key)?'rubble-field':'open-ground')}
 function drawTerrainArtwork(x,y){
   const type=terrainTypeAt(x,y);
@@ -57,9 +58,12 @@ function hexNeighbors(x,y){return y%2===0?[{x,y:y+1},{x:x-1,y:y+1},{x:x-1,y},{x:
 function findMovementPath(from,to,allowance,movingUnit=selected){const startKey=`${from.x},${from.y}`,targetKey=`${to.x},${to.y}`,occupied=new Set(units.filter(u=>u.hp>0&&u!==movingUnit).map(u=>`${u.x},${u.y}`)),best=new Map([[startKey,0]]),queue=[{x:from.x,y:from.y,cost:0,path:[]}];while(queue.length){queue.sort((a,b)=>a.cost-b.cost);const node=queue.shift(),key=`${node.x},${node.y}`;if(key===targetKey)return node.path;if(node.cost>allowance)continue;hexNeighbors(node.x,node.y).forEach(next=>{if(next.x<0||next.x>=W||next.y<0||next.y>=H)return;const nextKey=`${next.x},${next.y}`;if(occupied.has(nextKey)&&nextKey!==targetKey)return;const cost=node.cost+movementCost(movingUnit,nextKey);if(cost>allowance||best.has(nextKey)&&best.get(nextKey)<=cost)return;best.set(nextKey,cost);queue.push({x:next.x,y:next.y,cost,path:[...node.path,next]})})}return null}function drawAreaBoundary(radius,className,includeCell=null){if(!selected)return;const inside=(x,y)=>x>=0&&x<W&&y>=0&&y<H&&(includeCell?includeCell(x,y):dist(selected,{x,y})<=radius);let d='';for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(!inside(x,y))continue;const vertices=hexVertices(x,y),neighbors=hexNeighbors(x,y);for(let i=0;i<6;i++){const n=neighbors[i];if(!inside(n.x,n.y)){const a=vertices[i],b=vertices[(i+1)%6];d+=`M${a.x},${a.y}L${b.x},${b.y}`}}}const path=document.createElementNS(NS,'path');path.setAttribute('d',d);path.classList.add('area-boundary',...className.split(' '));svg.appendChild(path)}
 function dist(a,b){const aq=a.x-Math.floor(a.y/2),bq=b.x-Math.floor(b.y/2),dr=a.y-b.y,dq=aq-bq;return Math.max(Math.abs(dq),Math.abs(dr),Math.abs(dq+dr))}
 function nearestHex(px,py){let best=null,bestDistance=Infinity;for(let y=0;y<H;y++)for(let x=0;x<W;x++){const c=hexCenter(x,y),d=(c.x-px)**2+(c.y-py)**2;if(d<bestDistance){bestDistance=d;best={x,y}}}return best}
-// Preserve the established pixel sampling until the LOS boundary rule is specified.
+// Preserve the established pixel sampling for historical Field Test missions.
 function legacyLosSampleCount(a,b){return Math.max(2,Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y),Math.abs((a.x+a.y)-(b.x+b.y)))*8)}
-function lineOfSight(from,to){const steps=legacyLosSampleCount(from,to),a=hexCenter(from.x,from.y),b=hexCenter(to.x,to.y);for(let i=1;i<steps;i++){const t=i/steps,cell=nearestHex(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t);if((cell.x!==from.x||cell.y!==from.y)&&(cell.x!==to.x||cell.y!==to.y)&&TerrainRules.blocksLos(terrainTypeAt(cell.x,cell.y)))return false}return true}
+function lineOfSight(from,to){
+  if(activeRuleProfile.losMode==='strict-supercover')return GoblinHexSupercover.intermediateHexes(from,to).every(cell=>!TerrainRules.blocksLos(terrainTypeAt(cell.x,cell.y)));
+  const steps=legacyLosSampleCount(from,to),a=hexCenter(from.x,from.y),b=hexCenter(to.x,to.y);for(let i=1;i<steps;i++){const t=i/steps,cell=nearestHex(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t);if((cell.x!==from.x||cell.y!==from.y)&&(cell.x!==to.x||cell.y!==to.y)&&TerrainRules.blocksLos(terrainTypeAt(cell.x,cell.y)))return false}return true;
+}
 function findEnemyStep(foe,target){
   const occupied=new Set(units.filter(u=>u.hp>0&&u!==foe).map(u=>`${u.x},${u.y}`));
   const queue=[{x:foe.x,y:foe.y,cost:0,path:[]}],seen=new Map([[`${foe.x},${foe.y}`,0]]);let best=null;

@@ -6,7 +6,7 @@
   const catalogBase = new URL('../../../assets/ui-copy/', document.currentScript?.src || root.location.href);
   const contentCatalogs = {};
   const ready = Promise.all(languages.map(async (lang) => {
-    const response = await fetch(new URL(`content-02.${lang}.json`, catalogBase));
+    const response = await fetch(new URL(`content-02.${lang}.json?showcase=supercover-v1`, catalogBase));
     if (!response.ok) throw Error(`CONTENT-02 ${lang}: HTTP ${response.status}`);
     const catalog = await response.json();
     contentCatalogs[lang] = catalog.messages;

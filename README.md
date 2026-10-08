@@ -16,7 +16,7 @@ Enthalten sind:
 - Einheitliche Spiel-Dialoge für Phasenende, Szenariowechsel und Neustart. Escape bricht ab; Tab und Enter bedienen den Dialog. Spielkürzel und AUTO sind währenddessen gesperrt. „Never ask again“ gilt ausschließlich für das Phasenende. Keine Browser-Messageboxen.
 - Taste `L` beim ausgewählten Transporter: ohne Fracht Ladeauswahl wie `+`; mit Fracht Zielfelder zum Entladen der ersten geladenen Einheit anzeigen. Es gelten dieselben Phasenregeln wie beim Klick.
 - `BACK` nimmt Befehle der aktuellen Phase einzeln zurück: Bewegung, Feuer, Rammen und Transport inklusive Aktionsstatus und Kampflog. Phasenwechsel und Spielende schließen die Historie ab. AUTO wartet nach dem letzten Befehl zwei Sekunden; mit AUTO aus bleibt Zeit bis zum manuellen Phasenwechsel. Wiederholte Schüsse verwenden denselben gespeicherten Würfelwurf.
-- Fire Range und Line-of-Sight-Prüfung. Build 15 berechnet Feuer- und Transportreichweite sowie Raketensplash-Nachbarschaft nach dem tatsächlichen versetzten Hexraster; die historische Sichtlinien-Pixelabtastung bleibt bis zur gesonderten Grenzlinienentscheidung unverändert.
+- Fire Range und Line-of-Sight-Prüfung. Die acht bisherigen Missionen behalten ihre historische Sichtlinien-Pixelabtastung. Das zusätzliche Supercover-Showcase verwendet `FIELD_TEST_SUPERCOVER_v1`: Berührt die Sichtlinie die Grenze zweier Zwischenhexe, sperrt bereits ein blockierendes Hex den Schuss in beiden Richtungen.
 - CRT-Kampfsystem mit NE, D und X sowie expliziten Verteidigungswerten
 - Deaktivierung, Wiederherstellung, Zerstörung und sichtbare Wracks
 - Goblin-Ramming gegen gegnerische Fahrzeuge

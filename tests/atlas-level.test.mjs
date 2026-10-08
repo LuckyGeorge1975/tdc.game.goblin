@@ -23,7 +23,7 @@ async function load(bundle=showcase,search=''){
   return {context,options,errors,loaded};
 }
 
-test('ATLAS and four smaller scenarios load with complete roster and terrain coverage',async()=>{
+test('ATLAS and five smaller scenarios load with complete roster and terrain coverage',async()=>{
   const {context,options,errors}=await load();
   assert.equal(errors.length,0);
   assert.deepEqual(options.map(option=>option.value),['atlas-proving-grounds',...showcase.levels.map(level=>level.id)]);
@@ -44,6 +44,9 @@ test('ATLAS and four smaller scenarios load with complete roster and terrain cov
     }
   }
   assert.ok(small[3].units.find(unit=>unit.visualKey==='strategic-missile-carrier')?.strategicMissile);
+  assert.equal(small[4].ruleProfileId,'FIELD_TEST_SUPERCOVER_v1');
+  assert.equal(small[4].scenarioVersion,1);
+  assert.ok(small[4].terrainTypes.some(cell=>cell.x===1&&cell.y===1&&cell.type==='rubble-field'));
   assert.ok(small[3].units.find(unit=>unit.visualKey==='amphibious-infantry')?.amphibious);
   assert.equal(small[3].units.find(unit=>unit.visualKey==='skimmer-carrier')?.transportCapacity,3);
 });
