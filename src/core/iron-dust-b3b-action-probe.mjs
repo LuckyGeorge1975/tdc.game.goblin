@@ -3,7 +3,7 @@ import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_FIRE_GEOMETRY_VERSION,
   queryIronDustFireGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB3aAction, dispatchIronDustB3aAction} from './iron-dust-b3a-action-probe.mjs';
 
-export const IRON_DUST_B3B_ACTION_VERSION = 'iron-dust-explicit-near-core-victory-v1';
+export const IRON_DUST_B3B_ACTION_VERSION = 'iron-dust-explicit-core-v2';
 const crt = {
   '1-2': ['NE', 'NE', 'NE', 'NE', 'D', 'X'],
   '1-1': ['NE', 'NE', 'D', 'D', 'D', 'X'],
@@ -40,7 +40,7 @@ export function queryIronDustB3bAction(state, command) {
     return queryIronDustB3aAction(state, command);
   if (!exact(command, ['type', 'playerId', 'unitId', 'targetId', 'weaponKey']))
     return deny('B3B_COMMAND_INVALID');
-  if (state.fixture !== IRON_DUST_NEAR_CORE_FIXTURE_VERSION)
+  if (!['source', IRON_DUST_NEAR_CORE_FIXTURE_VERSION].includes(state.fixture))
     return deny('B3B_CORE_FIXTURE_UNSUPPORTED');
   if (state.victory.status !== 'ongoing') return deny('GAME_ENDED');
   if (command.playerId !== state.activeTeam) return deny('NOT_ACTIVE_TEAM');
@@ -78,7 +78,8 @@ export function queryIronDustB3bAttackSurface(state, commands) {
       ({index, ...queryIronDustB3bAction(state, command)}))};
 }
 
-// Only the versioned diagnostic fixture can destroy the core here.
+// The source roster may reach the core through legal movement; other
+// diagnostic fixtures retain their original scope.
 export function dispatchIronDustB3bAction(state, command) {
   const query = queryIronDustB3bAction(state, command);
   if (!query.available) return {error: query.error};

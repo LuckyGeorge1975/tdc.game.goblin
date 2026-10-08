@@ -10,6 +10,10 @@ import {createGame, replayPhase, expectedPhaseReplay} from '../src/core/game-cor
 import {recordProfileReplay} from '../src/core/replay-contract.mjs';
 import {queryIronDustB3bAction, preflightIronDustB3bAction,
   dispatchIronDustB3bAction} from '../src/core/iron-dust-b3b-action-probe.mjs';
+import {dispatchIronDustStandardFireAction} from
+  '../src/core/iron-dust-standard-fire-action-probe.mjs';
+import {createIronDustEnemyTurnController, dispatchIronDustEnemyTurnController} from
+  '../src/core/iron-dust-enemy-turn-controller-probe.mjs';
 
 const plain = value => JSON.parse(JSON.stringify(value));
 const unit = (state, id) => state.units.find(value => value.id === id);
@@ -19,6 +23,31 @@ const fire = (weaponKey = 'main') => ({type: 'PlayerFire', playerId: 'player',
 const near = seed => createIronDustUnifiedStateProbe(seed,
   {fixture: IRON_DUST_NEAR_CORE_FIXTURE_VERSION});
 const inFire = seed => dispatchIronDustB3bAction(near(seed), end('player')).state;
+function sourceCoreFire(seed) {
+  let state = createIronDustUnifiedStateProbe(seed);
+  for (const to of [{x: 3, y: 2}, {x: 6, y: 2}, {x: 9, y: 2}]) {
+    const move = {type: 'Move', playerId: 'player', unitId: 'ogre', to};
+    const moved = dispatchIronDustStandardFireAction(state, move);
+    assert.ok(moved.state, JSON.stringify(moved.error));
+    state = dispatchIronDustStandardFireAction(moved.state, end('player')).state;
+    if (to.x === 9) break;
+    state = dispatchIronDustStandardFireAction(state, end('player')).state;
+    state = dispatchIronDustStandardFireAction(state, end('player')).state;
+    let controller = createIronDustEnemyTurnController(state);
+    while (controller.cursor.pass !== 'complete') {
+      const result = dispatchIronDustEnemyTurnController(controller,
+        {type: 'AdvanceEnemyTurn', playerId: 'enemy'});
+      assert.ok(result.controller, JSON.stringify(result.error));
+      controller = result.controller;
+    }
+    state = controller.state;
+    assert.deepEqual(state.victory, {status: 'ongoing', winner: null});
+  }
+  assert.equal(state.fixture, 'source');
+  assert.deepEqual([unit(state, 'ogre').x, unit(state, 'ogre').y, state.phase],
+    [9, 2, 'fire']);
+  return state;
+}
 
 function extract(text, name) {
   const start = text.lastIndexOf(`function ${name}(`), opening = text.indexOf('{', start);
@@ -110,12 +139,104 @@ test('a real D leaves play ongoing and a second D can destroy the core', () => {
     (Math.imul(1664525, state.rng.state) + 1013904223) >>> 0);
 });
 
-test('core fire is fixture-bound and every command rejects after terminal victory without mutation', () => {
+test('legal source moves and enemy turns allow Ogre core fire with Legacy CRT parity', () => {
+  const sourceBefore = JSON.stringify(IRON_DUST_CORE_DATA_V1);
+  const state = sourceCoreFire(8), before = JSON.stringify(state);
+  const query = queryIronDustB3bAction(state, fire());
+  assert.deepEqual(preflightIronDustB3bAction(state, fire()), query);
+  assert.deepEqual(query, {available: true, attack: 4, range: 3, ready: 1,
+    losMode: 'legacy-pixel-sample-8-v1', direction: 'player-to-unit', targetId: 'core',
+    defense: 5, turn: 3, passengerIds: []});
+  const context = legacy(), legacyCore = plain(unit(state, 'core'));
+  context.turn = state.turn;
+  context.Math.random = () => 5 / 6;
+  const expected = context.combatOutcome({team: 'player', damage: query.attack}, legacyCore);
+  const result = dispatchIronDustStandardFireAction(state, fire());
+  assert.ok(result.state, JSON.stringify(result.error));
+  assert.deepEqual([result.events[0].ratio, result.events[0].roll,
+    result.events[0].result, result.events[0].hp],
+  [expected.ratio, expected.roll, expected.result, legacyCore.hp]);
+  assert.deepEqual([result.events[0].effectiveDefense, result.events[0].readyBefore,
+    result.events[0].readyAfter, result.events[0].selectedWeaponAfter],
+  [6, 1, 0, 'secondary']);
+  assert.deepEqual(result.state.victory, {status: 'ended', winner: 'player'});
+  assert.ok(result.state.units.some(item => item.team === 'player' && item.hp > 0));
+  assert.equal(result.state.rng.state,
+    (Math.imul(1664525, state.rng.state) + 1013904223) >>> 0);
+  assert.equal(result.state.executable, false);
+  assert.equal(JSON.stringify(state), before);
+  assert.equal(JSON.stringify(IRON_DUST_CORE_DATA_V1), sourceBefore);
+  assert.doesNotThrow(() => validateIronDustUnifiedStateProbe(result.state));
+  assert.throws(() => createGame(result.state, 8), {code: 'UNSUPPORTED_RULE_PROFILE'});
+  assert.throws(() => recordProfileReplay(result.state, 8, []),
+    {code: 'REPLAY_PROFILE_MISMATCH'});
+});
+
+test('source core fire keeps range, pixel sight, phase, weapon and budget gates', () => {
+  const far = dispatchIronDustStandardFireAction(createIronDustUnifiedStateProbe(8),
+    end('player')).state;
+  const reachable = sourceCoreFire(8);
+  const blocked = plain(reachable);
+  Object.assign(unit(blocked, 'ogre'), {x: 7, y: 1});
+  validateIronDustUnifiedStateProbe(blocked);
+  const spent = plain(reachable);
+  unit(spent, 'ogre').ogreSystems.weapons.main.firedThisPhase = 1;
+  validateIronDustUnifiedStateProbe(spent);
+  for (const [state, command, code] of [
+    [createIronDustUnifiedStateProbe(8), fire(), 'WRONG_PHASE'],
+    [far, fire(), 'WEAPON_OUT_OF_RANGE'],
+    [blocked, fire(), 'WEAPON_SIGHT_BLOCKED'],
+    [reachable, {...fire(), playerId: 'enemy'}, 'NOT_ACTIVE_TEAM'],
+    [reachable, {...fire(), unitId: 'gev'}, 'ATTACK_ACTOR_INVALID'],
+    [reachable, fire('missiles'), 'WEAPON_NOT_SELECTED'],
+    [reachable, fire('unknown'), 'WEAPON_UNKNOWN'],
+    [spent, fire(), 'WEAPON_NOT_READY'],
+    [reachable, {...fire(), extra: true}, 'B3B_COMMAND_INVALID']
+  ]) {
+    const before = JSON.stringify(state), rng = state.rng.state;
+    const expected = {available: false, error: {code}};
+    assert.deepEqual(queryIronDustB3bAction(state, command), expected);
+    assert.deepEqual(preflightIronDustB3bAction(state, command), expected);
+    assert.deepEqual(dispatchIronDustB3bAction(state, command), {error: {code}});
+    assert.equal(JSON.stringify(state), before);
+    assert.equal(state.rng.state, rng);
+  }
+  const forged = plain(reachable);
+  forged.rng.state = -1;
+  const before = JSON.stringify(forged);
+  for (const operation of [queryIronDustB3bAction, preflightIronDustB3bAction,
+    dispatchIronDustB3bAction])
+    assert.throws(() => operation(forged, fire()), {code: 'UNIFIED_STATE_MISMATCH'});
+  assert.equal(JSON.stringify(forged), before);
+});
+
+test('a source core D spends main budget and leaves the mission ongoing', () => {
+  const state = sourceCoreFire(2), before = JSON.stringify(state);
+  const result = dispatchIronDustB3bAction(state, fire());
+  assert.ok(result.state, JSON.stringify(result.error));
+  assert.deepEqual([result.events[0].ratio, result.events[0].roll,
+    result.events[0].result, result.events[0].readyAfter], ['1-1', 3, 'D', 0]);
+  assert.deepEqual(result.state.victory, {status: 'ongoing', winner: null});
+  assert.equal(unit(result.state, 'core').disabled, true);
+  assert.equal(unit(result.state, 'ogre').ogreSystems.selectedWeapon, 'secondary');
+  const selectMain = {type: 'SelectWeapon', playerId: 'player', unitId: 'ogre',
+    weaponKey: 'main'};
+  assert.deepEqual(queryIronDustB3bAction(result.state, selectMain),
+    {available: false, error: {code: 'WEAPON_NOT_READY'}});
+  assert.deepEqual(dispatchIronDustB3bAction(result.state, fire()),
+    {error: {code: 'WEAPON_NOT_SELECTED'}});
+  assert.equal(JSON.stringify(state), before);
+});
+
+test('other fixtures remain gated and every command rejects after terminal victory without mutation', () => {
   const source = dispatchIronDustB3bAction(createIronDustUnifiedStateProbe(2), end('player')).state;
+  const adjacent = dispatchIronDustB3bAction(createIronDustUnifiedStateProbe(2,
+    {fixture: 'adjacent'}), end('player')).state;
   const movement = near(2), fireState = inFire(2);
   const ended = dispatchIronDustB3bAction(fireState, fire()).state;
   for (const [state, command, code] of [
-    [source, fire(), 'B3B_CORE_FIXTURE_UNSUPPORTED'],
+    [source, fire(), 'WEAPON_OUT_OF_RANGE'],
+    [adjacent, fire(), 'B3B_CORE_FIXTURE_UNSUPPORTED'],
     [movement, fire(), 'WRONG_PHASE'],
     [fireState, {...fire(), unitId: 'gev'}, 'ATTACK_ACTOR_INVALID'],
     [fireState, {...fire(), weaponKey: 'missiles'}, 'WEAPON_NOT_SELECTED'],
