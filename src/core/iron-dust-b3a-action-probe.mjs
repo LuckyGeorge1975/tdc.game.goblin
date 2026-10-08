@@ -139,7 +139,8 @@ export function dispatchIronDustB3aAction(state, command) {
     if (treadHit) systems.treads -= loss;
     else systems.weapons[command.targetKey].destroyed += loss;
     if (helpless(systems)) target.hp = 0;
-    if (target.hp === 0) next.victory = {status: 'ended', winner: 'enemy'};
+    if (target.hp === 0 && !next.units.some(item => item.team === 'player' && item.hp > 0))
+      next.victory = {status: 'ended', winner: 'enemy'};
     const remainingAfter = treadHit ? systems.treads : remaining(systems.weapons[command.targetKey]);
     next.firedActorIds.push(actor.id);
     next.firedActorIds.sort((a, b) => actors.indexOf(a) - actors.indexOf(b));

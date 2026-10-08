@@ -41,22 +41,27 @@ test('a separate starting roster leaves the original Iron Dust data and replay i
   assert.equal(JSON.stringify(replayPhase()), JSON.stringify(expectedPhaseReplay));
 });
 
-test('only real enemy system commands destroy the last player and end in defeat', () => {
-  let state = createIronDustUnifiedStateProbe(2,
-    {fixture: IRON_DUST_REST_OGRE_FIXTURE_VERSION});
+function runOgreDestruction(fixture) {
+  let state = createIronDustUnifiedStateProbe(2, {fixture});
   let hits = 0;
-  for (let turn = 0; state.victory.status === 'ongoing' && turn < 300; turn++) {
+  for (let turn = 0; ogre(state).hp > 0 && turn < 300; turn++) {
     for (let step = 0; step < 3; step++) state = apply(state, end('player')).state;
     for (const actorId of ['guard', 'raider']) {
-      if (state.victory.status !== 'ongoing') break;
+      if (ogre(state).hp === 0) break;
       const systems = ogre(state).ogreSystems;
       const targetKey = systems.treads > 0 ? 'treads' :
         Object.keys(systems.weapons).find(key => remaining(systems.weapons[key]) > 0);
       assert.ok(targetKey);
       const command = attack(actorId, targetKey), before = JSON.stringify(state);
-      assert.deepEqual(preflightIronDustB3aAction(state, command),
-        queryIronDustB3aAction(state, command));
-      assert.equal(queryIronDustB3aAction(state, command).available, true);
+      const query = queryIronDustB3aAction(state, command);
+      assert.deepEqual(preflightIronDustB3aAction(state, command), query);
+      if (!query.available) {
+        assert.ok(['SYSTEM_OUT_OF_RANGE', 'SYSTEM_SIGHT_BLOCKED'].includes(query.error.code));
+        assert.deepEqual(dispatchIronDustB3aAction(state, command), {error: query.error});
+        assert.equal(JSON.stringify(state), before);
+        state = apply(state, {type: 'EnemyPass', playerId: 'enemy', actorId}).state;
+        continue;
+      }
       const result = apply(state, command);
       assert.equal(JSON.stringify(state), before);
       assert.equal(result.events[0].type, 'EnemySystemFireResolved');
@@ -65,12 +70,17 @@ test('only real enemy system commands destroy the last player and end in defeat'
       state = result.state;
       hits++;
     }
-    if (state.victory.status === 'ongoing') state = apply(state, end('enemy')).state;
+    if (ogre(state).hp > 0) state = apply(state, end('enemy')).state;
   }
   assert.ok(hits > 0);
-  assert.deepEqual(state.victory, {status: 'ended', winner: 'enemy'});
   assert.equal(ogre(state).hp, 0);
   assert.doesNotThrow(() => validateIronDustUnifiedStateProbe(state));
+  return state;
+}
+
+test('only real enemy system commands destroy the last player and end in defeat', () => {
+  const state = runOgreDestruction(IRON_DUST_REST_OGRE_FIXTURE_VERSION);
+  assert.deepEqual(state.victory, {status: 'ended', winner: 'enemy'});
   for (const command of [end('enemy'), attack('guard', 'treads')]) {
     const before = JSON.stringify(state);
     assert.deepEqual(queryIronDustB3aAction(state, command),
@@ -79,4 +89,24 @@ test('only real enemy system commands destroy the last player and end in defeat'
       {error: {code: 'GAME_ENDED'}});
     assert.equal(JSON.stringify(state), before);
   }
+});
+
+test('other surviving players keep adjacent play ongoing after real Ogre destruction', () => {
+  let state = runOgreDestruction('adjacent');
+  assert.deepEqual(state.victory, {status: 'ongoing', winner: null});
+  assert.deepEqual(state.units.filter(unit => unit.team === 'player' && unit.hp > 0)
+    .map(unit => unit.id), ['gev', 'missile', 'infantry']);
+  const destroyedTarget = attack('guard', 'treads');
+  assert.deepEqual(queryIronDustB3aAction(state, destroyedTarget),
+    {available: false, error: {code: 'ACTION_SPENT'}});
+  const finalTurn = state.turn;
+  for (const actorId of ['guard', 'raider']) {
+    if (!state.firedActorIds.includes(actorId))
+      state = apply(state, {type: 'EnemyPass', playerId: 'enemy', actorId}).state;
+  }
+  state = apply(state, end('enemy')).state;
+  assert.equal(state.turn, finalTurn + 1);
+  assert.equal(state.phase, 'movement');
+  assert.deepEqual(state.victory, {status: 'ongoing', winner: null});
+  assert.doesNotThrow(() => validateIronDustUnifiedStateProbe(state));
 });
