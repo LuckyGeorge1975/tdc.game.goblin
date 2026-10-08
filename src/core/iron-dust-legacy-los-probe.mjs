@@ -1,4 +1,4 @@
-import TerrainRules from '../../terrain-rules.js';
+import TerrainRules from '../../terrain-rules-module.mjs';
 import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1} from '../levels/iron-dust-core-data.v1.mjs';
 
 const clone = value => JSON.parse(JSON.stringify(value));

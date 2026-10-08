@@ -1,4 +1,4 @@
-import TerrainRules from '../../terrain-rules.js';
+import TerrainRules from '../../terrain-rules-module.mjs';
 import {inside} from './hex.mjs';
 import {queryIronDustUnifiedUnit, validateIronDustUnifiedStateProbe} from './iron-dust-unified-state-probe.mjs';
 

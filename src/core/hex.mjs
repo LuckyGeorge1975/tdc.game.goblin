@@ -1,4 +1,4 @@
-import TerrainRules from '../../terrain-rules.js';
+import TerrainRules from '../../terrain-rules-module.mjs';
 import {supercoverIntermediateHexes} from './supercover-line.mjs';
 import {CORE_SUPERCOVER_CONTRACT, CORE_IRON_DUST_GEV_PROBE_CONTRACT,
   CORE_SIEGE_TANK_PROBE_CONTRACT, CORE_ARTILLERY_SPOTTER_PROBE_CONTRACT} from './profile-contract.mjs';

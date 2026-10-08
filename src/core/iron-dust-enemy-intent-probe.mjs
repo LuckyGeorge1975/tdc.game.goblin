@@ -1,4 +1,4 @@
-import TerrainRules from '../../terrain-rules.js';
+import TerrainRules from '../../terrain-rules-module.mjs';
 import {hexDistance, terrainAt} from './hex.mjs';
 import {validateIronDustUnifiedStateProbe, queryIronDustFireGeometry,
   IRON_DUST_ZERO_TREADS_POLICY_VERSION} from

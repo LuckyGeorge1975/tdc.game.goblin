@@ -1,4 +1,4 @@
-import TerrainRules from '../../terrain-rules.js';
+import TerrainRules from '../../terrain-rules-module.mjs';
 import {inside, movementPaths} from './hex.mjs';
 import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_REST_OGRE_FIXTURE_VERSION,
   IRON_DUST_INFANTRY_FIRE_FIXTURE_VERSION, IRON_DUST_CORE_ROSTER_FIRE_FIXTURE_VERSION,

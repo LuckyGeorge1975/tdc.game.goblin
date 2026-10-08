@@ -1,4 +1,4 @@
-import TerrainRules from '../../terrain-rules.js';
+import TerrainRules from '../../terrain-rules-module.mjs';
 
 // Inactive data contract. A projection is a query fixture, not an engineering
 // action or an authorization for any terrain transition during play.

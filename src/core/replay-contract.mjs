@@ -1,6 +1,6 @@
 import {createGame, dispatch} from './game-core.mjs';
 import {CORE_PROFILE_CONTRACT, profileContractError} from './profile-contract.mjs';
-import TerrainRules from '../../terrain-rules.js';
+import TerrainRules from '../../terrain-rules-module.mjs';
 
 export const REPLAY_SCHEMA_VERSION = 1;
 const headerKeys = ['effectiveRules', 'ruleProfileId', 'rulesVersion', 'scenarioDigest',

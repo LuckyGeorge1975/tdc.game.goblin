@@ -1,4 +1,4 @@
-import TerrainRules from '../../terrain-rules.js';
+import TerrainRules from '../../terrain-rules-module.mjs';
 import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1} from
   '../levels/iron-dust-core-data.v1.mjs';
 import {IRON_DUST_LEGACY_LOS_PROBE_V1} from './iron-dust-legacy-los-probe.mjs';
