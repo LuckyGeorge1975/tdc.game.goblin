@@ -229,6 +229,17 @@ Eltern-Issue `goblin-9bj.19.7` offen.
 
 ## Vertragsklärung vor Integration
 
+Die ausschließlich technische Fixture `iron-dust-rest-ogre-fixture-v1` startet
+mit dem unveränderten Siegebreaker als einziger lebender Spielereinheit und
+mit Guard und Raider in seiner Schussreichweite. GEV, Artillerie und Infanterie
+sind bereits im versionierten **Startzustand** zerstört. Wiederholte explizite
+`EnemySystemAttack`-Befehle können alle Waffen und Laufwerke ausschalten; erst
+der letzte echte Systemtreffer führt zur Niederlage. Das ist kein spielbares
+IRON-DUST-v1-Level, kein Gegner-KI-Verhalten und keine Replay- oder
+`FULL_CATALOG`-Freigabe. Der validierte Quellsnapshot und historische Replays
+bleiben unverändert. Ein simultaner Kern-/Spielertod ist mit diesen Befehlen
+weiterhin nicht erreichbar.
+
 - `Load`/`Unload` sind als Befehlstyp erkannt, aber mangels Transporttyp im
   vereinbarten Zwei-Typen-Schnitt mit `UNSUPPORTED_COMMAND` abgelehnt. Eine
   spätere Erweiterung braucht Frachtdaten und Phasenregeln im Vertrag.

@@ -1,10 +1,12 @@
 import TerrainRules from '../../terrain-rules.js';
-import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, validateIronDustUnifiedStateProbe,
+import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_REST_OGRE_FIXTURE_VERSION,
+  validateIronDustUnifiedStateProbe,
   queryIronDustUnifiedGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB2Action, dispatchIronDustB2Action} from './iron-dust-b2-action-probe.mjs';
 
 export const IRON_DUST_B3A_ACTION_VERSION = 'iron-dust-explicit-enemy-system-turn-v1';
-const fixtures = ['source', 'adjacent', IRON_DUST_NEAR_CORE_FIXTURE_VERSION];
+const fixtures = ['source', 'adjacent', IRON_DUST_NEAR_CORE_FIXTURE_VERSION,
+  IRON_DUST_REST_OGRE_FIXTURE_VERSION];
 const actors = ['guard', 'raider'];
 const crt = {
   '1-2': ['NE', 'NE', 'NE', 'NE', 'D', 'X'],
@@ -137,6 +139,7 @@ export function dispatchIronDustB3aAction(state, command) {
     if (treadHit) systems.treads -= loss;
     else systems.weapons[command.targetKey].destroyed += loss;
     if (helpless(systems)) target.hp = 0;
+    if (target.hp === 0) next.victory = {status: 'ended', winner: 'enemy'};
     const remainingAfter = treadHit ? systems.treads : remaining(systems.weapons[command.targetKey]);
     next.firedActorIds.push(actor.id);
     next.firedActorIds.sort((a, b) => actors.indexOf(a) - actors.indexOf(b));
