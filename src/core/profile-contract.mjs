@@ -45,8 +45,25 @@ export const CORE_IRON_DUST_GEV_PROBE_CONTRACT = Object.freeze({
   })
 });
 
+// Internal single-unit fire probe. This ID is never advertised by a playable level.
+export const CORE_SIEGE_TANK_PROBE_CONTRACT = Object.freeze({
+  rulesVersion: 'core-v6-siege-tank-probe-v1',
+  scenarioId: 'core-siege-tank-probe',
+  scenarioVersion: 'siege-tank-probe-v1',
+  ruleProfileId: 'CORE_SIEGE_TANK_PROBE_v1',
+  effectiveRules: Object.freeze({
+    schemaVersion: 1,
+    capability: 'single-siege-tank-fire',
+    sourceDataProfile: 'full-catalog-v1-draft',
+    sourceTargetActive: false,
+    fireBudgetVersion: 'siege-tank-fire-budget-v1',
+    weapons: Object.freeze({main1: 3, main2: 3, mainBoth: 6, ap1: 1, ap2: 1,
+      mainRange: 3, apRange: 1})
+  })
+});
+
 const profileContracts = [CORE_PROFILE_CONTRACT, CORE_SUPERCOVER_CONTRACT,
-  CORE_IRON_DUST_GEV_PROBE_CONTRACT];
+  CORE_IRON_DUST_GEV_PROBE_CONTRACT, CORE_SIEGE_TANK_PROBE_CONTRACT];
 
 const historicalPairs = new Set([
   'core-v1/reference-v1',
@@ -88,7 +105,8 @@ export function profileContractError(value) {
 
 export function freezeEffectiveRules(state) {
   if (!profileContracts.some(item => item.rulesVersion === state.rulesVersion)) return state;
-  Object.freeze(state.effectiveRules.movement);
+  for (const value of Object.values(state.effectiveRules))
+    if (value && typeof value === 'object') Object.freeze(value);
   Object.freeze(state.effectiveRules);
   return state;
 }

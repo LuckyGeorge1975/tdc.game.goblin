@@ -3,8 +3,11 @@ import TerrainRules from '../../terrain-rules.js';
 import { referenceScenario, referenceCommands, REFERENCE_SEED } from './reference-fixture.mjs';
 import { phaseScenario, phaseCommands, PHASE_SEED, expectedPhaseTrace } from './phase-fixture.mjs';
 import {profileContractError, freezeEffectiveRules,
-  CORE_IRON_DUST_GEV_PROBE_CONTRACT} from './profile-contract.mjs';
+  CORE_IRON_DUST_GEV_PROBE_CONTRACT, CORE_SIEGE_TANK_PROBE_CONTRACT} from './profile-contract.mjs';
 import {ironDustGevProbeScenarioError} from './iron-dust-gev-probe.mjs';
+import {siegeTankProbeBudget, siegeTankProbeScenarioError} from './siege-tank-probe.mjs';
+import {resolveSiegeTankFire, resetSiegeTankFireBudget,
+  validateSiegeTankFireBudget} from '../../siege-tank-fire-budget.mjs';
 
 export { queryAreas } from './hex.mjs';
 export { referenceScenario, referenceCommands, REFERENCE_SEED } from './reference-fixture.mjs';
@@ -36,6 +39,11 @@ export function createGame(scenario, seed) {
     const scenarioError = ironDustGevProbeScenarioError(scenario);
     if (scenarioError) throw Object.assign(new Error(scenarioError.code), scenarioError);
   }
+  const siegeProbe = scenario.rulesVersion === CORE_SIEGE_TANK_PROBE_CONTRACT.rulesVersion;
+  if (siegeProbe) {
+    const scenarioError = siegeTankProbeScenarioError(scenario);
+    if (scenarioError) throw Object.assign(new Error(scenarioError.code), scenarioError);
+  }
   if (!Number.isInteger(seed)) throw new TypeError('seed must be an integer');
   if (!scenario?.map || !Array.isArray(scenario?.units)) throw new TypeError('invalid scenario');
   const map = clone(scenario.map), units = clone(scenario.units).map(u => ({ ...u, moved: false, fired: false, secondMoved: false, disabled: false, disabledUntil: 0 }));
@@ -47,7 +55,8 @@ export function createGame(scenario, seed) {
     ...(scenario.ruleProfileId ? {ruleProfileId: scenario.ruleProfileId} : {}),
     ...(scenario.effectiveRules ? {effectiveRules: clone(scenario.effectiveRules)} : {}), map, units,
     activeTeam: 'player', phase: 'movement', turn: 1, victory: { status: 'ongoing', winner: null },
-    rng: { seed: seed >>> 0, state: seed >>> 0 } });
+    rng: { seed: seed >>> 0, state: seed >>> 0 },
+    ...(siegeProbe ? {siegeTankFire: siegeTankProbeBudget(1)} : {}) });
 }
 
 function nextRoll(rng) {
@@ -90,17 +99,48 @@ function preflight(state, command) {
   if (!state || !command || typeof command.type !== 'string') return reject('INVALID_COMMAND');
   const profileError = profileContractError(state);
   if (profileError) return {error: profileError};
+  const siegeProbe = state.rulesVersion === CORE_SIEGE_TANK_PROBE_CONTRACT.rulesVersion;
+  if (siegeProbe) {
+    try {
+      validateSiegeTankFireBudget(state.siegeTankFire);
+      if (state.siegeTankFire.turn !== state.turn) return reject('INVALID_SIEGE_TANK_STATE');
+    } catch (error) { return reject(error.code ?? 'INVALID_SIEGE_TANK_STATE'); }
+  }
+  if (command.type === 'FireWeapon' && !siegeProbe ||
+      command.type === 'Fire' && siegeProbe)
+    return reject('UNSUPPORTED_COMMAND', {type: command.type, rulesVersion: state.rulesVersion});
   if (state.rulesVersion === CORE_IRON_DUST_GEV_PROBE_CONTRACT.rulesVersion &&
       (command.type === 'Fire' || command.type === 'Move' && command.unitId !== 'gev'))
     return reject('UNSUPPORTED_COMMAND', {type: command.type, rulesVersion: state.rulesVersion});
   if (state.victory.status !== 'ongoing') return reject('GAME_ENDED');
   if (command.playerId !== state.activeTeam) return reject('NOT_ACTIVE_TEAM', { activeTeam: state.activeTeam });
   if (command.type === 'Load' || command.type === 'Unload') return reject('UNSUPPORTED_COMMAND', { type: command.type, rulesVersion: state.rulesVersion });
-  if (!['Move', 'Fire', 'EndPhase'].includes(command.type)) return reject('UNKNOWN_COMMAND', { type: command.type });
+  if (!['Move', 'Fire', 'FireWeapon', 'EndPhase'].includes(command.type)) return reject('UNKNOWN_COMMAND', { type: command.type });
   if (command.type === 'EndPhase') return {};
   const actor = validateActor(state, command);
   if (actor.error) return actor;
   const unit = actor.unit;
+  if (command.type === 'FireWeapon') {
+    if (Object.keys(command).length !== 5 ||
+        !['type', 'playerId', 'unitId', 'targetId', 'weaponId'].every(key => Object.hasOwn(command, key)) ||
+        command.unitId !== 'siege-tank' || typeof command.targetId !== 'string' ||
+        !command.targetId || typeof command.weaponId !== 'string')
+      return reject('INVALID_COMMAND');
+    if (state.phase !== 'fire') return reject('WRONG_PHASE', {phase: state.phase});
+    const target = findUnit(state, command.targetId);
+    if (!target || target.hp <= 0 || target.team === unit.team || target.embarkedOn)
+      return reject('INVALID_TARGET', {targetId: command.targetId});
+    try {
+      const resolved = resolveSiegeTankFire(state.siegeTankFire, {
+        phase: state.phase, weapon: command.weaponId,
+        actor: {id: unit.id, team: unit.team, hp: unit.hp, disabled: unit.disabled},
+        target: {id: target.id, team: target.team, hp: target.hp,
+          infantry: target.infantry === true || target.type === 'infantry',
+          distance: hexDistance(unit, target), hasLineOfSight: hasLineOfSight(state, unit, target)}
+      });
+      return {unit, target, resolved};
+    } catch (error) { return reject(error.code ?? 'INVALID_COMMAND'); }
+  }
   if (command.type === 'Move') {
     if (state.phase !== 'movement' && state.phase !== 'gev') return reject('WRONG_PHASE', { phase: state.phase });
     if (state.phase === 'gev' && unit.movementMode !== 'gev') return reject('GEV_ONLY', { unitId: unit.id });
@@ -123,16 +163,39 @@ export function queryCommand(state, command) {
   return check.error ? { available: false, error: check.error } : { available: true };
 }
 
+export function queryWeaponActions(state, unitId) {
+  if (state?.rulesVersion !== CORE_SIEGE_TANK_PROBE_CONTRACT.rulesVersion ||
+      unitId !== 'siege-tank' || !Array.isArray(state.units)) return [];
+  const unit = findUnit(state, unitId);
+  if (!unit) return [];
+  const weapons = ['main-1', 'main-2', 'main-both', 'ap-1', 'ap-2'];
+  return state.units.filter(target => target.id !== unitId).flatMap(target =>
+    weapons.map(weaponId => {
+      const probe = queryCommand(state, {type: 'FireWeapon',
+        playerId: unit.team, unitId, targetId: target.id, weaponId});
+      return {weaponId, targetId: target.id, available: probe.available,
+        reason: probe.error?.code ?? null};
+    }));
+}
+
 function summarizeUnitActions(state, unitId) {
   const unit = findUnit(state, unitId);
   const playerId = unit?.team ?? state.activeTeam;
   const areas = queryAreas(state, unitId);
+  const siegeProbe = state.rulesVersion === CORE_SIEGE_TANK_PROBE_CONTRACT.rulesVersion;
   const movementTargets = areas.movementReachable;
-  const fireTargetIds = areas.attackableTargets;
+  const weaponActions = siegeProbe ? queryWeaponActions(state, unitId) : [];
+  const fireTargetIds = siegeProbe
+    ? [...new Set(weaponActions.filter(action => action.available).map(action => action.targetId))]
+    : areas.attackableTargets;
   const moveProbe = queryCommand(state, {
     type: 'Move', playerId, unitId, to: movementTargets[0] ?? { x: unit?.x ?? 0, y: unit?.y ?? 0 },
   });
-  const fireProbe = queryCommand(state, {
+  const fireProbe = siegeProbe
+    ? queryCommand(state, {type: 'FireWeapon', playerId, unitId,
+      targetId: weaponActions.find(action => action.available)?.targetId ?? unitId,
+      weaponId: weaponActions.find(action => action.available)?.weaponId ?? 'main-1'})
+    : queryCommand(state, {
     type: 'Fire', playerId, unitId, targetId: fireTargetIds[0] ?? unitId,
   });
   const reason = (probe, emptyCode, fallbackCode) => probe.available ? null
@@ -141,7 +204,8 @@ function summarizeUnitActions(state, unitId) {
     move: { available: moveProbe.available && movementTargets.length > 0,
       reason: reason(moveProbe, 'NO_REACHABLE_HEX', 'UNREACHABLE'), targets: moveProbe.available ? movementTargets : [] },
     fire: { available: fireProbe.available && fireTargetIds.length > 0,
-      reason: reason(fireProbe, 'NO_ATTACKABLE_TARGET', 'INVALID_TARGET'), targetIds: fireProbe.available ? fireTargetIds : [] },
+      reason: reason(fireProbe, 'NO_ATTACKABLE_TARGET', 'INVALID_TARGET'), targetIds: fireProbe.available ? fireTargetIds : [],
+      ...(siegeProbe ? {weaponActions} : {}) },
   };
 }
 
@@ -181,6 +245,9 @@ export function dispatch(state, command) {
           events.push({ type: 'UnitRecovered', unitId: u.id, activeTeam: next.activeTeam, turn: next.turn });
         }
       }
+      if (next.rulesVersion === CORE_SIEGE_TANK_PROBE_CONTRACT.rulesVersion &&
+          next.activeTeam === 'player')
+        next.siegeTankFire = resetSiegeTankFireBudget(next.siegeTankFire, next.turn);
     }
     events.push({ type: 'PhaseChanged', from: previous, to: next.phase, activeTeam: next.activeTeam, turn: next.turn });
     return { state: next, events };
@@ -197,9 +264,11 @@ export function dispatch(state, command) {
 
   const target = check.target;
   const next = freezeEffectiveRules(clone(state)), attacker = findUnit(next, unit.id), defender = findUnit(next, target.id), events = [];
-  attacker.fired = true;
+  if (command.type === 'FireWeapon') next.siegeTankFire = check.resolved.state;
+  else attacker.fired = true;
   const defense = defender.defense + TerrainRules.coverBonus(terrainAt(next, defender));
-  const ratio = combatRatio(attacker.damage, defense);
+  const ratio = combatRatio(command.type === 'FireWeapon'
+    ? check.resolved.attack.attack : attacker.damage, defense);
   const roll = nextRoll(next.rng), result = ratio === '5-1' ? 'X' : CRT[ratio][roll];
   if (result === 'X') defender.hp = 0;
   else if (result === 'D') {
@@ -210,7 +279,9 @@ export function dispatch(state, command) {
       defender.disabledUntil = next.turn + (attacker.team === 'enemy' ? 2 : 1);
     }
   }
-  events.push({ type: 'ShotResolved', attackerId: unit.id, targetId: target.id, roll, ratio, result, hpBefore: target.hp, hpAfter: defender.hp, disabled: defender.disabled });
+  events.push({ type: 'ShotResolved', attackerId: unit.id, targetId: target.id, roll, ratio, result, hpBefore: target.hp, hpAfter: defender.hp, disabled: defender.disabled,
+    ...(command.type === 'FireWeapon' ? {weaponId: command.weaponId,
+      slots: check.resolved.attack.slots, attack: check.resolved.attack.attack} : {}) });
   updateVictory(next, events);
   return { state: next, events };
 }

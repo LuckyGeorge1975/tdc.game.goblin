@@ -44,6 +44,11 @@ function validState(state) {
     (state.mainTargets.length !== 2 || state.mainTargets[0] !== state.mainTargets[1]);
 }
 
+export function validateSiegeTankFireBudget(state) {
+  if (!validState(state)) reject('INVALID_SIEGE_TANK_STATE');
+  return true;
+}
+
 export function createSiegeTankFireBudget(registry, dataProfileId, unitId, turn = 1) {
   if (dataProfileId !== DATA_PROFILE || registry?.schemaVersion !== 1 ||
       registry.legacyProfile !== 'field-test-atlas-v1' ||

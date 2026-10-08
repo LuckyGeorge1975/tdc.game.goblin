@@ -1,6 +1,7 @@
 import TerrainRules from '../../terrain-rules.js';
 import {supercoverIntermediateHexes} from './supercover-line.mjs';
-import {CORE_SUPERCOVER_CONTRACT, CORE_IRON_DUST_GEV_PROBE_CONTRACT} from './profile-contract.mjs';
+import {CORE_SUPERCOVER_CONTRACT, CORE_IRON_DUST_GEV_PROBE_CONTRACT,
+  CORE_SIEGE_TANK_PROBE_CONTRACT} from './profile-contract.mjs';
 
 export const key = ({ x, y }) => `${x},${y}`;
 export const inside = (map, p) => Number.isInteger(p?.x) && Number.isInteger(p?.y) && p.x >= 0 && p.y >= 0 && p.x < map.width && p.y < map.height;
@@ -76,7 +77,9 @@ export function queryAreas(state, unitId) {
   const fireRange = cells(state.map).filter(p => hexDistance(origin, p) > 0 && hexDistance(origin, p) <= unit.range);
   const lineOfSight = cells(state.map).filter(p => key(p) !== key(origin) && hasLineOfSight(state, origin, p));
   const inRange = new Set(fireRange.map(key)), visible = new Set(lineOfSight.map(key));
-  const attackableTargets = !gevProbe && state.phase === 'fire' && state.activeTeam === unit.team && !unit.fired && !unit.disabled
+  const attackableTargets = !gevProbe &&
+    state.rulesVersion !== CORE_SIEGE_TANK_PROBE_CONTRACT.rulesVersion &&
+    state.phase === 'fire' && state.activeTeam === unit.team && !unit.fired && !unit.disabled
     ? state.units.filter(target => target.team !== unit.team && target.hp > 0 && !target.embarkedOn && inRange.has(key(target)) && visible.has(key(target))).map(target => target.id)
     : [];
   return { movementReachable, fireRange, lineOfSight, attackableTargets };
