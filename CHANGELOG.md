@@ -2,6 +2,11 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden in `goblin-hr7` nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.19] - 2026-10-08
+
+- Das neue, separat auswählbare Supercover-Showcase verwendet eine strenge, symmetrische Sichtlinie für Vorschau sowie Spieler- und Gegnerfeuer. Ein blockierendes Hex an einer berührten Grenzkante sperrt die Linie. Die acht bisherigen Missionen behalten ihren bisherigen Regel- und Sichtlinienstand.
+- Spielskripte und Stile wurden im Repository unter `src/legacy/` geordnet; der Spieleinstieg bleibt an der Projektwurzel. Es gibt keine neuen Grafiksets, Icons oder Layouts. Vollkatalog-Regeln, Gegner-KI und weitere UX-Arbeit sind nicht Teil dieses Builds.
+
 ## [0.1.18] - 2026-10-06
 
 - `ICON SET` wechselt die sechs vorhandenen Grafiksets während einer laufenden Partie. Karte, Listen, Auswahl und Unit Guide zeichnen die gewählten Motive neu; Runde, Phase, Einheitenzustand und Auswahl bleiben erhalten. Die Wahl wird weiterhin im Browser gemerkt.

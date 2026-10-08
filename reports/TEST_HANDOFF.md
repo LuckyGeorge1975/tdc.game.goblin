@@ -2,6 +2,22 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## Build 0.1.19 · lokaler Kandidat
+
+| Feld | Wert |
+|---|---|
+| Version | `0.1.19` |
+| Build | `19` |
+| Basis | Veröffentlichter Commit `3eeaaa542f6e1adaaf4114d1c026bca07ef0e635` (`v0.1.18`) |
+| Geprüfter Produktstand | `c1c18ce13a239a8257facbd1434e04bb10b82172`; unabhängige Regression 144/144 Node-Tests und Validatoren bestanden (`goblin-9bj.28.1`) |
+| Datum | 2026-10-08 |
+| Pages-Einstieg nach Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.19> |
+| Änderungen | [CHANGELOG.md](../CHANGELOG.md#0119---2026-10-08) |
+
+Sichtbare Änderung: ein zusätzliches `FIELD_TEST_SUPERCOVER_v1`-Showcase mit eigener Szenarioversion und festem Terrain/Roster. Die Sichtlinie berücksichtigt dort jedes berührte Zwischenhex, auch an Grenzkanten. Vorschau, Spieler- und Gegnerfeuer verwenden denselben strengen Pfad. Die acht historischen `FIELD_TEST_LEGACY_v1`-Missionen und ihre Replays bleiben unverändert. Spielskripte und Stile liegen nun unter `src/legacy/`; der Root-Einstieg bleibt erhalten. Keine neuen Grafiken, Icons oder UX-Layouts. Vollkatalog-Regeln und Gegner-KI sind nicht Teil dieses Builds.
+
+Die unabhängige Regression auf dem Produktstand ist bestanden (`goblin-9bj.28.1`). Browser-/Bedien- und Release-QA auf dem finalen Metadatenstand sowie Content-/Legal-Deltaprüfung und Pages-Deploy bleiben gesonderte Gates in `goblin-4qk`. Bis zu einer geprüften Veröffentlichung bleibt `v0.1.18` öffentlich verfügbar und Rückfallpunkt. Tag, Push und Deploy erfolgen erst nach diesen Gates durch Koordination; den öffentlichen Einstieg anschließend prüfen.
+
 ## Build 0.1.18 · Veröffentlichung vorbereitet
 
 | Feld | Wert |
