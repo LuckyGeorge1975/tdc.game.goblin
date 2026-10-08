@@ -49,6 +49,32 @@ test('scenario change from Fire resets the active Legacy range overlay to Moveme
   assert.equal(run('selected'),null);
 });
 
+test('v2 test route confirms entry and restart, then returns to Legacy',async()=>{
+  const {run}=game();
+  run(`globalThis.IronDustBrowserV2={selectorId:'iron-dust-v2',available:true,active:false,
+    starts:0,stops:0,start(){this.active=true;this.starts++;currentScenario=this.selectorId},
+    restart(){this.starts++},stop(){this.active=false;this.stops++}}`);
+  run("GameDialogs.confirm=()=>new Promise(resolve=>globalThis.answer=resolve)");
+  run("document.querySelector('#scenario-select').value='iron-dust-v2'");
+  const canceled=run("document.querySelector('#scenario-select').onchange({target:document.querySelector('#scenario-select')})");
+  run('answer(false)');await canceled;
+  assert.equal(run('currentScenario'),'unit-trial');
+  assert.equal(run('IronDustBrowserV2.starts'),0);
+  run("document.querySelector('#scenario-select').value='iron-dust-v2'");
+  const entered=run("document.querySelector('#scenario-select').onchange({target:document.querySelector('#scenario-select')})");
+  run('answer(true)');await entered;
+  assert.equal(run('currentScenario'),'iron-dust-v2');
+  assert.equal(run('IronDustBrowserV2.starts'),1);
+  const restarted=run('resetScenario()');run('answer(true)');await restarted;
+  assert.equal(run('IronDustBrowserV2.starts'),2);
+  run("document.querySelector('#scenario-select').value='iron-dust'");
+  const returned=run("document.querySelector('#scenario-select').onchange({target:document.querySelector('#scenario-select')})");
+  run('answer(true)');await returned;
+  assert.equal(run('currentScenario'),'iron-dust');
+  assert.equal(run('IronDustBrowserV2.active'),false);
+  assert.equal(run('IronDustBrowserV2.stops'),1);
+});
+
 test('phase cancellation and open-dialog AUTO guard preserve the phase',async()=>{
   const {run}=game();run("GameDialogs.confirm=()=>new Promise(resolve=>globalThis.answer=resolve)");
   const pending=run("confirmPhaseAdvance(()=>setTurnPhase('fire'))");assert.equal(run('turnPhase'),'movement');run('answer(false)');await pending;

@@ -9,7 +9,7 @@ const objectiveFallback = {
   'showcase-specialists': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.'
 };
 function renderScenarioObjective(){
-  if(globalThis.goblinBootProfileError)return;
+  if(globalThis.goblinBootProfileError||globalThis.IronDustBrowserV2?.active)return;
   const config=legacySession.config,profile=victoryProfile(legacySession.effectiveRules);
   const key=`mission.${currentScenario}.objective.short`;
   const translated=globalThis.GoblinLanguage?.t(key);
@@ -31,6 +31,7 @@ function loadScenario(id){
   if(!config)return;
   let nextSession;
   try{nextSession=ScenarioRuleProfiles.beginSession(id,config)}catch(error){addLog(error.message,true);throw error}
+  globalThis.IronDustBrowserV2?.stop();
   legacySession=nextSession;
   const active=nextSession.config;
   currentScenario=id;
@@ -51,26 +52,32 @@ function loadScenario(id){
   setViewMode('movement');
 }
 
-function hasScenarioProgress(){return turn>1||units.some(unit=>unit.moveCount>0||unit.moved||unit.fired||unit.secondMoved||unit.embarkedOn||unit.hp<unit.maxHp)}
+function hasScenarioProgress(){return !!globalThis.IronDustBrowserV2?.active||turn>1||units.some(unit=>unit.moveCount>0||unit.moved||unit.fired||unit.secondMoved||unit.embarkedOn||unit.hp<unit.maxHp)}
 
 async function resetScenario(){
   if(GameDialogs.isOpen())return;
   if(hasScenarioProgress()&&!await GameDialogs.confirm({id:'restart',title:'MISSION NEU STARTEN?',message:'Der aktuelle Spielstand und die Befehle dieser Mission gehen verloren.',acceptLabel:'NEU STARTEN',cancelLabel:'WEITERSPIELEN'})){
     maybeAutoAdvancePhase();return;
   }
-  loadScenario(currentScenario);
+  if(globalThis.IronDustBrowserV2?.active)globalThis.IronDustBrowserV2.restart();
+  else loadScenario(currentScenario);
 }
 
 document.querySelector('#scenario-select').onchange=async event=>{
   const nextScenario=event.target.value;
   event.target.value=currentScenario;
-  if(nextScenario===currentScenario||!scenarioCatalog[nextScenario]||GameDialogs.isOpen())return;
-  if(hasScenarioProgress()&&!await GameDialogs.confirm({id:'scenario',title:'SZENARIO WECHSELN?',message:'Der aktuelle Spielstand wird verworfen. Neues Szenario: '+scenarioCatalog[nextScenario].kicker,acceptLabel:'WECHSELN',cancelLabel:'WEITERSPIELEN'})){
+  const v2=globalThis.IronDustBrowserV2;
+  const isV2=nextScenario===v2?.selectorId;
+  if(nextScenario===currentScenario||!(isV2||scenarioCatalog[nextScenario])||GameDialogs.isOpen())return;
+  if(isV2&&!v2.available)return;
+  const nextTitle=isV2?'IRON DUST v2 / INTERNAL TEST':scenarioCatalog[nextScenario].kicker;
+  if((isV2||hasScenarioProgress())&&!await GameDialogs.confirm({id:'scenario',title:'SZENARIO WECHSELN?',message:'Der aktuelle Spielstand wird verworfen. Neues Szenario: '+nextTitle,acceptLabel:'WECHSELN',cancelLabel:'WEITERSPIELEN'})){
     setToast('SZENARIOWECHSEL ABGEBROCHEN');
     maybeAutoAdvancePhase();
     return;
   }
-  loadScenario(nextScenario);
+  if(isV2)v2.start();
+  else loadScenario(nextScenario);
   event.target.value=nextScenario;
 };
 document.querySelector('#reset-game').onclick=resetScenario;

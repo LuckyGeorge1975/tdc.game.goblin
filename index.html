@@ -91,6 +91,20 @@
       .boot-profile-rejected .mission-pickers,
       .boot-profile-rejected .mobile-views,
       .boot-profile-rejected .game-layout { display:none!important; }
+      .iron-dust-v2-gated #battlefield-map,
+      .iron-dust-v2-gated #unit-roster,
+      .iron-dust-v2-gated #combat-log,
+      .iron-dust-v2-gated #unit-intel-card,
+      .iron-dust-v2-gated #intel-card,
+      .iron-dust-v2-gated #carrier-cargo,
+      .iron-dust-v2-gated #weapon-controls,
+      .iron-dust-v2-gated #map-toast { visibility:hidden!important; }
+      .iron-dust-v2-gated .map-frame::after {
+        content:attr(data-v2-message); z-index:4; display:grid; place-items:center;
+        padding:24px; text-align:center; white-space:pre-wrap;
+        color:#d1f35a; font:700 18px Barlow Condensed,sans-serif;
+        letter-spacing:.08em; background:#0a1216;
+      }
     </style>
     <link rel="stylesheet" href="mobile-views.css?v=1" />
   </head>
@@ -122,7 +136,7 @@
           <div class="objective-track"><span id="objective-progress"></span></div>
           <span id="objective-text">0 / 1 CORE</span>
         </div>
-        <div class="mission-pickers"><label class="scenario-picker"><span>SCENARIO</span><select id="scenario-select"><option value="iron-dust">IRON DUST</option><option value="relay-run">RELAY RUN</option><option value="unit-trial">UNIT TRIAL</option></select></label><label class="scenario-picker"><span>ICON SET</span><select id="art-style-select" aria-label="Icon-Set wählen"></select></label></div>
+        <div class="mission-pickers"><label class="scenario-picker"><span>SCENARIO</span><select id="scenario-select"><option value="iron-dust">IRON DUST</option><option value="iron-dust-v2" disabled>IRON DUST v2 · INTEGRATION</option><option value="relay-run">RELAY RUN</option><option value="unit-trial">UNIT TRIAL</option></select></label><label class="scenario-picker"><span>ICON SET</span><select id="art-style-select" aria-label="Icon-Set wählen"></select></label></div>
       </section>
 
       <nav class="mobile-views" aria-label="Spielbereiche">
@@ -231,5 +245,6 @@
       .disabled-unit{opacity:.55!important;filter:grayscale(.85) sepia(.35) drop-shadow(0 0 5px #e0a34f99)!important}
     </style>
     <script src="command-history.js?v=3"></script>
+    <script type="module" src="iron-dust-browser-v2.mjs?v=1"></script>
   </body>
 </html>
