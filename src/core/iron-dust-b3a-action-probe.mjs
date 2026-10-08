@@ -1,12 +1,16 @@
 import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_REST_OGRE_FIXTURE_VERSION,
   IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION,
+  IRON_DUST_INFANTRY_FIRE_FIXTURE_VERSION, IRON_DUST_CORE_ROSTER_FIRE_FIXTURE_VERSION,
+  IRON_DUST_BLOCKED_GEV_FIRE_FIXTURE_VERSION,
   validateIronDustUnifiedStateProbe,
   queryIronDustFireGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB2Action, dispatchIronDustB2Action} from './iron-dust-b2-action-probe.mjs';
 
 export const IRON_DUST_B3A_ACTION_VERSION = 'iron-dust-explicit-enemy-system-turn-v1';
 const fixtures = ['source', 'adjacent', IRON_DUST_NEAR_CORE_FIXTURE_VERSION,
-  IRON_DUST_REST_OGRE_FIXTURE_VERSION, 'boundary', IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION];
+  IRON_DUST_REST_OGRE_FIXTURE_VERSION, 'boundary', IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION,
+  IRON_DUST_INFANTRY_FIRE_FIXTURE_VERSION, IRON_DUST_CORE_ROSTER_FIRE_FIXTURE_VERSION,
+  IRON_DUST_BLOCKED_GEV_FIRE_FIXTURE_VERSION];
 const actors = ['guard', 'raider'];
 const crt = {
   '1-2': ['NE', 'NE', 'NE', 'NE', 'D', 'X'],

@@ -1,12 +1,16 @@
 import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_REST_OGRE_FIXTURE_VERSION,
   IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION,
+  IRON_DUST_INFANTRY_FIRE_FIXTURE_VERSION, IRON_DUST_CORE_ROSTER_FIRE_FIXTURE_VERSION,
+  IRON_DUST_BLOCKED_GEV_FIRE_FIXTURE_VERSION,
   validateIronDustUnifiedStateProbe,
   queryIronDustFireGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB1Action, dispatchIronDustB1Action} from './iron-dust-b1-action-probe.mjs';
 
 export const IRON_DUST_B2_ACTION_VERSION = 'iron-dust-explicit-ogre-fire-v1';
 const fixtures = ['source', 'adjacent', IRON_DUST_NEAR_CORE_FIXTURE_VERSION,
-  IRON_DUST_REST_OGRE_FIXTURE_VERSION, 'boundary', IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION];
+  IRON_DUST_REST_OGRE_FIXTURE_VERSION, 'boundary', IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION,
+  IRON_DUST_INFANTRY_FIRE_FIXTURE_VERSION, IRON_DUST_CORE_ROSTER_FIRE_FIXTURE_VERSION,
+  IRON_DUST_BLOCKED_GEV_FIRE_FIXTURE_VERSION];
 const targets = ['guard', 'raider'];
 const crt = {
   '1-2': ['NE', 'NE', 'NE', 'NE', 'D', 'X'],

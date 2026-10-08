@@ -1,6 +1,8 @@
 import TerrainRules from '../../terrain-rules.js';
 import {inside, movementPaths} from './hex.mjs';
 import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_REST_OGRE_FIXTURE_VERSION,
+  IRON_DUST_INFANTRY_FIRE_FIXTURE_VERSION, IRON_DUST_CORE_ROSTER_FIRE_FIXTURE_VERSION,
+  IRON_DUST_BLOCKED_GEV_FIRE_FIXTURE_VERSION,
   validateIronDustUnifiedStateProbe,
   queryIronDustUnifiedUnit} from './iron-dust-unified-state-probe.mjs';
 
@@ -54,7 +56,9 @@ function ramPath(state, actor, target) {
 export function queryIronDustB1Action(state, command) {
   validateIronDustUnifiedStateProbe(state);
   if (!['source', 'adjacent', IRON_DUST_NEAR_CORE_FIXTURE_VERSION,
-    IRON_DUST_REST_OGRE_FIXTURE_VERSION].includes(state.fixture))
+    IRON_DUST_REST_OGRE_FIXTURE_VERSION, IRON_DUST_INFANTRY_FIRE_FIXTURE_VERSION,
+    IRON_DUST_CORE_ROSTER_FIRE_FIXTURE_VERSION,
+    IRON_DUST_BLOCKED_GEV_FIRE_FIXTURE_VERSION].includes(state.fixture))
     return deny('B1_FIXTURE_UNSUPPORTED');
   if (!command || typeof command.type !== 'string') return deny('B1_COMMAND_INVALID');
   const keys = command.type === 'EndPhase' ? ['type', 'playerId'] :

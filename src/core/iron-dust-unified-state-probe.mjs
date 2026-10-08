@@ -7,6 +7,9 @@ export const IRON_DUST_UNIFIED_STATE_VERSION = 'iron-dust-unified-state-probe-v1
 export const IRON_DUST_NEAR_CORE_FIXTURE_VERSION = 'iron-dust-near-core-fixture-v1';
 export const IRON_DUST_REST_OGRE_FIXTURE_VERSION = 'iron-dust-rest-ogre-fixture-v1';
 export const IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION = 'iron-dust-blocked-fire-fixture-v1';
+export const IRON_DUST_INFANTRY_FIRE_FIXTURE_VERSION = 'iron-dust-infantry-fire-fixture-v1';
+export const IRON_DUST_CORE_ROSTER_FIRE_FIXTURE_VERSION = 'iron-dust-core-roster-fire-fixture-v1';
+export const IRON_DUST_BLOCKED_GEV_FIRE_FIXTURE_VERSION = 'iron-dust-blocked-gev-fire-fixture-v1';
 export const IRON_DUST_FIRE_GEOMETRY_VERSION = 'iron-dust-legacy-fire-geometry-v1';
 const source = validateIronDustCoreDataV1(IRON_DUST_CORE_DATA_V1);
 const sourceOgre = source.units.find(unit => unit.id === 'ogre');
@@ -18,7 +21,12 @@ const fixtures = Object.freeze({source: {}, adjacent: {guard: {x: 2, y: 5}},
   [IRON_DUST_REST_OGRE_FIXTURE_VERSION]: {ogre: {x: 8, y: 4},
     gev: {hp: 0}, missile: {hp: 0}, infantry: {hp: 0}},
   boundary: {ogre: {x: 2, y: 0}, guard: {x: 6, y: 1}},
-  [IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION]: {ogre: {x: 3, y: 0}, guard: {x: 4, y: 1}}});
+  [IRON_DUST_BLOCKED_FIRE_FIXTURE_VERSION]: {ogre: {x: 3, y: 0}, guard: {x: 4, y: 1}},
+  [IRON_DUST_INFANTRY_FIRE_FIXTURE_VERSION]: {guard: {x: 1, y: 7}},
+  [IRON_DUST_CORE_ROSTER_FIRE_FIXTURE_VERSION]: {
+    gev: {x: 9, y: 2}, missile: {x: 9, y: 3}, infantry: {x: 10, y: 3}},
+  [IRON_DUST_BLOCKED_GEV_FIRE_FIXTURE_VERSION]: {gev: {x: 3, y: 0},
+    guard: {x: 4, y: 1}}});
 const clone = value => JSON.parse(JSON.stringify(value));
 const freeze = value => {
   if (value && typeof value === 'object') {
