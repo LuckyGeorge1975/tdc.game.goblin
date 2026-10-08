@@ -77,11 +77,18 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
   };
   const previous = {document:globalThis.document,location:globalThis.location,
     bridge:globalThis.IronDustBrowserV2,draw:globalThis.draw,
-    visuals:globalThis.UnitVisuals};
+    visuals:globalThis.UnitVisuals,language:globalThis.GoblinLanguage,
+    addEventListener:globalThis.addEventListener};
+  let locale = 'de';
+  const languageEvents = new Map();
+  const titles = {de:'IRON DUST v2 · PROFILANSICHT',en:'IRON DUST v2 · PROFILE VIEW',
+    es:'IRON DUST v2 · VISTA DEL PERFIL',fr:'IRON DUST v2 · VUE DU PROFIL'};
   globalThis.document = document;
   globalThis.location = {hostname:'localhost',search:'?iron-dust-v2-test=1'};
   globalThis.draw = () => {};
   globalThis.UnitVisuals = {terrainAssetFor:() => null,draw:() => {}};
+  globalThis.GoblinLanguage = {t:key => key === 'mission.iron-dust-v2.title' ? titles[locale] : key};
+  globalThis.addEventListener = (name,handler) => languageEvents.set(name,handler);
   globalThis.selected = null;
   globalThis.focusedCell = null;
   globalThis.phase = 'player';
@@ -107,6 +114,12 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     assert.equal(document.querySelector('#turn-number').textContent,'01');
     assert.equal(document.querySelector('#combat-log').children.length,1);
     const beforeViewClick = JSON.stringify(bridge.session.projection);
+    for (const language of ['de','en','es','fr','de']) {
+      locale = language;
+      languageEvents.get('goblin-language-change')();
+      assert.equal(document.querySelector('#mission-title').textContent,titles[language]);
+    }
+    assert.equal(JSON.stringify(bridge.session.projection),beforeViewClick);
     document.querySelector('#battlefield-map').children[5 * 12 + 1].click();
     assert.equal(document.querySelector('#unit-intel-title').textContent,'GOBLIN SIEGEBREAKER');
     assert.equal(JSON.stringify(bridge.session.projection),beforeViewClick);
@@ -139,6 +152,8 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     globalThis.IronDustBrowserV2 = previous.bridge;
     globalThis.draw = previous.draw;
     globalThis.UnitVisuals = previous.visuals;
+    globalThis.GoblinLanguage = previous.language;
+    globalThis.addEventListener = previous.addEventListener;
     delete globalThis.selected;
     delete globalThis.focusedCell;
     delete globalThis.phase;

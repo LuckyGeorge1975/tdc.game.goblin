@@ -170,9 +170,11 @@ export function renderIronDustV2View(view) {
   renderRoster(view, rerender);
   renderIntel(view);
   setText('#mission-kicker', 'IRON DUST v2 / INTERNAL TEST');
+  const titleKey = 'mission.iron-dust-v2.title';
+  const title = globalThis.GoblinLanguage?.t(titleKey);
   setText('#mission-title', view.victory.status === 'ended' ?
     view.victory.winner === 'player' ? 'MISSION COMPLETE' : 'MISSION FAILED' :
-    'Durchbrechen. Ausschalten. Überleben.');
+    title && title !== titleKey ? title : 'IRON DUST v2 · PROFILANSICHT');
   setText('#mission-sub', `${view.ruleProfileId} · ANSICHT · BEFEHLE GESPERRT`);
   setText('#objective-text', `CORE HP ${view.objective.coreHp}/${view.objective.coreMaxHp}`);
   document.querySelector('#objective-progress').style.width = `${view.objective.progress}%`;

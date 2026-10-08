@@ -40,6 +40,7 @@ if (typeof document !== 'undefined') {
     if (mode === 'ready') return renderCurrent();
     return legacyDraw(...args);
   };
+  globalThis.addEventListener?.('goblin-language-change', renderCurrent);
   function showGate(message) {
     document.body.classList.add('iron-dust-v2-gated');
     document.body.classList.remove('iron-dust-v2-ready');

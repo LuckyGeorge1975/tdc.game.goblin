@@ -471,6 +471,10 @@
     'map.grid': 'GRID',
   });
   const templates = Object.freeze({
+    'mission.iron-dust-v2.title': {
+      de: 'IRON DUST v2 · PROFILANSICHT', en: 'IRON DUST v2 · PROFILE VIEW',
+      es: 'IRON DUST v2 · VISTA DEL PERFIL', fr: 'IRON DUST v2 · VUE DU PROFIL',
+    },
     'phase.readyUnits': {
       de: { one: '{count} Einheit kann in dieser Phase noch handeln.', other: '{count} Einheiten können in dieser Phase noch handeln.' },
       en: { one: '{count} unit can still act in this phase.', other: '{count} units can still act in this phase.' },
