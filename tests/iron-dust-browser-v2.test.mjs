@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  createIronDustBrowserSession, IRON_DUST_V2_SELECTOR_ID,
+  createIronDustBrowserSession, dispatchIronDustBrowserAction,
+  IRON_DUST_V2_SELECTOR_ID,
   IRON_DUST_V2_START_SEED
 } from '../iron-dust-browser-v2.mjs';
-import {createIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
+import {createIronDustProfile, dispatchIronDustProfile,
+  projectIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
 import {buildIronDustV2View, renderIronDustV2View} from '../iron-dust-v2-view.mjs';
 
 test('v2 browser session has a fixed validated identity and rejects a changed header', () => {
@@ -36,6 +38,97 @@ test('v2 browser session has a fixed validated identity and rejects a changed he
   }), /IRON_DUST_PROFILE_MISMATCH/);
   assert.throws(() => createIronDustBrowserSession(createIronDustProfile(IRON_DUST_V2_START_SEED + 1)),
     /IRON_DUST_V2_START_INVALID/);
+});
+
+test('browser player commands use the profile and preserve rejected state', () => {
+  let session = createIronDustBrowserSession();
+  const apply = command => {
+    const result = dispatchIronDustBrowserAction(session, command);
+    assert.ok(result.session, JSON.stringify(result.error));
+    session = result.session;
+    return result;
+  };
+  const move = (unitId, x, y) => ({type:'Move', playerId:'player', unitId, to:{x, y}});
+  const end = {type:'EndPhase', playerId:'player'};
+  for (const [id, x, y] of [['ogre', 2, 5], ['gev', 2, 7],
+    ['missile', 4, 6], ['infantry', 0, 6]]) apply(move(id, x, y));
+  assert.equal(session.projection.state.units.filter(unit =>
+    unit.team === 'player' && unit.moved).length, 4);
+  const beforeReject = JSON.stringify(session);
+  assert.deepEqual(dispatchIronDustBrowserAction(session, move('ogre', 3, 5)),
+    {error:{code:'ACTION_SPENT'}});
+  assert.equal(JSON.stringify(session), beforeReject);
+  assert.deepEqual(dispatchIronDustBrowserAction(session,
+    {type:'AutoEnemyAdvance', playerId:'enemy'}),
+  {error:{code:'BROWSER_ACTION_UNSUPPORTED'}});
+  apply(end);
+  assert.equal(session.projection.state.phase, 'fire');
+  apply({type:'SelectWeapon', playerId:'player', unitId:'ogre', weaponKey:'secondary'});
+  assert.equal(session.projection.state.units.find(unit => unit.id === 'ogre')
+    .ogreSystems.selectedWeapon, 'secondary');
+  apply(end);
+  assert.equal(session.projection.state.phase, 'gev');
+  const second = [move('gev', 3, 7), move('gev', 2, 8), move('gev', 3, 6)]
+    .find(command => dispatchIronDustBrowserAction(session, command).session);
+  assert.ok(second);
+  apply(second);
+  assert.equal(session.projection.state.units.find(unit => unit.id === 'gev').secondMoved, true);
+  apply(end);
+  assert.equal(session.projection.mode, 'enemy');
+  assert.equal(session.projection.events.length > 0, true);
+});
+
+test('browser fire and ram use the same reachable source commands', () => {
+  const end = {type:'EndPhase', playerId:'player'};
+  const advance = {type:'AutoEnemyAdvance', playerId:'enemy'};
+  const move = (unitId, x, y) => ({type:'Move', playerId:'player', unitId, to:{x,y}});
+  function setup(seed) {
+    let profile = createIronDustProfile(seed);
+    return {
+      get session() {return {profile, projection:projectIronDustProfile(profile)};},
+      apply(command) {
+        const result = dispatchIronDustProfile(profile, command);
+        assert.ok(result.profile, JSON.stringify(result.error));
+        profile = result.profile;
+      },
+      enemy() {while (profile.entry.mode === 'enemy') this.apply(advance);}
+    };
+  }
+  const missile = setup(1);
+  missile.apply(move('missile',4,6));
+  for (let i=0;i<3;i++) missile.apply(end);
+  missile.enemy();
+  missile.apply(move('missile',4,5));
+  missile.apply(end);
+  const shot = dispatchIronDustBrowserAction(missile.session,
+    {type:'PlayerFire', playerId:'player', unitId:'missile', targetId:'guard'});
+  assert.equal(shot.session.projection.events[0].type,'PlayerFireResolved');
+  assert.equal(shot.session.projection.state.units.find(unit => unit.id === 'missile').fired,true);
+
+  const ram = setup(1);
+  for (const x of [3,6]) {
+    ram.apply(move('ogre',x,2));
+    for (let i=0;i<3;i++) ram.apply(end);
+    ram.enemy();
+  }
+  const impact = dispatchIronDustBrowserAction(ram.session,
+    {type:'Ram', playerId:'player', unitId:'ogre', targetId:'guard'});
+  assert.equal(impact.session.projection.events[0].type,'RamResolved');
+  assert.equal(impact.session.projection.state.units.find(unit => unit.id === 'guard').hp,0);
+
+  const ogre = setup(8);
+  for (const x of [3,6,9]) {
+    ogre.apply(move('ogre',x,2));
+    ogre.apply(end);
+    if (x === 9) break;
+    ogre.apply(end);
+    ogre.apply(end);
+    ogre.enemy();
+  }
+  const coreShot = dispatchIronDustBrowserAction(ogre.session,
+    {type:'PlayerFire', playerId:'player', unitId:'ogre', targetId:'core', weaponKey:'main'});
+  assert.equal(coreShot.session.projection.mode,'ended');
+  assert.equal(coreShot.session.projection.state.victory.winner,'player');
 });
 
 test('public host keeps the unfinished v2 option disabled', async () => {
@@ -137,6 +230,35 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     assert.equal(bridge.restart(),true);
     assert.notEqual(bridge.session.profile,first);
     assert.equal(bridge.session.profile.digest,first.digest);
+    const clickCell = (x,y) => {
+      const polygon = document.querySelector('#battlefield-map').children.find(node =>
+        node.dataset.x === String(x) && node.dataset.y === String(y));
+      assert.ok(polygon, `${x},${y}`);
+      polygon.click();
+    };
+    document.querySelector('#battlefield-map').children
+      .find(node => node.dataset.unitId === 'ogre').click();
+    clickCell(2,5);
+    assert.equal(bridge.session.projection.state.units.find(unit => unit.id === 'ogre').x,2);
+    assert.equal(globalThis.gameOver,true);
+    assert.equal(globalThis.selected,null);
+    const beforeReject = JSON.stringify(bridge.session);
+    assert.deepEqual(bridge.dispatch({type:'Move', playerId:'player', unitId:'ogre',
+      to:{x:3,y:5}}),{error:{code:'ACTION_SPENT'}});
+    assert.equal(JSON.stringify(bridge.session),beforeReject);
+    assert.match(document.querySelector('#map-toast').textContent,/ACTION_SPENT/);
+    assert.equal(document.querySelector('#undo-command').disabled,true);
+    assert.match(document.querySelector('#undo-command').title,/nicht verfügbar/);
+    document.querySelector('#end-turn').onclick();
+    assert.equal(bridge.session.projection.state.phase,'fire');
+    assert.equal(document.querySelector('#weapon-controls').children.length,4);
+    document.querySelector('#weapon-controls').children[1].click();
+    assert.equal(bridge.session.projection.state.units.find(unit => unit.id === 'ogre')
+      .ogreSystems.selectedWeapon,'secondary');
+    const beforeBadShot = JSON.stringify(bridge.session);
+    clickCell(8,3);
+    assert.equal(JSON.stringify(bridge.session),beforeBadShot);
+    assert.match(document.querySelector('#map-toast').textContent,/ABGELEHNT/);
     assert.equal(bridge.start({...first, header:{...first.header, ruleProfileId:'BAD'}}),false);
     assert.equal(bridge.mode,'error');
     assert.equal(bridge.session,null);

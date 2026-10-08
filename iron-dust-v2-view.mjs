@@ -38,7 +38,11 @@ export function buildIronDustV2View(projection, ruleProfileId) {
     secondMoved:unit.secondMoved, embarkedOn:unit.embarkedOn,
     terrain:terrain.get(`${unit.x},${unit.y}`) ?? state.map.defaultTerrain,
     treads:unit.ogreSystems?.treads ?? null,
-    selectedWeapon:unit.ogreSystems?.selectedWeapon ?? null
+    selectedWeapon:unit.ogreSystems?.selectedWeapon ?? null,
+    weapons:unit.ogreSystems ? Object.fromEntries(Object.entries(unit.ogreSystems.weapons)
+      .map(([key, weapon]) => [key, {label:weapon.label, attack:weapon.attack,
+        range:weapon.range, ready:globalThis.GoblinSystems?.weaponReady(weapon) ??
+          Math.max(0, weapon.remaining - weapon.firedThisPhase)}])) : null
   }));
   const core = units.find(unit => unit.id === 'core');
   return {
@@ -67,13 +71,13 @@ function renderIntel(view) {
   const unit = view.units.find(item => item.id === selectedUnitId);
   const cell = selectedCell && view.cells.find(item =>
     item.x === selectedCell.x && item.y === selectedCell.y);
-  setText('#selection-readout', unit ? `${unit.name} · ${cellLabel(unit.x, unit.y)} · ANSICHT` :
-    'EINHEIT ODER FELD ANSEHEN · AKTIONEN GESPERRT');
+  setText('#selection-readout', unit ? `${unit.name} · ${cellLabel(unit.x, unit.y)} · ${unit.team === 'player' ? 'BEREIT' : 'ANSICHT'}` :
+    'EINHEIT ODER FELD WÄHLEN');
   setText('#unit-intel-kicker', unit?.team === 'enemy' ? 'HOSTILE INTEL' : 'UNIT INTEL');
   setText('#unit-intel-title', unit?.name ?? 'NO UNIT SELECTED');
   setText('#unit-intel-copy', unit ?
     `${unit.type} · ${unit.team.toUpperCase()} · SECTOR ${cellLabel(unit.x, unit.y)}` :
-    'V2-Profilansicht; Befehle sind in diesem Teststand gesperrt.');
+    'IRON DUST v2: eigene Einheit für Befehle wählen.');
   renderFacts(unit ? [
     ['HP', `${unit.hp}/${unit.maxHp}`], ['DEFENSE', unit.defense],
     ['MOVE / RANGE', `${unit.move ?? '—'} / ${unit.range ?? '—'}`],
@@ -93,7 +97,7 @@ function renderRoster(view, rerender) {
     const card = element('div', `unit-card ${unit.id === 'ogre' ? 'ogre' : ''}${unit.hp <= 0 ? ' destroyed' : ''}`);
     card.tabIndex = 0;
     card.setAttribute('role', 'button');
-    card.setAttribute('aria-label', `${unit.name} ansehen`);
+    card.setAttribute('aria-label', `${unit.name} auswählen`);
     const token = element('div', 'unit-token', unit.hp <= 0 ? '×' : unit.icon);
     const name = element('div');
     name.append(element('span', 'unit-name', unit.name),
@@ -111,23 +115,39 @@ function renderRoster(view, rerender) {
   setText('#force-count', String(view.units.filter(unit => unit.team === 'player' && unit.hp > 0).length).padStart(2, '0'));
 }
 
-function renderMap(view, rerender) {
+function renderMap(view, rerender, onAction) {
   const map = document.querySelector('#battlefield-map');
   map.setAttribute('viewBox', '0 0 790 480');
   map.replaceChildren();
+  const activateCell = cell => {
+    const occupant = view.units.find(unit => unit.hp > 0 && unit.x === cell.x && unit.y === cell.y);
+    const actor = view.units.find(unit => unit.id === selectedUnitId && unit.team === 'player' && unit.hp > 0);
+    if (onAction && actor && view.mode === 'player' &&
+        (view.phase === 'movement' || view.phase === 'gev' || view.phase === 'fire') &&
+        (!occupant || occupant.team === 'enemy')) {
+      const command = occupant ? view.phase === 'fire' ?
+        {type:'PlayerFire', playerId:'player', unitId:actor.id,
+          targetId:occupant.id, ...(actor.id === 'ogre' ? {weaponKey:actor.selectedWeapon} : {})} :
+        {type:'Ram', playerId:'player', unitId:actor.id, targetId:occupant.id} :
+        {type:'Move', playerId:'player', unitId:actor.id, to:{x:cell.x, y:cell.y}};
+      onAction(command);
+      return;
+    }
+    selectedCell = {x:cell.x, y:cell.y};
+    selectedUnitId = occupant?.id ?? null;
+    rerender();
+  };
   for (const cell of view.cells) {
     const polygon = svgElement('polygon');
+    polygon.dataset.x = String(cell.x);
+    polygon.dataset.y = String(cell.y);
     polygon.setAttribute('points', points(cell.x, cell.y));
     polygon.setAttribute('fill', cell.type === 'open-ground' ? '#0e2022' : '#243d3a');
     polygon.setAttribute('stroke', '#2d464b');
     polygon.classList.add('hex');
     if (selectedCell?.x === cell.x && selectedCell?.y === cell.y)
       polygon.setAttribute('stroke', '#d1f35a');
-    polygon.addEventListener('click', () => {
-      selectedCell = {x:cell.x, y:cell.y};
-      selectedUnitId = view.units.find(unit => unit.hp > 0 && unit.x === cell.x && unit.y === cell.y)?.id ?? null;
-      rerender();
-    });
+    polygon.addEventListener('click', () => activateCell(cell));
     map.appendChild(polygon);
     const asset = globalThis.UnitVisuals.terrainAssetFor(cell.type);
     if (asset && cell.type !== 'open-ground') {
@@ -142,6 +162,11 @@ function renderMap(view, rerender) {
   for (const unit of view.units) {
     const c = center(unit.x, unit.y), group = svgElement('g');
     group.classList.add('unit-svg');
+    group.dataset.unitId = unit.id;
+    group.addEventListener('click', event => {
+      event?.stopPropagation?.();
+      activateCell(unit);
+    });
     if (unit.hp <= 0) {
       const wreck = svgElement('text');
       wreck.setAttribute('x', c.x); wreck.setAttribute('y', c.y + 5);
@@ -162,20 +187,39 @@ function renderMap(view, rerender) {
   }
 }
 
+function renderWeapons(view, onAction) {
+  const panel = document.querySelector('#weapon-controls');
+  const actor = view.units.find(unit => unit.id === selectedUnitId && unit.team === 'player');
+  panel.replaceChildren();
+  panel.classList.toggle('hidden', !onAction || actor?.id !== 'ogre' || view.phase !== 'fire');
+  if (!onAction || actor?.id !== 'ogre' || view.phase !== 'fire') return;
+  for (const [key, weapon] of Object.entries(actor.weapons)) {
+    const button = element('button', `weapon-control${key === actor.selectedWeapon ? ' active' : ''}`);
+    button.type = 'button';
+    button.disabled = weapon.ready <= 0;
+    button.textContent = `${weapon.label} · A${weapon.attack} · R${weapon.range} · READY ${weapon.ready}`;
+    button.addEventListener('click', () => onAction({type:'SelectWeapon', playerId:'player',
+      unitId:'ogre', weaponKey:key}));
+    panel.appendChild(button);
+  }
+}
+
 export function resetIronDustV2View() {selectedUnitId = null; selectedCell = null;}
 
-export function renderIronDustV2View(view) {
-  const rerender = () => renderIronDustV2View(view);
-  renderMap(view, rerender);
+export function renderIronDustV2View(view, {onAction = null, actionError = null} = {}) {
+  const rerender = () => renderIronDustV2View(view, {onAction, actionError});
+  renderMap(view, rerender, onAction);
   renderRoster(view, rerender);
   renderIntel(view);
+  renderWeapons(view, onAction);
   setText('#mission-kicker', 'IRON DUST v2 / INTERNAL TEST');
   const titleKey = 'mission.iron-dust-v2.title';
   const title = globalThis.GoblinLanguage?.t(titleKey);
   setText('#mission-title', view.victory.status === 'ended' ?
     view.victory.winner === 'player' ? 'MISSION COMPLETE' : 'MISSION FAILED' :
     title && title !== titleKey ? title : 'IRON DUST v2 · PROFILANSICHT');
-  setText('#mission-sub', `${view.ruleProfileId} · ANSICHT · BEFEHLE GESPERRT`);
+  setText('#mission-sub', `${view.ruleProfileId} · ${view.mode === 'enemy' ?
+    'GEGNERZUG FOLGT IM NÄCHSTEN TESTABSCHNITT' : 'LOKALER AKTIONSTEST'}`);
   setText('#objective-text', `CORE HP ${view.objective.coreHp}/${view.objective.coreMaxHp}`);
   document.querySelector('#objective-progress').style.width = `${view.objective.progress}%`;
   const phase = view.victory.status === 'ended' ?
@@ -191,7 +235,13 @@ export function renderIronDustV2View(view) {
     node.classList.toggle('active', view.phase === phaseName);
   }
   setText('#log-status', view.victory.status === 'ended' ?
-    view.victory.winner === 'player' ? 'SUCCESS' : 'CRITICAL' : 'VIEW ONLY');
+    view.victory.winner === 'player' ? 'SUCCESS' : 'CRITICAL' :
+    actionError ? `REJECT · ${actionError}` : 'PROFILE ACTIVE');
+  const toast = document.querySelector('#map-toast');
+  toast.textContent = actionError ? `BEFEHL ABGELEHNT · ${actionError}` :
+    view.mode === 'enemy' ? 'GEGNERZUG IN DIESER TEILPROBE GESPERRT' :
+      view.victory.status === 'ended' ? 'MISSION BEENDET' :
+        `${view.phase.toUpperCase()} · EINHEIT WÄHLEN`;
   const log = document.querySelector('#combat-log');
   log.replaceChildren(...(view.events.length ? view.events.map(event =>
     element('div', 'log-line', `${event.type} · ${event.actorId ?? '—'} → ${event.targetId ?? '—'}`)) :

@@ -1,11 +1,12 @@
 import {
   createIronDustProfile, validateIronDustProfile, projectIronDustProfile,
+  queryIronDustProfile, preflightIronDustProfile, dispatchIronDustProfile,
   IRON_DUST_PROFILE_HEADER
 } from './src/core/iron-dust-executable-profile.mjs';
 import {buildIronDustV2View, renderIronDustV2View,
   resetIronDustV2View} from './iron-dust-v2-view.mjs';
 
-// This bridge only opens the validated profile. Rendering and actions follow in later slices.
+// Browser commands cross the same validated profile boundary as the Core probes.
 export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';
 export const IRON_DUST_V2_START_SEED = 0x1d057;
 
@@ -22,6 +23,20 @@ export function createIronDustBrowserSession(profile = createIronDustProfile(IRO
   return Object.freeze({profile, projection});
 }
 
+export function dispatchIronDustBrowserAction(session, command) {
+  if (!['Move', 'Ram', 'SelectWeapon', 'PlayerFire', 'EndPhase'].includes(command?.type))
+    return {error:{code:'BROWSER_ACTION_UNSUPPORTED'}};
+  const query = queryIronDustProfile(session.profile, command);
+  const preflight = preflightIronDustProfile(session.profile, command);
+  if (JSON.stringify(query) !== JSON.stringify(preflight))
+    return {error:{code:'IRON_DUST_PREFLIGHT_MISMATCH'}};
+  if (!query.available) return {error:query.error};
+  const result = dispatchIronDustProfile(session.profile, command);
+  if (!result.profile) return {error:result.error};
+  return {session:Object.freeze({profile:result.profile,
+    projection:projectIronDustProfile(result.profile, result.events)})};
+}
+
 if (typeof document !== 'undefined') {
   const option = document.querySelector('#scenario-select option[value="iron-dust-v2"]');
   const localTest = ['localhost', '127.0.0.1'].includes(location.hostname) &&
@@ -30,10 +45,27 @@ if (typeof document !== 'undefined') {
 
   let session = null;
   let mode = 'inactive';
+  let actionError = null;
+  const endButton = document.querySelector('#end-turn');
+  const legacyEndClick = endButton.onclick;
   function renderCurrent() {
     if (mode !== 'ready' || !session) return;
     renderIronDustV2View(buildIronDustV2View(session.projection,
-      session.profile.header.ruleProfileId));
+      session.profile.header.ruleProfileId), {onAction:dispatchAction, actionError});
+    endButton.disabled = session.projection.mode !== 'player';
+    endButton.textContent = session.projection.state.phase === 'gev' ?
+      'END TURN' : 'NEXT PHASE';
+    const undo = document.querySelector('#undo-command');
+    undo.disabled = true;
+    undo.title = 'IRON DUST v2: Rückgängig ist noch nicht verfügbar';
+  }
+  function dispatchAction(command) {
+    if (mode !== 'ready' || !session) return {error:{code:'V2_NOT_READY'}};
+    const result = dispatchIronDustBrowserAction(session, command);
+    if (result.session) session = result.session;
+    actionError = result.error?.code ?? null;
+    renderCurrent();
+    return result;
   }
   const legacyDraw = draw;
   draw = function(...args) {
@@ -71,9 +103,11 @@ if (typeof document !== 'undefined') {
       session = createIronDustBrowserSession(profile);
       mode = 'ready';
       showGate('V2-Profil validiert. Spielfläche bis zum vollständigen Browser-Gate gesperrt.');
+      actionError = null;
       resetIronDustV2View();
-      renderCurrent();
       document.body.classList.add('iron-dust-v2-ready');
+      endButton.onclick = () => dispatchAction({type:'EndPhase', playerId:'player'});
+      renderCurrent();
     } catch (error) {
       session = null;
       mode = 'error';
@@ -84,6 +118,8 @@ if (typeof document !== 'undefined') {
   function stop() {
     session = null;
     mode = 'inactive';
+    actionError = null;
+    endButton.onclick = legacyEndClick;
     document.body.classList.remove('iron-dust-v2-gated');
     document.body.classList.remove('iron-dust-v2-ready');
     resetIronDustV2View();
@@ -100,6 +136,7 @@ if (typeof document !== 'undefined') {
     get active() { return mode !== 'inactive'; },
     get mode() { return mode; },
     get session() { return session; },
+    dispatch: dispatchAction,
     start, restart: () => start(), stop
   });
 }
