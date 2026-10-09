@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
+import {formatIronDustV2Event, formatIronDustV2Error} from '../iron-dust-v2-view.mjs';
 
 test('phase fixture instructions and Skimmer phase displays translate without visible GEV jargon', () => {
   const source = readFileSync(new URL('../localization.js', import.meta.url), 'utf8');
@@ -43,4 +44,29 @@ test('phase fixture instructions and Skimmer phase displays translate without vi
     assert.equal(context.GoblinLanguage.t('mission.iron-dust-v2.title', {}, lang), title);
     assert.notEqual(title, context.GoblinLanguage.translate('Durchbrechen. Ausschalten. Überleben.', lang));
   }
+  const previousLanguage=globalThis.GoblinLanguage;
+  const events=['UnitMoved','EnemyMoved','EnemyHeld','EnemySkipped','UnitRecovered',
+    'PhaseChanged','EnemyPassRecorded','PlayerFireResolved','EnemySystemFireResolved',
+    'EnemyUnitFireResolved','RamResolved','WeaponSelected','IronDustGameEnded'];
+  const sample=Object.freeze({type:'EnemySystemFireResolved',actorId:'guard',targetId:'ogre'});
+  const before=JSON.stringify(sample);
+  try {
+    for(const lang of Object.keys(v2Titles)){
+      globalThis.GoblinLanguage={t:(key,params)=>context.GoblinLanguage.t(key,params,lang)};
+      for(const type of events){
+        const text=formatIronDustV2Event({...sample,type});
+        assert.ok(text.length>5,`${lang} ${type}`);
+        assert.doesNotMatch(text,/EnemySystemFireResolved|EnemyPassRecorded|UnitMoved|\bogre\b|\bguard\b/);
+        assert.doesNotMatch(text,/^v2\./);
+      }
+      assert.doesNotMatch(formatIronDustV2Event({type:'FutureEvent',actorId:'mystery'}),
+        /FutureEvent|mystery|^v2\./);
+      for(const code of ['GAME_ENDED','ACTION_SPENT','WRONG_PHASE','UNREACHABLE',
+        'WEAPON_OUT_OF_RANGE','WEAPON_SIGHT_BLOCKED','UNKNOWN_CODE']){
+        const text=formatIronDustV2Error(code);
+        assert.doesNotMatch(text,/GAME_ENDED|ACTION_SPENT|WRONG_PHASE|UNREACHABLE|WEAPON_|UNKNOWN_CODE|^v2\./);
+      }
+    }
+    assert.equal(JSON.stringify(sample),before);
+  } finally {globalThis.GoblinLanguage=previousLanguage;}
 });

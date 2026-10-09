@@ -264,7 +264,15 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
   globalThis.UnitVisuals = {terrainAssetFor:() => null,draw:() => {}};
   globalThis.GoblinLanguage = {t:key => key === 'mission.iron-dust-v2.title' ? titles[locale] :
     ({'v2.phase.movement':'BEWEGUNG','v2.phase.fire':'FEUER','v2.lose':'MISSION GESCHEITERT',
-      'v2.error':'BEFEHL ABGELEHNT','v2.undo':'Rückgängig ist nicht verfügbar.'})[key] ?? key};
+      'v2.error':'BEFEHL ABGELEHNT','v2.undo':'Rückgängig ist nicht verfügbar.',
+      'v2.reject.spent':'Diese Einheit hat ihre Aktion bereits genutzt.',
+      'v2.reject.range':'Das Ziel ist außer Reichweite.',
+      'v2.reject.target':'Dieses Ziel kann nicht angegriffen werden.',
+      'v2.reject.ended':'Die Mission ist beendet.',
+      'v2.reject.start':'IRON DUST v2 konnte nicht gestartet werden.',
+      'v2.unit.ogre':'Siegebreaker','v2.unit.core':'Kommandokern',
+      'v2.event.UnitMoved':'Siegebreaker bewegt sich.',
+      'v2.event.EnemyPassRecorded':'Gegnerzug wird fortgesetzt.'})[key] ?? key};
   globalThis.addEventListener = (name,handler) => languageEvents.set(name,handler);
   globalThis.selected = null;
   globalThis.focusedCell = null;
@@ -330,7 +338,7 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     assert.deepEqual(bridge.dispatch({type:'Move', playerId:'player', unitId:'ogre',
       to:{x:3,y:5}}),{error:{code:'ACTION_SPENT'}});
     assert.equal(JSON.stringify(bridge.session),beforeReject);
-    assert.match(document.querySelector('#map-toast').textContent,/ACTION_SPENT/);
+    assert.match(document.querySelector('#map-toast').textContent,/Aktion bereits genutzt/);
     assert.equal(document.querySelector('#undo-command').disabled,true);
     assert.match(document.querySelector('#undo-command').title,/nicht verfügbar/);
     document.querySelector('#end-turn').onclick();
@@ -342,7 +350,7 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     const beforeBadShot = JSON.stringify(bridge.session);
     clickCell(8,3);
     assert.equal(JSON.stringify(bridge.session),beforeBadShot);
-    assert.match(document.querySelector('#map-toast').textContent,/ABGELEHNT/);
+    assert.match(document.querySelector('#map-toast').textContent,/außer Reichweite/);
     assert.equal(bridge.restart(),true);
     for (let i=0;i<3;i++) bridge.dispatch({type:'EndPhase',playerId:'player'});
     assert.equal(bridge.session.projection.mode,'enemy');
@@ -363,11 +371,15 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     assert.equal(bridge.session.projection.mode,'player');
     assert.equal(bridge.session.projection.state.turn,2);
     assert.ok(document.querySelector('#combat-log').children.some(line =>
-      line.textContent.includes('FIRST')));
-    assert.ok(document.querySelector('#combat-log').children.some(line =>
-      line.textContent.includes('RETRY')));
-    assert.ok(document.querySelector('#combat-log').children.some(line =>
-      line.textContent.includes('FINISH')));
+      line.textContent.includes('Gegnerzug wird fortgesetzt')));
+    assert.ok(document.querySelector('#combat-log').children.every(line =>
+      !/EnemyPassRecorded|FIRST|RETRY|FINISH/.test(line.textContent)));
+    const afterEnemy=JSON.stringify(bridge.session);
+    for(const language of ['en','es','fr','de']){
+      locale=language;
+      languageEvents.get('goblin-language-change')();
+      assert.equal(JSON.stringify(bridge.session),afterEnemy);
+    }
     assert.equal(bridge.restart(),true);
     for (let i=0;i<3;i++) bridge.dispatch({type:'EndPhase',playerId:'player'});
     const abandoned = JSON.stringify(bridge.session);
@@ -403,7 +415,7 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     assert.equal(bridge.start({...first, header:{...first.header, ruleProfileId:'BAD'}}),false);
     assert.equal(bridge.mode,'error');
     assert.equal(bridge.session,null);
-    assert.match(document.querySelector('#mission-sub').textContent,/IRON DUST v2:/);
+    assert.match(document.querySelector('#mission-sub').textContent,/konnte nicht gestartet werden/);
     assert.equal(document.body.classList.contains('iron-dust-v2-gated'),true);
     assert.equal(document.body.classList.contains('iron-dust-v2-ready'),false);
     bridge.stop();

@@ -143,7 +143,7 @@ if (typeof document !== 'undefined') {
     document.querySelector('#mission-sub').textContent = message;
     document.querySelector('#objective-text').textContent = globalThis.GoblinLanguage?.t('v2.objective') ?? 'IRON DUST v2';
     document.querySelector('#objective-progress').style.width = '0%';
-    document.querySelector('#phase-title').textContent = 'START ERROR';
+    document.querySelector('#phase-title').textContent = message;
     document.querySelector('#end-turn').disabled = true;
     document.querySelector('#auto-end-turn').disabled = true;
     document.querySelector('#undo-command').disabled = true;
@@ -176,10 +176,11 @@ if (typeof document !== 'undefined') {
       document.querySelector('#unit-guide-open').disabled = false;
       endButton.onclick = () => dispatchAction({type:'EndPhase', playerId:'player'});
       renderCurrent();
-    } catch (error) {
+    } catch {
       session = null;
       mode = 'error';
-      showGate(`IRON DUST v2: ${error.code || error.message || 'START_ERROR'}`);
+      showGate(globalThis.GoblinLanguage?.t('v2.reject.start') ??
+        'IRON DUST v2 could not start.');
     }
     return mode === 'ready';
   }

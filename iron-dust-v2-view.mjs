@@ -23,6 +23,35 @@ const element = (tag, className, text) => {
 const svgElement = tag => document.createElementNS(SVG_NS, tag);
 const setText = (selector, value) => { document.querySelector(selector).textContent = value; };
 const t = key => globalThis.GoblinLanguage?.t(key) ?? key;
+const visibleEvents = new Set(['UnitMoved', 'EnemyMoved', 'EnemyHeld',
+  'EnemySkipped', 'UnitRecovered', 'PhaseChanged', 'EnemyPassRecorded',
+  'PlayerFireResolved', 'EnemySystemFireResolved', 'EnemyUnitFireResolved',
+  'RamResolved', 'WeaponSelected', 'IronDustGameEnded']);
+const unitLabel = id => {
+  const key = `v2.unit.${id}`;
+  const label = t(key);
+  return label === key ? t('v2.unit.unknown') : label;
+};
+export function formatIronDustV2Event(event) {
+  const key = visibleEvents.has(event?.type) ? `v2.event.${event.type}` :
+    'v2.event.unknown';
+  return globalThis.GoblinLanguage?.t(key, {actor:unitLabel(event?.actorId),
+    target:unitLabel(event?.targetId)}) ?? key;
+}
+export function formatIronDustV2Error(code) {
+  const category = code === 'GAME_ENDED' ? 'ended' :
+    code === 'ENEMY_TURN_RUNNING' || code === 'ENEMY_TURN_AUTOMATED' ? 'enemy' :
+    code === 'WRONG_PHASE' || code === 'RAM_WRONG_PHASE' ||
+      code === 'NOT_ACTIVE_TEAM' ? 'phase' :
+    code === 'ACTION_SPENT' || code === 'RAM_ACTION_SPENT' ? 'spent' :
+    code?.includes('OUT_OF_RANGE') ? 'range' :
+    code?.includes('SIGHT_BLOCKED') ? 'sight' :
+    ['UNREACHABLE', 'OUT_OF_BOUNDS', 'RAM_PATH_BLOCKED'].includes(code) ? 'path' :
+    code?.startsWith('WEAPON_') ? 'weapon' :
+    code?.includes('TARGET_') || code === 'RAM_CORE_FORBIDDEN' ? 'target' :
+    code?.includes('UNAVAILABLE') ? 'unavailable' : 'generic';
+  return t(`v2.reject.${category}`);
+}
 
 export function buildIronDustV2View(projection, ruleProfileId,
   events = projection.events) {
@@ -242,17 +271,14 @@ export function renderIronDustV2View(view, {onAction = null, actionError = null}
   }
   setText('#log-status', view.victory.status === 'ended' ?
     view.victory.winner === 'player' ? 'SUCCESS' : 'CRITICAL' :
-    actionError ? `${t('v2.error')} · ${actionError}` : 'IRON DUST v2');
+    actionError ? t('v2.error') : 'IRON DUST v2');
   const toast = document.querySelector('#map-toast');
-  toast.textContent = actionError ? `${t('v2.error')} · ${actionError}` :
+  toast.textContent = actionError ? formatIronDustV2Error(actionError) :
     view.mode === 'enemy' ? t('v2.enemy') :
       view.victory.status === 'ended' ? t('v2.ended') :
         `${t(`v2.phase.${view.phase}`)} · ${t('v2.select')}`;
   const log = document.querySelector('#combat-log');
   log.replaceChildren(...(view.events.length ? view.events.map(event =>
-    element('div', 'log-line', `${event.cursorPass ? event.cursorPass === 'finish' ?
-      'FINISH · ' : `${event.cursorPass.toUpperCase()} ${event.cursorIndex + 1}/2 · ` :
-      ''}${event.type} · ${
-      event.actorId ?? '—'} → ${event.targetId ?? '—'}`)) :
+    element('div', 'log-line', formatIronDustV2Event(event))) :
     [element('div', 'log-line', t('v2.objective'))]));
 }
