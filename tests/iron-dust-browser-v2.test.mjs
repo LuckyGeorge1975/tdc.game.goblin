@@ -41,6 +41,12 @@ test('v2 browser session has a fixed validated identity and rejects a changed he
   }), /IRON_DUST_PROFILE_MISMATCH/);
   assert.throws(() => createIronDustBrowserSession(createIronDustProfile(IRON_DUST_V2_START_SEED + 1)),
     /IRON_DUST_V2_START_INVALID/);
+  const defeatStart=createIronDustBrowserSession(createIronDustProfile(2),2);
+  assert.equal(defeatStart.projection.state.turn,1);
+  assert.equal(defeatStart.projection.mode,'player');
+  assert.equal(defeatStart.projection.state.rng.seed,2);
+  assert.throws(() => createIronDustBrowserSession(defeatStart.profile),
+    /IRON_DUST_V2_START_INVALID/);
 });
 
 test('browser player commands use the profile and preserve rejected state', () => {
@@ -250,13 +256,15 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     addEventListener:globalThis.addEventListener};
   let locale = 'de';
   const languageEvents = new Map();
-  const titles = {de:'IRON DUST v2 · PROFILANSICHT',en:'IRON DUST v2 · PROFILE VIEW',
-    es:'IRON DUST v2 · VISTA DEL PERFIL',fr:'IRON DUST v2 · VUE DU PROFIL'};
+  const titles = {de:'IRON DUST v2 · LOKAL',en:'IRON DUST v2 · LOCAL',
+    es:'IRON DUST v2 · LOCAL',fr:'IRON DUST v2 · LOCAL'};
   globalThis.document = document;
   globalThis.location = {hostname:'localhost',search:'?iron-dust-v2-test=1'};
   globalThis.draw = () => {};
   globalThis.UnitVisuals = {terrainAssetFor:() => null,draw:() => {}};
-  globalThis.GoblinLanguage = {t:key => key === 'mission.iron-dust-v2.title' ? titles[locale] : key};
+  globalThis.GoblinLanguage = {t:key => key === 'mission.iron-dust-v2.title' ? titles[locale] :
+    ({'v2.phase.movement':'BEWEGUNG','v2.phase.fire':'FEUER','v2.lose':'MISSION GESCHEITERT',
+      'v2.error':'BEFEHL ABGELEHNT','v2.undo':'Rückgängig ist nicht verfügbar.'})[key] ?? key};
   globalThis.addEventListener = (name,handler) => languageEvents.set(name,handler);
   globalThis.selected = null;
   globalThis.focusedCell = null;
@@ -273,13 +281,13 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     assert.equal(bridge.mode,'ready');
     assert.equal(globalThis.currentScenario,'iron-dust-v2');
     assert.equal(globalThis.gameOver,true);
-    assert.equal(document.body.classList.contains('iron-dust-v2-gated'),true);
+    assert.equal(document.body.classList.contains('iron-dust-v2-gated'),false);
     assert.equal(document.body.classList.contains('iron-dust-v2-ready'),true);
     assert.equal(document.querySelector('#battlefield-map').children.length,103);
     assert.equal(document.querySelector('#unit-roster').children.length,4);
-    assert.equal(document.querySelector('#mission-sub').textContent.includes('CORE_IRON_DUST_v2'),true);
-    assert.equal(document.querySelector('#objective-text').textContent,'CORE HP 5/5');
-    assert.equal(document.querySelector('#phase-title').textContent,'MOVEMENT PHASE');
+    assert.equal(document.querySelector('#mission-sub').textContent,'v2.objective');
+    assert.equal(document.querySelector('#objective-text').textContent,'CORE HP 5/5 · v2.objective');
+    assert.equal(document.querySelector('#phase-title').textContent,'BEWEGUNG');
     assert.equal(document.querySelector('#turn-number').textContent,'01');
     assert.equal(document.querySelector('#combat-log').children.length,1);
     const beforeViewClick = JSON.stringify(bridge.session.projection);
@@ -296,12 +304,12 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
       state:{...bridge.session.projection.state, victory:{status:'ended',winner:'enemy'}},
       events:[{type:'EnemySkipped', actorId:'guard'}]},
     bridge.session.profile.header.ruleProfileId));
-    assert.equal(document.querySelector('#phase-title').textContent,'MISSION FAILED');
+    assert.equal(document.querySelector('#phase-title').textContent,'MISSION GESCHEITERT');
     assert.equal(document.querySelector('#log-status').textContent,'CRITICAL');
     assert.equal(document.querySelector('#combat-log').children.length,1);
     assert.equal(JSON.stringify(bridge.session.projection),beforeViewClick);
     globalThis.draw();
-    assert.equal(document.querySelector('#phase-title').textContent,'MOVEMENT PHASE');
+    assert.equal(document.querySelector('#phase-title').textContent,'BEWEGUNG');
     const first = bridge.session.profile;
     assert.equal(bridge.restart(),true);
     assert.notEqual(bridge.session.profile,first);
@@ -370,10 +378,32 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     assert.equal(bridge.enemyRunning,false);
     assert.equal(globalThis.currentScenario,'iron-dust-v2');
     assert.ok(abandoned.includes('"mode":"enemy"'));
+    assert.equal(bridge.start(),true);
+    for(const x of [3,6,9]){
+      document.querySelector('#battlefield-map').children
+        .find(node => node.dataset.unitId === 'ogre').click();
+      clickCell(x,2);
+      assert.equal(bridge.session.projection.state.units.find(unit=>unit.id==='ogre').x,x);
+      document.querySelector('#end-turn').onclick();
+      if(x===9)break;
+      document.querySelector('#end-turn').onclick();
+      document.querySelector('#end-turn').onclick();
+      for(let i=0;i<30&&bridge.enemyRunning;i++)
+        await new Promise(resolve=>setTimeout(resolve,40));
+      assert.equal(bridge.session.projection.mode,'player');
+    }
+    document.querySelector('#battlefield-map').children
+      .find(node=>node.dataset.unitId==='core').click();
+    assert.equal(bridge.session.projection.mode,'ended');
+    assert.equal(bridge.session.projection.state.victory.winner,'player');
+    assert.equal(document.querySelector('#end-turn').disabled,true);
+    assert.equal(document.querySelector('#weapon-controls').children.length,0);
+    assert.equal(bridge.dispatch({type:'EndPhase',playerId:'player'}).error.code,'GAME_ENDED');
+    bridge.stop();
     assert.equal(bridge.start({...first, header:{...first.header, ruleProfileId:'BAD'}}),false);
     assert.equal(bridge.mode,'error');
     assert.equal(bridge.session,null);
-    assert.match(document.querySelector('#mission-sub').textContent,/V2-Start gesperrt/);
+    assert.match(document.querySelector('#mission-sub').textContent,/IRON DUST v2:/);
     assert.equal(document.body.classList.contains('iron-dust-v2-gated'),true);
     assert.equal(document.body.classList.contains('iron-dust-v2-ready'),false);
     bridge.stop();

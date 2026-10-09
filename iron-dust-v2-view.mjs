@@ -22,6 +22,7 @@ const element = (tag, className, text) => {
 };
 const svgElement = tag => document.createElementNS(SVG_NS, tag);
 const setText = (selector, value) => { document.querySelector(selector).textContent = value; };
+const t = key => globalThis.GoblinLanguage?.t(key) ?? key;
 
 export function buildIronDustV2View(projection, ruleProfileId,
   events = projection.events) {
@@ -217,21 +218,19 @@ export function renderIronDustV2View(view, {onAction = null, actionError = null}
   renderRoster(view, rerender);
   renderIntel(view);
   renderWeapons(view, onAction);
-  setText('#mission-kicker', 'IRON DUST v2 / INTERNAL TEST');
+  setText('#mission-kicker', 'IRON DUST v2 · LOCAL');
   const titleKey = 'mission.iron-dust-v2.title';
   const title = globalThis.GoblinLanguage?.t(titleKey);
   setText('#mission-title', view.victory.status === 'ended' ?
-    view.victory.winner === 'player' ? 'MISSION COMPLETE' : 'MISSION FAILED' :
-    title && title !== titleKey ? title : 'IRON DUST v2 · PROFILANSICHT');
-  setText('#mission-sub', `${view.ruleProfileId} · ${view.mode === 'enemy' ?
-    `GEGNERZUG ${view.cursor?.pass?.toUpperCase() ?? '—'} ${
-      view.cursor?.pass === 'finish' ? '' : `${(view.cursor?.index ?? 0) + 1}/2`}` :
-    view.mode === 'ended' ? 'MISSION BEENDET' : 'LOKALER AKTIONSTEST'}`);
-  setText('#objective-text', `CORE HP ${view.objective.coreHp}/${view.objective.coreMaxHp}`);
+    view.victory.winner === 'player' ? t('v2.win') : t('v2.lose') :
+    title && title !== titleKey ? title : 'IRON DUST v2');
+  setText('#mission-sub', view.mode === 'enemy' ? t('v2.enemy') :
+    view.mode === 'ended' ? t('v2.ended') : t('v2.objective'));
+  setText('#objective-text', `CORE HP ${view.objective.coreHp}/${view.objective.coreMaxHp} · ${t('v2.objective')}`);
   document.querySelector('#objective-progress').style.width = `${view.objective.progress}%`;
   const phase = view.victory.status === 'ended' ?
-    view.victory.winner === 'player' ? 'MISSION COMPLETE' : 'MISSION FAILED' :
-    `${view.phase.toUpperCase()} PHASE`;
+    view.victory.winner === 'player' ? t('v2.win') : t('v2.lose') :
+    t(`v2.phase.${view.phase}`);
   setText('#phase-title', phase);
   setText('#turn-number', String(view.turn).padStart(2, '0'));
   for (const [id, label, phaseName] of [
@@ -243,17 +242,17 @@ export function renderIronDustV2View(view, {onAction = null, actionError = null}
   }
   setText('#log-status', view.victory.status === 'ended' ?
     view.victory.winner === 'player' ? 'SUCCESS' : 'CRITICAL' :
-    actionError ? `REJECT · ${actionError}` : 'PROFILE ACTIVE');
+    actionError ? `${t('v2.error')} · ${actionError}` : 'IRON DUST v2');
   const toast = document.querySelector('#map-toast');
-  toast.textContent = actionError ? `BEFEHL ABGELEHNT · ${actionError}` :
-    view.mode === 'enemy' ? 'GEGNERZUG LÄUFT · AKTIONEN GESPERRT' :
-      view.victory.status === 'ended' ? 'MISSION BEENDET' :
-        `${view.phase.toUpperCase()} · EINHEIT WÄHLEN`;
+  toast.textContent = actionError ? `${t('v2.error')} · ${actionError}` :
+    view.mode === 'enemy' ? t('v2.enemy') :
+      view.victory.status === 'ended' ? t('v2.ended') :
+        `${t(`v2.phase.${view.phase}`)} · ${t('v2.select')}`;
   const log = document.querySelector('#combat-log');
   log.replaceChildren(...(view.events.length ? view.events.map(event =>
     element('div', 'log-line', `${event.cursorPass ? event.cursorPass === 'finish' ?
       'FINISH · ' : `${event.cursorPass.toUpperCase()} ${event.cursorIndex + 1}/2 · ` :
       ''}${event.type} · ${
       event.actorId ?? '—'} → ${event.targetId ?? '—'}`)) :
-    [element('div', 'log-line', 'V2-Profil geladen · noch keine Ereignisse')]));
+    [element('div', 'log-line', t('v2.objective'))]));
 }

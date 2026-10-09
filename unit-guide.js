@@ -60,7 +60,10 @@ const guideOpener=document.querySelector('#unit-guide-open');
 const guideBackground=[document.querySelector('.app-shell'),document.querySelector('#quick-start-modal')];
 let guideReturnFocus=null,guidePreviousInert=[];
 function renderUnitGuide(){
-  const unit=unitGuideEntries[guideIndex],live=units.find(item=>item.name===unit.name);
+  const v2=globalThis.IronDustBrowserV2?.mode==='ready';
+  const unit=unitGuideEntries[guideIndex],live=v2?
+    globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.name===unit.name):
+    units.find(item=>item.name===unit.name);
   document.querySelector('.guide-information').scrollTop=0;
   document.querySelector('#guide-symbol').textContent=unit.icon;
   document.querySelector('#guide-symbol').classList.toggle('enemy',(live?.team==='enemy')||(!live&&unit.team==='HOSTILE SYSTEM'));
@@ -68,22 +71,22 @@ function renderUnitGuide(){
   document.querySelector('#guide-name').textContent=unit.name;
   document.querySelector('#guide-role').textContent=unit.role;
   const liveDrone=unit.name==='ARTILLERY DRONE'&&live;
-  document.querySelector('#guide-copy').textContent=liveDrone?'Field-Test-Regel: Diese Artilleriedrohne kann sich selbstständig bewegen. Die stationäre Katalogregel ist noch nicht aktiv.':unit.copy;
+  document.querySelector('#guide-copy').textContent=v2&&live?GoblinLanguage.t(live.team==='player'?'v2.guide.player':'v2.guide.enemy'):liveDrone?'Field-Test-Regel: Diese Artilleriedrohne kann sich selbstständig bewegen. Die stationäre Katalogregel ist noch nicht aktiv.':unit.copy;
   globalThis.UnitGuideVoice.render(unit.name);
   const hp=live?(live.ogreSystems?`${live.ogreSystems.treads} TREADS`:`${Math.max(0,live.hp)}/${live.maxHp}`):unit.hp;
-  const move=live?`${live.move}${isGevUnit(live)?' + 2':''}`:unit.move;
+  const move=live?`${live.move}${v2?live.type==='gev'?' + 2':'':isGevUnit(live)?' + 2':''}`:unit.move;
   const range=live?(live.ogreSystems?'BY WEAPON':live.range):unit.range;
-  const attack=live?(live.ogreSystems?'BY WEAPON':live.damage):unit.attack;
-  const defense=live?(live.ogreSystems?'BY SYSTEM':effectiveDefense(live)):unit.defense;
+  const attack=live?(live.ogreSystems?'BY WEAPON':v2?live.attack:live.damage):unit.attack;
+  const defense=live?(live.ogreSystems?'BY SYSTEM':v2?live.defense:effectiveDefense(live)):unit.defense;
   document.querySelector('#guide-facts').innerHTML=`<div class="guide-fact"><span>ARMOR / HP</span><b>${hp}</b></div><div class="guide-fact"><span>MOVE</span><b>${move}</b></div><div class="guide-fact"><span>RANGE</span><b>${range}</b></div><div class="guide-fact"><span>ATTACK / DEF</span><b>${attack} / ${defense}</b></div>`;
-  globalThis.UnitGuideRange.render(unit,live);
+  globalThis.UnitGuideRange.render(unit,v2?null:live);
   const scenarios=Object.entries(scenarioCatalog).filter(([,config])=>config.units.some(item=>item.name===unit.name)).map(([id])=>id.toUpperCase().replaceAll('-',' '));
-  document.querySelector('#guide-scenarios').textContent=scenarios.join(' · ')||'CATALOG ONLY';
-  document.querySelector('#guide-status').textContent=live?(live.hp<=0?'DESTROYED':live.disabled?'DISABLED':currentScenario==='atlas-proving-grounds'?'ATLAS · PROTOTYPE STATS':'LIVE IN CURRENT SCENARIO'):'NOT IN CURRENT SCENARIO';
-  document.querySelector('#guide-phase-status').textContent=!live?'—':live.hp<=0?'DESTROYED':live.team==='enemy'?'HOSTILE AI':phaseCanAct(live)?'READY':live.disabled?'DISABLED':'NO ACTION NOW';
+  document.querySelector('#guide-scenarios').textContent=v2?'IRON DUST v2':scenarios.join(' · ')||'CATALOG ONLY';
+  document.querySelector('#guide-status').textContent=v2?(live?GoblinLanguage.t('v2.guide.live'):GoblinLanguage.t('v2.guide.absent')):live?(live.hp<=0?'DESTROYED':live.disabled?'DISABLED':currentScenario==='atlas-proving-grounds'?'ATLAS · PROTOTYPE STATS':'LIVE IN CURRENT SCENARIO'):'NOT IN CURRENT SCENARIO';
+  document.querySelector('#guide-phase-status').textContent=v2?(!live?'—':live.hp<=0?'DESTROYED':live.team==='enemy'?'HOSTILE AI':globalThis.IronDustBrowserV2.session.projection.mode==='player'?'READY':'NO ACTION NOW'):!live?'—':live.hp<=0?'DESTROYED':live.team==='enemy'?'HOSTILE AI':phaseCanAct(live)?'READY':live.disabled?'DISABLED':'NO ACTION NOW';
   const list=document.querySelector('#guide-action-list');list.replaceChildren();
-  for(const action of liveDrone?['Im Field Test bewegen und fernfeuern','Stationäre Katalogregel: geplant']:guideActions[unit.name]||[]){const item=document.createElement('li');item.textContent=action;list.appendChild(item)}
-  document.querySelector('#guide-find').disabled=!live;
+  for(const action of v2?(live&&live.team==='player'?[GoblinLanguage.t('v2.guide.actions')]:[]):liveDrone?['Im Field Test bewegen und fernfeuern','Stationäre Katalogregel: geplant']:guideActions[unit.name]||[]){const item=document.createElement('li');item.textContent=action;list.appendChild(item)}
+  document.querySelector('#guide-find').disabled=v2||!live;
   document.querySelector('#guide-count').textContent=`${String(guideIndex+1).padStart(2,'0')} / ${String(unitGuideEntries.length).padStart(2,'0')}`;
 }
 function openUnitGuide(){
@@ -107,7 +110,8 @@ document.querySelector('#unit-guide-close').onclick=closeUnitGuide;
 document.querySelector('#guide-details-jump').onclick=()=>{const heading=document.querySelector('#guide-voice-label');heading.tabIndex=-1;heading.scrollIntoView({block:'start'});heading.focus({preventScroll:true})};
 document.querySelector('#guide-prev').onclick=()=>{guideIndex=(guideIndex+unitGuideEntries.length-1)%unitGuideEntries.length;renderUnitGuide()};
 document.querySelector('#guide-next').onclick=()=>{guideIndex=(guideIndex+1)%unitGuideEntries.length;renderUnitGuide()};
-document.querySelector('#guide-find').onclick=()=>{const unit=units.find(item=>item.name===unitGuideEntries[guideIndex].name);if(!unit)return;closeUnitGuide();selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);updateSelection();draw();globalThis.GoblinMobileViews?.show('map',{focus:true})};
+document.querySelector('#guide-find').onclick=()=>{if(globalThis.IronDustBrowserV2?.mode==='ready')return;const unit=units.find(item=>item.name===unitGuideEntries[guideIndex].name);if(!unit)return;closeUnitGuide();selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);updateSelection();draw();globalThis.GoblinMobileViews?.show('map',{focus:true})};
+globalThis.addEventListener?.('goblin-language-change',()=>{if(!guideModal.classList.contains('hidden'))renderUnitGuide()});
 guideModal.addEventListener('click',event=>{if(event.target===guideModal)closeUnitGuide()});
 document.addEventListener('keydown',event=>{
   if(guideModal.classList.contains('hidden'))return;

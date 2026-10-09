@@ -34,10 +34,10 @@ test('phase fixture instructions and Skimmer phase displays translate without vi
     assert.doesNotMatch(translated, /\bGEV\b/i);
   }
   const v2Titles = {
-    de: 'IRON DUST v2 · PROFILANSICHT',
-    en: 'IRON DUST v2 · PROFILE VIEW',
-    es: 'IRON DUST v2 · VISTA DEL PERFIL',
-    fr: 'IRON DUST v2 · VUE DU PROFIL',
+    de: 'IRON DUST v2 · LOKAL',
+    en: 'IRON DUST v2 · LOCAL',
+    es: 'IRON DUST v2 · LOCAL',
+    fr: 'IRON DUST v2 · LOCAL',
   };
   for (const [lang, title] of Object.entries(v2Titles)) {
     assert.equal(context.GoblinLanguage.t('mission.iron-dust-v2.title', {}, lang), title);

@@ -9,6 +9,10 @@ const objectiveFallback = {
   'showcase-specialists': 'Kern und alle Gegner ausschalten; eigene Einheit erhalten.'
 };
 function renderScenarioObjective(){
+  for(const option of document.querySelectorAll('#scenario-select option[data-title-key]')){
+    const title=globalThis.GoblinLanguage?.t(option.dataset.titleKey);
+    option.textContent=title&&title!==option.dataset.titleKey?title:scenarioCatalog[option.value]?.title||option.textContent;
+  }
   if(globalThis.goblinBootProfileError||globalThis.IronDustBrowserV2?.active)return;
   const config=legacySession.config,profile=victoryProfile(legacySession.effectiveRules);
   const key=`mission.${currentScenario}.objective.short`;
@@ -17,10 +21,6 @@ function renderScenarioObjective(){
   if(profile.requiresAllEnemies){
     const titleKey=`mission.${currentScenario}.title`,title=globalThis.GoblinLanguage?.t(titleKey);
     $('#mission-title').textContent=title&&title!==titleKey?title:config.title;
-  }
-  for(const option of document.querySelectorAll('#scenario-select option[data-title-key]')){
-    const title=globalThis.GoblinLanguage?.t(option.dataset.titleKey);
-    option.textContent=title&&title!==option.dataset.titleKey?title:scenarioCatalog[option.value]?.title||option.textContent;
   }
 }
 globalThis.GoblinLanguage?.ready.then(renderScenarioObjective);
@@ -70,7 +70,7 @@ document.querySelector('#scenario-select').onchange=async event=>{
   const isV2=nextScenario===v2?.selectorId;
   if(nextScenario===currentScenario||!(isV2||scenarioCatalog[nextScenario])||GameDialogs.isOpen())return;
   if(isV2&&!v2.available)return;
-  const nextTitle=isV2?'IRON DUST v2 / INTERNAL TEST':scenarioCatalog[nextScenario].kicker;
+  const nextTitle=isV2?(globalThis.GoblinLanguage?.t('mission.iron-dust-v2.title')||'IRON DUST v2 · LOCAL'):scenarioCatalog[nextScenario].kicker;
   if((isV2||hasScenarioProgress())&&!await GameDialogs.confirm({id:'scenario',title:'SZENARIO WECHSELN?',message:'Der aktuelle Spielstand wird verworfen. Neues Szenario: '+nextTitle,acceptLabel:'WECHSELN',cancelLabel:'WEITERSPIELEN'})){
     setToast('SZENARIOWECHSEL ABGEBROCHEN');
     maybeAutoAdvancePhase();

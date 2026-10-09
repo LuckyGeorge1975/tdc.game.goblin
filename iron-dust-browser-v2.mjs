@@ -8,13 +8,15 @@ import {buildIronDustV2View, renderIronDustV2View,
 
 // Browser commands cross the same validated profile boundary as the Core probes.
 export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';
-export const IRON_DUST_V2_START_SEED = 0x1d057;
+export const IRON_DUST_V2_START_SEED = 8;
 
-export function createIronDustBrowserSession(profile = createIronDustProfile(IRON_DUST_V2_START_SEED)) {
+export function createIronDustBrowserSession(
+  profile = createIronDustProfile(IRON_DUST_V2_START_SEED),
+  expectedSeed = IRON_DUST_V2_START_SEED) {
   validateIronDustProfile(profile);
   const projection = projectIronDustProfile(profile);
   if (profile.header.ruleProfileId !== IRON_DUST_PROFILE_HEADER.ruleProfileId ||
-      projection.state.rng.seed !== IRON_DUST_V2_START_SEED ||
+      projection.state.rng.seed !== expectedSeed ||
       projection.state.turn !== 1 || projection.state.phase !== 'movement' ||
       projection.mode !== 'player') {
     throw Object.assign(new Error('IRON_DUST_V2_START_INVALID'),
@@ -74,6 +76,8 @@ if (typeof document !== 'undefined') {
   const option = document.querySelector('#scenario-select option[value="iron-dust-v2"]');
   const localTest = ['localhost', '127.0.0.1'].includes(location.hostname) &&
     new URLSearchParams(location.search).get('iron-dust-v2-test') === '1';
+  const localSeed = localTest && new URLSearchParams(location.search)
+    .get('iron-dust-v2-seed') === '2' ? 2 : IRON_DUST_V2_START_SEED;
   if (option && localTest && !globalThis.goblinBootProfileError) option.disabled = false;
 
   let session = null;
@@ -90,12 +94,13 @@ if (typeof document !== 'undefined') {
       session.profile.header.ruleProfileId, eventHistory),
     {onAction:dispatchAction, actionError});
     endButton.disabled = session.projection.mode !== 'player';
-    endButton.textContent = session.projection.mode === 'ended' ? 'MISSION ENDED' :
-      session.projection.mode === 'enemy' ? 'HOSTILE TURN' :
-        session.projection.state.phase === 'gev' ? 'END TURN' : 'NEXT PHASE';
+    const t = key => globalThis.GoblinLanguage?.t(key) ?? key;
+    endButton.textContent = session.projection.mode === 'ended' ? t('v2.ended') :
+      session.projection.mode === 'enemy' ? t('v2.enemy') :
+        session.projection.state.phase === 'gev' ? t('v2.endTurn') : t('v2.next');
     const undo = document.querySelector('#undo-command');
     undo.disabled = true;
-    undo.title = 'IRON DUST v2: Rückgängig ist noch nicht verfügbar';
+    undo.title = t('v2.undo');
   }
   function commitAction(command) {
     if (mode !== 'ready' || !session) return {error:{code:'V2_NOT_READY'}};
@@ -133,12 +138,12 @@ if (typeof document !== 'undefined') {
     document.body.classList.add('iron-dust-v2-gated');
     document.body.classList.remove('iron-dust-v2-ready');
     document.querySelector('.map-frame').dataset.v2Message = message;
-    document.querySelector('#mission-kicker').textContent = 'IRON DUST v2 / INTERNAL TEST';
-    document.querySelector('#mission-title').textContent = 'Profil-Anbindung in Arbeit';
+    document.querySelector('#mission-kicker').textContent = 'IRON DUST v2 · LOCAL';
+    document.querySelector('#mission-title').textContent = globalThis.GoblinLanguage?.t('mission.iron-dust-v2.title') ?? 'IRON DUST v2';
     document.querySelector('#mission-sub').textContent = message;
-    document.querySelector('#objective-text').textContent = 'V2-PROFIL · GESPERRT';
+    document.querySelector('#objective-text').textContent = globalThis.GoblinLanguage?.t('v2.objective') ?? 'IRON DUST v2';
     document.querySelector('#objective-progress').style.width = '0%';
-    document.querySelector('#phase-title').textContent = 'INTEGRATION GESPERRT';
+    document.querySelector('#phase-title').textContent = 'START ERROR';
     document.querySelector('#end-turn').disabled = true;
     document.querySelector('#auto-end-turn').disabled = true;
     document.querySelector('#undo-command').disabled = true;
@@ -157,19 +162,24 @@ if (typeof document !== 'undefined') {
     if (!localTest || globalThis.goblinBootProfileError) return false;
     enemyFlow.cancel();
     try {
-      session = createIronDustBrowserSession(profile);
+      session = createIronDustBrowserSession(profile ?? createIronDustProfile(localSeed),
+        localSeed);
       mode = 'ready';
-      showGate('V2-Profil validiert. Spielfläche bis zum vollständigen Browser-Gate gesperrt.');
+      showGate('');
       actionError = null;
       eventHistory = [];
       resetIronDustV2View();
+      document.body.classList.remove('iron-dust-v2-gated');
+      document.querySelector('.map-frame').removeAttribute('data-v2-message');
       document.body.classList.add('iron-dust-v2-ready');
+      document.querySelector('#quick-start-open').disabled = false;
+      document.querySelector('#unit-guide-open').disabled = false;
       endButton.onclick = () => dispatchAction({type:'EndPhase', playerId:'player'});
       renderCurrent();
     } catch (error) {
       session = null;
       mode = 'error';
-      showGate(`V2-Start gesperrt: ${error.code || error.message || 'UNBEKANNTER_FEHLER'}`);
+      showGate(`IRON DUST v2: ${error.code || error.message || 'START_ERROR'}`);
     }
     return mode === 'ready';
   }
