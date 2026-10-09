@@ -4,8 +4,8 @@ Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließli
 
 ## [0.1.20] - 2026-10-09
 
-- IRON DUST v2 ist als getrenntes, zunächst nur lokal auswählbares Level integriert. Es nutzt das versionierte Regelprofil mit vier eigenen und drei gegnerischen Einheiten, automatischem Gegnerzug und über die normale Oberfläche erreichbarem Sieg und Niederlage. Missionsziel, Quick Start, Unit Guide und Kampfmeldungen sind in Deutsch, Englisch, Spanisch und Französisch angebunden.
-- Die öffentliche Supercover-Mission aus 0.1.19 und die acht historischen Legacy-Missionen bleiben erhalten. Die neue v2-Auswahl wird nur auf `localhost` oder `127.0.0.1` mit `?iron-dust-v2-test=1` angeboten; `iron-dust-v2-seed=2` aktiviert dort den reproduzierbaren Niederlagepfad. Die bisher veröffentlichten Bildsets, Layouts und Content-Rechte werden nicht erweitert.
+- IRON DUST v2 ist als getrenntes, regulär auswählbares Level integriert. Es nutzt das versionierte Regelprofil mit vier eigenen und drei gegnerischen Einheiten, automatischem Gegnerzug und über die normale Oberfläche erreichbarem Sieg und Niederlage. Neue v2-Bedientexte, Missionsziel, Quick Start, Live-Status im Unit Guide und Kampfmeldungen sind in Deutsch, Englisch, Spanisch und Französisch angebunden; die übrigen historischen Katalogeinträge des Unit Guide bleiben unverändert.
+- Die öffentliche Supercover-Mission aus 0.1.19 und die acht historischen Legacy-Missionen bleiben erhalten. IRON DUST v2 ist im regulären Level-Menü auch auf Pages auswählbar. Der Entwicklungsparameter `iron-dust-v2-seed=2` aktiviert den reproduzierbaren Niederlagepfad ausschließlich auf `localhost` oder `127.0.0.1`. Die bisher veröffentlichten Bildsets, Layouts und Content-Rechte werden nicht erweitert.
 - Dieser Eintrag beschreibt einen **lokalen Release-Kandidaten**. Unabhängige Integrations-/Release-QA, Content-/Legal-Delta, Pages-Deploy und Tag-Prüfung stehen gesondert aus (`goblin-nuu`). `v0.1.19` bleibt bis dahin die öffentlich geprüfte Fassung und der Rückfallpunkt.
 
 ## [0.1.19] - 2026-10-08

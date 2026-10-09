@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   createIronDustBrowserSession, dispatchIronDustBrowserAction,
   createIronDustEnemyFlow,
+  ironDustV2StartSeed,
   IRON_DUST_V2_SELECTOR_ID,
   IRON_DUST_V2_START_SEED
 } from '../iron-dust-browser-v2.mjs';
@@ -213,18 +214,18 @@ test('browser adapter reaches terminal enemy defeat without an extra turn', () =
     {type:'AutoEnemyAdvance',playerId:'enemy'}),{error:{code:'GAME_ENDED'}});
 });
 
-test('public host keeps the unfinished v2 option disabled', async () => {
+test('public host enables v2 without a test flag while seed override stays local', async () => {
   const option = {disabled:true};
   const previous = {document:globalThis.document,location:globalThis.location,
     bridge:globalThis.IronDustBrowserV2,draw:globalThis.draw};
   globalThis.document = {querySelector:() => option};
-  globalThis.location = {hostname:'example.com',search:'?iron-dust-v2-test=1'};
+  globalThis.location = {hostname:'luckygeorge1975.github.io',
+    pathname:'/tdc.game.goblin/',search:'?iron-dust-v2-seed=2'};
   globalThis.draw = () => {};
   try {
     await import('../iron-dust-browser-v2.mjs?public-gate=1');
-    assert.equal(option.disabled,true);
-    assert.equal(globalThis.IronDustBrowserV2.available,false);
-    assert.equal(globalThis.IronDustBrowserV2.start(),false);
+    assert.equal(option.disabled,false);
+    assert.equal(globalThis.IronDustBrowserV2.available,true);
     assert.equal(globalThis.IronDustBrowserV2.active,false);
   } finally {
     globalThis.document = previous.document;
@@ -234,7 +235,15 @@ test('public host keeps the unfinished v2 option disabled', async () => {
   }
 });
 
-test('local test path gates the board, can restart, and locks a failed v2 start', async () => {
+test('development defeat seed is restricted to local hosts', () => {
+  assert.equal(ironDustV2StartSeed('luckygeorge1975.github.io','?iron-dust-v2-seed=2'),8);
+  assert.equal(ironDustV2StartSeed('example.com','?iron-dust-v2-seed=2'),8);
+  assert.equal(ironDustV2StartSeed('localhost','?iron-dust-v2-seed=2'),2);
+  assert.equal(ironDustV2StartSeed('127.0.0.1','?iron-dust-v2-seed=2'),2);
+  assert.equal(ironDustV2StartSeed('localhost',''),8);
+});
+
+test('Pages path starts v2, can restart, and locks a failed v2 start', async () => {
   const nodes = new Map();
   const classes = new Set();
   const element = () => ({disabled:false, value:'', textContent:'', dataset:{}, style:{}, children:[],listeners:{},
@@ -256,10 +265,11 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     addEventListener:globalThis.addEventListener};
   let locale = 'de';
   const languageEvents = new Map();
-  const titles = {de:'IRON DUST v2 · LOKAL',en:'IRON DUST v2 · LOCAL',
-    es:'IRON DUST v2 · LOCAL',fr:'IRON DUST v2 · LOCAL'};
+  const titles = {de:'IRON DUST v2',en:'IRON DUST v2',
+    es:'IRON DUST v2',fr:'IRON DUST v2'};
   globalThis.document = document;
-  globalThis.location = {hostname:'localhost',search:'?iron-dust-v2-test=1'};
+  globalThis.location = {hostname:'luckygeorge1975.github.io',
+    pathname:'/tdc.game.goblin/',search:'?iron-dust-v2-seed=2'};
   globalThis.draw = () => {};
   globalThis.UnitVisuals = {terrainAssetFor:() => null,draw:() => {}};
   globalThis.GoblinLanguage = {t:key => key === 'mission.iron-dust-v2.title' ? titles[locale] :
@@ -270,7 +280,8 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
       'v2.reject.target':'Dieses Ziel kann nicht angegriffen werden.',
       'v2.reject.ended':'Die Mission ist beendet.',
       'v2.reject.start':'IRON DUST v2 konnte nicht gestartet werden.',
-      'v2.unit.ogre':'Siegebreaker','v2.unit.core':'Kommandokern',
+      'v2.unit.ogre':'GOBLIN SIEGEBREAKER','v2.unit.core':'Kommandokern',
+      'v2.ui.coreHp':'CORE HP','v2.ui.critical':'CRITICAL',
       'v2.event.UnitMoved':'Siegebreaker bewegt sich.',
       'v2.event.EnemyPassRecorded':'Gegnerzug wird fortgesetzt.'})[key] ?? key};
   globalThis.addEventListener = (name,handler) => languageEvents.set(name,handler);
@@ -286,6 +297,7 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     assert.equal(bridge.available,true);
     assert.equal(document.querySelector('#scenario-select option[value="iron-dust-v2"]').disabled,false);
     assert.equal(bridge.start(),true);
+    assert.equal(bridge.session.projection.state.rng.seed,8);
     assert.equal(bridge.mode,'ready');
     assert.equal(globalThis.currentScenario,'iron-dust-v2');
     assert.equal(globalThis.gameOver,true);

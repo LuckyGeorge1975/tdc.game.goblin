@@ -35,14 +35,27 @@ test('phase fixture instructions and Skimmer phase displays translate without vi
     assert.doesNotMatch(translated, /\bGEV\b/i);
   }
   const v2Titles = {
-    de: 'IRON DUST v2 · LOKAL',
-    en: 'IRON DUST v2 · LOCAL',
-    es: 'IRON DUST v2 · LOCAL',
-    fr: 'IRON DUST v2 · LOCAL',
+    de: 'IRON DUST v2',
+    en: 'IRON DUST v2',
+    es: 'IRON DUST v2',
+    fr: 'IRON DUST v2',
   };
   for (const [lang, title] of Object.entries(v2Titles)) {
     assert.equal(context.GoblinLanguage.t('mission.iron-dust-v2.title', {}, lang), title);
     assert.notEqual(title, context.GoblinLanguage.translate('Durchbrechen. Ausschalten. Überleben.', lang));
+    for (const key of ['ready','view','selectUnitOrHex','hostileIntel','unitIntel','noUnit',
+      'selectFriendly','sector','defense','moveRange','status','destroyed','disabled',
+      'moved','treads','weapon','profile','fieldIntel','sectorBrief','selectHex','terrain',
+      'selectAria','team.player','team.enemy','type.ogre','type.gev','type.missile',
+      'type.infantry','type.core','type.guard','type.raider','terrain.open-ground',
+      'terrain.rubble-field','coreHp','move','fire','skimmer','success','critical',
+      'guideFriendlyLive','guideHostileLive','noAction','hostileAi','armorHp','range',
+      'attack','attackDef','byWeapon','bySystem','weapon.main','weapon.secondary',
+      'weapon.missiles','weapon.antipersonnel']) {
+      const fullKey=`v2.ui.${key}`;
+      assert.notEqual(context.GoblinLanguage.t(fullKey,{unit:'Siegebreaker'},lang),fullKey,
+        `${lang}: ${fullKey}`);
+    }
   }
   const previousLanguage=globalThis.GoblinLanguage;
   const events=['UnitMoved','EnemyMoved','EnemyHeld','EnemySkipped','UnitRecovered',

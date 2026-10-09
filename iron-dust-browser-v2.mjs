@@ -9,6 +9,11 @@ import {buildIronDustV2View, renderIronDustV2View,
 // Browser commands cross the same validated profile boundary as the Core probes.
 export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';
 export const IRON_DUST_V2_START_SEED = 8;
+export function ironDustV2StartSeed(hostname, search) {
+  return ['localhost', '127.0.0.1'].includes(hostname) &&
+    new URLSearchParams(search).get('iron-dust-v2-seed') === '2'
+    ? 2 : IRON_DUST_V2_START_SEED;
+}
 
 export function createIronDustBrowserSession(
   profile = createIronDustProfile(IRON_DUST_V2_START_SEED),
@@ -74,11 +79,8 @@ export function createIronDustEnemyFlow({getSession, advance,
 
 if (typeof document !== 'undefined') {
   const option = document.querySelector('#scenario-select option[value="iron-dust-v2"]');
-  const localTest = ['localhost', '127.0.0.1'].includes(location.hostname) &&
-    new URLSearchParams(location.search).get('iron-dust-v2-test') === '1';
-  const localSeed = localTest && new URLSearchParams(location.search)
-    .get('iron-dust-v2-seed') === '2' ? 2 : IRON_DUST_V2_START_SEED;
-  if (option && localTest && !globalThis.goblinBootProfileError) option.disabled = false;
+  const startSeed = ironDustV2StartSeed(location.hostname, location.search);
+  if (option) option.disabled = !!globalThis.goblinBootProfileError;
 
   let session = null;
   let mode = 'inactive';
@@ -138,7 +140,7 @@ if (typeof document !== 'undefined') {
     document.body.classList.add('iron-dust-v2-gated');
     document.body.classList.remove('iron-dust-v2-ready');
     document.querySelector('.map-frame').dataset.v2Message = message;
-    document.querySelector('#mission-kicker').textContent = 'IRON DUST v2 · LOCAL';
+    document.querySelector('#mission-kicker').textContent = 'IRON DUST v2';
     document.querySelector('#mission-title').textContent = globalThis.GoblinLanguage?.t('mission.iron-dust-v2.title') ?? 'IRON DUST v2';
     document.querySelector('#mission-sub').textContent = message;
     document.querySelector('#objective-text').textContent = globalThis.GoblinLanguage?.t('v2.objective') ?? 'IRON DUST v2';
@@ -159,11 +161,11 @@ if (typeof document !== 'undefined') {
     document.querySelector('#scenario-select').value = IRON_DUST_V2_SELECTOR_ID;
   }
   function start(profile) {
-    if (!localTest || globalThis.goblinBootProfileError) return false;
+    if (globalThis.goblinBootProfileError) return false;
     enemyFlow.cancel();
     try {
-      session = createIronDustBrowserSession(profile ?? createIronDustProfile(localSeed),
-        localSeed);
+      session = createIronDustBrowserSession(profile ?? createIronDustProfile(startSeed),
+        startSeed);
       mode = 'ready';
       showGate('');
       actionError = null;
@@ -203,7 +205,7 @@ if (typeof document !== 'undefined') {
   }
   globalThis.IronDustBrowserV2 = Object.freeze({
     selectorId: IRON_DUST_V2_SELECTOR_ID,
-    available: !!option && localTest && !globalThis.goblinBootProfileError,
+    available: !!option && !globalThis.goblinBootProfileError,
     get active() { return mode !== 'inactive'; },
     get mode() { return mode; },
     get session() { return session; },

@@ -1,4 +1,4 @@
-// Use an already approved local BrowserAct session at ?iron-dust-v2-test=1.
+// Use an already approved local BrowserAct session with IRON DUST v2 selected.
 // Pass that session's local CDP WebSocket URL; this script opens no browser session.
 import assert from 'node:assert/strict';
 
@@ -35,8 +35,7 @@ async function js(expression) {
 try {
   const targets = await send('Target.getTargets', {}, false);
   const page = targets.targetInfos.find(target => target.type === 'page' &&
-    /^http:\/\/(localhost|127\.0\.0\.1):4173\/\?/.test(target.url) &&
-    target.url.includes('iron-dust-v2-test=1'));
+    /^http:\/\/(localhost|127\.0\.0\.1):4173\/(?:\?|$)/.test(target.url));
   assert.ok(page, 'open the approved local v2 test page first');
   sessionId = (await send('Target.attachToTarget',
     {targetId:page.targetId, flatten:true}, false)).sessionId;

@@ -23,6 +23,7 @@ const element = (tag, className, text) => {
 const svgElement = tag => document.createElementNS(SVG_NS, tag);
 const setText = (selector, value) => { document.querySelector(selector).textContent = value; };
 const t = key => globalThis.GoblinLanguage?.t(key) ?? key;
+const label = (key, fallback) => { const value = t(key); return value === key ? fallback : value; };
 const visibleEvents = new Set(['UnitMoved', 'EnemyMoved', 'EnemyHeld',
   'EnemySkipped', 'UnitRecovered', 'PhaseChanged', 'EnemyPassRecorded',
   'PlayerFireResolved', 'EnemySystemFireResolved', 'EnemyUnitFireResolved',
@@ -104,24 +105,24 @@ function renderIntel(view) {
   const unit = view.units.find(item => item.id === selectedUnitId);
   const cell = selectedCell && view.cells.find(item =>
     item.x === selectedCell.x && item.y === selectedCell.y);
-  setText('#selection-readout', unit ? `${unit.name} · ${cellLabel(unit.x, unit.y)} · ${unit.team === 'player' ? 'BEREIT' : 'ANSICHT'}` :
-    'EINHEIT ODER FELD WÄHLEN');
-  setText('#unit-intel-kicker', unit?.team === 'enemy' ? 'HOSTILE INTEL' : 'UNIT INTEL');
-  setText('#unit-intel-title', unit?.name ?? 'NO UNIT SELECTED');
+  setText('#selection-readout', unit ? `${unitLabel(unit.id)} · ${cellLabel(unit.x, unit.y)} · ${t(unit.team === 'player' ? 'v2.ui.ready' : 'v2.ui.view')}` :
+    t('v2.ui.selectUnitOrHex'));
+  setText('#unit-intel-kicker', t(unit?.team === 'enemy' ? 'v2.ui.hostileIntel' : 'v2.ui.unitIntel'));
+  setText('#unit-intel-title', unit ? unitLabel(unit.id) : t('v2.ui.noUnit'));
   setText('#unit-intel-copy', unit ?
-    `${unit.type} · ${unit.team.toUpperCase()} · SECTOR ${cellLabel(unit.x, unit.y)}` :
-    'IRON DUST v2: eigene Einheit für Befehle wählen.');
+    `${label(`v2.ui.type.${unit.id}`, unit.type)} · ${t(`v2.ui.team.${unit.team}`)} · ${t('v2.ui.sector')} ${cellLabel(unit.x, unit.y)}` :
+    t('v2.ui.selectFriendly'));
   renderFacts(unit ? [
-    ['HP', `${unit.hp}/${unit.maxHp}`], ['DEFENSE', unit.defense],
-    ['MOVE / RANGE', `${unit.move ?? '—'} / ${unit.range ?? '—'}`],
-    ['STATUS', unit.hp <= 0 ? 'DESTROYED' : unit.disabled ? 'DISABLED' : unit.terrain.toUpperCase()],
-    ...(unit.treads === null ? [] : [['TREADS', unit.treads], ['WEAPON', unit.selectedWeapon]])
-  ] : [['PROFILE', view.ruleProfileId]]);
-  setText('#intel-kicker', 'FIELD INTEL');
-  setText('#intel-title', cell ? cellLabel(cell.x, cell.y) : 'SECTOR BRIEF');
-  setText('#intel-copy', cell ? cell.type.toUpperCase() : 'Feld auf der Karte wählen.');
+    ['HP', `${unit.hp}/${unit.maxHp}`], [t('v2.ui.defense'), unit.defense],
+    [t('v2.ui.moveRange'), `${unit.move ?? '—'} / ${unit.range ?? '—'}`],
+    [t('v2.ui.status'), unit.hp <= 0 ? t('v2.ui.destroyed') : unit.disabled ? t('v2.ui.disabled') : label(`v2.ui.terrain.${unit.terrain}`, unit.terrain)],
+    ...(unit.treads === null ? [] : [[t('v2.ui.treads'), unit.treads], [t('v2.ui.weapon'), label(`v2.ui.weapon.${unit.selectedWeapon}`, unit.selectedWeapon)]])
+  ] : [[t('v2.ui.profile'), view.ruleProfileId]]);
+  setText('#intel-kicker', t('v2.ui.fieldIntel'));
+  setText('#intel-title', cell ? cellLabel(cell.x, cell.y) : t('v2.ui.sectorBrief'));
+  setText('#intel-copy', cell ? label(`v2.ui.terrain.${cell.type}`, cell.type) : t('v2.ui.selectHex'));
   const fieldFacts = document.querySelector('#intel-facts');
-  fieldFacts.replaceChildren(element('div', null, cell ? `TERRAIN · ${cell.type}` : 'TERRAIN · —'));
+  fieldFacts.replaceChildren(element('div', null, cell ? `${t('v2.ui.terrain')} · ${label(`v2.ui.terrain.${cell.type}`, cell.type)}` : `${t('v2.ui.terrain')} · —`));
 }
 
 function renderRoster(view, rerender) {
@@ -130,12 +131,12 @@ function renderRoster(view, rerender) {
     const card = element('div', `unit-card ${unit.id === 'ogre' ? 'ogre' : ''}${unit.hp <= 0 ? ' destroyed' : ''}`);
     card.tabIndex = 0;
     card.setAttribute('role', 'button');
-    card.setAttribute('aria-label', `${unit.name} auswählen`);
+    card.setAttribute('aria-label', globalThis.GoblinLanguage?.t('v2.ui.selectAria', {unit:unitLabel(unit.id)}) ?? `${unitLabel(unit.id)} auswählen`);
     const token = element('div', 'unit-token', unit.hp <= 0 ? '×' : unit.icon);
     const name = element('div');
-    name.append(element('span', 'unit-name', unit.name),
-      element('span', 'unit-type', unit.hp <= 0 ? 'DESTROYED' : unit.disabled ? 'DISABLED' :
-        unit.moved ? 'MOVED' : unit.type));
+    name.append(element('span', 'unit-name', unitLabel(unit.id)),
+      element('span', 'unit-type', unit.hp <= 0 ? t('v2.ui.destroyed') : unit.disabled ? t('v2.ui.disabled') :
+        unit.moved ? t('v2.ui.moved') : label(`v2.ui.type.${unit.id}`, unit.type)));
     const health = element('div', 'hp-bar');
     for (let i = 0; i < unit.maxHp; i++) health.append(element('i', i >= unit.hp ? 'off' : ''));
     card.append(token, name, health);
@@ -232,7 +233,7 @@ function renderWeapons(view, onAction) {
     const button = element('button', `weapon-control${key === actor.selectedWeapon ? ' active' : ''}`);
     button.type = 'button';
     button.disabled = weapon.ready <= 0;
-    button.textContent = `${weapon.label} · A${weapon.attack} · R${weapon.range} · READY ${weapon.ready}`;
+    button.textContent = `${label(`v2.ui.weapon.${key}`, weapon.label)} · ${t('v2.ui.attack')} ${weapon.attack} · ${t('v2.ui.range')} ${weapon.range} · ${t('v2.ui.ready')} ${weapon.ready}`;
     button.addEventListener('click', () => onAction({type:'SelectWeapon', playerId:'player',
       unitId:'ogre', weaponKey:key}));
     panel.appendChild(button);
@@ -247,7 +248,7 @@ export function renderIronDustV2View(view, {onAction = null, actionError = null}
   renderRoster(view, rerender);
   renderIntel(view);
   renderWeapons(view, onAction);
-  setText('#mission-kicker', 'IRON DUST v2 · LOCAL');
+  setText('#mission-kicker', 'IRON DUST v2');
   const titleKey = 'mission.iron-dust-v2.title';
   const title = globalThis.GoblinLanguage?.t(titleKey);
   setText('#mission-title', view.victory.status === 'ended' ?
@@ -255,7 +256,7 @@ export function renderIronDustV2View(view, {onAction = null, actionError = null}
     title && title !== titleKey ? title : 'IRON DUST v2');
   setText('#mission-sub', view.mode === 'enemy' ? t('v2.enemy') :
     view.mode === 'ended' ? t('v2.ended') : t('v2.objective'));
-  setText('#objective-text', `CORE HP ${view.objective.coreHp}/${view.objective.coreMaxHp} · ${t('v2.objective')}`);
+  setText('#objective-text', `${t('v2.ui.coreHp')} ${view.objective.coreHp}/${view.objective.coreMaxHp} · ${t('v2.objective')}`);
   document.querySelector('#objective-progress').style.width = `${view.objective.progress}%`;
   const phase = view.victory.status === 'ended' ?
     view.victory.winner === 'player' ? t('v2.win') : t('v2.lose') :
@@ -263,14 +264,14 @@ export function renderIronDustV2View(view, {onAction = null, actionError = null}
   setText('#phase-title', phase);
   setText('#turn-number', String(view.turn).padStart(2, '0'));
   for (const [id, label, phaseName] of [
-    ['movement-ready', 'MOVE', 'movement'], ['fire-ready', 'FIRE', 'fire'],
-    ['gev-ready', 'SKIMMER', 'gev']]) {
+    ['movement-ready', 'v2.ui.move', 'movement'], ['fire-ready', 'v2.ui.fire', 'fire'],
+    ['gev-ready', 'v2.ui.skimmer', 'gev']]) {
     const node = document.querySelector(`#${id}`);
-    node.textContent = label;
+    node.textContent = t(label);
     node.classList.toggle('active', view.phase === phaseName);
   }
   setText('#log-status', view.victory.status === 'ended' ?
-    view.victory.winner === 'player' ? 'SUCCESS' : 'CRITICAL' :
+    view.victory.winner === 'player' ? t('v2.ui.success') : t('v2.ui.critical') :
     actionError ? t('v2.error') : 'IRON DUST v2');
   const toast = document.querySelector('#map-toast');
   toast.textContent = actionError ? formatIronDustV2Error(actionError) :

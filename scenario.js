@@ -70,7 +70,7 @@ document.querySelector('#scenario-select').onchange=async event=>{
   const isV2=nextScenario===v2?.selectorId;
   if(nextScenario===currentScenario||!(isV2||scenarioCatalog[nextScenario])||GameDialogs.isOpen())return;
   if(isV2&&!v2.available)return;
-  const nextTitle=isV2?(globalThis.GoblinLanguage?.t('mission.iron-dust-v2.title')||'IRON DUST v2 · LOCAL'):scenarioCatalog[nextScenario].kicker;
+  const nextTitle=isV2?(globalThis.GoblinLanguage?.t('mission.iron-dust-v2.title')||'IRON DUST v2'):scenarioCatalog[nextScenario].kicker;
   if((isV2||hasScenarioProgress())&&!await GameDialogs.confirm({id:'scenario',title:'SZENARIO WECHSELN?',message:'Der aktuelle Spielstand wird verworfen. Neues Szenario: '+nextTitle,acceptLabel:'WECHSELN',cancelLabel:'WEITERSPIELEN'})){
     setToast('SZENARIOWECHSEL ABGEBROCHEN');
     maybeAutoAdvancePhase();
