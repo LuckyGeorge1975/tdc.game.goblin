@@ -20,7 +20,7 @@ function game() {
     localStorage:{getItem(){return null}},
     setTimeout(fn){timers.set(++timerId,fn);return timerId},clearTimeout(id){timers.delete(id)}});
   const run = source => vm.runInContext(source,context);
-  for(const file of ['unit-visuals.js','terrain-rules.js','ogre-systems.js','game.js','ogre-runtime.js','combat-feedback.js','siegebreaker-weapons.js','scenario.js','command-history.js'])run(readFileSync(new URL('../src/legacy/scripts/'+file,import.meta.url),'utf8'));
+  for(const file of ['unit-visuals.js','terrain-rules.js','ogre-systems.js','scenario-profile-manifest.js','game.js','ogre-runtime.js','combat-feedback.js','siegebreaker-weapons.js','scenario.js','command-history.js'])run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
   run("draw=()=>{}; updateSelection=()=>{}; loadScenario('unit-trial');");
   return {run,timers};
 }
@@ -36,17 +36,43 @@ test('restart and scenario change wait for approval and preserve canceled comman
 
 test('scenario change from Fire resets the active Legacy range overlay to Movement',async()=>{
   const {run}=game();
-  run("scenarioCatalog['atlas-proving-grounds']=scenarioCatalog['unit-trial'];loadScenario('iron-dust');setTurnPhase('fire');units[0].moved=true");
+  run("loadScenario('iron-dust');setTurnPhase('fire');units[0].moved=true");
   assert.equal(run('viewMode'),'fire');
   assert.equal(run("document.querySelectorAll('.view-option:not(#grid-toggle)')[1].classList.contains('active')"),true);
-  run("document.querySelector('#scenario-select').value='atlas-proving-grounds'");
+  run("document.querySelector('#scenario-select').value='relay-run'");
   await run("document.querySelector('#scenario-select').onchange({target:document.querySelector('#scenario-select')})");
-  assert.equal(run('currentScenario'),'atlas-proving-grounds');
+  assert.equal(run('currentScenario'),'relay-run');
   assert.equal(run('turnPhase'),'movement');
   assert.equal(run('viewMode'),'movement');
   assert.equal(run("document.querySelectorAll('.view-option:not(#grid-toggle)')[0].classList.contains('active')"),true);
   assert.equal(run("document.querySelectorAll('.view-option:not(#grid-toggle)')[1].classList.contains('active')"),false);
   assert.equal(run('selected'),null);
+});
+
+test('v2 test route confirms entry and restart, then returns to Legacy',async()=>{
+  const {run}=game();
+  run(`globalThis.IronDustBrowserV2={selectorId:'iron-dust-v2',available:true,active:false,
+    starts:0,stops:0,start(){this.active=true;this.starts++;currentScenario=this.selectorId},
+    restart(){this.starts++},stop(){this.active=false;this.stops++}}`);
+  run("GameDialogs.confirm=()=>new Promise(resolve=>globalThis.answer=resolve)");
+  run("document.querySelector('#scenario-select').value='iron-dust-v2'");
+  const canceled=run("document.querySelector('#scenario-select').onchange({target:document.querySelector('#scenario-select')})");
+  run('answer(false)');await canceled;
+  assert.equal(run('currentScenario'),'unit-trial');
+  assert.equal(run('IronDustBrowserV2.starts'),0);
+  run("document.querySelector('#scenario-select').value='iron-dust-v2'");
+  const entered=run("document.querySelector('#scenario-select').onchange({target:document.querySelector('#scenario-select')})");
+  run('answer(true)');await entered;
+  assert.equal(run('currentScenario'),'iron-dust-v2');
+  assert.equal(run('IronDustBrowserV2.starts'),1);
+  const restarted=run('resetScenario()');run('answer(true)');await restarted;
+  assert.equal(run('IronDustBrowserV2.starts'),2);
+  run("document.querySelector('#scenario-select').value='iron-dust'");
+  const returned=run("document.querySelector('#scenario-select').onchange({target:document.querySelector('#scenario-select')})");
+  run('answer(true)');await returned;
+  assert.equal(run('currentScenario'),'iron-dust');
+  assert.equal(run('IronDustBrowserV2.active'),false);
+  assert.equal(run('IronDustBrowserV2.stops'),1);
 });
 
 test('phase cancellation and open-dialog AUTO guard preserve the phase',async()=>{
@@ -228,7 +254,7 @@ test('hardened core intel reports damage state instead of misleading HP',()=>{
   assert.equal(run("document.querySelector('#unit-intel-facts').innerHTML.includes('<span>HP</span>')"),false);
   assert.equal(run("document.querySelector('#unit-intel-facts').innerHTML.includes('DAMAGE STATE')"),true);
   assert.equal(run("document.querySelector('#unit-intel-facts').innerHTML.includes('NEXT D / X')"),true);
-  assert.equal(run("document.querySelector('#objective-text').textContent"),'CORE DISABLED · DAMAGE 1/2');
+  assert.equal(run("document.querySelector('#objective-text').textContent"),'HOSTILES 3/3');
 });
 
 test('combat feedback distinguishes first disable from the destroying second D',()=>{

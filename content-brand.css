@@ -1,0 +1,14 @@
+/* Content-brand layer: system fonts only, with no third-party runtime requests. */
+:root {
+  --display-font: "Arial Narrow", "Segoe UI Condensed", "Segoe UI", Arial, sans-serif;
+  --body-font: "Segoe UI", Arial, sans-serif;
+}
+
+body, .view-option, .scenario-picker, .scenario-picker select, .guide-close,
+.guide-kicker, .guide-nav button, .guide-count, .auto-turn, .modal-kicker,
+.command-list kbd, .action-button { font-family: var(--body-font) !important; }
+
+h1, h2, .mission-copy strong, .panel-heading, .unit-token, .unit-name,
+.turn-counter strong, .map-toast, .selection-readout b, .intel-card h3,
+.unit-label, .guide-symbol, .guide-body h3, .guide-fact b,
+.quick-guide-section h3 { font-family: var(--display-font) !important; }

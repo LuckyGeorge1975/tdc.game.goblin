@@ -2,6 +2,21 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## Build 0.1.20 · lokaler Integrationskandidat
+
+| Feld | Wert |
+|---|---|
+| Version | `0.1.20` |
+| Build | `20` |
+| Basis | Öffentlich geprüftes `v0.1.19` auf `81692a727fe4b9121865ae552c5183763a7a1302` |
+| Eingebrachter Produktstand | Lokal geprüfter IRON-DUST-v2-Stand `9ca56b71ebf52c1fd63ecccf76470835a4f24565` |
+| Integrationszweig | `codex/release-integration-020`; feste Prüf-SHA im Issue `goblin-nuu.2` |
+| Datum | 2026-10-09 |
+| Pages-Einstieg nach gesonderter Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.20> |
+| Änderungen | [CHANGELOG.md](../CHANGELOG.md#0120---2026-10-09) |
+
+Die Integration erhält die öffentliche Supercover-Mission und die acht Legacy-Missionen samt veröffentlichten Daten, Content-Notices und Rückfallstand. IRON DUST v2 ist vorerst nur lokal per `?iron-dust-v2-test=1` auswählbar; Seed 8 führt über normale UI-Aktionen zum Sieg, `&iron-dust-v2-seed=2` über normale UI-Aktionen zur Niederlage. Auf dem Integrationsarbeitsstand bestanden 374/374 Node-Tests; Build- und Release-Prüfung werden auf der festen SHA im Issue ergänzt. Die früheren unabhängigen v2-Prüfungen auf `9ca56b7` ersetzen **keine** unabhängige Integrations-/Release-QA auf dem neuen Commit. Desktop/Mobil, beide Terminalpfade, Legacy und Supercover, Content-/Legal-Delta und öffentlicher Pages-Einstieg sind vor Veröffentlichung zu prüfen. Kein Push, Tag oder Deploy aus diesem Handoff.
+
 ## Build 0.1.19 · lokaler Kandidat
 
 | Feld | Wert |

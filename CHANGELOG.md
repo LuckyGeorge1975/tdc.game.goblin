@@ -2,6 +2,12 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden in `goblin-hr7` nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.20] - 2026-10-09
+
+- IRON DUST v2 ist als getrenntes, zunächst nur lokal auswählbares Level integriert. Es nutzt das versionierte Regelprofil mit vier eigenen und drei gegnerischen Einheiten, automatischem Gegnerzug und über die normale Oberfläche erreichbarem Sieg und Niederlage. Missionsziel, Quick Start, Unit Guide und Kampfmeldungen sind in Deutsch, Englisch, Spanisch und Französisch angebunden.
+- Die öffentliche Supercover-Mission aus 0.1.19 und die acht historischen Legacy-Missionen bleiben erhalten. Die neue v2-Auswahl wird nur auf `localhost` oder `127.0.0.1` mit `?iron-dust-v2-test=1` angeboten; `iron-dust-v2-seed=2` aktiviert dort den reproduzierbaren Niederlagepfad. Die bisher veröffentlichten Bildsets, Layouts und Content-Rechte werden nicht erweitert.
+- Dieser Eintrag beschreibt einen **lokalen Release-Kandidaten**. Unabhängige Integrations-/Release-QA, Content-/Legal-Delta, Pages-Deploy und Tag-Prüfung stehen gesondert aus (`goblin-nuu`). `v0.1.19` bleibt bis dahin die öffentlich geprüfte Fassung und der Rückfallpunkt.
+
 ## [0.1.19] - 2026-10-08
 
 - Das neue, separat auswählbare Supercover-Showcase verwendet eine strenge, symmetrische Sichtlinie für Vorschau sowie Spieler- und Gegnerfeuer. Ein blockierendes Hex an einer berührten Grenzkante sperrt die Linie. Die acht bisherigen Missionen behalten ihren bisherigen Regel- und Sichtlinienstand.
