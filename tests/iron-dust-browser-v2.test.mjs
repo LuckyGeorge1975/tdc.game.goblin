@@ -2,12 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createIronDustBrowserSession, dispatchIronDustBrowserAction,
+  createIronDustEnemyFlow,
   IRON_DUST_V2_SELECTOR_ID,
   IRON_DUST_V2_START_SEED
 } from '../iron-dust-browser-v2.mjs';
 import {createIronDustProfile, dispatchIronDustProfile,
   projectIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
 import {buildIronDustV2View, renderIronDustV2View} from '../iron-dust-v2-view.mjs';
+import {IRON_DUST_SOURCE_DEFEAT_TRACE_V2 as defeat} from
+  './iron-dust-source-defeat-trace.v2.mjs';
 
 test('v2 browser session has a fixed validated identity and rejects a changed header', () => {
   const session = createIronDustBrowserSession();
@@ -60,7 +63,7 @@ test('browser player commands use the profile and preserve rejected state', () =
   assert.equal(JSON.stringify(session), beforeReject);
   assert.deepEqual(dispatchIronDustBrowserAction(session,
     {type:'AutoEnemyAdvance', playerId:'enemy'}),
-  {error:{code:'BROWSER_ACTION_UNSUPPORTED'}});
+  {error:{code:'WRONG_PHASE'}});
   apply(end);
   assert.equal(session.projection.state.phase, 'fire');
   apply({type:'SelectWeapon', playerId:'player', unitId:'ogre', weaponKey:'secondary'});
@@ -76,6 +79,17 @@ test('browser player commands use the profile and preserve rejected state', () =
   apply(end);
   assert.equal(session.projection.mode, 'enemy');
   assert.equal(session.projection.events.length > 0, true);
+  const steps = [];
+  while (session.projection.mode === 'enemy') {
+    const cursor = session.projection.cursor;
+    apply({type:'AutoEnemyAdvance', playerId:'enemy'});
+    steps.push({pass:cursor.pass, index:cursor.index,
+      event:session.projection.events[0].type});
+  }
+  assert.deepEqual(steps.map(step => step.pass),
+    ['first','first','retry','retry','finish']);
+  assert.equal(session.projection.mode, 'player');
+  assert.equal(session.projection.state.turn,2);
 });
 
 test('browser fire and ram use the same reachable source commands', () => {
@@ -129,6 +143,68 @@ test('browser fire and ram use the same reachable source commands', () => {
     {type:'PlayerFire', playerId:'player', unitId:'ogre', targetId:'core', weaponKey:'main'});
   assert.equal(coreShot.session.projection.mode,'ended');
   assert.equal(coreShot.session.projection.state.victory.winner,'player');
+});
+
+test('enemy flow is single-run and discards stale callbacks after restart', () => {
+  const enemySession = () => {
+    let current = createIronDustBrowserSession();
+    for (let i=0;i<3;i++) current = dispatchIronDustBrowserAction(current,
+      {type:'EndPhase', playerId:'player'}).session;
+    assert.equal(current.projection.mode,'enemy');
+    return current;
+  };
+  let current = enemySession(), calls = 0;
+  const pending = [];
+  const flow = createIronDustEnemyFlow({getSession:() => current,
+    advance:() => {
+      calls++;
+      const result = dispatchIronDustBrowserAction(current,
+        {type:'AutoEnemyAdvance',playerId:'enemy'});
+      if (result.session) current = result.session;
+      return result;
+    },
+    schedule:callback => {const task = {callback,canceled:false}; pending.push(task); return task;},
+    clear:task => {task.canceled = true;}});
+  assert.equal(flow.start(),true);
+  assert.equal(flow.start(),false);
+  pending.shift().callback();
+  assert.equal(calls,1);
+  const stale = pending.shift();
+  flow.cancel();
+  current = enemySession();
+  const before = JSON.stringify(current);
+  stale.callback();
+  assert.equal(JSON.stringify(current),before);
+  assert.equal(calls,1);
+  assert.equal(flow.start(),true);
+  while (flow.running) pending.shift().callback();
+  assert.equal(calls,6);
+  assert.equal(current.projection.mode,'player');
+  assert.equal(current.projection.state.turn,2);
+  assert.equal(flow.start(),false);
+});
+
+test('browser adapter reaches terminal enemy defeat without an extra turn', () => {
+  let profile = createIronDustProfile(defeat.seed);
+  for (const step of defeat.steps.slice(0,-1)) {
+    const command = step.command === 'E'
+      ? {type:'AutoEnemyAdvance',playerId:'enemy'}
+      : {type:'EndPhase',playerId:'player'};
+    const result = dispatchIronDustProfile(profile,command);
+    assert.ok(result.profile,JSON.stringify(result.error));
+    profile = result.profile;
+  }
+  const session = {profile,projection:projectIronDustProfile(profile)};
+  assert.equal(session.projection.mode,'enemy');
+  const final = dispatchIronDustBrowserAction(session,
+    {type:'AutoEnemyAdvance',playerId:'enemy'});
+  assert.equal(final.session.projection.mode,'ended');
+  assert.equal(final.session.projection.state.victory.winner,'enemy');
+  assert.equal(final.session.projection.state.turn,
+    session.projection.state.turn);
+  assert.equal(JSON.stringify(session.profile),JSON.stringify(profile));
+  assert.deepEqual(dispatchIronDustBrowserAction(final.session,
+    {type:'AutoEnemyAdvance',playerId:'enemy'}),{error:{code:'GAME_ENDED'}});
 });
 
 test('public host keeps the unfinished v2 option disabled', async () => {
@@ -259,6 +335,41 @@ test('local test path gates the board, can restart, and locks a failed v2 start'
     clickCell(8,3);
     assert.equal(JSON.stringify(bridge.session),beforeBadShot);
     assert.match(document.querySelector('#map-toast').textContent,/ABGELEHNT/);
+    assert.equal(bridge.restart(),true);
+    for (let i=0;i<3;i++) bridge.dispatch({type:'EndPhase',playerId:'player'});
+    assert.equal(bridge.session.projection.mode,'enemy');
+    assert.equal(bridge.enemyRunning,true);
+    assert.equal(document.querySelector('#end-turn').disabled,true);
+    const beforeDouble = JSON.stringify(bridge.session);
+    assert.deepEqual(bridge.dispatch({type:'EndPhase',playerId:'player'}),
+      {error:{code:'ENEMY_TURN_RUNNING'}});
+    assert.equal(JSON.stringify(bridge.session),beforeDouble);
+    assert.equal(bridge.restart(),true);
+    const restarted = JSON.stringify(bridge.session);
+    await new Promise(resolve => setTimeout(resolve,180));
+    assert.equal(JSON.stringify(bridge.session),restarted);
+    for (let i=0;i<3;i++) bridge.dispatch({type:'EndPhase',playerId:'player'});
+    for (let i=0;i<30 && bridge.enemyRunning;i++)
+      await new Promise(resolve => setTimeout(resolve,40));
+    assert.equal(bridge.enemyRunning,false);
+    assert.equal(bridge.session.projection.mode,'player');
+    assert.equal(bridge.session.projection.state.turn,2);
+    assert.ok(document.querySelector('#combat-log').children.some(line =>
+      line.textContent.includes('FIRST')));
+    assert.ok(document.querySelector('#combat-log').children.some(line =>
+      line.textContent.includes('RETRY')));
+    assert.ok(document.querySelector('#combat-log').children.some(line =>
+      line.textContent.includes('FINISH')));
+    assert.equal(bridge.restart(),true);
+    for (let i=0;i<3;i++) bridge.dispatch({type:'EndPhase',playerId:'player'});
+    const abandoned = JSON.stringify(bridge.session);
+    bridge.stop();
+    await new Promise(resolve => setTimeout(resolve,180));
+    assert.equal(bridge.active,false);
+    assert.equal(bridge.session,null);
+    assert.equal(bridge.enemyRunning,false);
+    assert.equal(globalThis.currentScenario,'iron-dust-v2');
+    assert.ok(abandoned.includes('"mode":"enemy"'));
     assert.equal(bridge.start({...first, header:{...first.header, ruleProfileId:'BAD'}}),false);
     assert.equal(bridge.mode,'error');
     assert.equal(bridge.session,null);

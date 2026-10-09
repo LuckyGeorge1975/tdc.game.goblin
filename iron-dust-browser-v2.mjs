@@ -24,7 +24,8 @@ export function createIronDustBrowserSession(profile = createIronDustProfile(IRO
 }
 
 export function dispatchIronDustBrowserAction(session, command) {
-  if (!['Move', 'Ram', 'SelectWeapon', 'PlayerFire', 'EndPhase'].includes(command?.type))
+  if (!['Move', 'Ram', 'SelectWeapon', 'PlayerFire', 'EndPhase',
+    'AutoEnemyAdvance'].includes(command?.type))
     return {error:{code:'BROWSER_ACTION_UNSUPPORTED'}};
   const query = queryIronDustProfile(session.profile, command);
   const preflight = preflightIronDustProfile(session.profile, command);
@@ -37,6 +38,38 @@ export function dispatchIronDustBrowserAction(session, command) {
     projection:projectIronDustProfile(result.profile, result.events)})};
 }
 
+export function createIronDustEnemyFlow({getSession, advance,
+  schedule = (callback, delay) => setTimeout(callback, delay),
+  clear = handle => clearTimeout(handle), delay = 140}) {
+  let generation = 0, handle = null, running = false;
+  const cancel = () => {
+    generation++;
+    if (handle !== null) clear(handle);
+    handle = null;
+    running = false;
+  };
+  const start = () => {
+    if (running || getSession()?.projection.mode !== 'enemy') return false;
+    running = true;
+    const current = ++generation;
+    const step = () => {
+      handle = null;
+      if (current !== generation || !running ||
+          getSession()?.projection.mode !== 'enemy') return;
+      const result = advance();
+      if (current !== generation) return;
+      if (!result?.session || result.session.projection.mode !== 'enemy') {
+        running = false;
+        return;
+      }
+      handle = schedule(step, delay);
+    };
+    handle = schedule(step, delay);
+    return true;
+  };
+  return Object.freeze({start, cancel, get running() {return running;}});
+}
+
 if (typeof document !== 'undefined') {
   const option = document.querySelector('#scenario-select option[value="iron-dust-v2"]');
   const localTest = ['localhost', '127.0.0.1'].includes(location.hostname) &&
@@ -46,25 +79,48 @@ if (typeof document !== 'undefined') {
   let session = null;
   let mode = 'inactive';
   let actionError = null;
+  let eventHistory = [];
   const endButton = document.querySelector('#end-turn');
   const legacyEndClick = endButton.onclick;
+  const enemyFlow = createIronDustEnemyFlow({getSession:() => mode === 'ready' ? session : null,
+    advance:() => commitAction({type:'AutoEnemyAdvance', playerId:'enemy'})});
   function renderCurrent() {
     if (mode !== 'ready' || !session) return;
     renderIronDustV2View(buildIronDustV2View(session.projection,
-      session.profile.header.ruleProfileId), {onAction:dispatchAction, actionError});
+      session.profile.header.ruleProfileId, eventHistory),
+    {onAction:dispatchAction, actionError});
     endButton.disabled = session.projection.mode !== 'player';
-    endButton.textContent = session.projection.state.phase === 'gev' ?
-      'END TURN' : 'NEXT PHASE';
+    endButton.textContent = session.projection.mode === 'ended' ? 'MISSION ENDED' :
+      session.projection.mode === 'enemy' ? 'HOSTILE TURN' :
+        session.projection.state.phase === 'gev' ? 'END TURN' : 'NEXT PHASE';
     const undo = document.querySelector('#undo-command');
     undo.disabled = true;
     undo.title = 'IRON DUST v2: Rückgängig ist noch nicht verfügbar';
   }
-  function dispatchAction(command) {
+  function commitAction(command) {
     if (mode !== 'ready' || !session) return {error:{code:'V2_NOT_READY'}};
+    const cursor = session.projection.cursor;
     const result = dispatchIronDustBrowserAction(session, command);
-    if (result.session) session = result.session;
+    if (result.session) {
+      session = result.session;
+      eventHistory.push(...session.projection.events.map(event => ({...event,
+        cursorPass:command.type === 'AutoEnemyAdvance' ? cursor?.pass : null,
+        cursorIndex:command.type === 'AutoEnemyAdvance' ? cursor?.index : null})));
+      eventHistory = eventHistory.slice(-120);
+    }
     actionError = result.error?.code ?? null;
     renderCurrent();
+    return result;
+  }
+  function dispatchAction(command) {
+    if (command?.type === 'AutoEnemyAdvance' || enemyFlow.running) {
+      actionError = command?.type === 'AutoEnemyAdvance' ?
+        'ENEMY_TURN_AUTOMATED' : 'ENEMY_TURN_RUNNING';
+      renderCurrent();
+      return {error:{code:actionError}};
+    }
+    const result = commitAction(command);
+    if (result.session?.projection.mode === 'enemy') enemyFlow.start();
     return result;
   }
   const legacyDraw = draw;
@@ -99,11 +155,13 @@ if (typeof document !== 'undefined') {
   }
   function start(profile) {
     if (!localTest || globalThis.goblinBootProfileError) return false;
+    enemyFlow.cancel();
     try {
       session = createIronDustBrowserSession(profile);
       mode = 'ready';
       showGate('V2-Profil validiert. Spielfläche bis zum vollständigen Browser-Gate gesperrt.');
       actionError = null;
+      eventHistory = [];
       resetIronDustV2View();
       document.body.classList.add('iron-dust-v2-ready');
       endButton.onclick = () => dispatchAction({type:'EndPhase', playerId:'player'});
@@ -116,9 +174,11 @@ if (typeof document !== 'undefined') {
     return mode === 'ready';
   }
   function stop() {
+    enemyFlow.cancel();
     session = null;
     mode = 'inactive';
     actionError = null;
+    eventHistory = [];
     endButton.onclick = legacyEndClick;
     document.body.classList.remove('iron-dust-v2-gated');
     document.body.classList.remove('iron-dust-v2-ready');
@@ -136,6 +196,7 @@ if (typeof document !== 'undefined') {
     get active() { return mode !== 'inactive'; },
     get mode() { return mode; },
     get session() { return session; },
+    get enemyRunning() {return enemyFlow.running;},
     dispatch: dispatchAction,
     start, restart: () => start(), stop
   });

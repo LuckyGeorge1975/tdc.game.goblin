@@ -23,7 +23,8 @@ const element = (tag, className, text) => {
 const svgElement = tag => document.createElementNS(SVG_NS, tag);
 const setText = (selector, value) => { document.querySelector(selector).textContent = value; };
 
-export function buildIronDustV2View(projection, ruleProfileId) {
+export function buildIronDustV2View(projection, ruleProfileId,
+  events = projection.events) {
   const state = projection.state;
   const terrain = new Map(state.map.terrain.map(cell => [`${cell.x},${cell.y}`, cell.type]));
   const cells = [];
@@ -48,13 +49,15 @@ export function buildIronDustV2View(projection, ruleProfileId) {
   return {
     profileVersion:projection.profileVersion, ruleProfileId,
     mode:projection.mode, phase:state.phase, turn:state.turn,
+    cursor:projection.cursor,
     victory:{status:state.victory.status, winner:state.victory.winner},
     cells, units,
     objective:{coreHp:core.hp, coreMaxHp:core.maxHp,
       progress:Math.round(100 * (core.maxHp - core.hp) / core.maxHp)},
-    events:projection.events.map(event => ({type:event.type,
+    events:events.map(event => ({type:event.type,
       actorId:event.actorId ?? event.attackerId ?? event.unitId ?? null,
-      targetId:event.targetId ?? null}))
+      targetId:event.targetId ?? null, cursorPass:event.cursorPass ?? null,
+      cursorIndex:event.cursorIndex ?? null}))
   };
 }
 
@@ -191,8 +194,10 @@ function renderWeapons(view, onAction) {
   const panel = document.querySelector('#weapon-controls');
   const actor = view.units.find(unit => unit.id === selectedUnitId && unit.team === 'player');
   panel.replaceChildren();
-  panel.classList.toggle('hidden', !onAction || actor?.id !== 'ogre' || view.phase !== 'fire');
-  if (!onAction || actor?.id !== 'ogre' || view.phase !== 'fire') return;
+  const available = onAction && view.mode === 'player' &&
+    actor?.id === 'ogre' && view.phase === 'fire';
+  panel.classList.toggle('hidden', !available);
+  if (!available) return;
   for (const [key, weapon] of Object.entries(actor.weapons)) {
     const button = element('button', `weapon-control${key === actor.selectedWeapon ? ' active' : ''}`);
     button.type = 'button';
@@ -219,7 +224,9 @@ export function renderIronDustV2View(view, {onAction = null, actionError = null}
     view.victory.winner === 'player' ? 'MISSION COMPLETE' : 'MISSION FAILED' :
     title && title !== titleKey ? title : 'IRON DUST v2 · PROFILANSICHT');
   setText('#mission-sub', `${view.ruleProfileId} · ${view.mode === 'enemy' ?
-    'GEGNERZUG FOLGT IM NÄCHSTEN TESTABSCHNITT' : 'LOKALER AKTIONSTEST'}`);
+    `GEGNERZUG ${view.cursor?.pass?.toUpperCase() ?? '—'} ${
+      view.cursor?.pass === 'finish' ? '' : `${(view.cursor?.index ?? 0) + 1}/2`}` :
+    view.mode === 'ended' ? 'MISSION BEENDET' : 'LOKALER AKTIONSTEST'}`);
   setText('#objective-text', `CORE HP ${view.objective.coreHp}/${view.objective.coreMaxHp}`);
   document.querySelector('#objective-progress').style.width = `${view.objective.progress}%`;
   const phase = view.victory.status === 'ended' ?
@@ -239,11 +246,14 @@ export function renderIronDustV2View(view, {onAction = null, actionError = null}
     actionError ? `REJECT · ${actionError}` : 'PROFILE ACTIVE');
   const toast = document.querySelector('#map-toast');
   toast.textContent = actionError ? `BEFEHL ABGELEHNT · ${actionError}` :
-    view.mode === 'enemy' ? 'GEGNERZUG IN DIESER TEILPROBE GESPERRT' :
+    view.mode === 'enemy' ? 'GEGNERZUG LÄUFT · AKTIONEN GESPERRT' :
       view.victory.status === 'ended' ? 'MISSION BEENDET' :
         `${view.phase.toUpperCase()} · EINHEIT WÄHLEN`;
   const log = document.querySelector('#combat-log');
   log.replaceChildren(...(view.events.length ? view.events.map(event =>
-    element('div', 'log-line', `${event.type} · ${event.actorId ?? '—'} → ${event.targetId ?? '—'}`)) :
+    element('div', 'log-line', `${event.cursorPass ? event.cursorPass === 'finish' ?
+      'FINISH · ' : `${event.cursorPass.toUpperCase()} ${event.cursorIndex + 1}/2 · ` :
+      ''}${event.type} · ${
+      event.actorId ?? '—'} → ${event.targetId ?? '—'}`)) :
     [element('div', 'log-line', 'V2-Profil geladen · noch keine Ereignisse')]));
 }
