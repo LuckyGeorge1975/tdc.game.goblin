@@ -2,20 +2,23 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## Build 0.1.20 · lokaler Integrationskandidat
+## Build 0.1.20 · geprüfter, unveröffentlichter Releasekandidat
 
 | Feld | Wert |
 |---|---|
 | Version | `0.1.20` |
 | Build | `20` |
 | Basis | Öffentlich geprüftes `v0.1.19` auf `81692a727fe4b9121865ae552c5183763a7a1302` |
-| Eingebrachter Produktstand | Lokal geprüfter IRON-DUST-v2-Stand `9ca56b71ebf52c1fd63ecccf76470835a4f24565` |
-| Integrationszweig | `codex/release-integration-020`; feste Prüf-SHA im Issue `goblin-nuu.2` |
-| Datum | 2026-10-09 |
+| Eingebrachter v2-Ausgangsstand | `9ca56b71ebf52c1fd63ecccf76470835a4f24565`; Integration `goblin-nuu.2` |
+| Unabhängig geprüfter Produktstand | `5d54a4d5ae6ee8375c446303c1c2f895d9c7f68e` auf `codex/release-integration-020` |
+| Regression | Vollständige Suite und Release-Verifier auf `e4930e7`, gezielter Text-Delta-Retest samt voller Suite auf `5d54a4d` (`goblin-nuu.3`, `.7`) |
+| Lokale Browser-/Bedien-QA | Sieg, Niederlage, Desktop/Mobil und vier Sprachen auf `e4930e7`; Quick-Start-Delta in vier Sprachen auf `5d54a4d` (`goblin-nuu.4`, `.7`) |
+| Content / Legal | Geprüftes Delta auf `5d54a4d`; begrenzte Empfehlung für nichtkommerzielle öffentliche Vorschau (`goblin-nuu.5`, [Notices](../docs/CONTENT-NOTICES.md)) |
+| Datum des Kandidatenstands | 2026-10-12 |
 | Pages-Einstieg nach gesonderter Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.20> |
 | Änderungen | [CHANGELOG.md](../CHANGELOG.md#0120---2026-10-09) |
 
-Die Integration erhält die öffentliche Supercover-Mission und die acht Legacy-Missionen samt veröffentlichten Daten, Content-Notices und Rückfallstand. IRON DUST v2 ist im normalen Level-Menü ohne Testflag auswählbar, auch auf Pages. Seed 8 führt über normale UI-Aktionen zum Sieg; `?iron-dust-v2-seed=2` ermöglicht den reproduzierbaren Niederlagepfad ausschließlich auf `localhost` oder `127.0.0.1`. Neue v2-Anzeigen und der Live-Status im Unit Guide verwenden die vier Sprachkataloge; historische Katalogeinträge des Unit Guide wurden nicht übersetzt. Die Folgeprüfung des öffentlichen Level-Gates, der Sprachansichten und die feste neue SHA stehen in `goblin-nuu.6`. Die früheren unabhängigen v2-Prüfungen auf `9ca56b7` ersetzen **keine** unabhängige Integrations-/Release-QA auf dem neuen Commit. Desktop/Mobil, beide Terminalpfade, Legacy und Supercover, Content-/Legal-Delta und öffentlicher Pages-Einstieg sind vor Veröffentlichung zu prüfen. Kein Push, Tag oder Deploy aus diesem Handoff.
+Die Integration erhält die öffentliche Supercover-Mission und die acht Legacy-Missionen samt veröffentlichten Daten, Content-Notices und Rückfallstand. IRON DUST v2 ist im normalen Level-Menü ohne Testflag auswählbar; die lokale QA prüfte beide Terminalpfade, Desktop/Mobil, Legacy, Supercover und die vier v2-Sprachansichten. Seed 8 führt über normale UI-Aktionen zum Sieg; `?iron-dust-v2-seed=2` ermöglicht den reproduzierbaren Niederlagepfad ausschließlich auf `localhost` oder `127.0.0.1`. Neue v2-Anzeigen und der Live-Status im Unit Guide verwenden die vier Sprachkataloge; historische Katalogeinträge des Unit Guide wurden nicht übersetzt. Der neue Quick Start nennt den Kommandopanzer in vier Sprachen (`goblin-nuu.7`). Die Content-/Legal-Empfehlung gilt nur für das geprüfte Delta und die begrenzte nichtkommerzielle Vorschau, nicht für umfassende Rechte oder eine bereits erteilte Veröffentlichungsfreigabe. Das Metadaten-Delta dieses Handoffs braucht noch einen unabhängigen Lese-Review auf seiner festen Commit-SHA (`goblin-nuu.8`). Danach bleiben gesonderte Nutzerfreigabe, Push/Tag/Deploy und Prüfung des tatsächlichen öffentlichen Pages-Einstiegs offen (`goblin-nuu`); `v0.1.19` bleibt bis dahin die öffentliche Fassung und der Rückfallpunkt.
 
 ## Build 0.1.19 · lokaler Kandidat
 
