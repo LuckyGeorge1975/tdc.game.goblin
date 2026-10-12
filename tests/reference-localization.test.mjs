@@ -57,6 +57,29 @@ test('phase fixture instructions and Skimmer phase displays translate without vi
         `${lang}: ${fullKey}`);
     }
   }
+  const quickSource = readFileSync(new URL('../quick-start.js', import.meta.url), 'utf8');
+  const intro = {textContent:'Legacy intro'}, footer = {textContent:'Legacy footer'};
+  const grid = {style:{}}, classes = {remove(){},add(){},contains(){return false}};
+  const modal = {classList:classes,addEventListener(){},querySelector(selector){
+    return selector === '.quick-guide-intro' ? intro :
+      selector === '.quick-guide-grid' ? grid : footer;
+  }};
+  const open = {}, close = {};
+  let lang = 'de';
+  const quickContext = {document:{querySelector(selector){return selector === '#quick-start-modal' ? modal :
+    selector === '#quick-start-open' ? open : close;},addEventListener(){}},
+    GoblinLanguage:{t:key=>context.GoblinLanguage.t(key,{},lang)},
+    IronDustBrowserV2:{mode:'ready'}};
+  runInNewContext(quickSource,quickContext);
+  const commandTank = {de:'Kommandopanzer',en:'command tank',es:'tanque de mando',
+    fr:'char de commandement'};
+  for (const [locale,name] of Object.entries(commandTank)) {
+    lang=locale;
+    open.onclick();
+    assert.ok(footer.textContent.includes(name), `${locale}: ${footer.textContent}`);
+    assert.doesNotMatch(footer.textContent,/\bogre\b/i);
+    assert.equal(grid.style.display,'none');
+  }
   const previousLanguage=globalThis.GoblinLanguage;
   const events=['UnitMoved','EnemyMoved','EnemyHeld','EnemySkipped','UnitRecovered',
     'PhaseChanged','EnemyPassRecorded','PlayerFireResolved','EnemySystemFireResolved',
