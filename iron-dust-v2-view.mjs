@@ -22,6 +22,14 @@ const element = (tag, className, text) => {
 };
 const svgElement = tag => document.createElementNS(SVG_NS, tag);
 const setText = (selector, value) => { document.querySelector(selector).textContent = value; };
+const unitArt = unit => {
+  const asset = unit?.hp > 0 ? globalThis.UnitVisuals?.resolve?.(unit)?.asset : null;
+  if (!asset) return null;
+  const image = element('img', 'unit-art-image');
+  image.src = asset;
+  image.alt = '';
+  return image;
+};
 const t = key => globalThis.GoblinLanguage?.t(key) ?? key;
 const label = (key, fallback) => { const value = t(key); return value === key ? fallback : value; };
 const visibleEvents = new Set(['UnitMoved', 'EnemyMoved', 'EnemyHeld',
@@ -105,8 +113,15 @@ function renderIntel(view) {
   const unit = view.units.find(item => item.id === selectedUnitId);
   const cell = selectedCell && view.cells.find(item =>
     item.x === selectedCell.x && item.y === selectedCell.y);
-  setText('#selection-readout', unit ? `${unitLabel(unit.id)} · ${cellLabel(unit.x, unit.y)} · ${t(unit.team === 'player' ? 'v2.ui.ready' : 'v2.ui.view')}` :
-    t('v2.ui.selectUnitOrHex'));
+  const selection = document.querySelector('#selection-readout');
+  const icon = element('span', 'selection-icon');
+  const artwork = unitArt(unit);
+  if (artwork) icon.append(artwork);
+  else icon.textContent = unit?.hp > 0 ? unit.icon : unit ? '×' : '+';
+  const details = element('div');
+  details.append(element('b', null, unit ? unitLabel(unit.id) : t('v2.ui.selectUnitOrHex')),
+    element('small', null, unit ? `${cellLabel(unit.x, unit.y)} · ${t(unit.team === 'player' ? 'v2.ui.ready' : 'v2.ui.view')}` : ''));
+  selection.replaceChildren(icon, details);
   setText('#unit-intel-kicker', t(unit?.team === 'enemy' ? 'v2.ui.hostileIntel' : 'v2.ui.unitIntel'));
   setText('#unit-intel-title', unit ? unitLabel(unit.id) : t('v2.ui.noUnit'));
   setText('#unit-intel-copy', unit ?
@@ -132,7 +147,10 @@ function renderRoster(view, rerender) {
     card.tabIndex = 0;
     card.setAttribute('role', 'button');
     card.setAttribute('aria-label', globalThis.GoblinLanguage?.t('v2.ui.selectAria', {unit:unitLabel(unit.id)}) ?? `${unitLabel(unit.id)} auswählen`);
-    const token = element('div', 'unit-token', unit.hp <= 0 ? '×' : unit.icon);
+    const token = element('div', 'unit-token');
+    const artwork = unitArt(unit);
+    if (artwork) token.append(artwork);
+    else token.textContent = unit.hp <= 0 ? '×' : unit.icon;
     const name = element('div');
     name.append(element('span', 'unit-name', unitLabel(unit.id)),
       element('span', 'unit-type', unit.hp <= 0 ? t('v2.ui.destroyed') : unit.disabled ? t('v2.ui.disabled') :

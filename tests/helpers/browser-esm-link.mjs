@@ -20,7 +20,7 @@ async function load(path) {
 const entry = await load(resolve(root, 'iron-dust-browser-v2.mjs'));
 await entry.link((specifier, referrer) => {
   assert.ok(specifier.startsWith('.'), `unexpected browser dependency: ${specifier}`);
-  return load(resolve(dirname(referrer.identifier), specifier));
+  return load(resolve(dirname(referrer.identifier), specifier.split('?')[0]));
 });
 await entry.evaluate();
 const session = entry.namespace.createIronDustBrowserSession();

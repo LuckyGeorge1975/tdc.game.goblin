@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {existsSync, readFileSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
 import {
   createIronDustBrowserSession, dispatchIronDustBrowserAction,
   createIronDustEnemyFlow,
@@ -9,7 +11,7 @@ import {
 } from '../iron-dust-browser-v2.mjs';
 import {createIronDustProfile, dispatchIronDustProfile,
   projectIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
-import {buildIronDustV2View, renderIronDustV2View} from '../iron-dust-v2-view.mjs';
+import {buildIronDustV2View, renderIronDustV2View} from '../iron-dust-v2-view.mjs?v=4';
 import {IRON_DUST_SOURCE_DEFEAT_TRACE_V2 as defeat} from
   './iron-dust-source-defeat-trace.v2.mjs';
 
@@ -271,7 +273,13 @@ test('Pages path starts v2, can restart, and locks a failed v2 start', async () 
   globalThis.location = {hostname:'luckygeorge1975.github.io',
     pathname:'/tdc.game.goblin/',search:'?iron-dust-v2-seed=2'};
   globalThis.draw = () => {};
-  globalThis.UnitVisuals = {terrainAssetFor:() => null,draw:() => {}};
+  const visualContext={document};
+  runInNewContext(readFileSync(new URL('../unit-visuals.js',import.meta.url),'utf8'),visualContext);
+  const visuals=visualContext.UnitVisuals;
+  globalThis.UnitVisuals={styles:visuals.styles,setStyle:visuals.setStyle,
+    assetFor:visuals.assetFor,resolve:visuals.resolve,
+    terrainAssetFor:() => null,draw:() => {}};
+  globalThis.UnitVisuals.setStyle('02-technical-illustration');
   globalThis.GoblinLanguage = {t:key => key === 'mission.iron-dust-v2.title' ? titles[locale] :
     ({'v2.phase.movement':'BEWEGUNG','v2.phase.fire':'FEUER','v2.lose':'MISSION GESCHEITERT',
       'v2.error':'BEFEHL ABGELEHNT','v2.undo':'Rückgängig ist nicht verfügbar.',
@@ -305,6 +313,29 @@ test('Pages path starts v2, can restart, and locks a failed v2 start', async () 
     assert.equal(document.body.classList.contains('iron-dust-v2-ready'),true);
     assert.equal(document.querySelector('#battlefield-map').children.length,103);
     assert.equal(document.querySelector('#unit-roster').children.length,4);
+    const beforeArtSwitch=JSON.stringify(bridge.session);
+    const artPaths=new Set();
+    for(const style of globalThis.UnitVisuals.styles){
+      globalThis.UnitVisuals.setStyle(style.id);
+      globalThis.draw();
+      const players=bridge.session.projection.state.units.filter(unit=>unit.team==='player');
+      const cards=document.querySelector('#unit-roster').children;
+      for(const [index,unit] of players.entries()){
+        const expected=globalThis.UnitVisuals.assetFor(unit);
+        assert.equal(cards[index].children[0].children[0].src,expected,
+          `${style.id} ${unit.id} roster`);
+        assert.ok(existsSync(new URL(`../${expected}`,import.meta.url)),
+          `${style.id} ${unit.id} asset exists`);
+      }
+      const card=cards[0],asset=globalThis.UnitVisuals.assetFor(players[0]);
+      card.click();
+      assert.equal(document.querySelector('#selection-readout').children[0].children[0].src,
+        asset,`${style.id} selection`);
+      artPaths.add(asset);
+    }
+    assert.equal(artPaths.size,6);
+    assert.equal(JSON.stringify(bridge.session),beforeArtSwitch,
+      'switching art styles never changes the v2 game state');
     assert.equal(document.querySelector('#mission-sub').textContent,'v2.objective');
     assert.equal(document.querySelector('#objective-text').textContent,'CORE HP 5/5 · v2.objective');
     assert.equal(document.querySelector('#phase-title').textContent,'BEWEGUNG');

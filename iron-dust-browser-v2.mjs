@@ -4,7 +4,7 @@ import {
   IRON_DUST_PROFILE_HEADER
 } from './src/core/iron-dust-executable-profile.mjs';
 import {buildIronDustV2View, renderIronDustV2View,
-  resetIronDustV2View} from './iron-dust-v2-view.mjs';
+  resetIronDustV2View} from './iron-dust-v2-view.mjs?v=4';
 
 // Browser commands cross the same validated profile boundary as the Core probes.
 export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';
