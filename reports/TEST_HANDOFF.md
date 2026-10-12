@@ -2,7 +2,21 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## Build 0.1.20 · geprüfter, unveröffentlichter Releasekandidat
+## Build 0.1.21 · lokaler Incident-Fix-Kandidat
+
+| Feld | Wert |
+|---|---|
+| Version | `0.1.21` |
+| Build | `21` |
+| Veröffentlichte Basis | `v0.1.20` auf `febdfe2c5b9950a6828a69c75783ce2b4f2f14e2` |
+| Lokaler Fixstand | `eefda4f2901442f639c34060418f9b5d798b847f` auf `codex/icon-set-v2-repair`; Metadaten-Nachtrag und feste QA-SHA in `goblin-dfs` |
+| Datum | 2026-10-12 |
+| Pages-Einstieg erst nach gesonderter Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.21> |
+| Änderungen | [CHANGELOG.md](../CHANGELOG.md#0121---2026-10-12) |
+
+Der Fix bindet die bereits vorhandenen sechs Grafiksets in IRON DUST v2 an Einheitenliste und Auswahl an. Der Setwechsel aktualisiert beide Bereiche ohne Zustandsänderung. Legacy, Kartenzeichnung, Layout, Regeln und Assetdateien sind gegenüber 0.1.20 unverändert. Die breitere Lesbarkeit der Legacy-Icons ist kein Teil dieses Kandidaten; der öffentliche Vergleichsbefund und die Nutzerentscheidung stehen im Incident `goblin-dfs`. Developer-Prüfungen auf `eefda4f`: gezielte 12/12 Tests, volle Node-Suite und Release-Verifier bestanden. Unabhängige Regression und Browser-/Bedien-QA müssen den finalen Kandidatencommit prüfen; Content-/Legal-/Releasegrenzen und ein möglicher Deploy werden in `goblin-dfs` dokumentiert. Kein Push, Tag oder Deploy aus diesem Handoff.
+
+## Build 0.1.20 · veröffentlicht
 
 | Feld | Wert |
 |---|---|
@@ -15,10 +29,10 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Lokale Browser-/Bedien-QA | Sieg, Niederlage, Desktop/Mobil und vier Sprachen auf `e4930e7`; Quick-Start-Delta in vier Sprachen auf `5d54a4d` (`goblin-nuu.4`, `.7`) |
 | Content / Legal | Geprüftes Delta auf `5d54a4d`; begrenzte Empfehlung für nichtkommerzielle öffentliche Vorschau (`goblin-nuu.5`, [Notices](../docs/CONTENT-NOTICES.md)) |
 | Datum des Kandidatenstands | 2026-10-12 |
-| Pages-Einstieg nach gesonderter Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.20> |
+| Veröffentlichter Pages-Einstieg | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.20> |
 | Änderungen | [CHANGELOG.md](../CHANGELOG.md#0120---2026-10-09) |
 
-Die Integration erhält die öffentliche Supercover-Mission und die acht Legacy-Missionen samt veröffentlichten Daten, Content-Notices und Rückfallstand. IRON DUST v2 ist im normalen Level-Menü ohne Testflag auswählbar; die lokale QA prüfte beide Terminalpfade, Desktop/Mobil, Legacy, Supercover und die vier v2-Sprachansichten. Seed 8 führt über normale UI-Aktionen zum Sieg; `?iron-dust-v2-seed=2` ermöglicht den reproduzierbaren Niederlagepfad ausschließlich auf `localhost` oder `127.0.0.1`. Neue v2-Anzeigen und der Live-Status im Unit Guide verwenden die vier Sprachkataloge; historische Katalogeinträge des Unit Guide wurden nicht übersetzt. Der neue Quick Start nennt den Kommandopanzer in vier Sprachen (`goblin-nuu.7`). Die Content-/Legal-Empfehlung gilt nur für das geprüfte Delta und die begrenzte nichtkommerzielle Vorschau, nicht für umfassende Rechte oder eine bereits erteilte Veröffentlichungsfreigabe. Das Metadaten-Delta dieses Handoffs braucht noch einen unabhängigen Lese-Review auf seiner festen Commit-SHA (`goblin-nuu.8`). Danach bleiben gesonderte Nutzerfreigabe, Push/Tag/Deploy und Prüfung des tatsächlichen öffentlichen Pages-Einstiegs offen (`goblin-nuu`); `v0.1.19` bleibt bis dahin die öffentliche Fassung und der Rückfallpunkt.
+Die Integration erhält die öffentliche Supercover-Mission und die acht Legacy-Missionen samt veröffentlichten Daten, Content-Notices und Rückfallstand. IRON DUST v2 ist im normalen Level-Menü ohne Testflag auswählbar; die lokale QA prüfte beide Terminalpfade, Desktop/Mobil, Legacy, Supercover und die vier v2-Sprachansichten. Seed 8 führt über normale UI-Aktionen zum Sieg; `?iron-dust-v2-seed=2` ermöglicht den reproduzierbaren Niederlagepfad ausschließlich auf `localhost` oder `127.0.0.1`. Neue v2-Anzeigen und der Live-Status im Unit Guide verwenden die vier Sprachkataloge; historische Katalogeinträge des Unit Guide wurden nicht übersetzt. Der neue Quick Start nennt den Kommandopanzer in vier Sprachen (`goblin-nuu.7`). Die Content-/Legal-Empfehlung galt nur für das geprüfte Delta und die begrenzte nichtkommerzielle Vorschau, nicht für umfassende Rechte. Build 0.1.20 wurde unter `v0.1.20` auf Commit `febdfe2c5b9950a6828a69c75783ce2b4f2f14e2` veröffentlicht (`goblin-nuu`); der nach Veröffentlichung gemeldete Icon-Sichtbefund wird in `goblin-dfs` bearbeitet. `v0.1.19` bleibt der ältere geprüfte Rückfallpunkt.
 
 ## Build 0.1.19 · lokaler Kandidat
 

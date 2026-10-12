@@ -2,11 +2,16 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden in `goblin-hr7` nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.21] - 2026-10-12
+
+- IRON DUST v2 zeigt die gewählten vorhandenen `ICON SET`-Motive nun auch in Einheitenliste und Auswahl an. Der Setwechsel aktualisiert beide Bereiche, ohne den Spielzustand zu verändern. Die Kartenzeichnung, der Legacy-Pfad, Layout, Regeln und Assetdateien bleiben unverändert (`goblin-dfs`).
+- Dieser Eintrag beschreibt einen lokalen Fix-Kandidaten auf dem veröffentlichten Build 0.1.20. Unabhängige Regression und Browserprüfung, Release-/Content-/Legal-Grenzen sowie ein möglicher neuer Pages-Deploy werden im Incident `goblin-dfs` entschieden und belegt. Keine breitere Änderung an der Lesbarkeit der Legacy-Icons ist enthalten; `v0.1.20` bleibt bis zu einem gesondert geprüften Deploy die öffentliche Fassung.
+
 ## [0.1.20] - 2026-10-09
 
 - IRON DUST v2 ist als getrenntes, regulär auswählbares Level integriert. Es nutzt das versionierte Regelprofil mit vier eigenen und drei gegnerischen Einheiten, automatischem Gegnerzug und über die normale Oberfläche erreichbarem Sieg und Niederlage. Neue v2-Bedientexte, Missionsziel, Quick Start, Live-Status im Unit Guide und Kampfmeldungen sind in Deutsch, Englisch, Spanisch und Französisch angebunden; die übrigen historischen Katalogeinträge des Unit Guide bleiben unverändert.
 - Die öffentliche Supercover-Mission aus 0.1.19 und die acht historischen Legacy-Missionen bleiben erhalten. IRON DUST v2 ist im regulären Level-Menü auch auf Pages auswählbar. Der Entwicklungsparameter `iron-dust-v2-seed=2` aktiviert den reproduzierbaren Niederlagepfad ausschließlich auf `localhost` oder `127.0.0.1`. Die bisher veröffentlichten Bildsets, Layouts und Content-Rechte werden nicht erweitert.
-- Dieser Eintrag beschreibt einen **geprüften, noch unveröffentlichten Releasekandidaten**. Unabhängige lokale Regression und Browser-/Bedien-QA sowie Content-/Legal-Delta wurden auf Produktstand `5d54a4d5ae6ee8375c446303c1c2f895d9c7f68e` dokumentiert (`goblin-nuu.3` bis `.5`, `.7`); Content und Legal empfehlen nur die begrenzte nichtkommerzielle Vorschau. Das abschließende Metadaten-Delta wird gesondert geprüft (`goblin-nuu.8`). Nutzerfreigabe, Pages-Deploy, danach öffentlicher Einstieg und eindeutiges Tag bleiben Release-Gates (`goblin-nuu`). `v0.1.19` bleibt bis dahin die öffentlich geprüfte Fassung und der Rückfallpunkt.
+- Build 0.1.20 wurde nach lokaler Regression, Browser-/Bedien-QA und begrenzter Content-/Legal-Prüfung unter `v0.1.20` auf Commit `febdfe2c5b9950a6828a69c75783ce2b4f2f14e2` veröffentlicht (`goblin-nuu`). Der nach Veröffentlichung gemeldete Sichtbefund zu den Grafiksets wird in `goblin-dfs` bearbeitet; `v0.1.19` bleibt der zuvor geprüfte Rückfallpunkt.
 
 ## [0.1.19] - 2026-10-08
 
