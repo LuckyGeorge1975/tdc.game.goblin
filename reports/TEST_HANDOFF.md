@@ -2,7 +2,7 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## Build 0.1.23 · lokaler PNG-Kandidat, unveröffentlicht
+## Build 0.1.23 · lokaler PNG-Kandidat, zur diagnostischen Veröffentlichung freigegeben
 
 | Feld | Wert |
 |---|---|
@@ -10,12 +10,14 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Build | `23` |
 | Veröffentlichte Basis | `v0.1.22` auf `dc7d068b1b14043962a7e296620020e2567760a3` |
 | Lokaler Runtime-Kandidat | `09b1b703d02eec11010c9ada56159a92e698fcc6` (`goblin-gp7`); der lokale Paket-Commit ist im Issue dokumentiert |
+| Geprüftes lokales Paket | `6f7e30b6470574b4c9d59f23ccd89fea1ab7d7e9`; nachfolgendes Freigabe-Dokudelta im Issue |
 | Kanonische Unit-Art-Quelle | Content-06-PNGs ab `2fd8ae9`; 130/130 SHA-256-identisch zur Runtime |
 | Datum des Kandidatenpakets | 2026-10-13 |
-| Pages-Einstieg erst nach gesonderter Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.23> |
+| Nutzerfreigabe | 13.10.2026 im Koordinations-Chat ausdrücklich für die diagnostische Veröffentlichung von 0.1.23 erteilt (`goblin-gp7`) |
+| Pages-Einstieg nach Deploy zu prüfen | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.23> |
 | Änderungen | [CHANGELOG.md](../CHANGELOG.md#0123---2026-10-13) |
 
-Sets 01–05 verwenden 130 transparente 256 × 256-RGBA-PNGs für Karte, Liste und Auswahl; Set 06 bleibt bei SVG. Die bisherigen SVGs bleiben im Repository, Guide und Terrain unverändert. Die zusätzliche rohe Assetmenge beträgt 1.416.801 Bytes (1,35 MiB). Der Skript-Cacheparameter für `unit-visuals.js` wurde angehoben und der lokale Server liefert `image/png`. Die Rasterdateien umgehen die interne SVG-Darstellung als technische Hypothese zum auf Android weiter sichtbaren Verlust heller Innenflächen. Auf `09b1b70` bestanden 375/375 Node-Tests, 130/130 Quellen-Hashes, Staging-Preflight und lokale Browserprüfungen für Legacy und IRON DUST v2 mit 54/34/27-px-Icongrößen; Set 06 blieb SVG. Für das Build-0.1.23-Metadatendelta bestanden `verify-release --previous=v0.1.22` und erneut 375/375 Node-Tests. Belege: `.tools/qa-gp7-png-set04-desktop.png` und `.tools/qa-gp7-png-set04-selected.png` (`goblin-gp7`). Desktop-Icons zeigen helle Innenflächen, wirken wegen transparenter Ränder aber schmaler als die enger zugeschnittenen SVGs. Der echte Android-A/B-Nachtest und unabhängige Bedien-QA auf der finalen Paket-SHA sind offen. Der Kandidat enthält keine Freigabe für Push, Tag oder Deploy; `v0.1.22` bleibt öffentlich verfügbar und `v0.1.21` älterer Rückfallpunkt. Die Content-/Legal-Beschreibung ist auf projektinterne Rasterkopien und die bisher begrenzte nichtkommerzielle Einschätzung beschränkt ([Notices](../docs/CONTENT-NOTICES.md)).
+Sets 01–05 verwenden 130 transparente 256 × 256-RGBA-PNGs für Karte, Liste und Auswahl; Set 06 bleibt bei SVG. Die bisherigen SVGs bleiben im Repository, Guide und Terrain unverändert. Die zusätzliche rohe Assetmenge beträgt 1.416.801 Bytes (1,35 MiB). Der Skript-Cacheparameter für `unit-visuals.js` wurde angehoben und der lokale Server liefert `image/png`. Die Rasterdateien umgehen die interne SVG-Darstellung als technische Hypothese zum auf Android weiter sichtbaren Verlust heller Innenflächen. Auf `09b1b70` bestanden 375/375 Node-Tests, 130/130 Quellen-Hashes und Staging-Preflight. Auf Metadaten-Commit `5e596eb` bestanden der Release-Verifier gegen `v0.1.22` und erneut 375/375 Node-Tests; der direkte Folgecommit `6f7e30b` korrigierte nur eine Handoff-Zeile und bestand den gezielten Diff-Check sowie den Release-Verifier. Die unabhängige Regression bestätigte 375/375 Tests und den Verifier auf `5e596eb`. Die unabhängige Desktop-Bedien-QA auf `09b1b70` bestätigte Legacy und IRON DUST v2 für Sets 02/04/05 mit geladenen, gefüllten PNGs in Karte, Liste und Auswahl; Set 06 und Guide blieben unverändert. Der finale lokale Browser-Smoke auf `6f7e30b` zeigte FIELD TEST 0.1.23, sieben Set-04-Karten-PNGs mit HTTP 200 `image/png` und gefüllte Innenformen. Belege: `.tools/qa-gp7-09b-legacy-02.png`, `-legacy-04.png`, `-legacy-05.png`, `-v2-02.png`, `-v2-04.png`, `-v2-05.png` sowie `.tools/qa-gp7-final-6f7-legacy-04.png` (`goblin-gp7`). Die Motive wirken wegen transparenter Ränder schmaler als die enger zugeschnittenen SVGs; eine vollständige Console-Fehlerfreiheit wurde im engen finalen Smoke nicht behauptet. Content und Legal fanden für das geprüfte Delta keine neue Quelle oder Rechtehürde innerhalb der begrenzten nichtkommerziellen Vorschau. Die Nutzerfreigabe für die diagnostische Veröffentlichung liegt vor. Der echte Android-A/B-Nachtest ist weiterhin offen; Push, Tag, Deploy und der öffentliche Pages-Einstieg müssen nach diesem Dokumentationscommit erst ausgeführt und geprüft werden. Bis dahin bleibt `v0.1.22` öffentlich verfügbar und `v0.1.21` älterer Rückfallpunkt ([Notices](../docs/CONTENT-NOTICES.md)).
 
 ## Build 0.1.22 · veröffentlicht, Android-Defekt weiter offen
 
