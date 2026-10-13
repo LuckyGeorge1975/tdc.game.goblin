@@ -2,10 +2,15 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden im jeweiligen Release-Issue nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.23] - 2026-10-13
+
+- Lokaler, unveröffentlichter Kandidat: Die kleinen Karten-, Listen- und Auswahlicons der Sets 01–05 laden 130 kanonische, projektinterne 256 × 256-RGBA-PNGs statt der SVG-Dateien (`09b1b70`, `goblin-gp7`). Die PNGs stimmen 130/130 per SHA-256 mit den Content-06-Quelldateien überein und ergänzen die rohen Runtime-Assets um 1.416.801 Bytes (1,35 MiB). Die SVGs bleiben im Repository; Set 06, Unit Guide, Terrain, Regeln und Layout behalten ihre bisherigen Pfade beziehungsweise Funktionen. Der lokale Server liefert PNGs als `image/png`; die geänderte Icon-Pfadlogik erhält einen neuen Skript-Cacheparameter.
+- Der Wechsel umgeht die interne SVG-Darstellung als technische Hypothese zum auf echtem Android weiterhin beobachteten Verlust heller Icon-Innenflächen. Lokale Desktop-Prüfungen in Legacy und IRON DUST v2 zeigen geladene PNGs bei 54/34/27 px und sichtbare Innenflächen; die Motive wirken durch transparente Ränder schmaler als die bisherigen eng zugeschnittenen SVGs. Eine Wirkung auf dem betroffenen Android-Gerät ist nicht nachgewiesen. Unabhängige Bedienprüfung und Freigabe für Push, Tag oder Pages-Deploy bleiben gesonderte Schritte; `v0.1.22` bleibt öffentlich verfügbar.
+
 ## [0.1.22] - 2026-10-13
 
 - Die 26 bestehenden Karten- und Listenicons des Sets 04 Pixel-Strategie enthalten ihre bisherigen Füll-, Kontur- und Schriftwerte zusätzlich als SVG-Präsentationsattribute (`c0fd78b`, `goblin-gp7`). Dies ist ein Kompatibilitätsfallback für die auf einem Android-Screenshot beobachteten fast schwarzen Innenflächen; Motive, Palette, Filter, Regeln und Layout sind unverändert.
-- Der kanonische Unit-Art-Generator und seine 26 Set-04-Quellicons wurden separat auf `da9095b` nachgezogen und reproduzieren die Runtime-Dateien. Auf dem lokalen Kandidaten `5ad3481` bestanden finale Regression sowie Desktop-, v2- und emulierte Mobilprüfung im begrenzten Umfang; Content und Legal fanden für diesen mechanischen Fallback keine neue Rechtehürde für die bisherige nichtkommerzielle Vorschau (`goblin-gp7`). Der Nutzer hat die Veröffentlichung von 0.1.22 gesondert freigegeben. Ob die Änderung den Fehler auf dem betroffenen Android-Gerät behebt, ist offen; Push, Tag, Deploy und öffentliche Pages-Prüfung stehen noch aus. Bis dahin bleibt `v0.1.21` öffentlich verfügbar.
+- Der kanonische Unit-Art-Generator und seine 26 Set-04-Quellicons wurden separat auf `da9095b` nachgezogen und reproduzieren die Runtime-Dateien. Auf dem lokalen Kandidaten `5ad3481` bestanden finale Regression sowie Desktop-, v2- und emulierte Mobilprüfung im begrenzten Umfang; Content und Legal fanden für diesen mechanischen Fallback keine neue Rechtehürde für die bisherige nichtkommerzielle Vorschau (`goblin-gp7`). Build 0.1.22 wurde nach gesonderter Nutzerfreigabe unter `v0.1.22` auf `dc7d068b1b14043962a7e296620020e2567760a3` veröffentlicht und öffentlich geprüft. Der anschließende Test auf dem betroffenen Android-Gerät zeigte weiterhin fehlende helle Icon-Innenflächen; dieser Defekt bleibt in `goblin-gp7` offen.
 
 ## [0.1.21] - 2026-10-12
 
