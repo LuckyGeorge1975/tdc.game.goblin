@@ -4,7 +4,7 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-Der Prototyp ist spielbar. **0.1.20 / Build 20** mit dem getrennten IRON-DUST-v2-Level wurde unter `v0.1.20` auf Commit `febdfe2c5b9950a6828a69c75783ce2b4f2f14e2` veröffentlicht (`goblin-nuu`). Content und Legal prüften das begrenzte nichtkommerzielle Vorschau-Delta; eine umfassende Rechte- oder Produktfreigabe ist damit nicht verbunden. **0.1.21 / Build 21** ist ein lokaler Fix-Kandidat: v2 zeigt die gewählten Grafiksets auch in Einheitenliste und Auswahl, und die 130 Icon-SVGs der Sets 01–05 sind für bessere Lesbarkeit bei transparentem Außenbereich enger gefasst und hell konturiert (`goblin-dfs`, Assetstand `8133906`). Guide-Bilder und Set 06 bleiben unverändert. Es gab noch keinen Push, Tag oder Deploy; `v0.1.19` bleibt der zuvor geprüfte Rückfallpunkt (`goblin-4qk`).
+Der Prototyp ist spielbar. **0.1.21 / Build 21** wurde unter `v0.1.21` auf Commit `00070606d6f5a4155cccff56a4b6daadb68997b5` veröffentlicht und öffentlich geprüft (`goblin-dfs`). IRON DUST v2 zeigt die gewählten Grafiksets auch in Einheitenliste und Auswahl; die 130 Runtime-Icons der Sets 01–05 besitzen engere transparente Ausschnitte und helle Konturen. **0.1.22 / Build 22** ist ein lokaler Kandidat: Die 26 Set-04-Icons tragen ihre bestehenden Füll- und Konturwerte zusätzlich als SVG-Attribute (`goblin-gp7`). Die Wirkung auf dem betroffenen Android-Gerät muss noch geprüft werden. Es gab für 0.1.22 keinen Push, Tag oder Deploy; `v0.1.21` bleibt öffentlich verfügbar und `v0.1.20` der vorherige Rückfallpunkt.
 
 Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](reports/TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](reports/REPORTS.md) versioniert. Die 130 kleineren Content-08-WebP-Bilder mit PNG-Fallback aus 0.1.17 bleiben in 0.1.18 unverändert.
 
@@ -45,7 +45,7 @@ node server.mjs
 
 Danach `http://localhost:4173` öffnen.
 
-`index.html`, `release.js` und `server.mjs` liegen im Projektroot. Der 0.1.20-Einstieg lädt die integrierten Spielskripte aus dem Projektroot; der veröffentlichte 0.1.19-Legacy-Pfad unter `src/legacy/` bleibt für seine Referenzen erhalten. Der modulare Pfad liegt unter `src/app/`, `src/core/` und `src/hex-renderer/`. Browser-URLs werden relativ zum jeweiligen HTML-Einstieg aufgelöst.
+`index.html`, `release.js` und `server.mjs` liegen im Projektroot. Der lokale 0.1.22-Einstieg lädt die integrierten Spielskripte aus dem Projektroot; der ältere Legacy-Pfad unter `src/legacy/` bleibt für seine Referenzen erhalten. Der modulare Pfad liegt unter `src/app/`, `src/core/` und `src/hex-renderer/`. Browser-URLs werden relativ zum jeweiligen HTML-Einstieg aufgelöst.
 
 ## Steuerung
 

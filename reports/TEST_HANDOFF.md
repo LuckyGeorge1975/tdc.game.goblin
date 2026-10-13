@@ -2,7 +2,24 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## Build 0.1.21 · lokaler Incident-Fix-Kandidat
+## Build 0.1.22 · lokaler Set-04-Kompatibilitätskandidat
+
+| Feld | Wert |
+|---|---|
+| Version | `0.1.22` |
+| Build | `22` |
+| Veröffentlichte Basis | `v0.1.21` auf `00070606d6f5a4155cccff56a4b6daadb68997b5` |
+| Runtime-Fix | `c0fd78bfd2f84b7061669beeb8578ecb49803e62` auf `codex/icon-set-v2-repair` (`goblin-gp7`) |
+| Kanonische Unit-Art-Quelle | `da9095b6592d592bc38229f283bc486d9b363e33`; 26 SVGs nach Zeilenende-Normalisierung bytegleich zur Runtime |
+| Datum des Kandidatenpakets | 2026-10-13 |
+| Pages-Einstieg erst nach gesonderter Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.22> |
+| Änderungen | [CHANGELOG.md](../CHANGELOG.md#0122---2026-10-13) |
+
+Die 26 Set-04-Karten- und Listenicons enthalten die vorhandenen SVG-Farb-, Kontur- und Schriftwerte zusätzlich als Präsentationsattribute. Geometrie, Filter, Palette, Guide-Bilder, andere Sets, Regeln und Layout sind gegenüber 0.1.21 unverändert. Der Fallback richtet sich gegen fast schwarze Icon-Innenflächen im Android-Screenshot des Nutzers. Er ist auf echter Android-Hardware noch nicht bestätigt.
+
+Auf dem Runtime-Fix `c0fd78b` bestanden die strukturelle SVG-Prüfung, 33/33 fokussierte Node-Tests sowie eine begrenzte unabhängige Bedienprüfung in Desktop-Chrome und emulierter Mobilansicht mit Legacy-Bewegungsreichweite und 2,5-fachem Zoom (`goblin-gp7`). Dort waren die Innenflächen der vier betroffenen Einheiten sichtbar; das alte Android-Verhalten wurde in der Emulation nicht reproduziert. Eine v2-Browserprüfung auf dem neuen Stand, die Prüfung des endgültigen Kandidatencommits, die Wirkung auf dem betroffenen Android-Gerät, Release-Gates und öffentliche Pages-Prüfung stehen noch aus. `v0.1.21` bleibt der öffentlich geprüfte Stand. Kein Push, Tag oder Deploy ist Teil dieses Handoffs.
+
+## Build 0.1.21 · veröffentlicht
 
 | Feld | Wert |
 |---|---|
@@ -10,13 +27,14 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Build | `21` |
 | Veröffentlichte Basis | `v0.1.20` auf `febdfe2c5b9950a6828a69c75783ce2b4f2f14e2` |
 | Geprüfter Asset- und Runtime-Stand | `8133906778acdd1a1df1ee1ed69cd6a01114aa67` auf `codex/icon-set-v2-repair` (v2-Anbindung `eefda4f`, Assetquelle `2fd8ae9`) |
+| Veröffentlichter Commit und Tag | `00070606d6f5a4155cccff56a4b6daadb68997b5` · `v0.1.21` (`goblin-dfs`) |
 | Datum des 0.1.21-Kandidaten | 2026-10-12; Asset-Nachtrag und QA 2026-10-13 |
-| Pages-Einstieg erst nach gesonderter Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.21> |
+| Öffentlich geprüfter Pages-Einstieg | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.21> |
 | Änderungen | [CHANGELOG.md](../CHANGELOG.md#0121---2026-10-12) |
 
 Der Fix bindet die sechs Grafiksets in IRON DUST v2 an Einheitenliste und Auswahl an; der Setwechsel verändert den Spielzustand nicht. Zusätzlich wurden 130 bestehende Icon-SVGs der Sets 01–05 (je 26) aus dem projektinternen Unit-Art-Commit `2fd8ae9` übernommen: engerer transparenter Ausschnitt und helle Kontur aus der jeweiligen Setpalette verbessern die Lesbarkeit in Legacy und v2. Quell-PNG-Vorschauen wurden nicht in den Runtime-Stand übernommen; Guide-Bilder und Set 06 bleiben unverändert. Regeln, Layout und sonstige Runtime-Logik sind gegenüber dem vorigen Kandidaten unverändert.
 
-Auf der festen Asset-/Runtime-SHA `8133906` bestanden die unabhängige Regression mit 38/38 fokussierten Tests und Release-Verifier sowie die Browser-/Bedien-QA im begrenzten Assetumfang: alle sechs Sets in Legacy und v2, 130 SVGs mit HTTP 200 und ohne Parserfehler, Setwechsel in Karte und Liste sowie v2-Auswahl, Desktop und emulierter Mobilansicht. Die Browser-QA sah eine bessere Erkennbarkeit auf dunklem Grund; feine Unterschiede auf der mobilen Karte bei etwa 22 CSS-Pixeln bleiben begrenzt. Es gab keinen Test auf realer Hardware. Die Legal-Einschätzung ist für eine nichtkommerzielle Vorschau bedingt positiv und erweitert keine Rechtefreigabe ([Notices](../docs/CONTENT-NOTICES.md)). Diese Prüfbelege gelten für die Asset-/Runtime-Dateien von `8133906`; ein anschließender reiner Dokumentationscommit braucht einen eigenen unabhängigen Delta-Review. Abschließende Release-Gates, Nutzerfreigabe, Push/Tag/Deploy und öffentlicher Pages-Nachtest bleiben bei Koordination in `goblin-dfs`. Der öffentliche Stand ist weiterhin `v0.1.20`.
+Auf der festen Asset-/Runtime-SHA `8133906` bestanden die unabhängige Regression mit 38/38 fokussierten Tests und Release-Verifier sowie die Browser-/Bedien-QA im begrenzten Assetumfang: alle sechs Sets in Legacy und v2, 130 SVGs mit HTTP 200 und ohne Parserfehler, Setwechsel in Karte und Liste sowie v2-Auswahl, Desktop und emulierter Mobilansicht. Es gab keinen Test auf realer Hardware. Die Legal-Einschätzung ist für eine nichtkommerzielle Vorschau bedingt positiv und erweitert keine Rechtefreigabe ([Notices](../docs/CONTENT-NOTICES.md)). Build 0.1.21 wurde anschließend unter `v0.1.21` auf `00070606d6f5a4155cccff56a4b6daadb68997b5` veröffentlicht und öffentlich geprüft (`goblin-dfs`). `v0.1.20` bleibt der vorherige Rückfallpunkt; der spätere Android-Sichtbefund gehört zu `goblin-gp7`.
 
 ## Build 0.1.20 · veröffentlicht
 

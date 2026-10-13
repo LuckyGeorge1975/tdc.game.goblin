@@ -1,12 +1,17 @@
 # Changelog
 
-Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden in `goblin-hr7` nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
+Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden im jeweiligen Release-Issue nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
+
+## [0.1.22] - 2026-10-13
+
+- Die 26 bestehenden Karten- und Listenicons des Sets 04 Pixel-Strategie enthalten ihre bisherigen Füll-, Kontur- und Schriftwerte zusätzlich als SVG-Präsentationsattribute (`c0fd78b`, `goblin-gp7`). Dies ist ein Kompatibilitätsfallback für die auf einem Android-Screenshot beobachteten fast schwarzen Innenflächen; Motive, Palette, Filter, Regeln und Layout sind unverändert.
+- Der kanonische Unit-Art-Generator und seine 26 Set-04-Quellicons wurden separat auf `da9095b` nachgezogen und reproduzieren die Runtime-Dateien. Lokale Regression sowie Desktop- und emulierte Mobilprüfung der Legacy-Bewegungsansicht sind dokumentiert. Ob die Änderung den Fehler auf dem betroffenen Android-Gerät behebt, ist noch offen. Build 0.1.22 bleibt ein lokaler Kandidat; `v0.1.21` bleibt öffentlich verfügbar, bis QA und eine gesonderte Veröffentlichungsfreigabe abgeschlossen sind.
 
 ## [0.1.21] - 2026-10-12
 
 - IRON DUST v2 zeigt die gewählten `ICON SET`-Motive nun auch in Einheitenliste und Auswahl an. Der Setwechsel aktualisiert beide Bereiche, ohne den Spielzustand zu verändern (`eefda4f`, `goblin-dfs`).
 - Am 13.10. wurden die 130 bestehenden Runtime-Icon-SVGs der Sets 01–05 (je 26) aus dem projektinternen Unit-Art-Stand `2fd8ae9` übernommen (`8133906`). Engere transparente Ausschnitte und eine helle Kontur aus der jeweiligen vorhandenen Setpalette verbessern ihre Erkennbarkeit in Legacy und v2. Guide-Bilder, Set 06, Regeln und Layout bleiben unverändert; Quell-PNG-Vorschauen sind nicht Teil des Runtime-Builds.
-- Dieser Eintrag beschreibt einen lokalen Fix-Kandidaten auf dem veröffentlichten Build 0.1.20. Unabhängige Asset-Regression und Browser-/Bedien-QA auf `8133906` sind im Incident `goblin-dfs` belegt. Der abschließende Dokumentationsreview, begrenzte Content-/Legal- und Release-Gates sowie ein möglicher Pages-Deploy bleiben separat zu klären; `v0.1.20` bleibt bis zu einem gesondert geprüften Deploy die öffentliche Fassung.
+- Build 0.1.21 wurde nach den Release-Gates unter `v0.1.21` am Commit `00070606d6f5a4155cccff56a4b6daadb68997b5` veröffentlicht und öffentlich geprüft (`goblin-dfs`). `v0.1.20` bleibt der vorherige Rückfallpunkt. Der anschließend gemeldete mobile Set-04-Sichtbefund wird in `goblin-gp7` bearbeitet.
 
 ## [0.1.20] - 2026-10-09
 
