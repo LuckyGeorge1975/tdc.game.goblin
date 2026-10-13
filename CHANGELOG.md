@@ -4,8 +4,9 @@ Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließli
 
 ## [0.1.21] - 2026-10-12
 
-- IRON DUST v2 zeigt die gewählten vorhandenen `ICON SET`-Motive nun auch in Einheitenliste und Auswahl an. Der Setwechsel aktualisiert beide Bereiche, ohne den Spielzustand zu verändern. Die Kartenzeichnung, der Legacy-Pfad, Layout, Regeln und Assetdateien bleiben unverändert (`goblin-dfs`).
-- Dieser Eintrag beschreibt einen lokalen Fix-Kandidaten auf dem veröffentlichten Build 0.1.20. Unabhängige Regression und Browserprüfung, Release-/Content-/Legal-Grenzen sowie ein möglicher neuer Pages-Deploy werden im Incident `goblin-dfs` entschieden und belegt. Keine breitere Änderung an der Lesbarkeit der Legacy-Icons ist enthalten; `v0.1.20` bleibt bis zu einem gesondert geprüften Deploy die öffentliche Fassung.
+- IRON DUST v2 zeigt die gewählten `ICON SET`-Motive nun auch in Einheitenliste und Auswahl an. Der Setwechsel aktualisiert beide Bereiche, ohne den Spielzustand zu verändern (`eefda4f`, `goblin-dfs`).
+- Am 13.10. wurden die 130 bestehenden Runtime-Icon-SVGs der Sets 01–05 (je 26) aus dem projektinternen Unit-Art-Stand `2fd8ae9` übernommen (`8133906`). Engere transparente Ausschnitte und eine helle Kontur aus der jeweiligen vorhandenen Setpalette verbessern ihre Erkennbarkeit in Legacy und v2. Guide-Bilder, Set 06, Regeln und Layout bleiben unverändert; Quell-PNG-Vorschauen sind nicht Teil des Runtime-Builds.
+- Dieser Eintrag beschreibt einen lokalen Fix-Kandidaten auf dem veröffentlichten Build 0.1.20. Unabhängige Asset-Regression und Browser-/Bedien-QA auf `8133906` sind im Incident `goblin-dfs` belegt. Der abschließende Dokumentationsreview, begrenzte Content-/Legal- und Release-Gates sowie ein möglicher Pages-Deploy bleiben separat zu klären; `v0.1.20` bleibt bis zu einem gesondert geprüften Deploy die öffentliche Fassung.
 
 ## [0.1.20] - 2026-10-09
 

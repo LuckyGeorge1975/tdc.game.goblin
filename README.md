@@ -4,7 +4,7 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-Der Prototyp ist spielbar. **0.1.20 / Build 20** mit dem getrennten IRON-DUST-v2-Level wurde unter `v0.1.20` auf Commit `febdfe2c5b9950a6828a69c75783ce2b4f2f14e2` veröffentlicht (`goblin-nuu`). Content und Legal prüften das begrenzte nichtkommerzielle Vorschau-Delta; eine umfassende Rechte- oder Produktfreigabe ist damit nicht verbunden. **0.1.21 / Build 21** ist ein lokaler Fix-Kandidat für die v2-Grafiksets (`goblin-dfs`), noch ohne Push, Tag oder Deploy. `v0.1.19` bleibt der zuvor geprüfte Rückfallpunkt (`goblin-4qk`).
+Der Prototyp ist spielbar. **0.1.20 / Build 20** mit dem getrennten IRON-DUST-v2-Level wurde unter `v0.1.20` auf Commit `febdfe2c5b9950a6828a69c75783ce2b4f2f14e2` veröffentlicht (`goblin-nuu`). Content und Legal prüften das begrenzte nichtkommerzielle Vorschau-Delta; eine umfassende Rechte- oder Produktfreigabe ist damit nicht verbunden. **0.1.21 / Build 21** ist ein lokaler Fix-Kandidat: v2 zeigt die gewählten Grafiksets auch in Einheitenliste und Auswahl, und die 130 Icon-SVGs der Sets 01–05 sind für bessere Lesbarkeit bei transparentem Außenbereich enger gefasst und hell konturiert (`goblin-dfs`, Assetstand `8133906`). Guide-Bilder und Set 06 bleiben unverändert. Es gab noch keinen Push, Tag oder Deploy; `v0.1.19` bleibt der zuvor geprüfte Rückfallpunkt (`goblin-4qk`).
 
 Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](reports/TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](reports/REPORTS.md) versioniert. Die 130 kleineren Content-08-WebP-Bilder mit PNG-Fallback aus 0.1.17 bleiben in 0.1.18 unverändert.
 

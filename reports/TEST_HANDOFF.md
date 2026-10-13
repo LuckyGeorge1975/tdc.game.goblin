@@ -9,12 +9,14 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Version | `0.1.21` |
 | Build | `21` |
 | Veröffentlichte Basis | `v0.1.20` auf `febdfe2c5b9950a6828a69c75783ce2b4f2f14e2` |
-| Lokaler Fixstand | `eefda4f2901442f639c34060418f9b5d798b847f` auf `codex/icon-set-v2-repair`; Metadaten-Nachtrag und feste QA-SHA in `goblin-dfs` |
-| Datum | 2026-10-12 |
+| Geprüfter Asset- und Runtime-Stand | `8133906778acdd1a1df1ee1ed69cd6a01114aa67` auf `codex/icon-set-v2-repair` (v2-Anbindung `eefda4f`, Assetquelle `2fd8ae9`) |
+| Datum des 0.1.21-Kandidaten | 2026-10-12; Asset-Nachtrag und QA 2026-10-13 |
 | Pages-Einstieg erst nach gesonderter Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.21> |
 | Änderungen | [CHANGELOG.md](../CHANGELOG.md#0121---2026-10-12) |
 
-Der Fix bindet die bereits vorhandenen sechs Grafiksets in IRON DUST v2 an Einheitenliste und Auswahl an. Der Setwechsel aktualisiert beide Bereiche ohne Zustandsänderung. Legacy, Kartenzeichnung, Layout, Regeln und Assetdateien sind gegenüber 0.1.20 unverändert. Die breitere Lesbarkeit der Legacy-Icons ist kein Teil dieses Kandidaten; der öffentliche Vergleichsbefund und die Nutzerentscheidung stehen im Incident `goblin-dfs`. Developer-Prüfungen auf `eefda4f`: gezielte 12/12 Tests, volle Node-Suite und Release-Verifier bestanden. Unabhängige Regression und Browser-/Bedien-QA müssen den finalen Kandidatencommit prüfen; Content-/Legal-/Releasegrenzen und ein möglicher Deploy werden in `goblin-dfs` dokumentiert. Kein Push, Tag oder Deploy aus diesem Handoff.
+Der Fix bindet die sechs Grafiksets in IRON DUST v2 an Einheitenliste und Auswahl an; der Setwechsel verändert den Spielzustand nicht. Zusätzlich wurden 130 bestehende Icon-SVGs der Sets 01–05 (je 26) aus dem projektinternen Unit-Art-Commit `2fd8ae9` übernommen: engerer transparenter Ausschnitt und helle Kontur aus der jeweiligen Setpalette verbessern die Lesbarkeit in Legacy und v2. Quell-PNG-Vorschauen wurden nicht in den Runtime-Stand übernommen; Guide-Bilder und Set 06 bleiben unverändert. Regeln, Layout und sonstige Runtime-Logik sind gegenüber dem vorigen Kandidaten unverändert.
+
+Auf der festen Asset-/Runtime-SHA `8133906` bestanden die unabhängige Regression mit 38/38 fokussierten Tests und Release-Verifier sowie die Browser-/Bedien-QA im begrenzten Assetumfang: alle sechs Sets in Legacy und v2, 130 SVGs mit HTTP 200 und ohne Parserfehler, Setwechsel in Karte und Liste sowie v2-Auswahl, Desktop und emulierter Mobilansicht. Die Browser-QA sah eine bessere Erkennbarkeit auf dunklem Grund; feine Unterschiede auf der mobilen Karte bei etwa 22 CSS-Pixeln bleiben begrenzt. Es gab keinen Test auf realer Hardware. Die Legal-Einschätzung ist für eine nichtkommerzielle Vorschau bedingt positiv und erweitert keine Rechtefreigabe ([Notices](../docs/CONTENT-NOTICES.md)). Diese Prüfbelege gelten für die Asset-/Runtime-Dateien von `8133906`; ein anschließender reiner Dokumentationscommit braucht einen eigenen unabhängigen Delta-Review. Abschließende Release-Gates, Nutzerfreigabe, Push/Tag/Deploy und öffentlicher Pages-Nachtest bleiben bei Koordination in `goblin-dfs`. Der öffentliche Stand ist weiterhin `v0.1.20`.
 
 ## Build 0.1.20 · veröffentlicht
 
