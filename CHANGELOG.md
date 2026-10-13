@@ -5,7 +5,7 @@ Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließli
 ## [0.1.22] - 2026-10-13
 
 - Die 26 bestehenden Karten- und Listenicons des Sets 04 Pixel-Strategie enthalten ihre bisherigen Füll-, Kontur- und Schriftwerte zusätzlich als SVG-Präsentationsattribute (`c0fd78b`, `goblin-gp7`). Dies ist ein Kompatibilitätsfallback für die auf einem Android-Screenshot beobachteten fast schwarzen Innenflächen; Motive, Palette, Filter, Regeln und Layout sind unverändert.
-- Der kanonische Unit-Art-Generator und seine 26 Set-04-Quellicons wurden separat auf `da9095b` nachgezogen und reproduzieren die Runtime-Dateien. Lokale Regression sowie Desktop- und emulierte Mobilprüfung der Legacy-Bewegungsansicht sind dokumentiert. Ob die Änderung den Fehler auf dem betroffenen Android-Gerät behebt, ist noch offen. Build 0.1.22 bleibt ein lokaler Kandidat; `v0.1.21` bleibt öffentlich verfügbar, bis QA und eine gesonderte Veröffentlichungsfreigabe abgeschlossen sind.
+- Der kanonische Unit-Art-Generator und seine 26 Set-04-Quellicons wurden separat auf `da9095b` nachgezogen und reproduzieren die Runtime-Dateien. Auf dem lokalen Kandidaten `5ad3481` bestanden finale Regression sowie Desktop-, v2- und emulierte Mobilprüfung im begrenzten Umfang; Content und Legal fanden für diesen mechanischen Fallback keine neue Rechtehürde für die bisherige nichtkommerzielle Vorschau (`goblin-gp7`). Der Nutzer hat die Veröffentlichung von 0.1.22 gesondert freigegeben. Ob die Änderung den Fehler auf dem betroffenen Android-Gerät behebt, ist offen; Push, Tag, Deploy und öffentliche Pages-Prüfung stehen noch aus. Bis dahin bleibt `v0.1.21` öffentlich verfügbar.
 
 ## [0.1.21] - 2026-10-12
 

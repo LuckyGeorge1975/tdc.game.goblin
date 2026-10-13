@@ -2,7 +2,7 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## Build 0.1.22 · lokaler Set-04-Kompatibilitätskandidat
+## Build 0.1.22 · Set-04-Kompatibilitätsfix zur Veröffentlichung vorbereitet
 
 | Feld | Wert |
 |---|---|
@@ -10,14 +10,15 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Build | `22` |
 | Veröffentlichte Basis | `v0.1.21` auf `00070606d6f5a4155cccff56a4b6daadb68997b5` |
 | Runtime-Fix | `c0fd78bfd2f84b7061669beeb8578ecb49803e62` auf `codex/icon-set-v2-repair` (`goblin-gp7`) |
+| Lokal geprüfter Release-Kandidat | `5ad348103434ab4342e2ecff34534922fb32f294` |
 | Kanonische Unit-Art-Quelle | `da9095b6592d592bc38229f283bc486d9b363e33`; 26 SVGs nach Zeilenende-Normalisierung bytegleich zur Runtime |
 | Datum des Kandidatenpakets | 2026-10-13 |
-| Pages-Einstieg erst nach gesonderter Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.22> |
+| Pages-Einstieg nach Deploy zu prüfen | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.22> |
 | Änderungen | [CHANGELOG.md](../CHANGELOG.md#0122---2026-10-13) |
 
 Die 26 Set-04-Karten- und Listenicons enthalten die vorhandenen SVG-Farb-, Kontur- und Schriftwerte zusätzlich als Präsentationsattribute. Geometrie, Filter, Palette, Guide-Bilder, andere Sets, Regeln und Layout sind gegenüber 0.1.21 unverändert. Der Fallback richtet sich gegen fast schwarze Icon-Innenflächen im Android-Screenshot des Nutzers. Er ist auf echter Android-Hardware noch nicht bestätigt.
 
-Auf dem Runtime-Fix `c0fd78b` bestanden die strukturelle SVG-Prüfung, 33/33 fokussierte Node-Tests sowie eine begrenzte unabhängige Bedienprüfung in Desktop-Chrome und emulierter Mobilansicht mit Legacy-Bewegungsreichweite und 2,5-fachem Zoom (`goblin-gp7`). Dort waren die Innenflächen der vier betroffenen Einheiten sichtbar; das alte Android-Verhalten wurde in der Emulation nicht reproduziert. Eine v2-Browserprüfung auf dem neuen Stand, die Prüfung des endgültigen Kandidatencommits, die Wirkung auf dem betroffenen Android-Gerät, Release-Gates und öffentliche Pages-Prüfung stehen noch aus. `v0.1.21` bleibt der öffentlich geprüfte Stand. Kein Push, Tag oder Deploy ist Teil dieses Handoffs.
+Auf dem Runtime-Fix `c0fd78b` bestanden die strukturelle SVG-Prüfung, 33/33 fokussierte Node-Tests sowie eine begrenzte unabhängige Bedienprüfung in Desktop-Chrome und emulierter Mobilansicht mit Legacy-Bewegungsreichweite und 2,5-fachem Zoom (`goblin-gp7`). Dort waren die Innenflächen der vier betroffenen Einheiten sichtbar; das alte Android-Verhalten wurde in der Emulation nicht reproduziert. Auf dem lokalen Release-Kandidaten `5ad3481` bestanden die vollständige Node-Suite (375/375), der Release-Verifier gegen `v0.1.21`, die unabhängige fokussierte Regression (33/33) und die lokale Browser-/Bedien-QA für Build-22-Einstieg, Set-04-Karte/Leiste/Auswahl in v2 und die Legacy-Mobil-Emulation. Belege: `.tools/qa-gp7-5ad-v2-desktop-04.png`, `.tools/qa-gp7-5ad-legacy-mobile-04.png` und der auf unveränderten Assets beruhende Zoombeleg `.tools/qa-gp7-c0fd-legacy-mobile-pinch04-units.png`. Content bestätigte die Parität zur kanonischen Quelle; die begrenzte Legal-Deltaprüfung fand keine neue Provenienz- oder Rechtehürde für die bisherige nichtkommerzielle Vorschau. Der Nutzer hat die Veröffentlichung von Build 0.1.22 gesondert freigegeben. Die Wirkung auf dem betroffenen Android-Gerät, Push, Tag, Deploy und anschließende öffentliche Pages-Prüfung sind noch offen; `v0.1.21` bleibt bis dahin der öffentlich geprüfte Stand.
 
 ## Build 0.1.21 · veröffentlicht
 
