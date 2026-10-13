@@ -9,7 +9,7 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Version | `0.1.23` |
 | Build | `23` |
 | Veröffentlichte Basis | `v0.1.22` auf `dc7d068b1b14043962a7e296620020e2567760a3` |
-| Lokaler Runtime-Kandidat | `09b1b703d02eec11010c9ada56159a92e698fcc6` (`goblin-gp7`); finale Paket-SHA im Issue nach Commit |
+| Lokaler Runtime-Kandidat | `09b1b703d02eec11010c9ada56159a92e698fcc6` (`goblin-gp7`); der lokale Paket-Commit ist im Issue dokumentiert |
 | Kanonische Unit-Art-Quelle | Content-06-PNGs ab `2fd8ae9`; 130/130 SHA-256-identisch zur Runtime |
 | Datum des Kandidatenpakets | 2026-10-13 |
 | Pages-Einstieg erst nach gesonderter Freigabe | <https://luckygeorge1975.github.io/tdc.game.goblin/?build=0.1.23> |
