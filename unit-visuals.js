@@ -37,7 +37,8 @@
       if(!['png','webp'].includes(format))return null;
       return `assets/unit-art/sets/${activeStyle}/${view}/${key}@${format==='webp'?'1024':'768'}.${format}`;
     }
-    return `assets/unit-art/sets/${activeStyle}/${view}/${key}.svg`;
+    const extension=view==='icons'&&activeStyle!=='06-military-symbols'?'png':'svg';
+    return `assets/unit-art/sets/${activeStyle}/${view}/${key}.${extension}`;
   }
 
   const terrainKeys=new Set(['open-ground','rubble-field','mountain','ridge','forest','marsh','water','river','road','bridge','urban','crater']);
