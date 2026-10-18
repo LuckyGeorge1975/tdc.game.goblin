@@ -2,7 +2,7 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## Build 0.1.24 · lokaler Kandidat, nicht veröffentlicht
+## Build 0.1.24 · zur Veröffentlichung freigegeben, noch nicht veröffentlicht
 
 | Feld | Wert |
 |---|---|
@@ -10,9 +10,11 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Build | `24` |
 | Öffentlich geprüfte Basis | `v0.1.23` auf `2748063b83dbb8957d00a7b0f8523753c6b80ae9` (`goblin-gp7`) |
 | Fester Produktstand | `7e9e71da37264164eef28c3c78d4d97f276f9ae6` (`goblin-bzs`) |
-| Lokaler Metadatenstand | Nach Commit im `goblin-bzs`-Issue festzuhalten |
-| Vorliegende QA | Fokussierte Tests, vollständige Regression und lokale Bedienprüfung auf festem Produktstand; Belege in `goblin-bzs` |
-| Offene Gates | Abschließende Release-/QA-Prüfung des Metadatenstands, Nutzerfreigabe, Push, eindeutiges Tag, Deploy und öffentliche Pages-Nachprüfung |
+| Geprüfter lokaler Kandidat | `5bde0973e7a6b006e1e0af083f95cee440006ea7` (`goblin-bzs`); finaler Freigabe-Metadatencommit wird dort gesondert festgehalten |
+| Vorliegende QA | Produktstand: 51/51 fokussierte und 379/379 vollständige Regression, unabhängige Browser-/Bedien-QA. Metadatenstand `5bde097`: Release-Test und Verifier bestanden; unabhängige Regression und lokaler Build-24-Browser-Smoke bestanden (`goblin-bzs`) |
+| Nutzerfreigabe | 18.10.2026 im Koordinations-Chat ausdrücklich für Build 0.1.24 auf GitHub Pages erteilt (`goblin-bzs`) |
+| Vorgesehenes Tag | `v0.1.24` am tatsächlich veröffentlichten Commit; noch nicht angelegt |
+| Offene Schritte | Push, eindeutiges Tag, Deploy und öffentliche Pages-Nachprüfung; finalen Commit und Workflow-Ergebnis in `goblin-bzs` belegen |
 | Änderungen | [CHANGELOG.md](../CHANGELOG.md#0124---2026-10-18) |
 
 Neue Starts, Neustarts und Levelwechsel der historischen Browser-Mission `iron-dust` binden `scenarioVersion: 2`, `FIELD_TEST_LEGACY_v2` und `skip-depleted-treads-v1`. Gegner überspringen Ketten mit Wert 0; die explizite historische v1-Paarung behält ihre Zielwahl. Die übrigen acht Legacy-Szenarien, das separate IRON-DUST-Core-v2-Profil und Replay-Schema 1 bleiben unverändert. Content und Legal fanden im geprüften Delta keine neue Asset- oder Lizenzhürde für die bisherige begrenzte nichtkommerzielle Vorschau (`goblin-bzs`); dies ist keine umfassende Regel-, Marken- oder Produktfreigabe. Der Kandidat bleibt lokal; `v0.1.23` ist der veröffentlichte Rückfallpunkt.
