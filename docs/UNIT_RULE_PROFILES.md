@@ -39,21 +39,22 @@ Die Zielwerte brauchen vor Aktivierung eigene Regeln für Skimmer-Budget, halfUn
 
 ## Szenario- und Produktprofilvertrag
 
-`scenario-profile-manifest.js` ist das synchrone, versionierte Manifest (`schemaVersion: 1`) für **neue** Legacy-Partien. Die Produktkennungen `FIELD_TEST_LEGACY_v1` und `FIELD_TEST_LEGACY_v2` sind von der 26er-Datenkennung `field-test-atlas-v1` getrennt. Letztere gilt nur für die fünf nachgeladenen Level; die drei eingebauten Level bewahren ihre eigenen bisherigen Einheiten- und Geländewerte. Alle Paarungen haben `objectiveVersion: 1`; nur `iron-dust` startet mit `scenarioVersion: 2`.
+`scenario-profile-manifest.js` ist das synchrone, versionierte Manifest (`schemaVersion: 1`) für **neue** Legacy-Partien. Die Produktkennungen `FIELD_TEST_LEGACY_v1` und `FIELD_TEST_LEGACY_v2` sind von der 26er-Datenkennung `field-test-atlas-v1` getrennt. Letztere gilt für sechs nachgeladene Level; die drei eingebauten Level bewahren ihre eigenen bisherigen Einheiten- und Geländewerte. Alle neun Default-Paarungen haben `objectiveVersion: 1`; nur `iron-dust` startet mit `scenarioVersion: 2`.
 
 | Szenario-ID | Produktprofil | Zielregel | 26er-Datenprofil |
 | --- | --- | --- | --- |
 | `iron-dust` | `FIELD_TEST_LEGACY_v2` | `core` | eigener Built-in-Snapshot |
 | `relay-run` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | eigener Built-in-Snapshot |
 | `unit-trial` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | eigener Built-in-Snapshot |
+| `los-supercover-showcase` | `FIELD_TEST_SUPERCOVER_v1` | `core-and-escort` | `field-test-atlas-v1` |
 | `atlas-proving-grounds` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | `field-test-atlas-v1` |
 | `showcase-terrain-course` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | `field-test-atlas-v1` |
 | `showcase-advance` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | `field-test-atlas-v1` |
 | `showcase-siege` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | `field-test-atlas-v1` |
 | `showcase-specialists` | `FIELD_TEST_LEGACY_v1` | `core-and-escort` | `field-test-atlas-v1` |
 
-Der synchrone Built-in-Start, jeder spätere `loadScenario`-Aufruf und die Registrierung der fünf Asset-Level prüfen diese Paarung vor dem Start beziehungsweise vor der Registrierung. Fehlende oder unbekannte Produktkennungen ergeben `UNSUPPORTED_RULE_PROFILE`; falsche Szenario-Versionen, Zielregeln oder Datenprofile `SCENARIO_PROFILE_MISMATCH`. Die Fehlermeldung wird angezeigt oder im Spielprotokoll ausgegeben. `full-catalog-v1-draft` bleibt inaktiv.
+Der synchrone Built-in-Start, jeder spätere `loadScenario`-Aufruf und die Registrierung der sechs Asset-Level prüfen diese Paarung vor dem Start beziehungsweise vor der Registrierung. Fehlende oder unbekannte Produktkennungen ergeben `UNSUPPORTED_RULE_PROFILE`; falsche Szenario-Versionen, Zielregeln oder Datenprofile `SCENARIO_PROFILE_MISMATCH`. Die Fehlermeldung wird angezeigt oder im Spielprotokoll ausgegeben. `full-catalog-v1-draft` bleibt inaktiv.
 
 Vor jedem Legacy-Partiestart erstellt `ScenarioRuleProfiles.beginSession` eine tief kopierte, unveränderliche Session mit Szenario-ID/-Version, Produktprofil und den effektiven Ziel-, Gelände- und Einheitenwerten. Der Erststart, Neustart und Levelwechsel erhalten jeweils eine neue Session. Laufende Sieg- und Zielanzeigen lesen den gebundenen Snapshot; Änderungen am äußeren Szenariokatalog schreiben die Partie nicht um. Sprache und Icon-Set ändern nur die Ansicht und starten die Mission nicht neu. Der Snapshot ist ein interner Laufzeitvertrag, kein gespeicherter Spielstand und kein Replay. Persistenz und deterministische Replay-Prüfung bleiben spätere Slices von `goblin-9bj.19`.
 
-Neue `iron-dust`-Sessions binden `targetPolicyVersion: skip-depleted-treads-v1`: automatische Systemangriffe überspringen Ketten bei Wert 0 und können danach noch vorhandenes Antipersonnel anvisieren. Die exakte historische Paarung `iron-dust` / `scenarioVersion: 1` / `FIELD_TEST_LEGACY_v1` bleibt als explizite Eingabe gültig und behält ihre bisherige Zielwahl. Die übrigen sieben Legacy-Szenarien, der separate IRON-DUST-Core-v2-Pfad und Replay-Schema 1 werden durch diesen Browser-Vertrag nicht umversioniert. Für unversionierte externe Legacy-Aufzeichnungen besteht kein Importvertrag.
+Neue `iron-dust`-Sessions binden `targetPolicyVersion: skip-depleted-treads-v1`: automatische Systemangriffe überspringen Ketten bei Wert 0 und können danach noch vorhandenes Antipersonnel anvisieren. Die exakte historische Paarung `iron-dust` / `scenarioVersion: 1` / `FIELD_TEST_LEGACY_v1` bleibt als explizite Eingabe gültig und behält ihre bisherige Zielwahl. Die übrigen acht Legacy-Szenarien, der separate IRON-DUST-Core-v2-Pfad und Replay-Schema 1 werden durch diesen Browser-Vertrag nicht umversioniert. Für unversionierte externe Legacy-Aufzeichnungen besteht kein Importvertrag.

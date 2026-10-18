@@ -4,7 +4,7 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-Der Prototyp ist spielbar. **0.1.22 / Build 22** wurde unter `v0.1.22` auf Commit `dc7d068b1b14043962a7e296620020e2567760a3` veröffentlicht und öffentlich geprüft (`goblin-gp7`). Die 26 Set-04-Icons tragen bestehende Füll- und Konturwerte zusätzlich als SVG-Attribute. Auf dem betroffenen Android-Gerät fehlen helle Icon-Innenflächen weiterhin. **0.1.23 / Build 23** ist ein lokal geprüfter PNG-Kandidat auf Runtime-Basis `09b1b703d02eec11010c9ada56159a92e698fcc6`: Sets 01–05 laden kleine PNG-Icons, um die interne SVG-Darstellung zu umgehen. Unabhängige lokale Regression und Desktop-Bedien-QA sind abgeschlossen; der Nutzer hat die diagnostische Veröffentlichung am 13.10.2026 ausdrücklich freigegeben. Der Erfolg auf echter Android-Hardware ist offen. Bis zum tatsächlichen Deploy und zur öffentlichen Pages-Prüfung bleibt `v0.1.22` der öffentliche Stand; `v0.1.21` bleibt als älterer Rückfallpunkt erhalten.
+Der Prototyp ist spielbar. **0.1.23 / Build 23** wurde nach Nutzerfreigabe unter `v0.1.23` auf Commit `2748063b83dbb8957d00a7b0f8523753c6b80ae9` veröffentlicht und öffentlich geprüft (`goblin-gp7`). Sets 01–05 laden kleine PNG-Icons statt der bisherigen SVG-Darstellung. Der echte Android-Nachtest zeigte die Innenflächen im geprüften Edge-Mobile-Fall; die ursprüngliche SVG-Ursache bleibt offen. **0.1.24 / Build 24** ist ein lokaler Kandidat für die versionierte Zielwahlkorrektur in der historischen Browser-Mission `iron-dust` (`goblin-bzs`, Produktcommit `7e9e71da37264164eef28c3c78d4d97f276f9ae6`). Content und Legal fanden im geprüften Delta keine neue Asset- oder Lizenzhürde für die bisherige begrenzte nichtkommerzielle Vorschau; umfassende Regel-, Marken- oder Produktfreigabe folgt daraus nicht. Abschließende Releasegates, Nutzerfreigabe, Push, Tag, Deploy und öffentliche Pages-Prüfung für 0.1.24 stehen aus. Bis dahin bleibt `v0.1.23` der öffentlich geprüfte Stand und Rückfallpunkt.
 
 Änderungen stehen im [Changelog](CHANGELOG.md), die Prüfaufträge in [Developer → Tester Handoff](reports/TEST_HANDOFF.md). Playtest-, Content- und Legal-Prüfungen werden in der [Berichtsübersicht](reports/REPORTS.md) versioniert. Die 130 kleineren Content-08-WebP-Bilder mit PNG-Fallback aus 0.1.17 bleiben in 0.1.18 unverändert.
 
@@ -45,7 +45,7 @@ node server.mjs
 
 Danach `http://localhost:4173` öffnen.
 
-`index.html`, `release.js` und `server.mjs` liegen im Projektroot. Der lokale 0.1.22-Einstieg lädt die integrierten Spielskripte aus dem Projektroot; der ältere Legacy-Pfad unter `src/legacy/` bleibt für seine Referenzen erhalten. Der modulare Pfad liegt unter `src/app/`, `src/core/` und `src/hex-renderer/`. Browser-URLs werden relativ zum jeweiligen HTML-Einstieg aufgelöst.
+`index.html`, `release.js` und `server.mjs` liegen im Projektroot. Der lokale Einstieg lädt die integrierten Spielskripte aus dem Projektroot; der ältere Legacy-Pfad unter `src/legacy/` bleibt für seine Referenzen erhalten. Der modulare Pfad liegt unter `src/app/`, `src/core/` und `src/hex-renderer/`. Browser-URLs werden relativ zum jeweiligen HTML-Einstieg aufgelöst.
 
 ## Steuerung
 
