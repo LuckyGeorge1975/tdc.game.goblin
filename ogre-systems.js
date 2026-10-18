@@ -21,6 +21,11 @@
     const priority=['missiles','main','secondary','treads','antipersonnel'];
     return priority.map(key=>targets(state).find(target=>target.key===key)).find(Boolean)||null;
   }
+  function chooseTargetSkippingDepletedTreads(state){
+    const available=targets(state).filter(target=>target.key!=='treads'||state.treads>0);
+    const priority=['missiles','main','secondary','treads','antipersonnel'];
+    return priority.map(key=>available.find(target=>target.key===key)).find(Boolean)||null;
+  }
   function applyHit(state,key,result,attackStrength=0){
     if(key==='treads'){
       const loss=result==='X'?Math.min(state.treads,Math.max(0,attackStrength)):0;
@@ -37,5 +42,5 @@
   function summary(state){
     return {movement:movementForTreads(state.treads),treads:`${state.treads}/${state.maxTreads}`,weapons:Object.fromEntries(Object.entries(state.weapons).map(([key,weapon])=>[key,`${weaponRemaining(weapon)}/${weapon.count}`]))};
   }
-  root.GoblinSystems=Object.freeze({WEAPONS,createMarkIII,weaponRemaining,weaponReady,recordFire,resetFireState,movementForTreads,targets,chooseTarget,applyHit,isHelpless,summary});
+  root.GoblinSystems=Object.freeze({WEAPONS,createMarkIII,weaponRemaining,weaponReady,recordFire,resetFireState,movementForTreads,targets,chooseTarget,chooseTargetSkippingDepletedTreads,applyHit,isHelpless,summary});
 })(globalThis);

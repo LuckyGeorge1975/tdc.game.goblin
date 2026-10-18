@@ -79,7 +79,9 @@
     const target=targets.find(unit=>dist(foe,unit)<=foe.range&&lineOfSight(foe,unit));
     if(!target)return false;
     if(target.ogreSystems){
-      const outcome=GoblinOgreRuntime.resolveSystemAttack(foe,target),effect=GoblinOgreRuntime.describeHit(outcome);
+      const outcome=GoblinOgreRuntime.resolveSystemAttack(foe,target);
+      if(!outcome)return false;
+      const effect=GoblinOgreRuntime.describeHit(outcome);
       target.justHit=true;
       target.lastOutcome=outcome.result;
       addLog(`${foe.name} feuert auf ${target.name} / ${outcome.system.label}: ${outcome.result} bei ${outcome.ratio} — ${effect}.`,true);

@@ -33,8 +33,10 @@ test('the inactive Core data view retains every Legacy unit, system and terrain 
   });
   assert.deepEqual(
     [data.scenarioId, data.scenarioVersion, data.ruleProfileId, data.objectiveVersion, data.objective],
-    ['iron-dust', legacy.scenarioVersion, legacy.ruleProfileId, legacy.objectiveVersion, legacy.objective]
+    ['iron-dust', 1, 'FIELD_TEST_LEGACY_v1', legacy.objectiveVersion, legacy.objective]
   );
+  assert.deepEqual([legacy.scenarioVersion,legacy.ruleProfileId,legacy.targetPolicyVersion],
+    [2,'FIELD_TEST_LEGACY_v2','skip-depleted-treads-v1']);
   assert.equal(data.sourceSchemaVersion, IRON_DUST_LEVEL_V1.schemaVersion);
   assert.deepEqual(plain(data.legacyTraitEvidence),
     [{unitId: 'gev', trait: 'gev', sourceField: 'id', sourceValue: 'gev'}]);

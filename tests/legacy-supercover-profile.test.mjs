@@ -95,6 +95,7 @@ test('non-boundary and endpoint cases agree with the geometry helper',()=>{
 
 test('old Field Test session ignores outer profile edits and retains nearestHex tie behavior',()=>{
   const game=legacy();
+  game.run("const {targetPolicyVersion,...historicalIronDust}=scenarioCatalog['iron-dust'];legacySession=ScenarioRuleProfiles.beginSession('iron-dust',{...historicalIronDust,scenarioVersion:1,ruleProfileId:'FIELD_TEST_LEGACY_v1'})");
   assert.equal(game.run('legacySession.ruleProfileId'),'FIELD_TEST_LEGACY_v1');
   game.run("terrain.clear();terrainTypes.clear();terrain.add('1,1')");
   const left=game.run('lineOfSight({x:2,y:2},{x:2,y:0})');

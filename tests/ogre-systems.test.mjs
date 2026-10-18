@@ -39,6 +39,19 @@ test('target priority advances as systems are destroyed',()=>{
   assert.equal(systems.chooseTarget(state).key,'main');
 });
 
+test('corrected automatic priority skips only depleted treads',()=>{
+  const state=systems.createMarkIII();
+  for(const key of ['missiles','main','secondary'])
+    state.weapons[key].destroyed=state.weapons[key].count;
+  assert.equal(systems.chooseTargetSkippingDepletedTreads(state).key,'treads');
+  state.treads=0;
+  assert.equal(systems.chooseTarget(state).key,'treads');
+  assert.equal(systems.chooseTargetSkippingDepletedTreads(state).key,'antipersonnel');
+  state.weapons.antipersonnel.destroyed=state.weapons.antipersonnel.count;
+  assert.equal(systems.chooseTargetSkippingDepletedTreads(state),null);
+  assert.equal(systems.chooseTarget(state).key,'treads');
+});
+
 test('weapon fire budgets reset while expended missiles stay expended',()=>{
   const state=systems.createMarkIII();
   systems.recordFire(state.weapons.main);systems.recordFire(state.weapons.missiles);

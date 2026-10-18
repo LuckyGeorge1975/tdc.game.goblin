@@ -178,6 +178,66 @@ test('enemy attacks target and destroy individual GOBLIN systems',()=>{
   assert.equal(run('units[0].hp'),5);
 });
 
+function prepareDepletedOgre(run,treads,ap=8){
+  run(`loadScenario('iron-dust');terrain.clear();units[5].x=2;units[5].y=5;
+    units.filter(unit=>unit.team==='player'&&unit.id!=='ogre').forEach(unit=>unit.hp=0);
+    const systems=units[0].ogreSystems;systems.treads=${treads};
+    for(const key of ['missiles','main','secondary'])
+      systems.weapons[key].destroyed=systems.weapons[key].count;
+    systems.weapons.antipersonnel.destroyed=8-${ap};
+    globalThis.rolls=0;Math.random=()=>{rolls++;return 0.99}`);
+}
+
+test('normal Iron Dust start and restart bind corrected frozen rules',async()=>{
+  const {run}=game();
+  prepareDepletedOgre(run,0);
+  assert.equal(run('legacySession.scenarioVersion'),2);
+  assert.equal(run('legacySession.ruleProfileId'),'FIELD_TEST_LEGACY_v2');
+  assert.equal(run('legacySession.effectiveRules.targetPolicyVersion'),'skip-depleted-treads-v1');
+  assert.equal(run('Object.isFrozen(legacySession)&&Object.isFrozen(legacySession.effectiveRules)'),true);
+  assert.equal(run('lineOfSight(units[5],units[0])'),true);
+  assert.equal(run('enemyFire(units[5])'),true);
+  assert.equal(run("logEl.innerHTML.includes('ANTI-PERSONNEL')"),true);
+  assert.equal(run('units[0].ogreSystems.weapons.antipersonnel.destroyed'),1);
+  assert.equal(run('rolls'),1);
+  const oldId=run('legacySession.sessionId');
+  await run('resetScenario()');
+  assert.ok(run('legacySession.sessionId')>oldId);
+  assert.equal(run('legacySession.ruleProfileId'),'FIELD_TEST_LEGACY_v2');
+  run("loadScenario('relay-run');loadScenario('iron-dust')");
+  assert.equal(run('legacySession.ruleProfileId'),'FIELD_TEST_LEGACY_v2');
+});
+
+test('historical v1 automatic zero-tread trace remains unchanged',()=>{
+  const {run}=game();
+  prepareDepletedOgre(run,0);
+  run("const {targetPolicyVersion,...historical}=scenarioCatalog['iron-dust'];legacySession=ScenarioRuleProfiles.beginSession('iron-dust',{...historical,scenarioVersion:1,ruleProfileId:'FIELD_TEST_LEGACY_v1'})");
+  assert.equal(run('legacySession.effectiveRules.targetPolicyVersion'),undefined);
+  assert.equal(run('lineOfSight(units[5],units[0])'),true);
+  assert.equal(run('enemyFire(units[5])'),true);
+  assert.equal(run("logEl.innerHTML.includes('TREADS: X bei 1-1 — KEIN EFFEKT')"),true);
+  assert.equal(run('units[0].ogreSystems.treads'),0);
+  assert.equal(run('units[0].ogreSystems.weapons.antipersonnel.destroyed'),0);
+  assert.equal(run('rolls'),1);
+  run("scenarioCatalog['iron-dust'].targetPolicyVersion='unknown'");
+  assert.equal(run('enemyFire(units[5])'),true);
+  assert.equal(run('units[0].ogreSystems.weapons.antipersonnel.destroyed'),0);
+  assert.equal(run('rolls'),2);
+});
+
+test('corrected automatic priority keeps positive treads and stops when AP is gone',()=>{
+  const first=game();prepareDepletedOgre(first.run,1);
+  assert.equal(first.run('enemyFire(units[5])'),true);
+  assert.equal(first.run("logEl.innerHTML.includes('TREADS')"),true);
+  assert.equal(first.run('units[0].ogreSystems.treads'),0);
+  assert.equal(first.run('units[0].ogreSystems.weapons.antipersonnel.destroyed'),0);
+  assert.equal(first.run('rolls'),1);
+  const none=game();prepareDepletedOgre(none.run,0,0);
+  assert.equal(none.run('enemyFire(units[5])'),false);
+  assert.equal(none.run('rolls'),0);
+  assert.equal(none.run('units[0].ogreSystems.treads'),0);
+});
+
 test('GOBLIN tread damage follows canonical movement thresholds',()=>{
   const {run}=game();
   run("loadScenario('iron-dust');units[5].damage=6;Math.random=()=>0.99;GoblinOgreRuntime.resolveSystemAttack(units[5],units[0],'treads');GoblinOgreRuntime.resolveSystemAttack(units[5],units[0],'treads');GoblinOgreRuntime.resolveSystemAttack(units[5],units[0],'treads')");

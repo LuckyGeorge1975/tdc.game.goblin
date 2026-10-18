@@ -10,7 +10,13 @@
     return unit;
   }
   function resolveSystemAttack(attacker,target,targetKey){
-    const state=ensureState(target),system=targetKey?GoblinSystems.targets(state).find(item=>item.key===targetKey):GoblinSystems.chooseTarget(state);
+    const session=typeof legacySession==='undefined'?null:legacySession;
+    const state=ensureState(target),corrected=!!session&&Object.isFrozen(session)&&
+      Object.isFrozen(session.effectiveRules)&&session.scenarioId==='iron-dust'&&
+      session.scenarioVersion===2&&session.ruleProfileId==='FIELD_TEST_LEGACY_v2'&&
+      session.effectiveRules.targetPolicyVersion==='skip-depleted-treads-v1';
+    const system=targetKey?GoblinSystems.targets(state).find(item=>item.key===targetKey):
+      corrected?GoblinSystems.chooseTargetSkippingDepletedTreads(state):GoblinSystems.chooseTarget(state);
     if(!system)return null;
     const roll=Math.floor(Math.random()*6);
     let ratio,result;
@@ -48,7 +54,9 @@
     const target=targets.find(unit=>dist(foe,unit)<=foe.range&&lineOfSight(foe,unit));
     if(!target)return false;
     if(ensureState(target)){
-      const outcome=resolveSystemAttack(foe,target),effect=describeHit(outcome);
+      const outcome=resolveSystemAttack(foe,target);
+      if(!outcome)return false;
+      const effect=describeHit(outcome);
       target.justHit=true;target.lastOutcome=outcome.result;
       addLog(`${foe.name} feuert auf ${target.name} / ${outcome.system.label}: ${outcome.result} bei ${outcome.ratio} — ${effect}.`,true);
       setTimeout(()=>{target.justHit=false;draw()},560);

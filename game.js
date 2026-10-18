@@ -25,7 +25,7 @@ const COMBAT_RULES=Object.freeze({crt:Object.freeze({'1-2':['NE','NE','NE','NE',
 ];
 // objective describes the mission for catalogs; checkVictory is authoritative.
 const scenarioCatalog={
-  'iron-dust':{kicker:'MISSION 07 / IRON DUST',title:'Durchbrechen. Ausschalten. Überleben.',sub:'Zerstöre den feindlichen Kommandokern, bevor Verstärkungen eintreffen.',scenarioVersion:1,ruleProfileId:'FIELD_TEST_LEGACY_v1',objectiveVersion:1,objective:'core',terrain:['3,1','8,1','1,4','5,3','9,5','2,6','7,6','10,2'],units:units.map(u=>({...u}))},
+  'iron-dust':{kicker:'MISSION 07 / IRON DUST',title:'Durchbrechen. Ausschalten. Überleben.',sub:'Zerstöre den feindlichen Kommandokern, bevor Verstärkungen eintreffen.',scenarioVersion:2,ruleProfileId:'FIELD_TEST_LEGACY_v2',targetPolicyVersion:'skip-depleted-treads-v1',objectiveVersion:1,objective:'core',terrain:['3,1','8,1','1,4','5,3','9,5','2,6','7,6','10,2'],units:units.map(u=>({...u}))},
   'relay-run':{kicker:'MISSION 08 / RELAY RUN',title:'Sichern. Halten. Extrahieren.',sub:'Erreiche den östlichen Relaisknoten und schalte seine Eskorte aus.',scenarioVersion:1,ruleProfileId:'FIELD_TEST_LEGACY_v1',objectiveVersion:1,objective:'core-and-escort',terrain:['4,2','5,2','4,5','7,4','8,6','2,3'],units:[
     {id:'ogre',name:'GOBLIN SIEGEBREAKER',type:'HEAVY ASSAULT',team:'player',x:1,y:6,hp:5,maxHp:5,defense:5,range:2,move:3,damage:3,icon:'G',ogreSystems:GoblinSystems.createMarkIII()},
     {id:'gev',name:'SKIMMER SCOUT',type:'HOVERCRAFT',team:'player',x:2,y:6,hp:3,maxHp:3,defense:3,range:3,move:3,damage:1,icon:'G'},
@@ -101,7 +101,10 @@ function lineOfSight(from,to){
     return GoblinHexSupercover.intermediateHexes(from,to)
       .every(cell=>!TerrainRules.blocksLos(terrainTypeAt(cell.x,cell.y)));
   }
-  if(session.ruleProfileId!=='FIELD_TEST_LEGACY_v1')return false;
+  if(session.ruleProfileId!=='FIELD_TEST_LEGACY_v1'&&
+     !(session.scenarioId==='iron-dust'&&session.scenarioVersion===2&&
+       session.ruleProfileId==='FIELD_TEST_LEGACY_v2'&&
+       session.effectiveRules.targetPolicyVersion==='skip-depleted-treads-v1'))return false;
   const steps=legacyLosSampleCount(from,to),a=hexCenter(from.x,from.y),b=hexCenter(to.x,to.y);
   for(let i=1;i<steps;i++){const t=i/steps,cell=nearestHex(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t);if((cell.x!==from.x||cell.y!==from.y)&&(cell.x!==to.x||cell.y!==to.y)&&TerrainRules.blocksLos(terrainTypeAt(cell.x,cell.y)))return false}
   return true;

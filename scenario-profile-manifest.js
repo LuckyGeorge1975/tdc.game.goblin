@@ -2,11 +2,15 @@
 // Unit data version field-test-atlas-v1 is separate from FIELD_TEST_LEGACY_v1.
 const ScenarioRuleProfiles=Object.freeze((()=>{
   const product='FIELD_TEST_LEGACY_v1';
+  const correctedIronDust='FIELD_TEST_LEGACY_v2';
+  const correctedTargetPolicy='skip-depleted-treads-v1';
   const atlasData='field-test-atlas-v1';
+  const historicalIronDust=Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:product});
   const losProbe=Object.freeze({id:'los-supercover-probe',scenarioVersion:1,
     objective:'core',ruleProfileId:'LEGACY_SUPERCOVER_PROBE_v1',losMode:'strict-supercover'});
   const entries=Object.freeze({
-    'iron-dust':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:product}),
+    'iron-dust':Object.freeze({scenarioVersion:2,objective:'core',ruleProfileId:correctedIronDust,
+      targetPolicyVersion:correctedTargetPolicy}),
     'relay-run':Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:product}),
     'unit-trial':Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:product}),
     'atlas-proving-grounds':Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:product,unitDataProfile:atlasData}),
@@ -18,12 +22,15 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   });
   function reject(code,message){const error=new Error(`${code}: ${message}`);error.code=code;throw error}
   function validate(id,config){
-    const expected=id===losProbe.id?losProbe:entries[id];
+    const expected=id===losProbe.id?losProbe:id==='iron-dust'&&
+      config?.scenarioVersion===1&&config?.ruleProfileId===product
+      ?historicalIronDust:entries[id];
     if(!config?.ruleProfileId||config.ruleProfileId!==expected?.ruleProfileId)
       reject('UNSUPPORTED_RULE_PROFILE',`Unbekanntes Regelprofil ${config?.ruleProfileId??'(fehlt)'}; Partie wurde nicht geladen.`);
     if(!expected||config.scenarioVersion!==expected.scenarioVersion||config.objectiveVersion!==1||
       config.objective!==expected.objective||config.ruleProfileId!==expected.ruleProfileId||
-      config.ruleProfile!==expected.unitDataProfile||config.losMode!==expected.losMode)
+      config.ruleProfile!==expected.unitDataProfile||config.losMode!==expected.losMode||
+      config.targetPolicyVersion!==expected.targetPolicyVersion)
       reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} und Regelprofil ${config.ruleProfileId} sind nicht kompatibel; Partie wurde nicht geladen.`);
     return expected;
   }
@@ -60,6 +67,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
       scenarioVersion:source.scenarioVersion,ruleProfileId:source.ruleProfileId,
       effectiveRules:{objectiveVersion:source.objectiveVersion,objective:source.objective,
         ...(source.losMode?{losMode:source.losMode}:{}),
+        ...(source.targetPolicyVersion?{targetPolicyVersion:source.targetPolicyVersion}:{}),
         unitDataProfile:source.ruleProfile??null,terrain:source.terrain,
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;

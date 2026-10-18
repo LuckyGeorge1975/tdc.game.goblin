@@ -15,15 +15,19 @@ function legacyIronDust() {
   return plain(vm.runInContext("scenarioCatalog['iron-dust']", context));
 }
 
-test('Iron Dust v1 data exactly matches the built-in Legacy start', () => {
+test('Iron Dust v1 data keeps the built-in roster and terrain across the new rule pair', () => {
   const legacy = legacyIronDust();
   const level = plain(IRON_DUST_LEVEL_V1);
   assert.deepEqual(
-    Object.fromEntries(['scenarioVersion', 'ruleProfileId', 'objectiveVersion', 'objective', 'terrain', 'units']
+    Object.fromEntries(['objectiveVersion', 'objective', 'terrain', 'units']
       .map(key => [key, level[key]])),
-    Object.fromEntries(['scenarioVersion', 'ruleProfileId', 'objectiveVersion', 'objective', 'terrain', 'units']
+    Object.fromEntries(['objectiveVersion', 'objective', 'terrain', 'units']
       .map(key => [key, legacy[key]]))
   );
+  assert.deepEqual([level.scenarioVersion,level.ruleProfileId],
+    [1,'FIELD_TEST_LEGACY_v1']);
+  assert.deepEqual([legacy.scenarioVersion,legacy.ruleProfileId,legacy.targetPolicyVersion],
+    [2,'FIELD_TEST_LEGACY_v2','skip-depleted-treads-v1']);
   assert.equal(level.id, 'iron-dust');
   assert.equal(level.width, 12);
   assert.equal(level.height, 8);
