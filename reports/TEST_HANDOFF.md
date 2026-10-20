@@ -2,6 +2,21 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## UI V2 · lokale Releasevorlage für möglichen Build 0.1.25
+
+| Feld | Stand am 20.10.2026 |
+|---|---|
+| Öffentlich veröffentlichte Version | `v0.1.24` auf `ceaf301c99ec35623dcf3dd323f9a7d7ee69137d`; `origin/main` zeigte beim lesenden GitHub-Abgleich auf dieselbe SHA |
+| Bestehender Rückfallpunkt | `v0.1.23` auf `2748063b83dbb8957d00a7b0f8523753c6b80ae9`; nach einer möglichen 0.1.25-Veröffentlichung wäre der geprüfte `v0.1.24` der unmittelbare Rückfallpunkt |
+| Lokaler Runtime-Kandidat | `56c135457c0384f08c3579af83b7ee3e724cbeba`, Branch `codex/ui-v2-integration`, Checkout `tdc.game.ogre-release-integration` |
+| Derzeitige Buildanzeige | `release.js`: `0.1.24` / Build `24`; UI V2 bleibt opt-in über `?ui=v2` |
+| Vorgeschlagene nächste Version | `0.1.25` / Build `25`, noch nicht in Runtime-Metadaten eingetragen; kein Tag und keine Veröffentlichung |
+| Lokale QA | `goblin-b22.6` und `.6.1`–`.6.3` inklusive unabhängiger UX- und Bedienprüfung; genaue SHAs, Ergebnisse und Geltungsgrenzen in der [Releasevorlage](../docs/UI_V2_RELEASE_CANDIDATE.md) |
+| Noch erforderliche Gates | Finale unabhängige Regression und Bedienkonsolidierung auf `56c1354`; Content-/Legal-Deltaprüfung; Entscheidung über Standardansicht und konkrete öffentliche Freigabe; anschließend Metadaten-, Verifier- und Pages-Prüfung auf der tatsächlichen Release-SHA |
+| Veröffentlichungsweg | [Lokale Releasevorlage und Rückfallverfahren](../docs/UI_V2_RELEASE_CANDIDATE.md); Push auf `main` würde den Pages-Workflow auslösen |
+
+Dieses Dokumentationspaket ändert keine Runtime-Dateien. Frühere Spiel- und Browserbelege gelten nur für die dort genannten festen SHAs und Prüfbereiche. Ein späterer Metadaten-Commit benötigt einen eigenen festen Handoff; eine Dokumentations-SHA allein ist kein veröffentlichungsfähiger Build-25-Commit.
+
 ## Build 0.1.24 · Nutzerfreigabe und lokale QA
 
 | Feld | Wert |

@@ -2,6 +2,12 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden im jeweiligen Release-Issue nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## Unveröffentlicht · UI V2 (geplanter Build 0.1.25)
+
+- Der lokale UI-V2-Kandidat `56c135457c0384f08c3579af83b7ee3e724cbeba` ergänzt zur bestehenden Spielbasis eine gesonderte Karten-, Befehls-, Menü- und Missionsoberfläche. Der Einstieg bleibt `?ui=v2`; die veröffentlichte Standardansicht und `release.js` stehen weiter auf Build 0.1.24. Die zehn wählbaren Missionen verwenden die vorhandenen neun Legacy-Profile und den getrennten IRON-DUST-v2-Core-Pfad. Auswahl, Vorschau und Briefing starten keine Mission.
+- Team-, Ziel-, Status- und Fokusmarker sind auch über Formen und Zeichen unterscheidbar. Das Kontextmenü bestätigt Befehle am Hex mit begrenztem Panel-Fallback; mobile System- und Phaseninformationen sind gegliedert. Das Hauptmenü hat eine linke Menüspalte mit Hexkulisse, die Levelwahl zeigt eine datengestützte Missionsvorschau. Die Rechtshinweise lesen das unveränderte englische `docs/CONTENT-NOTICES.md` (Version 18) über einen festen Pfad als Textansicht; nur der Navigationstitel ist in vier Sprachen lokalisiert.
+- Die Änderungen verwenden vorhandene lokale Unit-Art- und Terrain-Assets sowie Systemfonts und fügen keine fremden Bilder, Webfonts oder Audioquellen hinzu. Die unabhängigen lokalen Funktions- und UX-Prüfungen bis `goblin-b22.6` sind dokumentiert; die abschließende Konsolidierung für eine Veröffentlichung, Content-/Legal-Deltaprüfung und eine konkrete Nutzerentscheidung stehen aus (`goblin-b22.7`). Reale Geräteprüfungen (`goblin-wtg`), Standard-Legacy-FR320 (`goblin-5an`) sowie bedienbare Randpanel-/Querformatreste bleiben gesondert ausgewiesen. [Releasevorlage](docs/UI_V2_RELEASE_CANDIDATE.md).
+
 ## [0.1.24] - 2026-10-18
 
 - **Build 0.1.24: lokale QA bestanden, Veröffentlichung vom Nutzer freigegeben.** In der historischen Browser-Mission `iron-dust` erhalten neue Starts, Neustarts und Levelwechsel das Paar `scenarioVersion: 2` / `FIELD_TEST_LEGACY_v2` mit `skip-depleted-treads-v1` (`goblin-bzs`, Produktcommit `7e9e71da37264164eef28c3c78d4d97f276f9ae6`). Automatische Gegnerangriffe überspringen Ketten mit Wert 0 und können verbliebenes Antipersonnel treffen. Bei positivem Kettenwert bleibt die bisherige Priorität; ohne legales Systemziel wird kein Angriffswurf verbraucht.
