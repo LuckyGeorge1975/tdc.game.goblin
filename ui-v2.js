@@ -1,5 +1,6 @@
-// Opt-in presentation over the selected Legacy or Core session.
-if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.goblinBootProfileError) {
+// Default presentation over the selected Legacy or Core session; explicit non-V2 UI values keep the prior test path.
+const goblinUiChoice = new URLSearchParams(location.search).get('ui');
+if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBootProfileError) {
   (() => {
     const nativeMap = document.querySelector('#battlefield-map');
     const nativeShell = document.querySelector('.app-shell');
