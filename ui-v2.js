@@ -1,4 +1,4 @@
-// Opt-in presentation over the current Legacy session. The default entry never runs this code.
+// Opt-in presentation over the selected Legacy or Core session.
 if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.goblinBootProfileError) {
   (() => {
     const nativeMap = document.querySelector('#battlefield-map');
@@ -16,12 +16,32 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
     document.body.classList.add('ui-v2-active');
     const at = selector => shell.querySelector(selector);
     const t = (key, params) => globalThis.GoblinLanguage?.t(key, params) || key;
+    const core = () => globalThis.IronDustBrowserV2?.mode === 'ready';
 
     function revision() {
+      if (core()) return `core:${IronDustBrowserV2.epoch}:${IronDustBrowserV2.session.profile.digest}`;
       return JSON.stringify([currentScenario, legacySession?.sessionId, legacySession?.ruleProfileId, turn, phase, turnPhase, gameOver,
         [...terrain], [...terrainTypes], units.map(({ moveFrom, justHit, ...unit }) => unit)]);
     }
     function project() {
+      if (core()) {
+        const source = IronDustBrowserV2.view;
+        return {
+          revision: revision(), scenario: 'iron-dust-v2', profile: source.ruleProfileId,
+          mission: {title:t('mission.iron-dust-v2.title'), objective:t('v2.objective')},
+          turn:source.turn, phase:source.mode === 'player' ? 'player' : source.mode,
+          turnPhase:source.phase, gameOver:source.mode === 'ended',
+          objective:{goalMode:'core', coreHp:source.objective.coreHp,
+            coreMax:source.objective.coreMaxHp, outcome:source.victory.winner === 'player' ? true :
+              source.mode === 'ended' ? false : null},
+          ready:source.units.filter(unit => unit.team === 'player' && unit.hp > 0 && !unit.disabled && !unit.moved).length,
+          undo:{available:false,count:0}, units:source.units, cells:source.cells,
+          systems:source.units.filter(unit => unit.weapons).map(unit => ({id:unit.id,
+            summary:{treads:unit.treads,weapons:Object.fromEntries(Object.entries(unit.weapons)
+              .map(([key, weapon]) => [key, weapon.ready]))}})),
+          log:source.events.map(event => IronDustBrowserV2.formatEvent(event))
+        };
+      }
       const objective = objectiveSnapshot(victoryProfile(legacySession.effectiveRules), units);
       return {
         revision: revision(), scenario: currentScenario, profile: legacySession.ruleProfileId,
@@ -39,6 +59,12 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       };
     }
     function query(command) {
+      if (core()) {
+        if (GameDialogs.isOpen() || document.body.classList.contains('v2-screen-open'))
+          return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
+        const result = IronDustBrowserV2.query(command);
+        return result.available ? {ok:true,...result} : {ok:false,reason:IronDustBrowserV2.formatError(result.error?.code)};
+      }
       if (!scenarioCatalog[currentScenario] || !ScenarioRuleProfiles.entries[currentScenario] ||
           legacySession?.scenarioId !== currentScenario ||
           legacySession.ruleProfileId !== ScenarioRuleProfiles.entries[currentScenario].ruleProfileId ||
@@ -97,6 +123,16 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         : { ok: false, reason: t('ui.error.TARGET_NOT_ATTACKABLE') };
     }
     function dispatch(command, expectedRevision) {
+      if (core()) {
+        if (view.busy || expectedRevision !== revision()) return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
+        const check = query(command);
+        if (!check.ok) return check;
+        view.busy = true;
+        try {
+          const result = IronDustBrowserV2.dispatch(command);
+          return result.session ? {ok:true} : {ok:false,reason:IronDustBrowserV2.formatError(result.error?.code)};
+        } finally {view.busy = false; render();}
+      }
       if (view.busy) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       if (typeof expectedRevision !== 'string' || expectedRevision !== revision()) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       const check = query(command);
@@ -120,6 +156,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       } finally { view.busy = false; render(); }
     }
     function undo() {
+      if (core()) return {ok:false,reason:t('v2.undo')};
       if (view.busy || !phaseCommands.length || phase !== 'player' || gameOver) return { ok: false, reason: t('ui.error.ACTION_SPENT') };
       clearContext();
       undoPhaseCommand();
@@ -132,17 +169,18 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
     }
-    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo, resetView, focusUnit });
+    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo, resetView, focusUnit,
+      refresh: () => render() });
 
     function clearContext() { view.target = null; view.intentRevision = null; view.message = ''; }
     function chooseActor(id) {
-      const unit = units.find(item => item.id === id && item.team === 'player' && item.hp > 0);
+      const unit = (core() ? project().units : units).find(item => item.id === id && item.team === 'player' && item.hp > 0);
       view.actorId = unit?.id || null;
       if (unit) { view.focusCell = { x: unit.x, y: unit.y }; view.infoCell = { x: unit.x, y: unit.y }; }
       clearContext(); render();
     }
     function focusUnit(id) {
-      const unit = units.find(item => item.id === id && item.hp > 0);
+      const unit = (core() ? project().units : units).find(item => item.id === id && item.hp > 0);
       if (!unit) return;
       if (unit.team === 'player') chooseActor(id);
       else {
@@ -154,8 +192,9 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       hex?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
     function chooseHex(x, y) {
-      const unit = units.find(item => item.hp > 0 && !item.embarkedOn && item.x === x && item.y === y);
-      const actor = units.find(item => item.id === view.actorId);
+      const roster = core() ? project().units : units;
+      const unit = roster.find(item => item.hp > 0 && !item.embarkedOn && item.x === x && item.y === y);
+      const actor = roster.find(item => item.id === view.actorId);
       if (unit?.team === 'player' && !(actor && unit.id !== actor.id && unit.transportCapacity && canEmbark(actor, unit))) {
         chooseActor(unit.id); return;
       }
@@ -167,8 +206,114 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         at('#v2-actions button:not(:disabled)')?.focus();
       }
     }
+    function renderCore(state) {
+      const actor = state.units.find(unit => unit.id === view.actorId && unit.hp > 0);
+      if (!actor) {view.actorId = null; clearContext();}
+      if (state.phase !== 'player' || state.gameOver) clearContext();
+      at('#v2-mission').textContent = state.mission.title;
+      at('#v2-objective').textContent = state.mission.objective;
+      at('#v2-map-label').textContent = GoblinLanguage.translate('TACTICAL MAP');
+      at('#v2-map-caption').textContent = `${Math.max(...state.cells.map(cell => cell.x)) + 1} × ${Math.max(...state.cells.map(cell => cell.y)) + 1} · ${t('v2.ui.mapPan')}`;
+      at('#v2-map').setAttribute('aria-label', `${t('ui.hud.map')}: ${t('v2.ui.selectHex')}`);
+      at('#v2-profile').textContent = state.profile;
+      at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
+        state.phase === 'enemy' ? t('v2.enemy') : t(`v2.phase.${state.turnPhase}`);
+      at('#v2-turn').textContent = `${t('ui.hud.turn',{turn:state.turn})} · ${t('v2.ui.coreHp')} ${state.objective.coreHp}/${state.objective.coreMax}`;
+      const terminal = at('#v2-terminal'); terminal.hidden = !state.gameOver;
+      terminal.classList.toggle('v2-failed', state.gameOver && !state.objective.outcome);
+      terminal.textContent = state.gameOver ? t(state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '';
+      const phaseButton = at('#v2-phase-action');
+      phaseButton.textContent = state.phase === 'enemy' ? t('v2.enemy') : state.gameOver ? t('v2.ended') :
+        state.turnPhase === 'gev' ? t('v2.endTurn') : t('v2.next');
+      phaseButton.setAttribute('aria-label',phaseButton.textContent);
+      phaseButton.disabled = state.phase !== 'player' || !IronDustBrowserV2.query({type:'EndPhase',playerId:'player'}).available ||
+        GameDialogs.isOpen() || view.busy;
+      at('#v2-pause').disabled = GameDialogs.isOpen() || view.busy;
+      at('#v2-pause').textContent = t('ui.nav.pause');
+      at('#v2-undo').hidden = true;
+      at('#v2-units-label').textContent = t('ui.hud.units');
+      at('#v2-intel-label').textContent = t('v2.ui.fieldSystems');
+      at('#v2-log-label').textContent = t('ui.details.log');
+      at('#v2-selection').textContent = actor?.name || t('ui.hud.noSelection');
+      at('#v2-message').textContent = view.message;
+      const roster = at('#v2-units'); roster.replaceChildren();
+      state.units.filter(unit => unit.team === 'player').forEach(unit => {
+        const button = document.createElement('button');
+        const capabilities = `${t('v2.ui.move')} ${unit.move ?? t('v2.ui.bySystem')} · ${t('v2.ui.range')} ${unit.range ?? t('v2.ui.byWeapon')}`;
+        const weapons = unit.weapons ? ` · ${Object.entries(unit.weapons).map(([key, weapon]) =>
+          `${t(`v2.ui.weapon.${key}`)} ${weapon.ready}`).join(' · ')}` : '';
+        button.textContent = `${t('ui.team.player')} · ${unit.name} · ${unit.hp}/${unit.maxHp} HP · ${capabilities}${unit.treads === null ? '' : ` · ${t('v2.ui.treads')} ${unit.treads}`}${weapons}${unit.selectedWeapon ? ` · ${t('v2.ui.selectedWeapon')}: ${t(`v2.ui.weapon.${unit.selectedWeapon}`)}` : ''}${unit.moved ? ` · ${t('v2.ui.moved')}` : ''}${unit.fired ? ` · ${t('v2.ui.fired')}` : ''}${unit.secondMoved ? ` · ${t('v2.ui.secondMoved')}` : ''}${unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}`;
+        button.setAttribute('aria-pressed',String(unit.id === view.actorId));
+        button.disabled = unit.hp <= 0; button.onclick = () => chooseActor(unit.id); roster.append(button);
+      });
+      const intel = at('#v2-intel'); intel.replaceChildren();
+      const cell = view.target || view.infoCell;
+      if (cell) {
+        const terrain = state.cells.find(item => item.x === cell.x && item.y === cell.y);
+        const occupant = state.units.find(unit => unit.hp > 0 && unit.x === cell.x && unit.y === cell.y);
+        const line = document.createElement('p');
+        line.textContent = `${t('v2.ui.sector')} ${String.fromCharCode(65 + cell.x)}-${String(cell.y+1).padStart(2,'0')} · ${t(`v2.ui.terrain.${terrain?.type}`)}${occupant ? ` · ${occupant.name} (${t(occupant.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}) · ${occupant.hp}/${occupant.maxHp} HP` : ''}`;
+        intel.append(line);
+      }
+      state.systems.forEach(({id,summary}) => {const line=document.createElement('p');line.className='v2-system';
+        line.textContent=`${id}: ${t('v2.ui.treads')} ${summary.treads}; ${Object.entries(summary.weapons).map(([key,count]) => `${t(`v2.ui.weapon.${key}`)} ${count}`).join(' · ')}`;intel.append(line);});
+      const log = at('#v2-log'); log.replaceChildren();
+      state.log.slice(-4).forEach(entry => {const line=document.createElement('p');line.textContent=entry;log.append(line);});
+      const actions = at('#v2-actions'); actions.replaceChildren();
+      const footer = at('#v2-command-footer'); footer.replaceChildren();
+      const menuOpen = !!(view.target && view.actorId);
+      document.body.classList.toggle('v2-menu-open',menuOpen);
+      at('#v2-command-card').setAttribute('role',menuOpen ? 'dialog':'region');
+      at('#v2-command-target').textContent = menuOpen ? `${t('v2.ui.commandTarget')} · ${String.fromCharCode(65+view.target.x)}-${String(view.target.y+1).padStart(2,'0')}` : t('v2.ui.commandTarget');
+      if (menuOpen) {
+        const target=state.units.find(unit => unit.hp>0 && unit.x===view.target.x && unit.y===view.target.y);
+        const commands=[];
+        if (state.turnPhase==='fire' && target?.team==='enemy') {
+          if (actor.weapons) Object.entries(actor.weapons).forEach(([key,weapon]) => {
+            const selected=key===actor.selectedWeapon;
+            commands.push({command:selected ? {type:'PlayerFire',playerId:'player',unitId:actor.id,targetId:target.id,weaponKey:key} :
+              {type:'SelectWeapon',playerId:'player',unitId:actor.id,weaponKey:key},
+              label:`${t(`v2.ui.weapon.${key}`)} · A${weapon.attack} R${weapon.range} · ${weapon.ready} ${t('v2.ui.ready')} · ${t(selected?'v2.ui.fire':'v2.ui.weapon')}`,
+              keepTarget:!selected});
+          });
+          else commands.push({command:{type:'PlayerFire',playerId:'player',unitId:actor.id,targetId:target.id},label:t('v2.ui.fire')});
+        } else if (state.turnPhase!=='fire') {
+          if (target?.team==='enemy') commands.push({command:{type:'Ram',playerId:'player',unitId:actor.id,targetId:target.id},label:t('v2.ui.ram')});
+          else if (!target) commands.push({command:{type:'Move',playerId:'player',unitId:actor.id,to:{...view.target}},label:t('v2.ui.move')});
+        }
+        commands.forEach(({command,label,keepTarget}) => {
+          const availability=query(command),button=document.createElement('button');
+          button.textContent=availability.ok ? `${label} · ${t('ui.hud.intent.confirm')}` : `${label} · ${t('ui.hud.blocked',{reason:availability.reason})}`;
+          button.disabled=!availability.ok || view.busy;
+          button.onclick=()=>{const result=dispatch(command,view.intentRevision);
+            if(result.ok){if(keepTarget)view.intentRevision=revision();else clearContext();}
+            view.message=result.ok?'':result.reason;render();if(result.ok)at('.v2-map-card').scrollIntoView({block:'start'});};
+          actions.append(button);
+        });
+        const cancel=document.createElement('button');cancel.textContent=t('ui.dialog.cancel');cancel.onclick=()=>{clearContext();render();at('#v2-map').focus();};
+        const pause=document.createElement('button');pause.textContent=t('ui.nav.pause');pause.onclick=()=>at('#v2-pause').click();
+        footer.append(cancel,pause);
+      } else {const hint=document.createElement('p');hint.textContent=view.actorId?t('v2.ui.selectHex'):t('ui.hud.noIntent');actions.append(hint);}
+      let teams=nativeMap.querySelector('#v2-team-markers');
+      if(!teams){teams=document.createElementNS(NS,'g');teams.id='v2-team-markers';teams.setAttribute('pointer-events','none');nativeMap.append(teams);}
+      teams.replaceChildren();
+      state.units.filter(unit=>!unit.embarkedOn).forEach(unit=>{
+        const center=hexCenter(unit.x,unit.y),frame=document.createElementNS(NS,'polygon');
+        frame.classList.add(unit.team==='player'?'v2-team-own':'v2-team-enemy');
+        if(unit.disabled||unit.hp<=0)frame.classList.add('v2-team-inactive');
+        frame.setAttribute('points',hexPoints(unit.x,unit.y));frame.setAttribute('aria-label',`${t(unit.team==='player'?'ui.team.player':'ui.team.enemy')}: ${unit.name}${unit.id==='core'?`, ${t('ui.hud.objective')}`:''}`);teams.append(frame);
+        if(unit.id==='core'){const badge=document.createElementNS(NS,'text');badge.classList.add('v2-goal-badge');badge.setAttribute('x',center.x+24);badge.setAttribute('y',center.y-21);badge.textContent='◎';teams.append(badge);}
+      });
+      for(const [id,cell] of [['v2-actor-marker',actor],['v2-target-marker',view.target],['v2-focus-marker',view.focusCell]]){
+        let shape=nativeMap.querySelector(`#${id}`);if(!cell){shape?.remove();continue;}
+        if(!shape){shape=document.createElementNS(NS,'polygon');shape.id=id;shape.setAttribute('pointer-events','none');nativeMap.append(shape);}
+        shape.setAttribute('points',hexPoints(cell.x,cell.y));
+      }
+      globalThis.dispatchEvent(new Event('goblin-v2-render'));
+    }
     function render() {
       const state = project();
+      if (core()) { renderCore(state); return; }
       const actor = state.units.find(unit => unit.id === view.actorId);
       if (!actor || actor.hp <= 0) { view.actorId = null; clearContext(); }
       if (state.phase !== 'player' || state.gameOver) clearContext();
@@ -198,6 +343,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       at('#v2-pause').disabled = GameDialogs.isOpen() || view.busy;
       at('#v2-pause').textContent = t('ui.nav.pause');
       const undoButton = at('#v2-undo');
+      undoButton.hidden = false;
       undoButton.disabled = !state.undo.available || view.busy;
       undoButton.textContent = state.undo.count ? `${GoblinLanguage.translate('BACK')} (${state.undo.count})` : GoblinLanguage.translate('BACK');
       undoButton.setAttribute('aria-label', GoblinLanguage.translate('BACK'));
@@ -338,6 +484,13 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
     }
     at('#v2-undo').onclick = () => { const result = undo(); if (!result.ok) { view.message = result.reason; render(); } };
     at('#v2-phase-action').onclick = () => {
+      if (core()) {
+        const command={type:'EndPhase',playerId:'player'};
+        const expected=revision();
+        const result=dispatch(command,expected);
+        clearContext();view.message=result.ok?'':result.reason;render();
+        return;
+      }
       if (phase !== 'player' || gameOver || GameDialogs.isOpen()) return;
       clearContext();
       document.querySelector('#end-turn').click();
@@ -350,7 +503,10 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
     function cellAt(clientX, clientY) {
       const point = nativeMap.createSVGPoint(); point.x = clientX; point.y = clientY;
       const local = point.matrixTransform(nativeMap.getScreenCTM().inverse());
-      const cell = nearestHex(local.x, local.y);
+      const cell = core() ? IronDustBrowserV2.view.cells.reduce((best,next) => {
+        const center=hexCenter(next.x,next.y),distance=Math.hypot(center.x-local.x,center.y-local.y);
+        return !best || distance<best.distance ? {x:next.x,y:next.y,distance} : best;
+      },null) : nearestHex(local.x, local.y);
       return cell && Math.hypot(hexCenter(cell.x, cell.y).x - local.x, hexCenter(cell.x, cell.y).y - local.y) <= S ? cell : null;
     }
     function setZoom(value, clientX = mapPanel.getBoundingClientRect().left + mapPanel.clientWidth / 2,
@@ -474,6 +630,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       }
     }, true);
     globalThis.addEventListener('goblin-language-change', () => render());
+    globalThis.addEventListener('goblin-core-v2-render', () => {if(core()) render();});
     new MutationObserver(changes => {
       const own = node => node.nodeType === 1 && /^v2-(team-markers|actor-marker|target-marker|focus-marker)$/.test(node.id);
       if (changes.some(change => [...change.addedNodes, ...change.removedNodes].some(node => !own(node)))) render();

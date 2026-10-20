@@ -1,4 +1,4 @@
-// V2 navigation over the validated Legacy scenario sessions.
+// V2 navigation over the validated Legacy scenarios and separate Core mission.
 if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
   (() => {
     const shell = document.querySelector('.v2-shell');
@@ -7,7 +7,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     surface.className = 'v2-screen';
     shell.appendChild(surface);
     const t = (key, params) => GoblinLanguage.t(key, params);
-    let missionId = 'iron-dust', started = false;
+    let missionId = 'iron-dust', started = false, startError = '';
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
     const waiting = [];
     globalThis.GoblinV2PauseGate = Object.freeze({
@@ -17,6 +17,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function releasePause() {
       if (!pauseActive) return;
       pauseActive = false;
+      globalThis.IronDustBrowserV2?.resume();
       document.querySelector('#auto-end-turn').checked = savedAuto;
       waiting.splice(0).forEach(resolve => resolve());
       if (screen === 'play') maybeAutoAdvancePhase();
@@ -26,6 +27,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       savedAuto = document.querySelector('#auto-end-turn').checked;
       document.querySelector('#auto-end-turn').checked = false;
       pauseActive = true;
+      if (globalThis.IronDustBrowserV2?.mode === 'ready') IronDustBrowserV2.pause();
       show('pause');
     }
     function button(label, action, className = '') {
@@ -53,6 +55,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       document.body.classList.toggle('v2-screen-open', overlay);
       surface.hidden = !overlay;
       renderScreen(focus);
+      if (!overlay) GoblinUIV2.refresh();
       if (overlay) globalThis.scrollTo(0, 0);
       else {
         const map = document.querySelector('#v2-map');
@@ -73,7 +76,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         message: t('dialog.restart.body'), acceptLabel: t('dialog.restart.confirm'), cancelLabel: t('dialog.restart.cancel')
       });
       if (!accepted) { renderScreen(false); return; }
-      loadScenario(currentScenario);
+      if (globalThis.IronDustBrowserV2?.mode === 'ready') IronDustBrowserV2.restart();
+      else loadScenario(currentScenario);
       GoblinUIV2.resetView();
       show('play');
       releasePause();
@@ -87,7 +91,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           acceptLabel: t('dialog.changeMission.confirm'), cancelLabel: t('dialog.changeMission.cancel')
         });
         if (!accepted) { renderScreen(false); return; }
-        loadScenario(currentScenario);
+        if (globalThis.IronDustBrowserV2?.mode === 'ready') {
+          IronDustBrowserV2.stop();
+          loadScenario('iron-dust');
+        } else loadScenario(currentScenario);
         GoblinUIV2.resetView();
         started = false;
         releasePause();
@@ -96,10 +103,18 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     async function startMission() {
       if (GameDialogs.isOpen()) return;
-      if (!scenarioCatalog[missionId]) return;
-      loadScenario(missionId);
+      if (missionId === 'iron-dust-v2') {
+        if (!globalThis.IronDustBrowserV2?.available || !IronDustBrowserV2.start()) {
+          startError = t('v2.reject.start'); renderScreen(false); return;
+        }
+      } else {
+        if (!scenarioCatalog[missionId]) return;
+        globalThis.IronDustBrowserV2?.stop();
+        loadScenario(missionId);
+      }
       document.querySelector('#scenario-select').value = missionId;
       started = true;
+      startError = '';
       GoblinUIV2.resetView();
       show('play');
       releasePause();
@@ -109,7 +124,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       openUnitGuide();
     }
     function findUnit(id) {
-      const unit = units.find(item => item.id === id && item.hp > 0);
+      const unit = GoblinUIV2.project().units.find(item => item.id === id && item.hp > 0);
       if (!unit || !started) return;
       releasePause();
       show('play');
@@ -132,18 +147,21 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       } else if (screen === 'levels') {
         panel.append(heading(t('ui.levels.title')));
         const list = document.createElement('div'); list.className = 'v2-level-list';
-        for (const id of Object.keys(ScenarioRuleProfiles.entries)) {
+        for (const id of [...Object.keys(ScenarioRuleProfiles.entries), 'iron-dust-v2']) {
           const card = document.createElement('div'); card.className = 'v2-level';
-          card.append(heading(t(`mission.${id}.title`)), paragraph(t(`mission.${id}.objective.short`)));
-          const choose = button(scenarioCatalog[id] ? t('ui.levels.select') : t('v2.ui.missionDataUnavailable'), () => { missionId = id; show('briefing'); });
-          choose.disabled = !scenarioCatalog[id];
+          card.append(heading(t(`mission.${id}.title`)), paragraph(t(id === 'iron-dust-v2' ? 'v2.objective' : `mission.${id}.objective.short`)));
+          const available = id === 'iron-dust-v2' ? !!globalThis.IronDustBrowserV2?.available : !!scenarioCatalog[id];
+          const choose = button(available ? t('ui.levels.select') : t('v2.ui.missionDataUnavailable'), () => { missionId = id; startError = ''; show('briefing'); });
+          choose.disabled = !available;
           card.append(choose); list.append(card);
         }
         panel.append(list, actions(button(t('ui.nav.back'), () => show('menu'))));
       } else if (screen === 'briefing') {
+        const core = missionId === 'iron-dust-v2';
         panel.append(heading(t(`mission.${missionId}.title`)),
-          paragraph(t(`mission.${missionId}.briefing.full`)),
-          paragraph(t(`mission.${missionId}.objective.full`), 'v2-screen-objective'),
+          paragraph(t(core ? 'v2.quick.intro' : `mission.${missionId}.briefing.full`)),
+          paragraph(t(core ? 'v2.objective' : `mission.${missionId}.objective.full`), 'v2-screen-objective'),
+          ...(startError ? [paragraph(startError, 'v2-status')] : []),
           actions(button(t('ui.nav.back'), () => show('levels')),
             button(t('ui.briefing.start'), startMission, 'primary')));
       } else if (screen === 'pause') {
@@ -157,7 +175,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       } else if (screen === 'end') {
         const won = state.objective.outcome === true;
         panel.append(heading(t(won ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title')),
-          paragraph(t(won ? `mission.${state.scenario}.end.victory` : 'screen.missionEnd.defeat.allUnits')),
+          paragraph(t(won && state.scenario === 'iron-dust-v2' ? 'v2.win' : won ? `mission.${state.scenario}.end.victory` : 'screen.missionEnd.defeat.allUnits')),
           paragraph(t('ui.hud.turn', { turn: state.turn })),
           actions(button(t('screen.missionEnd.action.retry'), confirmRestart, 'primary'),
             button(t('screen.missionEnd.action.chooseMission'), goToLevels),
@@ -165,7 +183,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       } else if (screen === 'log') {
         panel.append(heading(t('screen.missionEnd.action.log')));
         const entries = document.createElement('div'); entries.className = 'v2-screen-log';
-        [...document.querySelectorAll('#combat-log .log-line')].forEach(line => entries.append(paragraph(line.textContent.trim())));
+        (state.scenario === 'iron-dust-v2' ? state.log : [...document.querySelectorAll('#combat-log .log-line')].map(line => line.textContent.trim()))
+          .forEach(line => entries.append(paragraph(line)));
         panel.append(entries, actions(button(t('ui.nav.back'), () => show('end'))));
       } else if (screen === 'catalog') {
         panel.append(heading(GoblinLanguage.translate('UNIT GUIDE')), paragraph(t('v2.ui.catalogNote')));
@@ -177,7 +196,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             const img = document.createElement('img'); img.src = asset; img.alt = '';
             item.prepend(img);
           }
-          const live = started ? units.find(unit => unit.name === entry.name && unit.hp > 0) : null;
+          const live = started ? state.units.find(unit => unit.name === entry.name && unit.hp > 0) : null;
           if (live) {
             const row = document.createElement('div'); row.className = 'v2-catalog-entry';
             row.append(item, button(t('v2.ui.find'), () => findUnit(live.id)));

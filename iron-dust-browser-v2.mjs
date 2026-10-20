@@ -3,7 +3,8 @@ import {
   queryIronDustProfile, preflightIronDustProfile, dispatchIronDustProfile,
   IRON_DUST_PROFILE_HEADER
 } from './src/core/iron-dust-executable-profile.mjs';
-import {buildIronDustV2View, renderIronDustV2View,
+import {buildIronDustV2View, renderIronDustV2View, formatIronDustV2Error,
+  formatIronDustV2Event,
   resetIronDustV2View} from './iron-dust-v2-view.mjs?v=4';
 
 // Browser commands cross the same validated profile boundary as the Core probes.
@@ -86,6 +87,8 @@ if (typeof document !== 'undefined') {
   let mode = 'inactive';
   let actionError = null;
   let eventHistory = [];
+  let epoch = 0;
+  let paused = false;
   const endButton = document.querySelector('#end-turn');
   const legacyEndClick = endButton.onclick;
   const enemyFlow = createIronDustEnemyFlow({getSession:() => mode === 'ready' ? session : null,
@@ -103,6 +106,7 @@ if (typeof document !== 'undefined') {
     const undo = document.querySelector('#undo-command');
     undo.disabled = true;
     undo.title = t('v2.undo');
+    globalThis.dispatchEvent?.(new Event('goblin-core-v2-render'));
   }
   function commitAction(command) {
     if (mode !== 'ready' || !session) return {error:{code:'V2_NOT_READY'}};
@@ -120,6 +124,7 @@ if (typeof document !== 'undefined') {
     return result;
   }
   function dispatchAction(command) {
+    if (paused) return {error:{code:'V2_PAUSED'}};
     if (command?.type === 'AutoEnemyAdvance' || enemyFlow.running) {
       actionError = command?.type === 'AutoEnemyAdvance' ?
         'ENEMY_TURN_AUTOMATED' : 'ENEMY_TURN_RUNNING';
@@ -163,6 +168,8 @@ if (typeof document !== 'undefined') {
   function start(profile) {
     if (globalThis.goblinBootProfileError) return false;
     enemyFlow.cancel();
+    paused = false;
+    epoch++;
     try {
       session = createIronDustBrowserSession(profile ?? createIronDustProfile(startSeed),
         startSeed);
@@ -188,6 +195,8 @@ if (typeof document !== 'undefined') {
   }
   function stop() {
     enemyFlow.cancel();
+    paused = false;
+    epoch++;
     session = null;
     mode = 'inactive';
     actionError = null;
@@ -209,7 +218,17 @@ if (typeof document !== 'undefined') {
     get active() { return mode !== 'inactive'; },
     get mode() { return mode; },
     get session() { return session; },
+    get epoch() { return epoch; },
+    get view() { return mode === 'ready' && session ? buildIronDustV2View(session.projection,
+      session.profile.header.ruleProfileId, eventHistory) : null; },
     get enemyRunning() {return enemyFlow.running;},
+    query: command => mode === 'ready' && session && !paused && !enemyFlow.running &&
+      command?.type !== 'AutoEnemyAdvance' ? queryIronDustProfile(session.profile, command)
+      : {available:false, error:{code:'V2_NOT_READY'}},
+    formatError: formatIronDustV2Error,
+    formatEvent: formatIronDustV2Event,
+    pause: () => {paused = true; enemyFlow.cancel();},
+    resume: () => {paused = false; if (mode === 'ready') enemyFlow.start();},
     dispatch: dispatchAction,
     start, restart: () => start(), stop
   });
