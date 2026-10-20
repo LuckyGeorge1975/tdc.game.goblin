@@ -70,10 +70,15 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         svg.append(polygon);
       }
       for (const unit of config?.units || []) {
-        const marker = document.createElementNS(svg.namespaceURI, 'circle');
-        marker.setAttribute('cx', 23 + unit.x * 36 + (unit.y % 2 ? 18 : 0));
-        marker.setAttribute('cy', 20 + unit.y * 30);
-        marker.setAttribute('r', unit.core ? 10 : 7);
+        const cx = 23 + unit.x * 36 + (unit.y % 2 ? 18 : 0), cy = 20 + unit.y * 30;
+        const radius = unit.core ? 10 : 8;
+        const marker = document.createElementNS(svg.namespaceURI, 'polygon');
+        marker.setAttribute('points', unit.team === 'player'
+          ? Array.from({length: 6}, (_, i) => {
+            const angle = Math.PI / 3 * i + Math.PI / 6;
+            return `${cx + radius * Math.cos(angle)},${cy + radius * Math.sin(angle)}`;
+          }).join(' ')
+          : `${cx},${cy - radius} ${cx + radius},${cy} ${cx},${cy + radius} ${cx - radius},${cy}`);
         marker.setAttribute('class', unit.team === 'player' ? 'v2-preview-own' : 'v2-preview-enemy');
         svg.append(marker);
       }
@@ -113,6 +118,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function openSection(next) { returnScreen = screen; show(next); }
     function goBack() { show(returnScreen === 'play' && GoblinUIV2.project().gameOver ? 'end' : returnScreen); }
+    function returnToSelectedLevel() {
+      show('levels', false);
+      document.getElementById(`v2-level-${missionId}`)?.focus();
+    }
     async function confirmRestart() {
       if (GameDialogs.isOpen()) return;
       const accepted = await GameDialogs.confirm({
@@ -228,7 +237,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           paragraph(t(core ? 'v2.quick.intro' : `mission.${missionId}.briefing.full`)),
           paragraph(t(core ? 'v2.objective' : `mission.${missionId}.objective.full`), 'v2-screen-objective'),
           ...(startError ? [paragraph(startError, 'v2-status')] : []),
-          actions(button(t('ui.nav.back'), () => show('levels')),
+          actions(button(t('ui.nav.back'), returnToSelectedLevel),
             button(t('ui.briefing.start'), startMission, 'primary')));
       } else if (screen === 'pause') {
         panel.append(heading(t('ui.nav.pause')),
@@ -333,7 +342,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     globalThis.addEventListener('keydown', event => {
       if (screen !== 'play' && event.key === 'Escape' && !GameDialogs.isOpen() && document.querySelector('#unit-guide-modal').classList.contains('hidden')) {
         if (screen === 'options' || screen === 'catalog' || screen === 'legal') goBack();
-        else if (screen === 'briefing') show('levels');
+        else if (screen === 'briefing') returnToSelectedLevel();
         else if (screen === 'levels') show('menu');
         else if (screen === 'pause') { show('play'); releasePause(); }
         else if (screen === 'log') show('end');
