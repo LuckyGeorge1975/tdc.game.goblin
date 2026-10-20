@@ -8,8 +8,8 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
     shell.className = 'v2-shell';
     shell.innerHTML = `
       <header class="v2-head"><div><span class="v2-label">G.O.B.L.I.N. / Mission</span><h1 id="v2-mission"></h1><p id="v2-objective"></p></div><div><span class="v2-label" id="v2-profile"></span><strong id="v2-phase"></strong><p id="v2-turn"></p></div></header>
-      <div class="v2-layout"><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label">Taktische Karte</span><strong id="v2-map-caption"></strong></div></div><div class="v2-map" id="v2-map" tabindex="0" aria-label="Karte: Einheit und danach Zielfeld wählen"></div><div class="v2-context"><span id="v2-selection"></span><p id="v2-message" class="v2-status" role="status"></p></div></main>
-      <aside class="v2-side"><section class="v2-card"><span class="v2-label">Eigene Einheiten</span><div class="v2-units" id="v2-units"></div></section><section class="v2-card"><span class="v2-label">Feld und Systeme</span><div id="v2-intel"></div></section><section class="v2-card"><span class="v2-label">Befehle für Zielhex</span><div class="v2-actions" id="v2-actions"></div></section></aside></div>`;
+      <div class="v2-layout"><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label">Taktische Karte</span><strong id="v2-map-caption"></strong></div><button type="button" id="v2-undo" aria-label="Letzten Befehl dieser Phase rückgängig machen">Zurück</button></div><div class="v2-map" id="v2-map" tabindex="0" aria-label="Karte: Einheit und danach Zielfeld wählen"></div><div class="v2-context"><span id="v2-selection"></span><p id="v2-message" class="v2-status" role="status"></p></div></main>
+      <aside class="v2-side"><section class="v2-card"><span class="v2-label">Eigene Einheiten</span><div class="v2-units" id="v2-units"></div></section><section class="v2-card"><span class="v2-label">Feld und Systeme</span><div id="v2-intel"></div></section><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target"><span class="v2-label" id="v2-command-target">Befehle für Zielhex</span><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section></aside></div>`;
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
     document.body.classList.add('ui-v2-active');
@@ -26,6 +26,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         revision: revision(), scenario: currentScenario, profile: legacySession.ruleProfileId,
         mission: { title: config.title, objective: document.querySelector('#mission-sub').textContent },
         turn, phase, turnPhase, gameOver, objective: structuredClone(objective),
+        undo: { available: phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },
         units: units.map(({ id, name, team, x, y, hp, maxHp, disabled, embarkedOn, core }) =>
           ({ id, name, team, x, y, hp, maxHp, disabled: !!disabled, embarkedOn: embarkedOn || null, core: !!core })),
         systems: units.filter(unit => unit.team === 'player' && unit.ogreSystems)
@@ -67,7 +68,14 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         return moved ? { ok: true } : { ok: false, reason: 'Runtime hat den Befehl abgelehnt.' };
       } finally { view.busy = false; render(); }
     }
-    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch });
+    function undo() {
+      if (view.busy || !phaseCommands.length || phase !== 'player' || gameOver) return { ok: false, reason: 'Kein Befehl in dieser Phase rückgängig zu machen.' };
+      clearContext();
+      undoPhaseCommand();
+      render();
+      return { ok: true };
+    }
+    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo });
 
     function clearContext() { view.target = null; view.intentRevision = null; view.message = ''; }
     function chooseActor(id) {
@@ -78,6 +86,11 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       const unit = units.find(item => item.hp > 0 && !item.embarkedOn && item.x === x && item.y === y);
       if (unit?.team === 'player') { chooseActor(unit.id); return; }
       view.target = { x, y }; view.intentRevision = revision(); view.message = ''; render();
+      if (view.actorId) {
+        if (matchMedia('(max-width: 599px), (max-height: 500px)').matches)
+          at('#v2-map').scrollIntoView({ block: 'start' });
+        at('#v2-actions button:not(:disabled)')?.focus();
+      }
     }
     function render() {
       const state = project();
@@ -89,6 +102,9 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       at('#v2-phase').textContent = state.turnPhase.toUpperCase();
       at('#v2-turn').textContent = `Zug ${state.turn} · Zielstatus ${state.objective.remaining}/${state.objective.total}`;
       at('#v2-map-caption').textContent = `${W} × ${H} Hexfelder`;
+      const undoButton = at('#v2-undo');
+      undoButton.disabled = !state.undo.available || view.busy;
+      undoButton.textContent = state.undo.count ? `Zurück (${state.undo.count})` : 'Zurück';
       at('#v2-selection').textContent = actor ? `Einheit: ${actor.name}` : 'Eigene Einheit wählen';
       at('#v2-message').textContent = view.message;
       const roster = at('#v2-units'); roster.replaceChildren();
@@ -114,6 +130,13 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         intel.appendChild(line);
       });
       const actions = at('#v2-actions'); actions.replaceChildren();
+      const footer = at('#v2-command-footer'); footer.replaceChildren();
+      const menuOpen = !!(view.target && view.actorId);
+      document.body.classList.toggle('v2-menu-open', menuOpen);
+      at('#v2-command-card').setAttribute('role', menuOpen ? 'dialog' : 'region');
+      at('#v2-command-target').textContent = menuOpen
+        ? `Ziel ${String.fromCharCode(65 + view.target.x)}-${String(view.target.y + 1).padStart(2, '0')} · ${terrainTypeAt(view.target.x, view.target.y)}`
+        : 'Befehle für Zielhex';
       if (view.target && view.actorId) {
         const command = { type: 'Move', actorId: view.actorId, ...view.target };
         const availability = query(command);
@@ -125,12 +148,13 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
           if (result.ok) clearContext();
           view.message = result.ok ? 'Bewegung ausgeführt.' : result.reason;
           render();
+          if (result.ok) at('.v2-map-card').scrollIntoView({ block: 'start' });
         };
         actions.appendChild(move);
         const fire = document.createElement('button'); fire.disabled = true;
         fire.textContent = 'Feuer und Sonderaktionen folgen im Kartenschnitt'; actions.appendChild(fire);
         const cancel = document.createElement('button'); cancel.textContent = 'Abbrechen';
-        cancel.onclick = () => { clearContext(); render(); }; actions.appendChild(cancel);
+        cancel.onclick = () => { clearContext(); render(); at('#v2-map').focus(); }; footer.appendChild(cancel);
       } else {
         const hint = document.createElement('p'); hint.textContent = view.actorId ? 'Zielfeld auf der Karte wählen.' : 'Einheit und danach Zielfeld wählen.';
         actions.appendChild(hint);
@@ -147,8 +171,10 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       marker('v2-actor-marker', actor);
       marker('v2-target-marker', view.target);
     }
+    at('#v2-undo').onclick = () => { const result = undo(); if (!result.ok) { view.message = result.reason; render(); } };
     nativeMap.addEventListener('click', event => {
       event.preventDefault(); event.stopImmediatePropagation();
+      if (view.target && view.actorId) return;
       const point = nativeMap.createSVGPoint(); point.x = event.clientX; point.y = event.clientY;
       const local = point.matrixTransform(nativeMap.getScreenCTM().inverse());
       const cell = nearestHex(local.x, local.y);
