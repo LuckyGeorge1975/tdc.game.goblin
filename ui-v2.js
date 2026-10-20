@@ -375,9 +375,13 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       if (cell) chooseHex(cell.x, cell.y);
     }, true);
     document.addEventListener('keydown', event => {
+      if (event.repeat && event.target === at('#v2-phase-action') && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault(); event.stopImmediatePropagation(); return;
+      }
       if (event.key === 'Escape') {
         if (view.target) clearContext(); else view.actorId = null;
         render(); mapPanel.focus(); event.preventDefault();
+        event.stopImmediatePropagation(); return;
       }
       const mapFocused = document.activeElement === mapPanel || document.activeElement === nativeMap;
       if (mapFocused && !(view.target && view.actorId)) {
@@ -395,14 +399,15 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
             if (box.top < frame.top) mapPanel.scrollTop -= frame.top - box.top;
             if (box.bottom > frame.bottom) mapPanel.scrollTop += box.bottom - frame.bottom;
           }
-          event.preventDefault();
+          event.preventDefault(); event.stopImmediatePropagation(); return;
         } else if ((event.key === 'Enter' || event.key === ' ') && view.focusCell) {
-          chooseHex(view.focusCell.x, view.focusCell.y); event.preventDefault();
-        } else if (event.key === '+' || event.key === '=') { setZoom(view.zoom * 1.1); event.preventDefault(); }
-        else if (event.key === '-') { setZoom(view.zoom * 0.9); event.preventDefault(); }
+          chooseHex(view.focusCell.x, view.focusCell.y); event.preventDefault(); event.stopImmediatePropagation(); return;
+        } else if (event.key === '+' || event.key === '=') { setZoom(view.zoom * 1.1); event.preventDefault(); event.stopImmediatePropagation(); return; }
+        else if (event.key === '-') { setZoom(view.zoom * 0.9); event.preventDefault(); event.stopImmediatePropagation(); return; }
       }
-      if (event.key.toLowerCase() === 'f' || event.key.toLowerCase() === 'l') event.preventDefault();
-      event.stopImmediatePropagation();
+      if (event.key.toLowerCase() === 'f' || event.key.toLowerCase() === 'l') {
+        event.preventDefault(); event.stopImmediatePropagation();
+      }
     }, true);
     globalThis.addEventListener('goblin-language-change', () => render());
     new MutationObserver(changes => {
