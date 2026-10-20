@@ -9,28 +9,28 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
     shell.className = 'v2-shell';
     shell.innerHTML = `
       <header class="v2-head"><div><span class="v2-label">G.O.B.L.I.N. / Mission</span><h1 id="v2-mission"></h1><p id="v2-objective"></p></div><div><span class="v2-label" id="v2-profile"></span><strong id="v2-phase"></strong><p id="v2-turn"></p></div></header>
-      <div class="v2-layout"><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label">Taktische Karte</span><strong id="v2-map-caption"></strong></div><button type="button" id="v2-undo" aria-label="Letzten Befehl dieser Phase rückgängig machen">Zurück</button></div><div class="v2-map" id="v2-map" tabindex="0" aria-label="Karte: Einheit und danach Zielfeld wählen"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause">Pause</button></div></main>
-      <aside class="v2-side"><section class="v2-card"><span class="v2-label">Eigene Einheiten</span><div class="v2-units" id="v2-units"></div></section><section class="v2-card"><span class="v2-label">Feld und Systeme</span><div id="v2-intel"></div><span class="v2-label">Ereignisse</span><div id="v2-log"></div></section><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target"><span class="v2-label" id="v2-command-target">Befehle für Zielhex</span><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section></aside></div>`;
+      <div class="v2-layout"><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><button type="button" id="v2-undo"></button></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main>
+      <aside class="v2-side"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card"><span class="v2-label" id="v2-intel-label"></span><div id="v2-intel"></div><span class="v2-label" id="v2-log-label"></span><div id="v2-log"></div></section><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target"><span class="v2-label" id="v2-command-target"></span><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section></aside></div>`;
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
     document.body.classList.add('ui-v2-active');
     const at = selector => shell.querySelector(selector);
+    const t = (key, params) => globalThis.GoblinLanguage?.t(key, params) || key;
 
     function revision() {
       return JSON.stringify([currentScenario, legacySession?.ruleProfileId, turn, phase, turnPhase, gameOver,
         [...terrain], [...terrainTypes], units.map(({ moveFrom, justHit, ...unit }) => unit)]);
     }
     function project() {
-      const config = legacySession.config;
       const objective = objectiveSnapshot(victoryProfile(legacySession.effectiveRules), units);
       return {
         revision: revision(), scenario: currentScenario, profile: legacySession.ruleProfileId,
-        mission: { title: config.title, objective: document.querySelector('#mission-sub').textContent },
+        mission: { title: t(`mission.${currentScenario}.title`), objective: t(`mission.${currentScenario}.objective.short`) },
         turn, phase, turnPhase, gameOver, objective: structuredClone(objective),
         ready: phase === 'player' && !gameOver ? phaseReadyUnits().length : 0,
         undo: { available: phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },
-        units: units.map(({ id, name, team, x, y, hp, maxHp, disabled, embarkedOn, core }) =>
-          ({ id, name, team, x, y, hp, maxHp, disabled: !!disabled, embarkedOn: embarkedOn || null, core: !!core })),
+        units: units.map(({ id, name, type, team, x, y, hp, maxHp, disabled, embarkedOn, core }) =>
+          ({ id, name, type, team, x, y, hp, maxHp, disabled: !!disabled, embarkedOn: embarkedOn || null, core: !!core })),
         systems: units.filter(unit => unit.team === 'player' && unit.ogreSystems)
           .map(unit => ({ id: unit.id, summary: GoblinSystems.summary(unit.ogreSystems) })),
         log: [...logEl.querySelectorAll('.log-line')].slice(0, 4).map(line => line.textContent.trim())
@@ -38,49 +38,51 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
     }
     function query(command) {
       if (currentScenario !== 'iron-dust' || legacySession?.ruleProfileId !== 'FIELD_TEST_LEGACY_v2' || globalThis.IronDustBrowserV2?.active)
-        return { ok: false, reason: 'Dieser V2-Grundschnitt ist nur für Legacy IRON DUST v2 verfügbar.' };
-      if (GameDialogs.isOpen()) return { ok: false, reason: 'Zuerst den offenen Dialog schließen.' };
-      if (phase !== 'player' || gameOver) return { ok: false, reason: 'Spielerphase ist nicht aktiv.' };
-      if (!['Move', 'Ram', 'Fire'].includes(command?.type)) return { ok: false, reason: 'Unbekannter Befehl.' };
+        return { ok: false, reason: t('ui.error.UNSUPPORTED_COMMAND') };
+      if (GameDialogs.isOpen()) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };
+      if (phase !== 'player' || gameOver) return { ok: false, reason: t(gameOver ? 'ui.error.GAME_ENDED' : 'ui.error.NOT_ACTIVE_TEAM') };
+      if (!['Move', 'Ram', 'Fire'].includes(command?.type)) return { ok: false, reason: t('ui.error.UNKNOWN_COMMAND') };
       const actor = units.find(unit => unit.id === command.actorId);
-      if (!actor || actor.team !== 'player' || actor.hp <= 0 || actor.disabled)
-        return { ok: false, reason: 'Keine einsatzfähige eigene Einheit.' };
+      if (!actor) return { ok: false, reason: t('ui.error.UNIT_NOT_FOUND') };
+      if (actor.team !== 'player') return { ok: false, reason: t('ui.error.UNIT_NOT_OWNED') };
+      if (actor.hp <= 0) return { ok: false, reason: t('ui.error.UNIT_DESTROYED') };
+      if (actor.disabled) return { ok: false, reason: t('ui.error.UNIT_DISABLED') };
       if (!Number.isInteger(command.x) || !Number.isInteger(command.y) || command.x < 0 || command.x >= W || command.y < 0 || command.y >= H)
-        return { ok: false, reason: 'Zielfeld liegt außerhalb der Karte.' };
+        return { ok: false, reason: t('ui.error.OUT_OF_BOUNDS') };
       const target = units.find(unit => unit.hp > 0 && !unit.embarkedOn && unit.x === command.x && unit.y === command.y);
       if (command.type === 'Move') {
-        if (turnPhase !== 'movement' && turnPhase !== 'gev') return { ok: false, reason: 'Bewegungsphase ist nicht aktiv.' };
-        if (actor.embarkedOn) return { ok: false, reason: 'Eingeschiffte Einheit kann nicht bewegen.' };
+        if (turnPhase !== 'movement' && turnPhase !== 'gev') return { ok: false, reason: t('ui.error.WRONG_PHASE') };
+        if (actor.embarkedOn) return { ok: false, reason: t('ui.error.UNIT_EMBARKED') };
         const second = turnPhase === 'gev';
-        if (!canMoveUnit(actor, second)) return { ok: false, reason: 'Einheit hat keine Bewegung mehr.' };
-        if (target) return { ok: false, reason: 'Zielfeld ist belegt.' };
+        if (!canMoveUnit(actor, second)) return { ok: false, reason: t('ui.error.ACTION_SPENT') };
+        if (target) return { ok: false, reason: t('ui.error.INVALID_TARGET') };
         const path = findMovementPath(actor, { x: command.x, y: command.y }, second ? 2 : actor.move, actor);
         return path?.length ? { ok: true, path: path.map(cell => ({ ...cell })) }
-          : { ok: false, reason: 'Kein zulässiger Weg zum Zielfeld.' };
+          : { ok: false, reason: t('ui.error.UNREACHABLE') };
       }
-      if (!target || target.team !== 'enemy') return { ok: false, reason: 'Kein gültiges gegnerisches Ziel.' };
+      if (!target || target.team !== 'enemy') return { ok: false, reason: t('ui.error.TARGET_NOT_ATTACKABLE') };
       if (command.type === 'Ram') {
         if (turnPhase !== 'movement' || actor.id !== 'ogre' || actor.embarkedOn || actor.moved || target.core)
-          return { ok: false, reason: 'Rammen nur mit ungezogener GOBLIN-Einheit gegen Nicht-Core-Ziel in Movement.' };
+          return { ok: false, reason: t('ui.error.UNSUPPORTED_COMMAND') };
         const path = findMovementPath(actor, { x: command.x, y: command.y }, actor.move, actor);
         return path?.length ? { ok: true, path: path.map(cell => ({ ...cell })) }
-          : { ok: false, reason: 'Kein zulässiger Rammweg.' };
+          : { ok: false, reason: t('ui.error.UNREACHABLE') };
       }
-      if (turnPhase !== 'fire' || !phaseCanAct(actor, 'fire')) return { ok: false, reason: 'Einheit hat in der Feuerphase keine verfügbare Aktion.' };
+      if (turnPhase !== 'fire' || !phaseCanAct(actor, 'fire')) return { ok: false, reason: t(turnPhase !== 'fire' ? 'ui.error.WRONG_PHASE' : 'ui.error.NO_ATTACKABLE_TARGET') };
       if (actor.ogreSystems) {
         const weapon = actor.ogreSystems.weapons[command.weaponKey];
         if (!weapon || !SiegebreakerWeapons.targetAllowed(actor, target, command.weaponKey))
-          return { ok: false, reason: 'Waffe für dieses Ziel nicht verfügbar.' };
+          return { ok: false, reason: t('ui.error.NO_ATTACKABLE_TARGET') };
         return { ok: true, weapon: { key: command.weaponKey, label: weapon.label, attack: weapon.attack, range: weapon.range } };
       }
       if (dist(actor, target) > actor.range || !lineOfSight(actor, target))
-        return { ok: false, reason: 'Ziel außerhalb der Reichweite oder Sichtlinie.' };
+        return { ok: false, reason: t('ui.error.TARGET_NOT_ATTACKABLE') };
       return weaponTargetAllowed(actor, target) ? { ok: true }
-        : { ok: false, reason: 'Ziel für diese Waffe nicht verfügbar.' };
+        : { ok: false, reason: t('ui.error.TARGET_NOT_ATTACKABLE') };
     }
     function dispatch(command, expectedRevision) {
-      if (view.busy) return { ok: false, reason: 'Befehl läuft bereits.' };
-      if (typeof expectedRevision !== 'string' || expectedRevision !== revision()) return { ok: false, reason: 'Spielstand hat sich geändert. Ziel erneut wählen.' };
+      if (view.busy) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };
+      if (typeof expectedRevision !== 'string' || expectedRevision !== revision()) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       const check = query(command);
       if (!check.ok) return check;
       view.busy = true;
@@ -88,21 +90,27 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         const actor = units.find(unit => unit.id === command.actorId);
         selected = actor;
         if (command.type === 'Fire' && actor.ogreSystems && !SiegebreakerWeapons.selectWeapon(actor, command.weaponKey))
-          return { ok: false, reason: 'Waffe nicht mehr verfügbar.' };
+          return { ok: false, reason: t('ui.error.NO_ATTACKABLE_TARGET') };
         const beforeExecution = revision();
         // handleHex is the final, command-history-wrapped Legacy path and checks again.
         handleHex(command.x, command.y);
-        return revision() !== beforeExecution ? { ok: true } : { ok: false, reason: 'Runtime hat den Befehl abgelehnt.' };
+        return revision() !== beforeExecution ? { ok: true } : { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       } finally { view.busy = false; render(); }
     }
     function undo() {
-      if (view.busy || !phaseCommands.length || phase !== 'player' || gameOver) return { ok: false, reason: 'Kein Befehl in dieser Phase rückgängig zu machen.' };
+      if (view.busy || !phaseCommands.length || phase !== 'player' || gameOver) return { ok: false, reason: t('ui.error.ACTION_SPENT') };
       clearContext();
       undoPhaseCommand();
       render();
       return { ok: true };
     }
-    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo });
+    function resetView() {
+      view.actorId = null; view.infoCell = null; view.focusCell = null; clearContext();
+      view.zoom = 1; nativeMap.style.removeProperty('width'); nativeMap.style.removeProperty('height');
+      at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
+      render();
+    }
+    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo, resetView });
 
     function clearContext() { view.target = null; view.intentRevision = null; view.message = ''; }
     function chooseActor(id) {
@@ -129,28 +137,40 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       if (state.phase !== 'player' || state.gameOver) clearContext();
       at('#v2-mission').textContent = state.mission.title;
       at('#v2-objective').textContent = state.mission.objective;
+      at('#v2-map-label').textContent = GoblinLanguage.translate('TACTICAL MAP');
+      at('#v2-units-label').textContent = t('ui.hud.units');
+      at('#v2-intel-label').textContent = t('v2.ui.fieldSystems');
+      at('#v2-log-label').textContent = t('ui.details.log');
       at('#v2-profile').textContent = state.profile;
-      at('#v2-phase').textContent = state.turnPhase.toUpperCase();
-      at('#v2-turn').textContent = `Zug ${state.turn} · Zielstatus ${state.objective.remaining}/${state.objective.total}`;
-      at('#v2-map-caption').textContent = `${W} × ${H} Hexfelder · Karte verschieben`;
+      at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') : t(`phase.${state.turnPhase}.label`);
+      at('#v2-turn').textContent = `${t('ui.hud.turn', { turn: state.turn })} · ${t('hud.objective.progress.core', { currentHp: state.objective.coreHp, maxHp: state.objective.coreMax })}`;
+      at('#v2-map-caption').textContent = `${W} × ${H} · ${t('v2.ui.mapPan')}`;
+      at('#v2-map').setAttribute('aria-label', `${t('ui.hud.map')}: ${t('v2.ui.selectHex')}`);
       const terminal = at('#v2-terminal');
       terminal.hidden = !state.gameOver;
       terminal.classList.toggle('v2-failed', state.gameOver && state.objective.outcome === false);
-      terminal.textContent = state.gameOver ? (state.objective.outcome ? 'MISSION COMPLETE' : 'MISSION FAILED') : '';
-      const next = { movement: 'Feuerphase', fire: 'Skimmer-Manöver', gev: 'Gegnerzug' }[state.turnPhase];
+      terminal.textContent = state.gameOver ? t(state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '';
+      const next = { movement: 'dialog.phaseAdvance.confirm.toFire', fire: 'dialog.phaseAdvance.confirm.toGev', gev: 'dialog.phaseAdvance.confirm.toEnemy' }[state.turnPhase];
       const phaseButton = at('#v2-phase-action');
-      phaseButton.textContent = next ? `Weiter: ${next} · ${state.ready} offen` : 'Gegnerzug / Missionsende';
+      phaseButton.textContent = next ? `${t(next)} · ${t('dialog.phaseAdvance.pending', { pendingCount: state.ready })}`
+        : t(state.gameOver ? (state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : 'phase.enemy.label');
+      phaseButton.setAttribute('aria-label', phaseButton.textContent);
       phaseButton.disabled = !next || state.phase !== 'player' || state.gameOver || GameDialogs.isOpen() || view.busy;
       at('#v2-pause').disabled = GameDialogs.isOpen() || view.busy;
+      at('#v2-pause').textContent = t('ui.nav.pause');
       const undoButton = at('#v2-undo');
       undoButton.disabled = !state.undo.available || view.busy;
-      undoButton.textContent = state.undo.count ? `Zurück (${state.undo.count})` : 'Zurück';
-      at('#v2-selection').textContent = actor ? `Einheit: ${actor.name}` : 'Eigene Einheit wählen';
+      undoButton.textContent = state.undo.count ? `${GoblinLanguage.translate('BACK')} (${state.undo.count})` : GoblinLanguage.translate('BACK');
+      undoButton.setAttribute('aria-label', GoblinLanguage.translate('BACK'));
+      at('#v2-selection').textContent = actor ? actor.name : t('ui.hud.noSelection');
       at('#v2-message').textContent = view.message;
       const roster = at('#v2-units'); roster.replaceChildren();
       state.units.filter(unit => unit.team === 'player').forEach(unit => {
         const button = document.createElement('button');
-        button.textContent = `Eigen · ${unit.name} · ${unit.hp}/${unit.maxHp} HP${unit.disabled ? ' · deaktiviert' : ''}`;
+        const system = state.systems.find(item => item.id === unit.id);
+        button.textContent = system
+          ? `${t('ui.team.player')} · ${unit.name} · ${t('v2.ui.treads')} ${system.summary.treads} · ${Object.entries(system.summary.weapons).map(([key, count]) => `${t(`v2.ui.weapon.${key}`)} ${count}`).join(' · ')}${unit.hp <= 0 ? ` · ${t('v2.ui.destroyed')}` : unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}`
+          : `${t('ui.team.player')} · ${t('ui.hud.unitSummary', { unitId: unit.name, unitType: unit.type || '', hp: unit.hp, maxHp: unit.maxHp })}${unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}`;
         button.setAttribute('aria-pressed', String(unit.id === view.actorId));
         button.disabled = unit.hp <= 0;
         button.onclick = () => chooseActor(unit.id);
@@ -161,12 +181,12 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         const { x, y } = view.target || view.infoCell;
         const target = state.units.find(unit => unit.hp > 0 && !unit.embarkedOn && unit.x === x && unit.y === y);
         const line = document.createElement('p');
-        line.textContent = `Feld ${String.fromCharCode(65 + x)}-${String(y + 1).padStart(2, '0')} · ${terrainTypeAt(x, y)}${target ? ` · ${target.name} (${target.team === 'player' ? 'Eigen' : 'Gegner'})` : ''}`;
+        line.textContent = `${t('v2.ui.sector')} ${String.fromCharCode(65 + x)}-${String(y + 1).padStart(2, '0')} · ${GoblinLanguage.translate(terrainTypeAt(x, y))}${target ? ` · ${target.name} (${t(target.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')})` : ''}`;
         intel.appendChild(line);
       }
       state.systems.forEach(({ id, summary }) => {
         const line = document.createElement('p'); line.className = 'v2-system';
-        line.textContent = `${id}: Ketten ${summary.treads}; ${Object.entries(summary.weapons).map(([name, count]) => `${name} ${count}`).join(' · ')}`;
+        line.textContent = `${id}: ${t('v2.ui.treads')} ${summary.treads}; ${Object.entries(summary.weapons).map(([name, count]) => `${t(`v2.ui.weapon.${name}`)} ${count}`).join(' · ')}`;
         intel.appendChild(line);
       });
       const log = at('#v2-log'); log.replaceChildren();
@@ -177,8 +197,8 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       document.body.classList.toggle('v2-menu-open', menuOpen);
       at('#v2-command-card').setAttribute('role', menuOpen ? 'dialog' : 'region');
       at('#v2-command-target').textContent = menuOpen
-        ? `Ziel ${String.fromCharCode(65 + view.target.x)}-${String(view.target.y + 1).padStart(2, '0')} · ${terrainTypeAt(view.target.x, view.target.y)}`
-        : 'Befehle für Zielhex';
+        ? `${t('v2.ui.commandTarget')} · ${String.fromCharCode(65 + view.target.x)}-${String(view.target.y + 1).padStart(2, '0')} · ${GoblinLanguage.translate(terrainTypeAt(view.target.x, view.target.y))}`
+        : t('v2.ui.commandTarget');
       if (view.target && view.actorId) {
         const runtimeActor = units.find(unit => unit.id === view.actorId);
         const target = units.find(unit => unit.hp > 0 && !unit.embarkedOn && unit.x === view.target.x && unit.y === view.target.y);
@@ -186,31 +206,34 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
           ? runtimeActor?.ogreSystems
             ? SiegebreakerWeapons.weaponEntries(runtimeActor).map(({ key, weapon }) => ({
               command: { type: 'Fire', actorId: view.actorId, ...view.target, weaponKey: key },
-              label: `${weapon.label} · A${weapon.attack} R${weapon.range} · ${GoblinSystems.weaponReady(weapon)} bereit` }))
-            : [{ command: { type: 'Fire', actorId: view.actorId, ...view.target }, label: 'Feuern' }]
+              label: `${t(`v2.ui.weapon.${key}`)} · A${weapon.attack} R${weapon.range} · ${GoblinSystems.weaponReady(weapon)} ${t('v2.ui.ready')}` }))
+            : [{ command: { type: 'Fire', actorId: view.actorId, ...view.target }, label: t('v2.ui.fire') }]
           : target?.team === 'enemy'
-            ? [{ command: { type: 'Ram', actorId: view.actorId, ...view.target }, label: 'Rammen' }]
-            : [{ command: { type: 'Move', actorId: view.actorId, ...view.target }, label: 'Bewegen' }];
+            ? [{ command: { type: 'Ram', actorId: view.actorId, ...view.target }, label: t('v2.ui.ram') }]
+            : [{ command: { type: 'Move', actorId: view.actorId, ...view.target }, label: t('v2.ui.move') }];
         commands.forEach(({ command, label }) => {
           const availability = query(command);
           const button = document.createElement('button');
           button.textContent = availability.ok
-            ? `${label} bestätigen${availability.path ? ` · ${availability.path.length} Felder` : ''}`
-            : `${label} gesperrt · ${availability.reason}`;
+            ? `${label} · ${t('ui.hud.intent.confirm')}${availability.path ? ` · ${availability.path.length}` : ''}`
+            : `${label} · ${t('ui.hud.blocked', { reason: availability.reason })}`;
           button.disabled = !availability.ok || view.busy;
           button.onclick = () => {
             const result = dispatch(command, view.intentRevision);
             if (result.ok) clearContext();
-            view.message = result.ok ? 'Befehl ausgeführt.' : result.reason;
+            view.message = result.ok ? '' : result.reason;
             render();
             if (result.ok) at('.v2-map-card').scrollIntoView({ block: 'start' });
           };
           actions.appendChild(button);
         });
-        const cancel = document.createElement('button'); cancel.textContent = 'Abbrechen';
-        cancel.onclick = () => { clearContext(); render(); at('#v2-map').focus(); }; footer.appendChild(cancel);
+        const cancel = document.createElement('button'); cancel.textContent = t('ui.dialog.cancel');
+        cancel.onclick = () => { clearContext(); render(); at('#v2-map').focus(); };
+        const pause = document.createElement('button'); pause.textContent = t('ui.nav.pause');
+        pause.onclick = () => at('#v2-pause').click();
+        footer.append(cancel, pause);
       } else {
-        const hint = document.createElement('p'); hint.textContent = view.actorId ? 'Zielfeld auf der Karte wählen.' : 'Einheit und danach Zielfeld wählen.';
+        const hint = document.createElement('p'); hint.textContent = view.actorId ? t('v2.ui.selectHex') : t('ui.hud.noIntent');
         actions.appendChild(hint);
       }
       function marker(id, cell) {
@@ -236,7 +259,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         frame.setAttribute('points', unit.team === 'player' ? hexPoints(unit.x, unit.y)
           : `${c.x},${c.y - S} ${c.x + S - 4},${c.y} ${c.x},${c.y + S} ${c.x - S + 4},${c.y}`);
         frame.setAttribute('role', 'img');
-        frame.setAttribute('aria-label', `${unit.team === 'player' ? 'Eigen' : 'Gegner'}: ${unit.name}${unit.core ? ', Missionsziel' : ''}${unit.hp <= 0 ? ', zerstört' : unit.disabled ? ', deaktiviert' : ''}`);
+        frame.setAttribute('aria-label', `${t(unit.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}: ${unit.name}${unit.core ? `, ${t('ui.hud.objective')}` : ''}${unit.hp <= 0 ? `, ${t('v2.ui.destroyed')}` : unit.disabled ? `, ${t('v2.ui.disabled')}` : ''}`);
         teams.appendChild(frame);
         function badge(kind, x, y, mark) {
           const badge = document.createElementNS(NS, 'text');
@@ -260,6 +283,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       marker('v2-actor-marker', actor);
       marker('v2-target-marker', view.target);
       marker('v2-focus-marker', view.focusCell);
+      globalThis.dispatchEvent(new Event('goblin-v2-render'));
     }
     at('#v2-undo').onclick = () => { const result = undo(); if (!result.ok) { view.message = result.reason; render(); } };
     at('#v2-phase-action').onclick = () => {
@@ -268,23 +292,6 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       document.querySelector('#end-turn').click();
       render();
       GameDialogs.whenIdle().then(render);
-    };
-    at('#v2-pause').onclick = async () => {
-      if (GameDialogs.isOpen()) return;
-      clearContext(); render();
-      const restart = await GameDialogs.confirm({
-        id: 'v2-pause', title: 'PAUSE', message: 'Mission angehalten. Fortsetzen oder Neustart wählen.',
-        acceptLabel: 'NEUSTART', cancelLabel: 'FORTSETZEN'
-      });
-      if (restart && await GameDialogs.confirm({
-        id: 'v2-restart', title: 'MISSION NEU STARTEN?',
-        message: 'Der aktuelle Spielstand und die Befehle dieser Mission gehen verloren.',
-        acceptLabel: 'NEU STARTEN', cancelLabel: 'FORTSETZEN'
-      })) {
-        loadScenario(currentScenario);
-        view.actorId = null;
-      }
-      render();
     };
     const mapPanel = at('#v2-map');
     const pointers = new Map();
@@ -322,7 +329,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       if (event.pointerType === 'touch') pointer.timer = setTimeout(() => {
         if (pointers.size !== 1 || pointer.moved) return;
         const cell = cellAt(pointer.x, pointer.y);
-        if (cell) { view.infoCell = cell; view.message = 'Feldinformation'; render(); }
+        if (cell) { view.infoCell = cell; view.message = t('ui.hud.intel'); render(); }
         pointer.moved = true; suppressTapUntil = performance.now() + 500;
       }, 500);
       if (pointers.size === 2) {
@@ -366,7 +373,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
     mapPanel.addEventListener('contextmenu', event => {
       event.preventDefault();
       const cell = cellAt(event.clientX, event.clientY);
-      if (cell && !(view.target && view.actorId)) { view.infoCell = cell; view.message = 'Feldinformation'; render(); }
+      if (cell && !(view.target && view.actorId)) { view.infoCell = cell; view.message = t('ui.hud.intel'); render(); }
     });
     nativeMap.addEventListener('click', event => {
       event.preventDefault(); event.stopImmediatePropagation();
@@ -375,6 +382,12 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       if (cell) chooseHex(cell.x, cell.y);
     }, true);
     document.addEventListener('keydown', event => {
+      if (document.body.classList.contains('v2-screen-open')) {
+        if (event.key.toLowerCase() === 'f' || event.key.toLowerCase() === 'l') {
+          event.preventDefault(); event.stopImmediatePropagation();
+        }
+        return;
+      }
       if (event.repeat && event.target === at('#v2-phase-action') && (event.key === 'Enter' || event.key === ' ')) {
         event.preventDefault(); event.stopImmediatePropagation(); return;
       }
@@ -415,5 +428,6 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       if (changes.some(change => [...change.addedNodes, ...change.removedNodes].some(node => !own(node)))) render();
     }).observe(nativeMap, { childList: true });
     render();
+    globalThis.GoblinLanguage?.ready.then(render);
   })();
 }

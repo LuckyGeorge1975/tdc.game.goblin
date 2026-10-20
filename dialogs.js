@@ -67,7 +67,7 @@ const GameDialogs = (() => {
 
 function scheduleGameTask(action, delay) {
   const firstUnit = units[0], scheduledTurn = turn;
-  return setTimeout(() => { GameDialogs.whenIdle().then(() => {
+  return setTimeout(() => { GameDialogs.whenIdle().then(() => globalThis.GoblinV2PauseGate?.whenResumed() || Promise.resolve()).then(() => {
     if (units[0] === firstUnit && turn === scheduledTurn && !gameOver) action();
   }); }, delay);
 }
