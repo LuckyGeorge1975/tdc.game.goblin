@@ -57,19 +57,28 @@ test('Core guide find uses stable live IDs, ignores dead and absent units, and l
   context.GoblinV2Flow={hasStarted:()=>true,findUnit:id=>found.push(id)};
   document.body={classList:{contains:name=>name==='ui-v2-active'}};
   for(const language of ['de','en','es','fr']){
-    context.GoblinLanguage={current:language,t:key=>key==='v2.unit.ogre'?`${language} Siegebreaker`:key};
+    context.GoblinLanguage={current:language,t:key=>key==='v2.unit.ogre'?`${language} Siegebreaker`:
+      key==='v2.ui.destroyed'?`${language} destroyed`:key==='ui.team.player'?`${language} friendly`:key};
     vm.runInContext('guideIndex=0;renderUnitGuide()',context);
     assert.equal(document.querySelector('#guide-find').disabled,false,language);
     assert.equal(document.querySelector('#guide-name').textContent,`${language} Siegebreaker`);
+    assert.equal(document.querySelector('#guide-status').textContent,'v2.guide.live');
     document.querySelector('#guide-find').onclick();
   }
   assert.deepEqual(found,['ogre','ogre','ogre','ogre']);
   assert.equal(profile.digest,createIronDustProfile(8).digest);
   assert.equal(state.rng.state,projection.state.rng.state);
   state.units.find(unit=>unit.id==='ogre').hp=0;
-  vm.runInContext('renderUnitGuide()',context);
-  assert.equal(document.querySelector('#guide-find').disabled,true);
-  document.querySelector('#guide-find').onclick();
+  for(const language of ['de','en','es','fr']){
+    context.GoblinLanguage={current:language,t:key=>key==='v2.ui.destroyed'?`${language} destroyed`:
+      key==='ui.team.player'?`${language} friendly`:key};
+    vm.runInContext('renderUnitGuide()',context);
+    assert.equal(document.querySelector('#guide-status').textContent,`${language} destroyed`);
+    assert.equal(document.querySelector('#guide-kicker').textContent,`${language} friendly · ${language} destroyed`);
+    assert.equal(document.querySelector('#guide-phase-status').textContent,`${language} destroyed`);
+    assert.equal(document.querySelector('#guide-find').disabled,true);
+    document.querySelector('#guide-find').onclick();
+  }
   assert.equal(found.length,4);
   vm.runInContext("guideIndex=unitGuideEntries.findIndex(entry=>entry.name==='ASSAULT TANK');renderUnitGuide()",context);
   assert.equal(document.querySelector('#guide-find').disabled,true);

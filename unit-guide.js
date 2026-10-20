@@ -67,7 +67,10 @@ function renderUnitGuide(){
   document.querySelector('.guide-information').scrollTop=0;
   document.querySelector('#guide-symbol').textContent=unit.icon;
   document.querySelector('#guide-symbol').classList.toggle('enemy',(live?.team==='enemy')||(!live&&unit.team==='HOSTILE SYSTEM'));
-  document.querySelector('#guide-kicker').textContent=v2&&live?GoblinLanguage.t(live.team==='player'?'v2.ui.guideFriendlyLive':'v2.ui.guideHostileLive'):live?(live.team==='player'?'FRIENDLY · LIVE':'HOSTILE · LIVE'):unit.team+' · CATALOG';
+  document.querySelector('#guide-kicker').textContent=v2&&live?(live.hp<=0?
+    `${GoblinLanguage.t(live.team==='player'?'ui.team.player':'ui.team.enemy')} · ${GoblinLanguage.t('v2.ui.destroyed')}`:
+    GoblinLanguage.t(live.team==='player'?'v2.ui.guideFriendlyLive':'v2.ui.guideHostileLive')):
+    live?(live.team==='player'?'FRIENDLY · LIVE':'HOSTILE · LIVE'):unit.team+' · CATALOG';
   document.querySelector('#guide-name').textContent=v2&&live?GoblinLanguage.t(`v2.unit.${live.id}`):unit.name;
   document.querySelector('#guide-role').textContent=v2&&live?GoblinLanguage.t(`v2.ui.type.${live.id}`):unit.role;
   const liveDrone=unit.name==='ARTILLERY DRONE'&&live;
@@ -83,7 +86,7 @@ function renderUnitGuide(){
   globalThis.UnitGuideRange.render(unit,v2?null:live);
   const scenarios=Object.entries(scenarioCatalog).filter(([,config])=>config.units.some(item=>item.name===unit.name)).map(([id])=>id.toUpperCase().replaceAll('-',' '));
   document.querySelector('#guide-scenarios').textContent=v2?'IRON DUST v2':scenarios.join(' · ')||'CATALOG ONLY';
-  document.querySelector('#guide-status').textContent=v2?(live?GoblinLanguage.t('v2.guide.live'):GoblinLanguage.t('v2.guide.absent')):live?(live.hp<=0?'DESTROYED':live.disabled?'DISABLED':currentScenario==='atlas-proving-grounds'?'ATLAS · PROTOTYPE STATS':'LIVE IN CURRENT SCENARIO'):'NOT IN CURRENT SCENARIO';
+  document.querySelector('#guide-status').textContent=v2?(live?GoblinLanguage.t(live.hp<=0?'v2.ui.destroyed':'v2.guide.live'):GoblinLanguage.t('v2.guide.absent')):live?(live.hp<=0?'DESTROYED':live.disabled?'DISABLED':currentScenario==='atlas-proving-grounds'?'ATLAS · PROTOTYPE STATS':'LIVE IN CURRENT SCENARIO'):'NOT IN CURRENT SCENARIO';
   document.querySelector('#guide-phase-status').textContent=v2?(!live?'—':live.hp<=0?GoblinLanguage.t('v2.ui.destroyed'):live.team==='enemy'?GoblinLanguage.t('v2.ui.hostileAi'):globalThis.IronDustBrowserV2.session.projection.mode==='player'?GoblinLanguage.t('v2.ui.ready'):GoblinLanguage.t('v2.ui.noAction')):!live?'—':live.hp<=0?'DESTROYED':live.team==='enemy'?'HOSTILE AI':phaseCanAct(live)?'READY':live.disabled?'DISABLED':'NO ACTION NOW';
   const list=document.querySelector('#guide-action-list');list.replaceChildren();
   for(const action of v2?(live&&live.team==='player'?[GoblinLanguage.t('v2.guide.actions')]:[]):liveDrone?['Im Field Test bewegen und fernfeuern','Stationäre Katalogregel: geplant']:guideActions[unit.name]||[]){const item=document.createElement('li');item.textContent=action;list.appendChild(item)}
