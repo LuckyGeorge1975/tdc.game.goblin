@@ -265,6 +265,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
               message:`${t('v2.ui.sector')} ${hexLabel(view.target)} · ${t('v2.ui.missileSplash')} · ${t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.splashAttack})}${affected.length ? ` · ${affected.join(', ')}` : ''}`,
               acceptLabel:t('ui.hud.intent.confirm'),cancelLabel:t('ui.dialog.cancel')});
             if (!accepted) {
+              render();
               (at('#v2-actions button:not(:disabled)') || at('#v2-command-footer button'))?.focus();
               return;
             }
