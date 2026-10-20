@@ -12,6 +12,7 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Derzeitige Buildanzeige | `release.js`: `0.1.24` / Build `24`; UI V2 bleibt opt-in über `?ui=v2` |
 | Vorgeschlagene nächste Version | `0.1.25` / Build `25`, noch nicht in Runtime-Metadaten eingetragen; kein Tag und keine Veröffentlichung |
 | Lokale QA | `goblin-b22.6` und `.6.1`–`.6.3` inklusive unabhängiger UX- und Bedienprüfung; genaue SHAs, Ergebnisse und Geltungsgrenzen in der [Releasevorlage](../docs/UI_V2_RELEASE_CANDIDATE.md) |
+| Entwurfsquelle | Nutzerangabe: `designV2reworked2.pen` wurde vom Nutzer selbst mit Claude-Hilfe erstellt; keine separate ausdrückliche Rechtevereinbarung. Konkreter Content-Quellenabgleich steht aus; keine pauschale Rechtefreigabe |
 | Noch erforderliche Gates | Finale unabhängige Regression und Bedienkonsolidierung auf `56c1354`; Content-/Legal-Deltaprüfung; Entscheidung über Standardansicht und konkrete öffentliche Freigabe; anschließend Metadaten-, Verifier- und Pages-Prüfung auf der tatsächlichen Release-SHA |
 | Veröffentlichungsweg | [Lokale Releasevorlage und Rückfallverfahren](../docs/UI_V2_RELEASE_CANDIDATE.md); Push auf `main` würde den Pages-Workflow auslösen |
 

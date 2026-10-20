@@ -21,6 +21,8 @@ Der Diff von `v0.1.24` bis `56c1354` betrifft `dialogs.js`, `index.html`, `iron-
 
 V2 verwendet `system-ui` und CSS-/SVG-Geometrie aus dem Projekt. `index.html` und die eingebundenen Stylesheets enthalten keinen externen Webfont-Import; ältere Legacy-Schriftfamilien fallen auf lokal verfügbare Schriften zurück. Die Einheitengrafiken kommen weiter aus den vorhandenen lokalen sechs Stilen und dem [Unit-Art-Manifest](../assets/unit-art/manifest.json); Herkunft, Format und bisherige Rechte-Grenzen stehen in [Unit Visuals](UNIT_VISUALS.md) und den [Content & Asset Notices](CONTENT-NOTICES.md). Diese Quellenangaben ersetzen die ausstehende Content-/Legal-Deltaprüfung für genau den UI-V2-Releaseumfang nicht.
 
+Zur Konzeptdatei `designV2reworked2.pen` lautet die Nutzerangabe: Er hat die Gestaltung selbst mit Hilfe von Claude erstellt; eine separate ausdrückliche Nutzungsrechtseinräumung gibt es nicht. Sie ist damit nicht als externe Auftragsgestaltung mit einem unbekannten Rechteinhaber zu beschreiben. Diese Herkunftsangabe ist keine pauschale Rechtsgarantie. Content gleicht sie mit den konkret verwendeten Quellen und dem UI-V2-Delta ab; die bisherigen Notices werden dafür nicht umgeschrieben.
+
 ## QA und Grenzen
 
 | Bereich | Beleg und Geltung |
