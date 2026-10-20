@@ -87,7 +87,7 @@ function renderUnitGuide(){
   document.querySelector('#guide-phase-status').textContent=v2?(!live?'—':live.hp<=0?GoblinLanguage.t('v2.ui.destroyed'):live.team==='enemy'?GoblinLanguage.t('v2.ui.hostileAi'):globalThis.IronDustBrowserV2.session.projection.mode==='player'?GoblinLanguage.t('v2.ui.ready'):GoblinLanguage.t('v2.ui.noAction')):!live?'—':live.hp<=0?'DESTROYED':live.team==='enemy'?'HOSTILE AI':phaseCanAct(live)?'READY':live.disabled?'DISABLED':'NO ACTION NOW';
   const list=document.querySelector('#guide-action-list');list.replaceChildren();
   for(const action of v2?(live&&live.team==='player'?[GoblinLanguage.t('v2.guide.actions')]:[]):liveDrone?['Im Field Test bewegen und fernfeuern','Stationäre Katalogregel: geplant']:guideActions[unit.name]||[]){const item=document.createElement('li');item.textContent=action;list.appendChild(item)}
-  document.querySelector('#guide-find').disabled=v2||!live;
+  document.querySelector('#guide-find').disabled=!!(v2||!live||(document.body?.classList?.contains('ui-v2-active')&&(live.hp<=0||!globalThis.GoblinV2Flow?.hasStarted())));
   document.querySelector('#guide-count').textContent=`${String(guideIndex+1).padStart(2,'0')} / ${String(unitGuideEntries.length).padStart(2,'0')}`;
 }
 function openUnitGuide(){
@@ -111,7 +111,7 @@ document.querySelector('#unit-guide-close').onclick=closeUnitGuide;
 document.querySelector('#guide-details-jump').onclick=()=>{const heading=document.querySelector('#guide-voice-label');heading.tabIndex=-1;heading.scrollIntoView({block:'start'});heading.focus({preventScroll:true})};
 document.querySelector('#guide-prev').onclick=()=>{guideIndex=(guideIndex+unitGuideEntries.length-1)%unitGuideEntries.length;renderUnitGuide()};
 document.querySelector('#guide-next').onclick=()=>{guideIndex=(guideIndex+1)%unitGuideEntries.length;renderUnitGuide()};
-document.querySelector('#guide-find').onclick=()=>{if(globalThis.IronDustBrowserV2?.mode==='ready')return;const unit=units.find(item=>item.name===unitGuideEntries[guideIndex].name);if(!unit)return;closeUnitGuide();selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);updateSelection();draw();globalThis.GoblinMobileViews?.show('map',{focus:true})};
+document.querySelector('#guide-find').onclick=()=>{if(globalThis.IronDustBrowserV2?.mode==='ready')return;const unit=units.find(item=>item.name===unitGuideEntries[guideIndex].name);if(!unit)return;closeUnitGuide();if(document.body?.classList?.contains('ui-v2-active')){globalThis.GoblinV2Flow?.findUnit(unit.id);return}selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);updateSelection();draw();globalThis.GoblinMobileViews?.show('map',{focus:true})};
 globalThis.addEventListener?.('goblin-language-change',()=>{if(!guideModal.classList.contains('hidden'))renderUnitGuide()});
 guideModal.addEventListener('click',event=>{if(event.target===guideModal)closeUnitGuide()});
 document.addEventListener('keydown',event=>{

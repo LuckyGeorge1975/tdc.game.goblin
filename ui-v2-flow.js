@@ -1,4 +1,4 @@
-// V2 navigation over the active Legacy session. Only the accepted Iron Dust slice starts here.
+// V2 navigation over the validated Legacy scenario sessions.
 if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
   (() => {
     const shell = document.querySelector('.v2-shell');
@@ -7,7 +7,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     surface.className = 'v2-screen';
     shell.appendChild(surface);
     const t = (key, params) => GoblinLanguage.t(key, params);
-    const missionId = 'iron-dust';
+    let missionId = 'iron-dust', started = false;
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
     const waiting = [];
     globalThis.GoblinV2PauseGate = Object.freeze({
@@ -73,7 +73,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         message: t('dialog.restart.body'), acceptLabel: t('dialog.restart.confirm'), cancelLabel: t('dialog.restart.cancel')
       });
       if (!accepted) { renderScreen(false); return; }
-      loadScenario(missionId);
+      loadScenario(currentScenario);
       GoblinUIV2.resetView();
       show('play');
       releasePause();
@@ -87,15 +87,19 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           acceptLabel: t('dialog.changeMission.confirm'), cancelLabel: t('dialog.changeMission.cancel')
         });
         if (!accepted) { renderScreen(false); return; }
-        loadScenario(missionId);
+        loadScenario(currentScenario);
         GoblinUIV2.resetView();
+        started = false;
         releasePause();
       }
       show('levels');
     }
     async function startMission() {
       if (GameDialogs.isOpen()) return;
+      if (!scenarioCatalog[missionId]) return;
       loadScenario(missionId);
+      document.querySelector('#scenario-select').value = missionId;
+      started = true;
       GoblinUIV2.resetView();
       show('play');
       releasePause();
@@ -104,6 +108,14 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       guideIndex = index;
       openUnitGuide();
     }
+    function findUnit(id) {
+      const unit = units.find(item => item.id === id && item.hp > 0);
+      if (!unit || !started) return;
+      releasePause();
+      show('play');
+      GoblinUIV2.focusUnit(unit.id);
+    }
+    globalThis.GoblinV2Flow = Object.freeze({ findUnit, hasStarted: () => started });
     function renderScreen(focus = true) {
       if (screen === 'play') return;
       const lastFocus = focus ? null : document.activeElement?.id;
@@ -112,7 +124,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       surface.replaceChildren(panel);
       const state = GoblinUIV2.project();
       if (screen === 'menu') {
-        panel.append(heading(t('ui.start.title')), paragraph(t('mission.iron-dust.briefing.short')),
+        panel.append(heading(t('ui.start.title')), paragraph(t(`mission.${currentScenario}.briefing.short`)),
           actions(button(t('ui.start.choose'), () => show('levels'), 'primary')),
           actions(button(t('ui.details.units'), () => openSection('catalog')),
             button(t('ui.nav.settings'), () => openSection('options'))));
@@ -120,18 +132,18 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       } else if (screen === 'levels') {
         panel.append(heading(t('ui.levels.title')));
         const list = document.createElement('div'); list.className = 'v2-level-list';
-        for (const [id, config] of Object.entries(scenarioCatalog)) {
+        for (const id of Object.keys(ScenarioRuleProfiles.entries)) {
           const card = document.createElement('div'); card.className = 'v2-level';
           card.append(heading(t(`mission.${id}.title`)), paragraph(t(`mission.${id}.objective.short`)));
-          const choose = button(id === missionId ? t('ui.levels.select') : t('v2.ui.missionUnavailable'), () => show('briefing'));
-          choose.disabled = id !== missionId;
+          const choose = button(scenarioCatalog[id] ? t('ui.levels.select') : t('v2.ui.missionDataUnavailable'), () => { missionId = id; show('briefing'); });
+          choose.disabled = !scenarioCatalog[id];
           card.append(choose); list.append(card);
         }
         panel.append(list, actions(button(t('ui.nav.back'), () => show('menu'))));
       } else if (screen === 'briefing') {
-        panel.append(heading(t('mission.iron-dust.title')),
-          paragraph(t('mission.iron-dust.briefing.full')),
-          paragraph(t('mission.iron-dust.objective.full'), 'v2-screen-objective'),
+        panel.append(heading(t(`mission.${missionId}.title`)),
+          paragraph(t(`mission.${missionId}.briefing.full`)),
+          paragraph(t(`mission.${missionId}.objective.full`), 'v2-screen-objective'),
           actions(button(t('ui.nav.back'), () => show('levels')),
             button(t('ui.briefing.start'), startMission, 'primary')));
       } else if (screen === 'pause') {
@@ -145,7 +157,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       } else if (screen === 'end') {
         const won = state.objective.outcome === true;
         panel.append(heading(t(won ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title')),
-          paragraph(t(won ? 'mission.iron-dust.end.victory' : 'screen.missionEnd.defeat.allUnits')),
+          paragraph(t(won ? `mission.${state.scenario}.end.victory` : 'screen.missionEnd.defeat.allUnits')),
           paragraph(t('ui.hud.turn', { turn: state.turn })),
           actions(button(t('screen.missionEnd.action.retry'), confirmRestart, 'primary'),
             button(t('screen.missionEnd.action.chooseMission'), goToLevels),
@@ -156,7 +168,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         [...document.querySelectorAll('#combat-log .log-line')].forEach(line => entries.append(paragraph(line.textContent.trim())));
         panel.append(entries, actions(button(t('ui.nav.back'), () => show('end'))));
       } else if (screen === 'catalog') {
-        panel.append(heading(GoblinLanguage.translate('UNIT GUIDE')));
+        panel.append(heading(GoblinLanguage.translate('UNIT GUIDE')), paragraph(t('v2.ui.catalogNote')));
         const list = document.createElement('div'); list.className = 'v2-catalog-list';
         unitGuideEntries.forEach((entry, index) => {
           const item = button(GoblinLanguage.translate(entry.name), () => openGuide(index));
@@ -165,7 +177,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             const img = document.createElement('img'); img.src = asset; img.alt = '';
             item.prepend(img);
           }
-          list.append(item);
+          const live = started ? units.find(unit => unit.name === entry.name && unit.hp > 0) : null;
+          if (live) {
+            const row = document.createElement('div'); row.className = 'v2-catalog-entry';
+            row.append(item, button(t('v2.ui.find'), () => findUnit(live.id)));
+            list.append(row);
+          } else list.append(item);
         });
         panel.append(list, actions(button(t('ui.nav.back'), goBack)));
       } else if (screen === 'options') {
@@ -210,6 +227,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
     }
     document.querySelector('#v2-pause').onclick = enterPause;
+    new MutationObserver(() => { if (screen === 'levels') renderScreen(false); })
+      .observe(document.querySelector('#scenario-select'), { childList: true });
     globalThis.addEventListener('goblin-v2-render', () => {
       if (screen === 'play' && GoblinUIV2.project().gameOver) show('end');
     });

@@ -18,7 +18,6 @@ body.ui-v2-active {
   color: var(--v2-text);
 }
 body.ui-v2-active > .app-shell { display: none; }
-body.ui-v2-active.v2-screen-open #guide-find { display: none; }
 .v2-screen[hidden] { display: none; }
 body.ui-v2-active.v2-screen-open .v2-head,
 body.ui-v2-active.v2-screen-open .v2-layout { display: none; }
@@ -39,6 +38,8 @@ body.ui-v2-active.v2-screen-open .v2-layout { display: none; }
 .v2-catalog-list { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .v2-catalog-list button { display: flex; align-items: center; gap: 10px; min-height: 56px; text-align: left; }
 .v2-catalog-list img { width: 40px; height: 40px; object-fit: contain; }
+.v2-catalog-entry { display: flex; gap: 8px; min-width: 0; }
+.v2-catalog-entry button:first-child { flex: 1; min-width: 0; }
 .v2-screen-panel label:not(.v2-setting-check) { display: grid; gap: 6px; margin: 14px 0; color: var(--v2-muted); }
 .v2-screen-panel select { min-height: 56px; width: 100%; padding: 10px; border: 1px solid var(--v2-line-strong); border-radius: 9px; background: var(--v2-surface3); color: var(--v2-text); font: inherit; }
 .v2-setting-check { display: flex; align-items: center; gap: 10px; min-height: 56px; }
@@ -103,7 +104,7 @@ body.ui-v2-active #v2-team-markers .v2-destroyed-badge { fill: var(--v2-muted); 
   .v2-controls { position: fixed; z-index: 10; left: max(8px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); width: min(440px, calc(100vw - 16px)); padding: 6px; border: 1px solid var(--v2-line-strong); border-radius: 10px; background: var(--v2-surface); box-shadow: 0 8px 30px #000a; }
   body.ui-v2-active.v2-menu-open .v2-controls { display: none; }
 }
-@media (max-width: 599px) { .v2-screen-panel { max-height: calc(100dvh - 24px); } .v2-screen-actions button { flex-basis: 100%; } .v2-level-list, .v2-catalog-list { max-height: 44dvh; } }
+@media (max-width: 599px) { .v2-screen-panel { max-height: calc(100dvh - 24px); } .v2-screen-actions button { flex-basis: 100%; } .v2-level-list, .v2-catalog-list { max-height: 44dvh; } .v2-catalog-entry { display: grid; } .v2-catalog-entry button { width: 100%; overflow-wrap: anywhere; } }
 @media (max-width: 599px) {
   body.ui-v2-active.v2-menu-open .v2-command-card { position: fixed; z-index: 20; left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); bottom: max(8px, env(safe-area-inset-bottom)); max-height: min(42dvh, 300px); margin: 0; box-shadow: 0 0 0 100vmax #100f1c55, 0 8px 30px #000a; }
 }

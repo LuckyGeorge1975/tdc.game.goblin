@@ -18,7 +18,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
     const t = (key, params) => globalThis.GoblinLanguage?.t(key, params) || key;
 
     function revision() {
-      return JSON.stringify([currentScenario, legacySession?.ruleProfileId, turn, phase, turnPhase, gameOver,
+      return JSON.stringify([currentScenario, legacySession?.sessionId, legacySession?.ruleProfileId, turn, phase, turnPhase, gameOver,
         [...terrain], [...terrainTypes], units.map(({ moveFrom, justHit, ...unit }) => unit)]);
     }
     function project() {
@@ -29,19 +29,24 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         turn, phase, turnPhase, gameOver, objective: structuredClone(objective),
         ready: phase === 'player' && !gameOver ? phaseReadyUnits().length : 0,
         undo: { available: phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },
-        units: units.map(({ id, name, type, team, x, y, hp, maxHp, disabled, embarkedOn, core }) =>
-          ({ id, name, type, team, x, y, hp, maxHp, disabled: !!disabled, embarkedOn: embarkedOn || null, core: !!core })),
+        units: units.map(({ id, name, type, team, x, y, hp, maxHp, disabled, embarkedOn, core, infantry, transportCapacity, strategicMissile, missilesRemaining }) =>
+          ({ id, name, type, team, x, y, hp, maxHp, disabled: !!disabled, embarkedOn: embarkedOn || null,
+            core: !!core, infantry: !!infantry, transportCapacity: transportCapacity || 0, strategicMissile: !!strategicMissile,
+            missilesRemaining: missilesRemaining ?? null })),
         systems: units.filter(unit => unit.team === 'player' && unit.ogreSystems)
           .map(unit => ({ id: unit.id, summary: GoblinSystems.summary(unit.ogreSystems) })),
         log: [...logEl.querySelectorAll('.log-line')].slice(0, 4).map(line => line.textContent.trim())
       };
     }
     function query(command) {
-      if (currentScenario !== 'iron-dust' || legacySession?.ruleProfileId !== 'FIELD_TEST_LEGACY_v2' || globalThis.IronDustBrowserV2?.active)
+      if (!scenarioCatalog[currentScenario] || !ScenarioRuleProfiles.entries[currentScenario] ||
+          legacySession?.scenarioId !== currentScenario ||
+          legacySession.ruleProfileId !== ScenarioRuleProfiles.entries[currentScenario].ruleProfileId ||
+          globalThis.IronDustBrowserV2?.active)
         return { ok: false, reason: t('ui.error.UNSUPPORTED_COMMAND') };
       if (GameDialogs.isOpen()) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       if (phase !== 'player' || gameOver) return { ok: false, reason: t(gameOver ? 'ui.error.GAME_ENDED' : 'ui.error.NOT_ACTIVE_TEAM') };
-      if (!['Move', 'Ram', 'Fire'].includes(command?.type)) return { ok: false, reason: t('ui.error.UNKNOWN_COMMAND') };
+      if (!['Move', 'Ram', 'Fire', 'Embark', 'Unload'].includes(command?.type)) return { ok: false, reason: t('ui.error.UNKNOWN_COMMAND') };
       const actor = units.find(unit => unit.id === command.actorId);
       if (!actor) return { ok: false, reason: t('ui.error.UNIT_NOT_FOUND') };
       if (actor.team !== 'player') return { ok: false, reason: t('ui.error.UNIT_NOT_OWNED') };
@@ -50,6 +55,17 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       if (!Number.isInteger(command.x) || !Number.isInteger(command.y) || command.x < 0 || command.x >= W || command.y < 0 || command.y >= H)
         return { ok: false, reason: t('ui.error.OUT_OF_BOUNDS') };
       const target = units.find(unit => unit.hp > 0 && !unit.embarkedOn && unit.x === command.x && unit.y === command.y);
+      if (command.type === 'Embark') {
+        if (target?.id !== command.carrierId || !canEmbark(actor, target))
+          return { ok: false, reason: t('ui.error.INVALID_TARGET') };
+        return { ok: true };
+      }
+      if (command.type === 'Unload') {
+        const cargo = units.find(unit => unit.id === command.cargoId);
+        if (!actor.transportCapacity || !canUnloadTo(actor, cargo, command.x, command.y))
+          return { ok: false, reason: t('ui.error.INVALID_TARGET') };
+        return { ok: true };
+      }
       if (command.type === 'Move') {
         if (turnPhase !== 'movement' && turnPhase !== 'gev') return { ok: false, reason: t('ui.error.WRONG_PHASE') };
         if (actor.embarkedOn) return { ok: false, reason: t('ui.error.UNIT_EMBARKED') };
@@ -89,12 +105,18 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       try {
         const actor = units.find(unit => unit.id === command.actorId);
         selected = actor;
+        const beforeExecution = revision();
+        if (command.type === 'Unload') {
+          const cargo = units.find(unit => unit.id === command.cargoId);
+          unloadAt(actor, cargo, command.x, command.y);
+          return revision() !== beforeExecution ? { ok: true } : { ok: false, reason: t('ui.error.INVALID_COMMAND') };
+        }
         if (command.type === 'Fire' && actor.ogreSystems && !SiegebreakerWeapons.selectWeapon(actor, command.weaponKey))
           return { ok: false, reason: t('ui.error.NO_ATTACKABLE_TARGET') };
-        const beforeExecution = revision();
+        const beforeHex = revision();
         // handleHex is the final, command-history-wrapped Legacy path and checks again.
         handleHex(command.x, command.y);
-        return revision() !== beforeExecution ? { ok: true } : { ok: false, reason: t('ui.error.INVALID_COMMAND') };
+        return revision() !== beforeHex ? { ok: true } : { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       } finally { view.busy = false; render(); }
     }
     function undo() {
@@ -110,7 +132,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
     }
-    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo, resetView });
+    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo, resetView, focusUnit });
 
     function clearContext() { view.target = null; view.intentRevision = null; view.message = ''; }
     function chooseActor(id) {
@@ -119,9 +141,24 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       if (unit) { view.focusCell = { x: unit.x, y: unit.y }; view.infoCell = { x: unit.x, y: unit.y }; }
       clearContext(); render();
     }
+    function focusUnit(id) {
+      const unit = units.find(item => item.id === id && item.hp > 0);
+      if (!unit) return;
+      if (unit.team === 'player') chooseActor(id);
+      else {
+        view.actorId = null; view.focusCell = { x: unit.x, y: unit.y };
+        view.infoCell = { ...view.focusCell }; clearContext(); render();
+      }
+      at('#v2-map').focus({ preventScroll: true });
+      const hex = unit && nativeMap.querySelector(`.hex[data-x="${unit.x}"][data-y="${unit.y}"]`);
+      hex?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
     function chooseHex(x, y) {
       const unit = units.find(item => item.hp > 0 && !item.embarkedOn && item.x === x && item.y === y);
-      if (unit?.team === 'player') { chooseActor(unit.id); return; }
+      const actor = units.find(item => item.id === view.actorId);
+      if (unit?.team === 'player' && !(actor && unit.id !== actor.id && unit.transportCapacity && canEmbark(actor, unit))) {
+        chooseActor(unit.id); return;
+      }
       view.target = { x, y }; view.infoCell = { x, y }; view.focusCell = { x, y };
       view.intentRevision = revision(); view.message = ''; render();
       if (view.actorId) {
@@ -143,7 +180,9 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       at('#v2-log-label').textContent = t('ui.details.log');
       at('#v2-profile').textContent = state.profile;
       at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') : t(`phase.${state.turnPhase}.label`);
-      at('#v2-turn').textContent = `${t('ui.hud.turn', { turn: state.turn })} · ${t('hud.objective.progress.core', { currentHp: state.objective.coreHp, maxHp: state.objective.coreMax })}`;
+      at('#v2-turn').textContent = `${t('ui.hud.turn', { turn: state.turn })} · ${state.objective.goalMode === 'core'
+        ? t('hud.objective.progress.core', { currentHp: state.objective.coreHp, maxHp: state.objective.coreMax })
+        : t('hud.objective.progress.enemies', { remainingEnemies: state.objective.enemyAlive, totalEnemies: state.objective.enemyTotal })}`;
       at('#v2-map-caption').textContent = `${W} × ${H} · ${t('v2.ui.mapPan')}`;
       at('#v2-map').setAttribute('aria-label', `${t('ui.hud.map')}: ${t('v2.ui.selectHex')}`);
       const terminal = at('#v2-terminal');
@@ -168,9 +207,12 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       state.units.filter(unit => unit.team === 'player').forEach(unit => {
         const button = document.createElement('button');
         const system = state.systems.find(item => item.id === unit.id);
+        const carrier = unit.embarkedOn && state.units.find(item => item.id === unit.embarkedOn);
+        const cargo = unit.transportCapacity ? units.find(item => item.id === unit.id) : null;
         button.textContent = system
           ? `${t('ui.team.player')} · ${unit.name} · ${t('v2.ui.treads')} ${system.summary.treads} · ${Object.entries(system.summary.weapons).map(([key, count]) => `${t(`v2.ui.weapon.${key}`)} ${count}`).join(' · ')}${unit.hp <= 0 ? ` · ${t('v2.ui.destroyed')}` : unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}`
-          : `${t('ui.team.player')} · ${t('ui.hud.unitSummary', { unitId: unit.name, unitType: unit.type || '', hp: unit.hp, maxHp: unit.maxHp })}${unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}`;
+          : `${t('ui.team.player')} · ${t(unit.infantry ? 'v2.ui.infantrySummary' : 'ui.hud.unitSummary',
+            { unitId: unit.name, unitType: GoblinLanguage.translate(unit.type || ''), hp: unit.hp, maxHp: unit.maxHp })}${unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}${carrier ? ` · ${t('v2.ui.embarked')} ${carrier.name}` : ''}${cargo ? ` · ${t('v2.ui.cargo')} ${carrierLoad(cargo)}/${unit.transportCapacity}` : ''}${unit.strategicMissile ? ` · ${t('v2.ui.missile')} ${unit.missilesRemaining}` : ''}`;
         button.setAttribute('aria-pressed', String(unit.id === view.actorId));
         button.disabled = unit.hp <= 0;
         button.onclick = () => chooseActor(unit.id);
@@ -207,10 +249,19 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
             ? SiegebreakerWeapons.weaponEntries(runtimeActor).map(({ key, weapon }) => ({
               command: { type: 'Fire', actorId: view.actorId, ...view.target, weaponKey: key },
               label: `${t(`v2.ui.weapon.${key}`)} · A${weapon.attack} R${weapon.range} · ${GoblinSystems.weaponReady(weapon)} ${t('v2.ui.ready')}` }))
-            : [{ command: { type: 'Fire', actorId: view.actorId, ...view.target }, label: t('v2.ui.fire') }]
+            : [{ command: { type: 'Fire', actorId: view.actorId, ...view.target },
+              label: runtimeActor?.strategicMissile ? `${t('v2.ui.missile')} · ${t('v2.ui.missileSplash')}` : t('v2.ui.fire') }]
           : target?.team === 'enemy'
             ? [{ command: { type: 'Ram', actorId: view.actorId, ...view.target }, label: t('v2.ui.ram') }]
-            : [{ command: { type: 'Move', actorId: view.actorId, ...view.target }, label: t('v2.ui.move') }];
+            : target?.team === 'player' && target.transportCapacity
+              ? [{ command: { type: 'Embark', actorId: view.actorId, carrierId: target.id, ...view.target }, label: t('v2.ui.embark') }]
+              : [
+                { command: { type: 'Move', actorId: view.actorId, ...view.target }, label: t('v2.ui.move') },
+                ...(runtimeActor?.transportCapacity ? carrierCargo(runtimeActor).map(cargo => ({
+                  command: { type: 'Unload', actorId: view.actorId, cargoId: cargo.id, ...view.target },
+                  label: `${t('v2.ui.unload')} · ${cargo.name}`
+                })) : [])
+              ];
         commands.forEach(({ command, label }) => {
           const availability = query(command);
           const button = document.createElement('button');
