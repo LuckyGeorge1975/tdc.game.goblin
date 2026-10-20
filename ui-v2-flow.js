@@ -50,6 +50,47 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const row = document.createElement('div'); row.className = 'v2-screen-actions';
       row.append(...nodes); return row;
     }
+    function missionPreview(id) {
+      const config = scenarioCatalog[id === 'iron-dust-v2' ? 'iron-dust' : id];
+      const figure = document.createElement('figure'); figure.className = 'v2-mission-map';
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 450 254');
+      svg.setAttribute('role', 'img');
+      svg.setAttribute('aria-label', t('v2.ui.previewMap'));
+      const terrain = new Set(config?.terrain || []);
+      const typed = new Map((config?.terrainTypes || []).map(cell => [`${cell.x},${cell.y}`, cell.type]));
+      for (let y = 0; y < 8; y++) for (let x = 0; x < 12; x++) {
+        const cx = 23 + x * 36 + (y % 2 ? 18 : 0), cy = 20 + y * 30;
+        const polygon = document.createElementNS(svg.namespaceURI, 'polygon');
+        polygon.setAttribute('points', Array.from({length: 6}, (_, i) => {
+          const angle = Math.PI / 3 * i + Math.PI / 6;
+          return `${cx + 20 * Math.cos(angle)},${cy + 20 * Math.sin(angle)}`;
+        }).join(' '));
+        polygon.setAttribute('class', typed.has(`${x},${y}`) || terrain.has(`${x},${y}`) ? 'v2-preview-terrain' : 'v2-preview-open');
+        svg.append(polygon);
+      }
+      for (const unit of config?.units || []) {
+        const marker = document.createElementNS(svg.namespaceURI, 'circle');
+        marker.setAttribute('cx', 23 + unit.x * 36 + (unit.y % 2 ? 18 : 0));
+        marker.setAttribute('cy', 20 + unit.y * 30);
+        marker.setAttribute('r', unit.core ? 10 : 7);
+        marker.setAttribute('class', unit.team === 'player' ? 'v2-preview-own' : 'v2-preview-enemy');
+        svg.append(marker);
+      }
+      figure.append(svg);
+      return figure;
+    }
+    function missionStats(id) {
+      const config = scenarioCatalog[id === 'iron-dust-v2' ? 'iron-dust' : id];
+      const stats = document.createElement('div'); stats.className = 'v2-mission-stats';
+      for (const [key, count] of [['own', config?.units.filter(unit => unit.team === 'player').length], ['enemy', config?.units.filter(unit => unit.team === 'enemy').length]]) {
+        const item = document.createElement('div');
+        const label = document.createElement('span'); label.textContent = t(`v2.ui.preview.${key}`);
+        const value = document.createElement('strong'); value.textContent = String(count);
+        item.append(label, value); stats.append(item);
+      }
+      return stats;
+    }
     function show(next, focus = true) {
       const previous = screen;
       if (previous === 'play' && next !== 'play') playScrollY = globalThis.scrollY;
@@ -142,23 +183,45 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       surface.replaceChildren(panel);
       const state = GoblinUIV2.project();
       if (screen === 'menu') {
-        panel.append(heading(t('ui.start.title')), paragraph(t(`mission.${currentScenario}.briefing.short`)),
-          actions(button(t('ui.start.choose'), () => show('levels'), 'primary')),
-          actions(button(t('ui.details.units'), () => openSection('catalog')),
-            button(t('ui.nav.settings'), () => openSection('options'))));
+        const intro = document.createElement('div'); intro.className = 'v2-menu-intro';
+        intro.append(paragraph(t('ui.start.eyebrow'), 'v2-menu-eyebrow'), heading(t('ui.start.title')),
+          paragraph(t('ui.start.subtitle')));
+        const menu = document.createElement('nav'); menu.className = 'v2-menu-links';
+        menu.setAttribute('aria-label', t('ui.start.title'));
+        menu.append(button(t('ui.start.choose'), () => show('levels'), 'primary'),
+          button(t('ui.details.units'), () => openSection('catalog')),
+          button(t('ui.nav.settings'), () => openSection('options')),
+          button(t('v2.ui.legalNotices'), () => openSection('legal')));
+        panel.append(intro, menu);
         panel.append(paragraph(document.querySelector('#build-version').textContent, 'v2-screen-meta'));
       } else if (screen === 'levels') {
         panel.append(heading(t('ui.levels.title')));
+        const layout = document.createElement('div'); layout.className = 'v2-level-layout';
         const list = document.createElement('div'); list.className = 'v2-level-list';
-        for (const id of [...Object.keys(ScenarioRuleProfiles.entries), 'iron-dust-v2']) {
-          const card = document.createElement('div'); card.className = 'v2-level';
-          card.append(heading(t(`mission.${id}.title`)), paragraph(t(id === 'iron-dust-v2' ? 'v2.objective' : `mission.${id}.objective.short`)));
+        const ids = [...Object.keys(ScenarioRuleProfiles.entries), 'iron-dust-v2'];
+        if (!ids.includes(missionId)) missionId = ids[0];
+        for (const id of ids) {
           const available = id === 'iron-dust-v2' ? !!globalThis.IronDustBrowserV2?.available : !!scenarioCatalog[id];
-          const choose = button(available ? t('ui.levels.select') : t('v2.ui.missionDataUnavailable'), () => { missionId = id; startError = ''; show('briefing'); });
+          const choose = button('', () => {
+            missionId = id; startError = ''; renderScreen(false);
+          }, 'v2-level-choice');
+          const title = document.createElement('strong'); title.textContent = t(`mission.${id}.title`);
+          const summary = document.createElement('span');
+          summary.textContent = t(id === 'iron-dust-v2' ? 'v2.objective' : `mission.${id}.objective.short`);
+          choose.append(title, summary);
+          choose.id = `v2-level-${id}`;
+          choose.setAttribute('aria-pressed', String(id === missionId));
+          if (!available) choose.title = t('v2.ui.missionDataUnavailable');
           choose.disabled = !available;
-          card.append(choose); list.append(card);
+          list.append(choose);
         }
-        panel.append(list, actions(button(t('ui.nav.back'), () => show('menu'))));
+        const detail = document.createElement('section'); detail.className = 'v2-level-detail';
+        detail.setAttribute('aria-label', t(`mission.${missionId}.title`));
+        detail.append(heading(t(`mission.${missionId}.title`)), missionPreview(missionId),
+          paragraph(t(missionId === 'iron-dust-v2' ? 'v2.objective' : `mission.${missionId}.objective.short`)),
+          missionStats(missionId), actions(button(t('ui.levels.select'), () => show('briefing'), 'primary')));
+        layout.append(list, detail);
+        panel.append(layout, actions(button(t('ui.nav.back'), () => show('menu'))));
       } else if (screen === 'briefing') {
         const core = missionId === 'iron-dust-v2';
         panel.append(heading(t(`mission.${missionId}.title`)),
@@ -208,6 +271,16 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           } else list.append(item);
         });
         panel.append(list, actions(button(t('ui.nav.back'), goBack)));
+      } else if (screen === 'legal') {
+        panel.append(heading(t('v2.ui.legalNotices')),
+          paragraph(t('v2.ui.legalEnglish'), 'v2-screen-meta'));
+        const notice = document.createElement('pre'); notice.className = 'v2-legal-text';
+        notice.lang = 'en'; notice.textContent = t('v2.ui.legalLoading');
+        panel.append(notice, actions(button(t('ui.nav.back'), goBack)));
+        fetch(new URL('docs/CONTENT-NOTICES.md', document.baseURI))
+          .then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.text(); })
+          .then(copy => { if (notice.isConnected) notice.textContent = copy; })
+          .catch(() => { if (notice.isConnected) notice.textContent = t('v2.ui.legalUnavailable'); });
       } else if (screen === 'options') {
         panel.append(heading(t('ui.nav.settings')));
         const language = document.createElement('label');
@@ -259,7 +332,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     GoblinLanguage.ready.then(() => renderScreen(false));
     globalThis.addEventListener('keydown', event => {
       if (screen !== 'play' && event.key === 'Escape' && !GameDialogs.isOpen() && document.querySelector('#unit-guide-modal').classList.contains('hidden')) {
-        if (screen === 'options' || screen === 'catalog') goBack();
+        if (screen === 'options' || screen === 'catalog' || screen === 'legal') goBack();
         else if (screen === 'briefing') show('levels');
         else if (screen === 'levels') show('menu');
         else if (screen === 'pause') { show('play'); releasePause(); }
