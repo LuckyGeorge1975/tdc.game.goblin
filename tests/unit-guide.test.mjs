@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
+import {createIronDustProfile,projectIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
 
 function guide(units=[{id:'ogre',name:'GOBLIN SIEGEBREAKER',team:'player',x:1,y:5,hp:5,maxHp:5,move:3,range:2,damage:3,defense:5,ogreSystems:{treads:45}}]){
   const nodes=new Map();
@@ -46,6 +47,37 @@ test('find-on-map focuses the unit without issuing a gameplay command',()=>{
   assert.equal(document.querySelector('#unit-guide-modal').classList.contains('hidden'),false);
   assert.equal(mobileCall[0],'map');
   assert.equal(mobileCall[1].focus,true);
+});
+
+test('Core guide find uses stable live IDs, ignores dead and absent units, and leaves the profile untouched',()=>{
+  const {context,document}=guide([]);
+  const profile=createIronDustProfile(8), projection=projectIronDustProfile(profile);
+  const state=structuredClone(projection.state), found=[];
+  context.IronDustBrowserV2={mode:'ready',session:{projection:{state,mode:'player'}}};
+  context.GoblinV2Flow={hasStarted:()=>true,findUnit:id=>found.push(id)};
+  document.body={classList:{contains:name=>name==='ui-v2-active'}};
+  for(const language of ['de','en','es','fr']){
+    context.GoblinLanguage={current:language,t:key=>key==='v2.unit.ogre'?`${language} Siegebreaker`:key};
+    vm.runInContext('guideIndex=0;renderUnitGuide()',context);
+    assert.equal(document.querySelector('#guide-find').disabled,false,language);
+    assert.equal(document.querySelector('#guide-name').textContent,`${language} Siegebreaker`);
+    document.querySelector('#guide-find').onclick();
+  }
+  assert.deepEqual(found,['ogre','ogre','ogre','ogre']);
+  assert.equal(profile.digest,createIronDustProfile(8).digest);
+  assert.equal(state.rng.state,projection.state.rng.state);
+  state.units.find(unit=>unit.id==='ogre').hp=0;
+  vm.runInContext('renderUnitGuide()',context);
+  assert.equal(document.querySelector('#guide-find').disabled,true);
+  document.querySelector('#guide-find').onclick();
+  assert.equal(found.length,4);
+  vm.runInContext("guideIndex=unitGuideEntries.findIndex(entry=>entry.name==='ASSAULT TANK');renderUnitGuide()",context);
+  assert.equal(document.querySelector('#guide-find').disabled,true);
+  document.querySelector('#guide-find').onclick();
+  assert.equal(found.length,4);
+  document.body.classList.contains=()=>false;
+  vm.runInContext('guideIndex=1;renderUnitGuide()',context);
+  assert.equal(document.querySelector('#guide-find').disabled,true);
 });
 
 test('artillery drone describes live Field Test movement separately from catalog movement',()=>{

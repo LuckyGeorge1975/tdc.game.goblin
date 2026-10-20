@@ -20,7 +20,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       globalThis.IronDustBrowserV2?.resume();
       document.querySelector('#auto-end-turn').checked = savedAuto;
       waiting.splice(0).forEach(resolve => resolve());
-      if (screen === 'play') maybeAutoAdvancePhase();
+      if (screen === 'play') {
+        GoblinUIV2.refresh();
+        maybeAutoAdvancePhase();
+      }
     }
     function enterPause() {
       if (GameDialogs.isOpen() || pauseActive) return;
@@ -126,8 +129,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function findUnit(id) {
       const unit = GoblinUIV2.project().units.find(item => item.id === id && item.hp > 0);
       if (!unit || !started) return;
-      releasePause();
       show('play');
+      releasePause();
       GoblinUIV2.focusUnit(unit.id);
     }
     globalThis.GoblinV2Flow = Object.freeze({ findUnit, hasStarted: () => started });
@@ -196,7 +199,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             const img = document.createElement('img'); img.src = asset; img.alt = '';
             item.prepend(img);
           }
-          const live = started ? state.units.find(unit => unit.name === entry.name && unit.hp > 0) : null;
+          const live = started ? state.units.find(unit =>
+            (state.scenario === 'iron-dust-v2' ? unit.id === entry.coreUnitId : unit.name === entry.name) && unit.hp > 0) : null;
           if (live) {
             const row = document.createElement('div'); row.className = 'v2-catalog-entry';
             row.append(item, button(t('v2.ui.find'), () => findUnit(live.id)));

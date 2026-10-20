@@ -1,7 +1,7 @@
 const unitGuideEntries=[
-  {name:'GOBLIN SIEGEBREAKER',role:'AUTONOMOUS ASSAULT FORTRESS',team:'FRIENDLY SYSTEM',icon:'G',hp:'SYSTEMS',move:'3 → 0',range:'1–5',attack:'1–6',defense:'BY SYSTEM',copy:'Autonome Belagerungsplattform mit getrennt verwalteten Batterien, Lenkflugkörpern, Nahbereichsschutz und Kettensegmenten. Kettenschäden reduzieren die Bewegung stufenweise.'},
-  {name:'SKIMMER SCOUT',role:'HOVER RECON · PROTOTYPE',team:'FRIENDLY SYSTEM',icon:'G',hp:'3',move:'3 + 2',range:'3',attack:'1',defense:'3',copy:'Schnelles Aufklärungsfahrzeug für Flankenmanöver. Sein zusätzlicher Manöverschritt macht es beweglich, verlangt aber eine vorausschauende Positionierung.'},
-  {name:'ROCKET ARTILLERY',role:'TRACKED ROCKET LAUNCHER',team:'CORE SYSTEM',icon:'M',hp:'2',move:'2',range:'4',attack:'3',defense:'2',copy:'Leicht gepanzerte Raketenartillerie mit hoher Reichweite. Sie wirkt am besten hinter der Front und ist im Nahkampf verwundbar.'},
+  {name:'GOBLIN SIEGEBREAKER',coreUnitId:'ogre',role:'AUTONOMOUS ASSAULT FORTRESS',team:'FRIENDLY SYSTEM',icon:'G',hp:'SYSTEMS',move:'3 → 0',range:'1–5',attack:'1–6',defense:'BY SYSTEM',copy:'Autonome Belagerungsplattform mit getrennt verwalteten Batterien, Lenkflugkörpern, Nahbereichsschutz und Kettensegmenten. Kettenschäden reduzieren die Bewegung stufenweise.'},
+  {name:'SKIMMER SCOUT',coreUnitId:'gev',role:'HOVER RECON · PROTOTYPE',team:'FRIENDLY SYSTEM',icon:'G',hp:'3',move:'3 + 2',range:'3',attack:'1',defense:'3',copy:'Schnelles Aufklärungsfahrzeug für Flankenmanöver. Sein zusätzlicher Manöverschritt macht es beweglich, verlangt aber eine vorausschauende Positionierung.'},
+  {name:'ROCKET ARTILLERY',coreUnitId:'missile',role:'TRACKED ROCKET LAUNCHER',team:'CORE SYSTEM',icon:'M',hp:'2',move:'2',range:'4',attack:'3',defense:'2',copy:'Leicht gepanzerte Raketenartillerie mit hoher Reichweite. Sie wirkt am besten hinter der Front und ist im Nahkampf verwundbar.'},
   {name:'INFANTRY SQUAD',role:'BATTLESUIT INFANTRY',team:'CORE SYSTEM',icon:'I',hp:'1–3',move:'2',range:'1',attack:'1 / squad',defense:'1 / squad',copy:'Infanterie wird in einzelnen Trupps gezählt. Bis zu drei Trupps können für Angriff und Verteidigung zusammenwirken.'},
   {name:'ASSAULT TANK',role:'FRONTLINE ARMOR',team:'CORE SYSTEM',icon:'H',hp:'3',move:'3',range:'2',attack:'4',defense:'3',copy:'Robustes Kettenfahrzeug für den direkten Schlagabtausch und das Halten wichtiger Korridore.'},
   {name:'RECON TANK',role:'SCOUT ARMOR',team:'CORE SYSTEM',icon:'L',hp:'2',move:'3',range:'2',attack:'2',defense:'2',copy:'Schneller und leichter Spähpanzer für Vorstöße, Flankenschutz und das Besetzen freier Räume.'},
@@ -19,11 +19,11 @@ const unitGuideEntries=[
   {name:'COMMAND HUB',role:'FIXED COMMAND UNIT',team:'CORE SYSTEM',icon:'C',hp:'2',move:'0',range:'0',attack:'0',defense:'2',copy:'Stationäres Führungsziel. Kommandozentren und Relaisknoten bilden zentrale Szenarioziele.'},
   {name:'GOBLIN DREADNAUGHT',role:'HEAVY ASSAULT PLATFORM',team:'HOSTILE SYSTEM',icon:'G',hp:'6',move:'2',range:'3',attack:'4',defense:'6',copy:'Schwere gegnerische Plattform. Im ATLAS-Teststand noch als einzelnes Fahrzeug modelliert; getrennte Systemschäden folgen später.'},
   {name:'PHANTOM PLATFORM',role:'MOBILE PLATFORM',team:'HOSTILE SYSTEM',icon:'P',hp:'3',move:'2',range:'3',attack:'2',defense:'3',copy:'Mobile Plattform. Ein eigener Tarnmechanismus ist noch nicht implementiert.'},
-  {name:'INFANTRY PLATOON',role:'MOBILE INFANTRY',team:'HOSTILE SYSTEM',icon:'I',hp:'2',move:'2',range:'1',attack:'1',defense:'2',copy:'Gegnerische Infanterie. Ein D-Treffer reduziert ihre Stärke statt sie vorübergehend zu deaktivieren.'},
-  {name:'COMMAND CORE',role:'FORTIFIED OBJECTIVE',team:'HOSTILE SYSTEM',icon:'X',hp:'5',move:'0',range:'0',attack:'0',defense:'5',copy:'Stationäres Missionsziel. Im ATLAS-Szenario müssen zusätzlich die übrigen Gegner ausgeschaltet werden.'},
+  {name:'INFANTRY PLATOON',coreUnitId:'infantry',role:'MOBILE INFANTRY',team:'HOSTILE SYSTEM',icon:'I',hp:'2',move:'2',range:'1',attack:'1',defense:'2',copy:'Gegnerische Infanterie. Ein D-Treffer reduziert ihre Stärke statt sie vorübergehend zu deaktivieren.'},
+  {name:'COMMAND CORE',coreUnitId:'core',role:'FORTIFIED OBJECTIVE',team:'HOSTILE SYSTEM',icon:'X',hp:'5',move:'0',range:'0',attack:'0',defense:'5',copy:'Stationäres Missionsziel. Im ATLAS-Szenario müssen zusätzlich die übrigen Gegner ausgeschaltet werden.'},
   {name:'RELAY NODE',role:'FORTIFIED OBJECTIVE',team:'HOSTILE SYSTEM',icon:'R',hp:'4',move:'0',range:'0',attack:'0',defense:'4',copy:'Stationärer Relaisknoten. Missionsziele und Siegbedingungen unterscheiden sich je nach Szenario.'},
-  {name:'GUARD TANK',role:'HOSTILE ARMOR',team:'HOSTILE SYSTEM',icon:'G',hp:'3',move:'1',range:'2',attack:'1',defense:'3',copy:'Gegnerischer Sicherungspanzer. Die KI feuert auf erreichbare Ziele und rückt sonst vor.'},
-  {name:'RAIDER SKIMMER',role:'HOSTILE HOVERCRAFT',team:'HOSTILE SYSTEM',icon:'R',hp:'2',move:'2',range:'2',attack:'1',defense:'2',copy:'Gegnerischer Skimmer. Kann Wasser und Flüsse überqueren; die eigenständige KI nutzt derzeit keine zusätzliche Skimmer-Phase.'},
+  {name:'GUARD TANK',coreUnitId:'guard',role:'HOSTILE ARMOR',team:'HOSTILE SYSTEM',icon:'G',hp:'3',move:'1',range:'2',attack:'1',defense:'3',copy:'Gegnerischer Sicherungspanzer. Die KI feuert auf erreichbare Ziele und rückt sonst vor.'},
+  {name:'RAIDER SKIMMER',coreUnitId:'raider',role:'HOSTILE HOVERCRAFT',team:'HOSTILE SYSTEM',icon:'R',hp:'2',move:'2',range:'2',attack:'1',defense:'2',copy:'Gegnerischer Skimmer. Kann Wasser und Flüsse überqueren; die eigenständige KI nutzt derzeit keine zusätzliche Skimmer-Phase.'},
   {name:'FORGE ENGINEER',role:'ENGINEERING FORTRESS',team:'SUPPORT',icon:'F',hp:'6',move:'2',range:'1',attack:'2',defense:'6',copy:'Autonome Reparatur- und Bergeplattform. Im ATLAS-Teststand noch als normales Fahrzeug spielbar; Reparatur, Bergung und Drohnen folgen später.'}
 ];
 const guideActions={
@@ -62,7 +62,7 @@ let guideReturnFocus=null,guidePreviousInert=[];
 function renderUnitGuide(){
   const v2=globalThis.IronDustBrowserV2?.mode==='ready';
   const unit=unitGuideEntries[guideIndex],live=v2?
-    globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.name===unit.name):
+    globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.id===unit.coreUnitId):
     units.find(item=>item.name===unit.name);
   document.querySelector('.guide-information').scrollTop=0;
   document.querySelector('#guide-symbol').textContent=unit.icon;
@@ -87,7 +87,8 @@ function renderUnitGuide(){
   document.querySelector('#guide-phase-status').textContent=v2?(!live?'—':live.hp<=0?GoblinLanguage.t('v2.ui.destroyed'):live.team==='enemy'?GoblinLanguage.t('v2.ui.hostileAi'):globalThis.IronDustBrowserV2.session.projection.mode==='player'?GoblinLanguage.t('v2.ui.ready'):GoblinLanguage.t('v2.ui.noAction')):!live?'—':live.hp<=0?'DESTROYED':live.team==='enemy'?'HOSTILE AI':phaseCanAct(live)?'READY':live.disabled?'DISABLED':'NO ACTION NOW';
   const list=document.querySelector('#guide-action-list');list.replaceChildren();
   for(const action of v2?(live&&live.team==='player'?[GoblinLanguage.t('v2.guide.actions')]:[]):liveDrone?['Im Field Test bewegen und fernfeuern','Stationäre Katalogregel: geplant']:guideActions[unit.name]||[]){const item=document.createElement('li');item.textContent=action;list.appendChild(item)}
-  document.querySelector('#guide-find').disabled=!!(v2||!live||(document.body?.classList?.contains('ui-v2-active')&&(live.hp<=0||!globalThis.GoblinV2Flow?.hasStarted())));
+  const inV2Ui=document.body?.classList?.contains('ui-v2-active');
+  document.querySelector('#guide-find').disabled=!!(!live||(v2&&!inV2Ui)||(inV2Ui&&(live.hp<=0||!globalThis.GoblinV2Flow?.hasStarted())));
   document.querySelector('#guide-count').textContent=`${String(guideIndex+1).padStart(2,'0')} / ${String(unitGuideEntries.length).padStart(2,'0')}`;
 }
 function openUnitGuide(){
@@ -111,7 +112,19 @@ document.querySelector('#unit-guide-close').onclick=closeUnitGuide;
 document.querySelector('#guide-details-jump').onclick=()=>{const heading=document.querySelector('#guide-voice-label');heading.tabIndex=-1;heading.scrollIntoView({block:'start'});heading.focus({preventScroll:true})};
 document.querySelector('#guide-prev').onclick=()=>{guideIndex=(guideIndex+unitGuideEntries.length-1)%unitGuideEntries.length;renderUnitGuide()};
 document.querySelector('#guide-next').onclick=()=>{guideIndex=(guideIndex+1)%unitGuideEntries.length;renderUnitGuide()};
-document.querySelector('#guide-find').onclick=()=>{if(globalThis.IronDustBrowserV2?.mode==='ready')return;const unit=units.find(item=>item.name===unitGuideEntries[guideIndex].name);if(!unit)return;closeUnitGuide();if(document.body?.classList?.contains('ui-v2-active')){globalThis.GoblinV2Flow?.findUnit(unit.id);return}selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);updateSelection();draw();globalThis.GoblinMobileViews?.show('map',{focus:true})};
+document.querySelector('#guide-find').onclick=()=>{
+  const core=globalThis.IronDustBrowserV2?.mode==='ready';
+  const inV2Ui=document.body?.classList?.contains('ui-v2-active');
+  if(core&&!inV2Ui)return;
+  const entry=unitGuideEntries[guideIndex];
+  const unit=core?globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.id===entry.coreUnitId):
+    units.find(item=>item.name===entry.name);
+  if(!unit||(core&&unit.hp<=0)||(inV2Ui&&!globalThis.GoblinV2Flow?.hasStarted()))return;
+  closeUnitGuide();
+  if(inV2Ui){globalThis.GoblinV2Flow.findUnit(unit.id);return}
+  selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);
+  updateSelection();draw();globalThis.GoblinMobileViews?.show('map',{focus:true});
+};
 globalThis.addEventListener?.('goblin-language-change',()=>{if(!guideModal.classList.contains('hidden'))renderUnitGuide()});
 guideModal.addEventListener('click',event=>{if(event.target===guideModal)closeUnitGuide()});
 document.addEventListener('keydown',event=>{
