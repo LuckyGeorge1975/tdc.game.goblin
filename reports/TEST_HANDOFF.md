@@ -2,21 +2,23 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## UI V2 · lokale Releasevorlage für möglichen Build 0.1.25
+## UI V2 · lokaler Build-25-Kandidat, nicht veröffentlicht
 
 | Feld | Stand am 20.10.2026 |
 |---|---|
+| Version | `0.1.25` |
+| Build | `25` |
 | Öffentlich veröffentlichte Version | `v0.1.24` auf `ceaf301c99ec35623dcf3dd323f9a7d7ee69137d`; `origin/main` zeigte beim lesenden GitHub-Abgleich auf dieselbe SHA |
 | Bestehender Rückfallpunkt | `v0.1.23` auf `2748063b83dbb8957d00a7b0f8523753c6b80ae9`; nach einer möglichen 0.1.25-Veröffentlichung wäre der geprüfte `v0.1.24` der unmittelbare Rückfallpunkt |
 | Lokaler Runtime-Kandidat | `56c135457c0384f08c3579af83b7ee3e724cbeba`, Branch `codex/ui-v2-integration`, Checkout `tdc.game.ogre-release-integration` |
-| Derzeitige Buildanzeige | `release.js`: `0.1.24` / Build `24`; UI V2 bleibt opt-in über `?ui=v2` |
-| Vorgeschlagene nächste Version | `0.1.25` / Build `25`, noch nicht in Runtime-Metadaten eingetragen; kein Tag und keine Veröffentlichung |
-| Lokale QA | `goblin-b22.6` und `.6.1`–`.6.3` inklusive unabhängiger UX- und Bedienprüfung; Tester Release/Bedienung hat die festen Belege auf `56c1354` read-only konsolidiert, ohne neuen Browserlauf. SHAs und Geltungsgrenzen in der [Releasevorlage](../docs/UI_V2_RELEASE_CANDIDATE.md) |
-| Entwurfsquelle | Nutzerangabe: `designV2reworked2.pen` wurde vom Nutzer selbst mit Claude-Hilfe erstellt; keine separate ausdrückliche Rechtevereinbarung. Konkreter Content-Quellenabgleich steht aus; keine pauschale Rechtefreigabe |
-| Noch erforderliche Gates | Finale unabhängige Regressionskonsolidierung auf `56c1354`; konkreter Content-/Legal-Quellenabgleich; Entscheidung über Standardansicht und konkrete öffentliche Freigabe; anschließend Metadaten-, Verifier- und Pages-Prüfung auf der tatsächlichen Release-SHA |
+| Derzeitige Buildanzeige | `release.js`: `0.1.25` / Build `25`, `status:candidate`, `tag:null`; `release.js?v=25`; UI V2 bleibt opt-in über `?ui=v2` |
+| Veröffentlichungsstand | Öffentlicher Build weiter 0.1.24; Kandidatendatum `2026-10-20` ist kein Deploy-Beleg; kein Build-25-Tag und keine Veröffentlichung |
+| Lokale QA | `goblin-b22.6` und `.6.1`–`.6.3` inklusive unabhängiger UX- und Bedienprüfung. Tester Release/Bedienung konsolidierte die festen Belege auf `56c1354` read-only, ohne neuen Browserlauf. Tester Regression bestand auf `56c1354` 71/71 gezielte Tests und 44/44 neue Locale-Prüfungen; frühere Vollsuite 380/380 auf `655db6f` für unveränderte Bereiche übernommen. SHAs und Geltungsgrenzen in der [Releasevorlage](../docs/UI_V2_RELEASE_CANDIDATE.md) |
+| Entwurfsquelle | Nutzerangabe: `designV2reworked2.pen` wurde vom Projektteam selbst mit Claude-Hilfe erstellt; keine separate ausdrückliche Rechtevereinbarung. Der korrigierte Content-Review fand im UI-V2-Delta keine neue Fremdquelle; Notices v18 sind unverändert. Keine pauschale Rechtsgarantie oder Releasefreigabe |
+| Noch erforderliche Gates | Gezielter unabhängiger Review dieser finalen Doku-/Metadaten-SHA; Entscheidung über Standardansicht und konkrete öffentliche Freigabe; anschließend Remote-, Workflow- und Pages-Prüfung auf der tatsächlichen Release-SHA. Hardware `goblin-wtg`, Standard-Legacy-FR320 `goblin-5an` und bedienbare Layoutreste bleiben ausgewiesene Grenzen |
 | Veröffentlichungsweg | [Lokale Releasevorlage und Rückfallverfahren](../docs/UI_V2_RELEASE_CANDIDATE.md); Push auf `main` würde den Pages-Workflow auslösen |
 
-Dieses Dokumentationspaket ändert keine Runtime-Dateien. Frühere Spiel- und Browserbelege gelten nur für die dort genannten festen SHAs und Prüfbereiche. Ein späterer Metadaten-Commit benötigt einen eigenen festen Handoff; eine Dokumentations-SHA allein ist kein veröffentlichungsfähiger Build-25-Commit.
+Dieses lokale Paket ändert zusätzlich nur `release.js` und dessen Cacheparameter in `index.html`; die Standardansicht und sonstige Runtime bleiben unverändert. Frühere Spiel- und Browserbelege gelten nur für die dort genannten festen SHAs und Prüfbereiche. Der feste Build-25-Kandidatencommit und sein gezielter Review werden in `goblin-b22.7` nachgetragen; diese Angaben allein sind kein Veröffentlichungsbeleg.
 
 ## Build 0.1.24 · Nutzerfreigabe und lokale QA
 
