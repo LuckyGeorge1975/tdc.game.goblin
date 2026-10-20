@@ -301,13 +301,38 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         const center=hexCenter(unit.x,unit.y),frame=document.createElementNS(NS,'polygon');
         frame.classList.add(unit.team==='player'?'v2-team-own':'v2-team-enemy');
         if(unit.disabled||unit.hp<=0)frame.classList.add('v2-team-inactive');
-        frame.setAttribute('points',hexPoints(unit.x,unit.y));frame.setAttribute('aria-label',`${t(unit.team==='player'?'ui.team.player':'ui.team.enemy')}: ${unit.name}${unit.id==='core'?`, ${t('ui.hud.objective')}`:''}`);teams.append(frame);
-        if(unit.id==='core'){const badge=document.createElementNS(NS,'text');badge.classList.add('v2-goal-badge');badge.setAttribute('x',center.x+24);badge.setAttribute('y',center.y-21);badge.textContent='◎';teams.append(badge);}
+        frame.setAttribute('points',unit.team==='player'?hexPoints(unit.x,unit.y):
+          `${center.x},${center.y-S} ${center.x+S-4},${center.y} ${center.x},${center.y+S} ${center.x-S+4},${center.y}`);
+        frame.setAttribute('role','img');
+        frame.setAttribute('aria-label',`${t(unit.team==='player'?'ui.team.player':'ui.team.enemy')}: ${unit.name}${unit.id==='core'?`, ${t('ui.hud.objective')}`:''}${unit.hp<=0?`, ${t('v2.ui.destroyed')}`:unit.disabled?`, ${t('v2.ui.disabled')}`:''}${unit.id===view.actorId?`, ${t('v2.ui.marker.selected',{unit:unit.name})}`:''}${view.focusCell?.x===unit.x&&view.focusCell?.y===unit.y?`, ${t('v2.ui.marker.focus',{hex:`${String.fromCharCode(65+unit.x)}-${String(unit.y+1).padStart(2,'0')}`})}`:''}`);
+        teams.append(frame);
+        function badge(kind,x,y,mark){const node=document.createElementNS(NS,'text');
+          node.classList.add(kind);node.setAttribute('x',center.x+x);node.setAttribute('y',center.y+y);
+          node.setAttribute('aria-hidden','true');node.textContent=mark;teams.append(node);}
+        if(unit.id==='core'){
+          const octagon=document.createElementNS(NS,'polygon');octagon.classList.add('v2-goal-octagon');
+          octagon.setAttribute('points',Array.from({length:8},(_,i)=>{const angle=Math.PI/8+i*Math.PI/4;
+            return `${center.x+24+12*Math.cos(angle)},${center.y-26+12*Math.sin(angle)}`;}).join(' '));
+          octagon.setAttribute('aria-hidden','true');teams.append(octagon);
+          badge('v2-goal-badge',24,-21,'◎');
+        }
+        if(unit.disabled&&unit.hp>0)badge('v2-disabled-badge',-24,-21,'!');
+        if(unit.hp<=0)badge('v2-destroyed-badge',24,29,'×');
       });
-      for(const [id,cell] of [['v2-actor-marker',actor],['v2-target-marker',view.target],['v2-focus-marker',view.focusCell]]){
+      function viewBadge(cell,kind,x,y,mark){if(!cell)return;const center=hexCenter(cell.x,cell.y);
+        const node=document.createElementNS(NS,'text');node.classList.add(kind);
+        node.setAttribute('x',center.x+x);node.setAttribute('y',center.y+y);
+        node.setAttribute('aria-hidden','true');node.textContent=mark;teams.append(node);}
+      viewBadge(actor,'v2-selected-badge',-24,29,'✓');
+      viewBadge(view.focusCell,'v2-focus-badge',0,-S-6,'⌖');
+      for(const [id,cell,key] of [['v2-actor-marker',actor,'v2.ui.marker.selected'],
+        ['v2-target-marker',view.target,'v2.ui.marker.target'],
+        ['v2-focus-marker',view.focusCell,'v2.ui.marker.focus']]){
         let shape=nativeMap.querySelector(`#${id}`);if(!cell){shape?.remove();continue;}
         if(!shape){shape=document.createElementNS(NS,'polygon');shape.id=id;shape.setAttribute('pointer-events','none');nativeMap.append(shape);}
         shape.setAttribute('points',hexPoints(cell.x,cell.y));
+        shape.setAttribute('role','img');
+        shape.setAttribute('aria-label',t(key,{unit:actor?.name||'',hex:`${String.fromCharCode(65+cell.x)}-${String(cell.y+1).padStart(2,'0')}`}));
       }
       globalThis.dispatchEvent(new Event('goblin-v2-render'));
     }
@@ -433,7 +458,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         const hint = document.createElement('p'); hint.textContent = view.actorId ? t('v2.ui.selectHex') : t('ui.hud.noIntent');
         actions.appendChild(hint);
       }
-      function marker(id, cell) {
+      function marker(id, cell, key) {
         let shape = nativeMap.querySelector(`#${id}`);
         if (!cell) { shape?.remove(); return; }
         if (!shape) {
@@ -441,6 +466,9 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
           shape.setAttribute('pointer-events', 'none'); nativeMap.appendChild(shape);
         }
         shape.setAttribute('points', hexPoints(cell.x, cell.y));
+        shape.setAttribute('role', 'img');
+        shape.setAttribute('aria-label', t(key, { unit: actor?.name || '',
+          hex: `${String.fromCharCode(65 + cell.x)}-${String(cell.y + 1).padStart(2, '0')}` }));
       }
       let teams = nativeMap.querySelector('#v2-team-markers');
       if (!teams) {
@@ -456,11 +484,12 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         frame.setAttribute('points', unit.team === 'player' ? hexPoints(unit.x, unit.y)
           : `${c.x},${c.y - S} ${c.x + S - 4},${c.y} ${c.x},${c.y + S} ${c.x - S + 4},${c.y}`);
         frame.setAttribute('role', 'img');
-        frame.setAttribute('aria-label', `${t(unit.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}: ${unit.name}${unit.core ? `, ${t('ui.hud.objective')}` : ''}${unit.hp <= 0 ? `, ${t('v2.ui.destroyed')}` : unit.disabled ? `, ${t('v2.ui.disabled')}` : ''}`);
+        frame.setAttribute('aria-label', `${t(unit.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}: ${unit.name}${unit.core ? `, ${t('ui.hud.objective')}` : ''}${unit.hp <= 0 ? `, ${t('v2.ui.destroyed')}` : unit.disabled ? `, ${t('v2.ui.disabled')}` : ''}${unit.id === view.actorId ? `, ${t('v2.ui.marker.selected', { unit: unit.name })}` : ''}${view.focusCell?.x === unit.x && view.focusCell?.y === unit.y ? `, ${t('v2.ui.marker.focus', { hex: `${String.fromCharCode(65 + unit.x)}-${String(unit.y + 1).padStart(2, '0')}` })}` : ''}`);
         teams.appendChild(frame);
         function badge(kind, x, y, mark) {
           const badge = document.createElementNS(NS, 'text');
           badge.setAttribute('x', c.x + x); badge.setAttribute('y', c.y + y);
+          badge.setAttribute('aria-hidden', 'true');
           badge.classList.add(kind); badge.textContent = mark;
           teams.appendChild(badge);
         }
@@ -471,15 +500,25 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
             const angle = Math.PI / 8 + i * Math.PI / 4;
             return `${c.x + 24 + 12 * Math.cos(angle)},${c.y - 26 + 12 * Math.sin(angle)}`;
           }).join(' '));
+          octagon.setAttribute('aria-hidden', 'true');
           teams.appendChild(octagon);
           badge('v2-goal-badge', 24, -21, '◎');
         }
         if (unit.disabled && unit.hp > 0) badge('v2-disabled-badge', -24, -21, '!');
         if (unit.hp <= 0) badge('v2-destroyed-badge', 24, 29, '×');
       });
-      marker('v2-actor-marker', actor);
-      marker('v2-target-marker', view.target);
-      marker('v2-focus-marker', view.focusCell);
+      function viewBadge(cell, kind, x, y, mark) {
+        if (!cell) return;
+        const c = hexCenter(cell.x, cell.y);
+        const badge = document.createElementNS(NS, 'text');
+        badge.classList.add(kind); badge.setAttribute('x', c.x + x); badge.setAttribute('y', c.y + y);
+        badge.setAttribute('aria-hidden', 'true'); badge.textContent = mark; teams.appendChild(badge);
+      }
+      viewBadge(actor, 'v2-selected-badge', -24, 29, '✓');
+      viewBadge(view.focusCell, 'v2-focus-badge', 0, -S - 6, '⌖');
+      marker('v2-actor-marker', actor, 'v2.ui.marker.selected');
+      marker('v2-target-marker', view.target, 'v2.ui.marker.target');
+      marker('v2-focus-marker', view.focusCell, 'v2.ui.marker.focus');
       globalThis.dispatchEvent(new Event('goblin-v2-render'));
     }
     at('#v2-undo').onclick = () => { const result = undo(); if (!result.ok) { view.message = result.reason; render(); } };

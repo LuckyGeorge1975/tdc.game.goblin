@@ -72,11 +72,13 @@ body.ui-v2-active #v2-team-markers polygon { fill: none; stroke-width: 2.5; }
 body.ui-v2-active #v2-team-markers .v2-team-own { stroke: var(--v2-signal); }
 body.ui-v2-active #v2-team-markers .v2-team-enemy { stroke: var(--v2-danger-text); }
 body.ui-v2-active #v2-team-markers .v2-team-inactive { stroke-dasharray: 4 4; }
-body.ui-v2-active #v2-team-markers .v2-goal-octagon { fill: var(--v2-surface); stroke: var(--v2-accent-text); stroke-width: 2.5; }
+body.ui-v2-active #v2-team-markers .v2-goal-octagon { fill: none; stroke: var(--v2-accent-text); stroke-width: 2.5; }
 body.ui-v2-active #v2-team-markers text { font: 700 18px system-ui,sans-serif; text-anchor: middle; paint-order: stroke; stroke: var(--v2-bg); stroke-width: 3; }
 body.ui-v2-active #v2-team-markers .v2-goal-badge { fill: var(--v2-accent-text); }
 body.ui-v2-active #v2-team-markers .v2-disabled-badge { fill: var(--v2-danger-text); }
 body.ui-v2-active #v2-team-markers .v2-destroyed-badge { fill: var(--v2-muted); }
+body.ui-v2-active #v2-team-markers .v2-selected-badge { fill: var(--v2-signal); }
+body.ui-v2-active #v2-team-markers .v2-focus-badge { fill: var(--v2-text); }
 .v2-side { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 12px; min-height: 0; }
 .v2-units { display: grid; align-content: start; gap: 6px; max-height: 32dvh; overflow: auto; }
 .v2-units button { width: 100%; text-align: left; }
