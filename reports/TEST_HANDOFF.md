@@ -11,9 +11,9 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Lokaler Runtime-Kandidat | `56c135457c0384f08c3579af83b7ee3e724cbeba`, Branch `codex/ui-v2-integration`, Checkout `tdc.game.ogre-release-integration` |
 | Derzeitige Buildanzeige | `release.js`: `0.1.24` / Build `24`; UI V2 bleibt opt-in über `?ui=v2` |
 | Vorgeschlagene nächste Version | `0.1.25` / Build `25`, noch nicht in Runtime-Metadaten eingetragen; kein Tag und keine Veröffentlichung |
-| Lokale QA | `goblin-b22.6` und `.6.1`–`.6.3` inklusive unabhängiger UX- und Bedienprüfung; genaue SHAs, Ergebnisse und Geltungsgrenzen in der [Releasevorlage](../docs/UI_V2_RELEASE_CANDIDATE.md) |
+| Lokale QA | `goblin-b22.6` und `.6.1`–`.6.3` inklusive unabhängiger UX- und Bedienprüfung; Tester Release/Bedienung hat die festen Belege auf `56c1354` read-only konsolidiert, ohne neuen Browserlauf. SHAs und Geltungsgrenzen in der [Releasevorlage](../docs/UI_V2_RELEASE_CANDIDATE.md) |
 | Entwurfsquelle | Nutzerangabe: `designV2reworked2.pen` wurde vom Nutzer selbst mit Claude-Hilfe erstellt; keine separate ausdrückliche Rechtevereinbarung. Konkreter Content-Quellenabgleich steht aus; keine pauschale Rechtefreigabe |
-| Noch erforderliche Gates | Finale unabhängige Regression und Bedienkonsolidierung auf `56c1354`; Content-/Legal-Deltaprüfung; Entscheidung über Standardansicht und konkrete öffentliche Freigabe; anschließend Metadaten-, Verifier- und Pages-Prüfung auf der tatsächlichen Release-SHA |
+| Noch erforderliche Gates | Finale unabhängige Regressionskonsolidierung auf `56c1354`; konkreter Content-/Legal-Quellenabgleich; Entscheidung über Standardansicht und konkrete öffentliche Freigabe; anschließend Metadaten-, Verifier- und Pages-Prüfung auf der tatsächlichen Release-SHA |
 | Veröffentlichungsweg | [Lokale Releasevorlage und Rückfallverfahren](../docs/UI_V2_RELEASE_CANDIDATE.md); Push auf `main` würde den Pages-Workflow auslösen |
 
 Dieses Dokumentationspaket ändert keine Runtime-Dateien. Frühere Spiel- und Browserbelege gelten nur für die dort genannten festen SHAs und Prüfbereiche. Ein späterer Metadaten-Commit benötigt einen eigenen festen Handoff; eine Dokumentations-SHA allein ist kein veröffentlichungsfähiger Build-25-Commit.
