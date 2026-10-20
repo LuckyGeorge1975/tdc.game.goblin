@@ -9,8 +9,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
     shell.className = 'v2-shell';
     shell.innerHTML = `
       <header class="v2-head"><div><span class="v2-label">G.O.B.L.I.N. / Mission</span><h1 id="v2-mission"></h1><p id="v2-objective"></p></div><div><span class="v2-label" id="v2-profile"></span><strong id="v2-phase"></strong><p id="v2-turn"></p></div></header>
-      <div class="v2-layout"><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><button type="button" id="v2-undo"></button></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main>
-      <aside class="v2-side"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card"><span class="v2-label" id="v2-intel-label"></span><div id="v2-intel"></div><span class="v2-label" id="v2-log-label"></span><div id="v2-log"></div></section><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target"><span class="v2-label" id="v2-command-target"></span><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section></aside></div>`;
+      <div class="v2-layout"><aside class="v2-own"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card v2-systems-card"><details id="v2-system-details" open><summary class="v2-label" id="v2-systems-label"></summary><div id="v2-systems"></div></details></section></aside><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><button type="button" id="v2-undo"></button></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main><aside class="v2-target"><section class="v2-card"><span class="v2-label" id="v2-intel-label"></span><div id="v2-intel"></div></section><section class="v2-card v2-log-card"><details id="v2-log-details" open><summary class="v2-label" id="v2-log-label"></summary><div id="v2-log"></div></details></section></aside></div><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target" hidden><div class="v2-command-head"><span class="v2-label" id="v2-command-target"></span><p id="v2-command-intel"></p></div><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section>`;
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
     document.body.classList.add('ui-v2-active');
@@ -34,9 +33,9 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
           objective:{goalMode:'core', coreHp:source.objective.coreHp,
             coreMax:source.objective.coreMaxHp, outcome:source.victory.winner === 'player' ? true :
               source.mode === 'ended' ? false : null},
-          ready:source.units.filter(unit => unit.team === 'player' && unit.hp > 0 && !unit.disabled && !unit.moved).length,
+          ready:coreOpenCount(source),
           undo:{available:false,count:0}, units:source.units, cells:source.cells,
-          systems:source.units.filter(unit => unit.weapons).map(unit => ({id:unit.id,
+          systems:source.units.filter(unit => unit.team === 'player' && unit.weapons).map(unit => ({id:unit.id,
             summary:{treads:unit.treads,weapons:Object.fromEntries(Object.entries(unit.weapons)
               .map(([key, weapon]) => [key, weapon.ready]))}})),
           log:source.events.map(event => IronDustBrowserV2.formatEvent(event))
@@ -173,6 +172,122 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       refresh: () => render() });
 
     function clearContext() { view.target = null; view.intentRevision = null; view.message = ''; }
+    const hexLabel = cell => `${String.fromCharCode(65 + cell.x)}-${String(cell.y + 1).padStart(2, '0')}`;
+    function coreOpenCount(source) {
+      if (source.mode !== 'player') return 0;
+      const enemies = source.units.filter(unit => unit.team === 'enemy' && unit.hp > 0);
+      return source.units.filter(unit => unit.team === 'player' && unit.hp > 0 && !unit.disabled)
+        .filter(unit => {
+          if (source.phase === 'movement' || source.phase === 'gev') {
+            if (source.phase === 'gev' && unit.id !== 'gev') return false;
+            if (source.cells.some(cell => IronDustBrowserV2.query({type:'Move',playerId:'player',unitId:unit.id,
+              to:{x:cell.x,y:cell.y}}).available)) return true;
+            return source.phase === 'movement' && enemies.some(enemy => IronDustBrowserV2.query({
+              type:'Ram',playerId:'player',unitId:unit.id,targetId:enemy.id}).available);
+          }
+          if (source.phase !== 'fire') return false;
+          if (enemies.some(enemy => IronDustBrowserV2.query({type:'PlayerFire',playerId:'player',
+            unitId:unit.id,targetId:enemy.id,...(unit.weapons ? {weaponKey:unit.selectedWeapon} : {})}).available)) return true;
+          return unit.weapons && Object.entries(unit.weapons).some(([key,weapon]) => key !== unit.selectedWeapon && weapon.ready > 0 &&
+            IronDustBrowserV2.query({type:'SelectWeapon',playerId:'player',unitId:unit.id,weaponKey:key}).available);
+        }).length;
+    }
+    function renderSystems(state, actor) {
+      const host = at('#v2-systems'); host.replaceChildren();
+      const entry = state.systems.find(item => item.id === actor?.id) || state.systems[0];
+      if (!entry) return;
+      const unit = state.units.find(item => item.id === entry.id);
+      const name = document.createElement('strong'); name.textContent = unit?.name || entry.id; host.append(name);
+      const facts = [];
+      if (entry.summary.treads != null) facts.push([t('v2.ui.treads'), entry.summary.treads]);
+      for (const [key, count] of Object.entries(entry.summary.weapons || {}))
+        facts.push([t(`v2.ui.weapon.${key}`), count]);
+      for (const [label, value] of facts) {
+        const line = document.createElement('div'); line.className = 'v2-system-row';
+        const term = document.createElement('span'); term.textContent = label;
+        const number = document.createElement('strong'); number.textContent = String(value);
+        line.append(term, number); host.append(line);
+      }
+    }
+    function positionCommandMenu(state) {
+      const card = at('#v2-command-card'), map = at('#v2-map');
+      if (card.hidden || !view.target) return;
+      card.classList.remove('v2-command-panel'); card.classList.add('v2-command-anchored');
+      card.style.left = '-9999px'; card.style.top = '0';
+      const frame = map.getBoundingClientRect(), box = card.getBoundingClientRect();
+      const point = nativeMap.createSVGPoint();
+      Object.assign(point, hexCenter(view.target.x, view.target.y));
+      const target = point.matrixTransform(nativeMap.getScreenCTM());
+      const occupied = state.units.filter(unit => unit.hp > 0 && !unit.embarkedOn)
+        .map(unit => {const node=nativeMap.createSVGPoint();Object.assign(node,hexCenter(unit.x,unit.y));
+          return node.matrixTransform(nativeMap.getScreenCTM());});
+      const inset = 8, gap = 44, w = box.width, h = box.height;
+      const candidates = [
+        {x:target.x+gap,y:target.y-h/2}, {x:target.x-gap-w,y:target.y-h/2},
+        {x:target.x-w/2,y:target.y-gap-h}, {x:target.x-w/2,y:target.y+gap}
+      ];
+      const placement = innerWidth >= 1024 && innerHeight >= 600 && frame.width >= 560 &&
+        target.x >= frame.left && target.x <= frame.right && target.y >= frame.top && target.y <= frame.bottom
+        ? candidates.find(({x,y}) => x>=frame.left+inset && y>=frame.top+inset &&
+          x+w<=frame.right-inset && y+h<=frame.bottom-inset &&
+          !occupied.some(point => point.x>=x-24 && point.x<=x+w+24 && point.y>=y-24 && point.y<=y+h+24))
+        : null;
+      if (placement) {card.dataset.placement='hex';card.style.left=`${placement.x}px`;card.style.top=`${placement.y}px`;}
+      else {card.dataset.placement='panel';card.classList.remove('v2-command-anchored');
+        card.classList.add('v2-command-panel');card.style.removeProperty('left');
+        if (innerWidth >= 1024 && innerHeight >= 600)
+          card.style.top = `${Math.min(frame.top + 8, innerHeight - h - 8)}px`;
+        else card.style.removeProperty('top');}
+    }
+    function renderCommandMenu(state, actor, commands, terrain) {
+      const card = at('#v2-command-card'), actions = at('#v2-actions'), footer = at('#v2-command-footer');
+      actions.replaceChildren(); footer.replaceChildren();
+      const open = !!(view.target && actor && !GameDialogs.isOpen() && !document.body.classList.contains('v2-screen-open'));
+      card.hidden = !open; document.body.classList.toggle('v2-menu-open', open);
+      if (!open) return;
+      card.setAttribute('role', 'dialog'); card.setAttribute('aria-modal', 'true');
+      at('#v2-command-target').textContent = `${t('v2.ui.commandTarget')} · ${hexLabel(view.target)}`;
+      const occupant = state.units.find(unit => unit.hp > 0 && !unit.embarkedOn && unit.x === view.target.x && unit.y === view.target.y);
+      at('#v2-command-intel').textContent = `${actor.name} → ${hexLabel(view.target)} · ${terrain}${occupant ? ` · ${occupant.name} (${t(occupant.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')})` : ''}`;
+      for (const {command,label,keepTarget,confirmSplash} of commands) {
+        const availability = query(command), button = document.createElement('button');
+        button.textContent = availability.ok
+          ? `${label} · ${t('ui.hud.intent.confirm')}${availability.path ? ` · ${availability.path.length}` : ''}`
+          : `${label} · ${t('ui.hud.blocked', {reason:availability.reason})}`;
+        button.disabled = !availability.ok || view.busy;
+        button.onclick = async () => {
+          const expectedRevision = view.intentRevision;
+          if (confirmSplash) {
+            const strike = globalThis.StrategicMissile.STRIKE;
+            const affected = state.units.filter(unit => unit.hp > 0 && !unit.embarkedOn &&
+              dist(unit, view.target) <= strike.radius).map(unit => `${unit.name} (${t(unit.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')})`);
+            const accepted = await GameDialogs.confirm({id:'v2-splash-confirm',title:t('v2.ui.missile'),
+              message:`${t('v2.ui.sector')} ${hexLabel(view.target)} · ${t('v2.ui.missileSplash')} · ${t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.splashAttack})}${affected.length ? ` · ${affected.join(', ')}` : ''}`,
+              acceptLabel:t('ui.hud.intent.confirm'),cancelLabel:t('ui.dialog.cancel')});
+            if (!accepted) {
+              (at('#v2-actions button:not(:disabled)') || at('#v2-command-footer button'))?.focus();
+              return;
+            }
+          }
+          const result = dispatch(command, expectedRevision);
+          if (result.ok && !keepTarget) clearContext();
+          else if (result.ok || view.intentRevision !== revision()) view.intentRevision = revision();
+          view.message = result.ok ? '' : result.reason;
+          render();
+          if (result.ok && keepTarget) at('#v2-actions button:not(:disabled)')?.focus();
+          else if (result.ok) {at('#v2-map').focus({preventScroll:true});at('.v2-map-card').scrollIntoView({block:'start'});}
+          else (at('#v2-actions button:not(:disabled)') || at('#v2-command-footer button'))?.focus();
+        };
+        actions.append(button);
+      }
+      if (!commands.length) {const hint=document.createElement('p');hint.textContent=t('v2.ui.noAction');actions.append(hint);}
+      const cancel = document.createElement('button');cancel.textContent=t('ui.dialog.cancel');
+      cancel.onclick=()=>{clearContext();render();at('#v2-map').focus({preventScroll:true});};
+      const pause = document.createElement('button');pause.textContent=t('ui.nav.pause');
+      pause.onclick=()=>{clearContext();render();at('#v2-pause').click();};
+      footer.append(cancel,pause);
+      positionCommandMenu(state);
+    }
     function chooseActor(id) {
       const unit = (core() ? project().units : units).find(item => item.id === id && item.team === 'player' && item.hp > 0);
       view.actorId = unit?.id || null;
@@ -203,7 +318,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       if (view.actorId) {
         if (matchMedia('(max-width: 599px), (max-height: 500px)').matches)
           at('#v2-map').scrollIntoView({ block: 'start' });
-        at('#v2-actions button:not(:disabled)')?.focus();
+        (at('#v2-actions button:not(:disabled)') || at('#v2-command-footer button'))?.focus();
       }
     }
     function renderCore(state) {
@@ -223,8 +338,10 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       terminal.classList.toggle('v2-failed', state.gameOver && !state.objective.outcome);
       terminal.textContent = state.gameOver ? t(state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '';
       const phaseButton = at('#v2-phase-action');
+      const next = {movement:'dialog.phaseAdvance.confirm.toFire',
+        fire:'dialog.phaseAdvance.confirm.toGev',gev:'dialog.phaseAdvance.confirm.toEnemy'}[state.turnPhase];
       phaseButton.textContent = state.phase === 'enemy' ? t('v2.enemy') : state.gameOver ? t('v2.ended') :
-        state.turnPhase === 'gev' ? t('v2.endTurn') : t('v2.next');
+        `${t(next)} · ${t('dialog.phaseAdvance.pending',{pendingCount:state.ready})}`;
       phaseButton.setAttribute('aria-label',phaseButton.textContent);
       phaseButton.disabled = state.phase !== 'player' || !IronDustBrowserV2.query({type:'EndPhase',playerId:'player'}).available ||
         GameDialogs.isOpen() || view.busy;
@@ -232,17 +349,18 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       at('#v2-pause').textContent = t('ui.nav.pause');
       at('#v2-undo').hidden = true;
       at('#v2-units-label').textContent = t('ui.hud.units');
-      at('#v2-intel-label').textContent = t('v2.ui.fieldSystems');
+      at('#v2-intel-label').textContent = t('v2.ui.fieldIntel');
+      at('#v2-systems-label').textContent = t('v2.ui.status');
       at('#v2-log-label').textContent = t('ui.details.log');
       at('#v2-selection').textContent = actor?.name || t('ui.hud.noSelection');
       at('#v2-message').textContent = view.message;
       const roster = at('#v2-units'); roster.replaceChildren();
       state.units.filter(unit => unit.team === 'player').forEach(unit => {
         const button = document.createElement('button');
-        const capabilities = `${t('v2.ui.move')} ${unit.move ?? t('v2.ui.bySystem')} · ${t('v2.ui.range')} ${unit.range ?? t('v2.ui.byWeapon')}`;
-        const weapons = unit.weapons ? ` · ${Object.entries(unit.weapons).map(([key, weapon]) =>
-          `${t(`v2.ui.weapon.${key}`)} ${weapon.ready}`).join(' · ')}` : '';
-        button.textContent = `${t('ui.team.player')} · ${unit.name} · ${unit.hp}/${unit.maxHp} HP · ${capabilities}${unit.treads === null ? '' : ` · ${t('v2.ui.treads')} ${unit.treads}`}${weapons}${unit.selectedWeapon ? ` · ${t('v2.ui.selectedWeapon')}: ${t(`v2.ui.weapon.${unit.selectedWeapon}`)}` : ''}${unit.moved ? ` · ${t('v2.ui.moved')}` : ''}${unit.fired ? ` · ${t('v2.ui.fired')}` : ''}${unit.secondMoved ? ` · ${t('v2.ui.secondMoved')}` : ''}${unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}`;
+        const strength = unit.treads === null ? `${unit.hp}/${unit.maxHp} HP` : `${t('v2.ui.treads')} ${unit.treads}`;
+        button.textContent = `${unit.name} · ${strength}${unit.hp <= 0 ? ` · ${t('v2.ui.destroyed')}` :
+          unit.disabled ? ` · ${t('v2.ui.disabled')}` : unit.secondMoved ? ` · ${t('v2.ui.secondMoved')}` :
+          unit.fired ? ` · ${t('v2.ui.fired')}` : unit.moved ? ` · ${t('v2.ui.moved')}` : ''}`;
         button.setAttribute('aria-pressed',String(unit.id === view.actorId));
         button.disabled = unit.hp <= 0; button.onclick = () => chooseActor(unit.id); roster.append(button);
       });
@@ -252,22 +370,15 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         const terrain = state.cells.find(item => item.x === cell.x && item.y === cell.y);
         const occupant = state.units.find(unit => unit.hp > 0 && unit.x === cell.x && unit.y === cell.y);
         const line = document.createElement('p');
-        line.textContent = `${t('v2.ui.sector')} ${String.fromCharCode(65 + cell.x)}-${String(cell.y+1).padStart(2,'0')} · ${t(`v2.ui.terrain.${terrain?.type}`)}${occupant ? ` · ${occupant.name} (${t(occupant.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}) · ${occupant.hp}/${occupant.maxHp} HP` : ''}`;
+        line.textContent = `${t('v2.ui.sector')} ${hexLabel(cell)} · ${t(`v2.ui.terrain.${terrain?.type}`)}${occupant ? ` · ${occupant.name} (${t(occupant.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}) · ${occupant.treads === null ? `${occupant.hp}/${occupant.maxHp} HP` : `${t('v2.ui.treads')} ${occupant.treads}`}` : ''}`;
         intel.append(line);
       }
-      state.systems.forEach(({id,summary}) => {const line=document.createElement('p');line.className='v2-system';
-        line.textContent=`${id}: ${t('v2.ui.treads')} ${summary.treads}; ${Object.entries(summary.weapons).map(([key,count]) => `${t(`v2.ui.weapon.${key}`)} ${count}`).join(' · ')}`;intel.append(line);});
+      renderSystems(state, actor);
       const log = at('#v2-log'); log.replaceChildren();
       state.log.slice(-4).forEach(entry => {const line=document.createElement('p');line.textContent=entry;log.append(line);});
-      const actions = at('#v2-actions'); actions.replaceChildren();
-      const footer = at('#v2-command-footer'); footer.replaceChildren();
-      const menuOpen = !!(view.target && view.actorId);
-      document.body.classList.toggle('v2-menu-open',menuOpen);
-      at('#v2-command-card').setAttribute('role',menuOpen ? 'dialog':'region');
-      at('#v2-command-target').textContent = menuOpen ? `${t('v2.ui.commandTarget')} · ${String.fromCharCode(65+view.target.x)}-${String(view.target.y+1).padStart(2,'0')}` : t('v2.ui.commandTarget');
-      if (menuOpen) {
+      const commands=[];
+      if (view.target && actor) {
         const target=state.units.find(unit => unit.hp>0 && unit.x===view.target.x && unit.y===view.target.y);
-        const commands=[];
         if (state.turnPhase==='fire' && target?.team==='enemy') {
           if (actor.weapons) Object.entries(actor.weapons).forEach(([key,weapon]) => {
             const selected=key===actor.selectedWeapon;
@@ -281,19 +392,9 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
           if (target?.team==='enemy') commands.push({command:{type:'Ram',playerId:'player',unitId:actor.id,targetId:target.id},label:t('v2.ui.ram')});
           else if (!target) commands.push({command:{type:'Move',playerId:'player',unitId:actor.id,to:{...view.target}},label:t('v2.ui.move')});
         }
-        commands.forEach(({command,label,keepTarget}) => {
-          const availability=query(command),button=document.createElement('button');
-          button.textContent=availability.ok ? `${label} · ${t('ui.hud.intent.confirm')}` : `${label} · ${t('ui.hud.blocked',{reason:availability.reason})}`;
-          button.disabled=!availability.ok || view.busy;
-          button.onclick=()=>{const result=dispatch(command,view.intentRevision);
-            if(result.ok){if(keepTarget)view.intentRevision=revision();else clearContext();}
-            view.message=result.ok?'':result.reason;render();if(result.ok)at('.v2-map-card').scrollIntoView({block:'start'});};
-          actions.append(button);
-        });
-        const cancel=document.createElement('button');cancel.textContent=t('ui.dialog.cancel');cancel.onclick=()=>{clearContext();render();at('#v2-map').focus();};
-        const pause=document.createElement('button');pause.textContent=t('ui.nav.pause');pause.onclick=()=>at('#v2-pause').click();
-        footer.append(cancel,pause);
-      } else {const hint=document.createElement('p');hint.textContent=view.actorId?t('v2.ui.selectHex'):t('ui.hud.noIntent');actions.append(hint);}
+      }
+      renderCommandMenu(state, actor, commands,
+        view.target ? t(`v2.ui.terrain.${state.cells.find(cell => cell.x === view.target.x && cell.y === view.target.y)?.type}`) : '');
       let teams=nativeMap.querySelector('#v2-team-markers');
       if(!teams){teams=document.createElementNS(NS,'g');teams.id='v2-team-markers';teams.setAttribute('pointer-events','none');nativeMap.append(teams);}
       teams.replaceChildren();
@@ -346,7 +447,8 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       at('#v2-objective').textContent = state.mission.objective;
       at('#v2-map-label').textContent = GoblinLanguage.translate('TACTICAL MAP');
       at('#v2-units-label').textContent = t('ui.hud.units');
-      at('#v2-intel-label').textContent = t('v2.ui.fieldSystems');
+      at('#v2-intel-label').textContent = t('v2.ui.fieldIntel');
+      at('#v2-systems-label').textContent = t('v2.ui.status');
       at('#v2-log-label').textContent = t('ui.details.log');
       at('#v2-profile').textContent = state.profile;
       at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') : t(`phase.${state.turnPhase}.label`);
@@ -380,10 +482,8 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         const system = state.systems.find(item => item.id === unit.id);
         const carrier = unit.embarkedOn && state.units.find(item => item.id === unit.embarkedOn);
         const cargo = unit.transportCapacity ? units.find(item => item.id === unit.id) : null;
-        button.textContent = system
-          ? `${t('ui.team.player')} · ${unit.name} · ${t('v2.ui.treads')} ${system.summary.treads} · ${Object.entries(system.summary.weapons).map(([key, count]) => `${t(`v2.ui.weapon.${key}`)} ${count}`).join(' · ')}${unit.hp <= 0 ? ` · ${t('v2.ui.destroyed')}` : unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}`
-          : `${t('ui.team.player')} · ${t(unit.infantry ? 'v2.ui.infantrySummary' : 'ui.hud.unitSummary',
-            { unitId: unit.name, unitType: GoblinLanguage.translate(unit.type || ''), hp: unit.hp, maxHp: unit.maxHp })}${unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}${carrier ? ` · ${t('v2.ui.embarked')} ${carrier.name}` : ''}${cargo ? ` · ${t('v2.ui.cargo')} ${carrierLoad(cargo)}/${unit.transportCapacity}` : ''}${unit.strategicMissile ? ` · ${t('v2.ui.missile')} ${unit.missilesRemaining}` : ''}`;
+        button.textContent = `${unit.name} · ${system ? `${t('v2.ui.treads')} ${system.summary.treads}` :
+          `${unit.hp}/${unit.maxHp} ${unit.infantry ? 'SP' : 'HP'}`}${unit.hp <= 0 ? ` · ${t('v2.ui.destroyed')}` : unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}${carrier ? ` · ${t('v2.ui.embarked')} ${carrier.name}` : ''}${cargo ? ` · ${t('v2.ui.cargo')} ${carrierLoad(cargo)}/${unit.transportCapacity}` : ''}${unit.strategicMissile ? ` · ${t('v2.ui.missile')} ${unit.missilesRemaining}` : ''}`;
         button.setAttribute('aria-pressed', String(unit.id === view.actorId));
         button.disabled = unit.hp <= 0;
         button.onclick = () => chooseActor(unit.id);
@@ -397,31 +497,21 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         line.textContent = `${t('v2.ui.sector')} ${String.fromCharCode(65 + x)}-${String(y + 1).padStart(2, '0')} · ${GoblinLanguage.translate(terrainTypeAt(x, y))}${target ? ` · ${target.name} (${t(target.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')})` : ''}`;
         intel.appendChild(line);
       }
-      state.systems.forEach(({ id, summary }) => {
-        const line = document.createElement('p'); line.className = 'v2-system';
-        line.textContent = `${id}: ${t('v2.ui.treads')} ${summary.treads}; ${Object.entries(summary.weapons).map(([name, count]) => `${t(`v2.ui.weapon.${name}`)} ${count}`).join(' · ')}`;
-        intel.appendChild(line);
-      });
+      renderSystems(state, actor);
       const log = at('#v2-log'); log.replaceChildren();
       state.log.forEach(entry => { const line = document.createElement('p'); line.textContent = entry; log.appendChild(line); });
-      const actions = at('#v2-actions'); actions.replaceChildren();
-      const footer = at('#v2-command-footer'); footer.replaceChildren();
-      const menuOpen = !!(view.target && view.actorId);
-      document.body.classList.toggle('v2-menu-open', menuOpen);
-      at('#v2-command-card').setAttribute('role', menuOpen ? 'dialog' : 'region');
-      at('#v2-command-target').textContent = menuOpen
-        ? `${t('v2.ui.commandTarget')} · ${String.fromCharCode(65 + view.target.x)}-${String(view.target.y + 1).padStart(2, '0')} · ${GoblinLanguage.translate(terrainTypeAt(view.target.x, view.target.y))}`
-        : t('v2.ui.commandTarget');
+      let commands = [];
       if (view.target && view.actorId) {
         const runtimeActor = units.find(unit => unit.id === view.actorId);
         const target = units.find(unit => unit.hp > 0 && !unit.embarkedOn && unit.x === view.target.x && unit.y === view.target.y);
-        const commands = state.turnPhase === 'fire'
+        commands = state.turnPhase === 'fire'
           ? runtimeActor?.ogreSystems
             ? SiegebreakerWeapons.weaponEntries(runtimeActor).map(({ key, weapon }) => ({
               command: { type: 'Fire', actorId: view.actorId, ...view.target, weaponKey: key },
               label: `${t(`v2.ui.weapon.${key}`)} · A${weapon.attack} R${weapon.range} · ${GoblinSystems.weaponReady(weapon)} ${t('v2.ui.ready')}` }))
             : [{ command: { type: 'Fire', actorId: view.actorId, ...view.target },
-              label: runtimeActor?.strategicMissile ? `${t('v2.ui.missile')} · ${t('v2.ui.missileSplash')}` : t('v2.ui.fire') }]
+              label: runtimeActor?.strategicMissile ? `${t('v2.ui.missile')} · ${t('v2.ui.missileSplash')}` : t('v2.ui.fire'),
+              confirmSplash:!!runtimeActor?.strategicMissile }]
           : target?.team === 'enemy'
             ? [{ command: { type: 'Ram', actorId: view.actorId, ...view.target }, label: t('v2.ui.ram') }]
             : target?.team === 'player' && target.transportCapacity
@@ -433,31 +523,9 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
                   label: `${t('v2.ui.unload')} · ${cargo.name}`
                 })) : [])
               ];
-        commands.forEach(({ command, label }) => {
-          const availability = query(command);
-          const button = document.createElement('button');
-          button.textContent = availability.ok
-            ? `${label} · ${t('ui.hud.intent.confirm')}${availability.path ? ` · ${availability.path.length}` : ''}`
-            : `${label} · ${t('ui.hud.blocked', { reason: availability.reason })}`;
-          button.disabled = !availability.ok || view.busy;
-          button.onclick = () => {
-            const result = dispatch(command, view.intentRevision);
-            if (result.ok) clearContext();
-            view.message = result.ok ? '' : result.reason;
-            render();
-            if (result.ok) at('.v2-map-card').scrollIntoView({ block: 'start' });
-          };
-          actions.appendChild(button);
-        });
-        const cancel = document.createElement('button'); cancel.textContent = t('ui.dialog.cancel');
-        cancel.onclick = () => { clearContext(); render(); at('#v2-map').focus(); };
-        const pause = document.createElement('button'); pause.textContent = t('ui.nav.pause');
-        pause.onclick = () => at('#v2-pause').click();
-        footer.append(cancel, pause);
-      } else {
-        const hint = document.createElement('p'); hint.textContent = view.actorId ? t('v2.ui.selectHex') : t('ui.hud.noIntent');
-        actions.appendChild(hint);
       }
+      renderCommandMenu(state, actor, commands,
+        view.target ? GoblinLanguage.translate(terrainTypeAt(view.target.x, view.target.y)) : '');
       function marker(id, cell, key) {
         let shape = nativeMap.querySelector(`#${id}`);
         if (!cell) { shape?.remove(); return; }
@@ -537,6 +605,35 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       GameDialogs.whenIdle().then(render);
     };
     const mapPanel = at('#v2-map');
+    let compactDetails = null;
+    function syncLayout() {
+      const compact = matchMedia('(max-width: 599px), (max-height: 500px)').matches;
+      if (compact !== compactDetails) {
+        at('#v2-system-details').open = !compact;
+        at('#v2-log-details').open = !compact;
+        compactDetails = compact;
+      }
+      if (view.target && view.actorId) positionCommandMenu({units:core()?IronDustBrowserV2.view.units:units});
+    }
+    syncLayout();
+    window.addEventListener('resize', syncLayout);
+    mapPanel.addEventListener('scroll', () => {
+      if (view.target && view.actorId) positionCommandMenu({units:core()?IronDustBrowserV2.view.units:units});
+    }, {passive:true});
+    at('#v2-command-card').addEventListener('keydown', event => {
+      if (event.key !== 'Tab') return;
+      const focusable = [...at('#v2-command-card').querySelectorAll('button:not(:disabled)')];
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) {last.focus();event.preventDefault();}
+      else if (!event.shiftKey && document.activeElement === last) {first.focus();event.preventDefault();}
+    });
+    document.addEventListener('click', event => {
+      if (view.target && view.actorId && !event.target.closest?.('dialog') &&
+          !at('#v2-command-card').contains(event.target) &&
+          !mapPanel.contains(event.target) && !at('#v2-units').contains(event.target) &&
+          !at('#v2-phase-action').contains(event.target)) {clearContext();render();}
+    });
     const pointers = new Map();
     let pinch = null, suppressTapUntil = 0;
     function cellAt(clientX, clientY) {
@@ -568,7 +665,10 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
       return Math.hypot(first.x - second.x, first.y - second.y);
     }
     mapPanel.addEventListener('pointerdown', event => {
-      if (view.target && view.actorId || event.pointerType === 'mouse' && event.button !== 0) return;
+      if (view.target && view.actorId) {
+        clearContext(); render(); suppressTapUntil = performance.now() + 500;
+      }
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
       const pointer = { startX: event.clientX, startY: event.clientY, x: event.clientX, y: event.clientY,
         scrollX: mapPanel.scrollLeft, scrollY: mapPanel.scrollTop, moved: false, timer: null };
       pointers.set(event.pointerId, pointer);
@@ -615,6 +715,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
     mapPanel.addEventListener('wheel', event => {
       event.preventDefault();
       setZoom(view.zoom * (event.deltaY < 0 ? 1.1 : 0.9), event.clientX, event.clientY);
+      if (view.target && view.actorId) positionCommandMenu({units:core()?IronDustBrowserV2.view.units:units});
     }, { passive: false });
     mapPanel.addEventListener('contextmenu', event => {
       event.preventDefault();
@@ -634,6 +735,7 @@ if (new URLSearchParams(location.search).get('ui') === 'v2' && !globalThis.gobli
         }
         return;
       }
+      if (GameDialogs.isOpen()) return;
       if (event.repeat && event.target === at('#v2-phase-action') && (event.key === 'Enter' || event.key === ' ')) {
         event.preventDefault(); event.stopImmediatePropagation(); return;
       }

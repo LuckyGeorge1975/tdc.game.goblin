@@ -508,6 +508,7 @@
     'v2.ui.find': {de:'Auf Karte',en:'Find on map',es:'Ver en el mapa',fr:'Voir sur la carte'},
     'v2.ui.catalogNote': {de:'Der Katalog zeigt vorhandene Einheiten. Einsatzwerte und Befehle richten sich nach der aktuellen Mission.',en:'The catalog shows existing units. Live values and orders depend on the current mission.',es:'El catálogo muestra las unidades existentes. Los valores y órdenes dependen de la misión actual.',fr:'Le catalogue présente les unités existantes. Leurs valeurs et ordres dépendent de la mission en cours.'},
     'v2.ui.missileSplash': {de:'Direktziel und Nachbarfelder, auch eigene Einheiten',en:'Direct target and neighbors, including friendly units',es:'Objetivo directo y casillas vecinas, incluso aliados',fr:'Cible directe et cases voisines, y compris les alliés'},
+    'v2.ui.missileImpact': {de:'Angriff {direct} direkt, {adjacent} auf Nachbarfeldern',en:'Attack {direct} direct, {adjacent} on adjacent hexes',es:'Ataque {direct} directo, {adjacent} en casillas vecinas',fr:'Attaque {direct} directe, {adjacent} sur les cases voisines'},
     'v2.ui.iconStyle.01-tabletop-miniatures': {de:'Tabletop-Miniaturen',en:'Tabletop Miniatures',es:'Miniaturas de mesa',fr:'Figurines de jeu de table'},
     'v2.ui.iconStyle.02-technical-illustration': {de:'Technische Illustration',en:'Technical Illustration',es:'Ilustración técnica',fr:'Illustration technique'},
     'v2.ui.iconStyle.03-industrial-realism': {de:'Industrieller Realismus',en:'Industrial Realism',es:'Realismo industrial',fr:'Réalisme industriel'},
