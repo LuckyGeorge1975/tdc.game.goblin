@@ -2,24 +2,24 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
-## UI V2 · lokaler Build-25-Kandidat, nicht veröffentlicht
+## UI V2 · Build 25 zur Veröffentlichung freigegeben, noch nicht ausgeliefert
 
-| Feld | Stand am 20.10.2026 |
+| Feld | Stand am 21.10.2026 |
 |---|---|
 | Version | `0.1.25` |
 | Build | `25` |
 | Öffentlich veröffentlichte Version | `v0.1.24` auf `ceaf301c99ec35623dcf3dd323f9a7d7ee69137d`; `origin/main` zeigte beim lesenden GitHub-Abgleich auf dieselbe SHA |
 | Bestehender Rückfallpunkt | `v0.1.23` auf `2748063b83dbb8957d00a7b0f8523753c6b80ae9`; nach einer möglichen 0.1.25-Veröffentlichung wäre der geprüfte `v0.1.24` der unmittelbare Rückfallpunkt |
 | Lokaler geprüfter Runtimekandidat | `819f0f3694a3570d8d92612056b14d918de58fca`, Branch `codex/ui-v2-integration`, Checkout `tdc.game.ogre-release-integration`; baut auf V2-Basis `56c135457c0384f08c3579af83b7ee3e724cbeba` auf |
-| Derzeitige Buildanzeige und Einstieg | `release.js`: `0.1.25` / Build `25`, `status:candidate`, `tag:null`; `release.js?v=25`. UI V2 startet nach Nutzerentscheidung unter der normalen URL; `?ui=v2` bleibt funktionsfähig |
-| Veröffentlichungsstand | Öffentlicher Build weiter 0.1.24; Kandidatendatum `2026-10-20` ist kein Deploy-Beleg; kein Build-25-Tag und keine Veröffentlichung |
+| Derzeitige Buildanzeige und Einstieg | `release.js`: `0.1.25` / Build `25`, `releasedAt:2026-10-21`, `status:approved-for-release`, geplantes `tag:v0.1.25`; `release.js?v=25`. UI V2 startet unter der normalen URL; `?ui=v2` bleibt funktionsfähig |
+| Nutzerfreigabe und Veröffentlichungsstand | Der Nutzer gab am 21.10.2026 Build 0.1.25 ausdrücklich zur Veröffentlichung frei und bat um Stop danach. Öffentlicher Build weiter 0.1.24; `v0.1.25` ist noch nicht angelegt, Push/Workflow/Pages-Nachprüfung stehen aus |
 | Lokale QA | `goblin-b22.6` und `.6.1`–`.6.3` inklusive unabhängiger UX- und Bedienprüfung. Tester Release/Bedienung konsolidierte die festen Belege auf `56c1354` read-only, ohne neuen Browserlauf. Tester Regression bestand auf `56c1354` 71/71 gezielte Tests und 44/44 neue Locale-Prüfungen; frühere Vollsuite 380/380 auf `655db6f` für unveränderte Bereiche übernommen. SHAs und Geltungsgrenzen in der [Releasevorlage](../docs/UI_V2_RELEASE_CANDIDATE.md) |
 | Default-Nachtest auf `819f0f3` | Regression: Syntax, Verifier gegen `v0.1.24`, 2/2 Release-/Pfadtests und 5/5 Guard-Fälle PASS. Release/Bedienung: lokale Normal-URL und Reload mit V2/Build25, Core-Start `IRON DUST v2` und Legacy-Start `Relay Run` bis Turn 1 über native Menüs, `?ui=v2` V2, `?ui=legacy` bisherige Legacy-Shell; 70/71 Ressourcen im lokalen Pages-Präfix ohne Fehler. Keine öffentliche Pages- oder Hardwareprüfung. Eigener Developer-Smoke auf derselben SHA ebenfalls bestanden (`goblin-b22.7`) |
-| Entwurfsquelle | Nutzerangabe: `designV2reworked2.pen` wurde vom Projektteam selbst mit Claude-Hilfe erstellt; keine separate ausdrückliche Rechtevereinbarung. Der korrigierte Content-Review fand im UI-V2-Delta keine neue Fremdquelle; Notices v18 sind unverändert. Keine pauschale Rechtsgarantie oder Releasefreigabe |
-| Noch erforderliche Gates | Begrenzter unabhängiger Link-/Konsistenzreview des abschließenden reinen Doku-Commits; konkrete öffentliche Freigabe; danach gegebenenfalls `tag`/`status`/Datum mit gezieltem Metadatenreview sowie Remote-, Workflow- und Pages-Prüfung auf der tatsächlichen Release-SHA. Hardware `goblin-wtg`, Standard-Legacy-FR320 `goblin-5an` und bedienbare Layoutreste bleiben ausgewiesene Grenzen |
+| Entwurfsquelle | Nutzerangabe: `designV2reworked2.pen` wurde vom Projektteam selbst mit Claude-Hilfe erstellt; keine separate ausdrückliche Rechtevereinbarung. Der korrigierte Content-Review fand im UI-V2-Delta keine neue Fremdquelle; Notices v18 sind unverändert. Die Herkunftsangabe ist keine pauschale Rechtsgarantie |
+| Noch erforderliche Gates | Abschließender Doku-Review auf `ed9e8f8` bestanden. Das Freigabe-Metadatendelta benötigt Verifier und gezielten unabhängigen Review auf fester SHA; danach Remote-, Workflow-, Tag- und öffentliche Pages-Prüfung auf der tatsächlichen Release-SHA. Hardware `goblin-wtg`, Standard-Legacy-FR320 `goblin-5an` und bedienbare Layoutreste bleiben ausgewiesene Grenzen |
 | Veröffentlichungsweg | [Lokale Releasevorlage und Rückfallverfahren](../docs/UI_V2_RELEASE_CANDIDATE.md); Push auf `main` würde den Pages-Workflow auslösen |
 
-Der Metadatencommit `b2420ce` änderte nur `release.js` und dessen Cacheparameter in `index.html` zusätzlich zur Dokumentation; beide Testerrollen prüften diese SHA gezielt. Die danach vom Nutzer entschiedene Default-Umschaltung auf `819f0f3` änderte `ui-v2.js`, dessen Cacheparameter und die zugehörige Dokumentation; beide Testerrollen prüften das Delta unabhängig. Frühere Spiel- und Browserbelege gelten nur für die dort genannten festen SHAs und Prüfbereiche. Der abschließende Doku-Commit wird mit seiner festen SHA in `goblin-b22.7` belegt; diese Angaben allein sind kein Veröffentlichungsbeleg.
+Der Metadatencommit `b2420ce` änderte nur `release.js` und dessen Cacheparameter in `index.html` zusätzlich zur Dokumentation; beide Testerrollen prüften diese SHA gezielt. Die danach vom Nutzer entschiedene Default-Umschaltung auf `819f0f3` änderte `ui-v2.js`, dessen Cacheparameter und die zugehörige Dokumentation; beide Testerrollen prüften das Delta unabhängig. Der reine Doku-Nachtrag `ed9e8f8` bestand einen begrenzten unabhängigen Link-/Konsistenzreview. Frühere Spiel- und Browserbelege gelten nur für die dort genannten festen SHAs und Prüfbereiche. Nutzerfreigabe und lokale Release-Metadaten allein sind kein Veröffentlichungsbeleg; tatsächliche Deploy-SHA und Nachprüfung werden in `goblin-b22.7` dokumentiert.
 
 ## Build 0.1.24 · Nutzerfreigabe und lokale QA
 
