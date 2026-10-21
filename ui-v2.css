@@ -23,23 +23,32 @@ body.ui-v2-active.v2-screen-open .v2-head,
 body.ui-v2-active.v2-screen-open .v2-layout { display: none; }
 .v2-screen { display: grid; place-items: center; min-width: 0; }
 .v2-screen-panel { width: min(780px, 100%); max-height: calc(100dvh - 24px); overflow: auto; padding: clamp(16px, 3vw, 30px); border: 1px solid var(--v2-line-strong); border-radius: 14px; background: var(--v2-surface); }
+.v2-screen-panel.v2-foundation { display: flex; flex-direction: column; min-width: 0; font: 16px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+.v2-foundation .v2-screen-header, .v2-foundation .v2-screen-main, .v2-foundation .v2-screen-footer { min-width: 0; }
+.v2-foundation .v2-screen-footer { position: sticky; bottom: 0; z-index: 2; margin-top: auto; padding-top: 12px; background: var(--v2-surface); }
+.v2-foundation .v2-screen-footer .v2-screen-actions { margin-top: 0; }
+.v2-foundation :is(button, select, input):focus-visible { outline: 3px solid var(--v2-accent-text); outline-offset: 2px; }
+.v2-foundation button { min-height: 44px; font-size: max(12px, 1em); overflow-wrap: anywhere; }
+.v2-foundation :is(p, label, span, strong) { overflow-wrap: anywhere; }
 .v2-screen-panel h2 { margin: 0 0 12px; color: var(--v2-text); font-size: clamp(23px, 5vw, 36px); overflow-wrap: anywhere; }
 .v2-screen-panel p { color: var(--v2-muted); overflow-wrap: anywhere; }
 .v2-screen-panel:has(.v2-level-layout) { width: min(1360px, 100%); }
-.v2-screen-panel:has(.v2-menu-links) { position: relative; width: min(1440px, 100%); min-height: min(860px, calc(100dvh - 24px)); display: flex; flex-direction: column; justify-content: center; overflow: hidden; padding: clamp(28px, 7vw, 96px); background: radial-gradient(circle at 78% 44%, #332d51 0, #1b192b 56%); }
+.v2-screen-panel:has(.v2-menu-links) { position: relative; width: min(1440px, 100%); min-height: min(860px, calc(100dvh - 24px)); display: flex; flex-direction: column; justify-content: center; overflow: hidden; padding: clamp(28px, 7vw, 96px); background: radial-gradient(circle at 78% 44%, var(--v2-surface3) 0, var(--v2-surface) 56%); }
 .v2-screen-panel:has(.v2-menu-links)::after { content: ''; position: absolute; inset: 0 0 0 52%; pointer-events: none; opacity: .34; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='156' height='135' viewBox='0 0 156 135'%3E%3Cpath d='M78 0L156 34v67l-78 34L0 101V34Z' fill='none' stroke='%23786d98' stroke-width='2'/%3E%3C/svg%3E"); background-size: 156px 135px; mask-image: linear-gradient(90deg, transparent, #000 30%); }
-.v2-menu-intro, .v2-menu-links, .v2-screen-panel:has(.v2-menu-links) .v2-screen-meta { position: relative; z-index: 1; max-width: 560px; }
+.v2-menu-intro, .v2-menu-links, .v2-screen-panel:has(.v2-menu-links) .v2-screen-footer { position: relative; z-index: 1; max-width: 560px; }
+.v2-screen-panel:has(.v2-menu-links) .v2-screen-footer { margin-top: 0; background: transparent; }
 .v2-menu-intro h2 { font-size: clamp(40px, 7vw, 72px); letter-spacing: .06em; }
 .v2-menu-eyebrow { color: var(--v2-accent-text) !important; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .v2-menu-links { display: grid; gap: 10px; margin-top: 34px; }
 .v2-menu-links button { width: 100%; min-height: 58px; text-align: left; font-weight: 700; }
 .v2-level-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); gap: 18px; min-height: 0; }
+.v2-foundation .v2-level-layout { flex: none; }
 .v2-level-list { max-height: min(70dvh, 690px); grid-auto-rows: max-content; align-content: start; }
 .v2-level-choice { display: grid; gap: 2px; width: 100%; min-height: 68px; text-align: left; overflow-wrap: anywhere; }
 .v2-level-choice span { color: var(--v2-muted); font-size: 13px; line-height: 1.3; }
 .v2-level-choice[aria-pressed="true"] { border-color: var(--v2-accent-text); background: var(--v2-surface3); box-shadow: inset 4px 0 var(--v2-accent); }
 .v2-level-detail { min-width: 0; padding: 16px; border: 1px solid var(--v2-line); border-radius: 10px; background: var(--v2-surface2); }
-.v2-level-detail h2 { font-size: clamp(22px, 3vw, 30px); }
+.v2-level-detail h3 { margin: 0 0 12px; font-size: clamp(22px, 3vw, 30px); overflow-wrap: anywhere; }
 .v2-mission-map { margin: 0; overflow: hidden; border: 1px solid var(--v2-line); border-radius: 8px; background: #151b2b; }
 .v2-mission-map svg { display: block; width: 100%; height: auto; }
 .v2-preview-open { fill: #28334d; stroke: #54617b; stroke-width: 1; }
@@ -48,7 +57,7 @@ body.ui-v2-active.v2-screen-open .v2-layout { display: none; }
 .v2-preview-enemy { fill: var(--v2-danger); stroke: #102226; stroke-width: 2; }
 .v2-mission-stats { display: flex; gap: 10px; }
 .v2-mission-stats div { flex: 1; display: grid; padding: 10px; border: 1px solid var(--v2-line); border-radius: 8px; }
-.v2-mission-stats span { color: var(--v2-muted); font-size: 11px; font-weight: 700; }
+.v2-mission-stats span { color: var(--v2-muted); font-size: 12px; font-weight: 700; }
 .v2-mission-stats strong { font-size: 26px; }
 .v2-legal-text { max-height: min(62dvh, 600px); overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.55 system-ui, sans-serif; color: var(--v2-text); }
 .v2-screen-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
@@ -72,7 +81,7 @@ body.ui-v2-active.v2-screen-open .v2-layout { display: none; }
 .v2-setting-check input { width: 24px; height: 24px; }
 .v2-screen-log { max-height: min(54dvh, 440px); overflow: auto; }
 .v2-screen-log p { border-bottom: 1px solid var(--v2-line); padding: 8px 0; }
-.v2-shell { box-sizing: border-box; height: 100dvh; min-height: 0; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 12px; background: var(--v2-bg); color: var(--v2-text); font: 16px/1.4 system-ui, sans-serif; }
+.v2-shell { box-sizing: border-box; height: 100dvh; min-height: 0; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 12px; background: var(--v2-bg); color: var(--v2-text); font: 16px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
 .v2-shell * { box-sizing: border-box; }
 .v2-shell button { min-height: 44px; border: 1px solid var(--v2-line-strong); border-radius: 9px; padding: 9px 12px; background: var(--v2-surface3); color: var(--v2-text); font: inherit; cursor: pointer; }
 .v2-shell button:focus-visible, .v2-map:focus-visible { outline: 3px solid var(--v2-accent-text); outline-offset: 2px; }
@@ -159,6 +168,7 @@ body.ui-v2-active .v2-area-cost { fill: var(--v2-text); text-anchor: middle; fon
 @media (max-width: 599px) { .v2-screen-panel { max-height: calc(100dvh - 24px); } .v2-screen-actions button { flex-basis: 100%; } .v2-level-list, .v2-catalog-list { max-height: 44dvh; } .v2-catalog-entry { display: grid; } .v2-catalog-entry button { width: 100%; overflow-wrap: anywhere; } }
 @media (max-width: 360px) { .v2-map-tools { grid-template-columns: 48px 48px minmax(0, 1fr); } #v2-zoom-center { grid-column: 1 / -1; } }
 @media (max-width: 850px) { .v2-level-layout { grid-template-columns: minmax(0, 1fr); } .v2-level-list { max-height: min(44dvh, 390px); } }
+@media (min-width: 600px) and (max-height: 500px) { .v2-level-list { max-height: none; overflow: visible; } }
 @media (max-width: 599px) { .v2-screen-panel:has(.v2-menu-links) { min-height: calc(100dvh - 24px); justify-content: flex-end; padding: 24px; } .v2-screen-panel:has(.v2-menu-links)::after { inset: 0 0 48% 0; mask-image: linear-gradient(180deg, #000, transparent); } .v2-menu-intro h2 { font-size: clamp(31px, 10vw, 48px); } .v2-menu-links { margin-top: 18px; } .v2-menu-links button { min-height: 52px; } .v2-level-choice { min-height: 56px; } .v2-level-detail { padding: 12px; } }
 @media (min-width: 600px) and (max-height: 500px) {
   .v2-map-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto auto auto; }

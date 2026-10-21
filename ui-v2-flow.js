@@ -9,6 +9,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     const t = (key, params) => GoblinLanguage.t(key, params);
     let missionId = 'iron-dust', started = false, startError = '';
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
+    const focusMemory = new Map(), scrollMemory = new Map();
     const waiting = [];
     globalThis.GoblinV2PauseGate = Object.freeze({
       whenResumed: () => pauseActive ? new Promise(resolve => waiting.push(resolve)) : Promise.resolve()
@@ -44,7 +45,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       return node;
     }
     function heading(copy) {
-      const node = document.createElement('h2'); node.textContent = copy; return node;
+      const node = document.createElement('h2'); node.id = 'v2-screen-heading'; node.tabIndex = -1;
+      node.textContent = copy; return node;
     }
     function actions(...nodes) {
       const row = document.createElement('div'); row.className = 'v2-screen-actions';
@@ -108,6 +110,14 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function show(next, focus = true) {
       const previous = screen;
+      const active = document.activeElement;
+      if (previous === 'levels') focusMemory.set(previous, `v2-level-${missionId}`);
+      else if (surface.contains(active) && active.id) focusMemory.set(previous, active.id);
+      const currentPanel = surface.querySelector('.v2-screen-panel');
+      if (currentPanel) scrollMemory.set(previous, {
+        panel: currentPanel.scrollTop,
+        list: currentPanel.querySelector('.v2-level-list')?.scrollTop || 0
+      });
       if (previous === 'play' && next !== 'play') playScrollY = globalThis.scrollY;
       screen = next;
       const overlay = next !== 'play';
@@ -198,24 +208,36 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (screen === 'play') return;
       const lastFocus = focus ? null : document.activeElement?.id;
       const lastIndex = focus ? -1 : [...surface.querySelectorAll('button, select, input')].indexOf(document.activeElement);
+      const currentPanel = surface.querySelector('.v2-screen-panel');
+      if (!focus && currentPanel) scrollMemory.set(screen, {
+        panel: currentPanel.scrollTop,
+        list: currentPanel.querySelector('.v2-level-list')?.scrollTop || 0
+      });
       const panel = document.createElement('div'); panel.className = 'v2-screen-panel';
+      if (['menu', 'levels', 'options'].includes(screen)) panel.classList.add('v2-foundation');
       surface.replaceChildren(panel);
+      surface.setAttribute('aria-labelledby', 'v2-screen-heading');
       const state = GoblinUIV2.project();
       if (screen === 'menu') {
         const intro = document.createElement('div'); intro.className = 'v2-menu-intro';
+        intro.classList.add('v2-screen-header');
         intro.append(paragraph(t('ui.start.eyebrow'), 'v2-menu-eyebrow'), heading(t('ui.start.title')),
           paragraph(t('ui.start.subtitle')));
-        const menu = document.createElement('nav'); menu.className = 'v2-menu-links';
+        const menu = document.createElement('nav'); menu.className = 'v2-menu-links v2-screen-main';
         menu.setAttribute('aria-label', t('ui.start.title'));
-        menu.append(button(t('ui.start.choose'), () => show('levels'), 'primary'),
-          button(t('ui.details.units'), () => openSection('catalog')),
-          button(t('ui.nav.settings'), () => openSection('options')),
-          button(t('v2.ui.legalNotices'), () => openSection('legal')));
-        panel.append(intro, menu);
-        panel.append(paragraph(document.querySelector('#build-version').textContent, 'v2-screen-meta'));
+        const choose = button(t('ui.start.choose'), () => show('levels'), 'primary'); choose.id = 'v2-menu-choose';
+        const units = button(t('ui.details.units'), () => openSection('catalog')); units.id = 'v2-menu-units';
+        const settings = button(t('ui.nav.settings'), () => openSection('options')); settings.id = 'v2-menu-settings';
+        const legal = button(t('v2.ui.legalNotices'), () => openSection('legal')); legal.id = 'v2-menu-legal';
+        menu.append(choose, units, settings, legal);
+        const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
+        footer.append(paragraph(document.querySelector('#build-version').textContent, 'v2-screen-meta'));
+        panel.append(intro, menu, footer);
       } else if (screen === 'levels') {
-        panel.append(heading(t('ui.levels.title')));
-        const layout = document.createElement('div'); layout.className = 'v2-level-layout';
+        const header = document.createElement('header'); header.className = 'v2-screen-header';
+        header.append(heading(t('ui.levels.title')));
+        panel.append(header);
+        const layout = document.createElement('div'); layout.className = 'v2-level-layout v2-screen-main';
         const list = document.createElement('div'); list.className = 'v2-level-list';
         const ids = [...Object.keys(ScenarioRuleProfiles.entries), 'iron-dust-v2'];
         if (!ids.includes(missionId)) missionId = ids[0];
@@ -236,11 +258,17 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         }
         const detail = document.createElement('section'); detail.className = 'v2-level-detail';
         detail.setAttribute('aria-label', t(`mission.${missionId}.title`));
-        detail.append(heading(t(`mission.${missionId}.title`)), missionPreview(missionId),
+        const detailTitle = document.createElement('h3'); detailTitle.textContent = t(`mission.${missionId}.title`);
+        detail.append(detailTitle, missionPreview(missionId),
           paragraph(t(missionId === 'iron-dust-v2' ? 'v2.objective' : `mission.${missionId}.objective.short`)),
-          missionStats(missionId), actions(button(t('ui.levels.select'), () => show('briefing'), 'primary')));
+          missionStats(missionId));
         layout.append(list, detail);
-        panel.append(layout, actions(button(t('ui.nav.back'), () => show('menu'))));
+        const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
+        const back = button(t('ui.nav.back'), () => show('menu')); back.id = 'v2-levels-back';
+        const select = button(t('ui.levels.select'), () => show('briefing'), 'primary');
+        select.id = 'v2-levels-select';
+        footer.append(actions(back, select));
+        panel.append(layout, footer);
       } else if (screen === 'briefing') {
         const core = missionId === 'iron-dust-v2';
         panel.append(heading(t(`mission.${missionId}.title`)),
@@ -301,7 +329,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           .then(copy => { if (notice.isConnected) notice.textContent = copy; })
           .catch(() => { if (notice.isConnected) notice.textContent = t('v2.ui.legalUnavailable'); });
       } else if (screen === 'options') {
-        panel.append(heading(t('ui.nav.settings')));
+        const header = document.createElement('header'); header.className = 'v2-screen-header';
+        header.append(heading(t('ui.nav.settings')));
+        const content = document.createElement('div'); content.className = 'v2-screen-main';
         const language = document.createElement('label');
         language.textContent = t('ui.settings.language');
         const languageSelect = document.createElement('select'); languageSelect.id = 'v2-language';
@@ -318,14 +348,24 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         gridInput.checked = GoblinUIV2.gridVisible;
         gridInput.onchange = () => GoblinUIV2.setGridVisible(gridInput.checked);
         grid.append(gridInput, document.createTextNode(t('ui.settings.grid')));
-        panel.append(language, grid, paragraph(t('ui.settings.note')),
-          actions(button(t('ui.nav.back'), goBack)));
+        content.append(language, grid, paragraph(t('ui.settings.note')));
+        const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
+        const back = button(t('ui.nav.back'), goBack); back.id = 'v2-options-back';
+        footer.append(actions(back));
+        panel.append(header, content, footer);
       }
-      if (focus) panel.querySelector('button:not(:disabled),select')?.focus({ preventScroll: true });
-      else {
-        const controls = [...panel.querySelectorAll('button, select, input')];
-        (lastFocus && panel.querySelector(`#${lastFocus}`) || controls[lastIndex])?.focus({ preventScroll: true });
+      const savedScroll = scrollMemory.get(screen);
+      if (savedScroll) {
+        panel.scrollTop = savedScroll.panel;
+        const list = panel.querySelector('.v2-level-list');
+        if (list) list.scrollTop = savedScroll.list;
       }
+      const controls = [...panel.querySelectorAll('button:not(:disabled), select, input')];
+      const targetId = focus ? focusMemory.get(screen) : lastFocus;
+      const target = targetId && document.getElementById(targetId);
+      const fallback = focus ? controls[0] : controls[lastIndex];
+      (target && panel.contains(target) ? target : fallback || panel.querySelector('#v2-screen-heading'))
+        ?.focus({ preventScroll: true });
     }
     document.querySelector('#v2-pause').onclick = enterPause;
     new MutationObserver(() => { if (screen === 'levels') renderScreen(false); })
