@@ -356,7 +356,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         choice.setAttribute('aria-pressed', String(libraryArtSide === side));
         artSwitch.append(choice);
       }
-      detail.append(artSwitch, header, values, tabs, body, mapRow);
+      detail.append(header, values, artSwitch, tabs, body, mapRow);
       return detail;
     }
     function findUnit(id) {
