@@ -59,8 +59,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         turn, phase, turnPhase, gameOver, objective: structuredClone(objective),
         ready: phase === 'player' && !gameOver ? phaseReadyUnits().length : 0,
         undo: { available: phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },
-        units: units.map(({ id, name, type, team, x, y, hp, maxHp, disabled, embarkedOn, core, infantry, transportCapacity, strategicMissile, missilesRemaining }) =>
+        units: units.map(({ id, name, type, team, x, y, hp, maxHp, attack, defense, move, range, damage, disabled, embarkedOn, core, infantry, transportCapacity, strategicMissile, missilesRemaining }) =>
           ({ id, name, type, team, x, y, hp, maxHp, disabled: !!disabled, embarkedOn: embarkedOn || null,
+            attack: attack ?? damage ?? null, defense: defense ?? null, move: move ?? null, range: range ?? null,
             core: !!core, infantry: !!infantry, transportCapacity: transportCapacity || 0, strategicMissile: !!strategicMissile,
             missilesRemaining: missilesRemaining ?? null })),
         systems: units.filter(unit => unit.team === 'player' && unit.ogreSystems)

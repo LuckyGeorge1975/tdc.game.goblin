@@ -73,7 +73,7 @@ export function buildIronDustV2View(projection, ruleProfileId,
   const units = state.units.map(unit => ({
     id:unit.id, name:unit.name, type:unit.type, team:unit.team, icon:unit.icon,
     x:unit.x, y:unit.y, hp:unit.hp, maxHp:unit.maxHp, defense:unit.defense,
-    move:unit.move ?? null, range:unit.range ?? null,
+    move:unit.move ?? null, range:unit.range ?? null, attack:unit.damage ?? null,
     disabled:unit.disabled, moved:unit.moved, fired:unit.fired,
     secondMoved:unit.secondMoved, embarkedOn:unit.embarkedOn,
     terrain:terrain.get(`${unit.x},${unit.y}`) ?? state.map.defaultTerrain,

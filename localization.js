@@ -12,7 +12,10 @@
     const briefingResponse = await fetch(new URL(`briefing-01.${lang}.json`, catalogBase));
     if (!briefingResponse.ok) throw Error(`BRIEFING-01 ${lang}: HTTP ${briefingResponse.status}`);
     const briefing = await briefingResponse.json();
-    contentCatalogs[lang] = { ...catalog.messages, ...briefing.messages };
+    const libraryResponse = await fetch(new URL(`library-01.${lang}.json`, catalogBase));
+    if (!libraryResponse.ok) throw Error(`LIBRARY-01 ${lang}: HTTP ${libraryResponse.status}`);
+    const library = await libraryResponse.json();
+    contentCatalogs[lang] = { ...catalog.messages, ...briefing.messages, ...library.messages };
   })).then(() => true, (error) => { console.error('Localization catalog unavailable:', error); return false; });
   const messages = new Map();
   const add = (source, de, en, es, fr) => messages.set(source, { de, en, es, fr });

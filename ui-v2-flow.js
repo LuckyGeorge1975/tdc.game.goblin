@@ -9,6 +9,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     const t = (key, params) => GoblinLanguage.t(key, params);
     let missionId = 'iron-dust', started = false, startError = '';
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
+    let libraryIndex = 0, libraryTab = 'values';
     const focusMemory = new Map(), scrollMemory = new Map();
     const waiting = [];
     globalThis.GoblinV2PauseGate = Object.freeze({
@@ -143,7 +144,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const currentPanel = surface.querySelector('.v2-screen-panel');
       if (currentPanel) scrollMemory.set(previous, {
         panel: currentPanel.scrollTop,
-        list: currentPanel.querySelector('.v2-level-list')?.scrollTop || 0
+        list: currentPanel.querySelector('.v2-level-list, .v2-library-list')?.scrollTop || 0,
+        libraryLayout: currentPanel.querySelector('.v2-library-layout')?.scrollTop || 0
       });
       if (previous === 'play' && next !== 'play') playScrollY = globalThis.scrollY;
       screen = next;
@@ -234,9 +236,111 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       show('play');
       releasePause();
     }
-    function openGuide(index = 0) {
-      guideIndex = index;
-      openUnitGuide();
+    function libraryAssetId(entry) { return UnitVisuals.artKey(entry); }
+    function libraryName(entry) {
+      return t(`library.unit.${libraryAssetId(entry)}.name`);
+    }
+    function libraryValue(value) {
+      if (value === 'BY SYSTEM') return t('screen.library.value.bySystem');
+      if (value === '1 / squad') return `1 / ${t('screen.library.value.perSquad')}`;
+      return value;
+    }
+    function openLibraryEntry(index) {
+      libraryIndex = index;
+      libraryTab = 'values';
+      if (matchMedia('(max-width: 900px)').matches) show('catalog-detail');
+      else renderScreen(false);
+    }
+    function returnToLibrary() {
+      show('catalog', false);
+      const row = document.getElementById(`v2-library-${libraryAssetId(unitGuideEntries[libraryIndex])}`);
+      row?.scrollIntoView({block:'nearest'});
+      const viewport = row?.closest('.v2-library-layout');
+      if (viewport && matchMedia('(max-width: 900px)').matches) {
+        const target = row.getBoundingClientRect(), area = viewport.getBoundingClientRect();
+        if (target.bottom > area.bottom) viewport.scrollTop += target.bottom - area.bottom + 2;
+        else if (target.top < area.top) viewport.scrollTop -= area.top - target.top + 2;
+      }
+      row?.focus({preventScroll:true});
+    }
+    function libraryTarget(entry, state) {
+      if (!started || state.gameOver || !['play', 'pause', 'catalog', 'catalog-detail'].includes(returnScreen))
+        return {reason:'screen.library.mapUnavailable.noMission'};
+      const match = state.units.find(unit => state.scenario === 'iron-dust-v2'
+        ? unit.id === entry.coreUnitId : unit.name === entry.name);
+      if (!match) return {reason:'screen.library.mapUnavailable.notPresent'};
+      if (match.hp <= 0) return {unit:match,reason:'screen.library.mapUnavailable.destroyed'};
+      return {unit:match};
+    }
+    function libraryDetail(entry, index, state, mobile) {
+      const target = libraryTarget(entry, state);
+      const live = target.unit;
+      const detail = document.createElement('section'); detail.className = 'v2-library-detail';
+      const title = mobile ? heading(libraryName(entry)) : document.createElement('h3');
+      if (!mobile) title.textContent = libraryName(entry);
+      const header = document.createElement('div'); header.className = 'v2-library-detail-head';
+      const art = UnitVisuals.assetFor(entry, 'library', 'png') || UnitVisuals.resolve(entry).asset;
+      if (art) {
+        const figure = document.createElement('figure'); figure.className = 'v2-library-art';
+        const picture = document.createElement('picture');
+        const webp = UnitVisuals.assetFor(entry, 'library', 'webp');
+        if (webp) {
+          const source = document.createElement('source'); source.srcset = webp; source.type = 'image/webp';
+          picture.append(source);
+        }
+        const image = document.createElement('img'); image.src = art; image.alt = '';
+        const caption = document.createElement('figcaption'); caption.textContent = libraryName(entry);
+        picture.append(image); figure.append(picture, caption); header.append(figure);
+      }
+      const identity = document.createElement('div'); identity.className = 'v2-library-identity';
+      identity.append(title, paragraph(t('screen.library.category'), 'v2-library-category'),
+        paragraph(GoblinLanguage.translate(entry.role)),
+        paragraph(GoblinLanguage.translate(entry.team), 'v2-library-team'));
+      header.append(identity);
+      const values = document.createElement('dl'); values.className = 'v2-library-values';
+      const system = !!live && (!!live.weapons || !!state.systems.find(item => item.id === live.id));
+      for (const [key, value] of [['attack',system ? t('v2.ui.byWeapon') : live?.attack ?? entry.attack],
+        ['defense',system ? t('screen.library.value.bySystem') : live?.defense ?? entry.defense],
+        ['move',live?.move ?? entry.move],
+        ['range',system ? t('v2.ui.byWeapon') : live?.range ?? entry.range]]) {
+        const field = document.createElement('div');
+        const label = document.createElement('dt'); label.textContent = t(`v2.ui.${key}`);
+        const number = document.createElement('dd'); number.textContent = libraryValue(value);
+        field.append(label, number); values.append(field);
+      }
+      const tabs = document.createElement('div'); tabs.className = 'v2-library-tabs';
+      for (const [tab, key] of [['values','screen.library.tab.valuesNote'],
+        ['range','screen.library.tab.range']]) {
+        const item = button(t(key), () => { libraryTab = tab; renderScreen(false); });
+        item.id = `v2-library-tab-${tab}`;
+        item.setAttribute('aria-pressed', String(libraryTab === tab));
+        tabs.append(item);
+      }
+      const body = document.createElement('div'); body.className = 'v2-library-detail-body';
+      if (libraryTab === 'values') {
+        const hpValue = system ? t('screen.library.value.bySystem') : live
+          ? `${Math.max(0, live.hp)}/${live.maxHp}` : entry.hp === 'SYSTEMS'
+            ? t('screen.library.value.bySystem') : entry.hp;
+        body.append(paragraph(`${t('v2.ui.armorHp')}: ${hpValue}`, 'v2-library-hp'));
+        body.append(paragraph(GoblinLanguage.translate(entry.copy)));
+        if (entry.move.includes('+')) body.append(paragraph(t('screen.library.value.skimmerManeuver')));
+      } else {
+        const profile = UnitGuideRange.profile(entry, null);
+        for (const [mode, key] of [['move','v2.ui.move'], ['attack','v2.ui.attack']]) {
+          const figure = document.createElement('figure'); figure.className = 'v2-library-range';
+          const caption = document.createElement('figcaption'); caption.textContent = t(key);
+          figure.innerHTML = UnitGuideRange.mapSvg(profile, mode);
+          figure.prepend(caption); body.append(figure);
+        }
+        body.append(paragraph(t('v2.ui.catalogNote')));
+      }
+      const find = button(t('screen.library.showOnMap'), () => findUnit(target.unit.id));
+      find.id = 'v2-library-find'; find.disabled = !!target.reason;
+      const mapRow = document.createElement('div'); mapRow.className = 'v2-library-map-action';
+      mapRow.append(find);
+      if (target.reason) mapRow.append(paragraph(t(target.reason), 'v2-library-unavailable'));
+      detail.append(header, values, tabs, body, mapRow);
+      return detail;
     }
     function findUnit(id) {
       const unit = GoblinUIV2.project().units.find(item => item.id === id && item.hp > 0);
@@ -253,11 +357,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const currentPanel = surface.querySelector('.v2-screen-panel');
       if (!focus && currentPanel?.dataset.screen === screen) scrollMemory.set(screen, {
         panel: currentPanel.scrollTop,
-        list: currentPanel.querySelector('.v2-level-list')?.scrollTop || 0
+        list: currentPanel.querySelector('.v2-level-list, .v2-library-list')?.scrollTop || 0,
+        libraryLayout: currentPanel.querySelector('.v2-library-layout')?.scrollTop || 0
       });
       const panel = document.createElement('div'); panel.className = 'v2-screen-panel';
       panel.dataset.screen = screen;
-      if (['menu', 'levels', 'options', 'briefing'].includes(screen)) panel.classList.add('v2-foundation');
+      if (['menu', 'levels', 'options', 'briefing', 'catalog', 'catalog-detail'].includes(screen))
+        panel.classList.add('v2-foundation');
       surface.replaceChildren(panel);
       surface.setAttribute('aria-labelledby', 'v2-screen-heading');
       const state = GoblinUIV2.project();
@@ -367,24 +473,42 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           .forEach(line => entries.append(paragraph(line)));
         panel.append(entries, actions(button(t('ui.nav.back'), () => show('end'))));
       } else if (screen === 'catalog') {
-        panel.append(heading(GoblinLanguage.translate('UNIT GUIDE')), paragraph(t('v2.ui.catalogNote')));
-        const list = document.createElement('div'); list.className = 'v2-catalog-list';
+        const header = document.createElement('header'); header.className = 'v2-screen-header';
+        header.append(heading(GoblinLanguage.translate('UNIT GUIDE')),
+          paragraph(t('v2.ui.catalogNote')));
+        const layout = document.createElement('div'); layout.className = 'v2-library-layout v2-screen-main';
+        const list = document.createElement('div'); list.className = 'v2-library-list';
         unitGuideEntries.forEach((entry, index) => {
-          const item = button(GoblinLanguage.translate(entry.name), () => openGuide(index));
+          const item = button(libraryName(entry), () => openLibraryEntry(index), 'v2-library-choice');
+          item.id = `v2-library-${libraryAssetId(entry)}`;
+          item.setAttribute('aria-current', index === libraryIndex ? 'true' : 'false');
           const asset = UnitVisuals.resolve(entry).asset;
           if (asset) {
             const img = document.createElement('img'); img.src = asset; img.alt = '';
             item.prepend(img);
           }
-          const live = started ? state.units.find(unit =>
-            (state.scenario === 'iron-dust-v2' ? unit.id === entry.coreUnitId : unit.name === entry.name) && unit.hp > 0) : null;
-          if (live) {
-            const row = document.createElement('div'); row.className = 'v2-catalog-entry';
-            row.append(item, button(t('v2.ui.find'), () => findUnit(live.id)));
-            list.append(row);
-          } else list.append(item);
+          list.append(item);
         });
-        panel.append(list, actions(button(t('ui.nav.back'), goBack)));
+        layout.append(list, libraryDetail(unitGuideEntries[libraryIndex], libraryIndex, state, false));
+        const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
+        const back = button(t('ui.nav.back'), goBack); back.id = 'v2-library-exit';
+        footer.append(actions(back));
+        panel.append(header, layout, footer);
+      } else if (screen === 'catalog-detail') {
+        const detail = libraryDetail(unitGuideEntries[libraryIndex], libraryIndex, state, true);
+        const footer = document.createElement('footer'); footer.className = 'v2-screen-footer v2-library-footer';
+        const back = button(t('screen.library.back'), returnToLibrary); back.id = 'v2-library-back';
+        const count = paragraph(t('screen.library.count', {current:libraryIndex + 1,
+          total:unitGuideEntries.length}), 'v2-library-count');
+        const next = button(t('screen.library.next'), () => {
+          libraryIndex = (libraryIndex + 1) % unitGuideEntries.length;
+          libraryTab = 'values';
+          renderScreen(false);
+        });
+        next.id = 'v2-library-next';
+        const mapAction = detail.querySelector('.v2-library-map-action');
+        footer.append(actions(back, count, next), mapAction);
+        panel.append(detail, footer);
       } else if (screen === 'legal') {
         panel.append(heading(t('v2.ui.legalNotices')),
           paragraph(t('v2.ui.legalEnglish'), 'v2-screen-meta'));
@@ -424,8 +548,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const savedScroll = scrollMemory.get(screen);
       if (savedScroll) {
         panel.scrollTop = savedScroll.panel;
-        const list = panel.querySelector('.v2-level-list');
+        const list = panel.querySelector('.v2-level-list, .v2-library-list');
         if (list) list.scrollTop = savedScroll.list;
+        const libraryLayout = panel.querySelector('.v2-library-layout');
+        if (libraryLayout) libraryLayout.scrollTop = savedScroll.libraryLayout || 0;
       }
       const controls = [...panel.querySelectorAll('button:not(:disabled), select, input')];
       const targetId = focus ? focusMemory.get(screen) : lastFocus;
@@ -449,6 +575,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (screen !== 'play' && event.key === 'Escape' && !GameDialogs.isOpen() && document.querySelector('#unit-guide-modal').classList.contains('hidden')) {
         if (screen === 'options' || screen === 'catalog' || screen === 'legal') goBack();
         else if (screen === 'briefing') returnToSelectedLevel();
+        else if (screen === 'catalog-detail') returnToLibrary();
         else if (screen === 'levels') show('menu');
         else if (screen === 'pause') { show('play'); releasePause(); }
         else if (screen === 'log') show('end');
