@@ -209,11 +209,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const lastFocus = focus ? null : document.activeElement?.id;
       const lastIndex = focus ? -1 : [...surface.querySelectorAll('button, select, input')].indexOf(document.activeElement);
       const currentPanel = surface.querySelector('.v2-screen-panel');
-      if (!focus && currentPanel) scrollMemory.set(screen, {
+      if (!focus && currentPanel?.dataset.screen === screen) scrollMemory.set(screen, {
         panel: currentPanel.scrollTop,
         list: currentPanel.querySelector('.v2-level-list')?.scrollTop || 0
       });
       const panel = document.createElement('div'); panel.className = 'v2-screen-panel';
+      panel.dataset.screen = screen;
       if (['menu', 'levels', 'options'].includes(screen)) panel.classList.add('v2-foundation');
       surface.replaceChildren(panel);
       surface.setAttribute('aria-labelledby', 'v2-screen-heading');
