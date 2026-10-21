@@ -150,9 +150,13 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         }
         if (command.type === 'Fire' && actor.ogreSystems && !SiegebreakerWeapons.selectWeapon(actor, command.weaponKey))
           return { ok: false, reason: t('ui.error.NO_ATTACKABLE_TARGET') };
+        const firingWeapon = command.type === 'Fire' && actor.ogreSystems?.weapons[command.weaponKey];
+        const readyBefore = firingWeapon ? GoblinSystems.weaponReady(firingWeapon) : null;
         const beforeHex = revision();
         // handleHex is the final, command-history-wrapped Legacy path and checks again.
         handleHex(command.x, command.y);
+        if (firingWeapon && GoblinSystems.weaponReady(firingWeapon) < readyBefore)
+          view.previewWeaponKey = null;
         return revision() !== beforeHex ? { ok: true } : { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       } finally { view.busy = false; render(); }
     }
