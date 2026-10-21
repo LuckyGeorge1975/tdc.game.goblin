@@ -9,7 +9,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     const t = (key, params) => GoblinLanguage.t(key, params);
     let missionId = 'iron-dust', started = false, startError = '';
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
-    let libraryIndex = 0, libraryTab = 'values';
+    let libraryIndex = 0, libraryTab = 'values', libraryArtSide = 'own';
     const focusMemory = new Map(), scrollMemory = new Map();
     const waiting = [];
     globalThis.GoblinV2PauseGate = Object.freeze({
@@ -279,17 +279,22 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const title = mobile ? heading(libraryName(entry)) : document.createElement('h3');
       if (!mobile) title.textContent = libraryName(entry);
       const header = document.createElement('div'); header.className = 'v2-library-detail-head';
-      const art = UnitVisuals.assetFor(entry, 'library', 'png') || UnitVisuals.resolve(entry).asset;
+      const artId = libraryAssetId(entry);
+      const enemyArt = `assets/unit-art/sets/02-technical-illustration/library-enemy/${artId}`;
+      const art = libraryArtSide === 'enemy' ? `${enemyArt}@768.png`
+        : UnitVisuals.assetFor(entry, 'library', 'png') || UnitVisuals.resolve(entry).asset;
       if (art) {
         const figure = document.createElement('figure'); figure.className = 'v2-library-art';
         const picture = document.createElement('picture');
-        const webp = UnitVisuals.assetFor(entry, 'library', 'webp');
+        const webp = libraryArtSide === 'enemy' ? `${enemyArt}@1024.webp`
+          : UnitVisuals.assetFor(entry, 'library', 'webp');
         if (webp) {
           const source = document.createElement('source'); source.srcset = webp; source.type = 'image/webp';
           picture.append(source);
         }
         const image = document.createElement('img'); image.src = art; image.alt = '';
-        const caption = document.createElement('figcaption'); caption.textContent = libraryName(entry);
+        const caption = document.createElement('figcaption');
+        caption.textContent = `${libraryName(entry)} · ${t(`v2.ui.preview.${libraryArtSide}`)}`;
         picture.append(image); figure.append(picture, caption); header.append(figure);
       }
       const identity = document.createElement('div'); identity.className = 'v2-library-identity';
@@ -339,7 +344,19 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const mapRow = document.createElement('div'); mapRow.className = 'v2-library-map-action';
       mapRow.append(find);
       if (target.reason) mapRow.append(paragraph(t(target.reason), 'v2-library-unavailable'));
-      detail.append(header, values, tabs, body, mapRow);
+      const artSwitch = document.createElement('div'); artSwitch.className = 'v2-library-art-switch';
+      for (const side of ['own', 'enemy']) {
+        const choice = button(t(`v2.ui.preview.${side}`), () => {
+          if (libraryArtSide === side) return;
+          libraryArtSide = side;
+          renderScreen(false);
+          document.getElementById(`v2-library-art-${side}`)?.focus({preventScroll:true});
+        });
+        choice.id = `v2-library-art-${side}`;
+        choice.setAttribute('aria-pressed', String(libraryArtSide === side));
+        artSwitch.append(choice);
+      }
+      detail.append(artSwitch, header, values, tabs, body, mapRow);
       return detail;
     }
     function findUnit(id) {
@@ -489,7 +506,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           }
           list.append(item);
         });
-        layout.append(list, libraryDetail(unitGuideEntries[libraryIndex], libraryIndex, state, false));
+        layout.append(list);
+        if (!matchMedia('(max-width: 900px)').matches)
+          layout.append(libraryDetail(unitGuideEntries[libraryIndex], libraryIndex, state, false));
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-library-exit';
         footer.append(actions(back));

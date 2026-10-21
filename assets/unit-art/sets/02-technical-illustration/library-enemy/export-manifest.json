@@ -1,0 +1,1861 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Approved enemy Unit Guide source masters converted to runtime-sized derivative candidates; no runtime integration",
+  "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+  "tool": {
+    "name": "Pillow",
+    "version": "12.3.0",
+    "webpLibraryVersion": "1.6.0"
+  },
+  "processing": {
+    "canvas": "Full RGBA master canvas; no bounding-box crop, color edit, overlay or compositing",
+    "resize": "Pillow Image.Resampling.LANCZOS from 1536x1024 master for each output independently",
+    "png": {
+      "size": [
+        768,
+        512
+      ],
+      "optimize": true,
+      "compressLevel": 9
+    },
+    "webp": {
+      "size": [
+        1024,
+        683
+      ],
+      "quality": 88,
+      "method": 6,
+      "lossless": false,
+      "exact": true
+    }
+  },
+  "totals": {
+    "sourceBytes": 44029682,
+    "pngBytes": 7688680,
+    "webpBytes": 2360372,
+    "pngDecodedRgbaBytes": 40894464,
+    "webpDecodedRgbaBytes": 72736768
+  },
+  "entries": [
+    {
+      "id": "goblin-siegebreaker",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/goblin-siegebreaker.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          164,
+          132,
+          1375,
+          877
+        ],
+        "anyAlphaBounds": [
+          159,
+          76,
+          1389,
+          958
+        ],
+        "alphaEdgeMargin": 132,
+        "bytes": 1743528,
+        "sha256": "17979a6a00f09a07fa289cb69cb9a1c7d72e01c1b39670ec2e7501ce2458bcf6"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/goblin-siegebreaker@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          82,
+          67,
+          687,
+          439
+        ],
+        "anyAlphaBounds": [
+          79,
+          63,
+          690,
+          441
+        ],
+        "alphaEdgeMargin": 67,
+        "bytes": 316844,
+        "sha256": "3e36bd8d60e7b79a51c8c9985f79f675c49098f452e93a9419701d89ce020771"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/goblin-siegebreaker@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          110,
+          89,
+          917,
+          585
+        ],
+        "anyAlphaBounds": [
+          106,
+          79,
+          926,
+          630
+        ],
+        "alphaEdgeMargin": 89,
+        "bytes": 98200,
+        "sha256": "4589f26b28e2eb341bfeea9ba1971b56da06c646802140d5b52368582595b404"
+      }
+    },
+    {
+      "id": "skimmer-scout",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/skimmer-scout.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          156,
+          153,
+          1382,
+          839
+        ],
+        "anyAlphaBounds": [
+          101,
+          68,
+          1508,
+          1005
+        ],
+        "alphaEdgeMargin": 153,
+        "bytes": 1547073,
+        "sha256": "e69cebdc81a4464edc20eba32632d4a88b9632715077ec91431ef7cf73277e07"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/skimmer-scout@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          78,
+          77,
+          691,
+          420
+        ],
+        "anyAlphaBounds": [
+          75,
+          74,
+          693,
+          485
+        ],
+        "alphaEdgeMargin": 77,
+        "bytes": 248902,
+        "sha256": "4ded8c783c4812e4ecf2a724c7ed20448789e46b4b4fd6ce51b744e84fd00643"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/skimmer-scout@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          104,
+          102,
+          921,
+          560
+        ],
+        "anyAlphaBounds": [
+          102,
+          45,
+          924,
+          667
+        ],
+        "alphaEdgeMargin": 102,
+        "bytes": 75886,
+        "sha256": "5a0306482e4bec3c9d55065af26f443c6f35a9dbdc2c8911a2d8aff3a141f3c8"
+      }
+    },
+    {
+      "id": "rocket-artillery",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/rocket-artillery.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          240,
+          160,
+          1305,
+          915
+        ],
+        "anyAlphaBounds": [
+          129,
+          65,
+          1468,
+          1006
+        ],
+        "alphaEdgeMargin": 109,
+        "bytes": 1750439,
+        "sha256": "c56375fdba199f4604611129547eeaa420e93acac7e88e54100d71a28a868a19"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/rocket-artillery@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          120,
+          80,
+          653,
+          457
+        ],
+        "anyAlphaBounds": [
+          117,
+          77,
+          655,
+          460
+        ],
+        "alphaEdgeMargin": 55,
+        "bytes": 312239,
+        "sha256": "859b34e10873fecc62d6464a3fb57871a78d720dcf17f1275336e8d31a217797"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/rocket-artillery@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          160,
+          107,
+          870,
+          610
+        ],
+        "anyAlphaBounds": [
+          86,
+          43,
+          979,
+          671
+        ],
+        "alphaEdgeMargin": 73,
+        "bytes": 90144,
+        "sha256": "19bef0501d214180f242830d0d1e697183b4fc635ac4d873636bcbd338857c87"
+      }
+    },
+    {
+      "id": "infantry-squad",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/infantry-squad.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          66,
+          130,
+          1470,
+          883
+        ],
+        "anyAlphaBounds": [
+          25,
+          77,
+          1473,
+          996
+        ],
+        "alphaEdgeMargin": 66,
+        "bytes": 1775233,
+        "sha256": "0ce6c9bec5eae48d7f5775ad8f1c3f05dbc8f9beb4017591a490fc19ec969320"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/infantry-squad@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          33,
+          65,
+          735,
+          442
+        ],
+        "anyAlphaBounds": [
+          30,
+          62,
+          738,
+          496
+        ],
+        "alphaEdgeMargin": 33,
+        "bytes": 321446,
+        "sha256": "0692de0c4ad3aee93719c60be2a9125bdb8d9dce1c640e3b3899bd837b967e34"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/infantry-squad@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          44,
+          87,
+          980,
+          589
+        ],
+        "anyAlphaBounds": [
+          17,
+          58,
+          983,
+          662
+        ],
+        "alphaEdgeMargin": 44,
+        "bytes": 107546,
+        "sha256": "f1ae07f22612bbebbbc98080104e931c1a92bc02a8e5a36fc594ff2b2e807698"
+      }
+    },
+    {
+      "id": "assault-tank",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/assault-tank.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          144,
+          156,
+          1390,
+          889
+        ],
+        "anyAlphaBounds": [
+          0,
+          73,
+          1498,
+          1000
+        ],
+        "alphaEdgeMargin": 135,
+        "bytes": 1684547,
+        "sha256": "926b51c8dd7213362aac321a21fb1c3bd607d815b59132b500b8783aada40ff2"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/assault-tank@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          72,
+          78,
+          695,
+          445
+        ],
+        "anyAlphaBounds": [
+          0,
+          42,
+          698,
+          495
+        ],
+        "alphaEdgeMargin": 67,
+        "bytes": 287422,
+        "sha256": "9fc814f7dddf634cb1e888114513f4387b52fd461d8eef94adb348131e757825"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/assault-tank@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          96,
+          104,
+          927,
+          593
+        ],
+        "anyAlphaBounds": [
+          0,
+          53,
+          999,
+          666
+        ],
+        "alphaEdgeMargin": 90,
+        "bytes": 85290,
+        "sha256": "b83319fe6fba2311158bd378bdb29192a282133117ca670bf402da513262a4b9"
+      }
+    },
+    {
+      "id": "recon-tank",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/recon-tank.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          201,
+          161,
+          1341,
+          892
+        ],
+        "anyAlphaBounds": [
+          0,
+          64,
+          1498,
+          1024
+        ],
+        "alphaEdgeMargin": 132,
+        "bytes": 1558134,
+        "sha256": "d0295b97ff06a3d3c1bdc2161e905014dd6d65468bc05d52c9869500559b0718"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/recon-tank@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          100,
+          80,
+          671,
+          446
+        ],
+        "anyAlphaBounds": [
+          97,
+          78,
+          699,
+          463
+        ],
+        "alphaEdgeMargin": 66,
+        "bytes": 271734,
+        "sha256": "1f4a97c3a3ae0a26668b9d782ae47655893542ad05068067f994232c0b4f767b"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/recon-tank@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          134,
+          107,
+          894,
+          595
+        ],
+        "anyAlphaBounds": [
+          0,
+          57,
+          932,
+          683
+        ],
+        "alphaEdgeMargin": 88,
+        "bytes": 78414,
+        "sha256": "1655480d63125f82a77f3dfd8bc3dcc46084f842c7a9b914e229192fa09be493"
+      }
+    },
+    {
+      "id": "siege-tank",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/siege-tank.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          201,
+          155,
+          1354,
+          883
+        ],
+        "anyAlphaBounds": [
+          27,
+          87,
+          1444,
+          904
+        ],
+        "alphaEdgeMargin": 141,
+        "bytes": 1675503,
+        "sha256": "ad6f67c7b2b0239b2a66ec76e4bcdd11fdd3e32d45de6ce4e0baab3712ab3fa4"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/siege-tank@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          101,
+          77,
+          677,
+          442
+        ],
+        "anyAlphaBounds": [
+          98,
+          75,
+          680,
+          444
+        ],
+        "alphaEdgeMargin": 70,
+        "bytes": 297863,
+        "sha256": "2ac5f8ac85db0156ce520d79f701c853de142a36d63e43ca448d3e9d2052555b"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/siege-tank@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          134,
+          103,
+          903,
+          589
+        ],
+        "anyAlphaBounds": [
+          18,
+          58,
+          963,
+          602
+        ],
+        "alphaEdgeMargin": 94,
+        "bytes": 85212,
+        "sha256": "22111ee080c1a21cb63101213c495533d4245c50a828438d78a3cd6dc8c730ca"
+      }
+    },
+    {
+      "id": "long-range-battery",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/long-range-battery.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          189,
+          152,
+          1381,
+          882
+        ],
+        "anyAlphaBounds": [
+          41,
+          69,
+          1508,
+          982
+        ],
+        "alphaEdgeMargin": 142,
+        "bytes": 1520111,
+        "sha256": "570472f8684c9410ec5bd80f8bd3e133145c0c5be2d25ffbdcf509ce5fa271a1"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/long-range-battery@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          95,
+          76,
+          690,
+          441
+        ],
+        "anyAlphaBounds": [
+          92,
+          73,
+          693,
+          444
+        ],
+        "alphaEdgeMargin": 71,
+        "bytes": 224998,
+        "sha256": "d135531ab370e09f6c2d74bf99d5f697030d15b1bc3c2fac4f13e2a67f156550"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/long-range-battery@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          126,
+          101,
+          920,
+          588
+        ],
+        "anyAlphaBounds": [
+          27,
+          46,
+          1004,
+          650
+        ],
+        "alphaEdgeMargin": 95,
+        "bytes": 77718,
+        "sha256": "b5804a6dd880eadf69eecc0acf8e6c813116dd93ce1c3988c237ea68c0275824"
+      }
+    },
+    {
+      "id": "mobile-siege-gun",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/mobile-siege-gun.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          161,
+          158,
+          1397,
+          849
+        ],
+        "anyAlphaBounds": [
+          63,
+          155,
+          1508,
+          968
+        ],
+        "alphaEdgeMargin": 139,
+        "bytes": 1685862,
+        "sha256": "1a53e31d5e0572fd1ccaed357faf90ec7bfb170758fb357051e3ece04cf03fd8"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/mobile-siege-gun@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          81,
+          79,
+          699,
+          424
+        ],
+        "anyAlphaBounds": [
+          32,
+          76,
+          701,
+          427
+        ],
+        "alphaEdgeMargin": 69,
+        "bytes": 291665,
+        "sha256": "91f241bccb85465a6cbd4bd0c7337fc5d10e77e197acec20e431481a2f17ddad"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/mobile-siege-gun@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          107,
+          105,
+          931,
+          566
+        ],
+        "anyAlphaBounds": [
+          42,
+          102,
+          1005,
+          646
+        ],
+        "alphaEdgeMargin": 93,
+        "bytes": 88152,
+        "sha256": "7c6136fda038d59bbb1578b1045a4cb834dd2d437eb5f06f1c97d8a6ca5d4b08"
+      }
+    },
+    {
+      "id": "combat-skimmer",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/combat-skimmer.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          133,
+          132,
+          1412,
+          849
+        ],
+        "anyAlphaBounds": [
+          130,
+          35,
+          1416,
+          992
+        ],
+        "alphaEdgeMargin": 124,
+        "bytes": 1686416,
+        "sha256": "194f1289f15cd703a61bb49cb764fddba3afe6a402cc99064d22d7f00569ac68"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/combat-skimmer@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          66,
+          66,
+          706,
+          424
+        ],
+        "anyAlphaBounds": [
+          64,
+          64,
+          709,
+          492
+        ],
+        "alphaEdgeMargin": 62,
+        "bytes": 286625,
+        "sha256": "dcaa6aebf9be72ec34285ad6d736ed2f55bbee718ad700a8179e909007085e42"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/combat-skimmer@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          89,
+          88,
+          942,
+          566
+        ],
+        "anyAlphaBounds": [
+          86,
+          23,
+          944,
+          662
+        ],
+        "alphaEdgeMargin": 82,
+        "bytes": 88296,
+        "sha256": "fc9966316111b161951c2c178110f3b1bf1bd852332c69d688922b5c4f200f73"
+      }
+    },
+    {
+      "id": "light-skimmer",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/light-skimmer.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          110,
+          184,
+          1468,
+          853
+        ],
+        "anyAlphaBounds": [
+          43,
+          23,
+          1514,
+          1024
+        ],
+        "alphaEdgeMargin": 68,
+        "bytes": 1667730,
+        "sha256": "6801e0817f43fd83ca45f80fb9581d1ed3ac46cacf466aa8f482662e3d39bfd4"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/light-skimmer@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          55,
+          92,
+          734,
+          426
+        ],
+        "anyAlphaBounds": [
+          52,
+          12,
+          737,
+          442
+        ],
+        "alphaEdgeMargin": 34,
+        "bytes": 282382,
+        "sha256": "1d01e90b73c285ee8d6618cba7cf36bf4dd98f18547f359a4f8027e484ff183b"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/light-skimmer@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          73,
+          122,
+          979,
+          569
+        ],
+        "anyAlphaBounds": [
+          30,
+          15,
+          995,
+          683
+        ],
+        "alphaEdgeMargin": 45,
+        "bytes": 82450,
+        "sha256": "72c2e048d5acc418d7260ab46b942a9bddb88fe6988c0fc8a8c8c3d26a8c1c12"
+      }
+    },
+    {
+      "id": "skimmer-carrier",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/skimmer-carrier.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          112,
+          120,
+          1452,
+          909
+        ],
+        "anyAlphaBounds": [
+          0,
+          38,
+          1482,
+          994
+        ],
+        "alphaEdgeMargin": 84,
+        "bytes": 1864791,
+        "sha256": "e3c3529e800f456a8f25fc25db44b18a3b5f1f9f619052a407babda49d949a26"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/skimmer-carrier@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          56,
+          60,
+          726,
+          454
+        ],
+        "anyAlphaBounds": [
+          53,
+          57,
+          729,
+          457
+        ],
+        "alphaEdgeMargin": 42,
+        "bytes": 364154,
+        "sha256": "6f186059e300c2ea003ce0a1a2a8c93b806ff834ce11016a31dafefcbe0cb98f"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/skimmer-carrier@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          75,
+          80,
+          968,
+          606
+        ],
+        "anyAlphaBounds": [
+          0,
+          34,
+          988,
+          663
+        ],
+        "alphaEdgeMargin": 56,
+        "bytes": 95528,
+        "sha256": "957ad32f15e053df592aab735cbea5c71da340b2c89d298245af3c4ddb7b29ae"
+      }
+    },
+    {
+      "id": "strategic-missile-carrier",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/strategic-missile-carrier.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          136,
+          128,
+          1406,
+          927
+        ],
+        "anyAlphaBounds": [
+          33,
+          28,
+          1488,
+          1008
+        ],
+        "alphaEdgeMargin": 97,
+        "bytes": 2022851,
+        "sha256": "734eb7f853c7686de345244282ddef23328ecce0bb2cd0c314dbd0ef3a9e1255"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/strategic-missile-carrier@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          68,
+          64,
+          703,
+          464
+        ],
+        "anyAlphaBounds": [
+          64,
+          61,
+          742,
+          487
+        ],
+        "alphaEdgeMargin": 48,
+        "bytes": 398436,
+        "sha256": "86ddc4753497e6c81a2cfdde142fa93f0087c9b7f0d4e2743573392c8005c566"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/strategic-missile-carrier@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          90,
+          85,
+          937,
+          619
+        ],
+        "anyAlphaBounds": [
+          22,
+          56,
+          992,
+          651
+        ],
+        "alphaEdgeMargin": 64,
+        "bytes": 119208,
+        "sha256": "dcbe5961e03f94b06cc0efef9fe16f52d0e3a5da39b2869eddff6498975902d0"
+      }
+    },
+    {
+      "id": "artillery-drone",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/artillery-drone.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          197,
+          157,
+          1343,
+          874
+        ],
+        "anyAlphaBounds": [
+          37,
+          30,
+          1346,
+          992
+        ],
+        "alphaEdgeMargin": 150,
+        "bytes": 1564824,
+        "sha256": "c44d3f6177ad6b4b0bbce374677ea96f4a24079b4f61d7712a202c034c68b48b"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/artillery-drone@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          98,
+          78,
+          671,
+          437
+        ],
+        "anyAlphaBounds": [
+          95,
+          76,
+          674,
+          440
+        ],
+        "alphaEdgeMargin": 75,
+        "bytes": 247887,
+        "sha256": "70e481407ec64ff8efd31d3fb32e977a028c0f20169028893840874a3fba860e"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/artillery-drone@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          131,
+          105,
+          895,
+          583
+        ],
+        "anyAlphaBounds": [
+          70,
+          20,
+          898,
+          662
+        ],
+        "alphaEdgeMargin": 100,
+        "bytes": 87452,
+        "sha256": "ca2281cb0b49ea2aba91c301a0eec7fea10b78f25e0a2d0d361531cc193a381f"
+      }
+    },
+    {
+      "id": "amphibious-infantry",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/amphibious-infantry.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          170,
+          129,
+          1374,
+          905
+        ],
+        "anyAlphaBounds": [
+          0,
+          43,
+          1480,
+          1024
+        ],
+        "alphaEdgeMargin": 119,
+        "bytes": 1759148,
+        "sha256": "4f2d9c495ede4879e082ceeeaced8be79a6bbb24498c34ce3ebcfb72e86677e4"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/amphibious-infantry@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          85,
+          64,
+          687,
+          452
+        ],
+        "anyAlphaBounds": [
+          82,
+          34,
+          690,
+          455
+        ],
+        "alphaEdgeMargin": 60,
+        "bytes": 287763,
+        "sha256": "b586a667709b97ba307c3b382f09983363c837283707420b142922acaa5a66fe"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/amphibious-infantry@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          113,
+          86,
+          916,
+          604
+        ],
+        "anyAlphaBounds": [
+          51,
+          45,
+          987,
+          683
+        ],
+        "alphaEdgeMargin": 79,
+        "bytes": 101452,
+        "sha256": "74b439864fda83eab1bb3e4acdc7f994b9a9693b5da7f59e055342ecaf825f30"
+      }
+    },
+    {
+      "id": "field-engineers",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/field-engineers.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          207,
+          139,
+          1322,
+          848
+        ],
+        "anyAlphaBounds": [
+          55,
+          19,
+          1436,
+          1024
+        ],
+        "alphaEdgeMargin": 139,
+        "bytes": 1626122,
+        "sha256": "782880f293fa8f8fdfb6ea88950ae7b75ce705c2abe29ec2acb56405ed848bea"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/field-engineers@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          104,
+          70,
+          661,
+          424
+        ],
+        "anyAlphaBounds": [
+          73,
+          41,
+          686,
+          427
+        ],
+        "alphaEdgeMargin": 70,
+        "bytes": 277026,
+        "sha256": "ac2656ed737ce8aaca350ac97933b8e64563ef84a5ec7a1d170de23da6c1549b"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/field-engineers@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          138,
+          93,
+          882,
+          566
+        ],
+        "anyAlphaBounds": [
+          54,
+          26,
+          919,
+          662
+        ],
+        "alphaEdgeMargin": 93,
+        "bytes": 98012,
+        "sha256": "9e22e8ded15df70384029eb0f9f70dde83ffc9b12af58be2ba23b911240fea71"
+      }
+    },
+    {
+      "id": "local-defense",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/local-defense.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          188,
+          144,
+          1344,
+          888
+        ],
+        "anyAlphaBounds": [
+          49,
+          37,
+          1462,
+          986
+        ],
+        "alphaEdgeMargin": 136,
+        "bytes": 1705156,
+        "sha256": "c5acdb4232e36b091959ad38d2911ad350966f3a7f9b0e3d83b80ab2c87626dc"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/local-defense@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          94,
+          72,
+          672,
+          444
+        ],
+        "anyAlphaBounds": [
+          91,
+          69,
+          675,
+          447
+        ],
+        "alphaEdgeMargin": 68,
+        "bytes": 275519,
+        "sha256": "618e20b3d9363ba1af03fdff1ad3c6df1115c593ce2604ead1eab76ac2bc5b1b"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/local-defense@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          125,
+          96,
+          896,
+          592
+        ],
+        "anyAlphaBounds": [
+          35,
+          46,
+          975,
+          658
+        ],
+        "alphaEdgeMargin": 91,
+        "bytes": 97574,
+        "sha256": "a0edcec340f084d1596e95dc66588809c5a1d41a053817c8ce7e66a66049f937"
+      }
+    },
+    {
+      "id": "command-hub",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/command-hub.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          141,
+          103,
+          1406,
+          919
+        ],
+        "anyAlphaBounds": [
+          0,
+          23,
+          1526,
+          1024
+        ],
+        "alphaEdgeMargin": 103,
+        "bytes": 1754398,
+        "sha256": "271b865e1bbe2ed5a4022242c0d92205e17c54d3186c777bd7c7d2fa1f9423b1"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/command-hub@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          70,
+          51,
+          703,
+          459
+        ],
+        "anyAlphaBounds": [
+          0,
+          41,
+          758,
+          492
+        ],
+        "alphaEdgeMargin": 51,
+        "bytes": 314423,
+        "sha256": "fdace1dfa4b8f61faa7208e4087814a0eccd6bb6162af6f27594fea0983f7f36"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/command-hub@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          94,
+          69,
+          937,
+          613
+        ],
+        "anyAlphaBounds": [
+          0,
+          15,
+          1012,
+          683
+        ],
+        "alphaEdgeMargin": 69,
+        "bytes": 92250,
+        "sha256": "a51a6272b5d844c43db5e5a72c34ba1f93e677501a93d0022d3bc0f7e1496a29"
+      }
+    },
+    {
+      "id": "goblin-dreadnaught",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/goblin-dreadnaught.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          147,
+          124,
+          1404,
+          899
+        ],
+        "anyAlphaBounds": [
+          73,
+          43,
+          1500,
+          990
+        ],
+        "alphaEdgeMargin": 124,
+        "bytes": 1902231,
+        "sha256": "48f6383a200a56dfbc659fbec02b0725d27370f474e969a8cf2032ed6de5cac0"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/goblin-dreadnaught@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          74,
+          62,
+          702,
+          450
+        ],
+        "anyAlphaBounds": [
+          71,
+          59,
+          705,
+          452
+        ],
+        "alphaEdgeMargin": 62,
+        "bytes": 360048,
+        "sha256": "0ecdfc40a3dcc7be69924f2a99d07f352c64d8cf53e9d26cd6b32182201b2f07"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/goblin-dreadnaught@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          98,
+          83,
+          936,
+          600
+        ],
+        "anyAlphaBounds": [
+          96,
+          30,
+          1000,
+          659
+        ],
+        "alphaEdgeMargin": 83,
+        "bytes": 104148,
+        "sha256": "3f5a3160beac3005b2ce4309c8a1e6459edfb9719ef647c7fdec37b2d54f014c"
+      }
+    },
+    {
+      "id": "forge-engineer",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/forge-engineer.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          254,
+          123,
+          1359,
+          909
+        ],
+        "anyAlphaBounds": [
+          250,
+          120,
+          1506,
+          986
+        ],
+        "alphaEdgeMargin": 115,
+        "bytes": 1882636,
+        "sha256": "a123c972300fcd536d0b0dca57cd86de332a3e63a98379c037bc2c8e7d232d94"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/forge-engineer@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          127,
+          63,
+          679,
+          454
+        ],
+        "anyAlphaBounds": [
+          124,
+          59,
+          682,
+          491
+        ],
+        "alphaEdgeMargin": 58,
+        "bytes": 341477,
+        "sha256": "c5134d0a42749a8d7953e5084cbf81fd6f14efbaa4211046d9a1d9c1b1628cfd"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/forge-engineer@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          169,
+          83,
+          906,
+          606
+        ],
+        "anyAlphaBounds": [
+          166,
+          81,
+          1004,
+          655
+        ],
+        "alphaEdgeMargin": 77,
+        "bytes": 110632,
+        "sha256": "156b5ad601d37bd57286f45ae608fad61e0579c9ccc1d954931b6d0d654f2836"
+      }
+    },
+    {
+      "id": "phantom-platform",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/phantom-platform.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          199,
+          187,
+          1340,
+          849
+        ],
+        "anyAlphaBounds": [
+          195,
+          32,
+          1344,
+          950
+        ],
+        "alphaEdgeMargin": 175,
+        "bytes": 1523560,
+        "sha256": "ec9682495cbd653c03fe020804e3798682792102626b997b8fa5c8bd2efc8180"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/phantom-platform@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          100,
+          93,
+          670,
+          425
+        ],
+        "anyAlphaBounds": [
+          97,
+          91,
+          673,
+          427
+        ],
+        "alphaEdgeMargin": 87,
+        "bytes": 252549,
+        "sha256": "86bfcf516131bbd881efe4d431abcac3e2591464489d1169c51770d93a155b7d"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/phantom-platform@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          133,
+          124,
+          894,
+          567
+        ],
+        "anyAlphaBounds": [
+          130,
+          21,
+          896,
+          634
+        ],
+        "alphaEdgeMargin": 116,
+        "bytes": 71420,
+        "sha256": "4407e072d29b751fea23a094b16e4a7c7e9c2d59154044725e935be350edc5bf"
+      }
+    },
+    {
+      "id": "infantry-platoon",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/infantry-platoon.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          195,
+          150,
+          1344,
+          889
+        ],
+        "anyAlphaBounds": [
+          41,
+          41,
+          1450,
+          1012
+        ],
+        "alphaEdgeMargin": 135,
+        "bytes": 1658251,
+        "sha256": "ea43cdeed42d7935ef7e2b22120fbc76226238addb36d4498ec5839f7debd066"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/infantry-platoon@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          97,
+          75,
+          672,
+          444
+        ],
+        "anyAlphaBounds": [
+          95,
+          28,
+          725,
+          506
+        ],
+        "alphaEdgeMargin": 68,
+        "bytes": 278761,
+        "sha256": "b108718c37a13da161708ac55886c4cf4a654b113b93acb08f1441dc7d09a762"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/infantry-platoon@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          130,
+          100,
+          896,
+          593
+        ],
+        "anyAlphaBounds": [
+          27,
+          27,
+          967,
+          675
+        ],
+        "alphaEdgeMargin": 90,
+        "bytes": 96654,
+        "sha256": "dd6f949dfde055c084fc6b8b83d081947e75a0478879cd0883346425664a0dcd"
+      }
+    },
+    {
+      "id": "command-core",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/command-core.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          74,
+          98,
+          1462,
+          899
+        ],
+        "anyAlphaBounds": [
+          51,
+          69,
+          1470,
+          1000
+        ],
+        "alphaEdgeMargin": 74,
+        "bytes": 1951461,
+        "sha256": "44ddabf23407625f58b7aae888a8eba70b5deca3bbfaafae751ed79b0cee4e07"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/command-core@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          37,
+          49,
+          731,
+          449
+        ],
+        "anyAlphaBounds": [
+          34,
+          35,
+          735,
+          452
+        ],
+        "alphaEdgeMargin": 37,
+        "bytes": 399074,
+        "sha256": "63a59fb0fa6102fd3e165db9541ec62861d49b796c7bdf96b865fbe3a138d0e2"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/command-core@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          49,
+          65,
+          975,
+          600
+        ],
+        "anyAlphaBounds": [
+          34,
+          46,
+          980,
+          666
+        ],
+        "alphaEdgeMargin": 49,
+        "bytes": 109884,
+        "sha256": "3d1a9349fc3ea137a4a939d51cdd3d9d71b859a5615a90d112966d1fe46597e8"
+      }
+    },
+    {
+      "id": "relay-node",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/relay-node.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          305,
+          138,
+          1262,
+          896
+        ],
+        "anyAlphaBounds": [
+          81,
+          37,
+          1314,
+          1024
+        ],
+        "alphaEdgeMargin": 128,
+        "bytes": 1388905,
+        "sha256": "bd0371c98037751d00bb5d4a005191960ab3dd52e32e7b1c3f1afc3ee9c6f538"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/relay-node@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          152,
+          69,
+          631,
+          448
+        ],
+        "anyAlphaBounds": [
+          150,
+          67,
+          634,
+          451
+        ],
+        "alphaEdgeMargin": 64,
+        "bytes": 217438,
+        "sha256": "0445737c9e0d618cb3b08a797e1c626a15d42fff5484379fcadbef51b9fee729"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/relay-node@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          203,
+          92,
+          841,
+          598
+        ],
+        "anyAlphaBounds": [
+          54,
+          45,
+          876,
+          683
+        ],
+        "alphaEdgeMargin": 85,
+        "bytes": 61096,
+        "sha256": "9536718e5e880a07ab7b0c4e90057d6550f808ab0bc1d393864276362dbab724"
+      }
+    },
+    {
+      "id": "guard-tank",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/guard-tank.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          184,
+          130,
+          1361,
+          885
+        ],
+        "anyAlphaBounds": [
+          177,
+          37,
+          1384,
+          920
+        ],
+        "alphaEdgeMargin": 130,
+        "bytes": 1667991,
+        "sha256": "064c0d5ae70247b0b2fe5cfc005e2867bd571f8b284330e81ffd60119b4d11bc"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/guard-tank@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          92,
+          65,
+          680,
+          442
+        ],
+        "anyAlphaBounds": [
+          89,
+          62,
+          683,
+          459
+        ],
+        "alphaEdgeMargin": 65,
+        "bytes": 308473,
+        "sha256": "c9ce11481c28e75f03ba8bc9b50308b39cdb12a6c54ebf52ff9d0c56cc7a4850"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/guard-tank@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          123,
+          87,
+          907,
+          590
+        ],
+        "anyAlphaBounds": [
+          118,
+          30,
+          923,
+          612
+        ],
+        "alphaEdgeMargin": 87,
+        "bytes": 89326,
+        "sha256": "d0b50db41f4d8ee1a2e5ccc8b68853d8a70c9ceb3c524ee624e6abc12743efc3"
+      }
+    },
+    {
+      "id": "raider-skimmer",
+      "source": {
+        "path": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/raider-skimmer.png",
+        "provenance": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 1536,
+        "height": 1024,
+        "alphaBounds": [
+          257,
+          159,
+          1354,
+          861
+        ],
+        "anyAlphaBounds": [
+          89,
+          140,
+          1498,
+          1010
+        ],
+        "alphaEdgeMargin": 159,
+        "bytes": 1462781,
+        "sha256": "054f1645e8f6b7109ae4dba0af777c110d26dc6b19c0399b485f773a8e8335bb"
+      },
+      "png": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/raider-skimmer@768.png",
+        "format": "PNG",
+        "mode": "RGBA",
+        "width": 768,
+        "height": 512,
+        "alphaBounds": [
+          129,
+          79,
+          677,
+          430
+        ],
+        "anyAlphaBounds": [
+          126,
+          70,
+          680,
+          433
+        ],
+        "alphaEdgeMargin": 79,
+        "bytes": 223532,
+        "sha256": "24d5d13dd2e7591003c0ea0b04a6918d0b0dc9c8f0e79b7fe6d0856f42dadaee"
+      },
+      "webp": {
+        "path": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/raider-skimmer@1024.webp",
+        "format": "WEBP",
+        "mode": "RGBA",
+        "width": 1024,
+        "height": 683,
+        "alphaBounds": [
+          172,
+          106,
+          902,
+          574
+        ],
+        "anyAlphaBounds": [
+          59,
+          93,
+          999,
+          672
+        ],
+        "alphaEdgeMargin": 106,
+        "bytes": 68428,
+        "sha256": "c69f1bc250c2b0951be42657a536a17cb380a2fef75d439ef027681a068e9fac"
+      }
+    }
+  ]
+}
