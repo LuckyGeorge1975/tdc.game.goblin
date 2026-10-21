@@ -1,0 +1,31 @@
+{
+  "messages": {
+    "mission.iron-dust.briefing.victory": "Détruisez le noyau de commandement ennemi. Au moins une unité alliée doit survivre.",
+    "mission.iron-dust.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau de commandement est détruit au même moment.",
+    "mission.relay-run.briefing.victory": "Détruisez le relais ennemi et éliminez toutes les unités ennemies. Au moins une unité alliée doit survivre.",
+    "mission.relay-run.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le relais est détruit au même moment.",
+    "mission.unit-trial.briefing.victory": "Détruisez le centre de commandement et éliminez toutes les unités ennemies. Au moins une unité alliée doit survivre.",
+    "mission.unit-trial.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le centre de commandement est détruit au même moment.",
+    "mission.atlas-proving-grounds.briefing.victory": "Détruisez le noyau ennemi et éliminez toutes les unités ennemies. Au moins une unité alliée doit survivre.",
+    "mission.atlas-proving-grounds.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau est détruit au même moment.",
+    "mission.showcase-terrain-course.briefing.victory": "Détruisez le noyau ennemi et éliminez toutes les unités ennemies. Au moins une unité alliée doit survivre.",
+    "mission.showcase-terrain-course.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau est détruit au même moment.",
+    "mission.showcase-advance.briefing.victory": "Détruisez le noyau ennemi et éliminez toutes les unités ennemies. Au moins une unité alliée doit survivre.",
+    "mission.showcase-advance.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau est détruit au même moment.",
+    "mission.showcase-siege.briefing.victory": "Détruisez le noyau ennemi et éliminez toutes les unités ennemies. Au moins une unité alliée doit survivre.",
+    "mission.showcase-siege.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau est détruit au même moment.",
+    "mission.showcase-specialists.briefing.victory": "Détruisez le noyau ennemi et éliminez toutes les unités ennemies. Au moins une unité alliée doit survivre.",
+    "mission.showcase-specialists.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau est détruit au même moment.",
+    "mission.los-supercover-showcase.briefing.victory": "Détruisez le noyau ennemi et éliminez toutes les unités ennemies. Au moins une unité alliée doit survivre.",
+    "mission.los-supercover-showcase.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau est détruit au même moment.",
+    "mission.iron-dust-v2.briefing.victory": "Détruisez le noyau de commandement ennemi. Au moins une unité alliée doit survivre.",
+    "mission.iron-dust-v2.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau de commandement est détruit au même moment.",
+    "mission.iron-dust-v2.briefing.short": "Détruisez le noyau de commandement ennemi et gardez au moins une unité alliée.",
+    "screen.briefing.victory": "Victoire",
+    "screen.briefing.defeat": "Défaite",
+    "screen.briefing.startForces": "Forces initiales",
+    "screen.briefing.backToLevels": "Retour aux niveaux",
+    "screen.briefing.startMission": "Lancer la mission",
+    "screen.briefing.dataUnavailable": "Données de mission indisponibles."
+  }
+}

@@ -6,6 +6,8 @@ import {
 import {buildIronDustV2View, renderIronDustV2View, formatIronDustV2Error,
   formatIronDustV2Event,
   resetIronDustV2View} from './iron-dust-v2-view.mjs?v=4';
+import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1}
+  from './src/levels/iron-dust-core-data.v1.mjs';
 
 // Browser commands cross the same validated profile boundary as the Core probes.
 export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';
@@ -215,6 +217,8 @@ if (typeof document !== 'undefined') {
   globalThis.IronDustBrowserV2 = Object.freeze({
     selectorId: IRON_DUST_V2_SELECTOR_ID,
     available: !!option && !globalThis.goblinBootProfileError,
+    // Read-only mission data for selection and briefing; no session is created here.
+    previewData: validateIronDustCoreDataV1(IRON_DUST_CORE_DATA_V1),
     get active() { return mode !== 'inactive'; },
     get mode() { return mode; },
     get session() { return session; },
@@ -232,4 +236,5 @@ if (typeof document !== 'undefined') {
     dispatch: dispatchAction,
     start, restart: () => start(), stop
   });
+  globalThis.dispatchEvent?.(new Event('goblin-core-v2-ready'));
 }

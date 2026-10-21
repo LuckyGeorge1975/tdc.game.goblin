@@ -1,0 +1,31 @@
+{
+  "messages": {
+    "mission.iron-dust.briefing.victory": "Destruye el núcleo de mando enemigo. Debe sobrevivir al menos una unidad aliada.",
+    "mission.iron-dust.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo de mando sea destruido al mismo tiempo.",
+    "mission.relay-run.briefing.victory": "Destruye el nodo de enlace y elimina todas las unidades enemigas. Debe sobrevivir al menos una unidad aliada.",
+    "mission.relay-run.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el nodo de enlace sea destruido al mismo tiempo.",
+    "mission.unit-trial.briefing.victory": "Destruye el centro de mando y elimina todas las unidades enemigas. Debe sobrevivir al menos una unidad aliada.",
+    "mission.unit-trial.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el centro de mando sea destruido al mismo tiempo.",
+    "mission.atlas-proving-grounds.briefing.victory": "Destruye el núcleo enemigo y elimina todas las unidades enemigas. Debe sobrevivir al menos una unidad aliada.",
+    "mission.atlas-proving-grounds.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo sea destruido al mismo tiempo.",
+    "mission.showcase-terrain-course.briefing.victory": "Destruye el núcleo enemigo y elimina todas las unidades enemigas. Debe sobrevivir al menos una unidad aliada.",
+    "mission.showcase-terrain-course.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo sea destruido al mismo tiempo.",
+    "mission.showcase-advance.briefing.victory": "Destruye el núcleo enemigo y elimina todas las unidades enemigas. Debe sobrevivir al menos una unidad aliada.",
+    "mission.showcase-advance.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo sea destruido al mismo tiempo.",
+    "mission.showcase-siege.briefing.victory": "Destruye el núcleo enemigo y elimina todas las unidades enemigas. Debe sobrevivir al menos una unidad aliada.",
+    "mission.showcase-siege.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo sea destruido al mismo tiempo.",
+    "mission.showcase-specialists.briefing.victory": "Destruye el núcleo enemigo y elimina todas las unidades enemigas. Debe sobrevivir al menos una unidad aliada.",
+    "mission.showcase-specialists.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo sea destruido al mismo tiempo.",
+    "mission.los-supercover-showcase.briefing.victory": "Destruye el núcleo enemigo y elimina todas las unidades enemigas. Debe sobrevivir al menos una unidad aliada.",
+    "mission.los-supercover-showcase.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo sea destruido al mismo tiempo.",
+    "mission.iron-dust-v2.briefing.victory": "Destruye el núcleo de mando enemigo. Debe sobrevivir al menos una unidad aliada.",
+    "mission.iron-dust-v2.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo de mando sea destruido al mismo tiempo.",
+    "mission.iron-dust-v2.briefing.short": "Destruye el núcleo de mando enemigo y conserva al menos una unidad aliada.",
+    "screen.briefing.victory": "Victoria",
+    "screen.briefing.defeat": "Derrota",
+    "screen.briefing.startForces": "Fuerzas iniciales",
+    "screen.briefing.backToLevels": "Volver a niveles",
+    "screen.briefing.startMission": "Iniciar misión",
+    "screen.briefing.dataUnavailable": "Datos de misión no disponibles."
+  }
+}

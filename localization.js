@@ -9,7 +9,10 @@
     const response = await fetch(new URL(`content-02.${lang}.json`, catalogBase));
     if (!response.ok) throw Error(`CONTENT-02 ${lang}: HTTP ${response.status}`);
     const catalog = await response.json();
-    contentCatalogs[lang] = catalog.messages;
+    const briefingResponse = await fetch(new URL(`briefing-01.${lang}.json`, catalogBase));
+    if (!briefingResponse.ok) throw Error(`BRIEFING-01 ${lang}: HTTP ${briefingResponse.status}`);
+    const briefing = await briefingResponse.json();
+    contentCatalogs[lang] = { ...catalog.messages, ...briefing.messages };
   })).then(() => true, (error) => { console.error('Localization catalog unavailable:', error); return false; });
   const messages = new Map();
   const add = (source, de, en, es, fr) => messages.set(source, { de, en, es, fr });

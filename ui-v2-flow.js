@@ -52,26 +52,53 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const row = document.createElement('div'); row.className = 'v2-screen-actions';
       row.append(...nodes); return row;
     }
-    function missionPreview(id) {
-      const config = scenarioCatalog[id === 'iron-dust-v2' ? 'iron-dust' : id];
+    function missionData(id) {
+      if (id === 'iron-dust-v2') {
+        const source = globalThis.IronDustBrowserV2?.previewData;
+        if (!globalThis.IronDustBrowserV2?.available ||
+            source?.dataContractVersion !== 'iron-dust-core-data-v1' ||
+            source.executable !== false || !Object.isFrozen(source) ||
+            source.map?.width !== 12 || source.map?.height !== 8 ||
+            !Array.isArray(source.map.terrain) || !Array.isArray(source.units)) return null;
+        return {width: source.map.width, height: source.map.height,
+          defaultTerrain: source.map.defaultTerrain, terrain: source.map.terrain,
+          units: source.units};
+      }
+      if (!Object.hasOwn(ScenarioRuleProfiles.entries, id)) return null;
+      const config = scenarioCatalog[id];
+      if (!config) return null;
+      try { ScenarioRuleProfiles.validate(id, config); } catch { return null; }
+      if (!Array.isArray(config.terrain) || !Array.isArray(config.units) ||
+          (config.terrainTypes !== undefined && !Array.isArray(config.terrainTypes))) return null;
+      return {width: 12, height: 8, defaultTerrain: 'open-ground',
+        terrain: [
+          ...config.terrain.map(key => {
+            const [x, y] = key.split(',').map(Number);
+            return {x, y, type: 'rubble-field'};
+          }),
+          ...(config.terrainTypes || [])
+        ], units: config.units};
+    }
+    function missionPreview(data) {
+      if (!data) return paragraph(t('screen.briefing.dataUnavailable'), 'v2-status');
       const figure = document.createElement('figure'); figure.className = 'v2-mission-map';
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('viewBox', '0 0 450 254');
+      svg.setAttribute('viewBox', '0 0 460 254');
       svg.setAttribute('role', 'img');
       svg.setAttribute('aria-label', t('v2.ui.previewMap'));
-      const terrain = new Set(config?.terrain || []);
-      const typed = new Map((config?.terrainTypes || []).map(cell => [`${cell.x},${cell.y}`, cell.type]));
-      for (let y = 0; y < 8; y++) for (let x = 0; x < 12; x++) {
+      const terrain = new Map(data.terrain.map(cell => [`${cell.x},${cell.y}`, cell.type]));
+      for (let y = 0; y < data.height; y++) for (let x = 0; x < data.width; x++) {
         const cx = 23 + x * 36 + (y % 2 ? 18 : 0), cy = 20 + y * 30;
         const polygon = document.createElementNS(svg.namespaceURI, 'polygon');
         polygon.setAttribute('points', Array.from({length: 6}, (_, i) => {
           const angle = Math.PI / 3 * i + Math.PI / 6;
           return `${cx + 20 * Math.cos(angle)},${cy + 20 * Math.sin(angle)}`;
         }).join(' '));
-        polygon.setAttribute('class', typed.has(`${x},${y}`) || terrain.has(`${x},${y}`) ? 'v2-preview-terrain' : 'v2-preview-open');
+        polygon.setAttribute('class', (terrain.get(`${x},${y}`) || data.defaultTerrain) !== data.defaultTerrain ?
+          'v2-preview-terrain' : 'v2-preview-open');
         svg.append(polygon);
       }
-      for (const unit of config?.units || []) {
+      for (const unit of data.units) {
         const cx = 23 + unit.x * 36 + (unit.y % 2 ? 18 : 0), cy = 20 + unit.y * 30;
         const radius = unit.core ? 10 : 8;
         const marker = document.createElementNS(svg.namespaceURI, 'polygon');
@@ -97,10 +124,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       figure.append(svg);
       return figure;
     }
-    function missionStats(id) {
-      const config = scenarioCatalog[id === 'iron-dust-v2' ? 'iron-dust' : id];
+    function missionStats(data) {
+      if (!data) return document.createElement('div');
       const stats = document.createElement('div'); stats.className = 'v2-mission-stats';
-      for (const [key, count] of [['own', config?.units.filter(unit => unit.team === 'player').length], ['enemy', config?.units.filter(unit => unit.team === 'enemy').length]]) {
+      for (const [key, count] of [['own', data.units.filter(unit => unit.team === 'player').length], ['enemy', data.units.filter(unit => unit.team === 'enemy').length]]) {
         const item = document.createElement('div');
         const label = document.createElement('span'); label.textContent = t(`v2.ui.preview.${key}`);
         const value = document.createElement('strong'); value.textContent = String(count);
@@ -188,6 +215,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     async function startMission() {
       if (GameDialogs.isOpen()) return;
+      if (!missionData(missionId)) {
+        startError = t('screen.briefing.dataUnavailable'); renderScreen(false); return;
+      }
       if (missionId === 'iron-dust-v2') {
         if (!globalThis.IronDustBrowserV2?.available || !IronDustBrowserV2.start()) {
           startError = t('v2.reject.start'); renderScreen(false); return;
@@ -227,7 +257,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       });
       const panel = document.createElement('div'); panel.className = 'v2-screen-panel';
       panel.dataset.screen = screen;
-      if (['menu', 'levels', 'options'].includes(screen)) panel.classList.add('v2-foundation');
+      if (['menu', 'levels', 'options', 'briefing'].includes(screen)) panel.classList.add('v2-foundation');
       surface.replaceChildren(panel);
       surface.setAttribute('aria-labelledby', 'v2-screen-heading');
       const state = GoblinUIV2.project();
@@ -255,7 +285,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const ids = [...Object.keys(ScenarioRuleProfiles.entries), 'iron-dust-v2'];
         if (!ids.includes(missionId)) missionId = ids[0];
         for (const id of ids) {
-          const available = id === 'iron-dust-v2' ? !!globalThis.IronDustBrowserV2?.available : !!scenarioCatalog[id];
+          const available = !!missionData(id);
           const choose = button('', () => {
             missionId = id; startError = ''; renderScreen(false);
           }, 'v2-level-choice');
@@ -265,32 +295,55 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           choose.append(title, summary);
           choose.id = `v2-level-${id}`;
           choose.setAttribute('aria-pressed', String(id === missionId));
-          if (!available) choose.title = t('v2.ui.missionDataUnavailable');
+          if (!available) choose.title = t('screen.briefing.dataUnavailable');
           choose.disabled = !available;
           list.append(choose);
         }
         const detail = document.createElement('section'); detail.className = 'v2-level-detail';
         detail.setAttribute('aria-label', t(`mission.${missionId}.title`));
         const detailTitle = document.createElement('h3'); detailTitle.textContent = t(`mission.${missionId}.title`);
-        detail.append(detailTitle, missionPreview(missionId),
+        const data = missionData(missionId);
+        detail.append(detailTitle, missionPreview(data),
           paragraph(t(missionId === 'iron-dust-v2' ? 'v2.objective' : `mission.${missionId}.objective.short`)),
-          missionStats(missionId));
+          missionStats(data));
         layout.append(list, detail);
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), () => show('menu')); back.id = 'v2-levels-back';
         const select = button(t('ui.levels.select'), () => show('briefing'), 'primary');
         select.id = 'v2-levels-select';
+        select.disabled = !data;
         select.setAttribute('aria-label', `${t('ui.levels.select')}: ${t(`mission.${missionId}.title`)}`);
         footer.append(actions(back, select));
         panel.append(layout, footer);
       } else if (screen === 'briefing') {
-        const core = missionId === 'iron-dust-v2';
-        panel.append(heading(t(`mission.${missionId}.title`)),
-          paragraph(t(core ? 'v2.quick.intro' : `mission.${missionId}.briefing.full`)),
-          paragraph(t(core ? 'v2.objective' : `mission.${missionId}.objective.full`), 'v2-screen-objective'),
-          ...(startError ? [paragraph(startError, 'v2-status')] : []),
-          actions(button(t('ui.nav.back'), returnToSelectedLevel),
-            button(t('ui.briefing.start'), startMission, 'primary')));
+        const data = missionData(missionId);
+        const header = document.createElement('header'); header.className = 'v2-screen-header';
+        const legacyNumber = missionId !== 'iron-dust-v2' &&
+          scenarioCatalog[missionId]?.kicker?.match(/^(MISSION \d+|SHOWCASE \d+)/)?.[1];
+        if (legacyNumber) header.append(paragraph(legacyNumber, 'v2-briefing-number'));
+        header.append(heading(t(`mission.${missionId}.title`)),
+          paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
+        const conditions = document.createElement('section'); conditions.className = 'v2-briefing-conditions';
+        conditions.append(document.createElement('div'), document.createElement('div'));
+        conditions.children[0].className = 'v2-briefing-victory';
+        conditions.children[1].className = 'v2-briefing-defeat';
+        for (const [index, outcome] of ['victory', 'defeat'].entries()) {
+          const label = document.createElement('h3'); label.textContent = t(`screen.briefing.${outcome}`);
+          conditions.children[index].append(label,
+            paragraph(t(`mission.${missionId}.briefing.${outcome}`)));
+        }
+        const preview = document.createElement('section'); preview.className = 'v2-briefing-preview';
+        const previewLabel = document.createElement('h3');
+        previewLabel.textContent = t('screen.briefing.startForces');
+        preview.append(previewLabel, missionPreview(data), missionStats(data));
+        const main = document.createElement('div'); main.className = 'v2-screen-main v2-briefing-main';
+        main.append(conditions, preview);
+        const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
+        const back = button(t('screen.briefing.backToLevels'), returnToSelectedLevel); back.id = 'v2-briefing-back';
+        const start = button(t('screen.briefing.startMission'), startMission, 'primary'); start.id = 'v2-briefing-start';
+        start.disabled = !data;
+        footer.append(...(startError ? [paragraph(startError, 'v2-status')] : []), actions(back, start));
+        panel.append(header, main, footer);
       } else if (screen === 'pause') {
         panel.append(heading(t('ui.nav.pause')),
           paragraph(state.mission.objective),
@@ -388,6 +441,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (screen === 'play' && GoblinUIV2.project().gameOver) show('end');
     });
     globalThis.addEventListener('goblin-language-change', () => renderScreen(false));
+    globalThis.addEventListener('goblin-core-v2-ready', () => {
+      if (screen === 'levels' || screen === 'briefing') renderScreen(false);
+    });
     GoblinLanguage.ready.then(() => renderScreen(false));
     globalThis.addEventListener('keydown', event => {
       if (screen !== 'play' && event.key === 'Escape' && !GameDialogs.isOpen() && document.querySelector('#unit-guide-modal').classList.contains('hidden')) {

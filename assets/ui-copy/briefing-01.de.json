@@ -1,0 +1,31 @@
+{
+  "messages": {
+    "mission.iron-dust.briefing.victory": "Zerstöre den feindlichen Kommandokern. Mindestens eine eigene Einheit muss überleben.",
+    "mission.iron-dust.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kommandokern gleichzeitig zerstört wird.",
+    "mission.relay-run.briefing.victory": "Zerstöre den Relaisknoten und schalte alle feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.relay-run.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Relaisknoten gleichzeitig zerstört wird.",
+    "mission.unit-trial.briefing.victory": "Zerstöre das Kommandozentrum und schalte alle feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.unit-trial.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn das Kommandozentrum gleichzeitig zerstört wird.",
+    "mission.atlas-proving-grounds.briefing.victory": "Zerstöre den feindlichen Kern und schalte alle feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.atlas-proving-grounds.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kern gleichzeitig zerstört wird.",
+    "mission.showcase-terrain-course.briefing.victory": "Zerstöre den feindlichen Kern und schalte alle feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.showcase-terrain-course.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kern gleichzeitig zerstört wird.",
+    "mission.showcase-advance.briefing.victory": "Zerstöre den feindlichen Kern und schalte alle feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.showcase-advance.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kern gleichzeitig zerstört wird.",
+    "mission.showcase-siege.briefing.victory": "Zerstöre den feindlichen Kern und schalte alle feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.showcase-siege.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kern gleichzeitig zerstört wird.",
+    "mission.showcase-specialists.briefing.victory": "Zerstöre den feindlichen Kern und schalte alle feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.showcase-specialists.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kern gleichzeitig zerstört wird.",
+    "mission.los-supercover-showcase.briefing.victory": "Zerstöre den feindlichen Kern und schalte alle feindlichen Einheiten aus. Mindestens eine eigene Einheit muss überleben.",
+    "mission.los-supercover-showcase.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kern gleichzeitig zerstört wird.",
+    "mission.iron-dust-v2.briefing.victory": "Zerstöre den feindlichen Kommandokern. Mindestens eine eigene Einheit muss überleben.",
+    "mission.iron-dust-v2.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kommandokern gleichzeitig zerstört wird.",
+    "mission.iron-dust-v2.briefing.short": "Zerstöre den feindlichen Kommandokern und erhalte mindestens eine eigene Einheit.",
+    "screen.briefing.victory": "Sieg",
+    "screen.briefing.defeat": "Niederlage",
+    "screen.briefing.startForces": "Startkräfte",
+    "screen.briefing.backToLevels": "Zur Levelwahl",
+    "screen.briefing.startMission": "Einsatz beginnen",
+    "screen.briefing.dataUnavailable": "Missionsdaten nicht verfügbar."
+  }
+}

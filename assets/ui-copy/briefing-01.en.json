@@ -1,0 +1,31 @@
+{
+  "messages": {
+    "mission.iron-dust.briefing.victory": "Destroy the enemy command core. At least one friendly unit must survive.",
+    "mission.iron-dust.briefing.defeat": "You lose if no friendly unit survives—even if the command core is destroyed at the same time.",
+    "mission.relay-run.briefing.victory": "Destroy the relay node and eliminate all enemy units. At least one friendly unit must survive.",
+    "mission.relay-run.briefing.defeat": "You lose if no friendly unit survives—even if the relay node is destroyed at the same time.",
+    "mission.unit-trial.briefing.victory": "Destroy the command center and eliminate all enemy units. At least one friendly unit must survive.",
+    "mission.unit-trial.briefing.defeat": "You lose if no friendly unit survives—even if the command center is destroyed at the same time.",
+    "mission.atlas-proving-grounds.briefing.victory": "Destroy the enemy core and eliminate all enemy units. At least one friendly unit must survive.",
+    "mission.atlas-proving-grounds.briefing.defeat": "You lose if no friendly unit survives—even if the core is destroyed at the same time.",
+    "mission.showcase-terrain-course.briefing.victory": "Destroy the enemy core and eliminate all enemy units. At least one friendly unit must survive.",
+    "mission.showcase-terrain-course.briefing.defeat": "You lose if no friendly unit survives—even if the core is destroyed at the same time.",
+    "mission.showcase-advance.briefing.victory": "Destroy the enemy core and eliminate all enemy units. At least one friendly unit must survive.",
+    "mission.showcase-advance.briefing.defeat": "You lose if no friendly unit survives—even if the core is destroyed at the same time.",
+    "mission.showcase-siege.briefing.victory": "Destroy the enemy core and eliminate all enemy units. At least one friendly unit must survive.",
+    "mission.showcase-siege.briefing.defeat": "You lose if no friendly unit survives—even if the core is destroyed at the same time.",
+    "mission.showcase-specialists.briefing.victory": "Destroy the enemy core and eliminate all enemy units. At least one friendly unit must survive.",
+    "mission.showcase-specialists.briefing.defeat": "You lose if no friendly unit survives—even if the core is destroyed at the same time.",
+    "mission.los-supercover-showcase.briefing.victory": "Destroy the enemy core and eliminate all enemy units. At least one friendly unit must survive.",
+    "mission.los-supercover-showcase.briefing.defeat": "You lose if no friendly unit survives—even if the core is destroyed at the same time.",
+    "mission.iron-dust-v2.briefing.victory": "Destroy the enemy command core. At least one friendly unit must survive.",
+    "mission.iron-dust-v2.briefing.defeat": "You lose if no friendly unit survives—even if the command core is destroyed at the same time.",
+    "mission.iron-dust-v2.briefing.short": "Destroy the enemy command core and keep at least one friendly unit alive.",
+    "screen.briefing.victory": "Victory",
+    "screen.briefing.defeat": "Defeat",
+    "screen.briefing.startForces": "Starting forces",
+    "screen.briefing.backToLevels": "Back to level select",
+    "screen.briefing.startMission": "Start mission",
+    "screen.briefing.dataUnavailable": "Mission data unavailable."
+  }
+}
