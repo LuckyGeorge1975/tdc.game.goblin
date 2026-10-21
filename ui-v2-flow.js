@@ -81,6 +81,16 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           : `${cx},${cy - radius} ${cx + radius},${cy} ${cx},${cy + radius} ${cx - radius},${cy}`);
         marker.setAttribute('class', unit.team === 'player' ? 'v2-preview-own' : 'v2-preview-enemy');
         svg.append(marker);
+        const artwork = UnitVisuals.assetFor(unit);
+        if (artwork) {
+          const image = document.createElementNS(svg.namespaceURI, 'image');
+          image.setAttribute('href', artwork);
+          image.setAttribute('x', cx - 12); image.setAttribute('y', cy - 12);
+          image.setAttribute('width', 24); image.setAttribute('height', 24);
+          image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+          image.setAttribute('pointer-events', 'none');
+          svg.append(image);
+        }
       }
       figure.append(svg);
       return figure;
@@ -303,26 +313,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         languageSelect.value = GoblinLanguage.current;
         languageSelect.onchange = () => GoblinLanguage.choose(languageSelect.value);
         language.append(languageSelect);
-        const style = document.createElement('label'); style.textContent = t('ui.settings.style');
-        const styleSelect = document.createElement('select'); styleSelect.id = 'v2-style';
-        for (const entry of UnitVisuals.styles) {
-          const option = document.createElement('option'); option.value = entry.id;
-          option.textContent = t(`v2.ui.iconStyle.${entry.id}`); styleSelect.append(option);
-        }
-        styleSelect.value = UnitVisuals.currentStyle();
-        styleSelect.onchange = () => {
-          const legacy = document.querySelector('#art-style-select');
-          legacy.value = styleSelect.value;
-          legacy.dispatchEvent(new Event('change', { bubbles: true }));
-          styleSelect.value = UnitVisuals.currentStyle();
-        };
-        style.append(styleSelect);
         const grid = document.createElement('label'); grid.className = 'v2-setting-check';
         const gridInput = document.createElement('input'); gridInput.type = 'checkbox'; gridInput.id = 'v2-grid';
         gridInput.checked = GoblinUIV2.gridVisible;
         gridInput.onchange = () => GoblinUIV2.setGridVisible(gridInput.checked);
         grid.append(gridInput, document.createTextNode(t('ui.settings.grid')));
-        panel.append(language, style, grid, paragraph(t('ui.settings.note')),
+        panel.append(language, grid, paragraph(t('ui.settings.note')),
           actions(button(t('ui.nav.back'), goBack)));
       }
       if (focus) panel.querySelector('button:not(:disabled),select')?.focus({ preventScroll: true });

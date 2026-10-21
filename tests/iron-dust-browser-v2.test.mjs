@@ -333,9 +333,9 @@ test('Pages path starts v2, can restart, and locks a failed v2 start', async () 
         asset,`${style.id} selection`);
       artPaths.add(asset);
     }
-    assert.equal(artPaths.size,6);
+    assert.equal(artPaths.size,1);
     assert.equal(JSON.stringify(bridge.session),beforeArtSwitch,
-      'switching art styles never changes the v2 game state');
+      'redrawing the fixed art style never changes the v2 game state');
     assert.equal(document.querySelector('#mission-sub').textContent,'v2.objective');
     assert.equal(document.querySelector('#objective-text').textContent,'CORE HP 5/5 · v2.objective');
     assert.equal(document.querySelector('#phase-title').textContent,'BEWEGUNG');

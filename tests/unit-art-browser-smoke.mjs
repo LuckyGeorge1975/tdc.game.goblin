@@ -1,6 +1,6 @@
-// BrowserAct CDP smoke for the isolated Unit-Art integration checkout.
-// Start tests/pages-prefix-server.mjs, open its /tdc.game.goblin/index.html URL
-// in a BrowserAct session, then pass `browser-act get cdp-url` as argv[2].
+// BrowserAct CDP smoke for the fixed technical illustration set.
+// Open a local /tdc.game.goblin/ page in a BrowserAct session, then pass
+// `browser-act get cdp-url` as argv[2].
 import assert from 'node:assert/strict';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -58,18 +58,19 @@ async function measure() {
 
 try {
   const targets = await send('Target.getTargets', {}, false);
-  const target = targets.targetInfos.find(item => item.type === 'page' && item.url.includes('/tdc.game.goblin/index.html'));
+  const target = targets.targetInfos.find(item => item.type === 'page' && item.url.includes('/tdc.game.goblin/'));
   assert.ok(target, 'BrowserAct integration tab not found');
   sessionId = (await send('Target.attachToTarget', { targetId: target.targetId, flatten: true }, false)).sessionId;
   await send('Runtime.enable'); await send('Page.enable'); await send('Network.enable');
   await viewport(1440, 900, false);
-  await send('Page.navigate', { url: 'http://127.0.0.1:4174/tdc.game.goblin/index.html?lang=de&unitArtAudit=1' });
-  for (let n = 0; n < 50 && !await js('!!window.UnitVisuals && document.querySelectorAll("#art-style-select option").length===6'); n++) await new Promise(resolve => setTimeout(resolve, 100));
-  assert.equal(await js('document.querySelectorAll("#art-style-select option").length'), 6);
-  await js("localStorage.removeItem('goblin-art-style')");
+  await send('Page.navigate', { url: `${new URL(target.url).origin}/tdc.game.goblin/index.html?lang=de&ui=legacy&unitArtAudit=1` });
+  for (let n = 0; n < 50 && !await js('!!window.UnitVisuals'); n++) await new Promise(resolve => setTimeout(resolve, 100));
+  await js("localStorage.setItem('goblin-art-style','06-military-symbols')");
   await send('Page.reload');
-  for (let n = 0; n < 50 && !await js('!!window.UnitVisuals && document.querySelectorAll("#art-style-select option").length===6'); n++) await new Promise(resolve => setTimeout(resolve, 100));
+  for (let n = 0; n < 50 && !await js('!!window.UnitVisuals'); n++) await new Promise(resolve => setTimeout(resolve, 100));
+  assert.equal(await js('document.querySelector("#art-style-select")'), null);
   assert.equal(await js('UnitVisuals.currentStyle()'), '02-technical-illustration');
+  assert.equal(await js("localStorage.getItem('goblin-art-style')"), '02-technical-illustration');
   await js("document.querySelector('#unit-guide-open').click()");
   for (let n = 0; n < 30 && !await js('document.querySelector("#guide-symbol img")?.naturalWidth'); n++) await new Promise(resolve => setTimeout(resolve, 100));
   const first = await measure();
@@ -84,30 +85,10 @@ try {
   assert.equal(await js("document.querySelector('#guide-range-map svg')?.querySelectorAll('polygon').length"),217);
   console.log('desktop', JSON.stringify(first));
 
-  const styles=['01-tabletop-miniatures','02-technical-illustration','03-industrial-realism','04-pixel-strategy','05-cel-shaded-comic','06-military-symbols'];
-  for(const style of styles){
-    await js("document.querySelector('#unit-guide-close').click()");
-    await js(`(() => { const picker=document.querySelector('#art-style-select'); picker.value='${style}'; picker.dispatchEvent(new Event('change',{bubbles:true})); })()`);
-    for(let n=0;n<30&&await js(`UnitVisuals.currentStyle()!=='${style}'`);n++) await new Promise(resolve=>setTimeout(resolve,100));
-    assert.equal(await js('UnitVisuals.currentStyle()'),style);
-    const art=await js("({roster:document.querySelector('#unit-roster .unit-art-image')?.getAttribute('src'),map:document.querySelector('.unit-svg image.unit-artwork')?.getAttribute('href'),terrain:UnitVisuals.terrainAssetFor('forest')})");
-    assert.equal(art.roster,`assets/unit-art/sets/${style}/icons/goblin-siegebreaker.svg`);
-    assert.equal(art.map,art.roster);
-    assert.match(art.terrain,/sets\/01-modular-stealth-geometry\/terrain\//);
-    await js("document.querySelector('#unit-guide-open').click()");
-    for(let n=0;n<30&&!await js('document.querySelector("#guide-symbol img")?.naturalWidth');n++) await new Promise(resolve=>setTimeout(resolve,100));
-    const guide=await measure();
-    const military=style==='06-military-symbols';
-    assert.equal(guide.src,`assets/unit-art/sets/${style}/library/goblin-siegebreaker${military?'':'@768'}.${military?'svg':'png'}`);
-    assert.match(guide.currentSrc,new RegExp(`/${style}/library/goblin-siegebreaker${military?'':'@1024'}\\.${military?'svg':'webp'}$`));
-    assert.deepEqual(guide.natural,military?{width:1024,height:768}:{width:1024,height:683});
-    assert.equal(guide.fit,'contain'); assert.equal(guide.clip,'none');
-    console.log('style switch',JSON.stringify({style,art,guide:guide.src}));
-  }
-  await screenshot('0t0-guide-military-desktop');
-  await js("document.querySelector('#unit-guide-close').click()");
-  await js("(() => { const picker=document.querySelector('#art-style-select'); picker.value='02-technical-illustration'; picker.dispatchEvent(new Event('change',{bubbles:true})); })()");
-  await js("document.querySelector('#unit-guide-open').click()");
+  const art=await js("({roster:document.querySelector('#unit-roster .unit-art-image')?.getAttribute('src'),map:document.querySelector('.unit-svg image.unit-artwork')?.getAttribute('href'),terrain:UnitVisuals.terrainAssetFor('forest')})");
+  assert.equal(art.roster,'assets/unit-art/sets/02-technical-illustration/icons/goblin-siegebreaker.png');
+  assert.equal(art.map,art.roster);
+  assert.match(art.terrain,/sets\/01-modular-stealth-geometry\/terrain\//);
 
   for (const [width, height, name] of [[390, 844, '0t0-guide-mobile'], [320, 568, '0t0-guide-mobile-min']]) {
     await viewport(width, height, true);

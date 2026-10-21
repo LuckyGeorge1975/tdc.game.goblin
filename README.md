@@ -30,8 +30,8 @@ Enthalten sind:
 - Der GOBLIN SIEGEBREAKER besitzt einen eigenen Systemzustand für Hauptbatterie, Sekundärbatterien, Raketen, Nahbereichsschutz und 45 Ketteneinheiten. Gegnerische Treffer werden gegen ein einzelnes System ausgewertet; Kettenschäden reduzieren seine Bewegung bei 30, 15 und 0 verbleibenden Kettenpunkten.
 - In der Fire Phase lassen sich die noch verfügbaren Waffensysteme des Siegebreakers einzeln auswählen und abfeuern. Nicht verbrauchte Batterien halten die Einheit handlungsfähig; Raketenmunition bleibt über Runden hinweg verbraucht.
 - Der Strategic Missile Carrier ist in `UNIT TRIAL` spielbar: eine Rakete pro Mission, Angriff 6 auf ein sichtbares Feindziel innerhalb von acht Hexen und Angriff 3 auf alle Einheiten in Nachbarhexen. Friendly Fire ist möglich; `BACK` stellt die Rakete innerhalb der Feuerphase wieder her.
-- Kartenmarker werden zentral über [docs/UNIT_VISUALS.md](docs/UNIT_VISUALS.md) konfiguriert. Lokale SVG-, PNG- oder WebP-Dateien können pro stabiler Einheiten-ID ausgetauscht werden, ohne Regeln oder Szenarien zu ändern.
-- [Sechs wählbare Grafiksets](assets/unit-art/README.md) mit je 26 kleinen Karten- und Listenicons und getrennten großen Ansichten im Unit Guide. `ICON SET` schaltet beide Größen gemeinsam um. Die fünf grafischen Guide-Sets laden 130 Content-08-WebP-Bilder mit PNG-Fallback; Military nutzt weiterhin getrennte kleine und große SVGs. In 0.1.18 bleibt die laufende Partie beim Wechsel erhalten. Die Wahl wird im Browser gemerkt. Herkunft und Grenzen der Motive stehen im [Unit-Art-Handoff](assets/unit-art/README.md) und in den [Content & Asset Notices](docs/CONTENT-NOTICES.md).
+- Einheitengrafiken werden zentral über [docs/UNIT_VISUALS.md](docs/UNIT_VISUALS.md) auf `02-technical-illustration` festgelegt. Karte, Listen und Bibliothek verwenden vorhandene Varianten derselben 26 Motive; Team- und Auswahlmarker bleiben getrennt.
+- Die [historischen Grafiksets](assets/unit-art/README.md) und ihre Herkunftsbelege bleiben im Repository erhalten. Die Spieloberfläche bietet keine Setumschaltung mehr; eine früher gespeicherte Auswahl wird auf Technische Illustration normalisiert. Herkunft und Grenzen stehen im [Unit-Art-Handoff](assets/unit-art/README.md) und in den [Content & Asset Notices](docs/CONTENT-NOTICES.md).
 - Vier auswählbare Legacy-Showcases K/U1/U2/U3, mobile Karten-/Truppen-/Intel-Navigation und die Niederlage bei simultaner vollständiger Ausschaltung. Die Showcases nutzen historische Field-Test-Werte; Katalog-Sonderregeln sind nicht vollständig umgesetzt.
 - Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
 
@@ -56,7 +56,6 @@ Danach `http://localhost:4173` öffnen.
 - `ESC`: aktive Einheitenauswahl aufheben
 - `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`: Overlay wechseln
 - `GRID`: dezentes Hexraster ein-/ausblenden
-- `ICON SET`: Stilrichtung für Karte, Listen und Unit Guide gemeinsam wechseln; die laufende Partie bleibt erhalten
 - `END TURN`: aktuelle Phase beenden bzw. Gegnerzug starten
 
 Nach Sieg oder Niederlage bleibt die Karte samt Combat Log sichtbar. Der Kampf wird nicht automatisch zurückgesetzt; nur `RESTART` startet die Mission neu.

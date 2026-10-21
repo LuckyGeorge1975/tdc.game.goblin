@@ -110,7 +110,8 @@ body.ui-v2-active #v2-team-markers .v2-selected-badge { fill: var(--v2-signal); 
 body.ui-v2-active #v2-team-markers .v2-focus-badge { fill: var(--v2-text); }
 .v2-own, .v2-target { display: grid; align-content: start; gap: 12px; min-height: 0; overflow: auto; }
 .v2-units { display: grid; align-content: start; gap: 6px; max-height: 32dvh; overflow: auto; }
-.v2-units button { width: 100%; text-align: left; }
+.v2-units button { width: 100%; text-align: left; display: flex; align-items: center; gap: 8px; }
+.v2-roster-art { width: 28px; height: 28px; object-fit: contain; flex: none; }
 .v2-systems-card summary, .v2-target summary { cursor: pointer; min-height: 44px; }
 .v2-systems-card #v2-systems { display: grid; gap: 4px; margin-top: 8px; }
 .v2-system-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-top: 1px solid var(--v2-line); padding: 4px 0; font-size: 13px; }

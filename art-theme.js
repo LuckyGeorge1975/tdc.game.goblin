@@ -1,20 +1,8 @@
 (function(){
   if(globalThis.goblinBootProfileError)return;
-  const picker=document.querySelector('#art-style-select');
-  if(!picker)return;
-
-  for(const style of UnitVisuals.styles){
-    const option=document.createElement('option');
-    option.value=style.id;
-    option.textContent=style.title;
-    picker.appendChild(option);
-  }
-
-  let saved=null;
-  try{saved=localStorage.getItem('goblin-art-style')}catch{/* Storage is optional. */}
-  const initial=UnitVisuals.styles.some(style=>style.id===saved)?saved:'02-technical-illustration';
-  UnitVisuals.setStyle(initial);
-  picker.value=initial;
+  const fixedStyle=UnitVisuals.currentStyle();
+  try{if(localStorage.getItem('goblin-art-style')!==fixedStyle)
+    localStorage.setItem('goblin-art-style',fixedStyle)}catch{/* Storage is optional. */}
 
   function replaceWithArt(container,unit,view='icons'){
     const asset=view==='icons'?(UnitVisuals.resolve(unit).asset||null)
@@ -24,7 +12,7 @@
     image.src=asset;
     image.alt='';
     image.className='unit-art-image';
-    if(view==='library'&&UnitVisuals.currentStyle()!=='06-military-symbols'){
+    if(view==='library'){
       const picture=document.createElement('picture');
       picture.className='unit-art-picture';
       const source=document.createElement('source');
@@ -67,17 +55,6 @@
     symbol.classList.add('art-active');
     replaceWithArt(symbol,unitGuideEntries[guideIndex],'library');
   };
-
-  picker.addEventListener('change',()=>{
-    const requested=picker.value,previous=UnitVisuals.currentStyle();
-    picker.value=previous;
-    if(requested===previous||!UnitVisuals.styles.some(style=>style.id===requested)||GameDialogs.isOpen())return;
-    UnitVisuals.setStyle(requested);
-    picker.value=requested;
-    try{localStorage.setItem('goblin-art-style',requested)}catch{/* Session still works. */}
-    draw();
-    renderUnitGuide();
-  });
 
   draw();
 })();

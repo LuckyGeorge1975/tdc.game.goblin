@@ -18,6 +18,15 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const at = selector => shell.querySelector(selector);
     const t = (key, params) => globalThis.GoblinLanguage?.t(key, params) || key;
     const core = () => globalThis.IronDustBrowserV2?.mode === 'ready';
+    function addRosterArt(button, unit) {
+      const asset = UnitVisuals.assetFor(unit);
+      if (!asset) return;
+      const image = document.createElement('img');
+      image.src = asset;
+      image.alt = '';
+      image.className = 'v2-roster-art';
+      button.prepend(image);
+    }
 
     function revision() {
       if (core()) return `core:${IronDustBrowserV2.epoch}:${IronDustBrowserV2.session.profile.digest}`;
@@ -543,6 +552,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         button.textContent = `${unit.name} · ${strength}${unit.hp <= 0 ? ` · ${t('v2.ui.destroyed')}` :
           unit.disabled ? ` · ${t('v2.ui.disabled')}` : unit.secondMoved ? ` · ${t('v2.ui.secondMoved')}` :
           unit.fired ? ` · ${t('v2.ui.fired')}` : unit.moved ? ` · ${t('v2.ui.moved')}` : ''}`;
+        addRosterArt(button, unit);
         button.setAttribute('aria-pressed',String(unit.id === view.actorId));
         button.disabled = unit.hp <= 0; button.onclick = () => chooseActor(unit.id); roster.append(button);
       });
@@ -678,6 +688,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const cargo = unit.transportCapacity ? units.find(item => item.id === unit.id) : null;
         button.textContent = `${unit.name} · ${system ? `${t('v2.ui.treads')} ${system.summary.treads}` :
           `${unit.hp}/${unit.maxHp} ${unit.infantry ? 'SP' : 'HP'}`}${unit.hp <= 0 ? ` · ${t('v2.ui.destroyed')}` : unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}${carrier ? ` · ${t('v2.ui.embarked')} ${carrier.name}` : ''}${cargo ? ` · ${t('v2.ui.cargo')} ${carrierLoad(cargo)}/${unit.transportCapacity}` : ''}${unit.strategicMissile ? ` · ${t('v2.ui.missile')} ${unit.missilesRemaining}` : ''}`;
+        addRosterArt(button, unit);
         button.setAttribute('aria-pressed', String(unit.id === view.actorId));
         button.disabled = unit.hp <= 0;
         button.onclick = () => chooseActor(unit.id);

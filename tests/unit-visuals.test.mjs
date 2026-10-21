@@ -1,119 +1,70 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync,existsSync} from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import vm from 'node:vm';
 
-function visualContext(){
-  const context=vm.createContext({document:{createElementNS(_ns,name){return {name,attributes:{},classList:{add(){}},setAttribute(key,value){this.attributes[key]=String(value)}}}}});
-  vm.runInContext(readFileSync(new URL('../unit-visuals.js',import.meta.url),'utf8'),context);
-  return context;
+const fixed = '02-technical-illustration';
+const prefix = `assets/unit-art/sets/${fixed}/`;
+const manifest = JSON.parse(readFileSync(new URL('../assets/unit-art/manifest.json', import.meta.url), 'utf8'));
+
+function visuals(file) {
+  const context = vm.createContext({});
+  vm.runInContext(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'), context);
+  return context.UnitVisuals;
 }
 
-test('visuals resolve by visualKey before stable unit id',()=>{
-  const {UnitVisuals}=visualContext();
-  UnitVisuals.register('scenario-variant',{shape:'objective',label:'V'});
-  assert.equal(UnitVisuals.resolve({id:'gev',visualKey:'scenario-variant'}).label,'V');
-  assert.equal(UnitVisuals.resolve({id:'gev'}).shape,'skimmer');
-});
+for (const source of ['unit-visuals.js', 'src/legacy/scripts/unit-visuals.js']) {
+  test(`${source} exposes only the fixed runtime set and rejects foreign styles`, () => {
+    const art = visuals(source);
+    assert.deepEqual(Array.from(art.styles, item => item.id), [fixed]);
+    assert.equal(art.currentStyle(), fixed);
+    assert.equal(art.setStyle('06-military-symbols'), false);
+    assert.equal(art.setStyle('01-tabletop-miniatures'), false);
+    assert.equal(art.currentStyle(), fixed);
+    assert.throws(() => art.setAsset('ogre', 'assets/unit-art/sets/06-military-symbols/icons/goblin-siegebreaker.svg'),
+      /fixed technical illustration/);
+    art.register('ogre', { kind: 'asset', asset: 'assets/unit-art/sets/06-military-symbols/icons/goblin-siegebreaker.svg' });
+    assert.equal(art.resolve({ id:'ogre', name:'GOBLIN SIEGEBREAKER' }).asset,
+      `${prefix}icons/goblin-siegebreaker.png`);
+  });
 
-test('a local asset can replace a vector without changing the unit',()=>{
-  const {UnitVisuals}=visualContext(),children=[];
-  UnitVisuals.setAsset('heavy-tank','assets/units/assault-tank.svg',{size:46});
-  const node=UnitVisuals.draw({appendChild(child){children.push(child)}},{id:'heavy-tank',icon:'A',team:'player'},{x:40,y:50},{ns:'svg',color:'#fff'});
-  assert.equal(node.name,'image');
-  assert.equal(node.attributes.href,'assets/units/assault-tank.svg');
-  assert.equal(node.attributes.width,'46');
-  assert.equal(children.length,1);
-});
-
-test('remote artwork URLs are rejected',()=>{
-  const {UnitVisuals}=visualContext();
-  assert.throws(()=>UnitVisuals.setAsset('gev','https://example.com/unit.svg'),/local project path/);
-});
-
-test('six art sets resolve all 26 icon and guide pairs by unit name',()=>{
-  const {UnitVisuals}=visualContext();
-  const manifest=JSON.parse(readFileSync(new URL('../assets/unit-art/manifest.json',import.meta.url),'utf8'));
-  assert.equal(UnitVisuals.styles.length,6);
-  assert.equal(manifest.styles.length,6);
-  for(const style of UnitVisuals.styles){
-    assert.ok(UnitVisuals.setStyle(style.id));
-    const metadata=manifest.styles.find(entry=>entry.id===style.id);
-    assert.ok(metadata);
-    assert.equal(metadata.terrainFallback,'01-modular-stealth-geometry');
-    assert.ok(existsSync(new URL(`../assets/unit-art/${metadata.logoFallback||`sets/${style.id}/logo.svg`}`,import.meta.url)));
-    for(const {id,name} of manifest.units){
-      const unit={id:'scenario-alias',name};
-      assert.equal(UnitVisuals.artKey(unit),id);
-      for(const view of ['icons','library']){
-        const path=UnitVisuals.assetFor(unit,view);
-        const isGuidePng=view==='library'&&style.id!=='06-military-symbols';
-        const isIconPng=view==='icons'&&style.id!=='06-military-symbols';
-        const isPng=isGuidePng||isIconPng;
-        assert.equal(path,`assets/unit-art/sets/${style.id}/${view}/${id}${isGuidePng?'@768':''}.${isPng?'png':'svg'}`);
-        assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),`${style.id}/${view}/${id}`);
-        if(isPng){
-          const png=readFileSync(new URL(`../${path}`,import.meta.url));
-          assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a',path);
-          assert.equal(png.readUInt32BE(16),isIconPng?256:768,path);
-          assert.equal(png.readUInt32BE(20),isIconPng?256:512,path);
-          assert.equal(png[25],6,path);
-          if(isGuidePng){
-            const webpPath=UnitVisuals.assetFor(unit,view,'webp');
-            assert.equal(webpPath,`assets/unit-art/sets/${style.id}/${view}/${id}@1024.webp`);
-            const webp=readFileSync(new URL(`../${webpPath}`,import.meta.url));
-            assert.equal(webp.toString('ascii',0,4),'RIFF',webpPath);
-            assert.equal(webp.toString('ascii',8,12),'WEBP',webpPath);
-            assert.equal(existsSync(new URL(`../assets/unit-art/sets/${style.id}/${view}/${id}.png`,import.meta.url)),false);
-          }
-        }else{
-          const svg=readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
-          assert.match(svg,new RegExp(`width="${view==='icons'?'256':'1024'}"`),path);
-          assert.match(svg,new RegExp(`height="${view==='icons'?'256':'768'}"`),path);
-        }
-      }
+  test(`${source} resolves all 26 unit aliases to existing icon and guide variants`, () => {
+    const art = visuals(source);
+    assert.equal(manifest.units.length, 26);
+    for (const { id, name } of manifest.units) {
+      const unit = { id:'scenario-alias', name };
+      assert.equal(art.artKey(unit), id);
+      const icon = art.assetFor(unit, 'icons');
+      const png = art.assetFor(unit, 'library');
+      const webp = art.assetFor(unit, 'library', 'webp');
+      assert.equal(icon, `${prefix}icons/${id}.png`);
+      assert.equal(png, `${prefix}library/${id}@768.png`);
+      assert.equal(webp, `${prefix}library/${id}@1024.webp`);
+      for (const path of [icon, png, webp]) assert.ok(existsSync(new URL(`../${path}`, import.meta.url)), path);
+      const iconBytes = readFileSync(new URL(`../${icon}`, import.meta.url));
+      assert.equal(iconBytes.subarray(0,8).toString('hex'), '89504e470d0a1a0a', icon);
+      assert.equal(iconBytes.readUInt32BE(16), 256, icon);
+      assert.equal(iconBytes.readUInt32BE(20), 256, icon);
+      const guideBytes = readFileSync(new URL(`../${png}`, import.meta.url));
+      assert.equal(guideBytes.readUInt32BE(16), 768, png);
+      assert.equal(guideBytes.readUInt32BE(20), 512, png);
+      const webpBytes = readFileSync(new URL(`../${webp}`, import.meta.url));
+      assert.equal(webpBytes.toString('ascii',0,4), 'RIFF', webp);
+      assert.equal(webpBytes.toString('ascii',8,12), 'WEBP', webp);
     }
-    const iconExtension=style.id==='06-military-symbols'?'svg':'png';
-    assert.match(UnitVisuals.resolve({id:'infantry',name:'FIELD ENGINEERS'}).asset,new RegExp(`field-engineers\\.${iconExtension}$`));
-    assert.match(UnitVisuals.resolve({id:'core',name:'RELAY NODE'}).asset,new RegExp(`relay-node\\.${iconExtension}$`));
-    assert.match(UnitVisuals.resolve({id:'guard',name:'SIEGE TANK'}).asset,new RegExp(`siege-tank\\.${iconExtension}$`));
-  }
-  assert.equal(UnitVisuals.setStyle('unknown'),false);
-});
+    assert.equal(art.resolve({ id:'infantry', name:'FIELD ENGINEERS' }).asset,
+      `${prefix}icons/field-engineers.png`);
+    assert.equal(art.resolve({ id:'core', name:'RELAY NODE' }).asset,
+      `${prefix}icons/relay-node.png`);
+  });
 
-test('guide artwork follows each map style for all 26 units',()=>{
-  const {UnitVisuals}=visualContext();
-  const manifest=JSON.parse(readFileSync(new URL('../assets/unit-art/manifest.json',import.meta.url),'utf8'));
-  for(const style of UnitVisuals.styles){
-    UnitVisuals.setStyle(style.id);
-    for(const unit of manifest.units){
-      const path=UnitVisuals.assetFor(unit,'library');
-      assert.equal(path,style.id==='06-military-symbols'
-        ?`assets/unit-art/sets/${style.id}/library/${unit.id}.svg`
-        :`assets/unit-art/sets/${style.id}/library/${unit.id}@768.png`);
-      assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),path);
+  test(`${source} keeps terrain fallback separate from the unit set`, () => {
+    const art = visuals(source);
+    for (const type of ['open-ground','rubble-field','mountain','ridge','forest','marsh',
+      'water','river','road','bridge','urban','crater']) {
+      const path = art.terrainAssetFor(type);
+      assert.equal(path, `assets/unit-art/sets/01-modular-stealth-geometry/terrain/${type}.svg`);
+      assert.ok(existsSync(new URL(`../${path}`, import.meta.url)), path);
     }
-  }
-});
-
-test('explicit local artwork still overrides the active art set',()=>{
-  const {UnitVisuals}=visualContext();
-  UnitVisuals.setStyle(UnitVisuals.styles[0].id);
-  UnitVisuals.setAsset('heavy-tank','assets/custom-tank.svg');
-  assert.equal(UnitVisuals.resolve({id:'heavy-tank',name:'ASSAULT TANK'}).asset,'assets/custom-tank.svg');
-});
-
-test('all twelve terrain visuals exist for each runtime style',()=>{
-  const {UnitVisuals}=visualContext();
-  const types=['open-ground','rubble-field','mountain','ridge','forest','marsh','water','river','road','bridge','urban','crater'];
-  for(const style of UnitVisuals.styles){
-    UnitVisuals.setStyle(style.id);
-    for(const type of types){
-      const path=UnitVisuals.terrainAssetFor(type);
-      assert.ok(path?.includes(`/terrain/${type}.svg`));
-      assert.ok(path.includes('/01-modular-stealth-geometry/'));
-      assert.ok(existsSync(new URL(`../${path}`,import.meta.url)),path);
-    }
-  }
-  assert.equal(UnitVisuals.terrainAssetFor('not-terrain'),null);
-});
+  });
+}

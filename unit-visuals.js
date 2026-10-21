@@ -1,14 +1,8 @@
 (function(root){
   const registry=new Map();
   const defaults=Object.freeze({kind:'vector',shape:'hex',scale:1});
-  const styles=Object.freeze([
-    Object.freeze({id:'01-tabletop-miniatures',title:'Tabletop-Miniaturen'}),
-    Object.freeze({id:'02-technical-illustration',title:'Technische Illustration'}),
-    Object.freeze({id:'03-industrial-realism',title:'Industrieller Realismus'}),
-    Object.freeze({id:'04-pixel-strategy',title:'Pixel-Strategie'}),
-    Object.freeze({id:'05-cel-shaded-comic',title:'Cel-Shading / Comic'}),
-    Object.freeze({id:'06-military-symbols',title:'Militärische Kartensymbole'})
-  ]);
+  const fixedStyle='02-technical-illustration';
+  const styles=Object.freeze([Object.freeze({id:fixedStyle,title:'Technische Illustration'})]);
   const artKeys=new Set([
     'goblin-siegebreaker','skimmer-scout','rocket-artillery','infantry-squad','assault-tank',
     'recon-tank','siege-tank','long-range-battery','mobile-siege-gun','combat-skimmer',
@@ -17,8 +11,8 @@
     'forge-engineer','phantom-platform','infantry-platoon','command-core','relay-node',
     'guard-tank','raider-skimmer'
   ]);
-  let activeStyle=null;
   const terrainFallback='01-modular-stealth-geometry';
+  const fixedAssetPrefix=`assets/unit-art/sets/${fixedStyle}/`;
 
   function register(key,descriptor){
     if(!key||!descriptor)throw new Error('Visual key and descriptor are required.');
@@ -32,35 +26,32 @@
 
   function assetFor(unit,view='icons',format='png'){
     const key=artKey(unit);
-    if(!activeStyle||!key||!['icons','library'].includes(view))return null;
-    if(view==='library'&&activeStyle!=='06-military-symbols'){
+    if(!key||!['icons','library'].includes(view))return null;
+    if(view==='library'){
       if(!['png','webp'].includes(format))return null;
-      return `assets/unit-art/sets/${activeStyle}/${view}/${key}@${format==='webp'?'1024':'768'}.${format}`;
+      return `${fixedAssetPrefix}${view}/${key}@${format==='webp'?'1024':'768'}.${format}`;
     }
-    const extension=view==='icons'&&activeStyle!=='06-military-symbols'?'png':'svg';
-    return `assets/unit-art/sets/${activeStyle}/${view}/${key}.${extension}`;
+    return `${fixedAssetPrefix}${view}/${key}.png`;
   }
 
   const terrainKeys=new Set(['open-ground','rubble-field','mountain','ridge','forest','marsh','water','river','road','bridge','urban','crater']);
   function terrainAssetFor(type){
-    return activeStyle&&terrainKeys.has(type)?`assets/unit-art/sets/${terrainFallback}/terrain/${type}.svg`:null;
+    return terrainKeys.has(type)?`assets/unit-art/sets/${terrainFallback}/terrain/${type}.svg`:null;
   }
 
   function setStyle(id){
-    if(!styles.some(style=>style.id===id))return false;
-    activeStyle=id;
-    return true;
+    return id===fixedStyle;
   }
 
-  function currentStyle(){return activeStyle}
+  function currentStyle(){return fixedStyle}
 
   function resolve(unit){
     const explicit=unit.visualKey&&registry.get(unit.visualKey);
-    if(explicit)return explicit;
+    if(explicit&&(explicit.kind!=='asset'||explicit.asset?.startsWith(fixedAssetPrefix)))return explicit;
     const registered=registry.get(unit.id)||registry.get(unit.type);
-    if(registered?.kind==='asset')return registered;
+    if(registered?.kind==='asset'&&registered.asset?.startsWith(fixedAssetPrefix))return registered;
     const asset=assetFor(unit);
-    return asset?{kind:'asset',asset,size:54}:registered||defaults;
+    return asset?{kind:'asset',asset,size:54}:registered?.kind==='asset'?defaults:registered||defaults;
   }
 
   function polygonPoints(shape,c,scale=1){
@@ -116,7 +107,7 @@
   }
 
   function setAsset(key,asset,options={}){
-    if(!asset||/^(?:https?:)?\/\//i.test(asset))throw new Error('Unit artwork must use a local project path.');
+    if(!asset?.startsWith(fixedAssetPrefix))throw new Error('Unit artwork must use the fixed technical illustration set.');
     register(key,{...options,kind:'asset',asset});
   }
 
