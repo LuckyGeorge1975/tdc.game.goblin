@@ -506,6 +506,8 @@
     'v2.ui.commandTarget': {de:'Befehle für markiertes Zielfeld',en:'Orders for selected hex',es:'Órdenes para la casilla seleccionada',fr:'Ordres pour la case sélectionnée'},
     'v2.ui.fieldSystems': {de:'Feld und Systeme',en:'Hex and systems',es:'Casilla y sistemas',fr:'Case et systèmes'},
     'v2.ui.mapPan': {de:'Karte verschieben',en:'Pan map',es:'Desplazar el mapa',fr:'Déplacer la carte'},
+    'v2.ui.mapFit': {de:'Einpassen',en:'Fit map',es:'Ajustar mapa',fr:'Ajuster la carte'},
+    'v2.ui.centerSelection': {de:'Auswahl zentrieren',en:'Center selection',es:'Centrar selección',fr:'Centrer la sélection'},
     'v2.ui.embarked': {de:'Eingeschifft in',en:'Embarked in',es:'Embarcada en',fr:'Embarquée dans'},
     'v2.ui.cargo': {de:'Fracht',en:'Cargo',es:'Carga',fr:'Cargaison'},
     'v2.ui.infantrySummary': {de:'{unitId} · {unitType} · {hp}/{maxHp} SP',en:'{unitId} · {unitType} · {hp}/{maxHp} SP',es:'{unitId} · {unitType} · {hp}/{maxHp} PF',fr:'{unitId} · {unitType} · {hp}/{maxHp} PF'},

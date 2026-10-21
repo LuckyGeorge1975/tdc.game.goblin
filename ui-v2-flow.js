@@ -111,7 +111,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         map.focus({ preventScroll: true });
         requestAnimationFrame(() => {
           if (screen !== 'play') return;
-          if (previous === 'briefing') map.scrollIntoView({ block: 'start' });
+          if (previous === 'briefing') globalThis.scrollTo(0, 0);
           else globalThis.scrollTo(0, playScrollY);
         });
       }

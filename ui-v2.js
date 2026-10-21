@@ -10,7 +10,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     shell.className = 'v2-shell';
     shell.innerHTML = `
       <header class="v2-head"><div><span class="v2-label">G.O.B.L.I.N. / Mission</span><h1 id="v2-mission"></h1><p id="v2-objective"></p></div><div><span class="v2-label" id="v2-profile"></span><strong id="v2-phase"></strong><p id="v2-turn"></p></div></header>
-      <div class="v2-layout"><aside class="v2-own"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card v2-systems-card"><details id="v2-system-details" open><summary class="v2-label" id="v2-systems-label"></summary><div id="v2-systems"></div></details></section></aside><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><button type="button" id="v2-undo"></button></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main><aside class="v2-target"><section class="v2-card"><span class="v2-label" id="v2-intel-label"></span><div id="v2-intel"></div></section><section class="v2-card v2-log-card"><details id="v2-log-details" open><summary class="v2-label" id="v2-log-label"></summary><div id="v2-log"></div></details></section></aside></div><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target" hidden><div class="v2-command-head"><span class="v2-label" id="v2-command-target"></span><p id="v2-command-intel"></p></div><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section>`;
+      <div class="v2-layout"><aside class="v2-own"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card v2-systems-card"><details id="v2-system-details" open><summary class="v2-label" id="v2-systems-label"></summary><div id="v2-systems"></div></details></section></aside><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><button type="button" id="v2-undo"></button></div><div class="v2-map-tools" role="group" id="v2-map-tools"><button type="button" id="v2-zoom-out">−</button><button type="button" id="v2-zoom-in">+</button><button type="button" id="v2-zoom-fit"></button><button type="button" id="v2-zoom-center"></button></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main><aside class="v2-target"><section class="v2-card"><details id="v2-intel-details" open><summary class="v2-label" id="v2-intel-label"></summary><div id="v2-intel"></div></details></section><section class="v2-card v2-log-card"><details id="v2-log-details" open><summary class="v2-label" id="v2-log-label"></summary><div id="v2-log"></div></details></section></aside></div><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target" hidden><div class="v2-command-head"><span class="v2-label" id="v2-command-target"></span><p id="v2-command-intel"></p></div><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section>`;
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
     document.body.classList.add('ui-v2-active');
@@ -165,7 +165,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function resetView() {
       view.actorId = null; view.infoCell = null; view.focusCell = null; clearContext();
-      view.zoom = 1; nativeMap.style.removeProperty('width'); nativeMap.style.removeProperty('height');
+      view.zoom = 1; applyMapSize();
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
     }
@@ -277,7 +277,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           view.message = result.ok ? '' : result.reason;
           render();
           if (result.ok && keepTarget) at('#v2-actions button:not(:disabled)')?.focus();
-          else if (result.ok) {at('#v2-map').focus({preventScroll:true});at('.v2-map-card').scrollIntoView({block:'start'});}
+          else if (result.ok) {at('#v2-map').focus({preventScroll:true});showMapCard();}
           else (at('#v2-actions button:not(:disabled)') || at('#v2-command-footer button'))?.focus();
         };
         actions.append(button);
@@ -306,7 +306,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
       at('#v2-map').focus({ preventScroll: true });
       const hex = unit && nativeMap.querySelector(`.hex[data-x="${unit.x}"][data-y="${unit.y}"]`);
-      hex?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      centerOnHex(hex);
     }
     function chooseHex(x, y) {
       const roster = core() ? project().units : units;
@@ -319,7 +319,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       view.intentRevision = revision(); view.message = ''; render();
       if (view.actorId) {
         if (matchMedia('(max-width: 599px), (max-height: 500px)').matches)
-          at('#v2-map').scrollIntoView({ block: 'start' });
+          showMapCard();
         (at('#v2-actions button:not(:disabled)') || at('#v2-command-footer button'))?.focus();
       }
     }
@@ -440,6 +440,18 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       globalThis.dispatchEvent(new Event('goblin-v2-render'));
     }
     function render() {
+      const zoomOut = at('#v2-zoom-out'), zoomIn = at('#v2-zoom-in');
+      const fit = at('#v2-zoom-fit'), center = at('#v2-zoom-center');
+      zoomOut.setAttribute('aria-label', t('ui.hud.zoomOut'));
+      zoomIn.setAttribute('aria-label', t('ui.hud.zoomIn'));
+      fit.textContent = t('v2.ui.mapFit');
+      fit.setAttribute('aria-label', fit.textContent);
+      center.textContent = t('v2.ui.centerSelection');
+      center.setAttribute('aria-label', center.textContent);
+      at('#v2-map-tools').setAttribute('aria-label', t('ui.hud.map'));
+      zoomOut.disabled = view.zoom <= 1;
+      zoomIn.disabled = view.zoom >= 4;
+      center.disabled = !view.actorId;
       const state = project();
       if (core()) { renderCore(state); return; }
       const actor = state.units.find(unit => unit.id === view.actorId);
@@ -607,11 +619,34 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       GameDialogs.whenIdle().then(render);
     };
     const mapPanel = at('#v2-map');
+    function showMapCard() {
+      const card = at('.v2-map-card'), head = at('.v2-head');
+      const top = card.getBoundingClientRect().top + scrollY - head.getBoundingClientRect().height - 8;
+      scrollTo(0, Math.max(0, top));
+    }
+    function centerOnHex(hex) {
+      if (!hex) return;
+      const box = hex.getBoundingClientRect(), frame = mapPanel.getBoundingClientRect();
+      mapPanel.scrollLeft += box.left + box.width / 2 - frame.left - frame.width / 2;
+      mapPanel.scrollTop += box.top + box.height / 2 - frame.top - frame.height / 2;
+    }
+    function applyMapSize() {
+      if (!mapPanel.clientWidth || !mapPanel.clientHeight) return;
+      const box = nativeMap.viewBox.baseVal;
+      const width = box.width || 790, height = box.height || 480;
+      const fit = Math.min(mapPanel.clientWidth / width, mapPanel.clientHeight / height);
+      const scaledWidth = width * fit * view.zoom, scaledHeight = height * fit * view.zoom;
+      nativeMap.style.width = `${scaledWidth}px`;
+      nativeMap.style.height = `${scaledHeight}px`;
+      nativeMap.style.marginTop = `${Math.max(0, (mapPanel.clientHeight - scaledHeight) / 2)}px`;
+    }
+    new ResizeObserver(() => applyMapSize()).observe(mapPanel);
     let compactDetails = null;
     function syncLayout() {
       const compact = matchMedia('(max-width: 599px), (max-height: 500px)').matches;
       if (compact !== compactDetails) {
         at('#v2-system-details').open = !compact;
+        at('#v2-intel-details').open = !compact;
         at('#v2-log-details').open = !compact;
         compactDetails = compact;
       }
@@ -649,19 +684,25 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function setZoom(value, clientX = mapPanel.getBoundingClientRect().left + mapPanel.clientWidth / 2,
       clientY = mapPanel.getBoundingClientRect().top + mapPanel.clientHeight / 2) {
-      const next = Math.max(1, Math.min(2.5, value));
+      const next = Math.max(1, Math.min(4, value));
       if (next === view.zoom) return;
-      const rect = mapPanel.getBoundingClientRect(), ratio = next / view.zoom;
-      const x = mapPanel.scrollLeft + clientX - rect.left, y = mapPanel.scrollTop + clientY - rect.top;
+      const point = nativeMap.createSVGPoint();
+      point.x = clientX; point.y = clientY;
+      const world = point.matrixTransform(nativeMap.getScreenCTM().inverse());
       view.zoom = next;
-      if (next === 1) { nativeMap.style.removeProperty('width'); nativeMap.style.removeProperty('height'); }
-      else {
-        nativeMap.style.width = `${Math.max(640, mapPanel.clientWidth) * next}px`;
-        nativeMap.style.height = `${Math.max(390, mapPanel.clientHeight) * next}px`;
-      }
-      mapPanel.scrollLeft = x * ratio - (clientX - rect.left);
-      mapPanel.scrollTop = y * ratio - (clientY - rect.top);
+      applyMapSize();
+      const screen = world.matrixTransform(nativeMap.getScreenCTM());
+      mapPanel.scrollLeft += screen.x - clientX;
+      mapPanel.scrollTop += screen.y - clientY;
+      render();
     }
+    at('#v2-zoom-out').onclick = () => setZoom(view.zoom / 1.25);
+    at('#v2-zoom-in').onclick = () => setZoom(view.zoom * 1.25);
+    at('#v2-zoom-fit').onclick = () => { view.zoom = 1; applyMapSize(); mapPanel.scrollTo(0, 0); render(); };
+    at('#v2-zoom-center').onclick = () => {
+      const actor = project().units.find(unit => unit.id === view.actorId);
+      if (actor) centerOnHex(nativeMap.querySelector(`.hex[data-x="${actor.x}"][data-y="${actor.y}"]`));
+    };
     function pointerDistance() {
       const [first, second] = [...pointers.values()];
       return Math.hypot(first.x - second.x, first.y - second.y);
