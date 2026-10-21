@@ -5,12 +5,12 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const nativeMap = document.querySelector('#battlefield-map');
     const nativeShell = document.querySelector('.app-shell');
     const view = { actorId: null, target: null, infoCell: null, focusCell: null,
-      intentRevision: null, busy: false, message: '', zoom: 1 };
+      intentRevision: null, busy: false, message: '', zoom: 1, areaMode: null, gridVisible: false };
     const shell = document.createElement('div');
     shell.className = 'v2-shell';
     shell.innerHTML = `
       <header class="v2-head"><div><span class="v2-label">G.O.B.L.I.N. / Mission</span><h1 id="v2-mission"></h1><p id="v2-objective"></p></div><div><span class="v2-label" id="v2-profile"></span><strong id="v2-phase"></strong><p id="v2-turn"></p></div></header>
-      <div class="v2-layout"><aside class="v2-own"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card v2-systems-card"><details id="v2-system-details" open><summary class="v2-label" id="v2-systems-label"></summary><div id="v2-systems"></div></details></section></aside><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><button type="button" id="v2-undo"></button></div><div class="v2-map-tools" role="group" id="v2-map-tools"><button type="button" id="v2-zoom-out">−</button><button type="button" id="v2-zoom-in">+</button><button type="button" id="v2-zoom-fit"></button><button type="button" id="v2-zoom-center"></button></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main><aside class="v2-target"><section class="v2-card"><details id="v2-intel-details" open><summary class="v2-label" id="v2-intel-label"></summary><div id="v2-intel"></div></details></section><section class="v2-card v2-log-card"><details id="v2-log-details" open><summary class="v2-label" id="v2-log-label"></summary><div id="v2-log"></div></details></section></aside></div><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target" hidden><div class="v2-command-head"><span class="v2-label" id="v2-command-target"></span><p id="v2-command-intel"></p></div><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section>`;
+      <div class="v2-layout"><aside class="v2-own"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card v2-systems-card"><details id="v2-system-details" open><summary class="v2-label" id="v2-systems-label"></summary><div id="v2-systems"></div></details></section></aside><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><div class="v2-area-controls" role="group" id="v2-area-controls"><button type="button" data-area="movement"></button><button type="button" data-area="fire"></button><button type="button" data-area="los"></button><button type="button" id="v2-area-grid"></button></div><button type="button" id="v2-undo"></button></div><div class="v2-map-tools" role="group" id="v2-map-tools"><button type="button" id="v2-zoom-out">−</button><button type="button" id="v2-zoom-in">+</button><button type="button" id="v2-zoom-fit"></button><button type="button" id="v2-zoom-center"></button></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-area-legend" class="v2-area-legend" role="status"></p><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main><aside class="v2-target"><section class="v2-card"><details id="v2-intel-details" open><summary class="v2-label" id="v2-intel-label"></summary><div id="v2-intel"></div></details></section><section class="v2-card v2-log-card"><details id="v2-log-details" open><summary class="v2-label" id="v2-log-label"></summary><div id="v2-log"></div></details></section></aside></div><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target" hidden><div class="v2-command-head"><span class="v2-label" id="v2-command-target"></span><p id="v2-command-intel"></p></div><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section>`;
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
     document.body.classList.add('ui-v2-active');
@@ -165,11 +165,12 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function resetView() {
       view.actorId = null; view.infoCell = null; view.focusCell = null; clearContext();
-      view.zoom = 1; applyMapSize();
+      view.zoom = 1; view.areaMode = null; applyMapSize();
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
     }
     globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo, resetView, focusUnit,
+      get gridVisible() { return view.gridVisible; }, setGridVisible(value) { view.gridVisible = !!value; render(); },
       refresh: () => render() });
 
     function clearContext() { view.target = null; view.intentRevision = null; view.message = ''; }
@@ -293,6 +294,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function chooseActor(id) {
       const unit = (core() ? project().units : units).find(item => item.id === id && item.team === 'player' && item.hp > 0);
       view.actorId = unit?.id || null;
+      view.areaMode = null;
       if (unit) { view.focusCell = { x: unit.x, y: unit.y }; view.infoCell = { x: unit.x, y: unit.y }; }
       clearContext(); render();
     }
@@ -322,6 +324,134 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           showMapCard();
         (at('#v2-actions button:not(:disabled)') || at('#v2-command-footer button'))?.focus();
       }
+    }
+    const areaCache = { key: null, value: null };
+    let areaPhase = null;
+    function activeAreaMode(state) {
+      if (view.areaMode === 'none') return null;
+      return view.areaMode || (state.turnPhase === 'fire' ? 'fire' :
+        state.turnPhase === 'movement' || state.turnPhase === 'gev' ? 'movement' : null);
+    }
+    function areaQuery(command) {
+      if (!core()) return query(command);
+      const result = IronDustBrowserV2.query(command);
+      return result.available ? { ok: true, ...result } :
+        { ok: false, reason: IronDustBrowserV2.formatError(result.error?.code) };
+    }
+    function areaData(state, actor, mode) {
+      const data = { legal: [], blocked: [], status: '', reason: '' };
+      if (!actor) { data.status = 'select'; return data; }
+      if (state.phase !== 'player' || state.gameOver) { data.status = 'phase'; return data; }
+      if (actor.disabled || actor.hp <= 0) { data.status = 'unavailable'; data.reason = t('v2.ui.disabled'); return data; }
+      const runtime = core() ? actor : units.find(unit => unit.id === actor.id);
+      if (mode === 'movement') {
+        if (state.turnPhase !== 'movement' && state.turnPhase !== 'gev') { data.status = 'phase'; return data; }
+        if (runtime.embarkedOn) { data.status = 'unavailable'; data.reason = t('ui.error.UNIT_EMBARKED'); return data; }
+        if (state.turnPhase === 'movement' && runtime.moved || state.turnPhase === 'gev' && runtime.secondMoved) {
+          data.status = 'unavailable'; data.reason = t('ui.error.ACTION_SPENT'); return data;
+        }
+        const width = core() ? Math.max(...state.cells.map(cell => cell.x)) + 1 : W;
+        const height = core() ? Math.max(...state.cells.map(cell => cell.y)) + 1 : H;
+        for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+          if (x === actor.x && y === actor.y || state.units.some(unit => unit.hp > 0 && !unit.embarkedOn && unit.x === x && unit.y === y)) continue;
+          const result = core() ? areaQuery({ type: 'Move', playerId: 'player', unitId: actor.id, to: { x, y } }) :
+            areaQuery({ type: 'Move', actorId: actor.id, x, y });
+          if (result.ok) data.legal.push({ x, y, cost: core() ? result.cost :
+            result.path.reduce((sum, step) => sum + movementCost(runtime, `${step.x},${step.y}`), 0) });
+        }
+        data.status = data.legal.length ? 'move' : 'blocked';
+        return data;
+      }
+      if (mode === 'fire' && state.turnPhase !== 'fire') { data.status = 'phase'; return data; }
+      if (mode === 'los' && core() && state.turnPhase !== 'fire') {
+        data.status = 'unavailable'; data.reason = t('v2.area.coreSightLimit'); return data;
+      }
+      if (mode === 'los' && !core()) {
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+          if (x !== actor.x || y !== actor.y)
+            (lineOfSight(runtime, { x, y }) ? data.legal : data.blocked).push({ x, y });
+        }
+        data.status = 'sight';
+        return data;
+      }
+      const weaponKey = core() ? actor.selectedWeapon : runtime.ogreSystems?.selectedWeapon;
+      for (const target of state.units.filter(unit => unit.team === 'enemy' && unit.hp > 0 && !unit.embarkedOn)) {
+        const command = core() ? { type: 'PlayerFire', playerId: 'player', unitId: actor.id,
+          targetId: target.id, ...(weaponKey ? { weaponKey } : {}) } :
+          { type: 'Fire', actorId: actor.id, x: target.x, y: target.y,
+            ...(weaponKey ? { weaponKey } : {}) };
+        const result = areaQuery(command);
+        if (result.ok) data.legal.push({ x: target.x, y: target.y });
+        else if (mode === 'fire') data.blocked.push({ x: target.x, y: target.y, reason: result.reason });
+      }
+      data.status = mode === 'los' ? 'coreSight' :
+        data.legal.length ? 'fire' : 'blocked';
+      data.reason = mode === 'fire' && !data.legal.length ?
+        (data.blocked.find(item => item.reason)?.reason || t('v2.area.noLegalTarget')) : '';
+      return data;
+    }
+    function renderAreaPreview(state, actor) {
+      const phaseKey = `${state.phase}:${state.turnPhase}`;
+      if (areaPhase !== phaseKey) { view.areaMode = null; areaPhase = phaseKey; }
+      const mode = activeAreaMode(state);
+      for (const button of at('#v2-area-controls').querySelectorAll('[data-area]')) {
+        const key = button.dataset.area;
+        button.textContent = t(`v2.area.${key}`);
+        button.setAttribute('aria-pressed', String(mode === key));
+      }
+      const gridButton = at('#v2-area-grid');
+      gridButton.textContent = t('v2.area.grid');
+      gridButton.setAttribute('aria-pressed', String(view.gridVisible));
+      at('#v2-area-controls').setAttribute('aria-label', t('v2.area.controls'));
+      const nativeGrid = document.querySelector('#grid-toggle');
+      nativeGrid.setAttribute('aria-pressed', String(view.gridVisible));
+      nativeGrid.classList.toggle('active', view.gridVisible);
+      let grid = nativeMap.querySelector('#v2-grid-overlay');
+      if (view.gridVisible) {
+        if (!grid) { grid = document.createElementNS(NS, 'g'); grid.id = 'v2-grid-overlay';
+          grid.setAttribute('pointer-events', 'none'); nativeMap.insertBefore(grid, nativeMap.querySelector('.unit-svg,#v2-team-markers')); }
+        grid.replaceChildren();
+        const cells = core() ? state.cells : Array.from({ length: W * H }, (_, index) => ({ x: index % W, y: Math.floor(index / W) }));
+        for (const cell of cells) { const shape = document.createElementNS(NS, 'polygon');
+          shape.setAttribute('points', hexPoints(cell.x, cell.y)); shape.classList.add('v2-grid-line'); grid.append(shape); }
+      } else grid?.remove();
+      let overlay = nativeMap.querySelector('#v2-area-overlay');
+      if (!overlay) { overlay = document.createElementNS(NS, 'g'); overlay.id = 'v2-area-overlay';
+        overlay.setAttribute('pointer-events', 'none'); nativeMap.insertBefore(overlay, nativeMap.querySelector('.unit-svg,#v2-team-markers')); }
+      overlay.replaceChildren();
+      const legend = at('#v2-area-legend');
+      if (!mode || document.body.classList.contains('v2-screen-open')) { legend.textContent = ''; return; }
+      const runtime = core() ? actor : units.find(unit => unit.id === actor?.id);
+      const weaponKey = core() ? actor?.selectedWeapon : runtime?.ogreSystems?.selectedWeapon;
+      const weapon = core() ? actor?.weapons?.[weaponKey] : runtime?.ogreSystems?.weapons?.[weaponKey];
+      const key = JSON.stringify([core(), state.revision, state.phase, state.turnPhase,
+        actor?.id, mode, weaponKey, GoblinLanguage.current]);
+      if (areaCache.key !== key) { areaCache.key = key; areaCache.value = areaData(state, actor, mode); }
+      const data = areaCache.value;
+      function mark(cell, kind) {
+        const shape = document.createElementNS(NS, 'polygon');
+        shape.setAttribute('points', hexPoints(cell.x, cell.y)); shape.classList.add(`v2-area-${kind}`);
+        shape.dataset.x = String(cell.x); shape.dataset.y = String(cell.y);
+        overlay.append(shape);
+        if (kind === 'movement' && Number.isFinite(cell.cost)) {
+          const center = hexCenter(cell.x, cell.y), label = document.createElementNS(NS, 'text');
+          label.classList.add('v2-area-cost'); label.setAttribute('x', center.x);
+          label.setAttribute('y', center.y + 5); label.dataset.x = String(cell.x);
+          label.dataset.y = String(cell.y); label.textContent = String(cell.cost); overlay.append(label);
+        }
+      }
+      for (const cell of data.legal) mark(cell, mode === 'movement' ? 'movement' : mode === 'fire' ? 'fire' : 'sight');
+      if (mode !== 'los') for (const cell of data.blocked) mark(cell, 'blocked');
+      let message = t(`v2.area.status.${data.status}`, { count: data.legal.length });
+      if (weapon && mode === 'fire') message += ` · ${weapon.label}`;
+      if (data.reason) message += ` · ${data.reason}`;
+      if (view.target && mode === 'movement' && data.status === 'move' &&
+          !data.legal.some(cell => cell.x === view.target.x && cell.y === view.target.y)) {
+        const rejected = areaQuery(core() ? { type: 'Move', playerId: 'player', unitId: actor.id, to: view.target } :
+          { type: 'Move', actorId: actor.id, ...view.target });
+        if (!rejected.ok) message += ` · ${t('v2.area.status.blocked')}: ${rejected.reason}`;
+      }
+      legend.textContent = message;
     }
     function renderCore(state) {
       const actor = state.units.find(unit => unit.id === view.actorId && unit.hp > 0);
@@ -437,6 +567,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         shape.setAttribute('role','img');
         shape.setAttribute('aria-label',t(key,{unit:actor?.name||'',hex:`${String.fromCharCode(65+cell.x)}-${String(cell.y+1).padStart(2,'0')}`}));
       }
+      renderAreaPreview(state, actor);
       globalThis.dispatchEvent(new Event('goblin-v2-render'));
     }
     function render() {
@@ -601,8 +732,12 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       marker('v2-actor-marker', actor, 'v2.ui.marker.selected');
       marker('v2-target-marker', view.target, 'v2.ui.marker.target');
       marker('v2-focus-marker', view.focusCell, 'v2.ui.marker.focus');
+      renderAreaPreview(state, actor?.hp > 0 ? actor : null);
       globalThis.dispatchEvent(new Event('goblin-v2-render'));
     }
+    for (const button of at('#v2-area-controls').querySelectorAll('[data-area]'))
+      button.onclick = () => { view.areaMode = activeAreaMode(project()) === button.dataset.area ? 'none' : button.dataset.area; render(); };
+    at('#v2-area-grid').onclick = () => GoblinUIV2.setGridVisible(!view.gridVisible);
     at('#v2-undo').onclick = () => { const result = undo(); if (!result.ok) { view.message = result.reason; render(); } };
     at('#v2-phase-action').onclick = () => {
       if (core()) {
@@ -816,7 +951,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     globalThis.addEventListener('goblin-language-change', () => render());
     globalThis.addEventListener('goblin-core-v2-render', () => {if(core()) render();});
     new MutationObserver(changes => {
-      const own = node => node.nodeType === 1 && /^v2-(team-markers|actor-marker|target-marker|focus-marker)$/.test(node.id);
+      const own = node => node.nodeType === 1 && /^v2-(team-markers|actor-marker|target-marker|focus-marker|grid-overlay|area-overlay)$/.test(node.id);
       if (changes.some(change => [...change.addedNodes, ...change.removedNodes].some(node => !own(node)))) render();
     }).observe(nativeMap, { childList: true });
     render();

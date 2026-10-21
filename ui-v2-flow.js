@@ -319,8 +319,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         style.append(styleSelect);
         const grid = document.createElement('label'); grid.className = 'v2-setting-check';
         const gridInput = document.createElement('input'); gridInput.type = 'checkbox'; gridInput.id = 'v2-grid';
-        gridInput.checked = document.querySelector('#grid-toggle').getAttribute('aria-pressed') === 'true';
-        gridInput.onchange = () => document.querySelector('#grid-toggle').click();
+        gridInput.checked = GoblinUIV2.gridVisible;
+        gridInput.onchange = () => GoblinUIV2.setGridVisible(gridInput.checked);
         grid.append(gridInput, document.createTextNode(t('ui.settings.grid')));
         panel.append(language, style, grid, paragraph(t('ui.settings.note')),
           actions(button(t('ui.nav.back'), goBack)));
