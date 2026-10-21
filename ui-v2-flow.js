@@ -140,7 +140,19 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function goBack() { show(returnScreen === 'play' && GoblinUIV2.project().gameOver ? 'end' : returnScreen); }
     function returnToSelectedLevel() {
       show('levels', false);
-      document.getElementById(`v2-level-${missionId}`)?.focus();
+      const row = document.getElementById(`v2-level-${missionId}`);
+      const panel = surface.querySelector('.v2-screen-panel');
+      const list = panel?.querySelector('.v2-level-list');
+      const footer = panel?.querySelector('.v2-screen-footer');
+      const rowBounds = row?.getBoundingClientRect();
+      const listBounds = list?.getBoundingClientRect();
+      const panelBounds = panel?.getBoundingClientRect();
+      const footerBounds = footer?.getBoundingClientRect();
+      const rowVisible = rowBounds && listBounds && panelBounds && footerBounds &&
+        rowBounds.top >= Math.max(listBounds.top, panelBounds.top) &&
+        rowBounds.bottom <= Math.min(listBounds.bottom, footerBounds.top);
+      (rowVisible ? row : document.getElementById('v2-levels-select') || row)
+        ?.focus({ preventScroll: true });
     }
     async function confirmRestart() {
       if (GameDialogs.isOpen()) return;
@@ -268,6 +280,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const back = button(t('ui.nav.back'), () => show('menu')); back.id = 'v2-levels-back';
         const select = button(t('ui.levels.select'), () => show('briefing'), 'primary');
         select.id = 'v2-levels-select';
+        select.setAttribute('aria-label', `${t('ui.levels.select')}: ${t(`mission.${missionId}.title`)}`);
         footer.append(actions(back, select));
         panel.append(layout, footer);
       } else if (screen === 'briefing') {
