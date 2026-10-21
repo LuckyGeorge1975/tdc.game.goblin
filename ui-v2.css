@@ -134,6 +134,14 @@ body.ui-v2-active #v2-team-markers .v2-focus-badge { fill: var(--v2-text); }
 .v2-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center; }
 .v2-area-controls { display: flex; flex-wrap: wrap; gap: 4px; }
 .v2-area-controls button { min-height: 44px; padding: 5px 8px; font-size: 13px; }
+.v2-weapon-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; min-width: 0; }
+.v2-weapon-controls[hidden] { display: none; }
+#v2-map-tools .v2-weapon-controls { grid-column: 1 / -1; }
+.v2-weapon-controls button { min-width: 0; min-height: 44px; padding: 4px; font-size: 11px; line-height: 1.15; overflow-wrap: anywhere; }
+.v2-weapon-controls button[aria-pressed="true"] { border-width: 2px; }
+#v2-command-weapons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#v2-command-weapons button { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 599px) { #v2-map-tools .v2-weapon-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .v2-area-legend { min-height: 1.4em; font-size: 13px; }
 body.ui-v2-active #v2-grid-overlay, body.ui-v2-active #v2-area-overlay { pointer-events: none; }
 body.ui-v2-active .v2-grid-line { fill: none; stroke: var(--v2-line-strong); stroke-width: 1.5; stroke-dasharray: 4 4; }
