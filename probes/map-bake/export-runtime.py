@@ -13,6 +13,8 @@ LEVELS = ROOT / "assets/unit-art/levels/showcase-levels.json"
 REPORT = Path(__file__).with_name("RESULTS.json")
 OUTPUT = ROOT / "assets/map-bakes"
 SOURCE = "c01ecb80bcdd813772d1433d9ae63b39e54ef050"
+GENERATOR_SHA = "47a2bbc446a89937d97ba39728896492ed1b2c0457ca16673f386b694f941385"
+ARCHIVE_SHA = "7cb8cb6d28ba7c10ba862e06f25fec58ce29be6456c84a3fb52d3cb4ab0b353a"
 IMAGE_SHA = "065b930e386665629efd0c96e7d41d9f9a0ebe91b596885101269e5c3d03abc1"
 
 
@@ -28,6 +30,10 @@ def main(result_file, render_dir):
     source = report["source"]
     render = next(item for item in result["renders"] if item["run"] == 1 and item["hexPx"] == 192)
     image = (render_dir / render["webpFile"]).read_bytes()
+    if source["generatorHtmlSha256"] != GENERATOR_SHA:
+        raise ValueError("Pinned generator HTML SHA-256 differs")
+    if source["iconArchiveSha256"] != ARCHIVE_SHA:
+        raise ValueError("Pinned terrain archive SHA-256 differs")
     if (source["sourceCommit"] != SOURCE or result["contentPin"] != SOURCE or
         result["runtimeCommit"] != "3d50be780c3833d1ff8a160bc2342aa668fe7552" or
         source["profile"] != "FIELD_TEST_LEGACY_v1" or
