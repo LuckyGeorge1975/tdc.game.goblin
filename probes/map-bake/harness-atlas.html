@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="de">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Isolierte Atlas-Kartenprobe</title>
+<style>
+body{margin:1rem;font:16px system-ui;background:#18201b;color:#f3f3ec}
+button,a{font:inherit;min-height:44px;margin:.25rem;padding:.5rem 1rem}
+button{cursor:pointer}a{color:#a8dfd2}pre{white-space:pre-wrap;overflow-wrap:anywhere}
+img{display:block;width:min(100%,960px);height:auto;border:1px solid #4e6257}iframe{display:none}
+</style>
+<h1>Atlas · isolierte 192-px-Generatorprobe</h1>
+<p>Nur das unveränderte spielbare Level <code>atlas-proving-grounds</code>. Die Generator-HTML läuft im gleichursprünglichen, versteckten Frame. Ein Renderlauf startet erst nach Klick oder gezieltem Aufruf durch die beauftragte Testerrolle.</p>
+<button type="button" id="render">192 px rendern</button>
+<p id="downloads"></p>
+<pre id="status">Bereit. Noch kein Bild erzeugt.</pre>
+<img id="preview" alt="Gerenderte Atlas-Karte" hidden>
+<iframe id="generator" src="generator.html" title="Gepinnter Kartengenerator"></iframe>
+<script>
+const status=document.querySelector('#status');
+const preview=document.querySelector('#preview');
+const frame=document.querySelector('#generator');
+let previousUrls=[];
+const blobOf=(canvas,type,quality)=>new Promise((resolve,reject)=>
+  canvas.toBlob(blob=>blob?resolve(blob):reject(Error(`toBlob ${type} failed`)),type,quality));
+const stable=value=>Array.isArray(value)?value.map(stable):
+  value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,stable(value[key])])):value;
+async function hashBytes(bytes){
+  return [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))]
+    .map(value=>value.toString(16).padStart(2,'0')).join('');
+}
+async function sha256(blob){
+  return hashBytes(await blob.arrayBuffer());
+}
+async function renderAtlas(){
+  if(!frame.contentWindow?.renderLevel)throw Error('Pinned generator not ready');
+  const [contract,level]=await Promise.all([
+    fetch('contract.json',{cache:'no-store'}).then(response=>{if(!response.ok)throw Error('Contract unavailable');return response.json()}),
+    fetch('level.json',{cache:'no-store'}).then(response=>{if(!response.ok)throw Error('Level unavailable');return response.json()})
+  ]);
+  if(contract.schemaVersion!==1||contract.scenario!=='atlas-proving-grounds'||
+      contract.profile!=='FIELD_TEST_LEGACY_v1'||contract.unitDataProfile!=='field-test-atlas-v1'||
+      contract.scenarioVersion!==1||contract.playable!==true||
+      contract.source?.contentCommit!=='c01ecb80bcdd813772d1433d9ae63b39e54ef050'||
+      contract.source?.generatorHtmlSha256!=='47a2bbc446a89937d97ba39728896492ed1b2c0457ca16673f386b694f941385'||
+      contract.source?.iconArchiveSha256!=='7cb8cb6d28ba7c10ba862e06f25fec58ce29be6456c84a3fb52d3cb4ab0b353a'||
+      contract.source?.levelSha256!=='1f4e6a6303e9e835f41556e57595cf6d2646bb30d028fb412e090b7ff223673d'||
+      contract.source?.unitProfileSha256!=='5cf6d5e5cc58b868cc5d8a7a290639b2a33bce5cd66c4ceb566e81956bbec3ad'||
+      contract.source?.scenarioManifestSha256!=='a02c649eed8f49c1a9b4c52f1c5567be9b35cf906400b47577c7333fd244b7ce'||
+      contract.source?.atlasLoaderSha256!=='03810e397afcfcda6e10bdb3933bdc3b2a871ac45e7fbd2eaac92f1fe3ddb66b'||
+      contract.cells?.length!==96||JSON.stringify(contract.level)!==JSON.stringify(level)||
+      level.width!==12||level.height!==8||level.defaultTerrain!=='open-ground'||
+      contract.render?.tileWidth!==192||JSON.stringify(contract.render.canvasPx)!=='[2400,1386]'||
+      contract.render?.webpQuality!==.85||contract.render?.imageFormat!=='image/webp'||
+      JSON.stringify(contract.visualMetadata)!=='{"overlays":[],"urbanVariantOverrides":[]}')
+    throw Error('Pinned Atlas contract differs');
+  const {fingerprint,...fingerprintData}=contract;
+  if(fingerprint!==await hashBytes(new TextEncoder().encode(JSON.stringify(stable(fingerprintData)))))
+    throw Error('Atlas contract fingerprint differs');
+  const byPosition=new Map(contract.cells.map(cell=>[`${cell.x},${cell.y}`,cell]));
+  const bridge=byPosition.get('6,3'),ridge=byPosition.get('7,3');
+  const terrain=new Map(level.terrain.map(cell=>[`${cell.x},${cell.y}`,cell.type]));
+  if(contract.cells.some(cell=>cell.type!==(terrain.get(`${cell.x},${cell.y}`)||level.defaultTerrain)))
+    throw Error('Atlas canonical cells differ');
+  if(byPosition.size!==96||bridge?.type!=='bridge'||
+      JSON.stringify(bridge.roadEdges)!=='[3]'||JSON.stringify(bridge.riverEdges)!=='[2,4]'||
+      bridge.neighbors?.[0]!=='ridge'||ridge?.type!=='ridge'||
+      JSON.stringify(byPosition.get('7,5')?.roadEdges)!=='[0]'||
+      JSON.stringify(byPosition.get('8,5')?.roadEdges)!=='[3]'||
+      JSON.stringify(byPosition.get('6,1')?.riverEdges)!=='[2,4,5]'||
+      JSON.stringify(byPosition.get('6,2')?.riverEdges)!=='[1,5]'||
+      JSON.stringify(byPosition.get('6,4')?.riverEdges)!=='[1,5]'||
+      JSON.stringify(byPosition.get('6,5')?.riverEdges)!=='[4]')
+    throw Error('Atlas bridge, separate road, water or river end differs');
+  status.textContent='Erzeuge Atlas bei 192 px…';
+  const started=performance.now();
+  const generated=await frame.contentWindow.renderLevel(level,192);
+  const renderMs=Math.round(performance.now()-started);
+  const canvas=frame.contentWindow.__r?.final;
+  if(!canvas||canvas.width!==2400||canvas.height!==1386||
+      JSON.stringify(generated.size)!=='[2400,1386]')throw Error('Generated canvas dimensions mismatch');
+  const png=await blobOf(canvas,'image/png');
+  const webp=await blobOf(canvas,'image/webp',.85);
+  if(webp.type!=='image/webp')throw Error('WebP encoding unsupported');
+  const decodeStart=performance.now();
+  const bitmap=await createImageBitmap(webp);
+  const decoded=[bitmap.width,bitmap.height];bitmap.close();
+  if(JSON.stringify(decoded)!=='[2400,1386]')throw Error('WebP dimensions mismatch');
+  const webpDecodeMs=Math.round(performance.now()-decodeStart);
+  for(const url of previousUrls)URL.revokeObjectURL(url);
+  const pngUrl=URL.createObjectURL(png),webpUrl=URL.createObjectURL(webp);
+  previousUrls=[pngUrl,webpUrl];
+  preview.src=webpUrl;preview.hidden=false;
+  document.querySelector('#downloads').replaceChildren(...[
+    ['PNG',pngUrl],['WebP',webpUrl]
+  ].map(([label,url])=>{
+    const link=document.createElement('a');
+    link.href=url;link.download=`atlas-proving-grounds-192.${label.toLowerCase()}`;
+    link.textContent=`${label} speichern`;return link;
+  }));
+  const result={scenario:'atlas-proving-grounds',playable:true,profile:contract.profile,
+    contentPin:contract.source.contentCommit,contractFingerprint:contract.fingerprint,
+    width:192,size:[2400,1386],renderMs,pngBytes:png.size,pngSha256:await sha256(png),
+    webpBytes:webp.size,webpSha256:await sha256(webp),webpDecodeMs,
+    decodedRGBABytes:canvas.width*canvas.height*4,environment:navigator.userAgent};
+  status.textContent=JSON.stringify(result,null,2);
+  return result;
+}
+document.querySelector('#render').onclick=()=>renderAtlas().catch(error=>{
+  status.textContent=String(error.stack||error);
+});
+window.mapBakeProbe=Object.freeze({render:renderAtlas});
+</script>
+</html>
