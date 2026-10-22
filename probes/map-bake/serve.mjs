@@ -1,5 +1,6 @@
-// Read-only local serving of the four prepared probe inputs. No browser launch.
+// Read-only local serving of the prepared probe inputs. No browser launch.
 import { createServer } from 'node:http';
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 
@@ -7,11 +8,12 @@ const dir = resolve(process.argv[2] || '');
 const port = Number(process.argv[3] || 4183);
 if (!process.argv[2] || !Number.isInteger(port) || port < 1024 || port > 65535)
   throw Error('Usage: node serve.mjs PREPARED_DIR [PORT]');
+const specialists = existsSync(join(dir, 'contract.json'));
 const allowed = new Map([
   ['/harness.html', 'text/html; charset=utf-8'],
   ['/generator.html', 'text/html; charset=utf-8'],
   ['/level.json', 'application/json; charset=utf-8'],
-  ['/render-only-test-card.cells.json', 'application/json; charset=utf-8'],
+  [specialists ? '/contract.json' : '/render-only-test-card.cells.json', 'application/json; charset=utf-8'],
 ]);
 createServer(async (req, res) => {
   const path = req.url === '/' ? '/harness.html' : req.url;
