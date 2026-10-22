@@ -527,16 +527,45 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         actor?.id, mode, weaponKey, GoblinLanguage.current]);
       if (areaCache.key !== key) { areaCache.key = key; areaCache.value = areaData(state, actor, mode); }
       const data = areaCache.value;
+      const hexWidth = Math.sqrt(3) * S;
+      const referenceScale = hexWidth / 112;
+      const mapWidth = nativeMap.getBoundingClientRect().width || nativeMap.clientWidth ||
+        Number.parseFloat(nativeMap.style.width) || nativeMap.viewBox.baseVal.width;
+      const pixelScale = mapWidth / nativeMap.viewBox.baseVal.width;
+      const showCostChips = hexWidth * pixelScale >= 50;
       function mark(cell, kind) {
+        const points = hexPoints(cell.x, cell.y);
+        if (kind === 'fire') {
+          const underlay = document.createElementNS(NS, 'polygon');
+          underlay.setAttribute('points', points); underlay.classList.add('v2-area-fire-underlay');
+          underlay.setAttribute('stroke-width', 5.5 * referenceScale);
+          underlay.dataset.x = String(cell.x); underlay.dataset.y = String(cell.y);
+          overlay.append(underlay);
+        }
         const shape = document.createElementNS(NS, 'polygon');
-        shape.setAttribute('points', hexPoints(cell.x, cell.y)); shape.classList.add(`v2-area-${kind}`);
+        shape.setAttribute('points', points); shape.classList.add(`v2-area-${kind}`);
+        if (kind === 'movement') shape.setAttribute('stroke-width', 2 * referenceScale);
+        if (kind === 'fire') shape.setAttribute('stroke-width', 2.5 * referenceScale);
         shape.dataset.x = String(cell.x); shape.dataset.y = String(cell.y);
         overlay.append(shape);
-        if (kind === 'movement' && Number.isFinite(cell.cost)) {
-          const center = hexCenter(cell.x, cell.y), label = document.createElementNS(NS, 'text');
+        if (kind === 'movement' && showCostChips && Number.isFinite(cell.cost)) {
+          const center = hexCenter(cell.x, cell.y);
+          const width = Math.max(28 * referenceScale, 24 / pixelScale);
+          const height = Math.max(24 * referenceScale, 20 / pixelScale);
+          const middleY = center.y + S - height / 2 - 4 * referenceScale;
+          const chip = document.createElementNS(NS, 'rect');
+          chip.classList.add('v2-area-cost-chip');
+          chip.setAttribute('x', center.x - width / 2); chip.setAttribute('y', middleY - height / 2);
+          chip.setAttribute('width', width); chip.setAttribute('height', height);
+          chip.setAttribute('rx', 4 * referenceScale);
+          chip.dataset.x = String(cell.x); chip.dataset.y = String(cell.y);
+          const label = document.createElementNS(NS, 'text');
           label.classList.add('v2-area-cost'); label.setAttribute('x', center.x);
-          label.setAttribute('y', center.y + 5); label.dataset.x = String(cell.x);
-          label.dataset.y = String(cell.y); label.textContent = String(cell.cost); overlay.append(label);
+          label.setAttribute('y', middleY);
+          label.setAttribute('font-size', Math.max(13 * referenceScale, 11 / pixelScale));
+          label.dataset.x = String(cell.x); label.dataset.y = String(cell.y);
+          label.textContent = String(cell.cost);
+          overlay.append(chip, label);
         }
       }
       for (const cell of data.legal) mark(cell, mode === 'movement' ? 'movement' : mode === 'fire' ? 'fire' : 'sight');
@@ -544,6 +573,12 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       let message = t(`v2.area.status.${data.status}`, { count: data.legal.length });
       if (weapon && mode === 'fire') message += ` · ${weapon.label}`;
       if (data.reason) message += ` · ${data.reason}`;
+      if (mode === 'movement') {
+        const focused = view.target || view.infoCell || view.focusCell;
+        const cell = focused && data.legal.find(item => item.x === focused.x && item.y === focused.y);
+        if (cell && Number.isFinite(cell.cost))
+          message += ` · ${t('v2.ui.sector')} ${hexLabel(focused)} · ${GoblinLanguage.translate('MOVE COST')} ${cell.cost}`;
+      }
       if (view.target && mode === 'movement' && data.status === 'move' &&
           !data.legal.some(cell => cell.x === view.target.x && cell.y === view.target.y)) {
         const rejected = areaQuery(core() ? { type: 'Move', playerId: 'player', unitId: actor.id, to: view.target } :
