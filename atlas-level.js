@@ -60,6 +60,7 @@
     }
   }
   function register(level){
+    const sourceLevel=level;
     level=normalizeLevel(level);
     validateLevel(level);
     if(scenarioCatalog[level.id])throw new Error(`Duplicate scenario: ${level.id}`);
@@ -71,7 +72,8 @@
       ...(level.id==='los-supercover-showcase'?{losMode:'strict-supercover'}:{}),
       showAllEnemiesProgress:true,
       terrain:level.terrain.filter(cell=>TerrainRules.coverBonus(cell.type)>0).map(cell=>`${cell.x},${cell.y}`),
-      terrainTypes:level.terrain,units:level.units.map(makeUnit)
+      terrainTypes:level.terrain,units:level.units.map(makeUnit),
+      ...(level.id==='showcase-terrain-course'?{bakeLevel:sourceLevel}:{})
     };
     const option=document.createElement('option');option.value=level.id;option.textContent=level.title;
     option.dataset.titleKey=`mission.${level.id}.title`;

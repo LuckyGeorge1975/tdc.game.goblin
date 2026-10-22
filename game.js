@@ -126,8 +126,22 @@ function findEnemyStep(foe,target){
 function addLog(text,enemy=false){const lang=globalThis.GoblinLanguage?.current||'de';const t=new Date().toLocaleTimeString(lang,{hour:'2-digit',minute:'2-digit'});logEl.insertAdjacentHTML('afterbegin',`<div class="log-line ${enemy?'enemy':''}"><span class="log-time">${t}</span><strong>${enemy?'HOSTILE':'COMMAND'}</strong> ${text}</div>`);logEl.firstElementChild?.setAttribute('data-l10n-source',text)}
 function drawGrid(){if(!gridVisible)return;for(let y=0;y<H;y++)for(let x=0;x<W;x++){const grid=document.createElementNS(NS,'polygon');grid.setAttribute('points',hexPoints(x,y));grid.classList.add('grid-hex');svg.appendChild(grid)}}function drawFocusMarker(){if(!focusedCell)return;const marker=document.createElementNS(NS,'polygon');marker.setAttribute('points',hexPoints(focusedCell.x,focusedCell.y));marker.classList.add('focus-marker');svg.appendChild(marker)}function draw(){
   svg.setAttribute('viewBox','0 0 790 480'); svg.innerHTML=''; const passiveSelection=selected&&selected.hp>0&&!phaseCanAct(selected);
+  const bakeData=typeof MapBake==='undefined'?null:MapBake.snapshot(currentScenario,legacySession?.config,legacySession,
+    scenarioCatalog[currentScenario]?.bakeLevel,W,H,S,58,48,terrainTypeAt);
+  const bakeUrl=typeof MapBake==='undefined'?null:MapBake.select(bakeData,draw),baked=!!bakeUrl;
+  if(baked){
+    const image=document.createElementNS(NS,'image'),scale=DX/192;
+    image.setAttribute('href',bakeUrl);
+    image.setAttribute('x',58-96*scale);
+    image.setAttribute('y',48-(192/Math.sqrt(3))*scale);
+    image.setAttribute('width',2400*scale);
+    image.setAttribute('height',1386*scale);
+    image.setAttribute('preserveAspectRatio','none');
+    image.setAttribute('class','terrain-bake');
+    svg.appendChild(image);
+  }
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){
-    const illustrated=drawTerrainArtwork(x,y);
+    const illustrated=baked||drawTerrainArtwork(x,y);
     const p=document.createElementNS(NS,'polygon');p.setAttribute('points',hexPoints(x,y));p.classList.add('hex');p.dataset.x=x;p.dataset.y=y;
     if(illustrated)p.classList.add('terrain-illustrated');
     const unit=units.find(u=>u.hp>0&&!u.embarkedOn&&u.x===x&&u.y===y); const attackPhase=turnPhase==='fire',canFire=!!selected,canMove=!!selected; if(attackPhase&&selected&&selected.hp>0&&unit&&unit.team==='enemy'&&dist(selected,{x,y})<=selected.range&&lineOfSight(selected,{x,y})&&(typeof canSelectedWeaponTarget!=='function'||canSelectedWeaponTarget(selected,unit))) p.classList.add('attack');

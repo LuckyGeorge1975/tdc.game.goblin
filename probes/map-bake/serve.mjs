@@ -1,4 +1,4 @@
-// Read-only local serving of the three prepared probe inputs. No browser launch.
+// Read-only local serving of the four prepared probe inputs. No browser launch.
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';

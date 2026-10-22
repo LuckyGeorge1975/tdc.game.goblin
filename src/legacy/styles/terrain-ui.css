@@ -1,4 +1,5 @@
 .terrain-artwork{pointer-events:none;opacity:.82}
+.terrain-bake{pointer-events:none}
 .hex.terrain-illustrated:not(.movement-fill):not(.fire-range):not(.los-visible):not(.attack):not(.unload-target){fill:transparent}
 .hex.terrain-illustrated.movement-fill{fill:#79bd6870}
 .hex.terrain-illustrated.fire-range{fill:#a2443670}
