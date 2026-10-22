@@ -509,6 +509,24 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         (data.blocked.find(item => item.reason)?.reason || t('v2.area.noLegalTarget')) : '';
       return data;
     }
+    function selectedFirePreview(state, actor, runtime, mode, weaponKey, legal) {
+      if (mode !== 'fire' || !actor || !view.target) return null;
+      const target = state.units.find(unit => unit.team === 'enemy' && unit.hp > 0 &&
+        !unit.embarkedOn && unit.x === view.target.x && unit.y === view.target.y);
+      if (!target || !legal.some(cell => cell.x === target.x && cell.y === target.y)) return null;
+      const selectedWeapon = (actor.weapons || runtime?.ogreSystems) ? weaponKey ?? null : null;
+      const command = core() ? {type: 'PlayerFire', playerId: 'player', unitId: actor.id,
+        targetId: target.id, ...(selectedWeapon ? {weaponKey: selectedWeapon} : {})} :
+        {type: 'Fire', actorId: actor.id, x: target.x, y: target.y,
+          ...(selectedWeapon ? {weaponKey: selectedWeapon} : {})};
+      const preview = previewFire(command);
+      return preview?.legal && preview.meaning === 'crt-attack-effective-defense' &&
+        preview.profileId === state.profile && preview.stateRevision === state.revision &&
+        preview.actorId === actor.id && preview.targetId === target.id &&
+        preview.weaponKey === selectedWeapon && preview.from?.x === actor.x &&
+        preview.from?.y === actor.y && preview.to?.x === target.x &&
+        preview.to?.y === target.y ? preview : null;
+    }
     function renderAreaPreview(state, actor) {
       renderWeaponControls(state, actor, at('#v2-weapon-controls'));
       const mode = activeAreaMode(state);
@@ -594,6 +612,45 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
       for (const cell of data.legal) mark(cell, mode === 'movement' ? 'movement' : mode === 'fire' ? 'fire' : 'sight');
       if (mode !== 'los') for (const cell of data.blocked) mark(cell, 'blocked');
+      const firePreview = selectedFirePreview(state, actor, runtime, mode, weaponKey, data.legal);
+      if (firePreview) {
+        const from = hexCenter(firePreview.from.x, firePreview.from.y);
+        const to = hexCenter(firePreview.to.x, firePreview.to.y);
+        for (const [kind, width] of [['underlay', 8], ['signal', 4]]) {
+          const line = document.createElementNS(NS, 'line');
+          line.classList.add(`v2-fire-link-${kind}`);
+          line.setAttribute('x1', from.x); line.setAttribute('y1', from.y);
+          line.setAttribute('x2', to.x); line.setAttribute('y2', to.y);
+          line.setAttribute('stroke-width', width * referenceScale);
+          line.setAttribute('aria-hidden', 'true');
+          overlay.append(line);
+        }
+        const category = firePreview.ratioCategory;
+        const ratioLabel = typeof category === 'string' && /^(?:1-2|[1-5]-1)$/.test(category)
+          ? category.replace('-', ':') : null;
+        if (ratioLabel) {
+          if (!at('#v2-command-card').hidden)
+            at('#v2-command-intel').textContent += ` · CRT ${ratioLabel}`;
+          if (hexWidth * pixelScale >= 50 && !matchMedia('(max-width: 599px)').matches) {
+            const x = (from.x + to.x) / 2, y = (from.y + to.y) / 2;
+            const width = Math.max(38 * referenceScale, 32 / pixelScale);
+            const height = Math.max(22 * referenceScale, 20 / pixelScale);
+            const chip = document.createElementNS(NS, 'rect');
+            chip.classList.add('v2-fire-ratio-chip');
+            chip.setAttribute('x', x - width / 2); chip.setAttribute('y', y - height / 2);
+            chip.setAttribute('width', width); chip.setAttribute('height', height);
+            chip.setAttribute('rx', 4 * referenceScale);
+            chip.setAttribute('aria-hidden', 'true');
+            const label = document.createElementNS(NS, 'text');
+            label.classList.add('v2-fire-ratio');
+            label.setAttribute('x', x); label.setAttribute('y', y);
+            label.setAttribute('font-size', Math.max(13 * referenceScale, 11 / pixelScale));
+            label.setAttribute('aria-hidden', 'true');
+            label.textContent = ratioLabel;
+            overlay.append(chip, label);
+          }
+        }
+      }
       let message = t(mode === 'movement' && data.status === 'move' && !showCostChips
         ? 'v2.area.status.moveCompact' : `v2.area.status.${data.status}`, { count: data.legal.length });
       if (weapon && mode === 'fire') message += ` · ${weapon.label}`;
