@@ -68,6 +68,18 @@ test('ATLAS and five smaller scenarios load with complete roster and terrain cov
   assert.equal(small[3].units.find(unit=>unit.visualKey==='skimmer-carrier')?.transportCapacity,3);
 });
 
+test('only approved baked missions retain their exact source level',async()=>{
+  const {context,errors}=await load();
+  assert.equal(errors.length,0);
+  for(const level of showcase.levels){
+    const retained=context.scenarioCatalog[level.id].bakeLevel;
+    if(['showcase-terrain-course','showcase-specialists'].includes(level.id))
+      assert.deepEqual(JSON.parse(JSON.stringify(retained)),level);
+    else assert.equal(retained,undefined);
+  }
+  assert.equal(context.scenarioCatalog['atlas-proving-grounds'].bakeLevel,undefined);
+});
+
 test('asset levels reject missing, unknown and mismatched product profiles before registration',async()=>{
   for(const mutation of [
     level=>{level.ruleProfileId=''},
