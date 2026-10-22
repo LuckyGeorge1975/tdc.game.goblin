@@ -1,0 +1,234 @@
+{
+  "source": {
+    "sourceRepository": "https://github.com/LuckyGeorge1975/tdc.game.goblin.content",
+    "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+    "profile": "FIELD_TEST_LEGACY_v1",
+    "levelSourceSha256": "eea48c2a044beb2c07ee852b6cfcfe6297ab91d810f85d033bebc72331e8c140",
+    "levelSemanticSha256": "102e647b93ca7c7d081e1d60e31965a06c2e4714cb2593e9c9bcaa7588bb6ed1",
+    "iconArchiveSha256": "7cb8cb6d28ba7c10ba862e06f25fec58ce29be6456c84a3fb52d3cb4ab0b353a",
+    "generatorHtmlSha256": "47a2bbc446a89937d97ba39728896492ed1b2c0457ca16673f386b694f941385",
+    "visualVersion": "map-probe-v1",
+    "iconBytes": 3458216,
+    "icons": {
+      "bridge.png": {
+        "sha256": "cd8d87236ad3d67dda3ffea53dca810b44118f3e7930629dfd553e766ee4a9d8",
+        "bytes": 75586
+      },
+      "crater.png": {
+        "sha256": "ca3c9988c9adb3b85842782231f53ceb73badf44c637fb7e9a6cbdb0136c0093",
+        "bytes": 72683
+      },
+      "forest-edge-w00.png": {
+        "sha256": "36e838901318502bafded9897231d57bd59bb84815e82f0ae42ac12ede8d4029",
+        "bytes": 140251
+      },
+      "forest-edge-w01.png": {
+        "sha256": "8f0ce45db2b8240ec7e63afda8fe7939da2850367660ffbdd10800316f6859ec",
+        "bytes": 137670
+      },
+      "forest-edge-w02.png": {
+        "sha256": "d0b78baf35ca261c045cb9d706fa8e9d5b05d99a957fc7bea7648b4b14c1aa19",
+        "bytes": 135872
+      },
+      "forest-edge-w03.png": {
+        "sha256": "44f83ae26065b1ffef90e8e9fa40cd0a2b7ff159a3429905de1f198ea4222612",
+        "bytes": 134846
+      },
+      "forest-edge-w04.png": {
+        "sha256": "68d99481f6e1c7188c405eca9b4c6bb93903cc9b1fe93d552e825b1de48a299a",
+        "bytes": 134933
+      },
+      "forest-edge-w05.png": {
+        "sha256": "62c3875147eef6435ebf05604c645f1ab0ecab27e15e14f3eb54a4d71c3893c1",
+        "bytes": 135303
+      },
+      "forest-edge-w06.png": {
+        "sha256": "15122bb062c2e28e601cc6dc84319597b8ad0244b67af931ed9891b69f67b358",
+        "bytes": 133576
+      },
+      "forest-edge-w07.png": {
+        "sha256": "013acbbe88818e3d66095a9abfb45ec4af0cc384dd712ce3b946a4bee17b57ad",
+        "bytes": 128327
+      },
+      "forest-edge-w08.png": {
+        "sha256": "0f5216a3ef80551496b7429aeb83680f31688cd883bd4ba18bdedee034c78302",
+        "bytes": 132628
+      },
+      "forest-edge-w09.png": {
+        "sha256": "ddfcd2a75f34011f8ecf8fb39e42da01940f4e5af58f3cb0237df6d5b022885d",
+        "bytes": 128362
+      },
+      "forest-edge-w10.png": {
+        "sha256": "3a1c665fc3be9dc0b7876fbc58acc0049b4fb02beddabcd606b9909ae1a0ff66",
+        "bytes": 131777
+      },
+      "forest-edge-w11.png": {
+        "sha256": "ad20f76c13d24c3390d9e341b7f79d917765514ab66e0e905c29571698ee054e",
+        "bytes": 130681
+      },
+      "forest-edge-w12.png": {
+        "sha256": "1a989d3862f753eae0e7a23fb0aa27fea2f5c406d3525795208d73b9a9e200d7",
+        "bytes": 132659
+      },
+      "forest.png": {
+        "sha256": "bcda89195ac72fe14cc8e248b9768c25b9f02aba492225ea3a3f20c67e5ff2e5",
+        "bytes": 140029
+      },
+      "marsh.png": {
+        "sha256": "37a8ba04467075cf7f6a7f0492d3a5e6661f07371181d3d367d1bb9c85b085e7",
+        "bytes": 95900
+      },
+      "mountain.png": {
+        "sha256": "2dd6abfdbd0a0c9fe69bd1fb370a579f76574f091eb684278ede67073e1f7027",
+        "bytes": 104238
+      },
+      "open-ground.png": {
+        "sha256": "8cac36bf189c1699c47c34fd7a980846955e052442c6314b6550442948b4204d",
+        "bytes": 108798
+      },
+      "ridge.png": {
+        "sha256": "c4ed73f495f0293c6664e0468e00f2b15b3071c65141937c5b02b26154030094",
+        "bytes": 121641
+      },
+      "river-curve-120.png": {
+        "sha256": "7e4b73420a92dd2da5d06346359be74567f32063068d0dc34cf8a19197d07ad1",
+        "bytes": 81161
+      },
+      "river-straight.png": {
+        "sha256": "0b69df2bfb2c2ebf6ddb145c7ee8daecc4fe8fcc734962d86d0bd0415ed31830",
+        "bytes": 79129
+      },
+      "river-y.png": {
+        "sha256": "5b63ab2f1709607bb9526cce7911466ffc927998ee195300e7b5a8960ff0d88f",
+        "bytes": 88303
+      },
+      "road-curve-120.png": {
+        "sha256": "ffe141c518993b390bb531e9a7dd16878714dcacb94d12ecd584ca33a804cf5e",
+        "bytes": 34078
+      },
+      "road-curve-60.png": {
+        "sha256": "2c63cb781b02d9bd14b70ec859e5b7e82b4e229f14c4f27ff55fb2124f92566e",
+        "bytes": 26536
+      },
+      "road-straight.png": {
+        "sha256": "64390b391269fd035b27da6baa91f92ac8acd40e7274ab3291140da018fd41ce",
+        "bytes": 16793
+      },
+      "road-y.png": {
+        "sha256": "51360756a74765d89adc97519342c576a7b596b730567c22155ebefce59cf8e2",
+        "bytes": 33492
+      },
+      "rubble-field.png": {
+        "sha256": "d9c66183c47adc418e9c5ca882be10a555f936642eef6da58bc140fc71413046",
+        "bytes": 85730
+      },
+      "urban-s0.png": {
+        "sha256": "a142c33ece4ca8c3fa6f1fd24dc88b7fed419451b66517a7bb4622c4dfae741b",
+        "bytes": 77758
+      },
+      "urban-s1.png": {
+        "sha256": "5306d7f02854b98d43b7b8f9d8f56f15f7b629d7c08a805baa53f5ecf03473d3",
+        "bytes": 55758
+      },
+      "urban-s2.png": {
+        "sha256": "f8b7f958b909290f7a9bd436a3dfe462abb3a7c1436f65f31135a1c2f382679d",
+        "bytes": 92433
+      },
+      "urban-s3.png": {
+        "sha256": "1f3a39068ec281ba84654f07c2259bf512486407c5c4dc73c542af536a5ae748",
+        "bytes": 68736
+      },
+      "urban-s4.png": {
+        "sha256": "878ab67639126077d749d8c87890ff040d76268f1624f8d081fccf092299a8e2",
+        "bytes": 83624
+      },
+      "urban-s5.png": {
+        "sha256": "6b00683deb6c348d1c5e484db6aa35323528e47e595205fc5b8044dcfb73f366",
+        "bytes": 94982
+      },
+      "water.png": {
+        "sha256": "51fe4586dff020d71a25b3e53f57162cd3c3f3e874aa25244dd72352e850c26b",
+        "bytes": 83943
+      }
+    }
+  },
+  "scenes": [
+    {
+      "scenario": "showcase-terrain-course",
+      "playable": true,
+      "cellCount": 96,
+      "unsupportedForestMasks": [],
+      "sizes": [
+        {
+          "tileWidth": 192,
+          "expectedCanvasPx": [
+            2400,
+            1386
+          ],
+          "decodedRGBABytes": 13305600,
+          "expectedFingerprint": "e7398f73e7a0a634dd039591c092836ef2037fe0a77db5d98d822a7a8211fbda",
+          "gate": {
+            "missing": false,
+            "wrong": false,
+            "exact": true
+          }
+        },
+        {
+          "tileWidth": 256,
+          "expectedCanvasPx": [
+            3200,
+            1848
+          ],
+          "decodedRGBABytes": 23654400,
+          "expectedFingerprint": "fceed0c17f6320d1d18ac0917b20e3ae20ae38aea07535b3487a100132405831",
+          "gate": {
+            "missing": false,
+            "wrong": false,
+            "exact": true
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "render-only-test-card",
+      "playable": false,
+      "cellCount": 96,
+      "unsupportedForestMasks": [
+        50,
+        55,
+        60
+      ],
+      "sizes": [
+        {
+          "tileWidth": 192,
+          "expectedCanvasPx": [
+            2400,
+            1386
+          ],
+          "decodedRGBABytes": 13305600,
+          "expectedFingerprint": "43529abba30ce26a3f94d3544057a46919448c7d07793a5d19bfb1183a459695",
+          "gate": {
+            "missing": false,
+            "wrong": false,
+            "exact": true
+          }
+        },
+        {
+          "tileWidth": 256,
+          "expectedCanvasPx": [
+            3200,
+            1848
+          ],
+          "decodedRGBABytes": 23654400,
+          "expectedFingerprint": "81f916e8009b8809475962e5bc9d5a6f42ab88a9570d1a04d8733fe4da0af0bd",
+          "gate": {
+            "missing": false,
+            "wrong": false,
+            "exact": true
+          }
+        }
+      ]
+    }
+  ],
+  "scope": "Data/fingerprint and existing master-byte probe only; no bake or load measurement"
+}
