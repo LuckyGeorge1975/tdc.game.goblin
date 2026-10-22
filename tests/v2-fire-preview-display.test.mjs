@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
+import {createIronDustProfile, dispatchIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
 
 const source=readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
 const css=readFileSync(new URL('../ui-v2.css',import.meta.url),'utf8');
@@ -9,6 +10,10 @@ const start=source.indexOf('    function selectedFirePreview(');
 const end=source.indexOf('    function renderAreaPreview(',start);
 assert.ok(start>0 && end>start);
 const selectionSource=source.slice(start,end);
+const placeStart=source.indexOf('    function freeRatioChipCenter(');
+const placeEnd=source.indexOf('    function renderAreaPreview(',placeStart);
+assert.ok(placeStart>0 && placeEnd>placeStart);
+const placementSource=source.slice(placeStart,placeEnd);
 
 const actor={id:'ogre',x:1,y:2,weapons:{main:{}}};
 const target={id:'guard',team:'enemy',hp:3,x:4,y:3};
@@ -57,7 +62,7 @@ const drawStart=source.indexOf('      const firePreview = selectedFirePreview(')
 const drawEnd=source.indexOf('      let message = t(',drawStart);
 assert.ok(drawStart>0 && drawEnd>drawStart);
 const drawSource=source.slice(drawStart,drawEnd);
-function draw(preview,pixelScale,cardHidden=false) {
+function draw(preview,pixelScale,cardHidden=false,world=state) {
   const children=[];
   const intel={textContent:'Target info'};
   const card={hidden:cardHidden};
@@ -66,14 +71,45 @@ function draw(preview,pixelScale,cardHidden=false) {
     element.classList={add(value){element.classes.push(value);}};
     return element;
   }};
-  const context={selectedFirePreview:()=>preview,state,actor,runtime:actor,mode:'fire',
+  const context={selectedFirePreview:()=>preview,state:world,actor,runtime:actor,mode:'fire',
     weaponKey:'main',data:{legal},document,NS:'svg',hexCenter:(x,y)=>({x:x*100,y:y*100}),
     overlay:{append(...nodes){children.push(...nodes);}},pixelScale,
     hexWidth:Math.sqrt(3)*34,referenceScale:Math.sqrt(3)*34/112,
-    matchMedia:()=>({matches:false}),at:key=>key==='#v2-command-card'?card:intel};
-  runInNewContext(drawSource,context);
+    matchMedia:()=>({matches:false}),at:key=>key==='#v2-command-card'?card:intel,
+    nativeMap:{viewBox:{baseVal:{x:0,y:0,width:600,height:500}}},
+    view:{focusCell:null},S:34};
+  runInNewContext(`${placementSource}\n${drawSource}`,context);
   return {children,intel:intel.textContent};
 }
+
+function place(from,to,units,focusCell=null,pixelScale=1) {
+  const S=34, DX=Math.sqrt(3)*S, DY=1.5*S;
+  const hexCenter=(x,y)=>({x:58+x*DX+(y%2?DX/2:0),y:48+y*DY});
+  const context={S,hexCenter,view:{focusCell},nativeMap:{viewBox:{baseVal:{x:0,y:0,width:790,height:480}}}};
+  runInNewContext(`${placementSource}\nglobalThis.place=freeRatioChipCenter;`,context);
+  const width=Math.max(38*DX/112,32/pixelScale),height=Math.max(22*DX/112,20/pixelScale);
+  return {center:context.place(hexCenter(from.x,from.y),hexCenter(to.x,to.y),
+    width,height,pixelScale,{units}),width,height,hexCenter};
+}
+
+test('adjacent Legacy target has no collision-free chip, while long Core target does', () => {
+  const actor={id:'ogre',x:2,y:1},guard={id:'guard',x:2,y:0};
+  assert.equal(place(actor,guard,[actor,guard],guard).center,null);
+  let profile=createIronDustProfile(8);
+  const moved=dispatchIronDustProfile(profile,{type:'Move',playerId:'player',unitId:'ogre',to:{x:4,y:5}});
+  assert.ok(moved.profile,JSON.stringify(moved.error));
+  profile=moved.profile;
+  const units=profile.entry.payload.units;
+  const own=units.find(unit=>unit.id==='ogre'),enemy=units.find(unit=>unit.id==='guard');
+  const long=place(own,enemy,units,enemy);
+  assert.ok(long.center,'long legal Core connection should retain a chip');
+  const clearance=34+10+6;
+  for(const unit of units.filter(unit=>!unit.embarkedOn)) {
+    const point=long.hexCenter(unit.x,unit.y);
+    assert.ok(Math.abs(long.center.x-point.x)>=long.width/2+clearance ||
+      Math.abs(long.center.y-point.y)>=long.height/2+clearance);
+  }
+});
 
 test('connection uses paired 8/4 reference strokes and centered 38x22 CRT chip', () => {
   const {children,intel}=draw(bound,2);
@@ -101,4 +137,8 @@ test('tiny fit keeps readable CRT in command intel; unknown quote keeps line onl
   const invalid=draw(null,2);
   assert.equal(invalid.children.length,0);
   assert.equal(invalid.intel,'Target info');
+  const adjacent=draw({...bound,from:{x:2,y:1},to:{x:2,y:0}},1,false,
+    {units:[{x:2,y:1},{x:2,y:0}]});
+  assert.deepEqual(adjacent.children.map(node=>node.tag),['line','line']);
+  assert.equal(adjacent.intel,'Target info · CRT 2:1');
 });

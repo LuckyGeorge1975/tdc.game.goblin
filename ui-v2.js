@@ -527,6 +527,22 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         preview.from?.y === actor.y && preview.to?.x === target.x &&
         preview.to?.y === target.y ? preview : null;
     }
+    function freeRatioChipCenter(from, to, width, height, pixelScale, state) {
+      const box = nativeMap.viewBox.baseVal;
+      const occupied = [...state.units.filter(unit => !unit.embarkedOn), view.focusCell]
+        .filter(cell => cell && Number.isFinite(cell.x) && Number.isFinite(cell.y))
+        .map(cell => hexCenter(cell.x, cell.y));
+      const clearance = S + 10 + 6 / pixelScale;
+      for (const fraction of [0.5, 0.375, 0.625, 0.25, 0.75]) {
+        const x = from.x + (to.x - from.x) * fraction;
+        const y = from.y + (to.y - from.y) * fraction;
+        if (x - width / 2 < box.x || x + width / 2 > box.x + box.width ||
+            y - height / 2 < box.y || y + height / 2 > box.y + box.height) continue;
+        if (occupied.every(center => Math.abs(x - center.x) >= width / 2 + clearance ||
+            Math.abs(y - center.y) >= height / 2 + clearance)) return {x, y};
+      }
+      return null;
+    }
     function renderAreaPreview(state, actor) {
       renderWeaponControls(state, actor, at('#v2-weapon-controls'));
       const mode = activeAreaMode(state);
@@ -632,22 +648,24 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           if (!at('#v2-command-card').hidden)
             at('#v2-command-intel').textContent += ` · CRT ${ratioLabel}`;
           if (hexWidth * pixelScale >= 50 && !matchMedia('(max-width: 599px)').matches) {
-            const x = (from.x + to.x) / 2, y = (from.y + to.y) / 2;
             const width = Math.max(38 * referenceScale, 32 / pixelScale);
             const height = Math.max(22 * referenceScale, 20 / pixelScale);
-            const chip = document.createElementNS(NS, 'rect');
-            chip.classList.add('v2-fire-ratio-chip');
-            chip.setAttribute('x', x - width / 2); chip.setAttribute('y', y - height / 2);
-            chip.setAttribute('width', width); chip.setAttribute('height', height);
-            chip.setAttribute('rx', 4 * referenceScale);
-            chip.setAttribute('aria-hidden', 'true');
-            const label = document.createElementNS(NS, 'text');
-            label.classList.add('v2-fire-ratio');
-            label.setAttribute('x', x); label.setAttribute('y', y);
-            label.setAttribute('font-size', Math.max(13 * referenceScale, 11 / pixelScale));
-            label.setAttribute('aria-hidden', 'true');
-            label.textContent = ratioLabel;
-            overlay.append(chip, label);
+            const center = freeRatioChipCenter(from, to, width, height, pixelScale, state);
+            if (center) {
+              const chip = document.createElementNS(NS, 'rect');
+              chip.classList.add('v2-fire-ratio-chip');
+              chip.setAttribute('x', center.x - width / 2); chip.setAttribute('y', center.y - height / 2);
+              chip.setAttribute('width', width); chip.setAttribute('height', height);
+              chip.setAttribute('rx', 4 * referenceScale);
+              chip.setAttribute('aria-hidden', 'true');
+              const label = document.createElementNS(NS, 'text');
+              label.classList.add('v2-fire-ratio');
+              label.setAttribute('x', center.x); label.setAttribute('y', center.y);
+              label.setAttribute('font-size', Math.max(13 * referenceScale, 11 / pixelScale));
+              label.setAttribute('aria-hidden', 'true');
+              label.textContent = ratioLabel;
+              overlay.append(chip, label);
+            }
           }
         }
       }
