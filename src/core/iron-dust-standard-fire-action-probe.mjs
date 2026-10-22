@@ -4,6 +4,7 @@ import {queryIronDustPlayerMove, dispatchIronDustPlayerMove} from
   './iron-dust-player-move-probe.mjs';
 import {queryIronDustB3bAction, dispatchIronDustB3bAction} from
   './iron-dust-b3b-action-probe.mjs';
+import {ironDustCrtRatio} from './iron-dust-crt-ratio.mjs';
 
 // Explicit technical commands on the same inactive seven-unit state. Enemy
 // target selection and movement are deliberately outside this probe.
@@ -31,12 +32,6 @@ const exact = (value, keys) => value !== null && typeof value === 'object' &&
   !Array.isArray(value) && Object.keys(value).length === keys.length &&
   keys.every(key => Object.hasOwn(value, key));
 const unit = (state, id) => state.units.find(item => item.id === id);
-const ratio = (attack, defense) => {
-  const strength = Math.max(0, attack), guarded = Math.max(1, defense);
-  if (strength >= guarded * 5) return '5-1';
-  if (strength * 2 < guarded) return '1-2';
-  return `${Math.min(4, Math.max(1, Math.floor(strength / guarded)))}-1`;
-};
 const victory = units => !units.some(item => item.team === 'player' && item.hp > 0)
   ? {status: 'ended', winner: 'enemy'}
   : unit({units}, 'core').hp === 0
@@ -101,7 +96,7 @@ export function dispatchIronDustStandardFireAction(state, command) {
   const actor = unit(next, actorId), target = unit(next, command.targetId);
   next.rng.state = (Math.imul(1664525, next.rng.state) + 1013904223) >>> 0;
   const roll = next.rng.state % 6;
-  const combatRatio = ratio(actor.damage, query.effectiveDefense);
+  const combatRatio = ironDustCrtRatio(actor.damage, query.effectiveDefense);
   const result = combatRatio === '5-1' ? 'X' : crt[combatRatio][roll];
   if (result === 'D') {
     if (target.infantry === true || target.engineering === true || target.id === 'infantry')

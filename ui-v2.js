@@ -171,6 +171,25 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       return weaponTargetAllowed(actor, target) ? { ok: true }
         : { ok: false, reason: t('ui.error.TARGET_NOT_ATTACKABLE') };
     }
+    function previewFire(command) {
+      if (core()) return query(command).ok ? IronDustBrowserV2.previewFire(command) : null;
+      if (command?.type !== 'Fire') return null;
+      const legal = query(command);
+      if (!legal.ok) return null;
+      const actor = units.find(unit => unit.id === command.actorId);
+      const target = units.find(unit => unit.hp > 0 && !unit.embarkedOn &&
+        unit.x === command.x && unit.y === command.y);
+      if (!actor || !target) return null;
+      const attack = actor.ogreSystems ? legal.weapon?.attack : actor.damage;
+      const defense = effectiveDefense(target);
+      const ratioCategory = Number.isFinite(attack) && Number.isFinite(defense)
+        ? combatRatio(attack, defense) : null;
+      return Object.freeze({profileId: legacySession.ruleProfileId,
+        stateRevision: revision(), actorId: actor.id, targetId: target.id,
+        weaponKey: actor.ogreSystems ? command.weaponKey : null,
+        from: {x: actor.x, y: actor.y}, to: {x: target.x, y: target.y},
+        legal: true, ratioCategory, meaning: 'crt-attack-effective-defense'});
+    }
     function dispatch(command, expectedRevision) {
       if (core()) {
         if (view.busy || expectedRevision !== revision()) return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
@@ -223,7 +242,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
     }
-    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo, resetView, focusUnit, notifyPhaseSkip,
+    globalThis.GoblinUIV2 = Object.freeze({ project, query, previewFire, dispatch, undo, resetView, focusUnit, notifyPhaseSkip,
       get gridVisible() { return view.gridVisible; }, setGridVisible(value) { view.gridVisible = !!value; render(); },
       refresh: () => render() });
 

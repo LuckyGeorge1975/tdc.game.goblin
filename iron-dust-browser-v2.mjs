@@ -1,6 +1,6 @@
 import {
   createIronDustProfile, validateIronDustProfile, projectIronDustProfile,
-  queryIronDustProfile, preflightIronDustProfile, dispatchIronDustProfile,
+  queryIronDustProfile, queryIronDustCrtPreview, preflightIronDustProfile, dispatchIronDustProfile,
   IRON_DUST_PROFILE_HEADER
 } from './src/core/iron-dust-executable-profile.mjs';
 import {buildIronDustV2View, renderIronDustV2View, formatIronDustV2Error,
@@ -46,6 +46,10 @@ export function dispatchIronDustBrowserAction(session, command) {
   if (!result.profile) return {error:result.error};
   return {session:Object.freeze({profile:result.profile,
     projection:projectIronDustProfile(result.profile, result.events)})};
+}
+
+export function queryIronDustBrowserCrtPreview(session, command) {
+  return session?.profile ? queryIronDustCrtPreview(session.profile, command) : null;
 }
 
 export function createIronDustEnemyFlow({getSession, advance,
@@ -229,6 +233,12 @@ if (typeof document !== 'undefined') {
     query: command => mode === 'ready' && session && !paused && !enemyFlow.running &&
       command?.type !== 'AutoEnemyAdvance' ? queryIronDustProfile(session.profile, command)
       : {available:false, error:{code:'V2_NOT_READY'}},
+    previewFire: command => {
+      if (mode !== 'ready' || !session || paused || enemyFlow.running) return null;
+      const preview = queryIronDustBrowserCrtPreview(session, command);
+      return preview ? Object.freeze({...preview,
+        stateRevision: `core:${epoch}:${preview.stateRevision}`}) : null;
+    },
     formatError: formatIronDustV2Error,
     formatEvent: formatIronDustV2Event,
     pause: () => {paused = true; enemyFlow.cancel();},

@@ -3,8 +3,10 @@ import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1} from
   '../levels/iron-dust-core-data.v1.mjs';
 import {IRON_DUST_LEGACY_LOS_PROBE_V1} from './iron-dust-legacy-los-probe.mjs';
 import {IRON_DUST_ZERO_TREADS_STATE_VERSION,
-  IRON_DUST_ZERO_TREADS_POLICY_VERSION, IRON_DUST_FIRE_GEOMETRY_VERSION} from
+  IRON_DUST_ZERO_TREADS_POLICY_VERSION, IRON_DUST_FIRE_GEOMETRY_VERSION,
+  queryIronDustFireGeometry} from
   './iron-dust-unified-state-probe.mjs';
+import {ironDustCrtRatio} from './iron-dust-crt-ratio.mjs';
 import {IRON_DUST_ZERO_TREADS_ENEMY_TURN_CONTROLLER_VERSION} from
   './iron-dust-enemy-turn-controller-probe.mjs';
 import {IRON_DUST_PLAYER_MOVE_PROBE_VERSION} from './iron-dust-player-move-probe.mjs';
@@ -112,6 +114,31 @@ export function queryIronDustProfile(profile, command) {
   try {validateIronDustProfile(profile)}
   catch {return deny('IRON_DUST_PROFILE_MISMATCH')}
   return queryIronDustSourceActionEntry(profile.entry, command);
+}
+
+// This describes only the directly selected player target. The legal query remains
+// the authority for phase, weapon, range, sight, and available resources.
+export function queryIronDustCrtPreview(profile, command) {
+  if (command?.type !== 'PlayerFire') return null;
+  const query = queryIronDustProfile(profile, command);
+  if (!query.available) return null;
+  const state = stateOf(profile.entry);
+  const actor = state.units.find(unit => unit.id === command.unitId);
+  const target = state.units.find(unit => unit.id === command.targetId);
+  if (!actor || !target) return null;
+  const geometry = command.unitId === 'ogre' ? queryIronDustFireGeometry(state,
+    actor.id, target.id, query.range, {outOfRange: 'WEAPON_OUT_OF_RANGE',
+      sightBlocked: 'WEAPON_SIGHT_BLOCKED'}) : null;
+  const effectiveDefense = command.unitId === 'ogre'
+    ? geometry?.available ? target.defense + geometry.cover : null
+    : query.effectiveDefense;
+  const ratioCategory = Number.isFinite(query.attack) && Number.isFinite(effectiveDefense)
+    ? ironDustCrtRatio(query.attack, effectiveDefense) : null;
+  return Object.freeze({profileId: profile.header.ruleProfileId,
+    stateRevision: profile.digest, actorId: actor.id, targetId: target.id,
+    weaponKey: command.weaponKey ?? null, from: {x: actor.x, y: actor.y},
+    to: {x: target.x, y: target.y}, legal: true, ratioCategory,
+    meaning: 'crt-attack-effective-defense'});
 }
 
 export function preflightIronDustProfile(profile, command) {

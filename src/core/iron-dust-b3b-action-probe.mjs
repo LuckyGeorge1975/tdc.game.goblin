@@ -2,6 +2,7 @@ import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_FIRE_GEOMETRY_VERSION,
   validateIronDustUnifiedStateProbe,
   queryIronDustFireGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB3aAction, dispatchIronDustB3aAction} from './iron-dust-b3a-action-probe.mjs';
+import {ironDustCrtRatio} from './iron-dust-crt-ratio.mjs';
 
 export const IRON_DUST_B3B_ACTION_VERSION = 'iron-dust-explicit-core-v2';
 const crt = {
@@ -26,12 +27,6 @@ const unit = (state, id) => state.units.find(item => item.id === id);
 const ready = weapon => {
   const remaining = Math.max(0, Math.min(weapon.remaining, weapon.count - weapon.destroyed));
   return weapon.expendable ? remaining : Math.max(0, remaining - weapon.firedThisPhase);
-};
-const ratio = (attack, defense) => {
-  const strength = Math.max(0, attack), guarded = Math.max(1, defense);
-  if (strength >= guarded * 5) return '5-1';
-  if (strength * 2 < guarded) return '1-2';
-  return `${Math.min(4, Math.max(1, Math.floor(strength / guarded)))}-1`;
 };
 
 export function queryIronDustB3bAction(state, command) {
@@ -93,7 +88,7 @@ export function dispatchIronDustB3bAction(state, command) {
   const geometry = queryIronDustFireGeometry(next, 'ogre', 'core', weapon.range,
     {outOfRange: 'WEAPON_OUT_OF_RANGE', sightBlocked: 'WEAPON_SIGHT_BLOCKED'});
   const effectiveDefense = target.defense + geometry.cover;
-  const combatRatio = ratio(query.attack, effectiveDefense);
+  const combatRatio = ironDustCrtRatio(query.attack, effectiveDefense);
   const result = combatRatio === '5-1' ? 'X' : crt[combatRatio][roll];
   if (result === 'D') {
     if (target.disabled) target.hp = 0;

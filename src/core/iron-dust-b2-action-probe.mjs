@@ -5,6 +5,7 @@ import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_REST_OGRE_FIXTURE_VERSION
   validateIronDustUnifiedStateProbe,
   queryIronDustFireGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB1Action, dispatchIronDustB1Action} from './iron-dust-b1-action-probe.mjs';
+import {ironDustCrtRatio} from './iron-dust-crt-ratio.mjs';
 
 export const IRON_DUST_B2_ACTION_VERSION = 'iron-dust-explicit-ogre-fire-v1';
 const fixtures = ['source', 'adjacent', IRON_DUST_NEAR_CORE_FIXTURE_VERSION,
@@ -36,12 +37,6 @@ const selected = state => unit(state, 'ogre').ogreSystems.selectedWeapon;
 const ready = weapon => {
   const remaining = Math.max(0, Math.min(weapon.remaining, weapon.count - weapon.destroyed));
   return weapon.expendable ? remaining : Math.max(0, remaining - weapon.firedThisPhase);
-};
-const ratio = (attack, defense) => {
-  const strength = Math.max(0, attack), guarded = Math.max(1, defense);
-  if (strength >= guarded * 5) return '5-1';
-  if (strength * 2 < guarded) return '1-2';
-  return `${Math.min(4, Math.max(1, Math.floor(strength / guarded)))}-1`;
 };
 
 function fireTarget(state, weaponKey, targetId) {
@@ -118,7 +113,7 @@ export function dispatchIronDustB2Action(state, command) {
     const geometry = queryIronDustFireGeometry(next, 'ogre', target.id, weapon.range,
       {outOfRange: 'WEAPON_OUT_OF_RANGE', sightBlocked: 'WEAPON_SIGHT_BLOCKED'});
     const effectiveDefense = target.defense + geometry.cover;
-    const combatRatio = ratio(query.attack, effectiveDefense);
+    const combatRatio = ironDustCrtRatio(query.attack, effectiveDefense);
     const result = combatRatio === '5-1' ? 'X' : crt[combatRatio][roll];
     if (result === 'D') {
       if (target.infantry === true || target.engineering === true || target.id === 'infantry')
