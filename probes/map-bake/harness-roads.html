@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="de">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Isolierte Straßenkartenprobe</title>
+<style>
+body{margin:1rem;font:16px system-ui;background:#18201b;color:#f3f3ec}
+button,a{font:inherit;min-height:44px;margin:.25rem;padding:.5rem 1rem}
+button{cursor:pointer}a{color:#a8dfd2}pre{white-space:pre-wrap;overflow-wrap:anywhere}
+img{display:block;width:min(100%,960px);height:auto;border:1px solid #4e6257}iframe{display:none}
+</style>
+<h1>Straßenkarte · isolierte 192-px-Generatorprobe</h1>
+<p>Genau <code id="scenario"></code>. Die Generator-HTML läuft im gleichursprünglichen, versteckten Frame. Ein Renderlauf startet erst nach Klick oder gezieltem Aufruf durch die beauftragte Testerrolle.</p>
+<button type="button" id="render">192 px rendern</button>
+<p id="downloads"></p>
+<pre id="status">Bereit. Noch kein Bild erzeugt.</pre>
+<img id="preview" alt="Gerenderte Straßenkarte" hidden>
+<iframe id="generator" src="generator.html" title="Gepinnter Kartengenerator"></iframe>
+<script>
+const expectedScenario='__SCENARIO__';
+const expectedFingerprint='__CONTRACT_FINGERPRINT__';
+const expected={
+  'showcase-siege':{profile:'FIELD_TEST_LEGACY_v1',losMode:null,
+    roads:{'4,3':[0],'5,3':[0,3],'6,3':[0,3],'7,3':[3]}},
+  'los-supercover-showcase':{profile:'FIELD_TEST_SUPERCOVER_v1',losMode:'strict-supercover',
+    roads:{'6,3':[0],'7,3':[3]}}
+}[expectedScenario];
+if(!expected)throw Error('Unapproved road scenario');
+document.querySelector('#scenario').textContent=expectedScenario;
+const status=document.querySelector('#status');
+const preview=document.querySelector('#preview');
+const frame=document.querySelector('#generator');
+let previousUrls=[];
+const blobOf=(canvas,type,quality)=>new Promise((resolve,reject)=>
+  canvas.toBlob(blob=>blob?resolve(blob):reject(Error(`toBlob ${type} failed`)),type,quality));
+const stable=value=>Array.isArray(value)?value.map(stable):
+  value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,stable(value[key])])):value;
+async function hashBytes(bytes){
+  return [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))]
+    .map(value=>value.toString(16).padStart(2,'0')).join('');
+}
+async function sha256(blob){return hashBytes(await blob.arrayBuffer());}
+async function renderRoad(){
+  if(!frame.contentWindow?.renderLevel)throw Error('Pinned generator not ready');
+  const [contract,level]=await Promise.all([
+    fetch('contract.json',{cache:'no-store'}).then(response=>{if(!response.ok)throw Error('Contract unavailable');return response.json()}),
+    fetch('level.json',{cache:'no-store'}).then(response=>{if(!response.ok)throw Error('Level unavailable');return response.json()})
+  ]);
+  if(contract.schemaVersion!==1||contract.scenario!==expectedScenario||level.id!==expectedScenario||
+      contract.fingerprint!==expectedFingerprint||contract.profile!==expected.profile||
+      contract.unitDataProfile!=='field-test-atlas-v1'||contract.losMode!==expected.losMode||
+      contract.scenarioVersion!==1||contract.playable!==true||
+      contract.source?.contentCommit!=='c01ecb80bcdd813772d1433d9ae63b39e54ef050'||
+      contract.source?.generatorZipSha256!=='0236c88dc8656dfdd8a799164621576fb151e90f866941d699ad6622613e11f2'||
+      contract.source?.generatorHtmlSha256!=='47a2bbc446a89937d97ba39728896492ed1b2c0457ca16673f386b694f941385'||
+      contract.source?.iconArchiveSha256!=='7cb8cb6d28ba7c10ba862e06f25fec58ce29be6456c84a3fb52d3cb4ab0b353a'||
+      contract.source?.levelBundleSha256!=='eea48c2a044beb2c07ee852b6cfcfe6297ab91d810f85d033bebc72331e8c140'||
+      contract.source?.unitProfileSha256!=='5cf6d5e5cc58b868cc5d8a7a290639b2a33bce5cd66c4ceb566e81956bbec3ad'||
+      contract.source?.scenarioManifestSha256!=='a02c649eed8f49c1a9b4c52f1c5567be9b35cf906400b47577c7333fd244b7ce'||
+      contract.source?.atlasLoaderSha256!=='159f286acbd46f17d19ef817c47427fb2c04811e925fff4199c4136804c56727'||
+      contract.cells?.length!==96||JSON.stringify(contract.level)!==JSON.stringify(level)||
+      level.width!==12||level.height!==8||level.defaultTerrain!=='open-ground'||
+      contract.render?.tileWidth!==192||JSON.stringify(contract.render.canvasPx)!=='[2400,1386]'||
+      contract.render?.webpQuality!==.85||contract.render?.imageFormat!=='image/webp'||
+      JSON.stringify(contract.visualMetadata)!=='{"overlays":[],"urbanVariantOverrides":[]}')
+    throw Error('Pinned road contract differs');
+  if(expectedScenario==='los-supercover-showcase' &&
+      (level.ruleProfileId!=='FIELD_TEST_SUPERCOVER_v1'||level.scenarioVersion!==1))
+    throw Error('Supercover explicit profile differs');
+  if(expectedScenario==='showcase-siege' &&
+      (Object.hasOwn(level,'ruleProfileId')||Object.hasOwn(level,'scenarioVersion')))
+    throw Error('Siege effective profile differs');
+  const {fingerprint,...fingerprintData}=contract;
+  if(fingerprint!==await hashBytes(new TextEncoder().encode(JSON.stringify(stable(fingerprintData)))))
+    throw Error('Road contract fingerprint differs');
+  const byPosition=new Map(contract.cells.map(cell=>[`${cell.x},${cell.y}`,cell]));
+  const terrain=new Map(level.terrain.map(cell=>[`${cell.x},${cell.y}`,cell.type]));
+  const roads=Object.fromEntries([...byPosition].filter(([,cell])=>cell.roadEdges.length)
+    .map(([position,cell])=>[position,cell.roadEdges]));
+  if(byPosition.size!==96||JSON.stringify(roads)!==JSON.stringify(expected.roads)||
+      contract.cells.some(cell=>cell.type!==(terrain.get(`${cell.x},${cell.y}`)||level.defaultTerrain)||
+        ['river','bridge','water'].includes(cell.type)||cell.riverEdges.length))
+    throw Error('Inner road caps or canonical cells differ');
+  status.textContent=`Erzeuge ${expectedScenario} bei 192 px…`;
+  const started=performance.now();
+  const generated=await frame.contentWindow.renderLevel(level,192);
+  const renderMs=Math.round(performance.now()-started);
+  const canvas=frame.contentWindow.__r?.final;
+  if(!canvas||canvas.width!==2400||canvas.height!==1386||
+      JSON.stringify(generated.size)!=='[2400,1386]')throw Error('Generated canvas dimensions mismatch');
+  const png=await blobOf(canvas,'image/png');
+  const webp=await blobOf(canvas,'image/webp',.85);
+  if(webp.type!=='image/webp')throw Error('WebP encoding unsupported');
+  const decodeStart=performance.now();
+  const bitmap=await createImageBitmap(webp);
+  const decoded=[bitmap.width,bitmap.height];bitmap.close();
+  if(JSON.stringify(decoded)!=='[2400,1386]')throw Error('WebP dimensions mismatch');
+  const webpDecodeMs=Math.round(performance.now()-decodeStart);
+  for(const url of previousUrls)URL.revokeObjectURL(url);
+  const pngUrl=URL.createObjectURL(png),webpUrl=URL.createObjectURL(webp);
+  previousUrls=[pngUrl,webpUrl];
+  preview.src=webpUrl;preview.hidden=false;
+  document.querySelector('#downloads').replaceChildren(...[
+    ['PNG',pngUrl],['WebP',webpUrl]
+  ].map(([label,url])=>{
+    const link=document.createElement('a');
+    link.href=url;link.download=`${expectedScenario}-192.${label.toLowerCase()}`;
+    link.textContent=`${label} speichern`;return link;
+  }));
+  const result={scenario:expectedScenario,playable:true,profile:contract.profile,
+    unitDataProfile:contract.unitDataProfile,losMode:contract.losMode,
+    contentPin:contract.source.contentCommit,contractFingerprint:contract.fingerprint,
+    width:192,size:[2400,1386],renderMs,pngBytes:png.size,pngSha256:await sha256(png),
+    webpBytes:webp.size,webpSha256:await sha256(webp),webpDecodeMs,
+    decodedRGBABytes:canvas.width*canvas.height*4,environment:navigator.userAgent};
+  status.textContent=JSON.stringify(result,null,2);
+  return result;
+}
+document.querySelector('#render').onclick=()=>renderRoad().catch(error=>{
+  status.textContent=String(error.stack||error);
+});
+window.mapBakeProbe=Object.freeze({render:renderRoad});
+</script>
+</html>
