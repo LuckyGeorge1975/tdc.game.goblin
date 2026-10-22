@@ -359,6 +359,12 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         actions.append(button);
       }
       if (!commands.length) {const hint=document.createElement('p');hint.textContent=t('v2.ui.noAction');actions.append(hint);}
+      if (state.turnPhase === 'fire') {
+        const fit = document.createElement('button'); fit.id = 'v2-command-fit';
+        fit.textContent = t('v2.ui.mapFit');
+        fit.onclick = () => { fitMap(); at('#v2-command-fit')?.focus({preventScroll:true}); };
+        footer.append(fit);
+      }
       const cancel = document.createElement('button');cancel.textContent=t('ui.dialog.cancel');
       cancel.onclick=()=>{clearContext();render();at('#v2-map').focus({preventScroll:true});};
       const pause = document.createElement('button');pause.textContent=t('ui.nav.pause');
@@ -819,7 +825,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function render() {
       const state = project();
       syncAreaPhase(state);
-      const centerFireActor = zoomOnFireEntry(state);
+      const fireZoom = fireZoomEntry(state);
+      if (fireZoom) renderWeaponControls(state,
+        state.units.find(unit => unit.id === view.actorId && unit.hp > 0), at('#v2-weapon-controls'));
+      const centerFireActor = fireZoom ? zoomOnFireEntry(fireZoom.target) : false;
+      if (fireZoom) fireZoomPhase = fireZoom.key;
       const zoomOut = at('#v2-zoom-out'), zoomIn = at('#v2-zoom-in');
       const fit = at('#v2-zoom-fit'), center = at('#v2-zoom-center');
       zoomOut.setAttribute('aria-label', t('ui.hud.zoomOut'));
@@ -1027,20 +1037,29 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const actor = state.units.find(unit => unit.id === view.actorId && unit.hp > 0);
       if (actor) centerOnHex(nativeMap.querySelector(`.hex[data-x="${actor.x}"][data-y="${actor.y}"]`));
     }
-    function zoomOnFireEntry(state) {
+    function fireZoomEntry(state) {
       if (state.phase !== 'player' || state.turnPhase !== 'fire' || state.gameOver ||
-          activeAreaMode(state) !== 'fire' || !mapPanel.clientWidth || !mapPanel.clientHeight) return false;
+          activeAreaMode(state) !== 'fire' || !mapPanel.clientWidth || !mapPanel.clientHeight) return null;
       const key = `${state.scenario}:${state.turn}:${state.phase}:${state.turnPhase}`;
-      if (fireZoomPhase === key) return false;
-      fireZoomPhase = key;
+      if (fireZoomPhase === key) return null;
       const box = nativeMap.viewBox.baseVal;
-      const fit = Math.min(mapPanel.clientWidth / (box.width || 790),
-        mapPanel.clientHeight / (box.height || 480));
-      const hexWidth = Math.sqrt(3) * S * fit;
-      if (hexWidth * view.zoom >= 50) return false;
-      view.zoom = Math.min(4, 50 / hexWidth);
-      applyMapSize();
-      return true;
+      const visibleHex = Math.sqrt(3) * S * nativeMap.getBoundingClientRect().width / (box.width || 790);
+      return {key,target:Math.max(50, view.zoom > 1 ? visibleHex : 0)};
+    }
+    function zoomOnFireEntry(target) {
+      const originalZoom = view.zoom;
+      const box = nativeMap.viewBox.baseVal;
+      const width = box.width || 790, height = box.height || 480;
+      for (let attempt = 0; attempt < 4; attempt++) {
+        const panelWidth = mapPanel.clientWidth, panelHeight = mapPanel.clientHeight;
+        const fit = Math.min(panelWidth / width, panelHeight / height);
+        view.zoom = Math.min(4, Math.max(view.zoom, target / (Math.sqrt(3) * S * fit)));
+        applyMapSize();
+        const actualHex = Math.sqrt(3) * S * nativeMap.getBoundingClientRect().width / width;
+        if (mapPanel.clientWidth === panelWidth && mapPanel.clientHeight === panelHeight &&
+            (actualHex >= target - 0.01 || view.zoom >= 4)) break;
+      }
+      return view.zoom > originalZoom + 0.0001;
     }
     function applyMapSize() {
       if (!mapPanel.clientWidth || !mapPanel.clientHeight) return;
@@ -1110,7 +1129,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     at('#v2-zoom-out').onclick = () => setZoom(view.zoom / 1.25);
     at('#v2-zoom-in').onclick = () => setZoom(view.zoom * 1.25);
-    at('#v2-zoom-fit').onclick = () => { view.zoom = 1; applyMapSize(); mapPanel.scrollTo(0, 0); render(); };
+    function fitMap() { view.zoom = 1; applyMapSize(); mapPanel.scrollTo(0, 0); render(); }
+    at('#v2-zoom-fit').onclick = fitMap;
     at('#v2-zoom-center').onclick = () => {
       const actor = project().units.find(unit => unit.id === view.actorId);
       if (actor) centerOnHex(nativeMap.querySelector(`.hex[data-x="${actor.x}"][data-y="${actor.y}"]`));

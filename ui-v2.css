@@ -263,5 +263,5 @@ body.ui-v2-active .v2-fire-ratio { fill: var(--v2-text); text-anchor: middle; do
   .v2-controls button { font-size: 12px; line-height: 1.2; padding: 4px 6px; }
   .v2-map { grid-column: 1 / -1; grid-row: 3; height: min(36dvh, 145px); }
   .v2-context { grid-column: 1 / -1; grid-row: 4; }
-  .v2-command-card.v2-command-panel { top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); bottom: max(8px, env(safe-area-inset-bottom)); width: min(320px, 40vw); max-height: none; }
+  .v2-command-card.v2-command-panel { top: max(8px, env(safe-area-inset-top)); left: auto; right: max(8px, env(safe-area-inset-right)); bottom: max(8px, env(safe-area-inset-bottom)); width: min(320px, 40vw); max-height: none; }
 }
