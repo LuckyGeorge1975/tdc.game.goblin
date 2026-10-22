@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+  "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+  "sourceManifest": "beratung-ui-ux/design-exports/uebergabe-karte/terrain-icons.json",
+  "sourceManifestSha256": "9ba53ce86fa4440947d18d8e0ff9153f193de5329c3c9d59df577661049c854f",
+  "sourceHashReceipt": "probes/map-bake/RESULTS.json",
+  "sourceHashReceiptSha256": "a4d3f0291d0ed4e72a4a7f486d48b687e0489fd14ae060c52b28f2f9cf51d143",
+  "sourceFilesVerified": 35,
+  "sourceBytesVerified": 3458216,
+  "export": {
+    "width": 48,
+    "height": 56,
+    "format": "image/webp",
+    "lossless": true,
+    "resampling": "Pillow LANCZOS",
+    "pillowVersion": "12.3.0",
+    "colorAndAlpha": "exact match to 48x56 PNG after decoding"
+  },
+  "png48TotalBytes": 59638,
+  "webpTotalBytes": 42188,
+  "types": {
+    "open-ground": {
+      "icon": "assets/terrain-icons/open-ground.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/open-ground.png",
+      "sourceSha256": "8cac36bf189c1699c47c34fd7a980846955e052442c6314b6550442948b4204d",
+      "sha256": "72d29198c8fc7ef876b29f7db94be71406f895dc4308d4739593493d2d21dac2",
+      "bytes": 3742,
+      "png48Bytes": 4805,
+      "representativeOnly": false
+    },
+    "rubble-field": {
+      "icon": "assets/terrain-icons/rubble-field.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/rubble-field.png",
+      "sourceSha256": "d9c66183c47adc418e9c5ca882be10a555f936642eef6da58bc140fc71413046",
+      "sha256": "ed25809ed580ab604886c657d2ecdcaaddfd7e790b5ae1aaa29c1c5d7c8da714",
+      "bytes": 2748,
+      "png48Bytes": 4687,
+      "representativeOnly": false
+    },
+    "mountain": {
+      "icon": "assets/terrain-icons/mountain.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/mountain.png",
+      "sourceSha256": "2dd6abfdbd0a0c9fe69bd1fb370a579f76574f091eb684278ede67073e1f7027",
+      "sha256": "c0c9261e4cee2bb4be70c95e773e4adbc69c4b718732325ab7fcbd0b6ae96507",
+      "bytes": 3548,
+      "png48Bytes": 6579,
+      "representativeOnly": false
+    },
+    "ridge": {
+      "icon": "assets/terrain-icons/ridge.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/ridge.png",
+      "sourceSha256": "c4ed73f495f0293c6664e0468e00f2b15b3071c65141937c5b02b26154030094",
+      "sha256": "dcc97d05d28680354929a53bb85db962aba091b75099b4320ad97b1dc352ac1d",
+      "bytes": 4630,
+      "png48Bytes": 6944,
+      "representativeOnly": false
+    },
+    "forest": {
+      "icon": "assets/terrain-icons/forest.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/forest.png",
+      "sourceSha256": "bcda89195ac72fe14cc8e248b9768c25b9f02aba492225ea3a3f20c67e5ff2e5",
+      "sha256": "03b576c20982a87d9511b056218f55822a1fcce39a83c2aa80cda32b4b56f3f5",
+      "bytes": 5506,
+      "png48Bytes": 7105,
+      "representativeOnly": true
+    },
+    "marsh": {
+      "icon": "assets/terrain-icons/marsh.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/marsh.png",
+      "sourceSha256": "37a8ba04467075cf7f6a7f0492d3a5e6661f07371181d3d367d1bb9c85b085e7",
+      "sha256": "0f9715056b084170801c91c36fcebc91e6772c03f966257e3bb9d9cc0ab29865",
+      "bytes": 4286,
+      "png48Bytes": 5361,
+      "representativeOnly": false
+    },
+    "water": {
+      "icon": "assets/terrain-icons/water.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/water.png",
+      "sourceSha256": "51fe4586dff020d71a25b3e53f57162cd3c3f3e874aa25244dd72352e850c26b",
+      "sha256": "358f7cb88f1e6492fb0f8348c85bfdbf1919a6b33757960e93e3592ffa2cd4f6",
+      "bytes": 3116,
+      "png48Bytes": 4690,
+      "representativeOnly": false
+    },
+    "river": {
+      "icon": "assets/terrain-icons/river.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/river-straight.png",
+      "sourceSha256": "0b69df2bfb2c2ebf6ddb145c7ee8daecc4fe8fcc734962d86d0bd0415ed31830",
+      "sha256": "a79eecd8d8e03701b89b5e0c4928d3767bc9ef4981dfee72f2f17ac3294e569c",
+      "bytes": 2900,
+      "png48Bytes": 3682,
+      "representativeOnly": true
+    },
+    "road": {
+      "icon": "assets/terrain-icons/road.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/road-straight.png",
+      "sourceSha256": "64390b391269fd035b27da6baa91f92ac8acd40e7274ab3291140da018fd41ce",
+      "sha256": "79b18d4b1434f23efcddff3470581957de2daeab0e8487aa142ed38046a8b191",
+      "bytes": 742,
+      "png48Bytes": 1060,
+      "representativeOnly": true
+    },
+    "bridge": {
+      "icon": "assets/terrain-icons/bridge.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/bridge.png",
+      "sourceSha256": "cd8d87236ad3d67dda3ffea53dca810b44118f3e7930629dfd553e766ee4a9d8",
+      "sha256": "d59ec2753af50941fcc4c59795aff7bf77861fa3a0e28821c0f20449730dc7d5",
+      "bytes": 3718,
+      "png48Bytes": 4911,
+      "representativeOnly": false
+    },
+    "urban": {
+      "icon": "assets/terrain-icons/urban.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/urban-s0.png",
+      "sourceSha256": "a142c33ece4ca8c3fa6f1fd24dc88b7fed419451b66517a7bb4622c4dfae741b",
+      "sha256": "3dbd3f4f3128118a6af4a37f6d5ee312f4198d8e99aeaa708cca30ef746517b3",
+      "bytes": 3796,
+      "png48Bytes": 5006,
+      "representativeOnly": true
+    },
+    "crater": {
+      "icon": "assets/terrain-icons/crater.webp",
+      "source": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/crater.png",
+      "sourceSha256": "ca3c9988c9adb3b85842782231f53ceb73badf44c637fb7e9a6cbdb0136c0093",
+      "sha256": "2ca728e5cdff2def95ce7131b90df25342a7a8b7b1eba2dd9d0a1b48e4cf143b",
+      "bytes": 3456,
+      "png48Bytes": 4808,
+      "representativeOnly": false
+    }
+  }
+}
