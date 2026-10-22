@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 
 const source = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
+const localization = readFileSync(new URL('../localization.js', import.meta.url), 'utf8');
 const match = source.match(/      function mark\(cell, kind\) \{[\s\S]*?\n      \}\n      for \(const cell of data\.legal\)/);
 assert.ok(match, 'area mark must remain inside renderAreaPreview');
 const markSource = match[0].slice(0, -'      for (const cell of data.legal)'.length);
@@ -70,4 +71,30 @@ test('fire uses a dark underlay and danger ring with reference-width proportions
   assert.equal(children[0].attrs['stroke-width']*refToSvg,5.5);
   assert.equal(children[1].attrs['stroke-width']*refToSvg,2.5);
   assert.equal(children[0].attrs.points,children[1].attrs.points);
+});
+
+test('compact movement status points to the focused cost instead of claiming a visible number', () => {
+  assert.match(source,/const showCostChips = hexWidth \* pixelScale >= 50 && !matchMedia\('\(max-width: 599px\)'\)\.matches;/);
+  const start=source.indexOf('      let message = t(mode ===');
+  const end=source.indexOf("      if (weapon && mode === 'fire')",start);
+  assert.ok(start>0 && end>start);
+  const status=source.slice(start,end);
+  for (const [visible,key] of [[true,'v2.area.status.move'],[false,'v2.area.status.moveCompact']]) {
+    const context={mode:'movement',data:{status:'move',legal:[{},{}]},showCostChips:visible,
+      t:(name,{count})=>`${name}:${count}`};
+    runInNewContext(`${status}\nglobalThis.result=message;`,context);
+    assert.equal(context.result,`${key}:2`);
+  }
+});
+
+test('movement button labels path length as steps in all four languages', () => {
+  const match=localization.match(/'v2\.ui\.pathSteps': (\{[^\n]+\}),/);
+  assert.ok(match);
+  const labels=runInNewContext(`(${match[1]})`);
+  assert.deepEqual(Object.keys(labels),['de','en','es','fr']);
+  for (const label of Object.values(labels)) assert.match(label,/\{count\}/);
+  assert.match(source,/command\.type === 'Move' && availability\.path \? ` · \$\{t\('v2\.ui\.pathSteps', \{count:availability\.path\.length\}\)\}`/);
+  const compact=localization.match(/'v2\.area\.status\.moveCompact': (\{[^\n]+\}),/);
+  assert.ok(compact);
+  assert.deepEqual(Object.keys(runInNewContext(`(${compact[1]})`)),['de','en','es','fr']);
 });

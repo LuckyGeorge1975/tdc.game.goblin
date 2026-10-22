@@ -309,7 +309,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       for (const {command,label,keepTarget,confirmSplash} of commands) {
         const availability = query(command), button = document.createElement('button');
         button.textContent = availability.ok
-          ? `${label} · ${t('ui.hud.intent.confirm')}${availability.path ? ` · ${availability.path.length}` : ''}`
+          ? `${label} · ${t('ui.hud.intent.confirm')}${command.type === 'Move' && availability.path ? ` · ${t('v2.ui.pathSteps', {count:availability.path.length})}` : ''}`
           : `${label} · ${t('ui.hud.blocked', {reason:availability.reason})}`;
         button.disabled = !availability.ok || view.busy;
         button.onclick = async () => {
@@ -532,7 +532,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const mapWidth = nativeMap.getBoundingClientRect().width || nativeMap.clientWidth ||
         Number.parseFloat(nativeMap.style.width) || nativeMap.viewBox.baseVal.width;
       const pixelScale = mapWidth / nativeMap.viewBox.baseVal.width;
-      const showCostChips = hexWidth * pixelScale >= 50;
+      const showCostChips = hexWidth * pixelScale >= 50 && !matchMedia('(max-width: 599px)').matches;
       function mark(cell, kind) {
         const points = hexPoints(cell.x, cell.y);
         if (kind === 'fire') {
@@ -570,7 +570,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
       for (const cell of data.legal) mark(cell, mode === 'movement' ? 'movement' : mode === 'fire' ? 'fire' : 'sight');
       if (mode !== 'los') for (const cell of data.blocked) mark(cell, 'blocked');
-      let message = t(`v2.area.status.${data.status}`, { count: data.legal.length });
+      let message = t(mode === 'movement' && data.status === 'move' && !showCostChips
+        ? 'v2.area.status.moveCompact' : `v2.area.status.${data.status}`, { count: data.legal.length });
       if (weapon && mode === 'fire') message += ` · ${weapon.label}`;
       if (data.reason) message += ` · ${data.reason}`;
       if (mode === 'movement') {
