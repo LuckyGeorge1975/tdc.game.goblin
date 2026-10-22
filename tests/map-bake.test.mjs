@@ -5,12 +5,15 @@ import {createHash, webcrypto} from 'node:crypto';
 import {runInNewContext} from 'node:vm';
 
 const root = new URL('../', import.meta.url);
-const [script, manifest, bytes, specialistsManifest, specialistsBytes, bundle] = await Promise.all([
+const [script, manifest, bytes, specialistsManifest, specialistsBytes, atlasManifest, atlasBytes, atlasLevel, bundle] = await Promise.all([
   readFile(new URL('map-bake.js', root), 'utf8'),
   readFile(new URL('assets/map-bakes/showcase-terrain-course-192.json', root), 'utf8').then(JSON.parse),
   readFile(new URL('assets/map-bakes/showcase-terrain-course-192.webp', root)),
   readFile(new URL('assets/map-bakes/showcase-specialists-192.json', root), 'utf8').then(JSON.parse),
   readFile(new URL('assets/map-bakes/showcase-specialists-192.webp', root)),
+  readFile(new URL('assets/map-bakes/atlas-proving-grounds-192.json', root), 'utf8').then(JSON.parse),
+  readFile(new URL('assets/map-bakes/atlas-proving-grounds-192.webp', root)),
+  readFile(new URL('assets/unit-art/levels/atlas-proving-grounds.json', root), 'utf8').then(JSON.parse),
   readFile(new URL('assets/unit-art/levels/showcase-levels.json', root), 'utf8').then(JSON.parse)
 ]);
 const level = bundle.levels.find(item => item.id === 'showcase-terrain-course');
@@ -23,7 +26,7 @@ const settled = async bake => {
   assert.notEqual(bake.status().phase, 'loading', 'bake request did not settle');
 };
 
-function setup(responses) {
+function setup(responses, bitmapSize = [2400, 1386]) {
   const requests = [];
   const revoked = [];
   let nextUrl = 0;
@@ -31,7 +34,7 @@ function setup(responses) {
     crypto: webcrypto, TextEncoder, Blob, console: {warn() {}},
     performance: {now: () => 10}, AbortController,
     URL: {createObjectURL: () => `blob:${++nextUrl}`, revokeObjectURL: url => revoked.push(url)},
-    createImageBitmap: async () => ({width: 2400, height: 1386, close() {}}),
+    createImageBitmap: async () => ({width: bitmapSize[0], height: bitmapSize[1], close() {}}),
     fetch: async (url, options) => {
       requests.push({url, signal: options.signal});
       const response = responses.shift();
@@ -42,9 +45,12 @@ function setup(responses) {
   const bake = runInNewContext(script + '\nMapBake', context);
   const snapshot = (selectedLevel = level) => {
     const cells = new Map(selectedLevel.terrain.map(cell => [`${cell.x},${cell.y}`, cell.type]));
+    const atlas = selectedLevel.id === 'atlas-proving-grounds';
     return bake.snapshot(selectedLevel.id,
-    {scenarioVersion: 1, ruleProfileId: 'FIELD_TEST_LEGACY_v1'},
-    {scenarioVersion: 1, ruleProfileId: 'FIELD_TEST_LEGACY_v1'},
+    {scenarioVersion: 1, ruleProfileId: 'FIELD_TEST_LEGACY_v1',
+      ...(atlas ? {ruleProfile: 'field-test-atlas-v1'} : {})},
+    {scenarioId: selectedLevel.id, scenarioVersion: 1, ruleProfileId: 'FIELD_TEST_LEGACY_v1',
+      ...(atlas ? {effectiveRules: {unitDataProfile: 'field-test-atlas-v1'}} : {})},
     selectedLevel, 12, 8, 34, 58, 48, (x, y) => cells.get(`${x},${y}`) || 'open-ground');
   };
   return {bake, snapshot, requests, revoked};
@@ -176,4 +182,91 @@ test('Specialists wrong route, profile or image falls back', async () => {
     await settled(fixture.bake);
     assert.equal(fixture.bake.status().phase, 'fallback');
   }
+});
+
+test('Atlas is the third explicit bake with effective profile and disconnected eastern road', async () => {
+  const fixture = setup([json(atlasManifest), image(atlasBytes), json(specialistsManifest),
+    image(specialistsBytes), json(manifest), image(bytes)]);
+  for (const id of ['showcase-advance', 'showcase-siege', 'los-supercover-showcase'])
+    assert.equal(fixture.bake.snapshot(id, {}, {}, atlasLevel, 12, 8, 34, 58, 48, () => 'road'), null);
+  assert.equal(fixture.requests.length, 0);
+  const atlas = fixture.snapshot(atlasLevel);
+  assert.equal(JSON.stringify(atlas), atlasManifest.key);
+  assert.equal(expectedHash(atlasManifest.key), atlasManifest.keySha256);
+  assert.equal(expectedHash(atlasBytes), atlasManifest.imageSha256);
+  assert.equal(atlas.unitDataProfile, 'field-test-atlas-v1');
+  assert.deepEqual(Array.from(atlas.visualCells[3][6][1]), [3]);
+  assert.deepEqual(Array.from(atlas.visualCells[3][6][2]), [2, 4]);
+  assert.equal(atlas.cells[3][7], 'ridge');
+  assert.deepEqual(Array.from(atlas.visualCells[5][7][1]), [0]);
+  assert.deepEqual(Array.from(atlas.visualCells[5][8][1]), [3]);
+  assert.deepEqual(Array.from(atlas.visualCells[1][6][2]), [2, 4, 5]);
+  assert.deepEqual(Array.from(atlas.visualCells[5][6][2]), [4]);
+  assert.equal(fixture.bake.select(atlas, () => {}), null);
+  await settled(fixture.bake);
+  assert.equal(fixture.bake.select(atlas, () => {}), 'blob:1');
+  const specialists = fixture.snapshot(specialistsLevel);
+  fixture.bake.select(specialists, () => {});
+  assert.deepEqual(fixture.revoked, ['blob:1']);
+  await settled(fixture.bake);
+  assert.equal(fixture.bake.select(specialists, () => {}), 'blob:2');
+  fixture.bake.select(fixture.snapshot(), () => {});
+  assert.deepEqual(fixture.revoked, ['blob:1', 'blob:2']);
+  await settled(fixture.bake);
+  assert.equal(fixture.bake.select(fixture.snapshot(), () => {}), 'blob:3');
+  assert.deepEqual(fixture.requests.map(request => request.url), [
+    'assets/map-bakes/atlas-proving-grounds-192.json',
+    'assets/map-bakes/atlas-proving-grounds-192.webp',
+    'assets/map-bakes/showcase-specialists-192.json',
+    'assets/map-bakes/showcase-specialists-192.webp',
+    'assets/map-bakes/showcase-terrain-course-192.json',
+    'assets/map-bakes/showcase-terrain-course-192.webp']);
+});
+
+test('Atlas profile, route, stale request and corrupt image preserve fallback', async () => {
+  const guard = setup([]);
+  const terrain = new Map(atlasLevel.terrain.map(cell => [`${cell.x},${cell.y}`, cell.type]));
+  const at = (x, y) => terrain.get(`${x},${y}`) || 'open-ground';
+  assert.equal(guard.bake.snapshot(atlasLevel.id,
+    {ruleProfileId: 'FIELD_TEST_LEGACY_v1', ruleProfile: 'wrong'},
+    {scenarioId: atlasLevel.id, ruleProfileId: 'FIELD_TEST_LEGACY_v1',
+      effectiveRules: {unitDataProfile: 'field-test-atlas-v1'}},
+    atlasLevel, 12, 8, 34, 58, 48, at), null);
+  assert.equal(guard.requests.length, 0);
+  for (const alter of [
+    data => { data.cells[3][7] = 'road'; },
+    data => { data.visualCells[3][6][1] = [0, 3]; },
+    data => { data.unitDataProfile = 'wrong'; },
+    data => { data.profileId = 'FIELD_TEST_LEGACY_v2'; }
+  ]) {
+    const fixture = setup([json(atlasManifest)]);
+    const data = fixture.snapshot(atlasLevel); alter(data);
+    fixture.bake.select(data, () => {});
+    await settled(fixture.bake);
+    assert.equal(fixture.bake.status().phase, 'fallback');
+    assert.equal(fixture.requests.length, 1);
+  }
+  const bad = setup([json(atlasManifest), image(Buffer.from(atlasBytes.map((value, index) =>
+    index === 50 ? value ^ 1 : value)))]);
+  bad.bake.select(bad.snapshot(atlasLevel), () => {});
+  await settled(bad.bake);
+  assert.equal(bad.bake.status().phase, 'fallback');
+  const dimensions = setup([json(atlasManifest), image(atlasBytes)], [2400, 1300]);
+  dimensions.bake.select(dimensions.snapshot(atlasLevel), () => {});
+  await settled(dimensions.bake);
+  assert.equal(dimensions.bake.status().phase, 'fallback');
+  let deliver;
+  const pending = new Promise(resolve => { deliver = resolve; });
+  const stale = setup([pending, json(manifest), image(bytes)]);
+  stale.bake.select(stale.snapshot(atlasLevel), () => assert.fail('stale Atlas redraw'));
+  await tick();
+  stale.bake.select(stale.snapshot(), () => {});
+  assert.equal(stale.requests[0].signal.aborted, true);
+  deliver(json(atlasManifest));
+  await settled(stale.bake);
+  assert.equal(stale.bake.status().phase, 'ready');
+  assert.deepEqual(stale.requests.map(request => request.url), [
+    'assets/map-bakes/atlas-proving-grounds-192.json',
+    'assets/map-bakes/showcase-terrain-course-192.json',
+    'assets/map-bakes/showcase-terrain-course-192.webp']);
 });

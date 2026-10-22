@@ -59,8 +59,8 @@
       if(unit.move>0&&!Number.isFinite(TerrainRules.movementCost(type,unit)))throw new Error(`${level.id}: impassable start for ${entry.assetId}`);
     }
   }
-  function register(level){
-    const sourceLevel=level;
+  function register(level, bakeSourceLevel=level){
+    const sourceLevel=bakeSourceLevel;
     level=normalizeLevel(level);
     validateLevel(level);
     if(scenarioCatalog[level.id])throw new Error(`Duplicate scenario: ${level.id}`);
@@ -73,7 +73,7 @@
       showAllEnemiesProgress:true,
       terrain:level.terrain.filter(cell=>TerrainRules.coverBonus(cell.type)>0).map(cell=>`${cell.x},${cell.y}`),
       terrainTypes:level.terrain,units:level.units.map(makeUnit),
-      ...(['showcase-terrain-course','showcase-specialists'].includes(level.id)?{bakeLevel:sourceLevel}:{})
+      ...(['showcase-terrain-course','showcase-specialists','atlas-proving-grounds'].includes(level.id)?{bakeLevel:sourceLevel}:{})
     };
     const option=document.createElement('option');option.value=level.id;option.textContent=level.title;
     option.dataset.titleKey=`mission.${level.id}.title`;
@@ -95,7 +95,7 @@
       const response=await fetch('assets/unit-art/levels/atlas-proving-grounds.json');
       if(!response.ok)throw new Error(`HTTP ${response.status}`);
       const level=await response.json();
-      register({...level,kicker:'MISSION 10 / ATLAS PROVING GROUNDS',title:'ATLAS / Proving Grounds',objective:'core-and-escort'});
+      register({...level,kicker:'MISSION 10 / ATLAS PROVING GROUNDS',title:'ATLAS / Proving Grounds',objective:'core-and-escort'},level);
     }catch(error){console.error('ATLAS level unavailable:',error);addLog(`ATLAS-Level konnte nicht geladen werden: ${error.message}`,true)}
     try{
       const response=await fetch('assets/unit-art/levels/showcase-levels.json');

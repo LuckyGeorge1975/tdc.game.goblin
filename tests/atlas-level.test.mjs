@@ -8,6 +8,8 @@ const showcase=JSON.parse(readFileSync(new URL('../assets/unit-art/levels/showca
 const profiles=JSON.parse(readFileSync(new URL('../assets/unit-art/rules/unit-profiles.v1.json',import.meta.url),'utf8'));
 const manifestSource=readFileSync(new URL('../scenario-profile-manifest.js',import.meta.url),'utf8');
 const source=readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8');
+const bakeSource=readFileSync(new URL('../map-bake.js',import.meta.url),'utf8');
+const atlasBake=JSON.parse(readFileSync(new URL('../assets/map-bakes/atlas-proving-grounds-192.json',import.meta.url),'utf8'));
 
 async function load(bundle=showcase,search='',registry=profiles){
   const options=[],errors=[],loaded=[];
@@ -77,7 +79,21 @@ test('only approved baked missions retain their exact source level',async()=>{
       assert.deepEqual(JSON.parse(JSON.stringify(retained)),level);
     else assert.equal(retained,undefined);
   }
-  assert.equal(context.scenarioCatalog['atlas-proving-grounds'].bakeLevel,undefined);
+  assert.deepEqual(JSON.parse(JSON.stringify(context.scenarioCatalog['atlas-proving-grounds'].bakeLevel)),atlas);
+});
+
+test('actual Atlas loader and session produce the approved bake key',async()=>{
+  const {context,errors}=await load();
+  assert.equal(errors.length,0);
+  vm.runInContext(bakeSource,context);
+  const result=vm.runInContext(`(() => {
+    const id='atlas-proving-grounds',scenario=scenarioCatalog[id];
+    const session=ScenarioRuleProfiles.beginSession(id,scenario);
+    const terrain=new Map(scenario.terrainTypes.map(cell=>[cell.x+','+cell.y,cell.type]));
+    return MapBake.snapshot(id,session.config,session,scenario.bakeLevel,12,8,34,58,48,
+      (x,y)=>terrain.get(x+','+y)||'open-ground');
+  })()`,context);
+  assert.equal(JSON.stringify(result),atlasBake.key);
 });
 
 test('asset levels reject missing, unknown and mismatched product profiles before registration',async()=>{

@@ -1,4 +1,4 @@
-// Optional terrain images for two pinned missions. Every failure keeps the live field renderer.
+// Optional terrain images for three pinned missions. Every failure keeps the live field renderer.
 const MapBake = (() => {
   const BAKES = Object.freeze({
     'showcase-terrain-course': {
@@ -28,6 +28,25 @@ const MapBake = (() => {
         '7cb8cb6d28ba7c10ba862e06f25fec58ce29be6456c84a3fb52d3cb4ab0b353a',
         '8f2fb7de4ecb0e322adaf233b8b6c40ac41065fc1f60c7d9a6199ce359c74ca0',
         'a17da5326c2ecdf613f44ea2ac84ef2a42b0c9175d07cee7a174c083a3864853']
+    },
+    'atlas-proving-grounds': {
+      manifest: 'assets/map-bakes/atlas-proving-grounds-192.json',
+      image: 'assets/map-bakes/atlas-proving-grounds-192.webp',
+      keySha256: 'ec1cb67ce9e42f8e0f391b1574e0b58200f13b5ba72322aaed50e396de136e14',
+      imageSha256: 'ceec086c39fef8c85cda01f445e61c577ee2576579c861e1bad02a5a148b9114',
+      imageBytes: 543180,
+      visualVersion: 'generator-levelToCfg-v1',
+      source: ['c01ecb80bcdd813772d1433d9ae63b39e54ef050',
+        '1f4e6a6303e9e835f41556e57595cf6d2646bb30d028fb412e090b7ff223673d',
+        'eb2388bbf56c848ce6898378f399fd842a8449b2992ac7d517cd1a388758fb18',
+        '0236c88dc8656dfdd8a799164621576fb151e90f866941d699ad6622613e11f2',
+        '47a2bbc446a89937d97ba39728896492ed1b2c0457ca16673f386b694f941385',
+        '7cb8cb6d28ba7c10ba862e06f25fec58ce29be6456c84a3fb52d3cb4ab0b353a',
+        '5cf6d5e5cc58b868cc5d8a7a290639b2a33bce5cd66c4ceb566e81956bbec3ad',
+        'a02c649eed8f49c1a9b4c52f1c5567be9b35cf906400b47577c7333fd244b7ce',
+        '03810e397afcfcda6e10bdb3933bdc3b2a871ac45e7fbd2eaac92f1fe3ddb66b',
+        '612b1b8c29c68f973758d24739f78dd30efaef9028bcfb9efa97febf15e98bcb',
+        '127b06239a4fc81d249b39b00ca285e8d0b2b6dd73fe8ee2d897e22ac5a4e64d']
     }
   });
   let generation = 0;
@@ -49,6 +68,11 @@ const MapBake = (() => {
   function snapshot(id, config, session, level, width, height, size, x0, y0, terrainTypeAt) {
     const bake = BAKES[id];
     if (!bake || !config || !session || !level) return null;
+    if (id === 'atlas-proving-grounds' &&
+        (session.scenarioId !== id || session.ruleProfileId !== 'FIELD_TEST_LEGACY_v1' ||
+         config.ruleProfileId !== 'FIELD_TEST_LEGACY_v1' ||
+         config.ruleProfile !== 'field-test-atlas-v1' ||
+         session.effectiveRules?.unitDataProfile !== 'field-test-atlas-v1')) return null;
     const cells = Array.from({length: height}, (_, y) =>
       Array.from({length: width}, (_, x) => terrainTypeAt(x, y)));
     const even = [[1,0],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1]];
@@ -69,6 +93,7 @@ const MapBake = (() => {
     return {
       scenarioId: id, scenarioVersion: session.scenarioVersion,
       profileId: session.ruleProfileId,
+      ...(id === 'atlas-proving-grounds' ? {unitDataProfile: session.effectiveRules.unitDataProfile} : {}),
       geometry: [width, height, size, x0, y0, 'odd-row-right', 'pointy-hex'],
       defaultTerrain: level.defaultTerrain, cells, visualCells, level,
       visual: {version: bake.visualVersion, urbanVariant: 'generator-levelToCfg-v1',
