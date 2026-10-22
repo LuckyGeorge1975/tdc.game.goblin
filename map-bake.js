@@ -1,4 +1,4 @@
-// Optional terrain images for three pinned missions. Every failure keeps the live field renderer.
+// Optional terrain images for five pinned missions. Every failure keeps the live field renderer.
 const MapBake = (() => {
   const BAKES = Object.freeze({
     'showcase-terrain-course': {
@@ -47,6 +47,44 @@ const MapBake = (() => {
         '03810e397afcfcda6e10bdb3933bdc3b2a871ac45e7fbd2eaac92f1fe3ddb66b',
         '612b1b8c29c68f973758d24739f78dd30efaef9028bcfb9efa97febf15e98bcb',
         '127b06239a4fc81d249b39b00ca285e8d0b2b6dd73fe8ee2d897e22ac5a4e64d']
+    },
+    'showcase-siege': {
+      manifest: 'assets/map-bakes/showcase-siege-192.json',
+      image: 'assets/map-bakes/showcase-siege-192.webp',
+      keySha256: '3a2ccfe314aeb8f3885682924dad295cdcf83fba83f75c54d45714b85c6fb38b',
+      imageSha256: 'b44d8b607cdcb4c4eae71a6a3c8c1aed197b716f7908e272c221dae3f95abdb4',
+      imageBytes: 548576,
+      visualVersion: 'generator-levelToCfg-v1',
+      source: ['c01ecb80bcdd813772d1433d9ae63b39e54ef050',
+        'eea48c2a044beb2c07ee852b6cfcfe6297ab91d810f85d033bebc72331e8c140',
+        '4eaa4dbc62ea06057a92bd276f6e3734cdbfd431ec8c64fda3db51e085045204',
+        '0236c88dc8656dfdd8a799164621576fb151e90f866941d699ad6622613e11f2',
+        '47a2bbc446a89937d97ba39728896492ed1b2c0457ca16673f386b694f941385',
+        '7cb8cb6d28ba7c10ba862e06f25fec58ce29be6456c84a3fb52d3cb4ab0b353a',
+        '5cf6d5e5cc58b868cc5d8a7a290639b2a33bce5cd66c4ceb566e81956bbec3ad',
+        'a02c649eed8f49c1a9b4c52f1c5567be9b35cf906400b47577c7333fd244b7ce',
+        '159f286acbd46f17d19ef817c47427fb2c04811e925fff4199c4136804c56727',
+        '05f763f2b6e73eb34d6ef82cbf16de7c7ac0b8f8eca2928831446ab4157e11ce',
+        'eb4d7338a014b2ec7374b67062dccd12e164c95fbcd30e4cda823c3e0aec09e3']
+    },
+    'los-supercover-showcase': {
+      manifest: 'assets/map-bakes/los-supercover-showcase-192.json',
+      image: 'assets/map-bakes/los-supercover-showcase-192.webp',
+      keySha256: 'd41b2eb4135a4d83dc82fa7ebd9fdfb3389ed319e0b04feadd3a3e0015715ec1',
+      imageSha256: 'b886a662f9c878cd603dde3090866b679d6eb74510b84777322edceedd1c06a6',
+      imageBytes: 540976,
+      visualVersion: 'generator-levelToCfg-v1',
+      source: ['c01ecb80bcdd813772d1433d9ae63b39e54ef050',
+        'eea48c2a044beb2c07ee852b6cfcfe6297ab91d810f85d033bebc72331e8c140',
+        'd3d235e0f69c3bdd9ab182f2d7937ababdd016cfe1d161946d44100d96ef883f',
+        '0236c88dc8656dfdd8a799164621576fb151e90f866941d699ad6622613e11f2',
+        '47a2bbc446a89937d97ba39728896492ed1b2c0457ca16673f386b694f941385',
+        '7cb8cb6d28ba7c10ba862e06f25fec58ce29be6456c84a3fb52d3cb4ab0b353a',
+        '5cf6d5e5cc58b868cc5d8a7a290639b2a33bce5cd66c4ceb566e81956bbec3ad',
+        'a02c649eed8f49c1a9b4c52f1c5567be9b35cf906400b47577c7333fd244b7ce',
+        '159f286acbd46f17d19ef817c47427fb2c04811e925fff4199c4136804c56727',
+        '3286ef8baa56417c58be12a5899470b1c4221a926c24e7d4d82c7831e6929bb6',
+        'cdcafbb94ca7e4c08e7694e68a74379ec79cc433d94591a173283942aa67d69e']
     }
   });
   let generation = 0;
@@ -73,6 +111,16 @@ const MapBake = (() => {
          config.ruleProfileId !== 'FIELD_TEST_LEGACY_v1' ||
          config.ruleProfile !== 'field-test-atlas-v1' ||
          session.effectiveRules?.unitDataProfile !== 'field-test-atlas-v1')) return null;
+    if (id === 'showcase-siege' || id === 'los-supercover-showcase') {
+      const supercover = id === 'los-supercover-showcase';
+      const profile = supercover ? 'FIELD_TEST_SUPERCOVER_v1' : 'FIELD_TEST_LEGACY_v1';
+      const losMode = supercover ? 'strict-supercover' : undefined;
+      if (session.scenarioId !== id || session.scenarioVersion !== 1 ||
+          session.ruleProfileId !== profile || config.ruleProfileId !== profile ||
+          config.ruleProfile !== 'field-test-atlas-v1' ||
+          session.effectiveRules?.unitDataProfile !== 'field-test-atlas-v1' ||
+          config.losMode !== losMode || session.effectiveRules?.losMode !== losMode) return null;
+    }
     const cells = Array.from({length: height}, (_, y) =>
       Array.from({length: width}, (_, x) => terrainTypeAt(x, y)));
     const even = [[1,0],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1]];
@@ -93,7 +141,9 @@ const MapBake = (() => {
     return {
       scenarioId: id, scenarioVersion: session.scenarioVersion,
       profileId: session.ruleProfileId,
-      ...(id === 'atlas-proving-grounds' ? {unitDataProfile: session.effectiveRules.unitDataProfile} : {}),
+      ...(['atlas-proving-grounds','showcase-siege','los-supercover-showcase'].includes(id)
+        ? {unitDataProfile: session.effectiveRules.unitDataProfile} : {}),
+      ...(id === 'los-supercover-showcase' ? {losMode: session.effectiveRules.losMode} : {}),
       geometry: [width, height, size, x0, y0, 'odd-row-right', 'pointy-hex'],
       defaultTerrain: level.defaultTerrain, cells, visualCells, level,
       visual: {version: bake.visualVersion, urbanVariant: 'generator-levelToCfg-v1',

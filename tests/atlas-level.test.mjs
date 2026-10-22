@@ -10,6 +10,8 @@ const manifestSource=readFileSync(new URL('../scenario-profile-manifest.js',impo
 const source=readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8');
 const bakeSource=readFileSync(new URL('../map-bake.js',import.meta.url),'utf8');
 const atlasBake=JSON.parse(readFileSync(new URL('../assets/map-bakes/atlas-proving-grounds-192.json',import.meta.url),'utf8'));
+const roadBakes=Object.fromEntries(['showcase-siege','los-supercover-showcase'].map(id=>
+  [id,JSON.parse(readFileSync(new URL(`../assets/map-bakes/${id}-192.json`,import.meta.url),'utf8'))]));
 
 async function load(bundle=showcase,search='',registry=profiles){
   const options=[],errors=[],loaded=[];
@@ -75,7 +77,7 @@ test('only approved baked missions retain their exact source level',async()=>{
   assert.equal(errors.length,0);
   for(const level of showcase.levels){
     const retained=context.scenarioCatalog[level.id].bakeLevel;
-    if(['showcase-terrain-course','showcase-specialists'].includes(level.id))
+    if(['showcase-terrain-course','showcase-specialists','showcase-siege','los-supercover-showcase'].includes(level.id))
       assert.deepEqual(JSON.parse(JSON.stringify(retained)),level);
     else assert.equal(retained,undefined);
   }
@@ -94,6 +96,25 @@ test('actual Atlas loader and session produce the approved bake key',async()=>{
       (x,y)=>terrain.get(x+','+y)||'open-ground');
   })()`,context);
   assert.equal(JSON.stringify(result),atlasBake.key);
+});
+
+test('actual Siege and Supercover sessions produce separate approved bake keys',async()=>{
+  const {context,errors}=await load();
+  assert.equal(errors.length,0);
+  vm.runInContext(bakeSource,context);
+  for(const id of ['showcase-siege','los-supercover-showcase']){
+    const result=vm.runInContext(`(() => {
+      const id=${JSON.stringify(id)},scenario=scenarioCatalog[id];
+      const session=ScenarioRuleProfiles.beginSession(id,scenario);
+      const terrain=new Map(scenario.terrainTypes.map(cell=>[cell.x+','+cell.y,cell.type]));
+      return MapBake.snapshot(id,session.config,session,scenario.bakeLevel,12,8,34,58,48,
+        (x,y)=>terrain.get(x+','+y)||'open-ground');
+    })()`,context);
+    assert.equal(JSON.stringify(result),roadBakes[id].key);
+    assert.equal(result.profileId,id==='showcase-siege'?'FIELD_TEST_LEGACY_v1':'FIELD_TEST_SUPERCOVER_v1');
+    assert.equal(result.unitDataProfile,'field-test-atlas-v1');
+    assert.equal(result.losMode,id==='showcase-siege'?undefined:'strict-supercover');
+  }
 });
 
 test('asset levels reject missing, unknown and mismatched product profiles before registration',async()=>{

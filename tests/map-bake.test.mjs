@@ -5,7 +5,8 @@ import {createHash, webcrypto} from 'node:crypto';
 import {runInNewContext} from 'node:vm';
 
 const root = new URL('../', import.meta.url);
-const [script, manifest, bytes, specialistsManifest, specialistsBytes, atlasManifest, atlasBytes, atlasLevel, bundle] = await Promise.all([
+const [script, manifest, bytes, specialistsManifest, specialistsBytes, atlasManifest, atlasBytes,
+  siegeManifest, siegeBytes, supercoverManifest, supercoverBytes, atlasLevel, bundle] = await Promise.all([
   readFile(new URL('map-bake.js', root), 'utf8'),
   readFile(new URL('assets/map-bakes/showcase-terrain-course-192.json', root), 'utf8').then(JSON.parse),
   readFile(new URL('assets/map-bakes/showcase-terrain-course-192.webp', root)),
@@ -13,11 +14,17 @@ const [script, manifest, bytes, specialistsManifest, specialistsBytes, atlasMani
   readFile(new URL('assets/map-bakes/showcase-specialists-192.webp', root)),
   readFile(new URL('assets/map-bakes/atlas-proving-grounds-192.json', root), 'utf8').then(JSON.parse),
   readFile(new URL('assets/map-bakes/atlas-proving-grounds-192.webp', root)),
+  readFile(new URL('assets/map-bakes/showcase-siege-192.json', root), 'utf8').then(JSON.parse),
+  readFile(new URL('assets/map-bakes/showcase-siege-192.webp', root)),
+  readFile(new URL('assets/map-bakes/los-supercover-showcase-192.json', root), 'utf8').then(JSON.parse),
+  readFile(new URL('assets/map-bakes/los-supercover-showcase-192.webp', root)),
   readFile(new URL('assets/unit-art/levels/atlas-proving-grounds.json', root), 'utf8').then(JSON.parse),
   readFile(new URL('assets/unit-art/levels/showcase-levels.json', root), 'utf8').then(JSON.parse)
 ]);
 const level = bundle.levels.find(item => item.id === 'showcase-terrain-course');
 const specialistsLevel = bundle.levels.find(item => item.id === 'showcase-specialists');
+const siegeLevel = bundle.levels.find(item => item.id === 'showcase-siege');
+const supercoverLevel = bundle.levels.find(item => item.id === 'los-supercover-showcase');
 const expectedHash = data => createHash('sha256').update(data).digest('hex');
 const tick = () => new Promise(resolve => setTimeout(resolve, 0));
 const settled = async bake => {
@@ -46,11 +53,16 @@ function setup(responses, bitmapSize = [2400, 1386]) {
   const snapshot = (selectedLevel = level) => {
     const cells = new Map(selectedLevel.terrain.map(cell => [`${cell.x},${cell.y}`, cell.type]));
     const atlas = selectedLevel.id === 'atlas-proving-grounds';
+    const road = ['showcase-siege','los-supercover-showcase'].includes(selectedLevel.id);
+    const supercover = selectedLevel.id === 'los-supercover-showcase';
+    const profile = supercover ? 'FIELD_TEST_SUPERCOVER_v1' : 'FIELD_TEST_LEGACY_v1';
     return bake.snapshot(selectedLevel.id,
-    {scenarioVersion: 1, ruleProfileId: 'FIELD_TEST_LEGACY_v1',
-      ...(atlas ? {ruleProfile: 'field-test-atlas-v1'} : {})},
-    {scenarioId: selectedLevel.id, scenarioVersion: 1, ruleProfileId: 'FIELD_TEST_LEGACY_v1',
-      ...(atlas ? {effectiveRules: {unitDataProfile: 'field-test-atlas-v1'}} : {})},
+    {scenarioVersion: 1, ruleProfileId: profile,
+      ...(atlas || road ? {ruleProfile: 'field-test-atlas-v1'} : {}),
+      ...(supercover ? {losMode: 'strict-supercover'} : {})},
+    {scenarioId: selectedLevel.id, scenarioVersion: 1, ruleProfileId: profile,
+      ...(atlas || road ? {effectiveRules: {unitDataProfile: 'field-test-atlas-v1',
+        ...(supercover ? {losMode: 'strict-supercover'} : {})}} : {})},
     selectedLevel, 12, 8, 34, 58, 48, (x, y) => cells.get(`${x},${y}`) || 'open-ground');
   };
   return {bake, snapshot, requests, revoked};
@@ -269,4 +281,105 @@ test('Atlas profile, route, stale request and corrupt image preserve fallback', 
     'assets/map-bakes/atlas-proving-grounds-192.json',
     'assets/map-bakes/showcase-terrain-course-192.json',
     'assets/map-bakes/showcase-terrain-course-192.webp']);
+});
+
+test('Siege and Supercover have distinct pinned keys and lazy five-mission selection', async () => {
+  const fixture = setup([json(siegeManifest), image(siegeBytes), json(supercoverManifest),
+    image(supercoverBytes), json(atlasManifest), image(atlasBytes)]);
+  for (const id of ['showcase-advance','relay-run','iron-dust'])
+    assert.equal(fixture.bake.snapshot(id, {}, {}, siegeLevel, 12, 8, 34, 58, 48, () => 'road'), null);
+  assert.equal(fixture.requests.length, 0);
+  const siege = fixture.snapshot(siegeLevel), supercover = fixture.snapshot(supercoverLevel);
+  assert.equal(JSON.stringify(siege), siegeManifest.key);
+  assert.equal(JSON.stringify(supercover), supercoverManifest.key);
+  assert.equal(expectedHash(siegeManifest.key), siegeManifest.keySha256);
+  assert.equal(expectedHash(supercoverManifest.key), supercoverManifest.keySha256);
+  assert.equal(expectedHash(siegeBytes), siegeManifest.imageSha256);
+  assert.equal(expectedHash(supercoverBytes), supercoverManifest.imageSha256);
+  assert.equal(siege.profileId, 'FIELD_TEST_LEGACY_v1');
+  assert.equal(supercover.profileId, 'FIELD_TEST_SUPERCOVER_v1');
+  assert.equal(supercover.losMode, 'strict-supercover');
+  assert.equal(siege.unitDataProfile, supercover.unitDataProfile);
+  assert.deepEqual(Array.from(siege.visualCells[3][4][1]), [0]);
+  assert.deepEqual(Array.from(siege.visualCells[3][7][1]), [3]);
+  assert.deepEqual(Array.from(supercover.visualCells[3][6][1]), [0]);
+  assert.deepEqual(Array.from(supercover.visualCells[3][7][1]), [3]);
+  fixture.bake.select(siege, () => {});
+  await settled(fixture.bake);
+  assert.equal(fixture.bake.select(siege, () => {}), 'blob:1');
+  fixture.bake.select(supercover, () => {});
+  assert.deepEqual(fixture.revoked, ['blob:1']);
+  await settled(fixture.bake);
+  assert.equal(fixture.bake.select(supercover, () => {}), 'blob:2');
+  fixture.bake.select(fixture.snapshot(atlasLevel), () => {});
+  assert.deepEqual(fixture.revoked, ['blob:1', 'blob:2']);
+  await settled(fixture.bake);
+  assert.equal(fixture.bake.select(fixture.snapshot(atlasLevel), () => {}), 'blob:3');
+  fixture.bake.select(null, () => {});
+  assert.deepEqual(fixture.revoked, ['blob:1', 'blob:2', 'blob:3']);
+  assert.deepEqual(fixture.requests.map(request => request.url), [
+    'assets/map-bakes/showcase-siege-192.json',
+    'assets/map-bakes/showcase-siege-192.webp',
+    'assets/map-bakes/los-supercover-showcase-192.json',
+    'assets/map-bakes/los-supercover-showcase-192.webp',
+    'assets/map-bakes/atlas-proving-grounds-192.json',
+    'assets/map-bakes/atlas-proving-grounds-192.webp']);
+});
+
+test('road profiles, corrupt assets, dimensions and stale requests fall back', async () => {
+  for (const [selectedLevel, approvedManifest, approvedBytes] of [
+    [siegeLevel,siegeManifest,siegeBytes],
+    [supercoverLevel,supercoverManifest,supercoverBytes]
+  ]) {
+    const fixture = setup([]);
+    const terrain = new Map(selectedLevel.terrain.map(cell => [`${cell.x},${cell.y}`,cell.type]));
+    const at = (x,y) => terrain.get(`${x},${y}`) || 'open-ground';
+    const wrong = selectedLevel.id === 'showcase-siege' ? 'FIELD_TEST_SUPERCOVER_v1' : 'FIELD_TEST_LEGACY_v1';
+    assert.equal(fixture.bake.snapshot(selectedLevel.id,
+      {ruleProfileId: wrong, ruleProfile: 'field-test-atlas-v1'},
+      {scenarioId: selectedLevel.id, scenarioVersion: 1, ruleProfileId: wrong,
+        effectiveRules: {unitDataProfile: 'field-test-atlas-v1'}},
+      selectedLevel, 12, 8, 34, 58, 48, at), null);
+    assert.equal(fixture.requests.length, 0);
+    const alterations = [
+      data => { data.visualCells[3][selectedLevel.id === 'showcase-siege' ? 4 : 6][1] = [0,3]; },
+      data => { data.profileId = wrong; },
+      data => { data.unitDataProfile = 'wrong'; }
+    ];
+    if (selectedLevel.id === 'los-supercover-showcase')
+      alterations.push(data => { data.losMode = 'legacy'; });
+    for (const alter of alterations) {
+      const bad = setup([json(approvedManifest)]);
+      const data = bad.snapshot(selectedLevel); alter(data);
+      bad.bake.select(data, () => {});
+      await settled(bad.bake);
+      assert.equal(bad.bake.status().phase, 'fallback');
+      assert.equal(bad.requests.length, 1);
+    }
+    for (const response of [new Error('missing image'),
+      image(Buffer.from(approvedBytes.map((value,index)=>index===50?value^1:value)))]) {
+      const bad = setup([json(approvedManifest),response]);
+      bad.bake.select(bad.snapshot(selectedLevel), () => {});
+      await settled(bad.bake);
+      assert.equal(bad.bake.status().phase, 'fallback');
+    }
+    const dimensions = setup([json(approvedManifest),image(approvedBytes)],[2400,1300]);
+    dimensions.bake.select(dimensions.snapshot(selectedLevel), () => {});
+    await settled(dimensions.bake);
+    assert.equal(dimensions.bake.status().phase, 'fallback');
+  }
+  let deliver;
+  const pending = new Promise(resolve => {deliver=resolve;});
+  const stale = setup([pending,json(siegeManifest),image(siegeBytes)]);
+  stale.bake.select(stale.snapshot(supercoverLevel),()=>assert.fail('stale Supercover redraw'));
+  await tick();
+  stale.bake.select(stale.snapshot(siegeLevel),()=>{});
+  assert.equal(stale.requests[0].signal.aborted,true);
+  deliver(json(supercoverManifest));
+  await settled(stale.bake);
+  assert.equal(stale.bake.status().phase,'ready');
+  assert.deepEqual(stale.requests.map(request=>request.url),[
+    'assets/map-bakes/los-supercover-showcase-192.json',
+    'assets/map-bakes/showcase-siege-192.json',
+    'assets/map-bakes/showcase-siege-192.webp']);
 });
