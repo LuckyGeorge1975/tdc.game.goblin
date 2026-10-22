@@ -534,18 +534,23 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const pixelScale = mapWidth / nativeMap.viewBox.baseVal.width;
       const showCostChips = hexWidth * pixelScale >= 50 && !matchMedia('(max-width: 599px)').matches;
       function mark(cell, kind) {
-        const points = hexPoints(cell.x, cell.y);
+        const outerPoints = hexPoints(cell.x, cell.y);
+        const center = kind === 'fire' ? hexCenter(cell.x, cell.y) : null;
+        const points = center ? outerPoints.split(' ').map(pair => {
+          const [x, y] = pair.split(',').map(Number);
+          return `${center.x + (x - center.x) * 92 / 112},${center.y + (y - center.y) * 92 / 112}`;
+        }).join(' ') : outerPoints;
         if (kind === 'fire') {
           const underlay = document.createElementNS(NS, 'polygon');
           underlay.setAttribute('points', points); underlay.classList.add('v2-area-fire-underlay');
-          underlay.setAttribute('stroke-width', 5.5 * referenceScale);
+          underlay.setAttribute('stroke-width', Math.max(5.5 * referenceScale, 3.5 / pixelScale));
           underlay.dataset.x = String(cell.x); underlay.dataset.y = String(cell.y);
           overlay.append(underlay);
         }
         const shape = document.createElementNS(NS, 'polygon');
         shape.setAttribute('points', points); shape.classList.add(`v2-area-${kind}`);
         if (kind === 'movement') shape.setAttribute('stroke-width', 2 * referenceScale);
-        if (kind === 'fire') shape.setAttribute('stroke-width', 2.5 * referenceScale);
+        if (kind === 'fire') shape.setAttribute('stroke-width', Math.max(2.5 * referenceScale, 1.5 / pixelScale));
         shape.dataset.x = String(cell.x); shape.dataset.y = String(cell.y);
         overlay.append(shape);
         if (kind === 'movement' && showCostChips && Number.isFinite(cell.cost)) {
@@ -577,8 +582,15 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (mode === 'movement') {
         const focused = view.target || view.infoCell || view.focusCell;
         const cell = focused && data.legal.find(item => item.x === focused.x && item.y === focused.y);
-        if (cell && Number.isFinite(cell.cost))
-          message += ` · ${t('v2.ui.sector')} ${hexLabel(focused)} · ${GoblinLanguage.translate('MOVE COST')} ${cell.cost}`;
+        if (cell && Number.isFinite(cell.cost)) {
+          const costText = `${hexLabel(focused)} · ${GoblinLanguage.translate('MOVE COST')} ${cell.cost}`;
+          message += ` · ${t('v2.ui.sector')} ${costText}`;
+          if (!showCostChips) {
+            at('#v2-map-caption').textContent = costText;
+            if (view.target && !at('#v2-command-card').hidden)
+              at('#v2-command-intel').textContent += ` · ${GoblinLanguage.translate('MOVE COST')} ${cell.cost}`;
+          }
+        }
       }
       if (view.target && mode === 'movement' && data.status === 'move' &&
           !data.legal.some(cell => cell.x === view.target.x && cell.y === view.target.y)) {

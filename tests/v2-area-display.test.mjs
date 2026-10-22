@@ -22,7 +22,7 @@ function scene(pixelScale, showCostChips) {
   };
   const context = {document, NS:'http://www.w3.org/2000/svg', S:34,
     referenceScale:Math.sqrt(3)*34/112, pixelScale, showCostChips,
-    hexPoints:()=> 'points', hexCenter:()=>({x:100,y:100}),
+    hexPoints:()=> '44,100 72,52 128,52 156,100 128,148 72,148', hexCenter:()=>({x:100,y:100}),
     overlay:{append(...nodes){children.push(...nodes);}}};
   runInNewContext(`${markSource}\nglobalThis.mark = mark;`,context);
   return {mark:context.mark, children};
@@ -50,27 +50,61 @@ test('small fit omits illegible chips without changing the legal movement shape'
   assert.equal(children[0].dataset.y,'4');
 });
 
-test('focused legal field keeps its authoritative cost in the existing status view', () => {
+function focusScene({view,legal,showCostChips,mode='movement',cardHidden=false}) {
   const start = source.indexOf("      if (mode === 'movement') {\n        const focused");
   const end = source.indexOf('      if (view.target && mode', start);
   assert.ok(start > 0 && end > start);
-  const context = {mode:'movement',view:{infoCell:{x:3,y:4}},
-    data:{legal:[{x:3,y:4,cost:2}]},message:'Reachable',
+  const caption={textContent:'12 × 8 · Pan'}, intel={textContent:'Unit → D-05 · Mountain'};
+  const card={hidden:cardHidden};
+  const context = {mode,view,data:{legal},message:'Reachable',showCostChips,
     t:key=>key==='v2.ui.sector'?'SECTOR':key,
     hexLabel:()=> 'D-05',
-    GoblinLanguage:{translate:()=> 'MOVE COST'}};
+    GoblinLanguage:{translate:()=> 'MOVE COST'},
+    at:key=>({'#v2-map-caption':caption,'#v2-command-intel':intel,'#v2-command-card':card})[key]};
   runInNewContext(`${source.slice(start,end)}\nglobalThis.result = message;`,context);
-  assert.equal(context.result,'Reachable · SECTOR D-05 · MOVE COST 2');
+  return {message:context.result,caption:caption.textContent,intel:intel.textContent};
+}
+
+test('focused legal field keeps its authoritative cost in the existing status view', () => {
+  const context=focusScene({view:{infoCell:{x:3,y:4}},legal:[{x:3,y:4,cost:2}],showCostChips:true});
+  assert.equal(context.message,'Reachable · SECTOR D-05 · MOVE COST 2');
 });
 
-test('fire uses a dark underlay and danger ring with reference-width proportions', () => {
-  const {mark,children}=scene(1.2,true);
+test('fire uses a centered inner ring with reference-width proportions', () => {
+  const {mark,children}=scene(2,true);
   mark({x:5,y:2},'fire');
   assert.deepEqual(children.map(node=>node.classes[0]),['v2-area-fire-underlay','v2-area-fire']);
   const refToSvg = 112/(Math.sqrt(3)*34);
   assert.equal(children[0].attrs['stroke-width']*refToSvg,5.5);
   assert.equal(children[1].attrs['stroke-width']*refToSvg,2.5);
   assert.equal(children[0].attrs.points,children[1].attrs.points);
+  const xs=children[0].attrs.points.split(' ').map(pair=>Number(pair.split(',')[0]));
+  assert.equal(Math.max(...xs)-Math.min(...xs),92);
+  assert.equal((Math.max(...xs)+Math.min(...xs))/2,100);
+});
+
+test('tiny fire ring keeps a visible projected stroke floor', () => {
+  const {mark,children}=scene(.3,true);
+  mark({x:5,y:2},'fire');
+  assert.ok(Math.abs(children[0].attrs['stroke-width']*.3-3.5)<1e-9);
+  assert.ok(Math.abs(children[1].attrs['stroke-width']*.3-1.5)<1e-9);
+});
+
+test('hidden chips expose only current legal focus cost above the map and in open move intel', () => {
+  const legal=[{x:3,y:4,cost:2}];
+  const selected=focusScene({view:{target:{x:3,y:4}},legal,showCostChips:false});
+  assert.equal(selected.message,'Reachable · SECTOR D-05 · MOVE COST 2');
+  assert.equal(selected.caption,'D-05 · MOVE COST 2');
+  assert.equal(selected.intel,'Unit → D-05 · Mountain · MOVE COST 2');
+  const focused=focusScene({view:{focusCell:{x:3,y:4}},legal,showCostChips:false,cardHidden:true});
+  assert.equal(focused.caption,'D-05 · MOVE COST 2');
+  assert.equal(focused.intel,'Unit → D-05 · Mountain');
+  const stale=focusScene({view:{target:{x:7,y:7},infoCell:{x:3,y:4}},legal,showCostChips:false});
+  assert.equal(stale.caption,'12 × 8 · Pan');
+  assert.equal(stale.intel,'Unit → D-05 · Mountain');
+  const phase=focusScene({view:{target:{x:3,y:4}},legal,showCostChips:false,mode:'fire'});
+  assert.equal(phase.caption,'12 × 8 · Pan');
+  assert.equal(phase.intel,'Unit → D-05 · Mountain');
 });
 
 test('compact movement status points to the focused cost instead of claiming a visible number', () => {

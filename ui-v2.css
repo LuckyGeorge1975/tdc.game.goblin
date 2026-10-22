@@ -231,7 +231,7 @@ body.ui-v2-active #v2-grid-overlay, body.ui-v2-active #v2-area-overlay { pointer
 body.ui-v2-active .v2-grid-line { fill: none; stroke: var(--v2-line-strong); stroke-width: 1.5; stroke-dasharray: 4 4; }
 body.ui-v2-active .v2-area-movement { fill: var(--v2-accent); fill-opacity: .22; stroke: var(--v2-accent); }
 body.ui-v2-active .v2-area-fire-underlay { fill: none; stroke: var(--v2-bg); }
-body.ui-v2-active .v2-area-fire { fill: none; stroke: var(--v2-danger); }
+body.ui-v2-active .v2-area-fire { fill: none; stroke: var(--v2-danger-text); }
 body.ui-v2-active .v2-area-sight { fill: var(--v2-accent); fill-opacity: .27; stroke: var(--v2-accent-text); stroke-width: 2; }
 body.ui-v2-active .v2-area-blocked { fill: none; stroke: var(--v2-muted); stroke-width: 2; stroke-dasharray: 5 5; }
 body.ui-v2-active .v2-area-cost-chip { fill: var(--v2-bg); fill-opacity: .94; stroke: var(--v2-line-strong); stroke-width: .8; }
