@@ -19,6 +19,9 @@ body.ui-v2-active {
 }
 body.ui-v2-active > .app-shell { display: none; }
 .v2-screen[hidden] { display: none; }
+.v2-log-entry { display: flex; align-items: baseline; gap: 8px; }
+.v2-log-time { flex: none; color: var(--v2-muted); font-variant-numeric: tabular-nums; }
+.v2-log-message { min-width: 0; overflow-wrap: anywhere; }
 body.ui-v2-active.v2-screen-open .v2-head,
 body.ui-v2-active.v2-screen-open .v2-layout { display: none; }
 .v2-screen { display: grid; place-items: center; min-width: 0; }

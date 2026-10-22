@@ -6,11 +6,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const nativeShell = document.querySelector('.app-shell');
     const view = { actorId: null, target: null, infoCell: null, focusCell: null,
       intentRevision: null, busy: false, message: '', zoom: 1, areaMode: null, gridVisible: false,
-      previewWeaponKey: null };
+      previewWeaponKey: null, phaseSkip: null };
     const shell = document.createElement('div');
     shell.className = 'v2-shell';
     shell.innerHTML = `
-      <header class="v2-head"><div><span class="v2-label">G.O.B.L.I.N. / Mission</span><h1 id="v2-mission"></h1><p id="v2-objective"></p></div><div><span class="v2-label" id="v2-profile"></span><strong id="v2-phase"></strong><p id="v2-turn"></p></div></header>
+      <header class="v2-head"><div><span class="v2-label">G.O.B.L.I.N. / Mission</span><h1 id="v2-mission"></h1><p id="v2-objective"></p></div><div><span class="v2-label" id="v2-profile"></span><strong id="v2-phase" role="status" aria-live="polite"></strong><p id="v2-turn"></p></div></header>
       <div class="v2-layout"><aside class="v2-own"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card v2-systems-card"><details id="v2-system-details" open><summary class="v2-label" id="v2-systems-label"></summary><div id="v2-systems"></div></details></section></aside><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><div class="v2-area-controls" role="group" id="v2-area-controls"><button type="button" data-area="movement"></button><button type="button" data-area="fire"></button><button type="button" data-area="los"></button><button type="button" id="v2-area-grid"></button></div><button type="button" id="v2-undo"></button></div><div class="v2-map-tools" role="group" id="v2-map-tools"><button type="button" id="v2-zoom-out">−</button><button type="button" id="v2-zoom-in">+</button><button type="button" id="v2-zoom-fit"></button><button type="button" id="v2-zoom-center"></button><div class="v2-weapon-controls" id="v2-weapon-controls" hidden></div></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-area-legend" class="v2-area-legend" role="status"></p><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main><aside class="v2-target"><section class="v2-card"><details id="v2-intel-details" open><summary class="v2-label" id="v2-intel-label"></summary><div id="v2-intel"></div></details></section><section class="v2-card v2-log-card"><details id="v2-log-details" open><summary class="v2-label" id="v2-log-label"></summary><div id="v2-log"></div></details></section></aside></div><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target" hidden><div class="v2-command-head"><span class="v2-label" id="v2-command-target"></span><p id="v2-command-intel"></p><div class="v2-weapon-controls" id="v2-command-weapons" hidden></div></div><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section>`;
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
@@ -33,6 +33,37 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       return JSON.stringify([currentScenario, legacySession?.sessionId, legacySession?.ruleProfileId, turn, phase, turnPhase, gameOver,
         [...terrain], [...terrainTypes], units.map(({ moveFrom, justHit, ...unit }) => unit)]);
     }
+    function legacyLogEntries() {
+      return [...logEl.querySelectorAll('.log-line')].slice(0, 4).map(line => ({
+        time:line.querySelector('.log-time')?.textContent.trim() || '',
+        source:line.querySelector('strong')?.textContent.trim() || '',
+        message:line.dataset.phaseSkipKey ? t(line.dataset.phaseSkipKey) :
+          [...line.childNodes].filter(node => node.nodeType === Node.TEXT_NODE)
+            .map(node => node.textContent).join('').trim()
+      }));
+    }
+    function renderLog(entries) {
+      const log = at('#v2-log'); log.replaceChildren();
+      for (const entry of entries) {
+        const line = document.createElement('p'); line.className = 'v2-log-entry';
+        if (entry.time) {
+          const time = document.createElement('time'); time.className = 'v2-log-time';
+          time.textContent = entry.time; line.append(time);
+        }
+        const message = document.createElement('span'); message.className = 'v2-log-message';
+        message.textContent = [entry.source, entry.message].filter(Boolean).join(' ');
+        line.append(message); log.append(line);
+      }
+    }
+    function notifyPhaseSkip(phaseName) {
+      if (!['movement', 'fire', 'gev'].includes(phaseName) || core()) return;
+      const key = `v2.phaseSkip.${phaseName}`;
+      addLog(t(key));
+      logEl.firstElementChild.dataset.phaseSkipKey = key;
+      view.phaseSkip = {key, turn};
+      clearTimeout(view.phaseSkipTimer);
+      view.phaseSkipTimer = setTimeout(() => { view.phaseSkip = null; render(); }, 9000);
+    }
     function project() {
       if (core()) {
         const source = IronDustBrowserV2.view;
@@ -53,6 +84,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         };
       }
       const objective = objectiveSnapshot(victoryProfile(legacySession.effectiveRules), units);
+      const logEntries = legacyLogEntries();
       return {
         revision: revision(), scenario: currentScenario, profile: legacySession.ruleProfileId,
         mission: { title: t(`mission.${currentScenario}.title`), objective: t(`mission.${currentScenario}.objective.short`) },
@@ -66,7 +98,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
             missilesRemaining: missilesRemaining ?? null })),
         systems: units.filter(unit => unit.team === 'player' && unit.ogreSystems)
           .map(unit => ({ id: unit.id, summary: GoblinSystems.summary(unit.ogreSystems) })),
-        log: [...logEl.querySelectorAll('.log-line')].slice(0, 4).map(line => line.textContent.trim())
+        logEntries,
+        log: logEntries.map(entry => [entry.time, entry.source, entry.message]
+          .filter(Boolean).join(' '))
       };
     }
     function query(command) {
@@ -180,11 +214,12 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function resetView() {
       view.actorId = null; view.infoCell = null; view.focusCell = null; clearContext();
-      view.zoom = 1; view.areaMode = null; view.previewWeaponKey = null; applyMapSize();
+      view.zoom = 1; view.areaMode = null; view.previewWeaponKey = null;
+      view.phaseSkip = null; clearTimeout(view.phaseSkipTimer); applyMapSize();
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
     }
-    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo, resetView, focusUnit,
+    globalThis.GoblinUIV2 = Object.freeze({ project, query, dispatch, undo, resetView, focusUnit, notifyPhaseSkip,
       get gridVisible() { return view.gridVisible; }, setGridVisible(value) { view.gridVisible = !!value; render(); },
       refresh: () => render() });
 
@@ -567,8 +602,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         intel.append(line);
       }
       renderSystems(state, actor);
-      const log = at('#v2-log'); log.replaceChildren();
-      state.log.slice(-4).forEach(entry => {const line=document.createElement('p');line.textContent=entry;log.append(line);});
+      renderLog(state.log.slice(-4).map(message => ({message})));
       const commands=[];
       if (view.target && actor) {
         const target=state.units.find(unit => unit.hp>0 && unit.x===view.target.x && unit.y===view.target.y);
@@ -656,7 +690,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-systems-label').textContent = t('v2.ui.status');
       at('#v2-log-label').textContent = t('ui.details.log');
       at('#v2-profile').textContent = state.profile;
-      at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') : t(`phase.${state.turnPhase}.label`);
+      at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
+        view.phaseSkip?.turn === state.turn ? t(view.phaseSkip.key) : t(`phase.${state.turnPhase}.label`);
       at('#v2-turn').textContent = `${t('ui.hud.turn', { turn: state.turn })} · ${state.objective.goalMode === 'core'
         ? t('hud.objective.progress.core', { currentHp: state.objective.coreHp, maxHp: state.objective.coreMax })
         : t('hud.objective.progress.enemies', { remainingEnemies: state.objective.enemyAlive, totalEnemies: state.objective.enemyTotal })}`;
@@ -704,8 +739,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         intel.appendChild(line);
       }
       renderSystems(state, actor);
-      const log = at('#v2-log'); log.replaceChildren();
-      state.log.forEach(entry => { const line = document.createElement('p'); line.textContent = entry; log.appendChild(line); });
+      renderLog(state.logEntries);
       let commands = [];
       if (view.target && view.actorId) {
         const runtimeActor = units.find(unit => unit.id === view.actorId);
@@ -801,6 +835,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     at('#v2-area-grid').onclick = () => GoblinUIV2.setGridVisible(!view.gridVisible);
     at('#v2-undo').onclick = () => { const result = undo(); if (!result.ok) { view.message = result.reason; render(); } };
     at('#v2-phase-action').onclick = () => {
+      view.phaseSkip = null; clearTimeout(view.phaseSkipTimer);
       if (core()) {
         const command={type:'EndPhase',playerId:'player'};
         const expected=revision();
