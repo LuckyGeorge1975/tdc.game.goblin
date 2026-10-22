@@ -238,6 +238,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function resetView() {
       view.actorId = null; view.infoCell = null; view.focusCell = null; clearContext();
       view.zoom = 1; view.areaMode = null; view.previewWeaponKey = null;
+      fireZoomPhase = null;
       view.phaseSkip = null; clearTimeout(view.phaseSkipTimer); applyMapSize();
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
@@ -401,6 +402,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     const areaCache = { key: null, value: null };
     let areaPhase = null;
+    let fireZoomPhase = null;
     function syncAreaPhase(state) {
       const key = `${state.phase}:${state.turnPhase}`;
       if (areaPhase !== key) { view.areaMode = null; view.previewWeaponKey = null; areaPhase = key; }
@@ -815,6 +817,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       globalThis.dispatchEvent(new Event('goblin-v2-render'));
     }
     function render() {
+      const state = project();
+      syncAreaPhase(state);
+      const centerFireActor = zoomOnFireEntry(state);
       const zoomOut = at('#v2-zoom-out'), zoomIn = at('#v2-zoom-in');
       const fit = at('#v2-zoom-fit'), center = at('#v2-zoom-center');
       zoomOut.setAttribute('aria-label', t('ui.hud.zoomOut'));
@@ -827,9 +832,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       zoomOut.disabled = view.zoom <= 1;
       zoomIn.disabled = view.zoom >= 4;
       center.disabled = !view.actorId;
-      const state = project();
-      syncAreaPhase(state);
-      if (core()) { renderCore(state); return; }
+      if (core()) { renderCore(state); if (centerFireActor) centerSelectedActor(state); return; }
       const actor = state.units.find(unit => unit.id === view.actorId);
       if (!actor || actor.hp <= 0) { view.actorId = null; clearContext(); }
       if (state.phase !== 'player' || state.gameOver) clearContext();
@@ -986,6 +989,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       marker('v2-target-marker', view.target, 'v2.ui.marker.target');
       marker('v2-focus-marker', view.focusCell, 'v2.ui.marker.focus');
       renderAreaPreview(state, actor?.hp > 0 ? actor : null);
+      if (centerFireActor) centerSelectedActor(state);
       globalThis.dispatchEvent(new Event('goblin-v2-render'));
     }
     for (const button of at('#v2-area-controls').querySelectorAll('[data-area]'))
@@ -1018,6 +1022,25 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const box = hex.getBoundingClientRect(), frame = mapPanel.getBoundingClientRect();
       mapPanel.scrollLeft += box.left + box.width / 2 - frame.left - frame.width / 2;
       mapPanel.scrollTop += box.top + box.height / 2 - frame.top - frame.height / 2;
+    }
+    function centerSelectedActor(state) {
+      const actor = state.units.find(unit => unit.id === view.actorId && unit.hp > 0);
+      if (actor) centerOnHex(nativeMap.querySelector(`.hex[data-x="${actor.x}"][data-y="${actor.y}"]`));
+    }
+    function zoomOnFireEntry(state) {
+      if (state.phase !== 'player' || state.turnPhase !== 'fire' || state.gameOver ||
+          activeAreaMode(state) !== 'fire' || !mapPanel.clientWidth || !mapPanel.clientHeight) return false;
+      const key = `${state.scenario}:${state.turn}:${state.phase}:${state.turnPhase}`;
+      if (fireZoomPhase === key) return false;
+      fireZoomPhase = key;
+      const box = nativeMap.viewBox.baseVal;
+      const fit = Math.min(mapPanel.clientWidth / (box.width || 790),
+        mapPanel.clientHeight / (box.height || 480));
+      const hexWidth = Math.sqrt(3) * S * fit;
+      if (hexWidth * view.zoom >= 50) return false;
+      view.zoom = Math.min(4, 50 / hexWidth);
+      applyMapSize();
+      return true;
     }
     function applyMapSize() {
       if (!mapPanel.clientWidth || !mapPanel.clientHeight) return;
