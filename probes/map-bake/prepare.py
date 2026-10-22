@@ -38,10 +38,16 @@ def main(archive_path, levels_path, output_dir):
     (output_dir / "generator.html").write_bytes(html)
     (output_dir / "level.json").write_bytes(level_bytes)
     shutil.copyfile(Path(__file__).with_name("harness.html"), output_dir / "harness.html")
+    test_card = Path(__file__).with_name("TEST-CARD.json").read_bytes()
+    fixture = json.loads(test_card)
+    if (fixture.get("scenario") != "render-only-test-card" or fixture.get("playable") is not False or len(fixture.get("cells", [])) != 96):
+        raise ValueError("Unexpected non-playable render fixture")
+    (output_dir / "render-only-test-card.cells.json").write_bytes(test_card)
     receipt = {"contentCommit": CONTENT_SHA, "sourcePath": GENERATOR_MEMBER,
                "generatorHtmlSha256": sha(html), "levelSourceSha256": sha(levels_path.read_bytes()),
                "levelJsonSha256": sha(level_bytes),
-               "files": ["harness.html", "generator.html", "level.json"],
+               "testCardSha256": sha(test_card),
+               "files": ["harness.html", "generator.html", "level.json", "render-only-test-card.cells.json"],
                "scope": "Cache-only local render harness; no game runtime import"}
     (output_dir / "harness-receipt.json").write_text(
         json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

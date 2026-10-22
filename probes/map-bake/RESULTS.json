@@ -166,7 +166,7 @@
             1386
           ],
           "decodedRGBABytes": 13305600,
-          "expectedFingerprint": "e7398f73e7a0a634dd039591c092836ef2037fe0a77db5d98d822a7a8211fbda",
+          "expectedFingerprint": "12bbb1d90f1e662b84824f69348cbe9d3b4983ae982ffee7660fdece21c90835",
           "gate": {
             "missing": false,
             "wrong": false,
@@ -180,7 +180,7 @@
             1848
           ],
           "decodedRGBABytes": 23654400,
-          "expectedFingerprint": "fceed0c17f6320d1d18ac0917b20e3ae20ae38aea07535b3487a100132405831",
+          "expectedFingerprint": "64a9c2c3516ff361cc375c7a42ba432f14ed337a6b7042ecb859046b64dcabd8",
           "gate": {
             "missing": false,
             "wrong": false,
@@ -206,7 +206,7 @@
             1386
           ],
           "decodedRGBABytes": 13305600,
-          "expectedFingerprint": "43529abba30ce26a3f94d3544057a46919448c7d07793a5d19bfb1183a459695",
+          "expectedFingerprint": "6e4d1a0ec006489246fbdf798527b619ebab3eb2ac667ea94f141c2e9daadda0",
           "gate": {
             "missing": false,
             "wrong": false,
@@ -220,7 +220,7 @@
             1848
           ],
           "decodedRGBABytes": 23654400,
-          "expectedFingerprint": "81f916e8009b8809475962e5bc9d5a6f42ab88a9570d1a04d8733fe4da0af0bd",
+          "expectedFingerprint": "01a92485bf43fc76d7489cb372dce280bff453dba1056497532099cdb6ab36f5",
           "gate": {
             "missing": false,
             "wrong": false,

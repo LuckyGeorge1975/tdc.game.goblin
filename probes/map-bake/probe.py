@@ -78,7 +78,7 @@ def render_test_grid():
     for (x, y), kind in types.items():
         grid[y][x] = kind
     overlays = {
-        "road": {(2, 2), (3, 2), (4, 2), (4, 3), (5, 3), (3, 4)},
+        "road": {(2, 2), (3, 2), (4, 2), (3, 3), (4, 3), (5, 3), (3, 4)},
         "river": {(5, 1), (5, 2), (5, 3), (5, 4)},
     }
     urban_variants = {(x, y): i for i, (x, y) in enumerate(
@@ -148,6 +148,15 @@ def main(level_file, icon_zip, generator_html, output_dir):
     reports = []
     for scenario_id, grid, overlays, urban_variants in scenes:
         cells = cells_for(grid, scenario_id, overlays, urban_variants)
+        if scenario_id == "render-only-test-card":
+            by_position = {(cell["x"], cell["y"]): cell for cell in cells}
+            city_variants = {cell["urbanVariant"] for cell in cells
+                             if cell["type"] == "urban"}
+            if city_variants != set(range(6)) or len(by_position[3, 3]["roadEdges"]) < 4 or not (
+                    by_position[5, 3]["visualRoad"] and by_position[5, 3]["visualRiver"]
+                    and 1 in by_position[5, 4]["riverEdges"]
+                    and by_position[5, 5]["type"] == "water"):
+                raise AssertionError("Render card lost city, junction, crossing or water end")
         unsupported = sorted({cell["forestOpenMask"] for cell in cells
                               if cell["type"] == "forest"
                               and cell["forestOpenMask"] not in MASTER_FOREST_MASKS})

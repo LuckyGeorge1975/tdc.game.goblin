@@ -11,8 +11,8 @@ img{display:block;width:min(100%,960px);height:auto;border:1px solid #4e6257}
 iframe{display:none}
 </style>
 <h1>Lokale Karten-Bake-Probe</h1>
-<p>Nur <code>showcase-terrain-course</code>, keine Spielintegration. Die mitgelieferte Generator-HTML läuft in einem gleichursprünglichen, versteckten Frame. Es wird kein Browser oder Profil angelegt.</p>
-<p><button type="button" id="b192">192 px je Hex</button><button type="button" id="b256">256 px je Hex</button></p>
+<p>Echter <code>showcase-terrain-course</code> oder ausdrücklich nicht spielbare Render-Prüfkarte. Keine Spielintegration. Die mitgelieferte Generator-HTML läuft in einem gleichursprünglichen, versteckten Frame. Es wird kein Browser oder Profil angelegt.</p>
+<p><button type="button" id="b192">Parcours 192 px</button><button type="button" id="b256">Parcours 256 px</button><button type="button" id="t192">Prüfkarte 192 px</button><button type="button" id="t256">Prüfkarte 256 px</button></p>
 <p id="downloads"></p>
 <pre id="status">Bereit. Ein Renderlauf startet erst nach Klick.</pre>
 <img id="preview" alt="Gerenderte Terrain-Karte" hidden>
@@ -29,15 +29,52 @@ async function sha256(blob) {
   return [...new Uint8Array(await crypto.subtle.digest('SHA-256', data))]
     .map(value => value.toString(16).padStart(2, '0')).join('');
 }
-async function renderProbe(width) {
+const terrainSymbol = Object.freeze({
+  'open-ground':'o',forest:'f',mountain:'m',ridge:'r',water:'w',
+  'rubble-field':'x',crater:'c',marsh:'a',urban:'u',road:'o',river:'o',bridge:'o'
+});
+async function renderProbe(width, scene = 'course') {
   if (![192, 256].includes(width)) throw Error('Only reviewed widths are allowed');
-  if (!frame.contentWindow?.renderLevel) throw Error('Pinned generator not ready');
-  const level = await (await fetch('level.json', {cache: 'no-store'})).json();
-  if (level.id !== 'showcase-terrain-course' || level.width !== 12 || level.height !== 8)
-    throw Error('Unexpected level data');
-  status.textContent = `Erzeuge ${width} px…`;
-  const start = performance.now();
-  const generated = await frame.contentWindow.renderLevel(level, width);
+  if (!['course', 'test-card'].includes(scene)) throw Error('Unknown scene');
+  if (!frame.contentWindow?.renderLevel || !frame.contentWindow?.render)
+    throw Error('Pinned generator not ready');
+  status.textContent = `Erzeuge ${scene} bei ${width} px…`;
+  let start;
+  let generated;
+  if (scene === 'course') {
+    const level = await (await fetch('level.json', {cache: 'no-store'})).json();
+    if (level.id !== 'showcase-terrain-course' || level.width !== 12 || level.height !== 8)
+      throw Error('Unexpected level data');
+    start = performance.now();
+    generated = await frame.contentWindow.renderLevel(level, width);
+  } else {
+    const manifest = await (await fetch('render-only-test-card.cells.json', {cache: 'no-store'})).json();
+    if (manifest.scenario !== 'render-only-test-card' || manifest.playable !== false ||
+        manifest.width !== 12 || manifest.height !== 8 || manifest.cells?.length !== 96)
+      throw Error('Unexpected non-playable render fixture');
+    const grid = Array.from({length:8}, () => Array(12).fill(null));
+    const city = {}, ovCells = {road:{},river:{}};
+    for (const cell of manifest.cells) {
+      const {x,y,type} = cell;
+      if (!Number.isInteger(x) || !Number.isInteger(y) || x<0 || x>=12 || y<0 || y>=8 ||
+          !Object.hasOwn(terrainSymbol,type) || grid[y][x] !== null)
+        throw Error('Invalid or repeated render cell');
+      grid[y][x] = terrainSymbol[type];
+      if (type === 'urban') {
+        if (!Number.isInteger(cell.urbanVariant) || cell.urbanVariant<0 || cell.urbanVariant>5)
+          throw Error('Invalid visual city variant');
+        city[`${x},${y}`] = cell.urbanVariant;
+      }
+      if (cell.visualRoad) ovCells.road[`${x},${y}`] = cell.roadEdges;
+      if (cell.visualRiver) ovCells.river[`${x},${y}`] = cell.riverEdges;
+    }
+    if (grid.some(row => row.includes(null))) throw Error('Incomplete render fixture');
+    start = performance.now();
+    const result = await frame.contentWindow.render({WT:width,grid:grid.map(row=>row.join('')),
+      city,ovCells,title:'render-only-test-card'});
+    frame.contentWindow.__r = result;
+    generated = {size:result.size};
+  }
   const renderMs = performance.now() - start;
   const canvas = frame.contentWindow.__r.final;
   if (canvas.width !== generated.size[0] || canvas.height !== generated.size[1])
@@ -57,11 +94,11 @@ async function renderProbe(width) {
     ['PNG', pngUrl], ['WebP', webpUrl]
   ].map(([label, url]) => {
     const link = document.createElement('a');
-    link.href = url; link.download = `showcase-terrain-course-${width}.${label.toLowerCase()}`;
+    link.href = url; link.download = `${scene}-${width}.${label.toLowerCase()}`;
     link.textContent = `${label} speichern`;
     return link;
   }));
-  const result = {level: level.id, width, size: generated.size,
+  const result = {scene, playable: scene === 'course', width, size: generated.size,
     renderMs: Math.round(renderMs), pngBytes: png.size, pngSha256: await sha256(png),
     webpBytes: webp.size, webpSha256: await sha256(webp),
     webpDecodeMs: Math.round(webpDecodeMs), decodedRGBABytes: canvas.width * canvas.height * 4,
@@ -71,7 +108,9 @@ async function renderProbe(width) {
 }
 for (const width of [192, 256]) {
   document.querySelector(`#b${width}`).onclick = () =>
-    renderProbe(width).catch(error => { status.textContent = String(error.stack || error); });
+    renderProbe(width, 'course').catch(error => { status.textContent = String(error.stack || error); });
+  document.querySelector(`#t${width}`).onclick = () =>
+    renderProbe(width, 'test-card').catch(error => { status.textContent = String(error.stack || error); });
 }
 window.mapBakeProbe = Object.freeze({render: renderProbe});
 </script>

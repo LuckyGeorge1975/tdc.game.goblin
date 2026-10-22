@@ -11,6 +11,7 @@ const allowed = new Map([
   ['/harness.html', 'text/html; charset=utf-8'],
   ['/generator.html', 'text/html; charset=utf-8'],
   ['/level.json', 'application/json; charset=utf-8'],
+  ['/render-only-test-card.cells.json', 'application/json; charset=utf-8'],
 ]);
 createServer(async (req, res) => {
   const path = req.url === '/' ? '/harness.html' : req.url;
