@@ -88,16 +88,24 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       svg.setAttribute('role', 'img');
       svg.setAttribute('aria-label', t('v2.ui.previewMap'));
       const terrain = new Map(data.terrain.map(cell => [`${cell.x},${cell.y}`, cell.type]));
+      const shown = new Set();
       for (let y = 0; y < data.height; y++) for (let x = 0; x < data.width; x++) {
         const cx = 23 + x * 36 + (y % 2 ? 18 : 0), cy = 20 + y * 30;
+        const type = terrain.get(`${x},${y}`) || data.defaultTerrain;
+        shown.add(type);
         const polygon = document.createElementNS(svg.namespaceURI, 'polygon');
         polygon.setAttribute('points', Array.from({length: 6}, (_, i) => {
           const angle = Math.PI / 3 * i + Math.PI / 6;
           return `${cx + 20 * Math.cos(angle)},${cy + 20 * Math.sin(angle)}`;
         }).join(' '));
-        polygon.setAttribute('class', (terrain.get(`${x},${y}`) || data.defaultTerrain) !== data.defaultTerrain ?
-          'v2-preview-terrain' : 'v2-preview-open');
+        polygon.setAttribute('class', type !== data.defaultTerrain ? 'v2-preview-terrain' : 'v2-preview-open');
+        polygon.setAttribute('data-terrain-id', type);
+        const title = document.createElementNS(svg.namespaceURI, 'title');
+        title.textContent = TerrainDisplay.label(type);
+        polygon.append(title);
         svg.append(polygon);
+        const icon = TerrainDisplay.svgIcon(type, cx - 18, cy - 21);
+        if (icon) svg.append(icon);
       }
       for (const unit of data.units) {
         const cx = 23 + unit.x * 36 + (unit.y % 2 ? 18 : 0), cy = 20 + unit.y * 30;
@@ -122,7 +130,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           svg.append(image);
         }
       }
-      figure.append(svg);
+      const caption = document.createElement('figcaption');
+      caption.className = 'v2-preview-legend';
+      TerrainDisplay.fillLegend(caption, shown, missionId === 'iron-dust-v2', true);
+      figure.append(svg, caption);
       return figure;
     }
     function missionStats(data) {

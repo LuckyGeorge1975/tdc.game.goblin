@@ -200,6 +200,9 @@ function showFieldInfo(x,y){
   const blocked=selected&&!lineOfSight(selected,{x,y});
   const label=`${String.fromCharCode(65+x)}-${String(y+1).padStart(2,'0')}`;
   $('#intel-kicker').textContent='FIELD INTEL';$('#intel-title').textContent=`SECTOR ${label}`;
+  const terrainIcon=typeof TerrainDisplay==='undefined'?null:TerrainDisplay.icon(type,'legacy-terrain-icon');
+  const terrainIconHost=$('#intel-terrain-icon');
+  if(terrainIconHost?.replaceChildren)terrainIconHost.replaceChildren(...(terrainIcon?[terrainIcon]:[]));
   $('#intel-copy').textContent=`${rule.note}${blocked?' Dieses Feld liegt hinter einem Sichtblocker.':''}`;
   $('#intel-facts').innerHTML=`<div><span>TERRAIN</span><b>${rule.label}</b></div><div><span>MOVE COST</span><b>${Number.isFinite(cost)?cost:'BLOCKED'}</b></div><div><span>COVER</span><b>${rule.cover?'+1 DEF':'NONE'}</b></div><div><span>OCCUPANT</span><b>${unit?unit.name:'NONE'}</b></div><div><span>VISIBILITY</span><b>${blocked?'BLOCKED':'CLEAR'}</b></div>`;
 }

@@ -12,6 +12,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     shell.innerHTML = `
       <header class="v2-head"><div><span class="v2-label">G.O.B.L.I.N. / Mission</span><h1 id="v2-mission"></h1><p id="v2-objective"></p></div><div><span class="v2-label" id="v2-profile"></span><strong id="v2-phase" role="status" aria-live="polite"></strong><p id="v2-turn"></p></div></header>
       <div class="v2-layout"><aside class="v2-own"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card v2-systems-card"><details id="v2-system-details" open><summary class="v2-label" id="v2-systems-label"></summary><div id="v2-systems"></div></details></section></aside><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><div class="v2-area-controls" role="group" id="v2-area-controls"><button type="button" data-area="movement"></button><button type="button" data-area="fire"></button><button type="button" data-area="los"></button><button type="button" id="v2-area-grid"></button></div><button type="button" id="v2-undo"></button></div><div class="v2-map-tools" role="group" id="v2-map-tools"><button type="button" id="v2-zoom-out">−</button><button type="button" id="v2-zoom-in">+</button><button type="button" id="v2-zoom-fit"></button><button type="button" id="v2-zoom-center"></button><div class="v2-weapon-controls" id="v2-weapon-controls" hidden></div></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-area-legend" class="v2-area-legend" role="status"></p><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main><aside class="v2-target"><section class="v2-card"><details id="v2-intel-details" open><summary class="v2-label" id="v2-intel-label"></summary><div id="v2-intel"></div></details></section><section class="v2-card v2-log-card"><details id="v2-log-details" open><summary class="v2-label" id="v2-log-label"></summary><div id="v2-log"></div></details></section></aside></div><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target" hidden><div class="v2-command-head"><span class="v2-label" id="v2-command-target"></span><p id="v2-command-intel"></p><div class="v2-weapon-controls" id="v2-command-weapons" hidden></div></div><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></section>`;
+    const terrainCard = document.createElement('section');
+    terrainCard.className = 'v2-card';
+    terrainCard.innerHTML = '<details id="v2-terrain-details" open><summary class="v2-label" id="v2-terrain-label"></summary><div id="v2-terrain-list"></div></details>';
+    shell.querySelector('.v2-log-card').before(terrainCard);
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
     document.body.classList.add('ui-v2-active');
@@ -579,6 +583,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-intel-label').textContent = t('v2.ui.fieldIntel');
       at('#v2-systems-label').textContent = t('v2.ui.status');
       at('#v2-log-label').textContent = t('ui.details.log');
+      at('#v2-terrain-label').textContent = t('v2.ui.terrain');
+      TerrainDisplay.fillLegend(at('#v2-terrain-list'), state.cells.map(cell => cell.type), true);
       at('#v2-selection').textContent = actor?.name || t('ui.hud.noSelection');
       at('#v2-message').textContent = view.message;
       const roster = at('#v2-units'); roster.replaceChildren();
@@ -598,7 +604,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const terrain = state.cells.find(item => item.x === cell.x && item.y === cell.y);
         const occupant = state.units.find(unit => unit.hp > 0 && unit.x === cell.x && unit.y === cell.y);
         const line = document.createElement('p');
-        line.textContent = `${t('v2.ui.sector')} ${hexLabel(cell)} · ${t(`v2.ui.terrain.${terrain?.type}`)}${occupant ? ` · ${occupant.name} (${t(occupant.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}) · ${occupant.treads === null ? `${occupant.hp}/${occupant.maxHp} HP` : `${t('v2.ui.treads')} ${occupant.treads}`}` : ''}`;
+        line.className = 'v2-terrain-info';
+        line.textContent = `${t('v2.ui.sector')} ${hexLabel(cell)} · ${TerrainDisplay.label(terrain?.type)}${occupant ? ` · ${occupant.name} (${t(occupant.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}) · ${occupant.treads === null ? `${occupant.hp}/${occupant.maxHp} HP` : `${t('v2.ui.treads')} ${occupant.treads}`}` : ''}`;
+        const image = TerrainDisplay.icon(terrain?.type);
+        if (image) line.prepend(image);
         intel.append(line);
       }
       renderSystems(state, actor);
@@ -619,7 +628,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         }
       }
       renderCommandMenu(state, actor, commands,
-        view.target ? t(`v2.ui.terrain.${state.cells.find(cell => cell.x === view.target.x && cell.y === view.target.y)?.type}`) : '');
+        view.target ? TerrainDisplay.label(state.cells.find(cell => cell.x === view.target.x && cell.y === view.target.y)?.type) : '');
       let teams=nativeMap.querySelector('#v2-team-markers');
       if(!teams){teams=document.createElementNS(NS,'g');teams.id='v2-team-markers';teams.setAttribute('pointer-events','none');nativeMap.append(teams);}
       teams.replaceChildren();
@@ -689,6 +698,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-intel-label').textContent = t('v2.ui.fieldIntel');
       at('#v2-systems-label').textContent = t('v2.ui.status');
       at('#v2-log-label').textContent = t('ui.details.log');
+      at('#v2-terrain-label').textContent = t('v2.ui.terrain');
+      TerrainDisplay.fillLegend(at('#v2-terrain-list'),
+        Array.from({length: H}, (_, y) => Array.from({length: W}, (_, x) => terrainTypeAt(x, y))).flat());
       at('#v2-profile').textContent = state.profile;
       at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
         view.phaseSkip?.turn === state.turn ? t(view.phaseSkip.key) : t(`phase.${state.turnPhase}.label`);
@@ -735,7 +747,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const { x, y } = view.target || view.infoCell;
         const target = state.units.find(unit => unit.hp > 0 && !unit.embarkedOn && unit.x === x && unit.y === y);
         const line = document.createElement('p');
-        line.textContent = `${t('v2.ui.sector')} ${String.fromCharCode(65 + x)}-${String(y + 1).padStart(2, '0')} · ${GoblinLanguage.translate(terrainTypeAt(x, y))}${target ? ` · ${target.name} (${t(target.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')})` : ''}`;
+        const terrainId = terrainTypeAt(x, y);
+        line.className = 'v2-terrain-info';
+        line.textContent = `${t('v2.ui.sector')} ${String.fromCharCode(65 + x)}-${String(y + 1).padStart(2, '0')} · ${TerrainDisplay.label(terrainId)}${target ? ` · ${target.name} (${t(target.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')})` : ''}`;
+        const image = TerrainDisplay.icon(terrainId);
+        if (image) line.prepend(image);
         intel.appendChild(line);
       }
       renderSystems(state, actor);
@@ -765,7 +781,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
               ];
       }
       renderCommandMenu(state, actor, commands,
-        view.target ? GoblinLanguage.translate(terrainTypeAt(view.target.x, view.target.y)) : '');
+        view.target ? TerrainDisplay.label(terrainTypeAt(view.target.x, view.target.y)) : '');
       function marker(id, cell, key) {
         let shape = nativeMap.querySelector(`#${id}`);
         if (!cell) { shape?.remove(); return; }
