@@ -13,6 +13,8 @@
   ]);
   const terrainFallback='01-modular-stealth-geometry';
   const fixedAssetPrefix=`assets/unit-art/sets/${fixedStyle}/`;
+  const mapIconPrefix=`${fixedAssetPrefix}map-icons/`;
+  const mapIconSize=Math.sqrt(3)*34*100/112;
 
   function register(key,descriptor){
     if(!key||!descriptor)throw new Error('Visual key and descriptor are required.');
@@ -31,7 +33,8 @@
       if(!['png','webp'].includes(format))return null;
       return `${fixedAssetPrefix}${view}/${key}@${format==='webp'?'1024':'768'}.${format}`;
     }
-    return `${fixedAssetPrefix}${view}/${key}.png`;
+    const side=unit?.team==='player'?'own':unit?.team==='enemy'?'enemy':null;
+    return side?`${mapIconPrefix}${side}/${key}.webp`:null;
   }
 
   const terrainKeys=new Set(['open-ground','rubble-field','mountain','ridge','forest','marsh','water','river','road','bridge','urban','crater']);
@@ -46,12 +49,13 @@
   function currentStyle(){return fixedStyle}
 
   function resolve(unit){
+    const mapAsset=assetFor(unit);
+    if(mapAsset)return {kind:'asset',asset:mapAsset,size:mapIconSize};
     const explicit=unit.visualKey&&registry.get(unit.visualKey);
     if(explicit&&(explicit.kind!=='asset'||explicit.asset?.startsWith(fixedAssetPrefix)))return explicit;
     const registered=registry.get(unit.id)||registry.get(unit.type);
     if(registered?.kind==='asset'&&registered.asset?.startsWith(fixedAssetPrefix))return registered;
-    const asset=assetFor(unit);
-    return asset?{kind:'asset',asset,size:54}:registered?.kind==='asset'?defaults:registered||defaults;
+    return registered?.kind==='asset'?defaults:registered||defaults;
   }
 
   function polygonPoints(shape,c,scale=1){

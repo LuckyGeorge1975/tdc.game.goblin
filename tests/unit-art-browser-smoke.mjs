@@ -86,7 +86,7 @@ try {
   console.log('desktop', JSON.stringify(first));
 
   const art=await js("({roster:document.querySelector('#unit-roster .unit-art-image')?.getAttribute('src'),map:document.querySelector('.unit-svg image.unit-artwork')?.getAttribute('href'),terrain:UnitVisuals.terrainAssetFor('forest')})");
-  assert.equal(art.roster,'assets/unit-art/sets/02-technical-illustration/icons/goblin-siegebreaker.png');
+  assert.equal(art.roster,'assets/unit-art/sets/02-technical-illustration/map-icons/own/goblin-siegebreaker.webp');
   assert.equal(art.map,art.roster);
   assert.match(art.terrain,/sets\/01-modular-stealth-geometry\/terrain\//);
 

@@ -2,9 +2,16 @@
   "schemaVersion": 1,
   "viewFormats": {
     "icon": "256×256 SVG · transparent · unit icon",
+    "mapIcon": "192×192 lossless WebP · transparent · active team-specific map icon",
     "library": "1024×683 transparent WebP with 768×512 RGBA PNG fallback for five graphical styles; 1024×768 SVG for military symbols · unit guide view",
     "logo": "1024×256 SVG · transparent",
     "terrain": "256×256 SVG · transparent outside hex · map tile"
+  },
+  "mapIcons": {
+    "set": "02-technical-illustration",
+    "own": "sets/02-technical-illustration/map-icons/own/",
+    "enemy": "sets/02-technical-illustration/map-icons/enemy/",
+    "sourceReceipt": "map-icons-source.json"
   },
   "styles": [
     {

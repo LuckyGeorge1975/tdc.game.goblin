@@ -24,8 +24,9 @@ for (const directory of ['', 'src/legacy/scripts/']) {
     assert.equal(context.UnitVisuals.currentStyle(),'02-technical-illustration');
     assert.equal(storage.get('goblin-art-style'),'02-technical-illustration');
     assert.equal(context.UnitVisuals.setStyle('03-industrial-realism'),false);
-    assert.equal(context.UnitVisuals.assetFor({name:'ASSAULT TANK'}),
-      'assets/unit-art/sets/02-technical-illustration/icons/assault-tank.png');
+    assert.equal(context.UnitVisuals.assetFor({name:'ASSAULT TANK',team:'player'}),
+      'assets/unit-art/sets/02-technical-illustration/map-icons/own/assault-tank.webp');
+    assert.equal(context.UnitVisuals.assetFor({name:'ASSAULT TANK',team:'neutral'}),null);
   });
 
   test(`${directory || 'root'} guide uses the fixed WebP with PNG fallback`, () => {
