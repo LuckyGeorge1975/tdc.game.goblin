@@ -25,6 +25,21 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function addRosterArt(button, unit) {
       button.prepend(UnitVisuals.iconElement(unit, 'v2-roster-art'));
     }
+    function strengthText(unit) {
+      return unit.ogreSystems
+        ? `${t('v2.ui.treads')} ${unit.ogreSystems.treads}/${unit.ogreSystems.maxTreads}`
+        : `${unit.hp}/${unit.maxHp} ${unit.infantry ? 'SP' : 'HP'}`;
+    }
+    function renderM1Markers(state, actor) {
+      nativeMap.querySelectorAll('.target-ring,.unit-selection-ring,.focus-marker').forEach(node => node.remove());
+      M1UnitMarkers.render(nativeMap, state.markers, {actor, target:view.target, focus:view.focusCell, t});
+      const members=state.markers.objective?.members || [];
+      const done=members.filter(member => member.state==='satisfied').length;
+      let status=at('#v2-objective-members');
+      if(!status){status=document.createElement('p');status.id='v2-objective-members';at('#v2-objective').after(status);}
+      status.textContent=members.length?t('v2.ui.objectiveMembers',{done,total:members.length}):'';
+      status.title=members.map(member => `${state.units.find(unit=>unit.id===member.unitId)?.name || member.unitId}: ${t(member.state==='satisfied'?'v2.ui.destroyed':'v2.ui.objectivePending')}`).join('\n');
+    }
 
     function revision() {
       if (core()) return `core:${IronDustBrowserV2.epoch}:${IronDustBrowserV2.session.profile.digest}`;
@@ -65,8 +80,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function project() {
       if (core()) {
         const source = IronDustBrowserV2.view;
+        const snapshotRevision = revision();
         return {
-          revision: revision(), scenario: 'iron-dust-v2', profile: source.ruleProfileId,
+          revision: snapshotRevision, scenario: 'iron-dust-v2', profile: source.ruleProfileId,
+          markers:M1UnitMarkers.core(source, IronDustBrowserV2.epoch, snapshotRevision),
           mission: {title:t('mission.iron-dust-v2.title'), objective:t('v2.objective')},
           turn:source.turn, phase:source.mode === 'player' ? 'player' : source.mode,
           turnPhase:source.phase, gameOver:source.mode === 'ended',
@@ -83,16 +100,20 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
       const objective = objectiveSnapshot(victoryProfile(legacySession.effectiveRules), units);
       const logEntries = legacyLogEntries();
+      const snapshotRevision = revision();
       return {
-        revision: revision(), scenario: currentScenario, profile: legacySession.ruleProfileId,
+        revision: snapshotRevision, scenario: currentScenario, profile: legacySession.ruleProfileId,
+        markers:M1UnitMarkers.legacy(legacySession, units, snapshotRevision, objective.outcome),
         mission: { title: t(`mission.${currentScenario}.title`), objective: t(`mission.${currentScenario}.objective.short`) },
         turn, phase, turnPhase, gameOver, objective: structuredClone(objective),
         ready: phase === 'player' && !gameOver ? phaseReadyUnits().length : 0,
         undo: { available: phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },
-        units: units.map(({ id, name, type, team, x, y, hp, maxHp, attack, defense, move, range, damage, disabled, embarkedOn, core, infantry, transportCapacity, strategicMissile, missilesRemaining }) =>
+        units: units.map(({ id, name, type, team, x, y, hp, maxHp, attack, defense, move, range, damage, disabled, embarkedOn, core, infantry, engineering, ogreSystems, transportCapacity, strategicMissile, missilesRemaining }) =>
           ({ id, name, type, team, x, y, hp, maxHp, disabled: !!disabled, embarkedOn: embarkedOn || null,
             attack: attack ?? damage ?? null, defense: defense ?? null, move: move ?? null, range: range ?? null,
-            core: !!core, infantry: !!infantry, transportCapacity: transportCapacity || 0, strategicMissile: !!strategicMissile,
+            core: !!core, infantry: !!infantry, engineering:!!engineering,
+            ogreSystems:ogreSystems ? structuredClone(ogreSystems) : null,
+            transportCapacity: transportCapacity || 0, strategicMissile: !!strategicMissile,
             missilesRemaining: missilesRemaining ?? null })),
         systems: units.filter(unit => unit.team === 'player' && unit.ogreSystems)
           .map(unit => ({ id: unit.id, summary: GoblinSystems.summary(unit.ogreSystems) })),
@@ -269,9 +290,13 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const unit = state.units.find(item => item.id === entry.id);
       const name = document.createElement('strong'); name.textContent = unit?.name || entry.id; host.append(name);
       const facts = [];
-      if (entry.summary.treads != null) facts.push([t('v2.ui.treads'), entry.summary.treads]);
-      for (const [key, count] of Object.entries(entry.summary.weapons || {}))
-        facts.push([t(`v2.ui.weapon.${key}`), count]);
+      if (entry.summary.treads != null) facts.push([t('v2.ui.treads'), unit?.ogreSystems
+        ? `${unit.ogreSystems.treads}/${unit.ogreSystems.maxTreads}` : entry.summary.treads]);
+      for (const [key, count] of Object.entries(entry.summary.weapons || {})) {
+        const raw=unit?.ogreSystems?.weapons[key];
+        facts.push([t(`v2.ui.weapon.${key}`), raw
+          ? `${Math.max(0,Math.min(raw.remaining,raw.count-raw.destroyed))}/${raw.count} · ${t('v2.ui.weaponDamage',{count:raw.destroyed})}` : count]);
+      }
       for (const [label, value] of facts) {
         const line = document.createElement('div'); line.className = 'v2-system-row';
         const term = document.createElement('span'); term.textContent = label;
@@ -531,6 +556,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function freeRatioChipCenter(from, to, width, height, pixelScale, state) {
       const box = nativeMap.viewBox.baseVal;
+      const pins = globalThis.M1UnitMarkers?.obstacles(state.markers) || [];
       const occupied = [...state.units.filter(unit => !unit.embarkedOn), view.focusCell]
         .filter(cell => cell && Number.isFinite(cell.x) && Number.isFinite(cell.y))
         .map(cell => hexCenter(cell.x, cell.y));
@@ -540,6 +566,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const y = from.y + (to.y - from.y) * fraction;
         if (x - width / 2 < box.x || x + width / 2 > box.x + box.width ||
             y - height / 2 < box.y || y + height / 2 > box.y + box.height) continue;
+        if (pins.some(pin => x+width/2+6/pixelScale>pin.left && x-width/2-6/pixelScale<pin.right &&
+            y+height/2+6/pixelScale>pin.top && y-height/2-6/pixelScale<pin.bottom)) continue;
         if (occupied.every(center => Math.abs(x - center.x) >= width / 2 + clearance ||
             Math.abs(y - center.y) >= height / 2 + clearance)) return {x, y};
       }
@@ -734,7 +762,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const roster = at('#v2-units'); roster.replaceChildren();
       state.units.filter(unit => unit.team === 'player').forEach(unit => {
         const button = document.createElement('button');
-        const strength = unit.treads === null ? `${unit.hp}/${unit.maxHp} HP` : `${t('v2.ui.treads')} ${unit.treads}`;
+        const strength = strengthText(unit);
         button.textContent = `${unit.name} · ${strength}${unit.hp <= 0 ? ` · ${t('v2.ui.destroyed')}` :
           unit.disabled ? ` · ${t('v2.ui.disabled')}` : unit.secondMoved ? ` · ${t('v2.ui.secondMoved')}` :
           unit.fired ? ` · ${t('v2.ui.fired')}` : unit.moved ? ` · ${t('v2.ui.moved')}` : ''}`;
@@ -749,7 +777,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const occupant = state.units.find(unit => unit.hp > 0 && unit.x === cell.x && unit.y === cell.y);
         const line = document.createElement('p');
         line.className = 'v2-terrain-info';
-        line.textContent = `${t('v2.ui.sector')} ${hexLabel(cell)} · ${TerrainDisplay.label(terrain?.type)}${occupant ? ` · ${occupant.name} (${t(occupant.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}) · ${occupant.treads === null ? `${occupant.hp}/${occupant.maxHp} HP` : `${t('v2.ui.treads')} ${occupant.treads}`}` : ''}`;
+        line.textContent = `${t('v2.ui.sector')} ${hexLabel(cell)} · ${TerrainDisplay.label(terrain?.type)}${occupant ? ` · ${occupant.name} (${t(occupant.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}) · ${strengthText(occupant)}` : ''}`;
         const image = TerrainDisplay.icon(terrain?.type);
         if (image) line.prepend(image);
         intel.append(line);
@@ -773,46 +801,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
       renderCommandMenu(state, actor, commands,
         view.target ? TerrainDisplay.label(state.cells.find(cell => cell.x === view.target.x && cell.y === view.target.y)?.type) : '');
-      let teams=nativeMap.querySelector('#v2-team-markers');
-      if(!teams){teams=document.createElementNS(NS,'g');teams.id='v2-team-markers';teams.setAttribute('pointer-events','none');nativeMap.append(teams);}
-      teams.replaceChildren();
-      state.units.filter(unit=>!unit.embarkedOn).forEach(unit=>{
-        const center=hexCenter(unit.x,unit.y),frame=document.createElementNS(NS,'polygon');
-        frame.classList.add(unit.team==='player'?'v2-team-own':'v2-team-enemy');
-        if(unit.disabled||unit.hp<=0)frame.classList.add('v2-team-inactive');
-        frame.setAttribute('points',unit.team==='player'?hexPoints(unit.x,unit.y):
-          `${center.x},${center.y-S} ${center.x+S-4},${center.y} ${center.x},${center.y+S} ${center.x-S+4},${center.y}`);
-        frame.setAttribute('role','img');
-        frame.setAttribute('aria-label',`${t(unit.team==='player'?'ui.team.player':'ui.team.enemy')}: ${unit.name}${unit.id==='core'?`, ${t('ui.hud.objective')}`:''}${unit.hp<=0?`, ${t('v2.ui.destroyed')}`:unit.disabled?`, ${t('v2.ui.disabled')}`:''}${unit.id===view.actorId?`, ${t('v2.ui.marker.selected',{unit:unit.name})}`:''}${view.focusCell?.x===unit.x&&view.focusCell?.y===unit.y?`, ${t('v2.ui.marker.focus',{hex:`${String.fromCharCode(65+unit.x)}-${String(unit.y+1).padStart(2,'0')}`})}`:''}`);
-        teams.append(frame);
-        function badge(kind,x,y,mark){const node=document.createElementNS(NS,'text');
-          node.classList.add(kind);node.setAttribute('x',center.x+x);node.setAttribute('y',center.y+y);
-          node.setAttribute('aria-hidden','true');node.textContent=mark;teams.append(node);}
-        if(unit.id==='core'){
-          const octagon=document.createElementNS(NS,'polygon');octagon.classList.add('v2-goal-octagon');
-          octagon.setAttribute('points',Array.from({length:8},(_,i)=>{const angle=Math.PI/8+i*Math.PI/4;
-            return `${center.x+24+12*Math.cos(angle)},${center.y-26+12*Math.sin(angle)}`;}).join(' '));
-          octagon.setAttribute('aria-hidden','true');teams.append(octagon);
-          badge('v2-goal-badge',24,-21,'◎');
-        }
-        if(unit.disabled&&unit.hp>0)badge('v2-disabled-badge',-24,-21,'!');
-        if(unit.hp<=0)badge('v2-destroyed-badge',24,29,'×');
-      });
-      function viewBadge(cell,kind,x,y,mark){if(!cell)return;const center=hexCenter(cell.x,cell.y);
-        const node=document.createElementNS(NS,'text');node.classList.add(kind);
-        node.setAttribute('x',center.x+x);node.setAttribute('y',center.y+y);
-        node.setAttribute('aria-hidden','true');node.textContent=mark;teams.append(node);}
-      viewBadge(actor,'v2-selected-badge',-24,29,'✓');
-      viewBadge(view.focusCell,'v2-focus-badge',0,-S-6,'⌖');
-      for(const [id,cell,key] of [['v2-actor-marker',actor,'v2.ui.marker.selected'],
-        ['v2-target-marker',view.target,'v2.ui.marker.target'],
-        ['v2-focus-marker',view.focusCell,'v2.ui.marker.focus']]){
-        let shape=nativeMap.querySelector(`#${id}`);if(!cell){shape?.remove();continue;}
-        if(!shape){shape=document.createElementNS(NS,'polygon');shape.id=id;shape.setAttribute('pointer-events','none');nativeMap.append(shape);}
-        shape.setAttribute('points',hexPoints(cell.x,cell.y));
-        shape.setAttribute('role','img');
-        shape.setAttribute('aria-label',t(key,{unit:actor?.name||'',hex:`${String.fromCharCode(65+cell.x)}-${String(cell.y+1).padStart(2,'0')}`}));
-      }
+      renderM1Markers(state, actor);
       renderAreaPreview(state, actor);
       globalThis.dispatchEvent(new Event('goblin-v2-render'));
     }
@@ -898,7 +887,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const line = document.createElement('p');
         const terrainId = terrainTypeAt(x, y);
         line.className = 'v2-terrain-info';
-        line.textContent = `${t('v2.ui.sector')} ${String.fromCharCode(65 + x)}-${String(y + 1).padStart(2, '0')} · ${TerrainDisplay.label(terrainId)}${target ? ` · ${target.name} (${t(target.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')})` : ''}`;
+        line.textContent = `${t('v2.ui.sector')} ${String.fromCharCode(65 + x)}-${String(y + 1).padStart(2, '0')} · ${TerrainDisplay.label(terrainId)}${target ? ` · ${target.name} (${t(target.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}) · ${strengthText(target)}` : ''}`;
         const image = TerrainDisplay.icon(terrainId);
         if (image) line.prepend(image);
         intel.appendChild(line);
@@ -931,67 +920,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
       renderCommandMenu(state, actor, commands,
         view.target ? TerrainDisplay.label(terrainTypeAt(view.target.x, view.target.y)) : '');
-      function marker(id, cell, key) {
-        let shape = nativeMap.querySelector(`#${id}`);
-        if (!cell) { shape?.remove(); return; }
-        if (!shape) {
-          shape = document.createElementNS(NS, 'polygon'); shape.id = id;
-          shape.setAttribute('pointer-events', 'none'); nativeMap.appendChild(shape);
-        }
-        shape.setAttribute('points', hexPoints(cell.x, cell.y));
-        shape.setAttribute('role', 'img');
-        shape.setAttribute('aria-label', t(key, { unit: actor?.name || '',
-          hex: `${String.fromCharCode(65 + cell.x)}-${String(cell.y + 1).padStart(2, '0')}` }));
-      }
-      let teams = nativeMap.querySelector('#v2-team-markers');
-      if (!teams) {
-        teams = document.createElementNS(NS, 'g'); teams.id = 'v2-team-markers';
-        teams.setAttribute('pointer-events', 'none'); nativeMap.appendChild(teams);
-      }
-      teams.replaceChildren();
-      state.units.filter(unit => !unit.embarkedOn).forEach(unit => {
-        const c = hexCenter(unit.x, unit.y);
-        const frame = document.createElementNS(NS, 'polygon');
-        frame.classList.add(unit.team === 'player' ? 'v2-team-own' : 'v2-team-enemy');
-        if (unit.disabled || unit.hp <= 0) frame.classList.add('v2-team-inactive');
-        frame.setAttribute('points', unit.team === 'player' ? hexPoints(unit.x, unit.y)
-          : `${c.x},${c.y - S} ${c.x + S - 4},${c.y} ${c.x},${c.y + S} ${c.x - S + 4},${c.y}`);
-        frame.setAttribute('role', 'img');
-        frame.setAttribute('aria-label', `${t(unit.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}: ${unit.name}${unit.core ? `, ${t('ui.hud.objective')}` : ''}${unit.hp <= 0 ? `, ${t('v2.ui.destroyed')}` : unit.disabled ? `, ${t('v2.ui.disabled')}` : ''}${unit.id === view.actorId ? `, ${t('v2.ui.marker.selected', { unit: unit.name })}` : ''}${view.focusCell?.x === unit.x && view.focusCell?.y === unit.y ? `, ${t('v2.ui.marker.focus', { hex: `${String.fromCharCode(65 + unit.x)}-${String(unit.y + 1).padStart(2, '0')}` })}` : ''}`);
-        teams.appendChild(frame);
-        function badge(kind, x, y, mark) {
-          const badge = document.createElementNS(NS, 'text');
-          badge.setAttribute('x', c.x + x); badge.setAttribute('y', c.y + y);
-          badge.setAttribute('aria-hidden', 'true');
-          badge.classList.add(kind); badge.textContent = mark;
-          teams.appendChild(badge);
-        }
-        if (unit.core) {
-          const octagon = document.createElementNS(NS, 'polygon');
-          octagon.classList.add('v2-goal-octagon');
-          octagon.setAttribute('points', Array.from({ length: 8 }, (_, i) => {
-            const angle = Math.PI / 8 + i * Math.PI / 4;
-            return `${c.x + 24 + 12 * Math.cos(angle)},${c.y - 26 + 12 * Math.sin(angle)}`;
-          }).join(' '));
-          octagon.setAttribute('aria-hidden', 'true');
-          teams.appendChild(octagon);
-          badge('v2-goal-badge', 24, -21, '◎');
-        }
-        if (unit.disabled && unit.hp > 0) badge('v2-disabled-badge', -24, -21, '!');
-        if (unit.hp <= 0) badge('v2-destroyed-badge', 24, 29, '×');
-      });
-      function viewBadge(cell, kind, x, y, mark) {
-        if (!cell) return;
-        const c = hexCenter(cell.x, cell.y);
-        const badge = document.createElementNS(NS, 'text');
-        badge.classList.add(kind); badge.setAttribute('x', c.x + x); badge.setAttribute('y', c.y + y);
-        badge.setAttribute('aria-hidden', 'true'); badge.textContent = mark; teams.appendChild(badge);
-      }
-      viewBadge(actor, 'v2-selected-badge', -24, 29, '✓');
-      viewBadge(view.focusCell, 'v2-focus-badge', 0, -S - 6, '⌖');
-      marker('v2-actor-marker', actor, 'v2.ui.marker.selected');
-      marker('v2-target-marker', view.target, 'v2.ui.marker.target');
-      marker('v2-focus-marker', view.focusCell, 'v2.ui.marker.focus');
+      renderM1Markers(state, actor?.hp > 0 ? actor : null);
       renderAreaPreview(state, actor?.hp > 0 ? actor : null);
       if (centerFireActor) centerSelectedActor(state);
       globalThis.dispatchEvent(new Event('goblin-v2-render'));
@@ -1242,7 +1171,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     globalThis.addEventListener('goblin-language-change', () => render());
     globalThis.addEventListener('goblin-core-v2-render', () => {if(core()) render();});
     new MutationObserver(changes => {
-      const own = node => node.nodeType === 1 && /^v2-(team-markers|actor-marker|target-marker|focus-marker|grid-overlay|area-overlay)$/.test(node.id);
+      const own = node => node.nodeType === 1 && /^v2-(m1-markers|team-markers|actor-marker|target-marker|focus-marker|grid-overlay|area-overlay)$/.test(node.id);
       if (changes.some(change => [...change.addedNodes, ...change.removedNodes].some(node => !own(node)))) render();
     }).observe(nativeMap, { childList: true });
     render();

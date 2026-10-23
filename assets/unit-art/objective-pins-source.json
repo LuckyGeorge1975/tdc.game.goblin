@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "tdc.game.goblin.content",
+  "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+  "sourceArchiveSha256": "a3d254c78d3accbf084d658e9ba4d95d0776e3d90fcfd75a675494cfe3ec39eb",
+  "export": {
+    "script": "scripts/export-objective-pins.py",
+    "pillowVersion": "12.3.0",
+    "size": [
+      300,
+      390
+    ],
+    "format": "WebP",
+    "lossless": true,
+    "resampling": "Lanczos",
+    "canvasAnchor": [
+      150,
+      195
+    ],
+    "referenceCanvas": [
+      200,
+      260
+    ],
+    "referenceHexWidth": 112
+  },
+  "pins": [
+    {
+      "sourcePath": "design-exports/einheitengrafiken/zielmarke/zielmarke-c-nadel.png",
+      "sourceSha256": "25c474d0494023d3715646ecbb07874e90ab0e166d36a904c3095e156b97cfe2",
+      "sourceBytes": 20844,
+      "sourceAlphaBounds": [
+        213,
+        31,
+        387,
+        242
+      ],
+      "runtimePath": "assets/unit-art/markers/objective-pin.webp",
+      "runtimeSha256": "3829b44aee7e7398a88eda643a839982d203905ab7f400951b956a0a500f2d7c",
+      "runtimeBytes": 6604,
+      "runtimeAlphaBounds": [
+        105,
+        14,
+        195,
+        122
+      ]
+    },
+    {
+      "sourcePath": "design-exports/einheitengrafiken/zielmarke/zielmarke-c-nadel-unten.png",
+      "sourceSha256": "4c86b15a558382cfc0037d6b593a3f8ada6ac0bc2c9cabc0bc61289c448b26d4",
+      "sourceBytes": 20129,
+      "sourceAlphaBounds": [
+        213,
+        538,
+        387,
+        749
+      ],
+      "runtimePath": "assets/unit-art/markers/objective-pin-below.webp",
+      "runtimeSha256": "24d700d79d88af502841fe003c53a787c4f30e4c7e72131b4f32e2d3ca912ba8",
+      "runtimeBytes": 6422,
+      "runtimeAlphaBounds": [
+        105,
+        268,
+        195,
+        376
+      ]
+    }
+  ]
+}

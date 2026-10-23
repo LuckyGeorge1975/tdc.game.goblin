@@ -75,13 +75,18 @@ export function buildIronDustV2View(projection, ruleProfileId,
     x:unit.x, y:unit.y, hp:unit.hp, maxHp:unit.maxHp, defense:unit.defense,
     move:unit.move ?? null, range:unit.range ?? null, attack:unit.damage ?? null,
     disabled:unit.disabled, moved:unit.moved, fired:unit.fired,
+    infantry:!!unit.infantry, engineering:!!unit.engineering,
     secondMoved:unit.secondMoved, embarkedOn:unit.embarkedOn,
     terrain:terrain.get(`${unit.x},${unit.y}`) ?? state.map.defaultTerrain,
     treads:unit.ogreSystems?.treads ?? null,
+    maxTreads:unit.ogreSystems?.maxTreads ?? null,
+    ogreSystems:unit.ogreSystems ? JSON.parse(JSON.stringify(unit.ogreSystems)) : null,
     selectedWeapon:unit.ogreSystems?.selectedWeapon ?? null,
     weapons:unit.ogreSystems ? Object.fromEntries(Object.entries(unit.ogreSystems.weapons)
       .map(([key, weapon]) => [key, {label:weapon.label, attack:weapon.attack,
-        range:weapon.range, ready:globalThis.GoblinSystems?.weaponReady(weapon) ??
+        range:weapon.range, count:weapon.count, destroyed:weapon.destroyed,
+        remaining:weapon.remaining, firedThisPhase:weapon.firedThisPhase,
+        ready:globalThis.GoblinSystems?.weaponReady(weapon) ??
           Math.max(0, weapon.remaining - weapon.firedThisPhase)}])) : null
   }));
   const core = units.find(unit => unit.id === 'core');
@@ -227,11 +232,12 @@ function renderMap(view, rerender, onAction) {
     } else {
       const color = unit.team === 'enemy' ? '#ee574d' : unit.id === 'ogre' ? '#d1f35a' : '#62cadd';
       globalThis.UnitVisuals.draw(group, unit, c,
-        {ns:SVG_NS, color, selected:unit.id === selectedUnitId});
+        {ns:SVG_NS, color, selected:unit.id === selectedUnitId && !document.body.classList.contains('ui-v2-active')});
       const hp = svgElement('rect');
       hp.setAttribute('x', c.x - 15); hp.setAttribute('y', c.y + 22);
       hp.setAttribute('width', 30 * unit.hp / unit.maxHp);
       hp.setAttribute('height', 3); hp.setAttribute('fill', color);
+      hp.classList.add('m1-replaced-hp');
       group.appendChild(hp);
       if (unit.disabled) group.classList.add('disabled-unit');
     }

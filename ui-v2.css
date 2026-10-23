@@ -177,20 +177,21 @@ body.ui-v2-active #battlefield-map { min-width: 0; min-height: 0; }
 body.ui-v2-active #battlefield-map .unit-svg.acted-unit,
 body.ui-v2-active #battlefield-map .unit-svg.disabled-unit,
 body.ui-v2-active #battlefield-map .unit-svg.transport-unavailable { opacity: 1 !important; filter: none !important; }
-body.ui-v2-active #v2-actor-marker { fill: none; stroke: var(--v2-signal); stroke-width: 3; stroke-dasharray: 8 5; }
-body.ui-v2-active #v2-target-marker { fill: none; stroke: var(--v2-accent-text); stroke-width: 4; }
 body.ui-v2-active #v2-focus-marker { fill: none; stroke: var(--v2-text); stroke-width: 2; stroke-dasharray: 3 5; }
-body.ui-v2-active #v2-team-markers polygon { fill: none; stroke-width: 2.5; }
-body.ui-v2-active #v2-team-markers .v2-team-own { stroke: var(--v2-signal); }
-body.ui-v2-active #v2-team-markers .v2-team-enemy { stroke: var(--v2-danger-text); }
-body.ui-v2-active #v2-team-markers .v2-team-inactive { stroke-dasharray: 4 4; }
-body.ui-v2-active #v2-team-markers .v2-goal-octagon { fill: none; stroke: var(--v2-accent-text); stroke-width: 2.5; }
-body.ui-v2-active #v2-team-markers text { font: 700 18px system-ui,sans-serif; text-anchor: middle; paint-order: stroke; stroke: var(--v2-bg); stroke-width: 3; }
-body.ui-v2-active #v2-team-markers .v2-goal-badge { fill: var(--v2-accent-text); }
-body.ui-v2-active #v2-team-markers .v2-disabled-badge { fill: var(--v2-danger-text); }
-body.ui-v2-active #v2-team-markers .v2-destroyed-badge { fill: var(--v2-muted); }
-body.ui-v2-active #v2-team-markers .v2-selected-badge { fill: var(--v2-signal); }
-body.ui-v2-active #v2-team-markers .v2-focus-badge { fill: var(--v2-text); }
+body.ui-v2-active #battlefield-map .m1-replaced-hp,
+body.ui-v2-active #battlefield-map .target-ring,
+body.ui-v2-active #battlefield-map .unit-selection-ring,
+body.ui-v2-active #battlefield-map .focus-marker { display: none; }
+body.ui-v2-active #battlefield-map .hex.selected,
+body.ui-v2-active #battlefield-map .hex.attack { stroke: transparent; stroke-width: 0; }
+.m1-damage-empty { fill: var(--v2-line); }
+.m1-damage-fill { fill: var(--v2-text); }
+.m1-damage-border { fill: none; stroke: #0b0e12; stroke-width: .526; }
+.m1-ring { fill: none; }
+.m1-ring-outer { stroke: #0b0e12; }
+.m1-ring-inner.m1-ring-selected { stroke: var(--v2-signal); }
+.m1-ring-inner.m1-ring-target { stroke: var(--v2-danger); }
+.m1-status, .m1-weapon-damage { font: 700 8px system-ui,sans-serif; text-anchor: middle; fill: var(--v2-danger-text); paint-order: stroke; stroke: #0b0e12; stroke-width: 1.5; }
 .v2-own, .v2-target { display: grid; align-content: start; gap: 12px; min-height: 0; overflow: auto; }
 .v2-units { display: grid; align-content: start; gap: 6px; max-height: 32dvh; overflow: auto; }
 .v2-units button { width: 100%; text-align: left; display: flex; align-items: center; gap: 8px; }

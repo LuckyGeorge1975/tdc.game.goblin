@@ -166,13 +166,13 @@ function renderUnit(u){if(u.embarkedOn)return;
   if(selected&&selected.team==='player'&&selected!==u&&u.transportCapacity&&canEmbark(selected,u))g.classList.add('transport-target')
   const targetable=turnPhase==='fire'&&u.team==='enemy'&&selected&&dist(selected,u)<=selected.range&&lineOfSight(selected,u)&&(typeof canSelectedWeaponTarget!=='function'||canSelectedWeaponTarget(selected,u));
   if(targetable&&u.disabled){g.style.opacity='1';g.style.filter='none'}
-  if(targetable){const ring=document.createElementNS(NS,'polygon');ring.setAttribute('points',`${c.x},${c.y-24} ${c.x+21},${c.y-12} ${c.x+21},${c.y+12} ${c.x},${c.y+24} ${c.x-21},${c.y+12} ${c.x-21},${c.y-12}`);ring.classList.add('target-ring');g.appendChild(ring)}
+  if(targetable&&!document.body.classList.contains('ui-v2-active')){const ring=document.createElementNS(NS,'polygon');ring.setAttribute('points',`${c.x},${c.y-24} ${c.x+21},${c.y-12} ${c.x+21},${c.y+12} ${c.x},${c.y+24} ${c.x-21},${c.y+12} ${c.x-21},${c.y-12}`);ring.classList.add('target-ring');g.appendChild(ring)}
   if(u.transportCapacity&&turnPhase==='movement'&&!u.disabled&&carrierLoad(u)<u.transportCapacity){const slot=carrierCargo(u).length,plus=document.createElementNS(NS,'text');plus.setAttribute('x',c.x-20+slot*20);plus.setAttribute('y',c.y-28);plus.setAttribute('text-anchor','middle');plus.classList.add('transport-slot');plus.textContent='+';plus.addEventListener('click',event=>{event.stopPropagation();activateLoadMode(u)});g.appendChild(plus)}
-  UnitVisuals.draw(g,u,c,{ns:NS,color,selected:u===selected});
+  UnitVisuals.draw(g,u,c,{ns:NS,color,selected:u===selected&&!document.body.classList.contains('ui-v2-active')});
   const bg=document.createElementNS(NS,'rect');
-  bg.setAttribute('x',c.x-15);bg.setAttribute('y',c.y+22);bg.setAttribute('width',30);bg.setAttribute('height',3);bg.classList.add('unit-hp-bg');g.appendChild(bg);
+  bg.setAttribute('x',c.x-15);bg.setAttribute('y',c.y+22);bg.setAttribute('width',30);bg.setAttribute('height',3);bg.classList.add('unit-hp-bg','m1-replaced-hp');g.appendChild(bg);
   const hp=document.createElementNS(NS,'rect');
-  hp.setAttribute('x',c.x-15);hp.setAttribute('y',c.y+22);hp.setAttribute('width',30*(u.hp/u.maxHp));hp.setAttribute('height',3);hp.setAttribute('fill',color);g.appendChild(hp);
+  hp.setAttribute('x',c.x-15);hp.setAttribute('y',c.y+22);hp.setAttribute('width',30*(u.hp/u.maxHp));hp.setAttribute('height',3);hp.setAttribute('fill',color);hp.classList.add('m1-replaced-hp');g.appendChild(hp);
   if(covered){const shield=document.createElementNS(NS,'path');shield.setAttribute('d',`M${c.x+17},${c.y-20} l6,3 v6 l-6,4 l-6,-4 v-6 z`);shield.classList.add('cover-mark');g.appendChild(shield)}
   g.addEventListener('click',event=>{event.stopPropagation();handleUnitClick(u)});
   svg.appendChild(g);
