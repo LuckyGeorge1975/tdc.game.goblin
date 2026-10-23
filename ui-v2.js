@@ -6,12 +6,13 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const nativeShell = document.querySelector('.app-shell');
     const view = { actorId: null, target: null, infoCell: null, focusCell: null,
       intentRevision: null, busy: false, message: '', zoom: 1, areaMode: null, gridVisible: false,
+      targetsVisible:true,damageVisible:true,
       previewWeaponKey: null, phaseSkip: null };
     const shell = document.createElement('div');
     shell.className = 'v2-shell';
     shell.innerHTML = `
       <header class="v2-head"><div><span class="v2-label">G.O.B.L.I.N. / Mission</span><h1 id="v2-mission"></h1><p id="v2-objective"></p></div><div><span class="v2-label" id="v2-profile"></span><strong id="v2-phase" role="status" aria-live="polite"></strong><p id="v2-turn"></p></div></header>
-      <div class="v2-layout"><aside class="v2-own"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card v2-systems-card"><details id="v2-system-details" open><summary class="v2-label" id="v2-systems-label"></summary><div id="v2-systems"></div></details></section></aside><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><div class="v2-area-controls" role="group" id="v2-area-controls"><button type="button" data-area="movement"></button><button type="button" data-area="fire"></button><button type="button" data-area="los"></button><button type="button" id="v2-area-grid"></button></div><button type="button" id="v2-undo"></button></div><div class="v2-map-tools" role="group" id="v2-map-tools"><button type="button" id="v2-zoom-out">−</button><button type="button" id="v2-zoom-in">+</button><button type="button" id="v2-zoom-fit"></button><button type="button" id="v2-zoom-center"></button><div class="v2-weapon-controls" id="v2-weapon-controls" hidden></div></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-area-legend" class="v2-area-legend" role="status"></p><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main><aside class="v2-target"><section class="v2-card"><details id="v2-intel-details" open><summary class="v2-label" id="v2-intel-label"></summary><div id="v2-intel"></div></details></section><section class="v2-card v2-log-card"><details id="v2-log-details" open><summary class="v2-label" id="v2-log-label"></summary><div id="v2-log"></div></details></section></aside></div><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target" hidden><div class="v2-command-body" id="v2-command-body"><div class="v2-command-head"><span class="v2-label" id="v2-command-target"></span><p id="v2-command-intel"></p><div class="v2-weapon-controls" id="v2-command-weapons" hidden></div></div><div class="v2-actions" id="v2-actions"></div></div><div class="v2-command-footer" id="v2-command-footer"></div></section>`;
+      <div class="v2-layout"><aside class="v2-own"><section class="v2-card"><span class="v2-label" id="v2-units-label"></span><div class="v2-units" id="v2-units"></div></section><section class="v2-card v2-systems-card"><details id="v2-system-details" open><summary class="v2-label" id="v2-systems-label"></summary><div id="v2-systems"></div></details></section></aside><main class="v2-card v2-map-card"><div class="v2-row"><div><span class="v2-label" id="v2-map-label"></span><strong id="v2-map-caption"></strong></div><button type="button" id="v2-undo"></button><div class="v2-area-controls" role="group" id="v2-area-controls"><button type="button" data-area="movement"></button><button type="button" data-area="fire"></button><button type="button" data-area="los"></button><button type="button" id="v2-display-toggle" aria-expanded="false" aria-controls="v2-display-controls" hidden></button><div id="v2-display-controls" class="v2-display-controls" role="group"><button type="button" id="v2-area-grid"></button><button type="button" id="v2-area-targets"></button><button type="button" id="v2-area-damage"></button></div></div></div><div class="v2-map-tools" role="group" id="v2-map-tools"><button type="button" id="v2-zoom-out">−</button><button type="button" id="v2-zoom-in">+</button><button type="button" id="v2-zoom-fit"></button><button type="button" id="v2-zoom-center"></button><div class="v2-weapon-controls" id="v2-weapon-controls" hidden></div></div><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-context"><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-area-legend" class="v2-area-legend" role="status"></p><p id="v2-message" class="v2-status" role="status"></p></div><div class="v2-controls"><button type="button" id="v2-phase-action"></button><button type="button" id="v2-pause"></button></div></main><aside class="v2-target"><section class="v2-card"><details id="v2-intel-details" open><summary class="v2-label" id="v2-intel-label"></summary><div id="v2-intel"></div></details></section><section class="v2-card v2-log-card"><details id="v2-log-details" open><summary class="v2-label" id="v2-log-label"></summary><div id="v2-log"></div></details></section></aside></div><section class="v2-card v2-command-card" id="v2-command-card" aria-labelledby="v2-command-target" hidden><div class="v2-command-body" id="v2-command-body"><div class="v2-command-head"><span class="v2-label" id="v2-command-target"></span><p id="v2-command-intel"></p><div class="v2-weapon-controls" id="v2-command-weapons" hidden></div></div><div class="v2-actions" id="v2-actions"></div></div><div class="v2-command-footer" id="v2-command-footer"></div></section>`;
     const terrainCard = document.createElement('section');
     terrainCard.className = 'v2-card';
     terrainCard.innerHTML = '<details id="v2-terrain-details" open><summary class="v2-label" id="v2-terrain-label"></summary><div id="v2-terrain-list"></div></details>';
@@ -20,6 +21,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     shell.querySelector('#v2-map').appendChild(nativeMap);
     document.body.classList.add('ui-v2-active');
     const at = selector => shell.querySelector(selector);
+    const displayControls=GoblinDisplayControls.create(at('#v2-area-controls'),{
+      disclosure:at('#v2-display-toggle'),panel:at('#v2-display-controls'),
+      buttons:[...at('#v2-area-controls').querySelectorAll('[data-area]'),at('#v2-area-grid'),
+        at('#v2-area-targets'),at('#v2-area-damage')]});
     const t = (key, params) => globalThis.GoblinLanguage?.t(key, params) || key;
     const core = () => globalThis.IronDustBrowserV2?.mode === 'ready';
     function addRosterArt(button, unit) {
@@ -32,7 +37,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function renderM1Markers(state, actor) {
       nativeMap.querySelectorAll('.target-ring,.unit-selection-ring,.focus-marker').forEach(node => node.remove());
-      M1UnitMarkers.render(nativeMap, state.markers, {actor, target:view.target, focus:view.focusCell, t});
+      M1UnitMarkers.render(nativeMap, state.markers, {actor, target:view.target, focus:view.focusCell, t,
+        targetsVisible:view.targetsVisible,damageVisible:view.damageVisible});
       const members=state.markers.objective?.members || [];
       const done=members.filter(member => member.state==='satisfied').length;
       let status=at('#v2-objective-members');
@@ -261,8 +267,14 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       render();
     }
     globalThis.GoblinUIV2 = Object.freeze({ project, query, previewFire, dispatch, undo, resetView, startView, focusUnit, notifyPhaseSkip,
-      get gridVisible() { return view.gridVisible; }, setGridVisible(value) { view.gridVisible = !!value; render(); },
+      get gridVisible() { return view.gridVisible; }, setGridVisible(value) { setViewFlag('gridVisible',value); },
+      get targetsVisible() { return view.targetsVisible; }, setTargetsVisible(value) { setViewFlag('targetsVisible',value); },
+      get damageVisible() { return view.damageVisible; }, setDamageVisible(value) { setViewFlag('damageVisible',value); },
       refresh: () => render() });
+    function setViewFlag(key,value){
+      view[key]=!!value;render();
+      globalThis.dispatchEvent(new Event('goblin-view-settings-change'));
+    }
 
     function clearContext() { view.target = null; view.intentRevision = null; view.message = ''; }
     const hexLabel = cell => `${String.fromCharCode(65 + cell.x)}-${String(cell.y + 1).padStart(2, '0')}`;
@@ -561,7 +573,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function freeRatioChipCenter(from, to, width, height, pixelScale, state) {
       const box = nativeMap.viewBox.baseVal;
-      const pins = globalThis.M1UnitMarkers?.obstacles(state.markers) || [];
+      const pins = globalThis.M1UnitMarkers?.obstacles(state.markers,{targetsVisible:view.targetsVisible}) || [];
       const occupied = [...state.units.filter(unit => !unit.embarkedOn), view.focusCell]
         .filter(cell => cell && Number.isFinite(cell.x) && Number.isFinite(cell.y))
         .map(cell => hexCenter(cell.x, cell.y));
@@ -589,6 +601,15 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const gridButton = at('#v2-area-grid');
       gridButton.textContent = t('v2.area.grid');
       gridButton.setAttribute('aria-pressed', String(view.gridVisible));
+      for(const [key,label] of [['targets','missionTargets'],['damage','damage']]){
+        const button=at(`#v2-area-${key}`);
+        button.textContent=t(`v2.display.${key}`);
+        button.setAttribute('aria-label',t(`v2.display.${label}`));
+        button.setAttribute('aria-pressed',String(view[`${key}Visible`]));
+      }
+      at('#v2-display-toggle').textContent=t('v2.display.group');
+      at('#v2-display-controls').setAttribute('aria-label',t('v2.display.group'));
+      displayControls.update();
       at('#v2-area-controls').setAttribute('aria-label', t('v2.area.controls'));
       const nativeGrid = document.querySelector('#grid-toggle');
       nativeGrid.setAttribute('aria-pressed', String(view.gridVisible));
@@ -933,6 +954,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     for (const button of at('#v2-area-controls').querySelectorAll('[data-area]'))
       button.onclick = () => { view.areaMode = activeAreaMode(project()) === button.dataset.area ? 'none' : button.dataset.area; render(); };
     at('#v2-area-grid').onclick = () => GoblinUIV2.setGridVisible(!view.gridVisible);
+    at('#v2-area-targets').onclick=()=>GoblinUIV2.setTargetsVisible(!view.targetsVisible);
+    at('#v2-area-damage').onclick=()=>GoblinUIV2.setDamageVisible(!view.damageVisible);
     at('#v2-undo').onclick = () => { const result = undo(); if (!result.ok) { view.message = result.reason; render(); } };
     at('#v2-phase-action').onclick = () => {
       view.phaseSkip = null; clearTimeout(view.phaseSkipTimer);
@@ -1051,6 +1074,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     document.addEventListener('click', event => {
       if (view.target && view.actorId && !event.target.closest?.('dialog') &&
           !at('#v2-command-card').contains(event.target) &&
+          !at('#v2-area-controls').contains(event.target) &&
           !mapPanel.contains(event.target) && !at('#v2-units').contains(event.target) &&
           !at('#v2-phase-action').contains(event.target)) {clearContext();render();}
     });
@@ -1161,6 +1185,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }, true);
     document.addEventListener('keydown', event => {
       startZoomPending = null;
+      if(displayControls.handleKeydown(event))return;
       if (document.body.classList.contains('v2-screen-open')) {
         if (event.key.toLowerCase() === 'f' || event.key.toLowerCase() === 'l') {
           event.preventDefault(); event.stopImmediatePropagation();

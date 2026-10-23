@@ -191,6 +191,27 @@ test('all 52 measured icon anchors keep exactly four reference pixels to the vis
   assert.ok(Math.abs((markers.pinLayout(guard).bounds.top-48)/scale-27.4375)<1e-10);
 });
 
+test('display flags hide only pins/segments globally while keeping status, rings and exact anchors',()=>{
+  const {document,map}=scene(),{markers,session}=adapter(document),units=raw();
+  units.find(unit=>unit.id==='guard').disabled=true;
+  units.find(unit=>unit.id==='ogre').ogreSystems.weapons.main.destroyed=1;
+  const data=markers.legacy(session(config(units)),units,'unchanged',null),before=JSON.stringify(data);
+  const actor=units.find(unit=>unit.id==='ogre'),target=units.find(unit=>unit.id==='core');
+  const t=key=>key,anchor=markers.pinLayout(data.units.find(unit=>unit.unitId==='core'));
+  for(const targetsVisible of [false,true])for(const damageVisible of [false,true]){
+    markers.render(map,data,{actor,target,focus:{x:1,y:1},t,targetsVisible,damageVisible});
+    const all=map.all();
+    assert.equal(all.filter(node=>node.attrs.class==='m1-objective-pin').length,targetsVisible?3:0);
+    assert.equal(all.filter(node=>node.attrs.class==='m1-damage-empty').length,damageVisible?21:0);
+    assert.equal(all.filter(node=>node.attrs.class==='m1-status').length,1);
+    assert.equal(all.filter(node=>node.attrs.class==='m1-weapon-damage').length,1);
+    for(const id of ['v2-actor-marker','v2-target-marker','v2-focus-marker'])assert.ok(map.querySelector('#'+id));
+    assert.equal(markers.obstacles(data,{targetsVisible}).length,targetsVisible?3:0);
+    assert.deepEqual(markers.pinLayout(data.units.find(unit=>unit.unitId==='core')),anchor);
+    assert.equal(JSON.stringify(data),before);
+  }
+});
+
 test('failed images use existing vector geometry; absent measured metadata creates no guessed pin',()=>{
   const {markers,visuals,context}=adapter();
   const events=[];context.Event=class{constructor(type){this.type=type}};

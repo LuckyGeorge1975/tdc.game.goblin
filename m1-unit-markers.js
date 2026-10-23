@@ -80,13 +80,13 @@
       bounds:{left:x+left/pin.width*width,top:y+top/pin.height*height,
         right:x+right/pin.width*width,bottom:y+bottom/pin.height*height}};
   }
-  function obstacles(data){
-    if(!data?.supported)return [];
+  function obstacles(data,{targetsVisible=true}={}){
+    if(!data?.supported||!targetsVisible)return [];
     return data.units.filter(unit=>unit.mapVisible&&data.objective.members
       .some(member=>member.unitId===unit.unitId&&member.state==='pending'))
       .map(pinLayout).filter(Boolean).map(layout=>layout.bounds);
   }
-  function render(map,data,{actor,target,focus,t}={}){
+  function render(map,data,{actor,target,focus,t,targetsVisible=true,damageVisible=true}={}){
     map.querySelector('#v2-m1-markers')?.remove();
     // Old UI-V2 layers may still exist during an in-place render transition.
     for(const id of ['v2-team-markers','v2-actor-marker','v2-target-marker','v2-focus-marker'])
@@ -98,7 +98,7 @@
       const c=center(unit.position),value=damage(unit);
       const label=`${unit.name} · ${t(unit.team==='player'?'ui.team.player':'ui.team.enemy')} · ${t(`v2.ui.${unit.status==='active'?'ready':unit.status}`)}`;
       const group=node('g',{'data-unit-id':unit.unitId,role:'img','aria-label':label});
-      if(unit.status!=='destroyed'&&value.segments){
+      if(damageVisible&&unit.status!=='destroyed'&&value.segments){
         const title=node('title');title.textContent=`${t(value.kind==='treads'?'v2.ui.treads':value.kind==='infantry-strength'?'v2.ui.strength':'v2.ui.hitPoints')} ${value.current}/${value.maximum}`;
         group.append(title);
         value.segments.forEach((fill,index)=>{
@@ -119,7 +119,7 @@
       if(unit.status!=='destroyed'&&value.destroyedWeapons>0)
         badge('×','m1-weapon-damage',46,-40,t('v2.ui.weaponDamage',{count:value.destroyedWeapons}));
       layer.append(group);
-      if(data.objective.members.some(member=>member.unitId===unit.unitId&&member.state==='pending')){
+      if(targetsVisible&&data.objective.members.some(member=>member.unitId===unit.unitId&&member.state==='pending')){
         const layout=pinLayout(unit);
         if(!layout)continue;
         const pin=node('image',{x:layout.x,y:layout.y,width:layout.width,height:layout.height,class:'m1-objective-pin',

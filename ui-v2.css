@@ -218,8 +218,15 @@ body.ui-v2-active #battlefield-map .hex.attack { stroke: transparent; stroke-wid
 #v2-terminal[hidden] { display: none; }
 .v2-status { color: var(--v2-danger-text); min-height: 1.4em; }
 .v2-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center; }
-.v2-area-controls { display: flex; flex-wrap: wrap; gap: 4px; }
-.v2-area-controls button { min-height: 44px; padding: 5px 8px; font-size: 13px; }
+.v2-area-controls { position: relative; display: flex; flex-wrap: wrap; flex: 1 1 100%; min-width: 0; gap: 4px; }
+.v2-area-controls button { min-width: 44px; min-height: 44px; max-width: 100%; padding: 5px 8px; font-size: 13px; overflow-wrap: anywhere; }
+.v2-display-controls { display: contents; }
+.v2-display-controls[hidden], #v2-display-toggle[hidden] { display: none !important; }
+.v2-area-controls[data-compact="true"] .v2-display-controls:not([hidden]) { display: flex; flex-wrap: wrap; flex-basis: 100%; min-width: 0; max-width: 100%; gap: 4px; padding: 5px; }
+.v2-area-controls[data-compact="true"] .v2-display-controls button { flex: 1 1 max-content; }
+.v2-control-measure { position: absolute; visibility: hidden; pointer-events: none; width: 0; height: 0; overflow: hidden; }
+.v2-control-measure-track { display: flex; width: max-content; gap: 4px; }
+.v2-control-measure button { flex: none; max-width: none; white-space: nowrap; }
 .v2-weapon-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; min-width: 0; }
 .v2-weapon-controls[hidden] { display: none; }
 #v2-map-tools .v2-weapon-controls { grid-column: 1 / -1; }

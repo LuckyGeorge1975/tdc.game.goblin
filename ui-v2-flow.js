@@ -570,7 +570,16 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         gridInput.checked = GoblinUIV2.gridVisible;
         gridInput.onchange = () => GoblinUIV2.setGridVisible(gridInput.checked);
         grid.append(gridInput, document.createTextNode(t('ui.settings.grid')));
-        content.append(language, grid, paragraph(t('ui.settings.note')));
+        const displayOptions=[];
+        for(const [key,label] of [['targets','missionTargets'],['damage','damage']]){
+          const row=document.createElement('label');row.className='v2-setting-check';
+          const input=document.createElement('input');input.type='checkbox';input.id=`v2-${key}`;
+          input.setAttribute('aria-label',t(`v2.display.${label}`));
+          input.checked=GoblinUIV2[`${key}Visible`];
+          input.onchange=()=>GoblinUIV2[key==='targets'?'setTargetsVisible':'setDamageVisible'](input.checked);
+          row.append(input,document.createTextNode(t(`v2.display.${key}`)));displayOptions.push(row);
+        }
+        content.append(language, grid, ...displayOptions, paragraph(t('ui.settings.note')));
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-options-back';
         footer.append(actions(back));
@@ -592,6 +601,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         ?.focus({ preventScroll: true });
     }
     document.querySelector('#v2-pause').onclick = enterPause;
+    globalThis.addEventListener('goblin-view-settings-change',()=>{
+      for(const key of ['grid','targets','damage']){
+        const input=surface.querySelector(`#v2-${key}`);
+        if(input)input.checked=GoblinUIV2[`${key}Visible`];
+      }
+    });
     new MutationObserver(() => { if (screen === 'levels') renderScreen(false); })
       .observe(document.querySelector('#scenario-select'), { childList: true });
     globalThis.addEventListener('goblin-v2-render', () => {
