@@ -200,11 +200,12 @@ body.ui-v2-active #battlefield-map .hex.attack { stroke: transparent; stroke-wid
 .v2-systems-card #v2-systems { display: grid; gap: 4px; margin-top: 8px; }
 .v2-system-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-top: 1px solid var(--v2-line); padding: 4px 0; font-size: 13px; }
 .v2-system-row span { overflow-wrap: anywhere; }
-.v2-command-card { position: fixed; z-index: 20; width: min(340px, calc(100vw - 16px)); max-height: min(68dvh, 500px); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 8px; box-shadow: 0 8px 30px #000b; }
+.v2-command-card { position: fixed; z-index: 20; width: min(340px, calc(100vw - 16px)); max-height: min(68dvh, 500px); display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 8px; box-shadow: 0 8px 30px #000b; }
 .v2-command-card[hidden] { display: none !important; }
 .v2-command-card.v2-command-panel { right: max(8px, env(safe-area-inset-right)); top: max(72px, env(safe-area-inset-top)); max-height: calc(100dvh - 84px); }
 .v2-command-head p { font-size: 13px; overflow-wrap: anywhere; }
-.v2-actions { display: grid; align-content: start; gap: 8px; min-height: 0; overflow-y: auto; }
+.v2-command-body { min-height: 0; overflow-y: auto; }
+.v2-actions { display: grid; align-content: start; gap: 8px; margin-top: 8px; }
 .v2-actions button { width: 100%; text-align: left; min-height: 48px; }
 .v2-command-footer { display: flex; gap: 8px; border-top: 1px solid var(--v2-line); padding-top: 8px; }
 .v2-command-footer button { flex: 1; min-width: 0; }
