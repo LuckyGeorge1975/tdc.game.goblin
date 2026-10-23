@@ -156,6 +156,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const currentPanel = surface.querySelector('.v2-screen-panel');
       if (currentPanel) scrollMemory.set(previous, {
         panel: currentPanel.scrollTop,
+        options: currentPanel.querySelector('.v2-options-main')?.scrollTop || 0,
         list: currentPanel.querySelector('.v2-level-list, .v2-library-list')?.scrollTop || 0,
         libraryLayout: currentPanel.querySelector('.v2-library-layout')?.scrollTop || 0
       });
@@ -388,6 +389,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const currentPanel = surface.querySelector('.v2-screen-panel');
       if (!focus && currentPanel?.dataset.screen === screen) scrollMemory.set(screen, {
         panel: currentPanel.scrollTop,
+        options: currentPanel.querySelector('.v2-options-main')?.scrollTop || 0,
         list: currentPanel.querySelector('.v2-level-list, .v2-library-list')?.scrollTop || 0,
         libraryLayout: currentPanel.querySelector('.v2-library-layout')?.scrollTop || 0
       });
@@ -551,9 +553,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           .then(copy => { if (notice.isConnected) notice.textContent = copy; })
           .catch(() => { if (notice.isConnected) notice.textContent = t('v2.ui.legalUnavailable'); });
       } else if (screen === 'options') {
+        panel.classList.add('v2-options-panel');
         const header = document.createElement('header'); header.className = 'v2-screen-header';
         header.append(heading(t('ui.nav.settings')));
-        const content = document.createElement('div'); content.className = 'v2-screen-main';
+        const content = document.createElement('div'); content.className = 'v2-screen-main v2-options-main';
         const language = document.createElement('label');
         language.textContent = t('ui.settings.language');
         const languageSelect = document.createElement('select'); languageSelect.id = 'v2-language';
@@ -588,6 +591,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const savedScroll = scrollMemory.get(screen);
       if (savedScroll) {
         panel.scrollTop = savedScroll.panel;
+        const options=panel.querySelector('.v2-options-main');
+        if(options)options.scrollTop=savedScroll.options || 0;
         const list = panel.querySelector('.v2-level-list, .v2-library-list');
         if (list) list.scrollTop = savedScroll.list;
         const libraryLayout = panel.querySelector('.v2-library-layout');
