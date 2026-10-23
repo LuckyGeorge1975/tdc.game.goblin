@@ -15,6 +15,8 @@
   const fixedAssetPrefix=`assets/unit-art/sets/${fixedStyle}/`;
   const mapIconPrefix=`${fixedAssetPrefix}map-icons/`;
   const mapIconSize=Math.sqrt(3)*34*100/112;
+  const failedMapAssets=new Set();
+  const pendingMapAssets=new Map();
 
   function register(key,descriptor){
     if(!key||!descriptor)throw new Error('Visual key and descriptor are required.');
@@ -34,7 +36,8 @@
       return `${fixedAssetPrefix}${view}/${key}@${format==='webp'?'1024':'768'}.${format}`;
     }
     const side=unit?.team==='player'?'own':unit?.team==='enemy'?'enemy':null;
-    return side?`${mapIconPrefix}${side}/${key}.webp`:null;
+    const asset=side?`${mapIconPrefix}${side}/${key}.webp`:null;
+    return failedMapAssets.has(asset)?null:asset;
   }
 
   const terrainKeys=new Set(['open-ground','rubble-field','mountain','ridge','forest','marsh','water','river','road','bridge','urban','crater']);
@@ -48,9 +51,15 @@
 
   function currentStyle(){return fixedStyle}
 
+  function resolveVector(unit){
+    return [unit.visualKey,unit.id,unit.type].map(key=>registry.get(key))
+      .find(visual=>visual&&visual.kind!=='asset')||defaults;
+  }
+
   function resolve(unit){
     const mapAsset=assetFor(unit);
     if(mapAsset)return {kind:'asset',asset:mapAsset,size:mapIconSize};
+    if(artKey(unit)&&['player','enemy'].includes(unit.team))return resolveVector(unit);
     const explicit=unit.visualKey&&registry.get(unit.visualKey);
     if(explicit&&(explicit.kind!=='asset'||explicit.asset?.startsWith(fixedAssetPrefix)))return explicit;
     const registered=registry.get(unit.id)||registry.get(unit.type);
@@ -70,8 +79,42 @@
     return (shapes[shape]||shapes.hex).map(([x,y])=>`${c.x+x*scale},${c.y+y*scale}`).join(' ');
   }
 
-  function draw(group,unit,center,{ns,color,selected=false}={}){
-    const visual=resolve(unit),namespace=ns||'http://www.w3.org/2000/svg';
+  function watchMapImage(image,asset,fallback){
+    if(failedMapAssets.has(asset)){fallback();return false}
+    let pending=pendingMapAssets.get(asset);
+    if(!pending)pendingMapAssets.set(asset,pending=new Set());
+    const cleanup=()=>{pending.delete(fallback);if(!pending.size)pendingMapAssets.delete(asset)};
+    pending.add(fallback);
+    image.onload=cleanup;
+    image.onerror=()=>{
+      failedMapAssets.add(asset);
+      const callbacks=[...(pendingMapAssets.get(asset)||[])];
+      pendingMapAssets.delete(asset);
+      callbacks.forEach(callback=>callback());
+    };
+    return true;
+  }
+
+  function iconElement(unit,className=''){
+    const vector=()=>{
+      const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('viewBox','-24 -24 48 48');
+      svg.setAttribute('aria-hidden','true');
+      svg.setAttribute('class',className);
+      draw(svg,unit,{x:0,y:0},{color:unit.team==='enemy'?'#e59191':'#9dc8ba',vectorOnly:true});
+      return svg;
+    };
+    const asset=assetFor(unit);
+    if(!asset)return vector();
+    const image=document.createElement('img');
+    image.alt='';image.className=className;
+    watchMapImage(image,asset,()=>image.replaceWith(vector()));
+    image.src=asset;
+    return image;
+  }
+
+  function draw(group,unit,center,{ns,color,selected=false,vectorOnly=false}={}){
+    const visual=vectorOnly?resolveVector(unit):resolve(unit),namespace=ns||'http://www.w3.org/2000/svg';
     if(visual.asset){
       if(selected){
         const ring=document.createElementNS(namespace,'polygon');
@@ -83,7 +126,6 @@
         group.appendChild(ring);
       }
       const size=visual.size||42,image=document.createElementNS(namespace,'image');
-      image.setAttribute('href',visual.asset);
       image.setAttribute('x',center.x-size/2);
       image.setAttribute('y',center.y-size/2);
       image.setAttribute('width',size);
@@ -91,6 +133,12 @@
       image.setAttribute('preserveAspectRatio','xMidYMid meet');
       image.classList.add('unit-artwork');
       group.appendChild(image);
+      watchMapImage(image,visual.asset,()=>{
+        const replacement=document.createElementNS(namespace,'g');
+        draw(replacement,unit,center,{ns:namespace,color,selected,vectorOnly:true});
+        image.replaceWith(replacement);
+      });
+      image.setAttribute('href',visual.asset);
       return image;
     }
     const shape=document.createElementNS(namespace,'polygon');
@@ -128,5 +176,5 @@
   register('light-tank',{shape:'tracked',label:'R'});
   register('guard',{shape:'tracked',label:'G'});
 
-  root.UnitVisuals=Object.freeze({register,resolve,draw,setAsset,polygonPoints,styles,artKey,assetFor,terrainAssetFor,setStyle,currentStyle});
+  root.UnitVisuals=Object.freeze({register,resolve,draw,iconElement,watchMapImage,setAsset,polygonPoints,styles,artKey,assetFor,terrainAssetFor,setStyle,currentStyle});
 })(globalThis);

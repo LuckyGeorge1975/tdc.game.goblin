@@ -11,13 +11,51 @@ const manifest = JSON.parse(readFileSync(new URL('../assets/unit-art/manifest.js
 const receipt = JSON.parse(readFileSync(new URL('../assets/unit-art/map-icons-source.json', import.meta.url), 'utf8'));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 
-function visuals(file) {
-  const context = vm.createContext({});
+function visuals(file, document) {
+  const context = vm.createContext({document});
   vm.runInContext(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'), context);
   return context.UnitVisuals;
 }
 
 for (const source of ['unit-visuals.js', 'src/legacy/scripts/unit-visuals.js']) {
+  test(`${source} replaces failed map and list images and suppresses later attempts`, () => {
+    const makeNode = tag => ({tag,children:[],attributes:{},classList:{add(){}},
+      setAttribute(key,value){this.attributes[key]=value},
+      appendChild(node){this.children.push(node);return node},
+      replaceWith(node){this.replacement=node}});
+    const document={createElement:makeNode,createElementNS:(_,tag)=>makeNode(tag)};
+    const art=visuals(source,document);
+    const unit={id:'ogre',type:'ogre',name:'GOBLIN SIEGEBREAKER',team:'player',icon:'G'};
+    const asset=art.assetFor(unit);
+    const group=makeNode('g');
+    const map=art.draw(group,unit,{x:40,y:40},{color:'#fff',selected:true});
+    const list=art.iconElement(unit,'v2-roster-art');
+    assert.equal(map.tag,'image');assert.equal(list.tag,'img');
+    // Both missing HTTP resources and undecodable image bodies raise image error.
+    list.onerror();
+    assert.equal(map.replacement.tag,'g');
+    assert.equal(map.replacement.children[0].tag,'polygon');
+    assert.equal(list.replacement.tag,'svg');
+    assert.equal(list.replacement.children[0].tag,'polygon');
+    assert.equal(list.replacement.children[1].textContent,'G');
+    assert.equal(art.assetFor(unit),null);
+    assert.equal(art.resolve(unit).shape,'fortress');
+    for(let i=0;i<8;i++){
+      assert.equal(art.draw(makeNode('g'),unit,{x:0,y:0}).tag,'polygon');
+      assert.equal(art.iconElement(unit).tag,'svg');
+    }
+    assert.equal(art.assetFor({...unit,team:'enemy'}),asset.replace('/own/','/enemy/'));
+    assert.equal(art.assetFor(unit,'library','webp'),`${prefix}library/goblin-siegebreaker@1024.webp`);
+    const healthy=art.iconElement({...unit,team:'enemy'});
+    healthy.onload();
+    assert.equal(healthy.replacement,undefined);
+    assert.equal(art.resolve({...unit,team:'enemy'}).kind,'asset');
+    const corrupt=art.iconElement({id:'infantry',name:'INFANTRY SQUAD',team:'player'});
+    corrupt.onerror();
+    assert.equal(corrupt.replacement.children[0].tag,'polygon');
+    assert.equal(art.iconElement({id:'infantry',name:'INFANTRY SQUAD',team:'player'}).tag,'svg');
+  });
+
   test(`${source} exposes only the fixed runtime set and rejects foreign styles`, () => {
     const art = visuals(source);
     assert.deepEqual(Array.from(art.styles, item => item.id), [fixed]);

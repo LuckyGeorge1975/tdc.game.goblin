@@ -7,7 +7,12 @@
   function replaceWithArt(container,unit,view='icons'){
     const asset=view==='icons'?(UnitVisuals.resolve(unit).asset||null)
       :UnitVisuals.assetFor(unit,view);
-    if(!asset||!container)return;
+    if(!container)return;
+    if(view==='icons'){
+      container.replaceChildren(UnitVisuals.iconElement(unit,'unit-art-image'));
+      return;
+    }
+    if(!asset)return;
     const image=document.createElement('img');
     image.src=asset;
     image.alt='';

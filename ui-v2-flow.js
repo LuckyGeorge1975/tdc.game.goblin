@@ -122,12 +122,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const artwork = UnitVisuals.assetFor(unit);
         if (artwork) {
           const image = document.createElementNS(svg.namespaceURI, 'image');
-          image.setAttribute('href', artwork);
           image.setAttribute('x', cx - 12); image.setAttribute('y', cy - 12);
           image.setAttribute('width', 24); image.setAttribute('height', 24);
           image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
           image.setAttribute('pointer-events', 'none');
           svg.append(image);
+          UnitVisuals.watchMapImage(image, artwork, () => image.remove());
+          image.setAttribute('href', artwork);
         }
       }
       const caption = document.createElement('figcaption');
@@ -510,11 +511,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           const item = button(libraryName(entry), () => openLibraryEntry(index), 'v2-library-choice');
           item.id = `v2-library-${libraryAssetId(entry)}`;
           item.setAttribute('aria-current', index === libraryIndex ? 'true' : 'false');
-          const asset = UnitVisuals.resolve(entry).asset;
-          if (asset) {
-            const img = document.createElement('img'); img.src = asset; img.alt = '';
-            item.prepend(img);
-          }
+          if (UnitVisuals.resolve(entry).asset ||
+              (UnitVisuals.artKey(entry) && ['player', 'enemy'].includes(entry.team)))
+            item.prepend(UnitVisuals.iconElement(entry, 'v2-library-map-icon'));
           list.append(item);
         });
         layout.append(list);

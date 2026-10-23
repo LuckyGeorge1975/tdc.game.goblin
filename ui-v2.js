@@ -23,13 +23,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const t = (key, params) => globalThis.GoblinLanguage?.t(key, params) || key;
     const core = () => globalThis.IronDustBrowserV2?.mode === 'ready';
     function addRosterArt(button, unit) {
-      const asset = UnitVisuals.assetFor(unit);
-      if (!asset) return;
-      const image = document.createElement('img');
-      image.src = asset;
-      image.alt = '';
-      image.className = 'v2-roster-art';
-      button.prepend(image);
+      button.prepend(UnitVisuals.iconElement(unit, 'v2-roster-art'));
     }
 
     function revision() {
