@@ -207,6 +207,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       GoblinUIV2.resetView();
       show('play');
       releasePause();
+      GoblinUIV2.startView();
     }
     async function goToLevels() {
       if (GameDialogs.isOpen()) return;
@@ -247,6 +248,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       GoblinUIV2.resetView();
       show('play');
       releasePause();
+      GoblinUIV2.startView();
     }
     function libraryAssetId(entry) { return UnitVisuals.artKey(entry); }
     function libraryName(entry) {

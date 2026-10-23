@@ -206,6 +206,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         legal: true, ratioCategory, meaning: 'crt-attack-effective-defense'});
     }
     function dispatch(command, expectedRevision) {
+      startZoomPending = null;
       if (core()) {
         if (view.busy || expectedRevision !== revision()) return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
         const check = query(command);
@@ -251,6 +252,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       return { ok: true };
     }
     function resetView() {
+      startZoomPending = null;
       view.actorId = null; view.infoCell = null; view.focusCell = null; clearContext();
       view.zoom = 1; view.areaMode = null; view.previewWeaponKey = null;
       fireZoomPhase = null;
@@ -258,7 +260,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
     }
-    globalThis.GoblinUIV2 = Object.freeze({ project, query, previewFire, dispatch, undo, resetView, focusUnit, notifyPhaseSkip,
+    globalThis.GoblinUIV2 = Object.freeze({ project, query, previewFire, dispatch, undo, resetView, startView, focusUnit, notifyPhaseSkip,
       get gridVisible() { return view.gridVisible; }, setGridVisible(value) { view.gridVisible = !!value; render(); },
       refresh: () => render() });
 
@@ -392,6 +394,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       positionCommandMenu(state);
     }
     function chooseActor(id) {
+      startZoomPending = null;
       const unit = (core() ? project().units : units).find(item => item.id === id && item.team === 'player' && item.hp > 0);
       view.actorId = unit?.id || null;
       view.areaMode = null; view.previewWeaponKey = null;
@@ -411,6 +414,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       centerOnHex(hex);
     }
     function chooseHex(x, y) {
+      startZoomPending = null;
       const roster = core() ? project().units : units;
       const unit = roster.find(item => item.hp > 0 && !item.embarkedOn && item.x === x && item.y === y);
       const actor = roster.find(item => item.id === view.actorId);
@@ -428,6 +432,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const areaCache = { key: null, value: null };
     let areaPhase = null;
     let fireZoomPhase = null;
+    let startZoomMission = null, startZoomPending = null;
     function syncAreaPhase(state) {
       const key = `${state.phase}:${state.turnPhase}`;
       if (areaPhase !== key) { view.areaMode = null; view.previewWeaponKey = null; areaPhase = key; }
@@ -960,6 +965,30 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const actor = state.units.find(unit => unit.id === view.actorId && unit.hp > 0);
       if (actor) centerOnHex(nativeMap.querySelector(`.hex[data-x="${actor.x}"][data-y="${actor.y}"]`));
     }
+    function startView() {
+      const state = project(), binding = state.markers?.binding;
+      if (!binding) return;
+      const key = JSON.stringify([binding.scenarioId, binding.profileId, binding.sessionId, binding.epoch]);
+      if (startZoomMission === key) return;
+      startZoomMission = key;
+      if (!matchMedia('(max-width: 599px), (max-height: 500px)').matches) return;
+      const actor = state.units.find(unit => unit.team === 'player' && unit.hp > 0 && !unit.embarkedOn);
+      if (!actor) return;
+      chooseActor(actor.id);
+      const request = { key, actorId:actor.id, revision:revision() };
+      startZoomPending = request;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (startZoomPending !== request) return;
+        startZoomPending = null;
+        if (startZoomMission !== request.key || view.actorId !== request.actorId ||
+            revision() !== request.revision || GameDialogs.isOpen() || document.body.classList.contains('v2-screen-open') ||
+            !mapPanel.clientWidth || !mapPanel.clientHeight) return;
+        zoomOnFireEntry(52);
+        render();
+        centerSelectedActor(project());
+        showMapCard();
+      }));
+    }
     function fireZoomEntry(state) {
       if (state.phase !== 'player' || state.turnPhase !== 'fire' || state.gameOver ||
           activeAreaMode(state) !== 'fire' || !mapPanel.clientWidth || !mapPanel.clientHeight) return null;
@@ -1038,6 +1067,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function setZoom(value, clientX = mapPanel.getBoundingClientRect().left + mapPanel.clientWidth / 2,
       clientY = mapPanel.getBoundingClientRect().top + mapPanel.clientHeight / 2) {
+      startZoomPending = null;
       const next = Math.max(1, Math.min(4, value));
       if (next === view.zoom) return;
       const point = nativeMap.createSVGPoint();
@@ -1052,9 +1082,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     at('#v2-zoom-out').onclick = () => setZoom(view.zoom / 1.25);
     at('#v2-zoom-in').onclick = () => setZoom(view.zoom * 1.25);
-    function fitMap() { view.zoom = 1; applyMapSize(); mapPanel.scrollTo(0, 0); render(); }
+    function fitMap() { startZoomPending = null; view.zoom = 1; applyMapSize(); mapPanel.scrollTo(0, 0); render(); }
     at('#v2-zoom-fit').onclick = fitMap;
     at('#v2-zoom-center').onclick = () => {
+      startZoomPending = null;
       const actor = project().units.find(unit => unit.id === view.actorId);
       if (actor) centerOnHex(nativeMap.querySelector(`.hex[data-x="${actor.x}"][data-y="${actor.y}"]`));
     };
@@ -1063,6 +1094,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       return Math.hypot(first.x - second.x, first.y - second.y);
     }
     mapPanel.addEventListener('pointerdown', event => {
+      startZoomPending = null;
       if (view.target && view.actorId) {
         clearContext(); render(); suppressTapUntil = performance.now() + 500;
       }
@@ -1111,6 +1143,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     window.addEventListener('pointercancel', endPointer);
     window.addEventListener('blur', () => { for (const pointer of pointers.values()) clearTimeout(pointer.timer); pointers.clear(); pinch = null; });
     mapPanel.addEventListener('wheel', event => {
+      startZoomPending = null;
       event.preventDefault();
       setZoom(view.zoom * (event.deltaY < 0 ? 1.1 : 0.9), event.clientX, event.clientY);
       if (view.target && view.actorId) positionCommandMenu({units:core()?IronDustBrowserV2.view.units:units});
@@ -1127,6 +1160,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (cell) chooseHex(cell.x, cell.y);
     }, true);
     document.addEventListener('keydown', event => {
+      startZoomPending = null;
       if (document.body.classList.contains('v2-screen-open')) {
         if (event.key.toLowerCase() === 'f' || event.key.toLowerCase() === 'l') {
           event.preventDefault(); event.stopImmediatePropagation();
