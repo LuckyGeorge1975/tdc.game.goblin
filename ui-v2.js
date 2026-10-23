@@ -270,7 +270,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       get gridVisible() { return view.gridVisible; }, setGridVisible(value) { setViewFlag('gridVisible',value); },
       get targetsVisible() { return view.targetsVisible; }, setTargetsVisible(value) { setViewFlag('targetsVisible',value); },
       get damageVisible() { return view.damageVisible; }, setDamageVisible(value) { setViewFlag('damageVisible',value); },
-      refresh: () => render() });
+      refresh: () => { areaCache.key = null; render(); } });
     function setViewFlag(key,value){
       view[key]=!!value;render();
       globalThis.dispatchEvent(new Event('goblin-view-settings-change'));
