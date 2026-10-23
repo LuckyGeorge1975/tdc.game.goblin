@@ -2,6 +2,37 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## Build 0.1.26 · lokales Releasepaket, keine Veröffentlichung
+
+| Feld | Stand am 23.10.2026 |
+|---|---|
+| Version | `0.1.26` |
+| Build | `26` |
+| Status | `release-candidate`; `releasedAt:2026-10-23` ist das Paketdatum, kein Deploynachweis |
+| Öffentlich veröffentlichte Basis | `v0.1.25` auf `1f52b2dfabd694c84726e9401460794caad79ca5`; Remote-main und annotiertes Tag frisch bestätigt, öffentliche Pages-release.js weiterhin Build 25 |
+| Rückfallpunkt | Bei einer späteren freigegebenen Veröffentlichung bleibt das unveränderte `v0.1.25` erhalten; bisheriger Rückfallpunkt von Build 25 ist `v0.1.24` auf `ceaf301c99ec35623dcf3dd323f9a7d7ee69137d` |
+| Fester geprüfter Runtimestand | `74e594d4627598898b9fb81e02881c427dda6497`, Branch `codex/ui-v2-library-enemy`, Checkout `tdc.game.ogre-release-integration` |
+| Paketumfang | Release-/Cache-/Fallback-Buildanzeige, Changelog, README/Screenshot, dieser Handoff sowie additive Notices v19, datierter Herkunfts-/Clearance-Zusatz, 118-Dateien-Matrix und Berichtsregister; keine Spiel-, Regel-, Session-, RNG-, Assetdesign- oder Contentpinänderung |
+| Cacheparameter | `release.js?v=26`, `ui-v2.js?v=23`; die UI-Datei selbst bleibt gegenüber `74e594d` unverändert |
+| Regression | `goblin-nbg.15.1`: einmalige volle Suite 453/453 PASS, 71 Assethashes, 13 HTML-Einstiege/439 Ressourcen und 404 statische Modulbezüge; normaler Build benötigt kein privates Content-Repo |
+| Vollständige Partien | `goblin-nbg.9.1`: echte Core-Partie mit normalem Seed 8 und echte Legacy-Partie ohne gesetztes Math.random, jeweils Sieg Zug 3. Unterschiedliche tatsächlich gespielte Wege, keine Fixture-/Sieg-/Stateinjektion; Aktionenaudit und Grenzen im QA-Handoff |
+| Gezielte Übernahmen | K9 `goblin-nbg.14` und begrenzte Bereinigung `goblin-nbg.17` auf diesem Runtimecommit mit ausgewiesenen Grenzen abgenommen; insbesondere Pause/FR/Resume und Bereichs-/CRT-Anzeige unabhängig nachgeprüft |
+| README-Aufnahme | Atlas Proving Grounds, französische Oberfläche, echter Runtime `74e594d`, 1440 × 900; keine zusätzliche Atlas-Vollpartie. Sichtbare Karte, eigene/gegnerische Einheiten, Zielnadeln und Bewegungskosten |
+| Bildherkunft | Root-QA `.tools/playtest-nbg-9-1/readme-atlas-map-74e594d.png`, unveränderte Kopie der echten Atlas-Aufnahme aus `.14.10-rest`; siehe `goblin-nbg.9.1` |
+| Bildableitung | [docs/images/field-test-0.1.26-atlas.webp](../docs/images/field-test-0.1.26-atlas.webp), verlustfreies RGB-WebP, 471.428 Byte statt PNG 655.564 Byte; gleiche Auflösung und alle RGB-Pixel identisch |
+| Bildhashes SHA-256 | Quell-PNG `bdc6705bab2dd38c82d48672c4b97d741baf39d1fd4e0cc58d279f809dc93ef8`; Ableitung `905446b87843644946910939d4e64d35f10767f44d2cf779f3f43dbd09cb100d` |
+| Contentquelle | Aktueller Remote-main `2fdce6ac1be30e8b2a360250b37724586469e71c` lesend geprüft; vorhandene feste Export-/Implementierungspins unverändert. Keine Vollständigkeits- oder Rechtefreigabe daraus abgeleitet |
+| Datierter Contentnachtrag | [Notices v19](../docs/CONTENT-NOTICES.md), [Clearance-Zusatz](CONTENT-CLEARANCE-UI-0.1.26-2026-10-23.md), [118-Dateien-Pfad-/Hashmatrix](CONTENT-PROVENANCE-0.1.26.json); 52 Mapicons, 2 Pins, 12 Terrainicons, 52 Gegner-Library-Derivate. Vorhandene Receipts/Master bleiben unverändert, Legal-Endreview offen |
+| Offene Releasegates | Unabhängiger Paket-/Build-/Bildreview und finaler Einstiegssmoke auf festem Paketcommit; Content-/Legal-Delta `goblin-nbg.9.3`; danach gesonderte Nutzerentscheidung. Kein Push, Tag oder Deploy in diesem Auftrag |
+| Bekannte Grenzen | Reale Hardware/Ergonomie `goblin-wtg`, historische Standard-Legacy-FR320-Grenze `goblin-5an`, nicht universell geprüfte Dichte-/Rand-/Terrainkombinationen und lokale Performancebelege mit begrenztem Scope; kein pauschaler Gesamt-PASS |
+| Sicherung/Neucheckout | `goblin-j0k`/Mastervollständigkeit und Wiederherstellungstest bleiben offen; lokaler Paketcommit ist kein unabhängiges Backup. Unit-Art-/Masterbranch nicht pushen |
+
+Die Runtimebelege gelten für die oben genannte feste SHA und ihren dokumentierten Umfang. Ihre Übernahme auf den Paketcommit setzt den unabhängigen Nachweis voraus, dass außer den hier genannten Metadaten und der README-Abbildung keine Runtime geändert wurde. Der Paketcommit wird nach Erstellung in `goblin-nbg.9.2` festgehalten; dieses Dokument behauptet keine selbstreferenzielle Commit-ID. Das vorgesehene `tag:v0.1.26` in release.js ist keine existierende Gitreferenz und keine Veröffentlichungsfreigabe.
+
+### Historischer Handoff Build 25
+
+Die folgende Übergabe bleibt als damaliger lokaler Vorbereitungsstand erhalten. Ihr späterer Veröffentlichungsabschluss ist in `goblin-b22.7` belegt: Workflow 39570974873 erfolgreich, Commit `1f52b2dfabd694c84726e9401460794caad79ca5`, Tag `v0.1.25`, unabhängige öffentliche Pages-Prüfung bestanden. Die früheren Aussagen „noch nicht ausgeliefert“ beschreiben den damaligen Handoffzeitpunkt.
+
 ## UI V2 · Build 25 zur Veröffentlichung freigegeben, noch nicht ausgeliefert
 
 | Feld | Stand am 21.10.2026 |

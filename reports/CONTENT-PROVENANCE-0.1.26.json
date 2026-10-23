@@ -1,0 +1,1205 @@
+{
+  "schemaVersion": 1,
+  "releaseCandidate": "0.1.26",
+  "checkedRuntime": "74e594d4627598898b9fb81e02881c427dda6497",
+  "date": "2026-10-23",
+  "scope": "Additive provenance mapping; existing receipts retained, no source import or rights guarantee",
+  "receipts": [
+    {
+      "path": "assets/unit-art/map-icons-source.json",
+      "sha256": "6cb5c86e14b483d63b94b31fc0c19de8f81dd3553d31665230358e61c7561f11"
+    },
+    {
+      "path": "assets/unit-art/objective-pins-source.json",
+      "sha256": "ef804d6fd8bec30a9cbd259b374ff7b3f9e081b12fe9cf325833df659147ae73"
+    },
+    {
+      "path": "assets/terrain-icons/manifest.json",
+      "sha256": "c4b80478ef64cb465dfe826978306b94c19a313976fe316b86489b49947ff688"
+    },
+    {
+      "path": "assets/unit-art/sets/02-technical-illustration/library-enemy/export-manifest.json",
+      "sha256": "5c25379b8266e9ac493b769aabc211916a1a73821838416d8ffc64722947901b"
+    }
+  ],
+  "files": [
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/goblin-siegebreaker-eigen.png",
+      "sourceSha256": "bf230e2f0e722257f99aa676211dba832447e04002579ed63fa6663b705820b9",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/goblin-siegebreaker.webp",
+      "runtimeSha256": "9b7077836b8dca998a923dbb5eb9c9f030bae4e13920f6779a21e77af5c87e03"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/goblin-siegebreaker-gegner.png",
+      "sourceSha256": "b1a86c93bbafe53f63f3c53958ec867cd52ec062802914c6fce48053fe4eec62",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/goblin-siegebreaker.webp",
+      "runtimeSha256": "b7f8d985363310506af3c4bbb1917cbdf1799c07ec2000f01d520e4612a20435"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/skimmer-scout-eigen.png",
+      "sourceSha256": "b8243341d8fe21e0d0a222938b25694f9d2387d98ac006bf2426cb6363f7218d",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/skimmer-scout.webp",
+      "runtimeSha256": "240fdf5e52d4a5947ae178d0899aea7cc010ec1671faac1e8d5638574758cffe"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/skimmer-scout-gegner.png",
+      "sourceSha256": "69485bbc320b9478b6aa12d78faec7cd50b6bc4b238ed8816ed9e71340d06bbe",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/skimmer-scout.webp",
+      "runtimeSha256": "2b0ba87e6782f989ddcfd75ab362babd8183505f76892ce0eed95257882fd99d"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/rocket-artillery-eigen.png",
+      "sourceSha256": "d7f2529ee3286128fc364fa082a6b01609562787ca561fcf84619ce5f2e168ce",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/rocket-artillery.webp",
+      "runtimeSha256": "c89abaf5c7dd10b07dd032dd5abb1a8f81eb922b4756b6af534949b4f38dd79c"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/rocket-artillery-gegner.png",
+      "sourceSha256": "18bbca650243465cb88e4c4b2cd20aa26bf45c2dc7878ea188436a5a78d07be2",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/rocket-artillery.webp",
+      "runtimeSha256": "eeb16a58cc82cb01b99a1d432953c7e507999dab6fbad924f3373e53f6bccfd7"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/infantry-squad-eigen.png",
+      "sourceSha256": "c641dfcc9461e51cfed0fbffefe13da25f01a625af9c4a81aaff0596439b97f4",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/infantry-squad.webp",
+      "runtimeSha256": "8c11f6cde15a8f6c83475ea8684203b3d843055e45ccb110100273926e7c536a"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/infantry-squad-gegner.png",
+      "sourceSha256": "5fb92d731c8d1803eb360971a642274c98e5f9ed474935274ae8920d844d99c2",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/infantry-squad.webp",
+      "runtimeSha256": "2eceeaa97d3fc446698fcc0e6d75ce5e1d4fb21d56a3f88ef052ebae058afb91"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/assault-tank-eigen.png",
+      "sourceSha256": "1267dbcecf1f620fddc4eae7699a9471fefb13f408f2d95593257f845d1ab6db",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/assault-tank.webp",
+      "runtimeSha256": "e3bb50ddb066427358975848a3026affa5e09288302ac152e7049053104685aa"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/assault-tank-gegner.png",
+      "sourceSha256": "8052b9641ef1d2034b3117f417f421622312a84777d4eed6d140981dde489098",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/assault-tank.webp",
+      "runtimeSha256": "f19afd004a40b34645f71c3a0e5aaf2abb368fd8a3e996cb4cac7618addcb2ca"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/recon-tank-eigen.png",
+      "sourceSha256": "cd43a38cd58ac8134cd00a2a71d36c25c52f685a5f0fbe1312786064f0a384e6",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/recon-tank.webp",
+      "runtimeSha256": "e2831ebc1505d7638a69fcd3a410bafcf7c211771cb9bef8f077376dbfe497d3"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/recon-tank-gegner.png",
+      "sourceSha256": "6fa8db79ee8894595243d65819ac687d9b9b4a9f9ecdfa619cb929ec03a63c64",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/recon-tank.webp",
+      "runtimeSha256": "b035ea72647a2305f5f91bc0fdba05cfb3b49007e0efb9c359eda604e52c6530"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/siege-tank-eigen.png",
+      "sourceSha256": "7c2d97e3bd330dd7e13a00d970f92db0d935a6c7db0f5842268743a5c8306307",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/siege-tank.webp",
+      "runtimeSha256": "cdcfc191df2212f897fc2e062421090ed1e21d71284074caa0b98653f8fed158"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/siege-tank-gegner.png",
+      "sourceSha256": "ebcbaac8ce317cef9a3e44b48f2fe5cb6d453e30cdc99d5985e9067dd70a99ba",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/siege-tank.webp",
+      "runtimeSha256": "dc3173348e842b91a5a06d9e8c940d707a1116b0a3c2ba8b9d7f0f2d1cf6900a"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/long-range-battery-eigen.png",
+      "sourceSha256": "9520b0d5f6cd5501ef6e107d1cd5e23dc62c55f83df2c8e02662a4b888d9314e",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/long-range-battery.webp",
+      "runtimeSha256": "799ba1c5f457ed25d43f7617b30981340d2718c3614635761578d9f5dd90fb8f"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/long-range-battery-gegner.png",
+      "sourceSha256": "a349074af361c1db4f4ecc2fe8ced418a9d2dfbdf76cda6cdab9426a8794325a",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/long-range-battery.webp",
+      "runtimeSha256": "61508f3c4bdb95dd9b2e63b6b187e61615dc5c471fb1751f8d6f6a21d149eac3"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/mobile-siege-gun-eigen.png",
+      "sourceSha256": "3a94fc5c7ad42b8f449ddce14c8c3323ee8abb0685082ee35d87d899bc68a902",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/mobile-siege-gun.webp",
+      "runtimeSha256": "994dcdd8de12c336e1473f838c9fe5017650a45e3f4680ea117161a6993c8903"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/mobile-siege-gun-gegner.png",
+      "sourceSha256": "ee30417597456e556bd19f160ad424ad8549ffb9d56ba5e4eb6b6259d7bf23cf",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/mobile-siege-gun.webp",
+      "runtimeSha256": "3f86300403f359b9bc6d9a2713cfd21c41e1e12e62ff49e50096a81bd6bc6573"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/combat-skimmer-eigen.png",
+      "sourceSha256": "95abb59c97950e5a46df9967f869e6ede4f149cb8408c6614138e243d829c514",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/combat-skimmer.webp",
+      "runtimeSha256": "2d724e90c9755079a18a17e309ee73f64307c4ce7b05af412920f38f71d55f28"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/combat-skimmer-gegner.png",
+      "sourceSha256": "3215954577094314865be451e5ba06e32534b7adfd408883cb6b36434681e975",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/combat-skimmer.webp",
+      "runtimeSha256": "ac86b726f13d7f5fb463e270527622eb005b9f4dcf7ec104291538ec93a6f13a"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/light-skimmer-eigen.png",
+      "sourceSha256": "8944cf81ea90e292b930617222118b15f0bc538cf935b7817d5467714db283a7",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/light-skimmer.webp",
+      "runtimeSha256": "a8374715336b737d4e42c730cde985662370575bfdea2a20f573032bacbe9d0f"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/light-skimmer-gegner.png",
+      "sourceSha256": "cc659e69d9a668ec1393a7d311787bbfdae42b3893f579262eb7eea9465f72fc",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/light-skimmer.webp",
+      "runtimeSha256": "c83c7828576a769ea6b9104543c541138c4f4ef8c9f814e6e83b8bbaea689a3d"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/skimmer-carrier-eigen.png",
+      "sourceSha256": "a3f2e91b9478ee80036aa71c2676952987a67109d76213c22333ef53ef7a8253",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/skimmer-carrier.webp",
+      "runtimeSha256": "a4754c7f831ac43237c70d4b7913da358048822fced065310aed7eba2ee8b485"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/skimmer-carrier-gegner.png",
+      "sourceSha256": "10cdd8d3ff0cdde50261af0eb857d70fecbcbcada1c985ddff21d8872e362e76",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/skimmer-carrier.webp",
+      "runtimeSha256": "1ca3ffe1301d2c02db3acadd7e5d02cf2bc408d5178483ed0e39bdd6554009fb"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/strategic-missile-carrier-eigen.png",
+      "sourceSha256": "e79c923ab2a3a3168b18a8424250fc0162e2f03a9075dbef5f85483d541cc015",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/strategic-missile-carrier.webp",
+      "runtimeSha256": "53c1e7b897fb18040e55f0e549c7926a74d0cd3347b34c80163fe4eb788f0ce8"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/strategic-missile-carrier-gegner.png",
+      "sourceSha256": "3391438bcee8ddad5cafad9e976914dae352b1349c05a7f005cad5b54702d2df",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/strategic-missile-carrier.webp",
+      "runtimeSha256": "5d4d3cf30d6b15690fe707afd141307644afa2d54f5b2576d70fc1bcac724e04"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/artillery-drone-eigen.png",
+      "sourceSha256": "30c61f68bafb7e195d955c2924d8370f640e6596e470ede161428df0a02f6e68",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/artillery-drone.webp",
+      "runtimeSha256": "3b9ad3f0dffa3bb3688fb331684a512e66427ae11d610e37f7da35e7700c892e"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/artillery-drone-gegner.png",
+      "sourceSha256": "cc1ee21cc299be749f7dcfadfcdca643960ec2f6528ec835351d1b432267e7dd",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/artillery-drone.webp",
+      "runtimeSha256": "36e6838effb338b598a7d1862bb20028e7108f8e3a566137016424da751091fa"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/amphibious-infantry-eigen.png",
+      "sourceSha256": "c39eab0f13b3cdebe6c91cd6100978564b42e9c7023b61c1945981e00c3b41de",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/amphibious-infantry.webp",
+      "runtimeSha256": "f7d95d5e5a958688b6f5293900a645322e56af32e07bfeaacd4dba2aa31637c6"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/amphibious-infantry-gegner.png",
+      "sourceSha256": "db505507b1dc56d8c4e8d4e45fe433c2a66c90e187c44918fcb5fe14e387374e",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/amphibious-infantry.webp",
+      "runtimeSha256": "06f1307009fc233783361c67820a5028bb40a63765c6d85107679539a4733d94"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/field-engineers-eigen.png",
+      "sourceSha256": "e9639a4eede662a6c18d32bfa683907e722a1602d1fcf53a319cc8f023bfa995",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/field-engineers.webp",
+      "runtimeSha256": "d6982c75d2b774c297061365a8deff22c599f471d425b4069b9739b2355bf79a"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/field-engineers-gegner.png",
+      "sourceSha256": "0d57089805bff4b8a04ccdf39e0e8494eae7a6fd09c417701dd2777b480fd3ae",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/field-engineers.webp",
+      "runtimeSha256": "663c7a188a881efe54bdba888a21fcec0b2223135d466f98d6d506a6c00b2f99"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/local-defense-eigen.png",
+      "sourceSha256": "5703cf811a72c8b1305d341e0740505be3edaaa09e0e1cf7257ecf4ce2a15425",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/local-defense.webp",
+      "runtimeSha256": "30a19959b3172fc10100e01aad7683086b3f348faace2c980693dca367edcd9c"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/local-defense-gegner.png",
+      "sourceSha256": "a1814a7a4a89230c3f91c7f1d1227e7b9f9b0e11bdcf3d241ad227924c4c3b40",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/local-defense.webp",
+      "runtimeSha256": "60122ba1a24e25d44fa5722f700f5cf474aee86a133bb47636eb24241cb82ff5"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/command-hub-eigen.png",
+      "sourceSha256": "c2dd49aa8fd39279ec2504da04e7fd9fa5ff79010509e034c2c2f7ee6a158f0b",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/command-hub.webp",
+      "runtimeSha256": "6df29e6734854c44cbb2715bb1a8f5753716761a03ac934ec75a252f26e0ea4d"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/command-hub-gegner.png",
+      "sourceSha256": "07870352985785f37f152f6caf4c5b98db2b36f31bdcc2f58b80af21c2b91963",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/command-hub.webp",
+      "runtimeSha256": "31512922a73721338d00618696e1aae050ceea39c2eb149cf87df69f1a4e92a3"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/goblin-dreadnaught-eigen.png",
+      "sourceSha256": "a85b42dd1b48b09c845a3e2544900e6206689dbfba0575023be6a5a74d05cb45",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/goblin-dreadnaught.webp",
+      "runtimeSha256": "7f663ff736c00f15b8f89fde21af6c5b58340fb1ee7105fa9857e9e418919d5a"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/goblin-dreadnaught-gegner.png",
+      "sourceSha256": "fc5f9d4ca65f8565d66ff7bc348b09d8b45294a0de226bd133a85cf9582fab0b",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/goblin-dreadnaught.webp",
+      "runtimeSha256": "5ee66a7a444b56882c0aaf119ffe07d8df725d1bd5a9ed94674729774cc7f41e"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/forge-engineer-eigen.png",
+      "sourceSha256": "6cc68b2a975922567b5f2c4431dffae023cab94950deb99d919946e134de22f0",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/forge-engineer.webp",
+      "runtimeSha256": "45ea79a4f329fbbbada37c2753f7d80956498b7a2fa44e618e6c92eeaa235968"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/forge-engineer-gegner.png",
+      "sourceSha256": "27de4846435d74a5eab122e5743650639cc2c05980095e46d4f059ce732cbeeb",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/forge-engineer.webp",
+      "runtimeSha256": "533b273f61fec3b9c2938f6a0d5677057825d72851245575c2d145ab38d47ec2"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/phantom-platform-eigen.png",
+      "sourceSha256": "af6983b2b25dfcdfb42c64101bc5d1b5cd2b2d59ebdcaba4f121f34af7f697ed",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/phantom-platform.webp",
+      "runtimeSha256": "93e9cb1a0e6f7100720fc88b71a6373dbae7d6db51a8d7f7fd81669b79113363"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/phantom-platform-gegner.png",
+      "sourceSha256": "9ee29cff819a0e946ee1f65ee2a4592b9db06e44f7ff61498fae43ff85529b63",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/phantom-platform.webp",
+      "runtimeSha256": "1ddd3007098755e54a3a2cbf7dbd69f5c24f467b242139f4b0b203f15da07030"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/infantry-platoon-eigen.png",
+      "sourceSha256": "4355b31c8c0070dbca4d2f53bac2a192cb987329916e816fa8c44d4ce98211db",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/infantry-platoon.webp",
+      "runtimeSha256": "7e11aadf909cc15fba6726f63e6e326d8cb18b52d53e0406d5bed46deb72ade5"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/infantry-platoon-gegner.png",
+      "sourceSha256": "8ed46c9c555d557babe15fd1f9e2a81e6fa2340267b557dd0967545c45f064f5",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/infantry-platoon.webp",
+      "runtimeSha256": "cee8104d87eeb29dbe97b20aa59a9b365531e83c7f3008edd7cf08d3beb8e706"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/command-core-eigen.png",
+      "sourceSha256": "d3df302597dbf49d87bf6265f44a3def6b56e43417a24b435bc110a242cce4d4",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/command-core.webp",
+      "runtimeSha256": "c77fe9159a26a0c637f5150ef9033850014fdd19023641667d1622ef03125124"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/command-core-gegner.png",
+      "sourceSha256": "56682b95d32b2fe492ceb333f6ce57119cd4f979f9ffc8e4ad4097b4839a6b20",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/command-core.webp",
+      "runtimeSha256": "15ecbbc535b493ec05e8764828e89356a097ce441180716435f59245f7ba89f6"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/relay-node-eigen.png",
+      "sourceSha256": "9344b8195eb16043744ca5b42d05ee78690e36737c5c6695a09edaaf3ad3cf2c",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/relay-node.webp",
+      "runtimeSha256": "91e935fde131b11f0fe28379abd90f64878c2256799d83d50db38be187a4ce9c"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/relay-node-gegner.png",
+      "sourceSha256": "4847d9d39aef7c0a78858f78b13d68d81857d34c10f62b552ece9697760b7a0e",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/relay-node.webp",
+      "runtimeSha256": "ab801739b1deffd1b2379444b661e8d714c477e69c3030fa5aaaefd5e956f87d"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/guard-tank-eigen.png",
+      "sourceSha256": "a7386c4de09d2ddb37d384e38150c1eca17ed62625063072d077c2086a5efc47",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/guard-tank.webp",
+      "runtimeSha256": "af32498d9109f6808fa096f74cc4d719c31eb11c1ffec953456c1fbfb812986f"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/guard-tank-gegner.png",
+      "sourceSha256": "be92a0b79efa44ef4f8da4e9f95b03ee766351f4cd3a8dc8a717122b92a75979",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/guard-tank.webp",
+      "runtimeSha256": "12de2a38ab6921c87f01f8defecbcf5bcdbf7140a741173668ecb0fc86e60494"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/raider-skimmer-eigen.png",
+      "sourceSha256": "9cf3a2d4f115481fc2909ca30f1f3125c6448379dc3edbbd0628d3f8a5b265c8",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/own/raider-skimmer.webp",
+      "runtimeSha256": "af1ce9fa6cebb9a95017f316dcdd703f7bb6d05964953f509542329a419279f9"
+    },
+    {
+      "kind": "map-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/icons-ohne-schatten/raider-skimmer-gegner.png",
+      "sourceSha256": "eb6813a00e78e5dd4220156a228f8d7877131ccc448cc6c6f3d1e0123d58802f",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/map-icons/enemy/raider-skimmer.webp",
+      "runtimeSha256": "860e31450701998c385366428e852c014197fc4970b19fd18bd91100acb34899"
+    },
+    {
+      "kind": "objective-pin",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/zielmarke/zielmarke-c-nadel.png",
+      "sourceSha256": "25c474d0494023d3715646ecbb07874e90ab0e166d36a904c3095e156b97cfe2",
+      "runtimePath": "assets/unit-art/markers/objective-pin.webp",
+      "runtimeSha256": "3829b44aee7e7398a88eda643a839982d203905ab7f400951b956a0a500f2d7c"
+    },
+    {
+      "kind": "objective-pin",
+      "sourceRepository": "tdc.game.goblin.content",
+      "sourceCommit": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePath": "design-exports/einheitengrafiken/zielmarke/zielmarke-c-nadel-unten.png",
+      "sourceSha256": "4c86b15a558382cfc0037d6b593a3f8ada6ac0bc2c9cabc0bc61289c448b26d4",
+      "runtimePath": "assets/unit-art/markers/objective-pin-below.webp",
+      "runtimeSha256": "24d700d79d88af502841fe003c53a787c4f30e4c7e72131b4f32e2d3ca912ba8"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/open-ground.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "8cac36bf189c1699c47c34fd7a980846955e052442c6314b6550442948b4204d",
+      "runtimePath": "assets/terrain-icons/open-ground.webp",
+      "runtimeSha256": "72d29198c8fc7ef876b29f7db94be71406f895dc4308d4739593493d2d21dac2"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/rubble-field.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "d9c66183c47adc418e9c5ca882be10a555f936642eef6da58bc140fc71413046",
+      "runtimePath": "assets/terrain-icons/rubble-field.webp",
+      "runtimeSha256": "ed25809ed580ab604886c657d2ecdcaaddfd7e790b5ae1aaa29c1c5d7c8da714"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/mountain.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "2dd6abfdbd0a0c9fe69bd1fb370a579f76574f091eb684278ede67073e1f7027",
+      "runtimePath": "assets/terrain-icons/mountain.webp",
+      "runtimeSha256": "c0c9261e4cee2bb4be70c95e773e4adbc69c4b718732325ab7fcbd0b6ae96507"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/ridge.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "c4ed73f495f0293c6664e0468e00f2b15b3071c65141937c5b02b26154030094",
+      "runtimePath": "assets/terrain-icons/ridge.webp",
+      "runtimeSha256": "dcc97d05d28680354929a53bb85db962aba091b75099b4320ad97b1dc352ac1d"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/forest.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "bcda89195ac72fe14cc8e248b9768c25b9f02aba492225ea3a3f20c67e5ff2e5",
+      "runtimePath": "assets/terrain-icons/forest.webp",
+      "runtimeSha256": "03b576c20982a87d9511b056218f55822a1fcce39a83c2aa80cda32b4b56f3f5"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/marsh.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "37a8ba04467075cf7f6a7f0492d3a5e6661f07371181d3d367d1bb9c85b085e7",
+      "runtimePath": "assets/terrain-icons/marsh.webp",
+      "runtimeSha256": "0f9715056b084170801c91c36fcebc91e6772c03f966257e3bb9d9cc0ab29865"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/water.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "51fe4586dff020d71a25b3e53f57162cd3c3f3e874aa25244dd72352e850c26b",
+      "runtimePath": "assets/terrain-icons/water.webp",
+      "runtimeSha256": "358f7cb88f1e6492fb0f8348c85bfdbf1919a6b33757960e93e3592ffa2cd4f6"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/river-straight.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "0b69df2bfb2c2ebf6ddb145c7ee8daecc4fe8fcc734962d86d0bd0415ed31830",
+      "runtimePath": "assets/terrain-icons/river.webp",
+      "runtimeSha256": "a79eecd8d8e03701b89b5e0c4928d3767bc9ef4981dfee72f2f17ac3294e569c"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/road-straight.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "64390b391269fd035b27da6baa91f92ac8acd40e7274ab3291140da018fd41ce",
+      "runtimePath": "assets/terrain-icons/road.webp",
+      "runtimeSha256": "79b18d4b1434f23efcddff3470581957de2daeab0e8487aa142ed38046a8b191"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/bridge.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "cd8d87236ad3d67dda3ffea53dca810b44118f3e7930629dfd553e766ee4a9d8",
+      "runtimePath": "assets/terrain-icons/bridge.webp",
+      "runtimeSha256": "d59ec2753af50941fcc4c59795aff7bf77861fa3a0e28821c0f20449730dc7d5"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/urban-s0.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "a142c33ece4ca8c3fa6f1fd24dc88b7fed419451b66517a7bb4622c4dfae741b",
+      "runtimePath": "assets/terrain-icons/urban.webp",
+      "runtimeSha256": "3dbd3f4f3128118a6af4a37f6d5ee312f4198d8e99aeaa708cca30ef746517b3"
+    },
+    {
+      "kind": "terrain-icon",
+      "sourceRepository": "tdc.game.goblin.content",
+      "contentPin": "c01ecb80bcdd813772d1433d9ae63b39e54ef050",
+      "sourcePathAtVerifiedMain": "beratung-ui-ux/design-exports/uebergabe-karte/icons-terrain/crater.png",
+      "verifiedMain": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+      "sourceSha256": "ca3c9988c9adb3b85842782231f53ceb73badf44c637fb7e9a6cbdb0136c0093",
+      "runtimePath": "assets/terrain-icons/crater.webp",
+      "runtimeSha256": "2ca728e5cdff2def95ce7131b90df25342a7a8b7b1eba2dd9d0a1b48e4cf143b"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/goblin-siegebreaker.png",
+      "sourceSha256": "17979a6a00f09a07fa289cb69cb9a1c7d72e01c1b39670ec2e7501ce2458bcf6",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/goblin-siegebreaker@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/goblin-siegebreaker@768.png",
+      "runtimeSha256": "3e36bd8d60e7b79a51c8c9985f79f675c49098f452e93a9419701d89ce020771"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/goblin-siegebreaker.png",
+      "sourceSha256": "17979a6a00f09a07fa289cb69cb9a1c7d72e01c1b39670ec2e7501ce2458bcf6",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/goblin-siegebreaker@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/goblin-siegebreaker@1024.webp",
+      "runtimeSha256": "4589f26b28e2eb341bfeea9ba1971b56da06c646802140d5b52368582595b404"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/skimmer-scout.png",
+      "sourceSha256": "e69cebdc81a4464edc20eba32632d4a88b9632715077ec91431ef7cf73277e07",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/skimmer-scout@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/skimmer-scout@768.png",
+      "runtimeSha256": "4ded8c783c4812e4ecf2a724c7ed20448789e46b4b4fd6ce51b744e84fd00643"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/skimmer-scout.png",
+      "sourceSha256": "e69cebdc81a4464edc20eba32632d4a88b9632715077ec91431ef7cf73277e07",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/skimmer-scout@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/skimmer-scout@1024.webp",
+      "runtimeSha256": "5a0306482e4bec3c9d55065af26f443c6f35a9dbdc2c8911a2d8aff3a141f3c8"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/rocket-artillery.png",
+      "sourceSha256": "c56375fdba199f4604611129547eeaa420e93acac7e88e54100d71a28a868a19",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/rocket-artillery@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/rocket-artillery@768.png",
+      "runtimeSha256": "859b34e10873fecc62d6464a3fb57871a78d720dcf17f1275336e8d31a217797"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/rocket-artillery.png",
+      "sourceSha256": "c56375fdba199f4604611129547eeaa420e93acac7e88e54100d71a28a868a19",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/rocket-artillery@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/rocket-artillery@1024.webp",
+      "runtimeSha256": "19bef0501d214180f242830d0d1e697183b4fc635ac4d873636bcbd338857c87"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/infantry-squad.png",
+      "sourceSha256": "0ce6c9bec5eae48d7f5775ad8f1c3f05dbc8f9beb4017591a490fc19ec969320",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/infantry-squad@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/infantry-squad@768.png",
+      "runtimeSha256": "0692de0c4ad3aee93719c60be2a9125bdb8d9dce1c640e3b3899bd837b967e34"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/infantry-squad.png",
+      "sourceSha256": "0ce6c9bec5eae48d7f5775ad8f1c3f05dbc8f9beb4017591a490fc19ec969320",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/infantry-squad@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/infantry-squad@1024.webp",
+      "runtimeSha256": "f1ae07f22612bbebbbc98080104e931c1a92bc02a8e5a36fc594ff2b2e807698"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/assault-tank.png",
+      "sourceSha256": "926b51c8dd7213362aac321a21fb1c3bd607d815b59132b500b8783aada40ff2",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/assault-tank@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/assault-tank@768.png",
+      "runtimeSha256": "9fc814f7dddf634cb1e888114513f4387b52fd461d8eef94adb348131e757825"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/assault-tank.png",
+      "sourceSha256": "926b51c8dd7213362aac321a21fb1c3bd607d815b59132b500b8783aada40ff2",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/assault-tank@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/assault-tank@1024.webp",
+      "runtimeSha256": "b83319fe6fba2311158bd378bdb29192a282133117ca670bf402da513262a4b9"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/recon-tank.png",
+      "sourceSha256": "d0295b97ff06a3d3c1bdc2161e905014dd6d65468bc05d52c9869500559b0718",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/recon-tank@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/recon-tank@768.png",
+      "runtimeSha256": "1f4a97c3a3ae0a26668b9d782ae47655893542ad05068067f994232c0b4f767b"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/recon-tank.png",
+      "sourceSha256": "d0295b97ff06a3d3c1bdc2161e905014dd6d65468bc05d52c9869500559b0718",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/recon-tank@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/recon-tank@1024.webp",
+      "runtimeSha256": "1655480d63125f82a77f3dfd8bc3dcc46084f842c7a9b914e229192fa09be493"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/siege-tank.png",
+      "sourceSha256": "ad6f67c7b2b0239b2a66ec76e4bcdd11fdd3e32d45de6ce4e0baab3712ab3fa4",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/siege-tank@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/siege-tank@768.png",
+      "runtimeSha256": "2ac5f8ac85db0156ce520d79f701c853de142a36d63e43ca448d3e9d2052555b"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/siege-tank.png",
+      "sourceSha256": "ad6f67c7b2b0239b2a66ec76e4bcdd11fdd3e32d45de6ce4e0baab3712ab3fa4",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/siege-tank@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/siege-tank@1024.webp",
+      "runtimeSha256": "22111ee080c1a21cb63101213c495533d4245c50a828438d78a3cd6dc8c730ca"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/long-range-battery.png",
+      "sourceSha256": "570472f8684c9410ec5bd80f8bd3e133145c0c5be2d25ffbdcf509ce5fa271a1",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/long-range-battery@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/long-range-battery@768.png",
+      "runtimeSha256": "d135531ab370e09f6c2d74bf99d5f697030d15b1bc3c2fac4f13e2a67f156550"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/long-range-battery.png",
+      "sourceSha256": "570472f8684c9410ec5bd80f8bd3e133145c0c5be2d25ffbdcf509ce5fa271a1",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/long-range-battery@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/long-range-battery@1024.webp",
+      "runtimeSha256": "b5804a6dd880eadf69eecc0acf8e6c813116dd93ce1c3988c237ea68c0275824"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/mobile-siege-gun.png",
+      "sourceSha256": "1a53e31d5e0572fd1ccaed357faf90ec7bfb170758fb357051e3ece04cf03fd8",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/mobile-siege-gun@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/mobile-siege-gun@768.png",
+      "runtimeSha256": "91f241bccb85465a6cbd4bd0c7337fc5d10e77e197acec20e431481a2f17ddad"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/mobile-siege-gun.png",
+      "sourceSha256": "1a53e31d5e0572fd1ccaed357faf90ec7bfb170758fb357051e3ece04cf03fd8",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/mobile-siege-gun@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/mobile-siege-gun@1024.webp",
+      "runtimeSha256": "7c6136fda038d59bbb1578b1045a4cb834dd2d437eb5f06f1c97d8a6ca5d4b08"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/combat-skimmer.png",
+      "sourceSha256": "194f1289f15cd703a61bb49cb764fddba3afe6a402cc99064d22d7f00569ac68",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/combat-skimmer@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/combat-skimmer@768.png",
+      "runtimeSha256": "dcaa6aebf9be72ec34285ad6d736ed2f55bbee718ad700a8179e909007085e42"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/combat-skimmer.png",
+      "sourceSha256": "194f1289f15cd703a61bb49cb764fddba3afe6a402cc99064d22d7f00569ac68",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/combat-skimmer@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/combat-skimmer@1024.webp",
+      "runtimeSha256": "fc9966316111b161951c2c178110f3b1bf1bd852332c69d688922b5c4f200f73"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/light-skimmer.png",
+      "sourceSha256": "6801e0817f43fd83ca45f80fb9581d1ed3ac46cacf466aa8f482662e3d39bfd4",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/light-skimmer@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/light-skimmer@768.png",
+      "runtimeSha256": "1d01e90b73c285ee8d6618cba7cf36bf4dd98f18547f359a4f8027e484ff183b"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/light-skimmer.png",
+      "sourceSha256": "6801e0817f43fd83ca45f80fb9581d1ed3ac46cacf466aa8f482662e3d39bfd4",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/light-skimmer@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/light-skimmer@1024.webp",
+      "runtimeSha256": "72c2e048d5acc418d7260ab46b942a9bddb88fe6988c0fc8a8c8c3d26a8c1c12"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/skimmer-carrier.png",
+      "sourceSha256": "e3c3529e800f456a8f25fc25db44b18a3b5f1f9f619052a407babda49d949a26",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/skimmer-carrier@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/skimmer-carrier@768.png",
+      "runtimeSha256": "6f186059e300c2ea003ce0a1a2a8c93b806ff834ce11016a31dafefcbe0cb98f"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/skimmer-carrier.png",
+      "sourceSha256": "e3c3529e800f456a8f25fc25db44b18a3b5f1f9f619052a407babda49d949a26",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/skimmer-carrier@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/skimmer-carrier@1024.webp",
+      "runtimeSha256": "957ad32f15e053df592aab735cbea5c71da340b2c89d298245af3c4ddb7b29ae"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/strategic-missile-carrier.png",
+      "sourceSha256": "734eb7f853c7686de345244282ddef23328ecce0bb2cd0c314dbd0ef3a9e1255",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/strategic-missile-carrier@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/strategic-missile-carrier@768.png",
+      "runtimeSha256": "86ddc4753497e6c81a2cfdde142fa93f0087c9b7f0d4e2743573392c8005c566"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/strategic-missile-carrier.png",
+      "sourceSha256": "734eb7f853c7686de345244282ddef23328ecce0bb2cd0c314dbd0ef3a9e1255",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/strategic-missile-carrier@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/strategic-missile-carrier@1024.webp",
+      "runtimeSha256": "dcbe5961e03f94b06cc0efef9fe16f52d0e3a5da39b2869eddff6498975902d0"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/artillery-drone.png",
+      "sourceSha256": "c44d3f6177ad6b4b0bbce374677ea96f4a24079b4f61d7712a202c034c68b48b",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/artillery-drone@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/artillery-drone@768.png",
+      "runtimeSha256": "70e481407ec64ff8efd31d3fb32e977a028c0f20169028893840874a3fba860e"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/artillery-drone.png",
+      "sourceSha256": "c44d3f6177ad6b4b0bbce374677ea96f4a24079b4f61d7712a202c034c68b48b",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/artillery-drone@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/artillery-drone@1024.webp",
+      "runtimeSha256": "ca2281cb0b49ea2aba91c301a0eec7fea10b78f25e0a2d0d361531cc193a381f"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/amphibious-infantry.png",
+      "sourceSha256": "4f2d9c495ede4879e082ceeeaced8be79a6bbb24498c34ce3ebcfb72e86677e4",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/amphibious-infantry@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/amphibious-infantry@768.png",
+      "runtimeSha256": "b586a667709b97ba307c3b382f09983363c837283707420b142922acaa5a66fe"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/amphibious-infantry.png",
+      "sourceSha256": "4f2d9c495ede4879e082ceeeaced8be79a6bbb24498c34ce3ebcfb72e86677e4",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/amphibious-infantry@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/amphibious-infantry@1024.webp",
+      "runtimeSha256": "74b439864fda83eab1bb3e4acdc7f994b9a9693b5da7f59e055342ecaf825f30"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/field-engineers.png",
+      "sourceSha256": "782880f293fa8f8fdfb6ea88950ae7b75ce705c2abe29ec2acb56405ed848bea",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/field-engineers@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/field-engineers@768.png",
+      "runtimeSha256": "ac2656ed737ce8aaca350ac97933b8e64563ef84a5ec7a1d170de23da6c1549b"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/field-engineers.png",
+      "sourceSha256": "782880f293fa8f8fdfb6ea88950ae7b75ce705c2abe29ec2acb56405ed848bea",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/field-engineers@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/field-engineers@1024.webp",
+      "runtimeSha256": "9e22e8ded15df70384029eb0f9f70dde83ffc9b12af58be2ba23b911240fea71"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/local-defense.png",
+      "sourceSha256": "c5acdb4232e36b091959ad38d2911ad350966f3a7f9b0e3d83b80ab2c87626dc",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/local-defense@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/local-defense@768.png",
+      "runtimeSha256": "618e20b3d9363ba1af03fdff1ad3c6df1115c593ce2604ead1eab76ac2bc5b1b"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/local-defense.png",
+      "sourceSha256": "c5acdb4232e36b091959ad38d2911ad350966f3a7f9b0e3d83b80ab2c87626dc",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/local-defense@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/local-defense@1024.webp",
+      "runtimeSha256": "a0edcec340f084d1596e95dc66588809c5a1d41a053817c8ce7e66a66049f937"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/command-hub.png",
+      "sourceSha256": "271b865e1bbe2ed5a4022242c0d92205e17c54d3186c777bd7c7d2fa1f9423b1",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/command-hub@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/command-hub@768.png",
+      "runtimeSha256": "fdace1dfa4b8f61faa7208e4087814a0eccd6bb6162af6f27594fea0983f7f36"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/command-hub.png",
+      "sourceSha256": "271b865e1bbe2ed5a4022242c0d92205e17c54d3186c777bd7c7d2fa1f9423b1",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/command-hub@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/command-hub@1024.webp",
+      "runtimeSha256": "a51a6272b5d844c43db5e5a72c34ba1f93e677501a93d0022d3bc0f7e1496a29"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/goblin-dreadnaught.png",
+      "sourceSha256": "48f6383a200a56dfbc659fbec02b0725d27370f474e969a8cf2032ed6de5cac0",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/goblin-dreadnaught@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/goblin-dreadnaught@768.png",
+      "runtimeSha256": "0ecdfc40a3dcc7be69924f2a99d07f352c64d8cf53e9d26cd6b32182201b2f07"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/goblin-dreadnaught.png",
+      "sourceSha256": "48f6383a200a56dfbc659fbec02b0725d27370f474e969a8cf2032ed6de5cac0",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/goblin-dreadnaught@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/goblin-dreadnaught@1024.webp",
+      "runtimeSha256": "3f5a3160beac3005b2ce4309c8a1e6459edfb9719ef647c7fdec37b2d54f014c"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/forge-engineer.png",
+      "sourceSha256": "a123c972300fcd536d0b0dca57cd86de332a3e63a98379c037bc2c8e7d232d94",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/forge-engineer@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/forge-engineer@768.png",
+      "runtimeSha256": "c5134d0a42749a8d7953e5084cbf81fd6f14efbaa4211046d9a1d9c1b1628cfd"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/forge-engineer.png",
+      "sourceSha256": "a123c972300fcd536d0b0dca57cd86de332a3e63a98379c037bc2c8e7d232d94",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/forge-engineer@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/forge-engineer@1024.webp",
+      "runtimeSha256": "156b5ad601d37bd57286f45ae608fad61e0579c9ccc1d954931b6d0d654f2836"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/phantom-platform.png",
+      "sourceSha256": "ec9682495cbd653c03fe020804e3798682792102626b997b8fa5c8bd2efc8180",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/phantom-platform@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/phantom-platform@768.png",
+      "runtimeSha256": "86bfcf516131bbd881efe4d431abcac3e2591464489d1169c51770d93a155b7d"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/phantom-platform.png",
+      "sourceSha256": "ec9682495cbd653c03fe020804e3798682792102626b997b8fa5c8bd2efc8180",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/phantom-platform@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/phantom-platform@1024.webp",
+      "runtimeSha256": "4407e072d29b751fea23a094b16e4a7c7e9c2d59154044725e935be350edc5bf"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/infantry-platoon.png",
+      "sourceSha256": "ea43cdeed42d7935ef7e2b22120fbc76226238addb36d4498ec5839f7debd066",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/infantry-platoon@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/infantry-platoon@768.png",
+      "runtimeSha256": "b108718c37a13da161708ac55886c4cf4a654b113b93acb08f1441dc7d09a762"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/infantry-platoon.png",
+      "sourceSha256": "ea43cdeed42d7935ef7e2b22120fbc76226238addb36d4498ec5839f7debd066",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/infantry-platoon@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/infantry-platoon@1024.webp",
+      "runtimeSha256": "dd6f949dfde055c084fc6b8b83d081947e75a0478879cd0883346425664a0dcd"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/command-core.png",
+      "sourceSha256": "44ddabf23407625f58b7aae888a8eba70b5deca3bbfaafae751ed79b0cee4e07",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/command-core@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/command-core@768.png",
+      "runtimeSha256": "63a59fb0fa6102fd3e165db9541ec62861d49b796c7bdf96b865fbe3a138d0e2"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/command-core.png",
+      "sourceSha256": "44ddabf23407625f58b7aae888a8eba70b5deca3bbfaafae751ed79b0cee4e07",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/command-core@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/command-core@1024.webp",
+      "runtimeSha256": "3d1a9349fc3ea137a4a939d51cdd3d9d71b859a5615a90d112966d1fe46597e8"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/relay-node.png",
+      "sourceSha256": "bd0371c98037751d00bb5d4a005191960ab3dd52e32e7b1c3f1afc3ee9c6f538",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/relay-node@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/relay-node@768.png",
+      "runtimeSha256": "0445737c9e0d618cb3b08a797e1c626a15d42fff5484379fcadbef51b9fee729"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/relay-node.png",
+      "sourceSha256": "bd0371c98037751d00bb5d4a005191960ab3dd52e32e7b1c3f1afc3ee9c6f538",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/relay-node@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/relay-node@1024.webp",
+      "runtimeSha256": "9536718e5e880a07ab7b0c4e90057d6550f808ab0bc1d393864276362dbab724"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/guard-tank.png",
+      "sourceSha256": "064c0d5ae70247b0b2fe5cfc005e2867bd571f8b284330e81ffd60119b4d11bc",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/guard-tank@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/guard-tank@768.png",
+      "runtimeSha256": "c9ce11481c28e75f03ba8bc9b50308b39cdb12a6c54ebf52ff9d0c56cc7a4850"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/guard-tank.png",
+      "sourceSha256": "064c0d5ae70247b0b2fe5cfc005e2867bd571f8b284330e81ffd60119b4d11bc",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/guard-tank@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/guard-tank@1024.webp",
+      "runtimeSha256": "d0b50db41f4d8ee1a2e5ccc8b68853d8a70c9ceb3c524ee624e6abc12743efc3"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/raider-skimmer.png",
+      "sourceSha256": "054f1645e8f6b7109ae4dba0af777c110d26dc6b19c0399b485f773a8e8335bb",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/raider-skimmer@768.png",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/raider-skimmer@768.png",
+      "runtimeSha256": "24d5d13dd2e7591003c0ea0b04a6918d0b0dc9c8f0e79b7fe6d0856f42dadaee"
+    },
+    {
+      "kind": "enemy-library",
+      "sourceRepository": "project-unit-art",
+      "sourceCommit": "41b1700af94257cb14e3fe39a667a27ac11b53ef",
+      "sourcePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/raider-skimmer.png",
+      "sourceSha256": "054f1645e8f6b7109ae4dba0af777c110d26dc6b19c0399b485f773a8e8335bb",
+      "provenancePath": "assets/unit-art/proposals/content-08/sets/02-technical-illustration/library-enemy/PROVENANCE-U3.md",
+      "historicalExportPath": "assets/unit-art/exports/content-08/02-technical-illustration/library-enemy/raider-skimmer@1024.webp",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/library-enemy/raider-skimmer@1024.webp",
+      "runtimeSha256": "c69f1bc250c2b0951be42657a536a17cb380a2fef75d439ef027681a068e9fac"
+    }
+  ]
+}
