@@ -1170,6 +1170,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }, true);
     globalThis.addEventListener('goblin-language-change', () => render());
     globalThis.addEventListener('goblin-core-v2-render', () => {if(core()) render();});
+    globalThis.addEventListener('goblin-unit-art-fallback', () => render());
     new MutationObserver(changes => {
       const own = node => node.nodeType === 1 && /^v2-(m1-markers|team-markers|actor-marker|target-marker|focus-marker|grid-overlay|area-overlay)$/.test(node.id);
       if (changes.some(change => [...change.addedNodes, ...change.removedNodes].some(node => !own(node)))) render();

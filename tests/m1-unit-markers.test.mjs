@@ -9,9 +9,11 @@ import {buildIronDustV2View} from '../iron-dust-v2-view.mjs';
 const source=readFileSync(new URL('../m1-unit-markers.js',import.meta.url),'utf8');
 function adapter(document){
   const context=vm.createContext({document});
+  for(const file of ['assets/unit-art/marker-geometry.js','unit-visuals.js'])
+    vm.runInContext(readFileSync(new URL(`../${file}`,import.meta.url),'utf8'),context);
   vm.runInContext(source,context);
   vm.runInContext(readFileSync(new URL('../scenario-profile-manifest.js',import.meta.url),'utf8'),context);
-  return {markers:context.M1UnitMarkers,session(config){
+  return {markers:context.M1UnitMarkers,visuals:context.UnitVisuals,context,session(config){
     context.config=config;
     return vm.runInContext("ScenarioRuleProfiles.beginSession('relay-run',config)",context);
   }};
@@ -131,7 +133,7 @@ function scene(){
   const document={createElementNS:(_,tag)=>new Node(tag)};
   return {document,map:new Node('svg')};
 }
-test('shared renderer has one paired actor/target ring, no team plates, top-row pin below and pins last',()=>{
+test('shared renderer places interaction rings above the pin and keeps picking transparent',()=>{
   const {document,map}=scene(),{markers}=adapter(document),units=raw();
   units.find(unit=>unit.id==='core').y=0;
   const data=markers.core(coreView(units),1,'same-revision');
@@ -147,7 +149,15 @@ test('shared renderer has one paired actor/target ring, no team plates, top-row 
   const pins=all.filter(node=>node.attrs.class==='m1-objective-pin');
   assert.equal(pins.length,1);
   assert.match(pins[0].attrs.href,/objective-pin-below.webp$/);
-  assert.equal(map.children[0].children.at(-1).attrs.class,'m1-objective-pins');
+  const children=map.children[0].children;
+  const pinIndex=children.findIndex(node=>node.attrs.class==='m1-objective-pins');
+  assert.ok(pinIndex<children.findIndex(node=>node.attrs.id==='v2-actor-marker'));
+  assert.ok(pinIndex<children.findIndex(node=>node.attrs.id==='v2-target-marker'));
+  assert.ok(pinIndex<children.findIndex(node=>node.attrs.id==='v2-focus-marker'));
+  assert.equal(map.children[0].attrs['pointer-events'],'none');
+  const layout=markers.pinLayout(data.units.find(unit=>unit.unitId==='core'));
+  for(const key of ['x','y','width','height'])assert.equal(Number(pins[0].attrs[key]),layout[key]);
+  assert.deepEqual({...markers.obstacles(data)[0]},{...layout.bounds});
   assert.equal(all.filter(node=>node.attrs.class==='m1-damage-empty').length,21);
   const widths=map.querySelector('#v2-actor-marker').children.map(node=>Number(node.attrs['stroke-width']));
   assert.ok(Math.abs(widths[0]/widths[1]-3)<1e-12);
@@ -157,6 +167,48 @@ test('shared renderer has one paired actor/target ring, no team plates, top-row 
   assert.equal(map.children.length,1);
   assert.equal(map.querySelector('#v2-target-marker'),null);
   assert.equal(map.all().filter(node=>node.attrs.class==='m1-objective-pin').length,0);
+});
+
+test('all 52 measured icon anchors keep exactly four reference pixels to the visible pin tip',()=>{
+  const {markers,visuals,context}=adapter();
+  const receipt=JSON.parse(readFileSync(new URL('../assets/unit-art/map-icons-source.json',import.meta.url)));
+  const scale=Math.sqrt(3)*34/112;
+  for(const entry of receipt.icons)for(const y of [0,1,7]){
+    assert.deepEqual(Array.from(context.GoblinMarkerGeometry.icons[entry.runtimePath].bounds),entry.runtimeAlphaBounds);
+    const unit={unitId:entry.unitId,team:entry.team,position:{x:0,y}};
+    const layout=markers.pinLayout(unit),icon=visuals.boundsFor({...unit,id:unit.unitId});
+    const cy=48+y*51;
+    assert.equal(icon.kind,'asset');
+    assert.ok(Math.abs(icon.top/scale-(entry.runtimeAlphaBounds[1]/192-.5)*100)<1e-10);
+    assert.ok(Math.abs(icon.bottom/scale-(entry.runtimeAlphaBounds[3]/192-.5)*100)<1e-10);
+    const tip=y===0?layout.bounds.top:layout.bounds.bottom;
+    const gap=y===0?tip-cy-icon.bottom:cy+icon.top-tip;
+    assert.ok(Math.abs(gap/scale-4)<1e-10,`${entry.unitId}/${entry.team}/row${y}`);
+    assert.ok(Math.abs(layout.width/scale-200)<1e-10);
+    assert.ok(Math.abs(layout.height/scale-260)<1e-10);
+  }
+  const guard={unitId:'guard-tank',team:'enemy',position:{x:2,y:0}};
+  assert.ok(Math.abs((markers.pinLayout(guard).bounds.top-48)/scale-27.4375)<1e-10);
+});
+
+test('failed images use existing vector geometry; absent measured metadata creates no guessed pin',()=>{
+  const {markers,visuals,context}=adapter();
+  const events=[];context.Event=class{constructor(type){this.type=type}};
+  context.dispatchEvent=event=>events.push(event.type);
+  const unit={unitId:'guard',name:'GUARD TANK',type:'guard',team:'enemy',position:{x:2,y:0}};
+  const image={},asset=visuals.assetFor({...unit,id:unit.unitId});
+  visuals.watchMapImage(image,asset,()=>{});image.onerror();
+  assert.deepEqual(events,['goblin-unit-art-fallback']);
+  const layout=markers.pinLayout(unit),bounds=visuals.boundsFor({...unit,id:unit.unitId});
+  assert.equal(layout.iconKind,'vector');
+  assert.ok(Math.abs(layout.bounds.top-48-bounds.bottom-4*Math.sqrt(3)*34/112)<1e-10);
+  assert.equal(bounds.bottom,14.75); // Registered tracked polygon + its existing half-stroke.
+  const pinImage={};visuals.watchMapImage(pinImage,layout.asset,()=>{});pinImage.onerror();
+  assert.equal(markers.pinLayout(unit),null);
+  assert.deepEqual(Array.from(markers.obstacles({supported:true,units:[{...unit,mapVisible:true}],
+    objective:{members:[{unitId:unit.unitId,state:'pending'}]}})),[]);
+  context.GoblinMarkerGeometry=undefined;
+  assert.equal(markers.pinLayout({...unit,position:{x:2,y:1}}),null);
 });
 
 test('pin derivatives have fixed provenance, centered full canvas and matching hashes',()=>{

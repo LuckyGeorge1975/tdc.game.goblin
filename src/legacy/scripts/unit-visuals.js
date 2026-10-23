@@ -78,6 +78,22 @@
     };
     return (shapes[shape]||shapes.hex).map(([x,y])=>`${c.x+x*scale},${c.y+y*scale}`).join(' ');
   }
+  function boundsFor(unit){
+    const visual=resolve(unit);
+    if(visual.asset){
+      const measured=root.GoblinMarkerGeometry?.icons[visual.asset];
+      if(!measured)return null;
+      const [left,top,right,bottom]=measured.bounds,size=visual.size||42;
+      return {kind:'asset',left:(left/measured.width-.5)*size,top:(top/measured.height-.5)*size,
+        right:(right/measured.width-.5)*size,bottom:(bottom/measured.height-.5)*size};
+    }
+    const points=polygonPoints(visual.shape,{x:0,y:0},visual.scale).split(' ')
+      .map(pair=>pair.split(',').map(Number));
+    // The existing fallback polygon has a 1.5 SVG-unit stroke in M1 (unselected).
+    return {kind:'vector',left:Math.min(...points.map(point=>point[0]))-.75,
+      top:Math.min(...points.map(point=>point[1]))-.75,
+      right:Math.max(...points.map(point=>point[0]))+.75,bottom:Math.max(...points.map(point=>point[1]))+.75};
+  }
 
   function watchMapImage(image,asset,fallback){
     if(failedMapAssets.has(asset)){fallback();return false}
@@ -91,6 +107,7 @@
       const callbacks=[...(pendingMapAssets.get(asset)||[])];
       pendingMapAssets.delete(asset);
       callbacks.forEach(callback=>callback());
+      if(root.dispatchEvent&&root.Event)root.dispatchEvent(new root.Event('goblin-unit-art-fallback'));
     };
     return true;
   }
@@ -176,5 +193,6 @@
   register('light-tank',{shape:'tracked',label:'R'});
   register('guard',{shape:'tracked',label:'G'});
 
-  root.UnitVisuals=Object.freeze({register,resolve,draw,iconElement,watchMapImage,setAsset,polygonPoints,styles,artKey,assetFor,terrainAssetFor,setStyle,currentStyle});
+  root.UnitVisuals=Object.freeze({register,resolve,draw,iconElement,watchMapImage,boundsFor,
+    assetFailed:asset=>failedMapAssets.has(asset),setAsset,polygonPoints,styles,artKey,assetFor,terrainAssetFor,setStyle,currentStyle});
 })(globalThis);

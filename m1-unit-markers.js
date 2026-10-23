@@ -10,7 +10,7 @@
   function snapshot(binding,roster,code,memberIds,outcome){
     const units=roster.map(unit=>{
       const systems=copy(unit.ogreSystems);
-      return {unitId:unit.id,name:unit.name,team:unit.team,
+      return {unitId:unit.id,name:unit.name,team:unit.team,type:unit.type,visualKey:unit.visualKey,
         position:{x:unit.x,y:unit.y},mapVisible:!unit.embarkedOn,
         status:unit.hp<=0?'destroyed':unit.disabled?'disabled':'active',
         vitality:{kind:systems?'system-carrier':unit.infantry?'infantry-strength':'hp',
@@ -63,14 +63,28 @@
       return `${c.x+size*scale*Math.cos(angle)},${c.y+size*scale*Math.sin(angle)}`;
     }).join(' ');
   }
+  function pinLayout(unit){
+    const below=unit.position.y===0;
+    const asset=`assets/unit-art/markers/objective-pin${below?'-below':''}.webp`;
+    if(root.UnitVisuals?.assetFailed(asset))return null;
+    const pin=root.GoblinMarkerGeometry?.pins[asset];
+    const icon=root.UnitVisuals?.boundsFor({...unit,id:unit.unitId});
+    if(!pin||!icon)return null;
+    const c=center(unit.position),width=pin.referenceCanvas[0]*referenceScale,
+      height=pin.referenceCanvas[1]*referenceScale;
+    const [left,top,right,bottom]=pin.bounds;
+    const tip=(below?top/pin.height-.5:bottom/pin.height-.5)*height;
+    const desiredTip=(below?icon.bottom:icon.top)+(below?4:-4)*referenceScale;
+    const x=c.x-width/2,y=c.y-height/2+desiredTip-tip;
+    return {asset,x,y,width,height,iconKind:icon.kind,
+      bounds:{left:x+left/pin.width*width,top:y+top/pin.height*height,
+        right:x+right/pin.width*width,bottom:y+bottom/pin.height*height}};
+  }
   function obstacles(data){
     if(!data?.supported)return [];
     return data.units.filter(unit=>unit.mapVisible&&data.objective.members
-      .some(member=>member.unitId===unit.unitId&&member.state==='pending')).map(unit=>{
-        const c=center(unit.position),below=unit.position.y===0;
-        return {left:c.x-29*referenceScale,right:c.x+29*referenceScale,
-          top:c.y+(below?49:-120)*referenceScale,bottom:c.y+(below?120:-49)*referenceScale};
-      });
+      .some(member=>member.unitId===unit.unitId&&member.state==='pending'))
+      .map(pinLayout).filter(Boolean).map(layout=>layout.bounds);
   }
   function render(map,data,{actor,target,focus,t}={}){
     map.querySelector('#v2-m1-markers')?.remove();
@@ -106,13 +120,16 @@
         badge('×','m1-weapon-damage',46,-40,t('v2.ui.weaponDamage',{count:value.destroyedWeapons}));
       layer.append(group);
       if(data.objective.members.some(member=>member.unitId===unit.unitId&&member.state==='pending')){
-        const pin=node('image',{href:`assets/unit-art/markers/objective-pin${unit.position.y===0?'-below':''}.webp`,
-          x:c.x-100*referenceScale,y:c.y-130*referenceScale,
-          width:200*referenceScale,height:260*referenceScale,class:'m1-objective-pin',
+        const layout=pinLayout(unit);
+        if(!layout)continue;
+        const pin=node('image',{x:layout.x,y:layout.y,width:layout.width,height:layout.height,class:'m1-objective-pin',
           'data-unit-id':unit.unitId,role:'img','aria-label':`${t('ui.hud.objective')}: ${unit.name}`});
         pins.append(pin);
+        if(root.UnitVisuals.watchMapImage(pin,layout.asset,()=>pin.remove()))pin.setAttribute('href',layout.asset);
       }
     }
+    // User decision: interaction contours stay visible above mission pins.
+    layer.append(pins);
     function ring(id,cell,kind){
       if(!cell)return;
       const group=node('g',{id,role:'img','aria-label':t(`v2.ui.marker.${kind}`,{unit:actor?.name||'',hex:`${String.fromCharCode(65+cell.x)}-${String(cell.y+1).padStart(2,'0')}`})});
@@ -125,7 +142,7 @@
     if(!actor||target?.x!==actor.x||target?.y!==actor.y)ring('v2-target-marker',target,'target');
     if(focus)layer.append(node('polygon',{id:'v2-focus-marker',points:hex(focus),role:'img',
       'aria-label':t('v2.ui.marker.focus',{hex:`${String.fromCharCode(65+focus.x)}-${String(focus.y+1).padStart(2,'0')}`})}));
-    layer.append(pins);map.append(layer);
+    map.append(layer);
   }
-  root.M1UnitMarkers=Object.freeze({legacy,core,damage,obstacles,render});
+  root.M1UnitMarkers=Object.freeze({legacy,core,damage,pinLayout,obstacles,render});
 })(globalThis);
