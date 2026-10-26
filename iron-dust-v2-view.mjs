@@ -216,7 +216,7 @@ function renderMap(view, rerender, onAction) {
       map.appendChild(image);
     }
   }
-  for (const unit of view.units) {
+  for (const unit of globalThis.UnitVisuals.sortMapUnits?.(view.units)??view.units) {
     const c = center(unit.x, unit.y), group = svgElement('g');
     group.classList.add('unit-svg');
     group.dataset.unitId = unit.id;
@@ -232,7 +232,7 @@ function renderMap(view, rerender, onAction) {
     } else {
       const color = unit.team === 'enemy' ? '#ee574d' : unit.id === 'ogre' ? '#d1f35a' : '#62cadd';
       globalThis.UnitVisuals.draw(group, unit, c,
-        {ns:SVG_NS, color, selected:unit.id === selectedUnitId && !document.body.classList.contains('ui-v2-active')});
+        {ns:SVG_NS, color, map:true, selected:unit.id === selectedUnitId && !document.body.classList.contains('ui-v2-active')});
       const hp = svgElement('rect');
       hp.setAttribute('x', c.x - 15); hp.setAttribute('y', c.y + 22);
       hp.setAttribute('width', 30 * unit.hp / unit.maxHp);

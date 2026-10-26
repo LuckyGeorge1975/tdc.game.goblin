@@ -78,14 +78,47 @@
     };
     return (shapes[shape]||shapes.hex).map(([x,y])=>`${c.x+x*scale},${c.y+y*scale}`).join(' ');
   }
+  // Read only the settled presentation belonging to this exact displayed unit.
+  function mapAngle(unit){
+    try{
+    const owner=root.GoblinPresentation,sidecar=owner?.read(),state=owner?.endState();
+    if(!sidecar||sidecar.schemaVersion!==1||!['core','legacy'].includes(sidecar.binding?.runtime)||
+      sidecar.mappingVersion!=='movement-facing-v1'||
+      sidecar.visualConfigVersion!=='instant-off-v1'||
+      !owner.owns(sidecar.binding?.runtime)||!state||
+      sidecar.settledRevision!==root.GoblinPresentationState?.stamp(state))return 0;
+    const id=unit.id??unit.unitId,key=artKey(unit),position=unit.position??unit;
+    const actual=state.units.find(item=>item.id===id);
+    const facing=sidecar.facingByUnit.find(item=>item.unitId===id);
+    if(!actual||!facing||actual.team!==unit.team||facing.team!==unit.team||
+      actual.visualKey!==key||facing.visualKey!==key||
+      actual.x!==position.x||actual.y!==position.y||
+      !Number.isFinite(facing.angleDegrees)||facing.angleDegrees<0||facing.angleDegrees>=360)return 0;
+    return facing.angleDegrees-(unit.team==='enemy'?180:0);
+    }catch{return 0;}
+  }
+
+  function sortMapUnits(units){
+    return units.slice().sort((a,b)=>{
+      // Keep existing wrecks below live units; only reorder inside the unit layer.
+      const layer=(a.hp>0?1:0)-(b.hp>0?1:0),depth=a.y-b.y;
+      return layer||depth||(String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0);
+    });
+  }
+
   function boundsFor(unit){
     const visual=resolve(unit);
     if(visual.asset){
       const measured=root.GoblinMarkerGeometry?.icons[visual.asset];
       if(!measured)return null;
       const [left,top,right,bottom]=measured.bounds,size=visual.size||42;
-      return {kind:'asset',left:(left/measured.width-.5)*size,top:(top/measured.height-.5)*size,
-        right:(right/measured.width-.5)*size,bottom:(bottom/measured.height-.5)*size};
+      const angle=mapAngle(unit)*Math.PI/180,cos=Math.cos(angle),sin=Math.sin(angle);
+      const corners=[[left,top],[right,top],[right,bottom],[left,bottom]].map(([x,y])=>{
+        x=(x/measured.width-.5)*size;y=(y/measured.height-.5)*size;
+        return [x*cos-y*sin,x*sin+y*cos];
+      });
+      return {kind:'asset',left:Math.min(...corners.map(p=>p[0])),top:Math.min(...corners.map(p=>p[1])),
+        right:Math.max(...corners.map(p=>p[0])),bottom:Math.max(...corners.map(p=>p[1]))};
     }
     const points=polygonPoints(visual.shape,{x:0,y:0},visual.scale).split(' ')
       .map(pair=>pair.split(',').map(Number));
@@ -130,7 +163,7 @@
     return image;
   }
 
-  function draw(group,unit,center,{ns,color,selected=false,vectorOnly=false}={}){
+  function draw(group,unit,center,{ns,color,selected=false,vectorOnly=false,map=false}={}){
     const visual=vectorOnly?resolveVector(unit):resolve(unit),namespace=ns||'http://www.w3.org/2000/svg';
     if(visual.asset){
       if(selected){
@@ -149,11 +182,21 @@
       image.setAttribute('height',size);
       image.setAttribute('preserveAspectRatio','xMidYMid meet');
       image.classList.add('unit-artwork');
-      group.appendChild(image);
+      let sprite=image;
+      if(map){
+        sprite=document.createElementNS(namespace,'g');
+        sprite.classList.add('unit-sprite-shadow');
+        // Prototype reference: offsets 3/4.5, blur 4 at a 100px sprite.
+        const scale=size/100;
+        sprite.setAttribute('style',`filter:drop-shadow(${3*scale}px ${4.5*scale}px ${4*scale}px rgba(8,10,14,.5))`);
+        image.setAttribute('transform',`rotate(${mapAngle(unit)} ${center.x} ${center.y})`);
+        sprite.appendChild(image);
+      }
+      group.appendChild(sprite);
       watchMapImage(image,visual.asset,()=>{
         const replacement=document.createElementNS(namespace,'g');
         draw(replacement,unit,center,{ns:namespace,color,selected,vectorOnly:true});
-        image.replaceWith(replacement);
+        sprite.replaceWith(replacement);
       });
       image.setAttribute('href',visual.asset);
       return image;
@@ -193,6 +236,6 @@
   register('light-tank',{shape:'tracked',label:'R'});
   register('guard',{shape:'tracked',label:'G'});
 
-  root.UnitVisuals=Object.freeze({register,resolve,draw,iconElement,watchMapImage,boundsFor,
+  root.UnitVisuals=Object.freeze({register,resolve,draw,iconElement,watchMapImage,boundsFor,mapAngle,sortMapUnits,
     assetFailed:asset=>failedMapAssets.has(asset),setAsset,polygonPoints,styles,artKey,assetFor,terrainAssetFor,setStyle,currentStyle});
 })(globalThis);
