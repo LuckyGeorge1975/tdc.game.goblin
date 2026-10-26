@@ -804,6 +804,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const line = document.createElement('p');
         line.className = 'v2-terrain-info';
         line.textContent = `${t('v2.ui.sector')} ${hexLabel(cell)} · ${TerrainDisplay.label(terrain?.type)}${occupant ? ` · ${occupant.name} (${t(occupant.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}) · ${strengthText(occupant)}` : ''}`;
+        for(const wreck of globalThis.UnitVisuals?.wrecksAt?.(cell.x,cell.y)??[])
+          line.textContent += ` · ${globalThis.UnitVisuals.wreckLabel({name:wreck.nameKeyOrRuntimeName})}`;
         const image = TerrainDisplay.icon(terrain?.type);
         if (image) line.prepend(image);
         intel.append(line);
@@ -914,6 +916,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const terrainId = terrainTypeAt(x, y);
         line.className = 'v2-terrain-info';
         line.textContent = `${t('v2.ui.sector')} ${String.fromCharCode(65 + x)}-${String(y + 1).padStart(2, '0')} · ${TerrainDisplay.label(terrainId)}${target ? ` · ${target.name} (${t(target.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')}) · ${strengthText(target)}` : ''}`;
+        for(const wreck of globalThis.UnitVisuals?.wrecksAt?.(x,y)??[])
+          line.textContent += ` · ${globalThis.UnitVisuals.wreckLabel({name:wreck.nameKeyOrRuntimeName})}`;
         const image = TerrainDisplay.icon(terrainId);
         if (image) line.prepend(image);
         intel.appendChild(line);

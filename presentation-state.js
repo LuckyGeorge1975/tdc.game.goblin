@@ -33,7 +33,7 @@
     let tickets=new WeakSet();
     const records=new Map();
     function cancel(){generation++;tickets=new WeakSet();}
-    function synchronize(state,destructionRef=null){
+    function synchronize(state,destructionRef=null,confirmedBefore=null){
       if(!sidecar)return;
       const previous=new Map(sidecar.facingByUnit.map(item=>[item.unitId,item]));
       sidecar.facingByUnit=state.units.map(unit=>{
@@ -46,6 +46,13 @@
       sidecar.wrecks=state.units.filter(unit=>Number.isFinite(unit.hp)&&unit.hp<=0).map(unit=>{
         const old=oldWrecks.get(unit.id),prior=endState?.units.find(item=>item.id===unit.id);
         const same=old&&old.team===unit.team&&old.visualKey===(unit.visualKey??null);
+        const beforeUnit=confirmedBefore?.units.find(item=>item.id===unit.id);
+        // A draw may have reconstructed this death before the accepted Ram settles.
+        const enrich=same&&old.origin==='reconstructed-state-transition'&&old.destructionRef===null&&
+          destructionRef?.source==='accepted-command'&&beforeUnit?.hp>0&&
+          beforeUnit.team===unit.team&&(beforeUnit.visualKey??null)===(unit.visualKey??null)&&
+          old.position.x===unit.x&&old.position.y===unit.y&&
+          destructionRef.beforeRevision===stamp(confirmedBefore)&&destructionRef.afterRevision===stamp(state);
         const carrierId=unit.embarkedOn??prior?.embarkedOn??null;
         const facing=sidecar.facingByUnit.find(item=>item.unitId===unit.id);
         return {...(same?old:{wreckId:`${sidecar.sessionInstanceId}/${sidecar.branchGeneration}/wreck/${unit.id}`,
@@ -55,6 +62,7 @@
           destructionRef:destructionRef?copy(destructionRef):null,
           cargoRelation:carrierId?{carrierId}:null,
           origin:destructionRef?'confirmed-end-state':prior?.hp>0?'reconstructed-state-transition':'reconstructed-default'}),
+          ...(enrich?{destructionRef:copy(destructionRef),origin:'confirmed-end-state'}:{}),
           position:position(unit),facingDegrees:facing.angleDegrees};
       });
       endState=immutable(state);
@@ -82,7 +90,7 @@
       item.status='running';
       const event=item.event;
       synchronize(event.after,{source:'accepted-command',command:event.action.sourceCommand,
-        beforeRevision:event.action.beforeRevision,afterRevision:event.action.afterRevision});
+        beforeRevision:event.action.beforeRevision,afterRevision:event.action.afterRevision},event.before);
       if(event.path){
         const from=event.path.length===1?event.actor.positionBefore:event.path.at(-2);
         const facing=sidecar.facingByUnit.find(unit=>unit.unitId===event.actor.unitId);
@@ -90,7 +98,7 @@
           facing.sourceActionId=eventId;facing.origin='confirmed-movement';}
       }
       synchronize(event.after,{source:'accepted-command',command:event.action.sourceCommand,
-        beforeRevision:event.action.beforeRevision,afterRevision:event.action.afterRevision});
+        beforeRevision:event.action.beforeRevision,afterRevision:event.action.afterRevision},event.before);
       sidecar.settledThrough=eventId;item.status='settled';return true;
     }
     function confirm(ticket,after,sourceResults,movements){
@@ -98,7 +106,7 @@
       tickets.delete(ticket);
       if(!Array.isArray(movements)||!movements.length){
         synchronize(after,{source:'accepted-command',command:ticket.command,
-          beforeRevision:stamp(ticket.before),afterRevision:stamp(after)});return [];}
+          beforeRevision:stamp(ticket.before),afterRevision:stamp(after)},ticket.before);return [];}
       const acceptedSequence=++sequence,events=[];
       sidecar.acceptedSequence=sequence;
       for(const movement of movements){
@@ -138,9 +146,13 @@
           !(saved.settledThrough===null||typeof saved.settledThrough==='string')||
           saved.wreckMappingVersion!=='static-wreck-v1'||!Array.isArray(saved.wrecks)||!Array.isArray(saved.facingByUnit)||
           saved.facingByUnit.length!==state.units.length)return false;
+      const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+      if(!saved.wrecks.every(object)||!saved.facingByUnit.every(object))return false;
       const dead=state.units.filter(unit=>Number.isFinite(unit.hp)&&unit.hp<=0),wreckIds=new Set(),wreckUnits=new Set();
       if(saved.wrecks.length!==dead.length||!saved.wrecks.every(item=>{
         const unit=dead.find(unit=>unit.id===item.unitId),facing=saved.facingByUnit.find(f=>f.unitId===item.unitId);
+        const carrierId=unit?.embarkedOn??null;
+        const carrier=carrierId?state.units.find(candidate=>candidate.id===carrierId):null;
         if(!unit||wreckUnits.has(item.unitId)||typeof item.wreckId!=='string'||wreckIds.has(item.wreckId)||
           item.team!==unit.team||item.visualKey!==(unit.visualKey??null)||item.type!==(unit.type??null)||
           item.position?.x!==unit.x||item.position?.y!==unit.y||item.facingDegrees!==facing?.angleDegrees||
@@ -151,8 +163,8 @@
           item.binding.branchGeneration>saved.branchGeneration||
           item.wreckId!==`${saved.sessionInstanceId}/${item.binding.branchGeneration}/wreck/${unit.id}`||
           Object.entries(binding).some(([key,value])=>item.binding[key]!==value)||
-          !(item.cargoRelation===null||typeof item.cargoRelation?.carrierId==='string')||
-          unit.embarkedOn&&item.cargoRelation?.carrierId!==unit.embarkedOn||
+          !(carrierId===null?item.cargoRelation===null:
+            object(item.cargoRelation)&&item.cargoRelation.carrierId===carrierId&&carrier&&carrier.id!==unit.id)||
           !(item.destructionRef===null||typeof item.destructionRef==='object'&&
             typeof item.destructionRef.source==='string'&&typeof item.destructionRef.beforeRevision==='string'&&
             typeof item.destructionRef.afterRevision==='string')||

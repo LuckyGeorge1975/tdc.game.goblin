@@ -99,6 +99,51 @@ test('wreck map draw is lazy, centered, separately shadowed and never draws live
   assert.equal(JSON.stringify(owner.read()),before,'draw and fallback do not change presentation/game state');
 });
 
+test('malformed restore entries reject quietly and reconstruct rather than partially accepting',()=>{
+  for(const field of ['wrecks','facingByUnit'])for(const entry of [null,[],1,'invalid']){
+    const {owner,state,unit}=scene(),dead={...state,units:[{...unit,hp:0}]};owner.synchronize(dead);
+    const saved=JSON.parse(JSON.stringify(owner.read()));saved[field]=[entry];
+    assert.doesNotThrow(()=>assert.equal(owner.restore(saved,dead),false));
+    assert.equal(owner.read().wrecks[0].origin,'reconstructed-default');
+    assert.equal(owner.read().wrecks[0].cargoRelation,null);
+    assert.equal(owner.read().facingByUnit[0].unitId,unit.id);
+  }
+});
+
+test('restore cargo must match an authoritative non-self carrier, not an invented hidden flag',()=>{
+  for(const carrierId of ['ghost','actor','carrier']){
+    const {owner,state,unit,art,node}=scene('legacy');
+    const carrier={...unit,id:'carrier',hp:3};
+    const dead={...state,units:[{...unit,hp:0},carrier]};owner.synchronize(dead);
+    const saved=JSON.parse(JSON.stringify(owner.read()));saved.wrecks[0].cargoRelation={carrierId};
+    assert.equal(owner.restore(saved,dead),false);
+    assert.equal(owner.read().wrecks[0].cargoRelation,null);
+    assert.equal(art.drawWreck(node('g'),dead.units[0],{x:0,y:0}).tag,'image');
+    const carried={...dead,units:[{...unit,hp:0,embarkedOn:'carrier'},carrier]};owner.bind({runtime:'legacy',sessionId:2},carried);
+    assert.equal(owner.restore(owner.read(),carried),true);
+    assert.equal(art.drawWreck(node('g'),carried.units[0],{x:0,y:0}),null);
+  }
+});
+
+test('only a matching accepted death enriches a reconstructed record, without duplicate or pose change',()=>{
+  const {owner,state,unit}=scene(),ticket=owner.begin({type:'Ram'},state);
+  const dead={...state,units:[{...unit,hp:0}]};owner.synchronize(dead);
+  const old=owner.read().wrecks[0];assert.equal(old.origin,'reconstructed-state-transition');
+  owner.confirm(ticket,dead,[],[]);
+  const confirmed=owner.read().wrecks[0];
+  assert.equal(confirmed.origin,'confirmed-end-state');assert.equal(confirmed.destructionRef.command.type,'Ram');
+  assert.equal(confirmed.wreckId,old.wreckId);assert.equal(confirmed.facingDegrees,old.facingDegrees);
+  assert.equal(JSON.stringify(confirmed.position),JSON.stringify(old.position));assert.equal(owner.read().wrecks.length,1);
+  const baseline={...dead};owner.bind({runtime:'core',sessionId:2},baseline);
+  const unrelated=owner.begin({type:'SelectWeapon'},baseline);owner.confirm(unrelated,baseline,[],[]);
+  assert.equal(owner.read().wrecks[0].origin,'reconstructed-default');
+  assert.equal(owner.read().wrecks[0].destructionRef,null,'an unrelated accepted command cannot invent baseline destruction');
+  owner.bind({runtime:'core',sessionId:3},state);owner.synchronize(dead);
+  const noDeath=owner.begin({type:'SelectWeapon'},dead);owner.confirm(noDeath,dead,[],[]);
+  assert.equal(owner.read().wrecks[0].origin,'reconstructed-state-transition');
+  assert.equal(owner.read().wrecks[0].destructionRef,null,'a pre-existing transition is not evidence that a later command killed it');
+});
+
 test('hidden cargo has fieldinfo but no separate map image; missing sidecar stays neutral',()=>{
   const {owner,state,unit,art,node,context}=scene('legacy'),dead={...unit,hp:0,embarkedOn:'carrier'};
   owner.synchronize({...state,units:[dead]});

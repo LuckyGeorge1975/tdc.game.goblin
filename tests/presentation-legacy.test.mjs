@@ -93,6 +93,8 @@ test('Legacy Ram records the actual path and target end state without extra roll
   const event=observed.events()[0].event;
   assert.equal(event.kind,'ram');assert.equal(event.after.units.find(u=>u.id==='guard').hp,0);
   assert.equal(event.sourceResults[0].targetId,'guard');
+  assert.equal(observed.run("GoblinPresentation.read().wrecks.find(w=>w.unitId==='guard').origin"),'confirmed-end-state');
+  assert.equal(observed.run("GoblinPresentation.read().wrecks.find(w=>w.unitId==='guard').destructionRef.command.type"),'Ram');
   observed.run('undoPhaseCommand()');assert.equal(observed.run('units[5].hp'),3);
 });
 
