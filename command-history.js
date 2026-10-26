@@ -22,9 +22,11 @@ function clearPhaseCommands() {
 }
 
 function commandSnapshot(label) {
-  return { label, units: structuredClone(units), terrain: [...terrain], terrainTypes: [...terrainTypes],
+  const snapshot = { label, units: structuredClone(units), terrain: [...terrain], terrainTypes: [...terrainTypes],
     selectedId: selected?.id, focus: focusedCell && {...focusedCell},
     log: logEl.innerHTML, rollCursor: phaseRollCursor };
+  globalThis.GoblinLegacyPresentation?.checkpoint(snapshot);
+  return snapshot;
 }
 
 function commandStateKey(list) {
@@ -53,6 +55,7 @@ function undoPhaseCommand() {
   autoPhaseTimer = null;
   closePhaseConfirm(false);
   const before = phaseCommands.pop();
+  globalThis.GoblinLegacyPresentation?.beforeUndo();
   units.splice(0, units.length, ...structuredClone(before.units));
   units.forEach(unit => { unit.moveFrom = null; unit.justHit = false; });
   terrain = new Set(before.terrain);
@@ -63,6 +66,7 @@ function undoPhaseCommand() {
   transportUnloadMode = null;
   phaseRollCursor = before.rollCursor;
   logEl.innerHTML = before.log;
+  globalThis.GoblinLegacyPresentation?.afterUndo(before);
   updateSelection();
   if (focusedCell) showFieldInfo(focusedCell.x, focusedCell.y);
   if (selected) showUnitInfo(selected);

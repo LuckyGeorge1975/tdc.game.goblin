@@ -48,6 +48,7 @@ function loadScenario(id){
   $('#log-status').textContent='STANDBY';
   logEl.innerHTML='';
   addLog(`${active.kicker} online. Awaiting command.`);
+  globalThis.GoblinLegacyPresentation?.sync();
   updateSelection();
   setViewMode('movement');
 }

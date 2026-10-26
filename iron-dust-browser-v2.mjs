@@ -1,3 +1,9 @@
+import {createCorePresentationObserver} from './core-presentation.mjs';
+
+function observePresentation(observer,method,...args){
+  try{return observer?.[method]?.(...args);}catch{return null;}
+}
+
 import {
   createIronDustProfile, validateIronDustProfile, projectIronDustProfile,
   queryIronDustProfile, queryIronDustCrtPreview, preflightIronDustProfile, dispatchIronDustProfile,
@@ -33,7 +39,7 @@ export function createIronDustBrowserSession(
   return Object.freeze({profile, projection});
 }
 
-export function dispatchIronDustBrowserAction(session, command) {
+export function dispatchIronDustBrowserAction(session, command, observer = null) {
   if (!['Move', 'Ram', 'SelectWeapon', 'PlayerFire', 'EndPhase',
     'AutoEnemyAdvance'].includes(command?.type))
     return {error:{code:'BROWSER_ACTION_UNSUPPORTED'}};
@@ -42,10 +48,13 @@ export function dispatchIronDustBrowserAction(session, command) {
   if (JSON.stringify(query) !== JSON.stringify(preflight))
     return {error:{code:'IRON_DUST_PREFLIGHT_MISMATCH'}};
   if (!query.available) return {error:query.error};
+  const presentation = observePresentation(observer,'begin',session,command,query);
   const result = dispatchIronDustProfile(session.profile, command);
   if (!result.profile) return {error:result.error};
-  return {session:Object.freeze({profile:result.profile,
-    projection:projectIronDustProfile(result.profile, result.events)})};
+  const nextSession=Object.freeze({profile:result.profile,
+    projection:projectIronDustProfile(result.profile, result.events)});
+  observePresentation(observer,'confirm',presentation,nextSession);
+  return {session:nextSession};
 }
 
 export function queryIronDustBrowserCrtPreview(session, command) {
@@ -95,6 +104,8 @@ if (typeof document !== 'undefined') {
   let eventHistory = [];
   let epoch = 0;
   let paused = false;
+  const presentation = globalThis.GoblinPresentation
+    ? createCorePresentationObserver(globalThis.GoblinPresentation,()=>epoch) : null;
   const endButton = document.querySelector('#end-turn');
   const legacyEndClick = endButton.onclick;
   const enemyFlow = createIronDustEnemyFlow({getSession:() => mode === 'ready' ? session : null,
@@ -117,7 +128,7 @@ if (typeof document !== 'undefined') {
   function commitAction(command) {
     if (mode !== 'ready' || !session) return {error:{code:'V2_NOT_READY'}};
     const cursor = session.projection.cursor;
-    const result = dispatchIronDustBrowserAction(session, command);
+    const result = dispatchIronDustBrowserAction(session, command, presentation);
     if (result.session) {
       session = result.session;
       eventHistory.push(...session.projection.events.map(event => ({...event,
@@ -177,9 +188,11 @@ if (typeof document !== 'undefined') {
     paused = false;
     epoch++;
     try {
+      globalThis.GoblinPresentation?.stop();
       session = createIronDustBrowserSession(profile ?? createIronDustProfile(startSeed),
         startSeed);
       mode = 'ready';
+      observePresentation(presentation,'sync',session);
       showGate('');
       actionError = null;
       eventHistory = [];
@@ -203,6 +216,7 @@ if (typeof document !== 'undefined') {
     enemyFlow.cancel();
     paused = false;
     epoch++;
+    globalThis.GoblinPresentation?.stop('core');
     session = null;
     mode = 'inactive';
     actionError = null;
