@@ -77,7 +77,7 @@
   "archiveMetadataNote": "Git archive may convert text line endings; source hashes below describe the raw verified archive entries, copied byte-identically to runtime metadata.",
   "export": {
     "script": "scripts/export-wrecks.py",
-    "scriptSha256": "e4df6d9ba272e99442b89222f0ef0ba79f08cb44dd7867c43a79b5cf6398f841",
+    "scriptSha256": "09e8d1d697ced374cdf2ca916897979b7d3cdb6e1aadbd5dec8e73dd8913d363",
     "version": 1,
     "pillowVersion": "12.3.0",
     "size": 192,

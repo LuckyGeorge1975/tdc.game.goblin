@@ -45,10 +45,12 @@ def safe_path(base, candidate):
     for item in (candidate, *candidate.parents):
         try:
             info = item.lstat()
-        except FileNotFoundError:
+        except (FileNotFoundError, NotADirectoryError):
             continue
         if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
             raise ValueError(f'reparse/symlink path rejected: {item}')
+        if item != candidate and not stat.S_ISDIR(info.st_mode):
+            raise ValueError(f'parent path is not a directory: {item}')
     return candidate
 
 

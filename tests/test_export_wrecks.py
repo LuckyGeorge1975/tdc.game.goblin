@@ -153,6 +153,22 @@ class ExportTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 export.unit_ids(json.dumps(manifest).encode())
 
+    def test_output_parent_file_conflicts_reject_before_any_write(self):
+        runs = export.PREVIEW.parent / 'test-runs'
+        runs.mkdir(parents=True, exist_ok=True)
+        for suffix in ('second.webp', 'deeper/second.webp'):
+            with self.subTest(suffix=suffix), tempfile.TemporaryDirectory(dir=runs) as directory:
+                base = Path(directory)
+                (base / 'blocked').write_bytes(b'keep')
+                with self.assertRaises(ValueError):
+                    export.write_outputs(base, {'new-dir/first.webp': b'new',
+                                                f'blocked/{suffix}': b'new'})
+                self.assertEqual(sorted(path.name for path in base.iterdir()), ['blocked'])
+                self.assertEqual((base / 'blocked').read_bytes(), b'keep')
+                with self.assertRaises(ValueError):
+                    export.write_outputs(base / 'blocked', {'third.webp': b'new'})
+                self.assertEqual((base / 'blocked').read_bytes(), b'keep')
+
     def test_output_containment_reparse_and_conflict_preflight(self):
         runs = export.PREVIEW.parent / 'test-runs'
         runs.mkdir(parents=True, exist_ok=True)
