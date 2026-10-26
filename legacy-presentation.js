@@ -18,7 +18,8 @@
   }
   root.GoblinLegacyPresentation=Object.freeze({
     sync:safe(sync),
-    beforeResult:safe(source=>sync()?{source,beforeRevision:root.GoblinPresentationState.stamp(snapshot())}:null),
+    beforeResult:safe(source=>sync()?{source,beforeRevision:root.GoblinPresentationState.stamp(snapshot()),
+      animationPreference:root.GoblinPresentationPreferences?.read()??{schemaVersion:1,mode:'high'}}:null),
     afterResult:safe(reference=>{
       if(!reference||!root.GoblinPresentation.owns('legacy'))return;
       const state=snapshot();

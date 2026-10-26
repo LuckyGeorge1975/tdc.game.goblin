@@ -5,6 +5,11 @@
     return value;
   }
   const immutable=value=>freeze(copy(value));
+  const preference=value=>({schemaVersion:1,mode:value?.schemaVersion===1&&
+    ['high','normal','off'].includes(value.mode)?value.mode:'high'});
+  function currentPreference(){
+    try{return preference(root.GoblinPresentationPreferences?.read());}catch{return preference(null);}
+  }
   function stamp(value){
     let hash=2166136261;
     for(const char of JSON.stringify(value)){hash^=char.charCodeAt(0);hash=Math.imul(hash,16777619);}
@@ -35,6 +40,7 @@
     function cancel(){generation++;tickets=new WeakSet();}
     function synchronize(state,destructionRef=null,confirmedBefore=null){
       if(!sidecar)return;
+      if(destructionRef?.animationPreference)sidecar.animationPreference=preference(destructionRef.animationPreference);
       const previous=new Map(sidecar.facingByUnit.map(item=>[item.unitId,item]));
       sidecar.facingByUnit=state.units.map(unit=>{
         const old=previous.get(unit.id);
@@ -75,13 +81,13 @@
       sidecar={schemaVersion:1,binding:copy(binding),sessionInstanceId:`presentation-${++nextRun}`,
         mappingVersion:'movement-facing-v1',visualConfigVersion:'instant-off-v1',branchGeneration:0,
         acceptedSequence:0,settledThrough:null,baselineRevision:stamp(state),settledRevision:stamp(state),
-        facingByUnit:[],wrecks:[],wreckMappingVersion:'static-wreck-v1'};
+        facingByUnit:[],wrecks:[],wreckMappingVersion:'static-wreck-v1',animationPreference:currentPreference()};
       synchronize(state);return true;
     }
     function begin(command,before,details={}){
       if(!sidecar)return null;
       synchronize(before);
-      const ticket=immutable({generation,bindingKey:key,command,before,details});
+      const ticket=immutable({generation,bindingKey:key,command,before,details,animationPreference:currentPreference()});
       tickets.add(ticket);return ticket;
     }
     function settleToAfter(eventId,expectedGeneration=generation){
@@ -104,6 +110,7 @@
     function confirm(ticket,after,sourceResults,movements){
       if(!tickets.has(ticket)||ticket.generation!==generation||ticket.bindingKey!==key)return [];
       tickets.delete(ticket);
+      sidecar.animationPreference=preference(ticket.animationPreference);
       if(!Array.isArray(movements)||!movements.length){
         synchronize(after,{source:'accepted-command',command:ticket.command,
           beforeRevision:stamp(ticket.before),afterRevision:stamp(after)},ticket.before);return [];}
@@ -122,6 +129,7 @@
         const event=immutable({schemaVersion:1,eventId,kind:movement.kind,
           binding:{...binding,sessionInstanceId:sidecar.sessionInstanceId,branchGeneration:sidecar.branchGeneration},
           action:{acceptedSequence,sourceCommand:ticket.command,...ticket.details,
+            animationPreference:ticket.animationPreference,
             turn:ticket.before.turn,phase:ticket.before.phase,
             beforeRevision:stamp(ticket.before),afterRevision:stamp(after)},
           actor:{unitId:beforeUnit.id,team:beforeUnit.team,visualKey:beforeUnit.visualKey??null,
@@ -187,6 +195,7 @@
       const valid=compatible(saved,state,true);
       sidecar.facingByUnit=valid?copy(saved.facingByUnit):[];
       sidecar.wrecks=valid?copy(saved.wrecks):[];
+      sidecar.animationPreference=valid?preference(saved.animationPreference):currentPreference();
       endState=null;
       sidecar.settledThrough=valid?saved.settledThrough:null;
       synchronize(state);return valid;
@@ -201,7 +210,8 @@
       restore(saved,state){if(!sidecar)return false;
         if(!compatible(saved,state)){cancel();sidecar.facingByUnit=[];sidecar.wrecks=[];endState=null;sidecar.settledThrough=null;
           synchronize(state);return false;}
-        cancel();sidecar=copy(saved);sequence=Math.max(sequence,saved.acceptedSequence);synchronize(state);return true;}
+        cancel();sidecar=copy(saved);sidecar.animationPreference=preference(saved.animationPreference);
+        sequence=Math.max(sequence,saved.acceptedSequence);synchronize(state);return true;}
     });
   }
   const api=Object.freeze({createOwner,stamp,validPath,direction,

@@ -477,6 +477,10 @@
     'map.grid': 'GRID',
   });
   const templates = Object.freeze({
+    'ui.settings.animation': {de:'Animation',en:'Animation',es:'Animación',fr:'Animation'},
+    'ui.settings.animation.high': {de:'Hoch',en:'High',es:'Alta',fr:'Élevée'},
+    'ui.settings.animation.normal': {de:'Normal',en:'Normal',es:'Normal',fr:'Normale'},
+    'ui.settings.animation.off': {de:'Aus',en:'Off',es:'Desactivada',fr:'Désactivée'},
     'v2.field.wreck': {de:'Wrack: {name}',en:'Wreck: {name}',es:'Restos: {name}',fr:'Épave : {name}'},
     'mission.iron-dust-v2.title': {
       de: 'IRON DUST v2', en: 'IRON DUST v2',

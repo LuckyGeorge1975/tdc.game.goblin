@@ -568,6 +568,20 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         languageSelect.value = GoblinLanguage.current;
         languageSelect.onchange = () => GoblinLanguage.choose(languageSelect.value);
         language.append(languageSelect);
+        const animation=document.createElement('fieldset');animation.className='v2-animation-options';
+        const animationTitle=document.createElement('legend');animationTitle.textContent=t('ui.settings.animation');
+        const animationChoices=document.createElement('div');animationChoices.className='v2-animation-segments';
+        for(const mode of GoblinPresentationPreferences.modes){
+          const choice=button(t(`ui.settings.animation.${mode}`),()=>{
+            GoblinPresentationPreferences.set(mode);
+            for(const item of animationChoices.children)
+              item.setAttribute('aria-pressed',String(item.dataset.animationMode===GoblinPresentationPreferences.read().mode));
+          });
+          choice.dataset.animationMode=mode;
+          choice.setAttribute('aria-pressed',String(GoblinPresentationPreferences.read().mode===mode));
+          animationChoices.append(choice);
+        }
+        animation.append(animationTitle,animationChoices);
         const grid = document.createElement('label'); grid.className = 'v2-setting-check';
         const gridInput = document.createElement('input'); gridInput.type = 'checkbox'; gridInput.id = 'v2-grid';
         gridInput.checked = GoblinUIV2.gridVisible;
@@ -582,7 +596,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           input.onchange=()=>GoblinUIV2[key==='targets'?'setTargetsVisible':'setDamageVisible'](input.checked);
           row.append(input,document.createTextNode(t(`v2.display.${key}`)));displayOptions.push(row);
         }
-        content.append(language, grid, ...displayOptions, paragraph(t('ui.settings.note')));
+        content.append(language, animation, grid, ...displayOptions, paragraph(t('ui.settings.note')));
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-options-back';
         footer.append(actions(back));

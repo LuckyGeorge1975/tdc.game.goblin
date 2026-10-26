@@ -23,7 +23,7 @@ function scene(enabled=true){
     scheduleGameTask(fn){timers.set(++id,fn);return id;}});
   const run=s=>vm.runInContext(s,context);
   const files=['unit-visuals.js','terrain-rules.js','ogre-systems.js','scenario-profile-manifest.js',
-    ...(enabled?['presentation-state.js']:[]),'game.js','ogre-runtime.js','combat-feedback.js',
+    ...(enabled?['presentation-preferences.js','presentation-state.js']:[]),'game.js','ogre-runtime.js','combat-feedback.js',
     'siegebreaker-weapons.js','strategic-missile.js','scenario.js',
     ...(enabled?['legacy-presentation.js']:[]),'command-history.js'];
   for(const file of files)run(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'));
@@ -147,6 +147,20 @@ test('a terminal Legacy Ram captures the completed victory check, not its interm
   const event=game.events()[0].event;
   assert.equal(event.after.gameOver,true);
   assert.equal(event.after.phase,game.run('turnPhase'));
+});
+
+test('Legacy resolver captures explicit animation mode at action start without changing cached fire/Undo state',()=>{
+  const observed=scene(),control=scene(false);
+  observed.run("GoblinPresentationPreferences.set('normal')");
+  for(const game of [observed,control])game.run("units[5].x=2;units[5].y=5;setTurnPhase('fire');attack(units[1],units[5])");
+  assert.equal(observed.run('GoblinPresentation.read().animationPreference.mode'),'normal');
+  assert.equal(observed.run('GoblinPresentation.read().wrecks[0].destructionRef.animationPreference.mode'),'normal');
+  observed.run("GoblinPresentationPreferences.set('off');GoblinLegacyPresentation.sync()");
+  assert.equal(observed.run('GoblinPresentation.read().animationPreference.mode'),'normal','redraw cannot change current action mode');
+  for(const game of [observed,control])game.run('undoPhaseCommand();attack(units[1],units[5])');
+  assert.equal(observed.run('GoblinPresentation.read().animationPreference.mode'),'off');
+  assert.equal(observed.run('GoblinPresentationPreferences.read().mode'),'off','Undo does not revert explicit setting');
+  assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
 });
 
 test('each internal Legacy enemy move is captured before later enemy actions, not as one turn diff',()=>{
