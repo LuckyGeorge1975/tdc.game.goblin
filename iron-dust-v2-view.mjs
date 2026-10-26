@@ -144,9 +144,7 @@ function renderIntel(view) {
   const fieldFacts = document.querySelector('#intel-facts');
   fieldFacts.replaceChildren(element('div', null, cell ? `${t('v2.ui.terrain')} · ${label(`v2.ui.terrain.${cell.type}`, cell.type)}` : `${t('v2.ui.terrain')} · —`));
   if(cell)for(const wreck of globalThis.UnitVisuals?.wrecksAt?.(cell.x,cell.y)??[]){
-    const unit=view.units.find(item=>item.id===wreck.unitId);
-    fieldFacts.appendChild(element('div',null,globalThis.UnitVisuals.wreckLabel(
-      {name:wreck.nameKeyOrRuntimeName},unit?unitLabel(unit.id):wreck.nameKeyOrRuntimeName)));
+    fieldFacts.appendChild(element('div',null,globalThis.UnitVisuals.wreckLabel(wreck)));
   }
 }
 

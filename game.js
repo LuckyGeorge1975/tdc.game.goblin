@@ -209,7 +209,7 @@ function showFieldInfo(x,y){
   $('#intel-copy').textContent=`${rule.note}${blocked?' Dieses Feld liegt hinter einem Sichtblocker.':''}`;
   $('#intel-facts').innerHTML=`<div><span>TERRAIN</span><b>${rule.label}</b></div><div><span>MOVE COST</span><b>${Number.isFinite(cost)?cost:'BLOCKED'}</b></div><div><span>COVER</span><b>${rule.cover?'+1 DEF':'NONE'}</b></div><div><span>OCCUPANT</span><b>${unit?unit.name:'NONE'}</b></div><div><span>VISIBILITY</span><b>${blocked?'BLOCKED':'CLEAR'}</b></div>`;
   for(const wreck of UnitVisuals.wrecksAt(x,y)){
-    const row=document.createElement('div');row.textContent=UnitVisuals.wreckLabel({name:wreck.nameKeyOrRuntimeName});
+    const row=document.createElement('div');row.textContent=UnitVisuals.wreckLabel(wreck);
     $('#intel-facts').appendChild(row);
   }
 }

@@ -118,8 +118,20 @@
     }catch{return null;}
   }
 
-  function wreckLabel(unit,name=unit.name??unit.id){
-    const localized=root.GoblinLanguage?.translate?.(name)??name;
+  function wreckLabel(unit,name=unit.name??unit.nameKeyOrRuntimeName??unit.id??unit.unitId){
+    const language=root.GoblinLanguage,raw=typeof name==='string'&&name.trim()?name:String(unit.id??unit.unitId??'×');
+    let localized=language?.translate?.(raw)??raw;
+    const visualKey=artKey(unit);
+    // Only canonical names matching the actual artwork may use unit/type catalog keys.
+    if(visualKey&&artKey({name:raw})===visualKey){
+      for(const key of [`v2.unit.${unit.id??unit.unitId}`,`library.unit.${visualKey}.name`]){
+        const english=language?.t(key,{},'en'),value=language?.t(key);
+        if(typeof english==='string'&&english!==key&&artKey({name:english})===visualKey&&
+          typeof value==='string'&&value!==key&&value.trim()){
+          localized=value;break;
+        }
+      }
+    }
     const label=root.GoblinLanguage?.t('v2.field.wreck',{name:localized});
     return label&&label!=='v2.field.wreck'?label:localized;
   }
