@@ -143,6 +143,11 @@ function renderIntel(view) {
   setText('#intel-copy', cell ? label(`v2.ui.terrain.${cell.type}`, cell.type) : t('v2.ui.selectHex'));
   const fieldFacts = document.querySelector('#intel-facts');
   fieldFacts.replaceChildren(element('div', null, cell ? `${t('v2.ui.terrain')} · ${label(`v2.ui.terrain.${cell.type}`, cell.type)}` : `${t('v2.ui.terrain')} · —`));
+  if(cell)for(const wreck of globalThis.UnitVisuals?.wrecksAt?.(cell.x,cell.y)??[]){
+    const unit=view.units.find(item=>item.id===wreck.unitId);
+    fieldFacts.appendChild(element('div',null,globalThis.UnitVisuals.wreckLabel(
+      {name:wreck.nameKeyOrRuntimeName},unit?unitLabel(unit.id):wreck.nameKeyOrRuntimeName)));
+  }
 }
 
 function renderRoster(view, rerender) {
@@ -225,10 +230,9 @@ function renderMap(view, rerender, onAction) {
       activateCell(unit);
     });
     if (unit.hp <= 0) {
-      const wreck = svgElement('text');
-      wreck.setAttribute('x', c.x); wreck.setAttribute('y', c.y + 5);
-      wreck.setAttribute('text-anchor', 'middle'); wreck.classList.add('wreck-mark');
-      wreck.textContent = '×'; group.appendChild(wreck);
+      group.setAttribute('pointer-events','none');
+      if(unit.embarkedOn||globalThis.UnitVisuals?.wreckFor?.(unit)?.cargoRelation)continue;
+      globalThis.UnitVisuals?.drawWreck?.(group,unit,c,{ns:SVG_NS});
     } else {
       const color = unit.team === 'enemy' ? '#ee574d' : unit.id === 'ogre' ? '#d1f35a' : '#62cadd';
       globalThis.UnitVisuals.draw(group, unit, c,

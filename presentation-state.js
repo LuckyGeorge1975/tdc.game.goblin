@@ -33,7 +33,7 @@
     let tickets=new WeakSet();
     const records=new Map();
     function cancel(){generation++;tickets=new WeakSet();}
-    function synchronize(state){
+    function synchronize(state,destructionRef=null){
       if(!sidecar)return;
       const previous=new Map(sidecar.facingByUnit.map(item=>[item.unitId,item]));
       sidecar.facingByUnit=state.units.map(unit=>{
@@ -42,17 +42,32 @@
           {unitId:unit.id,team:unit.team,visualKey:unit.visualKey??null,
             angleDegrees:unit.team==='enemy'?180:0,sourceActionId:null,origin:'baseline'};
       });
+      const oldWrecks=new Map(sidecar.wrecks.map(item=>[item.unitId,item]));
+      sidecar.wrecks=state.units.filter(unit=>Number.isFinite(unit.hp)&&unit.hp<=0).map(unit=>{
+        const old=oldWrecks.get(unit.id),prior=endState?.units.find(item=>item.id===unit.id);
+        const same=old&&old.team===unit.team&&old.visualKey===(unit.visualKey??null);
+        const carrierId=unit.embarkedOn??prior?.embarkedOn??null;
+        const facing=sidecar.facingByUnit.find(item=>item.unitId===unit.id);
+        return {...(same?old:{wreckId:`${sidecar.sessionInstanceId}/${sidecar.branchGeneration}/wreck/${unit.id}`,
+          unitId:unit.id,visualKey:unit.visualKey??null,team:unit.team,type:unit.type??null,
+          nameKeyOrRuntimeName:unit.name??unit.id,
+          binding:{...binding,sessionInstanceId:sidecar.sessionInstanceId,branchGeneration:sidecar.branchGeneration},
+          destructionRef:destructionRef?copy(destructionRef):null,
+          cargoRelation:carrierId?{carrierId}:null,
+          origin:destructionRef?'confirmed-end-state':prior?.hp>0?'reconstructed-state-transition':'reconstructed-default'}),
+          position:position(unit),facingDegrees:facing.angleDegrees};
+      });
       endState=immutable(state);
       sidecar.settledRevision=stamp(state);
     }
     function bind(next,state){
       const nextKey=JSON.stringify(next);
       if(nextKey===key)return false;
-      cancel();key=nextKey;binding=immutable(next);sequence=0;records.clear();
+      cancel();key=nextKey;binding=immutable(next);sequence=0;records.clear();endState=null;
       sidecar={schemaVersion:1,binding:copy(binding),sessionInstanceId:`presentation-${++nextRun}`,
         mappingVersion:'movement-facing-v1',visualConfigVersion:'instant-off-v1',branchGeneration:0,
         acceptedSequence:0,settledThrough:null,baselineRevision:stamp(state),settledRevision:stamp(state),
-        facingByUnit:[],wrecks:[]};
+        facingByUnit:[],wrecks:[],wreckMappingVersion:'static-wreck-v1'};
       synchronize(state);return true;
     }
     function begin(command,before,details={}){
@@ -66,19 +81,24 @@
       if(expectedGeneration!==generation||!item||item.status==='settled')return false;
       item.status='running';
       const event=item.event;
-      synchronize(event.after);
+      synchronize(event.after,{source:'accepted-command',command:event.action.sourceCommand,
+        beforeRevision:event.action.beforeRevision,afterRevision:event.action.afterRevision});
       if(event.path){
         const from=event.path.length===1?event.actor.positionBefore:event.path.at(-2);
         const facing=sidecar.facingByUnit.find(unit=>unit.unitId===event.actor.unitId);
         if(facing){facing.angleDegrees=direction(from,event.path.at(-1));
           facing.sourceActionId=eventId;facing.origin='confirmed-movement';}
       }
+      synchronize(event.after,{source:'accepted-command',command:event.action.sourceCommand,
+        beforeRevision:event.action.beforeRevision,afterRevision:event.action.afterRevision});
       sidecar.settledThrough=eventId;item.status='settled';return true;
     }
     function confirm(ticket,after,sourceResults,movements){
       if(!tickets.has(ticket)||ticket.generation!==generation||ticket.bindingKey!==key)return [];
       tickets.delete(ticket);
-      if(!Array.isArray(movements)||!movements.length){synchronize(after);return [];}
+      if(!Array.isArray(movements)||!movements.length){
+        synchronize(after,{source:'accepted-command',command:ticket.command,
+          beforeRevision:stamp(ticket.before),afterRevision:stamp(after)});return [];}
       const acceptedSequence=++sequence,events=[];
       sidecar.acceptedSequence=sequence;
       for(const movement of movements){
@@ -116,8 +136,29 @@
             saved.acceptedSequence!==sidecar.acceptedSequence)||
           typeof saved.baselineRevision!=='string'||
           !(saved.settledThrough===null||typeof saved.settledThrough==='string')||
-          !Array.isArray(saved.wrecks)||saved.wrecks.length||!Array.isArray(saved.facingByUnit)||
+          saved.wreckMappingVersion!=='static-wreck-v1'||!Array.isArray(saved.wrecks)||!Array.isArray(saved.facingByUnit)||
           saved.facingByUnit.length!==state.units.length)return false;
+      const dead=state.units.filter(unit=>Number.isFinite(unit.hp)&&unit.hp<=0),wreckIds=new Set(),wreckUnits=new Set();
+      if(saved.wrecks.length!==dead.length||!saved.wrecks.every(item=>{
+        const unit=dead.find(unit=>unit.id===item.unitId),facing=saved.facingByUnit.find(f=>f.unitId===item.unitId);
+        if(!unit||wreckUnits.has(item.unitId)||typeof item.wreckId!=='string'||wreckIds.has(item.wreckId)||
+          item.team!==unit.team||item.visualKey!==(unit.visualKey??null)||item.type!==(unit.type??null)||
+          item.position?.x!==unit.x||item.position?.y!==unit.y||item.facingDegrees!==facing?.angleDegrees||
+          item.nameKeyOrRuntimeName!==(unit.name??unit.id)||
+          !['confirmed-end-state','reconstructed-state-transition','reconstructed-default'].includes(item.origin)||
+          item.binding?.sessionInstanceId!==saved.sessionInstanceId||
+          !Number.isSafeInteger(item.binding?.branchGeneration)||item.binding.branchGeneration<0||
+          item.binding.branchGeneration>saved.branchGeneration||
+          item.wreckId!==`${saved.sessionInstanceId}/${item.binding.branchGeneration}/wreck/${unit.id}`||
+          Object.entries(binding).some(([key,value])=>item.binding[key]!==value)||
+          !(item.cargoRelation===null||typeof item.cargoRelation?.carrierId==='string')||
+          unit.embarkedOn&&item.cargoRelation?.carrierId!==unit.embarkedOn||
+          !(item.destructionRef===null||typeof item.destructionRef==='object'&&
+            typeof item.destructionRef.source==='string'&&typeof item.destructionRef.beforeRevision==='string'&&
+            typeof item.destructionRef.afterRevision==='string')||
+          (item.origin==='confirmed-end-state')!==(item.destructionRef!==null))return false;
+        wreckUnits.add(item.unitId);wreckIds.add(item.wreckId);return true;
+      }))return false;
       const ids=new Set();
       return saved.facingByUnit.every(item=>{
         const unit=state.units.find(unit=>unit.id===item.unitId);
@@ -133,6 +174,8 @@
       // Keep sequence monotonic; repeating an undone action belongs to a new visual branch.
       const valid=compatible(saved,state,true);
       sidecar.facingByUnit=valid?copy(saved.facingByUnit):[];
+      sidecar.wrecks=valid?copy(saved.wrecks):[];
+      endState=null;
       sidecar.settledThrough=valid?saved.settledThrough:null;
       synchronize(state);return valid;
     }
@@ -144,7 +187,7 @@
       owns:runtime=>binding?.runtime===runtime,
       guard(callback){const expected=generation;return (...args)=>expected===generation?callback(...args):undefined;},
       restore(saved,state){if(!sidecar)return false;
-        if(!compatible(saved,state)){cancel();sidecar.facingByUnit=[];sidecar.settledThrough=null;
+        if(!compatible(saved,state)){cancel();sidecar.facingByUnit=[];sidecar.wrecks=[];endState=null;sidecar.settledThrough=null;
           synchronize(state);return false;}
         cancel();sidecar=copy(saved);sequence=Math.max(sequence,saved.acceptedSequence);synchronize(state);return true;}
     });

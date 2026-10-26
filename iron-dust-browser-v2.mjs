@@ -11,7 +11,7 @@ import {
 } from './src/core/iron-dust-executable-profile.mjs';
 import {buildIronDustV2View, renderIronDustV2View, formatIronDustV2Error,
   formatIronDustV2Event,
-  resetIronDustV2View} from './iron-dust-v2-view.mjs?v=7';
+  resetIronDustV2View} from './iron-dust-v2-view.mjs?v=8';
 import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1}
   from './src/levels/iron-dust-core-data.v1.mjs';
 

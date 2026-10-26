@@ -105,6 +105,39 @@ test('movement-sidecar checkpoints leave active fire wrappers and Undo roll cach
   assert.equal(observed.events().length,0,'this foundation does not emit fire effects');
 });
 
+test('real Legacy fire creates a static wreck, Undo removes it and cached reissue stays gameplay-identical',()=>{
+  const observed=scene(),control=scene(false);
+  for(const game of [observed,control])game.run("units[5].x=2;units[5].y=5;setTurnPhase('fire');attack(units[1],units[5])");
+  assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
+  const read=()=>JSON.parse(observed.run('JSON.stringify(GoblinPresentation.read())'));
+  const first=read().wrecks.find(w=>w.unitId==='guard');
+  assert.ok(first);assert.equal(first.destructionRef.source,'legacy-combatOutcome');
+  for(const game of [observed,control])game.run('undoPhaseCommand()');
+  assert.equal(read().wrecks.length,0);
+  for(const game of [observed,control])game.run('attack(units[1],units[5])');
+  assert.notEqual(read().wrecks.find(w=>w.unitId==='guard').wreckId,first.wreckId);
+  assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
+});
+
+test('Legacy system losses create no wreck until actual whole-unit destruction, without extra rolls',()=>{
+  const observed=scene(),control=scene(false);
+  for(const game of [observed,control])game.run("GoblinOgreRuntime.resolveSystemAttack(units[5],units[0],'main')");
+  assert.equal(observed.run('GoblinPresentation.read().wrecks.length'),0);
+  for(const game of [observed,control])game.run("const system=units[0].ogreSystems;Object.values(system.weapons).forEach(w=>w.destroyed=w.count);system.treads=1;GoblinOgreRuntime.resolveSystemAttack(units[5],units[0],'treads')");
+  assert.equal(observed.run('units[0].hp'),0);
+  assert.equal(observed.run('GoblinPresentation.read().wrecks[0].destructionRef.source'),'legacy-resolveSystemAttack');
+  assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
+});
+
+test('actual Legacy carrier combat serializes killed hidden passengers without a second visible wreck',()=>{
+  const observed=scene(),control=scene(false);
+  for(const game of [observed,control])game.run("units[5].transportCapacity=3;units[6].embarkedOn=units[5].id;units[6].x=units[5].x;units[6].y=units[5].y;units[1].damage=99;combatOutcome(units[1],units[5])");
+  assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
+  const wrecks=JSON.parse(observed.run('JSON.stringify(GoblinPresentation.read().wrecks)'));
+  assert.ok(wrecks.some(w=>w.unitId==='guard'&&w.cargoRelation===null));
+  assert.ok(wrecks.some(w=>w.unitId===observed.run('units[6].id')&&w.cargoRelation?.carrierId==='guard'));
+});
+
 test('a terminal Legacy Ram captures the completed victory check, not its intermediate state',()=>{
   const game=scene();
   game.run("terrain.clear();units.filter(u=>u.team==='enemy'&&u.id!=='guard').forEach(u=>u.hp=0);units[5].x=2;units[5].y=5;selected=units[0];handleHex(2,5)");

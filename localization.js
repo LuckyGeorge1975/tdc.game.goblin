@@ -477,6 +477,7 @@
     'map.grid': 'GRID',
   });
   const templates = Object.freeze({
+    'v2.field.wreck': {de:'Wrack: {name}',en:'Wreck: {name}',es:'Restos: {name}',fr:'Épave : {name}'},
     'mission.iron-dust-v2.title': {
       de: 'IRON DUST v2', en: 'IRON DUST v2',
       es: 'IRON DUST v2', fr: 'IRON DUST v2',

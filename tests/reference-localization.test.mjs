@@ -32,6 +32,9 @@ test('phase fixture instructions and Skimmer phase displays translate without vi
     assert.ok(translated.includes(term), `${lang}: ${translated}`);
     assert.equal(context.GoblinLanguage.translate('Zum Skimmer-Manöver →', lang), button);
     assert.equal(context.GoblinLanguage.translate('Player · Skimmer-Manöver', lang), phase);
+    const wreck={de:'Wrack: Alpha',en:'Wreck: Alpha',es:'Restos: Alpha',fr:'Épave : Alpha'};
+    assert.equal(context.GoblinLanguage.t('v2.field.wreck',{name:'Alpha'},lang),wreck[lang]);
+    assert.doesNotMatch(context.GoblinLanguage.t('v2.field.wreck',{name:'Alpha'},lang),/\{name\}|v2\.field/);
     assert.doesNotMatch(translated, /\bGEV\b/i);
   }
   const v2Titles = {

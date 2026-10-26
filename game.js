@@ -161,8 +161,10 @@ function renderUnit(u){if(u.embarkedOn)return;
   const covered=terrain.has(`${u.x},${u.y}`);
   if(covered&&u.hp>0)g.classList.add('covered-unit');
   if(!phaseCanAct(u)&&u.hp>0&&u.team==='player'&&!u.disabled)g.classList.add('acted-unit');if(u.disabled&&u.hp>0){g.classList.add('disabled-unit');g.style.opacity='.32';g.style.filter='grayscale(1)'}
-  if(u.justHit)g.classList.add('hit-flash');
-  if(u.hp<=0){g.classList.add('wreck');const wreck=document.createElementNS(NS,'polygon');wreck.setAttribute('points',`${c.x-18},${c.y-10} ${c.x+12},${c.y-16} ${c.x+19},${c.y+8} ${c.x-8},${c.y+16}`);wreck.setAttribute('fill','#1a2528');wreck.setAttribute('stroke','#a34e46');wreck.setAttribute('stroke-width','2');g.appendChild(wreck);const mark=document.createElementNS(NS,'text');mark.setAttribute('x',c.x);mark.setAttribute('y',c.y+5);mark.setAttribute('text-anchor','middle');mark.classList.add('wreck-mark');mark.textContent='×';g.appendChild(mark);svg.appendChild(g);return}
+  if(u.justHit&&u.hp>0)g.classList.add('hit-flash');
+  if(u.hp<=0){g.classList.add('wreck');g.setAttribute('pointer-events','none');
+    if(UnitVisuals.wreckFor(u)?.cargoRelation)return;
+    UnitVisuals.drawWreck(g,u,c,{ns:NS});svg.appendChild(g);return}
   if(transportLoadMode&&u.team==='player'&&u!==transportLoadMode){if(canEmbark(transportLoadMode,u))g.classList.add('transport-candidate');else g.classList.add('transport-unavailable')}
   if(selected&&selected.team==='player'&&selected!==u&&u.transportCapacity&&canEmbark(selected,u))g.classList.add('transport-target')
   const targetable=turnPhase==='fire'&&u.team==='enemy'&&selected&&dist(selected,u)<=selected.range&&lineOfSight(selected,u)&&(typeof canSelectedWeaponTarget!=='function'||canSelectedWeaponTarget(selected,u));
@@ -206,6 +208,10 @@ function showFieldInfo(x,y){
   if(terrainIconHost?.replaceChildren)terrainIconHost.replaceChildren(...(terrainIcon?[terrainIcon]:[]));
   $('#intel-copy').textContent=`${rule.note}${blocked?' Dieses Feld liegt hinter einem Sichtblocker.':''}`;
   $('#intel-facts').innerHTML=`<div><span>TERRAIN</span><b>${rule.label}</b></div><div><span>MOVE COST</span><b>${Number.isFinite(cost)?cost:'BLOCKED'}</b></div><div><span>COVER</span><b>${rule.cover?'+1 DEF':'NONE'}</b></div><div><span>OCCUPANT</span><b>${unit?unit.name:'NONE'}</b></div><div><span>VISIBILITY</span><b>${blocked?'BLOCKED':'CLEAR'}</b></div>`;
+  for(const wreck of UnitVisuals.wrecksAt(x,y)){
+    const row=document.createElement('div');row.textContent=UnitVisuals.wreckLabel({name:wreck.nameKeyOrRuntimeName});
+    $('#intel-facts').appendChild(row);
+  }
 }
 function carrierCargo(unit){return units.filter(u=>u.embarkedOn===unit.id&&u.hp>0)}
 function carrierLoad(unit){return carrierCargo(unit).reduce((sum,cargo)=>sum+Math.max(1,cargo.hp),0)}

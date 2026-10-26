@@ -18,6 +18,12 @@
   }
   root.GoblinLegacyPresentation=Object.freeze({
     sync:safe(sync),
+    beforeResult:safe(source=>sync()?{source,beforeRevision:root.GoblinPresentationState.stamp(snapshot())}:null),
+    afterResult:safe(reference=>{
+      if(!reference||!root.GoblinPresentation.owns('legacy'))return;
+      const state=snapshot();
+      root.GoblinPresentation.synchronize(state,{...reference,afterRevision:root.GoblinPresentationState.stamp(state)});
+    }),
     begin:safe((actor,path,kind,target)=>{
       if(!sync())return null;
       return {ticket:root.GoblinPresentation.begin({type:kind==='ram'?'Ram':'Move',actorId:actor.id,
@@ -39,5 +45,13 @@
     beforeUndo:safe(()=>root.GoblinPresentation.cancel()),
     afterUndo:safe(snapshotKey=>{if(sync())root.GoblinPresentation.rewind(checkpoints.get(snapshotKey),snapshot());})
   });
+  // The later roll-cache wrapper still invokes this resolver exactly once.
+  const baseCombatOutcome=combatOutcome;
+  combatOutcome=function(...args){
+    const reference=root.GoblinLegacyPresentation.beforeResult('legacy-combatOutcome');
+    const result=baseCombatOutcome(...args);
+    root.GoblinLegacyPresentation.afterResult(reference);
+    return result;
+  };
   root.GoblinLegacyPresentation.sync();
 })(globalThis);

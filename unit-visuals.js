@@ -106,6 +106,58 @@
     });
   }
 
+  function wreckFor(unit){
+    try{
+      if(!Number.isFinite(unit.hp)||unit.hp>0)return null;
+      const owner=root.GoblinPresentation,state=owner?.endState(),sidecar=owner?.read();
+      if(sidecar?.wreckMappingVersion!=='static-wreck-v1'||!owner.owns(sidecar.binding?.runtime)||
+        sidecar.settledRevision!==root.GoblinPresentationState?.stamp(state))return null;
+      const item=sidecar.wrecks.find(item=>item.unitId===unit.id);
+      return item&&item.team===unit.team&&item.visualKey===artKey(unit)&&
+        item.position.x===unit.x&&item.position.y===unit.y?item:null;
+    }catch{return null;}
+  }
+
+  function wreckLabel(unit,name=unit.name??unit.id){
+    const localized=root.GoblinLanguage?.translate?.(name)??name;
+    const label=root.GoblinLanguage?.t('v2.field.wreck',{name:localized});
+    return label&&label!=='v2.field.wreck'?label:localized;
+  }
+
+  function wrecksAt(x,y){
+    try{
+      const owner=root.GoblinPresentation,sidecar=owner?.read(),state=owner?.endState();
+      if(sidecar?.wreckMappingVersion!=='static-wreck-v1'||!owner.owns(sidecar.binding?.runtime)||
+        sidecar.settledRevision!==root.GoblinPresentationState?.stamp(state))return [];
+      return sidecar.wrecks.filter(item=>item.position.x===x&&item.position.y===y)
+        .slice().sort((a,b)=>a.unitId<b.unitId?-1:a.unitId>b.unitId?1:0);
+    }catch{return [];}
+  }
+
+  function drawWreck(group,unit,center,{ns}={}){
+    const namespace=ns||'http://www.w3.org/2000/svg',wreck=wreckFor(unit);
+    if(!Number.isFinite(unit.hp)||unit.hp>0||unit.embarkedOn||wreck?.cargoRelation)return null;
+    const name=wreckLabel(unit),fallback=()=>{
+      const container=document.createElementNS(namespace,'g'),mark=document.createElementNS(namespace,'text');
+      const title=document.createElementNS(namespace,'title');title.textContent=name;container.appendChild(title);
+      mark.setAttribute('x',center.x);mark.setAttribute('y',center.y+5);mark.setAttribute('text-anchor','middle');
+      mark.classList.add('wreck-mark');mark.textContent='×';container.appendChild(mark);return container;
+    };
+    const side=unit.team==='player'?'own':unit.team==='enemy'?'enemy':null;
+    const asset=wreck&&side&&artKeys.has(wreck.visualKey)?`${fixedAssetPrefix}wrecks/${side}/${wreck.visualKey}.webp`:null;
+    if(!asset||failedMapAssets.has(asset)){const mark=fallback();group.appendChild(mark);return mark;}
+    const shadow=document.createElementNS(namespace,'g'),image=document.createElementNS(namespace,'image');
+    const scale=mapIconSize/100;shadow.classList.add('unit-wreck-shadow');
+    shadow.setAttribute('style',`filter:drop-shadow(${1.5*scale}px ${2.5*scale}px ${3*scale}px rgba(8,10,14,.35))`);
+    const title=document.createElementNS(namespace,'title');title.textContent=name;shadow.appendChild(title);
+    for(const [key,value] of Object.entries({x:center.x-mapIconSize/2,y:center.y-mapIconSize/2,
+      width:mapIconSize,height:mapIconSize,preserveAspectRatio:'xMidYMid meet',
+      transform:`rotate(${wreck.facingDegrees-(unit.team==='enemy'?180:0)} ${center.x} ${center.y})`,
+      'aria-label':name}))image.setAttribute(key,value);
+    image.classList.add('unit-wreck-artwork');shadow.appendChild(image);group.appendChild(shadow);
+    watchMapImage(image,asset,()=>shadow.replaceWith(fallback()));image.setAttribute('href',asset);return image;
+  }
+
   function boundsFor(unit){
     const visual=resolve(unit);
     if(visual.asset){
@@ -237,5 +289,6 @@
   register('guard',{shape:'tracked',label:'G'});
 
   root.UnitVisuals=Object.freeze({register,resolve,draw,iconElement,watchMapImage,boundsFor,mapAngle,sortMapUnits,
+    wreckFor,wreckLabel,wrecksAt,drawWreck,
     assetFailed:asset=>failedMapAssets.has(asset),setAsset,polygonPoints,styles,artKey,assetFor,terrainAssetFor,setStyle,currentStyle});
 })(globalThis);

@@ -93,6 +93,20 @@ test('real Core Ram keeps the accepted path and destroyed target in immutable af
   assert.equal(event.after.units.find(u=>u.id==='guard').hp,0);
   assert.equal(event.before.units.find(u=>u.id==='guard').hp>0,true);
   assert.deepEqual(event.effects,[],'no invented fire/damage effects');
+  const wreck=game.owner.read().wrecks.find(wreck=>wreck.unitId==='guard');
+  assert.ok(wreck);assert.equal(wreck.destructionRef.source,'accepted-command');
+  assert.equal(wreck.facingDegrees,game.owner.read().facingByUnit.find(unit=>unit.unitId==='guard').angleDegrees);
+});
+
+test('actual Core fire projects wrecks exactly for authoritative HP0 without changing canonical events',()=>{
+  const game=pair(1);
+  game.apply(move('missile',4,6));for(let i=0;i<3;i++)game.apply(end);game.enemy();
+  game.apply(move('missile',4,5));game.apply(end);
+  const result=game.apply({type:'PlayerFire',playerId:'player',unitId:'missile',targetId:'guard'});
+  assert.equal(result.session.projection.events[0].type,'PlayerFireResolved');
+  const dead=game.session.projection.state.units.filter(unit=>unit.hp<=0).map(unit=>unit.id).sort();
+  assert.deepEqual(game.owner.read().wrecks.map(w=>w.unitId).sort(),dead);
+  assert.equal(game.owner.events().some(item=>item.event.kind==='fire'),false);
 });
 
 test('observer errors never retry or block an otherwise accepted gameplay action',()=>{

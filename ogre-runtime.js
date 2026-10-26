@@ -18,6 +18,7 @@
     const system=targetKey?GoblinSystems.targets(state).find(item=>item.key===targetKey):
       corrected?GoblinSystems.chooseTargetSkippingDepletedTreads(state):GoblinSystems.chooseTarget(state);
     if(!system)return null;
+    const presentation=root.GoblinLegacyPresentation?.beforeResult('legacy-resolveSystemAttack');
     const roll=Math.floor(Math.random()*6);
     let ratio,result;
     if(system.type==='treads'){
@@ -28,6 +29,7 @@
     }
     const applied=GoblinSystems.applyHit(state,system.key,result,attacker.damage);
     syncUnit(target);
+    root.GoblinLegacyPresentation?.afterResult(presentation);
     return {system,ratio,result,roll,...applied};
   }
   function describeHit(outcome){
