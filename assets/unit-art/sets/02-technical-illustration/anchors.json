@@ -1,0 +1,450 @@
+{
+ "guard-tank": {
+  "klasse": "cannon",
+  "own": [
+   [
+    82.0,
+    10
+   ]
+  ],
+  "enemy": [
+   [
+    90.0,
+    11
+   ]
+  ]
+ },
+ "assault-tank": {
+  "klasse": "cannon",
+  "own": [
+   [
+    111.0,
+    10
+   ]
+  ],
+  "enemy": [
+   [
+    111.0,
+    10
+   ]
+  ]
+ },
+ "combat-skimmer": {
+  "klasse": "cannon",
+  "own": [
+   [
+    88.0,
+    0
+   ]
+  ],
+  "enemy": [
+   [
+    88.0,
+    7
+   ]
+  ]
+ },
+ "siege-tank": {
+  "klasse": "twin",
+  "own": [
+   [
+    83.0,
+    -4
+   ],
+   [
+    83.0,
+    22
+   ]
+  ],
+  "enemy": [
+   [
+    93.0,
+    -3
+   ],
+   [
+    93.0,
+    23
+   ]
+  ]
+ },
+ "goblin-siegebreaker": {
+  "klasse": "twin",
+  "own": [
+   [
+    113.0,
+    -7
+   ],
+   [
+    113.0,
+    23
+   ]
+  ],
+  "enemy": [
+   [
+    111.0,
+    -4
+   ],
+   [
+    111.0,
+    24
+   ]
+  ]
+ },
+ "raider-skimmer": {
+  "klasse": "twin",
+  "own": [
+   [
+    94.0,
+    -12
+   ],
+   [
+    94.0,
+    14
+   ]
+  ],
+  "enemy": [
+   [
+    95.0,
+    -13
+   ],
+   [
+    95.0,
+    13
+   ]
+  ]
+ },
+ "goblin-dreadnaught": {
+  "klasse": "quad",
+  "own": [
+   [
+    113.0,
+    26
+   ],
+   [
+    113.0,
+    52
+   ]
+  ],
+  "enemy": [
+   [
+    112.0,
+    24
+   ],
+   [
+    112.0,
+    50
+   ]
+  ]
+ },
+ "mobile-siege-gun": {
+  "klasse": "longgun",
+  "own": [
+   [
+    112.0,
+    11
+   ]
+  ],
+  "enemy": [
+   [
+    111.0,
+    13
+   ]
+  ]
+ },
+ "long-range-battery": {
+  "klasse": "longgun",
+  "own": [
+   [
+    89.0,
+    10
+   ]
+  ],
+  "enemy": [
+   [
+    97.0,
+    16
+   ]
+  ]
+ },
+ "artillery-drone": {
+  "klasse": "longgun",
+  "own": [
+   [
+    59.0,
+    5
+   ]
+  ],
+  "enemy": [
+   [
+    57.0,
+    7
+   ]
+  ]
+ },
+ "skimmer-carrier": {
+  "klasse": "lightgun",
+  "own": [
+   [
+    14,
+    -4
+   ]
+  ],
+  "enemy": [
+   [
+    14,
+    -4
+   ]
+  ]
+ },
+ "infantry-squad": {
+  "klasse": "rifles",
+  "own": [
+   [
+    71.0,
+    -52
+   ],
+   [
+    22.0,
+    -1
+   ],
+   [
+    69.0,
+    59
+   ]
+  ],
+  "enemy": [
+   [
+    24.0,
+    -33
+   ],
+   [
+    71.0,
+    -1
+   ],
+   [
+    24.0,
+    30
+   ]
+  ]
+ },
+ "local-defense": {
+  "klasse": "rifles",
+  "own": [
+   [
+    54.0,
+    -37
+   ],
+   [
+    56.0,
+    -23
+   ],
+   [
+    70.0,
+    68
+   ]
+  ],
+  "enemy": [
+   [
+    28.0,
+    -34
+   ],
+   [
+    75.0,
+    -2
+   ],
+   [
+    27.0,
+    30
+   ]
+  ]
+ },
+ "amphibious-infantry": {
+  "klasse": "rifles",
+  "own": [
+   [
+    82.0,
+    -57
+   ],
+   [
+    34.0,
+    1
+   ],
+   [
+    81.0,
+    60
+   ]
+  ],
+  "enemy": [
+   [
+    35.0,
+    -33
+   ],
+   [
+    82.0,
+    -1
+   ],
+   [
+    35.0,
+    30
+   ]
+  ]
+ },
+ "field-engineers": {
+  "klasse": "rifles",
+  "own": [
+   [
+    64.0,
+    -47
+   ],
+   [
+    41.0,
+    -28
+   ],
+   [
+    74.0,
+    53
+   ]
+  ],
+  "enemy": [
+   [
+    30.0,
+    -34
+   ],
+   [
+    65.0,
+    -11
+   ],
+   [
+    37.0,
+    49
+   ]
+  ]
+ },
+ "infantry-platoon": {
+  "klasse": "rifles",
+  "own": [
+   [
+    55.0,
+    -67
+   ],
+   [
+    35.0,
+    -52
+   ],
+   [
+    65.0,
+    0
+   ],
+   [
+    32.0,
+    52
+   ],
+   [
+    54.0,
+    67
+   ]
+  ],
+  "enemy": [
+   [
+    30.0,
+    -56
+   ],
+   [
+    64.0,
+    -28
+   ],
+   [
+    63.0,
+    -18
+   ],
+   [
+    65.0,
+    34
+   ],
+   [
+    31.0,
+    54
+   ]
+  ]
+ },
+ "skimmer-scout": {
+  "klasse": "light",
+  "own": [
+   [
+    92.0,
+    0
+   ]
+  ],
+  "enemy": [
+   [
+    91.6,
+    1
+   ]
+  ]
+ },
+ "recon-tank": {
+  "klasse": "light",
+  "own": [
+   [
+    64.0,
+    35
+   ]
+  ],
+  "enemy": [
+   [
+    71.0,
+    0
+   ]
+  ]
+ },
+ "light-skimmer": {
+  "klasse": "light",
+  "own": [
+   [
+    72.0,
+    0
+   ]
+  ],
+  "enemy": [
+   [
+    70.6,
+    0
+   ]
+  ]
+ },
+ "phantom-platform": {
+  "klasse": "none",
+  "own": [],
+  "enemy": []
+ },
+ "forge-engineer": {
+  "klasse": "none",
+  "own": [],
+  "enemy": []
+ },
+ "rocket-artillery": {
+  "klasse": "rockets",
+  "own": [],
+  "enemy": []
+ },
+ "strategic-missile-carrier": {
+  "klasse": "missile",
+  "own": [],
+  "enemy": []
+ },
+ "command-core": {
+  "klasse": "none",
+  "own": [],
+  "enemy": []
+ },
+ "command-hub": {
+  "klasse": "none",
+  "own": [],
+  "enemy": []
+ },
+ "relay-node": {
+  "klasse": "none",
+  "own": [],
+  "enemy": []
+ }
+}

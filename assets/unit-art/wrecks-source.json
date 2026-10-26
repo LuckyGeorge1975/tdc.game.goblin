@@ -1,0 +1,2574 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "https://github.com/LuckyGeorge1975/tdc.game.goblin.content",
+  "sourceCommit": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+  "sourceArchives": [
+    {
+      "sha256": "0b5afd159b65b7f5f2c1c4bcd71751a4b10f126403511653d117acaa89c3b4a1",
+      "bytes": 2396299,
+      "sourcePaths": [
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/amphibious-infantry-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/amphibious-infantry-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/artillery-drone-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/artillery-drone-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/assault-tank-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/assault-tank-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/combat-skimmer-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/combat-skimmer-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/command-core-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/command-core-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/command-hub-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/command-hub-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/field-engineers-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/field-engineers-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/forge-engineer-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/forge-engineer-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/goblin-dreadnaught-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/goblin-dreadnaught-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/goblin-siegebreaker-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/goblin-siegebreaker-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/guard-tank-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/guard-tank-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/infantry-platoon-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/infantry-platoon-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/infantry-squad-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/infantry-squad-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/klassen.json",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/light-skimmer-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/light-skimmer-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/local-defense-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/local-defense-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/long-range-battery-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/long-range-battery-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/mobile-siege-gun-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/mobile-siege-gun-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/phantom-platform-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/phantom-platform-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/raider-skimmer-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/raider-skimmer-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/recon-tank-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/recon-tank-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/relay-node-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/relay-node-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/rocket-artillery-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/rocket-artillery-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/siege-tank-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/siege-tank-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/skimmer-carrier-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/skimmer-carrier-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/skimmer-scout-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/skimmer-scout-gegner.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/strategic-missile-carrier-eigen.png",
+        "beratung-ui-ux/design-exports/einheitengrafiken/wracks/strategic-missile-carrier-gegner.png"
+      ]
+    },
+    {
+      "sha256": "d41a2052789b7be5a54a2b2c651de1fff15af226c69fe510c0ef409b8a17dfdc",
+      "bytes": 1520,
+      "sourcePaths": [
+        "beratung-ui-ux/design-exports/einheitengrafiken/anchors.json"
+      ]
+    }
+  ],
+  "sourceFileCount": 54,
+  "previewOnly": false,
+  "manifestSha256": "9876b56735333f52506ed39ec53665ae0109a82fdda985f0257d9e967880fbc8",
+  "manifestHashNormalization": "CRLF to LF; manifest file unchanged",
+  "archiveMetadataNote": "Git archive may convert text line endings; source hashes below describe the raw verified archive entries, copied byte-identically to runtime metadata.",
+  "export": {
+    "script": "scripts/export-wrecks.py",
+    "scriptSha256": "e4df6d9ba272e99442b89222f0ef0ba79f08cb44dd7867c43a79b5cf6398f841",
+    "version": 1,
+    "pillowVersion": "12.3.0",
+    "size": 192,
+    "format": "WebP",
+    "resampling": "Lanczos",
+    "lossless": true,
+    "quality": 100,
+    "method": 6,
+    "exact": true,
+    "crop": false,
+    "sourceCanvasCenter": [
+      128,
+      128
+    ],
+    "runtimeCanvasCenter": [
+      96,
+      96
+    ]
+  },
+  "provenance": {
+    "wrecks": "code-generated from shadowless icons; icons/werkzeuge/wracks.py",
+    "anchors": "alpha-derived; icons/werkzeuge/anchors.py",
+    "enemyLibraryImported": false,
+    "weaponGroupAnchors": "not supplied; inactive data only"
+  },
+  "sourceImageTotalBytes": 2383835,
+  "runtimeImageTotalBytes": 1444610,
+  "metadata": [
+    {
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/anchors.json",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/anchors.json",
+      "sourceSha256": "3bb637bc0c81abcd95b4f65f697aea12c012a8003643f9b4e16077cbbcd73598",
+      "runtimeSha256": "3bb637bc0c81abcd95b4f65f697aea12c012a8003643f9b4e16077cbbcd73598",
+      "sourceBytes": 4426,
+      "runtimeBytes": 4426,
+      "transformation": "byte-identical copy; original 256px anchor coordinates"
+    },
+    {
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/klassen.json",
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wreck-classes.json",
+      "sourceSha256": "74c85cabb54a37011721b8d8eca798a37ff46708024df0ea9e0c549ae129f837",
+      "runtimeSha256": "74c85cabb54a37011721b8d8eca798a37ff46708024df0ea9e0c549ae129f837",
+      "sourceBytes": 2031,
+      "runtimeBytes": 2031,
+      "transformation": "byte-identical copy; original 256px anchor coordinates"
+    }
+  ],
+  "wrecks": [
+    {
+      "unitId": "goblin-siegebreaker",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/goblin-siegebreaker-eigen.png",
+      "sourceSha256": "c3de749e3d5832757289c25aba1fdbb4cc5e9e1e2eba0113d6348200392c2231",
+      "sourceBytes": 53779,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          7,
+          254,
+          249
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/goblin-siegebreaker.webp",
+      "runtimeSha256": "3baffcf5a1bd202ee07ba616dba88c97fad125479d5c60f8af6d70cfa6ebf8be",
+      "runtimeBytes": 31326,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          5,
+          190,
+          187
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "goblin-siegebreaker",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/goblin-siegebreaker-gegner.png",
+      "sourceSha256": "aec3d8f0f3728af381d72a2596cf1a124dde35f05e77fc886695bbf989aebfab",
+      "sourceBytes": 47453,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          9,
+          254,
+          247
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/goblin-siegebreaker.webp",
+      "runtimeSha256": "09ea4a4c0fbf1723d3be9c842a7347497c082051105c5519f3741ad4ab38a8d0",
+      "runtimeBytes": 29090,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          7,
+          190,
+          185
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "skimmer-scout",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/skimmer-scout-eigen.png",
+      "sourceSha256": "3e578f4a003926cd55b3aad6ceda292bbc81e046f1d2d5300dff5316e2325c42",
+      "sourceBytes": 48024,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          4,
+          12,
+          252,
+          245
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/skimmer-scout.webp",
+      "runtimeSha256": "b30933804c3da6d389cedebce5ab92eb18cc05f30c066f8db08246969df2ddf6",
+      "runtimeBytes": 28672,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          3,
+          9,
+          189,
+          184
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "skimmer-scout",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/skimmer-scout-gegner.png",
+      "sourceSha256": "73dfed10fb0c7cf1e6eab184109abd134eb4a974a1d06b0f8ccbe16b3d30f2a5",
+      "sourceBytes": 45830,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          4,
+          12,
+          253,
+          245
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/skimmer-scout.webp",
+      "runtimeSha256": "dc69495d1cb75f08bb3937e61b723aec86328014ed16abd27cd70bd877b63343",
+      "runtimeBytes": 27522,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          3,
+          9,
+          191,
+          184
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "rocket-artillery",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/rocket-artillery-eigen.png",
+      "sourceSha256": "be1a2eb413008acff51b183682644aebe31be58f74bbad3a63e9b237300c3840",
+      "sourceBytes": 46319,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          4,
+          14,
+          253,
+          242
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/rocket-artillery.webp",
+      "runtimeSha256": "8567e418601e96e9f7d8ed166b4332367c172c1db3acd92c88f91163630516e7",
+      "runtimeBytes": 27974,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          3,
+          10,
+          190,
+          182
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "rocket-artillery",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/rocket-artillery-gegner.png",
+      "sourceSha256": "8693bead42b847c480b360038513fbbea86bfd950252b312d4bc34d0b54f0f6c",
+      "sourceBytes": 48057,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          14,
+          253,
+          241
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/rocket-artillery.webp",
+      "runtimeSha256": "511cdc9c759cb71b08fc7343ed76860dedad846832e1e6ac446994f2c9e86c89",
+      "runtimeBytes": 28052,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          1,
+          10,
+          190,
+          181
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "infantry-squad",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/infantry-squad-eigen.png",
+      "sourceSha256": "07383602dbd791b8c497fdb8619b361c6907123b1fdb36be550348957d0c3f31",
+      "sourceBytes": 35575,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          30,
+          2,
+          254,
+          254
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/infantry-squad.webp",
+      "runtimeSha256": "0b609151363c910b7245b95e2fd56d2f10fd450601dfa38feafa8f1092acf353",
+      "runtimeBytes": 23338,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          22,
+          2,
+          190,
+          191
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "infantry-squad",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/infantry-squad-gegner.png",
+      "sourceSha256": "fa59e421c862f6408c30a733395aa0fa7f97459f02413505ca61d6c3183b5a34",
+      "sourceBytes": 38726,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          2,
+          253,
+          241
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/infantry-squad.webp",
+      "runtimeSha256": "7db390c84b1856f6848ce02fa4ae25089a3a98459ecec593c3a2376eb30b43c9",
+      "runtimeBytes": 25412,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          1,
+          190,
+          181
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "assault-tank",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/assault-tank-eigen.png",
+      "sourceSha256": "fcf48ad3196fa109d6cfde0949aec4ea6bc494a4b85039ce9ed3e6d0ba83f9ff",
+      "sourceBytes": 49029,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          13,
+          254,
+          244
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/assault-tank.webp",
+      "runtimeSha256": "194c745503d11416d7436a296de9f01f3a228d8166777aee647df9db22a1948b",
+      "runtimeBytes": 29416,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          10,
+          190,
+          183
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "assault-tank",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/assault-tank-gegner.png",
+      "sourceSha256": "61a0768fcd1e5bc88b3cc275e7c4aaafa69fd606b92b0cd7e0b60e0475a21f4a",
+      "sourceBytes": 45631,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          17,
+          254,
+          240
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/assault-tank.webp",
+      "runtimeSha256": "39735ecb7e198c7a72a798450990e50fdf20d35e59f1da9ccab7da1f09aaf4ef",
+      "runtimeBytes": 27206,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          13,
+          190,
+          180
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "recon-tank",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/recon-tank-eigen.png",
+      "sourceSha256": "6f492985f743acbc6faa9ba05602526c776b58c490a0c0f9e3ceca319f29f36e",
+      "sourceBytes": 37253,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          14,
+          29,
+          243,
+          228
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/recon-tank.webp",
+      "runtimeSha256": "5c3aea39e1fcb88c00c1575495d986a6130b99dac71f146167f3674fa3c13f99",
+      "runtimeBytes": 22232,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          10,
+          22,
+          182,
+          171
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "recon-tank",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/recon-tank-gegner.png",
+      "sourceSha256": "7e83266666ffdcd7d3011148ae66eb663b4a72b8c43b06185798a5a0fbdd81a1",
+      "sourceBytes": 36804,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          11,
+          29,
+          247,
+          228
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/recon-tank.webp",
+      "runtimeSha256": "e9b46a39ff4805920e93e14659f7be1c8bcc7c8c07d93bc8ead4c945e403c516",
+      "runtimeBytes": 21976,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          8,
+          22,
+          185,
+          171
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "siege-tank",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/siege-tank-eigen.png",
+      "sourceSha256": "cae6a1f259580d49cf47566a8271c53bddad279bb6a387523361388890db43fb",
+      "sourceBytes": 44582,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          5,
+          14,
+          251,
+          243
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/siege-tank.webp",
+      "runtimeSha256": "d063cdc1c20c403789944e8b9e3b089add81894de3f4944ad5fd1cd4cba81c3a",
+      "runtimeBytes": 27142,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          4,
+          10,
+          188,
+          182
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "siege-tank",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/siege-tank-gegner.png",
+      "sourceSha256": "a966694e25a893ce7ae5f8b9d88b0bb6b2ab01372b5dc7a7e3661f8d13b6c4d9",
+      "sourceBytes": 45176,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          3,
+          14,
+          252,
+          242
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/siege-tank.webp",
+      "runtimeSha256": "5ba286d3f81a2b9672f8c7e3964303275e580b6fa73e2c250501b3660c4a287c",
+      "runtimeBytes": 27996,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          11,
+          189,
+          182
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "long-range-battery",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/long-range-battery-eigen.png",
+      "sourceSha256": "9905d2391b4295e4cbcc9b291a2119989a78ec6d4bb69327dc7cfcdb13954ca6",
+      "sourceBytes": 54096,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          4,
+          2,
+          252,
+          254
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/long-range-battery.webp",
+      "runtimeSha256": "d448e8f601f9db0b20a8fbd5de680e3b3aa73191c2a28584a2263d9431f8ea25",
+      "runtimeBytes": 33236,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          3,
+          1,
+          189,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "long-range-battery",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/long-range-battery-gegner.png",
+      "sourceSha256": "5f78ae9d459c8a1759179163658e53e075a79064767b418683ed5dac028a3dc4",
+      "sourceBytes": 53461,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          3,
+          0,
+          252,
+          253
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/long-range-battery.webp",
+      "runtimeSha256": "ae32e36deec87f6acfc80cace4884b2b278e42b8b5792789f990f09aa225a050",
+      "runtimeBytes": 33942,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          0,
+          189,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "mobile-siege-gun",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/mobile-siege-gun-eigen.png",
+      "sourceSha256": "98e2adf951b7f278f5dae69ffc04f6d6a93492f319d8f62fa49e29e2bc2d9f02",
+      "sourceBytes": 40152,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          24,
+          254,
+          233
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/mobile-siege-gun.webp",
+      "runtimeSha256": "92a4279f77c8601c0c6f7b6720d290eed91bb831de147ecc8dcd38f2b360e73c",
+      "runtimeBytes": 25130,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          18,
+          190,
+          175
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "mobile-siege-gun",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/mobile-siege-gun-gegner.png",
+      "sourceSha256": "50954f6d49551c518f67c4a616d17c67ce43bf6029f84bde6e006f01397719aa",
+      "sourceBytes": 42430,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          25,
+          254,
+          232
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/mobile-siege-gun.webp",
+      "runtimeSha256": "e218bdc8b76fe88e44cd701018356665fc2ac92b948cca10e1b5d103ea73de04",
+      "runtimeBytes": 26002,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          19,
+          190,
+          174
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "combat-skimmer",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/combat-skimmer-eigen.png",
+      "sourceSha256": "28bb4b12785b188313a3c14d63aed6d0fe62a67e7bdb37733d10aaabf12477d8",
+      "sourceBytes": 54232,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          4,
+          5,
+          250,
+          251
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/combat-skimmer.webp",
+      "runtimeSha256": "fceaba51bf24bdef7a6e61ba1b9b16b3a5499050bf23ca712d273265a8cc1d69",
+      "runtimeBytes": 31572,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          3,
+          4,
+          188,
+          188
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "combat-skimmer",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/combat-skimmer-gegner.png",
+      "sourceSha256": "5cf6ba69a12f650822f05d2cef732243159db51d8a0deea4e98e67e29daea3e6",
+      "sourceBytes": 49374,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          1,
+          5,
+          252,
+          251
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/combat-skimmer.webp",
+      "runtimeSha256": "b49a76710e6476aa29837083b6ce03892868c703c3d95e6b57fa4d3037a20235",
+      "runtimeBytes": 30174,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          0,
+          4,
+          189,
+          188
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "light-skimmer",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/light-skimmer-eigen.png",
+      "sourceSha256": "45de84113cf87dcc1a322fe83b888c03173600a7af62263fa22d3fbebd0ea70b",
+      "sourceBytes": 41595,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          9,
+          17,
+          247,
+          240
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/light-skimmer.webp",
+      "runtimeSha256": "5e436b1b4c310304525c8cc912e9d9e31733b8e0e2e8010800affe55ce287571",
+      "runtimeBytes": 24446,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          7,
+          13,
+          185,
+          180
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "light-skimmer",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/light-skimmer-gegner.png",
+      "sourceSha256": "b25a0fe6f1f02c182219ab86e4a5a5a28d085326014cbb13dd10ab26a9bef539",
+      "sourceBytes": 39432,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          10,
+          18,
+          247,
+          240
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/light-skimmer.webp",
+      "runtimeSha256": "eb2c83b8e003a34b65b21887e384ee97fb854a06b9d9d57d470360d02f703f34",
+      "runtimeBytes": 23944,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          7,
+          13,
+          185,
+          180
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "skimmer-carrier",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/skimmer-carrier-eigen.png",
+      "sourceSha256": "a855db61090e3178ad0ac94c6570351c0ddc8023cb896e35599266c714ce5bba",
+      "sourceBytes": 60606,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          0,
+          5,
+          254,
+          251
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/skimmer-carrier.webp",
+      "runtimeSha256": "7f086e8ce84d183a0b182f98bd103a86a879cc0930f079c350bbaecea16fcaec",
+      "runtimeBytes": 35958,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          0,
+          4,
+          190,
+          188
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "skimmer-carrier",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/skimmer-carrier-gegner.png",
+      "sourceSha256": "59f21ee70518e6c8ff1e76624b406aa3c2aeeeebea7f5da4590d74c87fbbecd4",
+      "sourceBytes": 53107,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          3,
+          6,
+          256,
+          251
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/skimmer-carrier.webp",
+      "runtimeSha256": "d7206094f1499b117abd6f2009e6749e20ad952574e87a3df6229e12932cd86d",
+      "runtimeBytes": 32928,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          4,
+          192,
+          188
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "strategic-missile-carrier",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/strategic-missile-carrier-eigen.png",
+      "sourceSha256": "bf7106be09b0bbb49494d82579aba3df5f8042c2dd26c36b5a4d564ab740600d",
+      "sourceBytes": 52326,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          1,
+          11,
+          254,
+          246
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/strategic-missile-carrier.webp",
+      "runtimeSha256": "e34c988bf3e909a19c45d1a8dcaf9c0332fdcbc62f05d721017e267821d70b84",
+      "runtimeBytes": 29644,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          0,
+          8,
+          190,
+          185
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "strategic-missile-carrier",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/strategic-missile-carrier-gegner.png",
+      "sourceSha256": "e1c247a64e8b48ed5e6c6ad3f16884cb1ed5d5c266031fa6c76f0ae294a454b5",
+      "sourceBytes": 48507,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          13,
+          254,
+          244
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/strategic-missile-carrier.webp",
+      "runtimeSha256": "320b67c3ab4b8beaa58ca7e932520264813dc066f68ad00f51f5825468a0d6f9",
+      "runtimeBytes": 28736,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          10,
+          190,
+          183
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "artillery-drone",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/artillery-drone-eigen.png",
+      "sourceSha256": "3eb7b6abf324c2ef6445a4abb2536e4a2331dd36cff69cf214040c31a0c336f6",
+      "sourceBytes": 39794,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          20,
+          18,
+          237,
+          237
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/artillery-drone.webp",
+      "runtimeSha256": "dcbfe55acc95b4e9ab1330e5d12c852a0ccf3d0249d5fefbcdecfb9a024b78cc",
+      "runtimeBytes": 23348,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          15,
+          13,
+          178,
+          178
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "artillery-drone",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/artillery-drone-gegner.png",
+      "sourceSha256": "e0186eb0c58fcecb1879dfcf0151f3ec761b5581114181cf28aa948fd28198f4",
+      "sourceBytes": 36988,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          19,
+          21,
+          240,
+          236
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/artillery-drone.webp",
+      "runtimeSha256": "fb68719764df41b915d5d029b6c7b34118c1d95ca7a8f43f9b174e92ee6f109f",
+      "runtimeBytes": 22756,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          14,
+          16,
+          180,
+          177
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "amphibious-infantry",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/amphibious-infantry-eigen.png",
+      "sourceSha256": "f5f4e36a5da8f8645f16bac62bcf05c328d735e0911d0d451a5117f14f1bbca1",
+      "sourceBytes": 37613,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          6,
+          7,
+          254,
+          254
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/amphibious-infantry.webp",
+      "runtimeSha256": "7830f0925631741587f6367fc367f39a54fd999facdfd27e91e153b303abf328",
+      "runtimeBytes": 24080,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          4,
+          5,
+          190,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "amphibious-infantry",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/amphibious-infantry-gegner.png",
+      "sourceSha256": "d1e824ae83d743a038f4e6c61d097617788394f30f8d78638bd0f5c5d88cfee7",
+      "sourceBytes": 41602,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          3,
+          254,
+          254
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/amphibious-infantry.webp",
+      "runtimeSha256": "9ca22f29ccc946e7c8db773b66119aef84a4acae045024e8455feb4400ad9c3b",
+      "runtimeBytes": 26644,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          2,
+          190,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "field-engineers",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/field-engineers-eigen.png",
+      "sourceSha256": "d6aecb2476730a22ac9399633cdba6e0e7c99ec24daec70e1dd65508017719cb",
+      "sourceBytes": 42969,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          2,
+          254,
+          254
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/field-engineers.webp",
+      "runtimeSha256": "91759707bb1e393807af53ed13a421156b2062ed9e761d7c46da2634194a26fe",
+      "runtimeBytes": 27662,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          2,
+          190,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "field-engineers",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/field-engineers-gegner.png",
+      "sourceSha256": "de781cae5891a24f3211ee3439e9aaf1c266ed73d10ce2692a574f7238c2ee26",
+      "sourceBytes": 38011,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          7,
+          2,
+          250,
+          253
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/field-engineers.webp",
+      "runtimeSha256": "ab5002a3c38db480f6db690ee60aa306847814d46a4330576536d8c616800111",
+      "runtimeBytes": 24156,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          5,
+          2,
+          188,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "local-defense",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/local-defense-eigen.png",
+      "sourceSha256": "5c1fe24b4906cd89f750749067fe0b436d52b8cf32f63076bab763021de42d63",
+      "sourceBytes": 38974,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          4,
+          1,
+          252,
+          254
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/local-defense.webp",
+      "runtimeSha256": "132e291be5dd3ef97b8a74ed6eb90ba3643d0a6a9ec0066d8971fb019617f809",
+      "runtimeBytes": 25424,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          3,
+          0,
+          189,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "local-defense",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/local-defense-gegner.png",
+      "sourceSha256": "6219ad055c993be20705138472b4b87d8f51fec337dbb8c792688c7eb99bfb1f",
+      "sourceBytes": 41660,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          2,
+          252,
+          253
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/local-defense.webp",
+      "runtimeSha256": "73ea23e5b7d80a5f044fc095127936ffb34c4adfc02bd1739370fac88c025cc8",
+      "runtimeBytes": 26562,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          1,
+          189,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "command-hub",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/command-hub-eigen.png",
+      "sourceSha256": "aa3ce4c2c4ce7475b6d4385b8a7f1eab11e93681ef43aad8fb866b5c3f3e5d87",
+      "sourceBytes": 49816,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          4,
+          18,
+          253,
+          239
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/command-hub.webp",
+      "runtimeSha256": "d3eacb64dfe4e89a6533ce52101c93b119933736389b85eec1e2feeb22e4700a",
+      "runtimeBytes": 29708,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          3,
+          13,
+          191,
+          179
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "command-hub",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/command-hub-gegner.png",
+      "sourceSha256": "329212e5c91be6ee4f88f51cae04b90edb037bf6c841d3930433868aa6949268",
+      "sourceBytes": 47751,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          4,
+          13,
+          253,
+          245
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/command-hub.webp",
+      "runtimeSha256": "68f8b3032bd9dec8956954512666b4a6718dd9b3da49c105165e489103b2d61c",
+      "runtimeBytes": 28422,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          3,
+          10,
+          190,
+          184
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "goblin-dreadnaught",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/goblin-dreadnaught-eigen.png",
+      "sourceSha256": "e4a3d517d63a016c48e71cd829b3df6c75888ec94957d87b382dc6b1d8c11ea9",
+      "sourceBytes": 57832,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          2,
+          254,
+          252
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/goblin-dreadnaught.webp",
+      "runtimeSha256": "f9c603d4d303c9cb08892b560a8511ad4d97823e6c7211102cc58f0e216c79c0",
+      "runtimeBytes": 33746,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          1,
+          190,
+          189
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "goblin-dreadnaught",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/goblin-dreadnaught-gegner.png",
+      "sourceSha256": "e02cb3fa2ee162abcadcb3634eff3f6dc3cc33b362eca7b94d260ec78c72c5fd",
+      "sourceBytes": 50783,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          1,
+          5,
+          254,
+          251
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/goblin-dreadnaught.webp",
+      "runtimeSha256": "728e754caafb9ab08a620e898e14af49c699ce1173a6bd533ebec5fe75f96b32",
+      "runtimeBytes": 31030,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          0,
+          4,
+          191,
+          188
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "forge-engineer",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/forge-engineer-eigen.png",
+      "sourceSha256": "aaa6e8e24f7576cf111c7abfdaad82bf35780012c6bc9e0f53a03f2bc448ce09",
+      "sourceBytes": 48762,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          3,
+          14,
+          255,
+          242
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/forge-engineer.webp",
+      "runtimeSha256": "7a4da7ba916d0c0a0ec1205c9ae1bcc13ec529abf61e6705a851af22c8966b4f",
+      "runtimeBytes": 28134,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          11,
+          192,
+          182
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "forge-engineer",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/forge-engineer-gegner.png",
+      "sourceSha256": "72a5905671ada0f2e6fc49b8e0c8a0cef1c70b456323507c4ef35dfb8f6002b1",
+      "sourceBytes": 47289,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          14,
+          255,
+          242
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/forge-engineer.webp",
+      "runtimeSha256": "316c5ff0fb1fae82cdea3be2c2e92deb31d5c3d71760db3d1a679a21c412d02b",
+      "runtimeBytes": 28792,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          10,
+          192,
+          182
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "phantom-platform",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/phantom-platform-eigen.png",
+      "sourceSha256": "14596cd4b0a8b0b0f674f89ef9947a1ba58031ac96f0785cda7cb5d28d711edc",
+      "sourceBytes": 48787,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          3,
+          14,
+          253,
+          243
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/phantom-platform.webp",
+      "runtimeSha256": "65fef7bbb9788a070c362018505e3f74003efddaf3d925292a9c66f2c503a88e",
+      "runtimeBytes": 29170,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          10,
+          191,
+          182
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "phantom-platform",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/phantom-platform-gegner.png",
+      "sourceSha256": "e23590fd61b9decc29870542ebb6d412e516d40c457c60345b9f18ed97f7a9f6",
+      "sourceBytes": 48027,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          0,
+          13,
+          254,
+          242
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/phantom-platform.webp",
+      "runtimeSha256": "eb5009969364343dcd2526c4507683f135336e52d1377c2da7db23a2a5beb6dd",
+      "runtimeBytes": 28424,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          0,
+          10,
+          190,
+          182
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "infantry-platoon",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/infantry-platoon-eigen.png",
+      "sourceSha256": "c2fb25a9f52090eea4508cbc64f232b588d244dab4ed67bf55fd907dd4c9673e",
+      "sourceBytes": 41604,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          7,
+          3,
+          252,
+          254
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/infantry-platoon.webp",
+      "runtimeSha256": "1fb9efb6d1cd53e4de8c200d4e91b3aeeda5cfa9b4c48d4ffdddb8d8386737ba",
+      "runtimeBytes": 27244,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          5,
+          2,
+          189,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "infantry-platoon",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/infantry-platoon-gegner.png",
+      "sourceSha256": "8eee59f62eb542e700525441bf808872b6b8f5f50b282a7380803490d7e3b3e3",
+      "sourceBytes": 42041,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          2,
+          248,
+          254
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/infantry-platoon.webp",
+      "runtimeSha256": "c2d7f3c3752d0a5d579ba324e901dec48de016c81d794feedfcd538435d8307f",
+      "runtimeBytes": 27404,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          2,
+          186,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "command-core",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/command-core-eigen.png",
+      "sourceSha256": "b2783034b09451495a94af9d712ddc61485144357db6fbc5b0dccc2932bd5d87",
+      "sourceBytes": 63990,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          2,
+          3,
+          254,
+          254
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/command-core.webp",
+      "runtimeSha256": "f2c86e0f989c8986cb8cf1d9459889998ea9029267af9d6288b1cf287fe93c70",
+      "runtimeBytes": 34846,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          2,
+          191,
+          191
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "command-core",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/command-core-gegner.png",
+      "sourceSha256": "ebd2017e73dc8e703c2593de37e7f5c6d33e0e8dd2b3bee76aa440d37a07410b",
+      "sourceBytes": 55743,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          3,
+          0,
+          253,
+          253
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/command-core.webp",
+      "runtimeSha256": "ad8e516cda6870fdcaed1e665baa5debabcde36003c4af96aa4cb698dfa94ebf",
+      "runtimeBytes": 32782,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          0,
+          190,
+          190
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "relay-node",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/relay-node-eigen.png",
+      "sourceSha256": "9859d22cd184c589a9f72dace7a46634c5d3218137f5b0c7560b434f196dea97",
+      "sourceBytes": 44171,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          12,
+          16,
+          244,
+          241
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/relay-node.webp",
+      "runtimeSha256": "47cd2ac5ec9733d3420bfc0d31f5e0add6313039957bdc7bc3aa6d86995f6ed0",
+      "runtimeBytes": 25706,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          9,
+          12,
+          183,
+          181
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "relay-node",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/relay-node-gegner.png",
+      "sourceSha256": "ecd4c42988e5dc8da91e225e2f4f9bdbfc62ad5a7cc6cdd0321ac0859ff9bebf",
+      "sourceBytes": 42428,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          12,
+          19,
+          244,
+          239
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/relay-node.webp",
+      "runtimeSha256": "957a5bd4b565005218977bed78ef9fee83cb4fd70939300e9edf49c9aafe66d8",
+      "runtimeBytes": 24212,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          9,
+          14,
+          183,
+          179
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "guard-tank",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/guard-tank-eigen.png",
+      "sourceSha256": "66753860ca98188fb38c3eb02532f1aa0281447b11d6c5cdf8471ccf52eac250",
+      "sourceBytes": 43327,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          6,
+          23,
+          250,
+          234
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/guard-tank.webp",
+      "runtimeSha256": "aed40a7c70b56852c7e7ebbdb3bb608849c6ca61888ba91ca5f5b56860aea5e2",
+      "runtimeBytes": 26412,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          4,
+          17,
+          188,
+          176
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "guard-tank",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/guard-tank-gegner.png",
+      "sourceSha256": "036d6f57178362481d5c6766ab09a4f5fe8f5a24670b8e6f1cf448b260bd2209",
+      "sourceBytes": 41947,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          4,
+          23,
+          250,
+          234
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/guard-tank.webp",
+      "runtimeSha256": "6f04e4118d2e879ae6d5f8dcad1778c5fabe42bff7c7ef2ee112ee7ca0d12465",
+      "runtimeBytes": 25260,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          3,
+          17,
+          188,
+          176
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "raider-skimmer",
+      "team": "player",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/raider-skimmer-eigen.png",
+      "sourceSha256": "afcc491cef16fb7a21569a2861d1f7d0b26cd8d03f2fbe21a6b1c08cf1cfe762",
+      "sourceBytes": 41492,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          4,
+          21,
+          253,
+          236
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/own/raider-skimmer.webp",
+      "runtimeSha256": "aba7d23bf3e68258dd7aab6c3c1221443fabcd2e23230052036a9e164fd52b09",
+      "runtimeBytes": 25354,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          3,
+          16,
+          190,
+          177
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    },
+    {
+      "unitId": "raider-skimmer",
+      "team": "enemy",
+      "sourcePath": "beratung-ui-ux/design-exports/einheitengrafiken/wracks/raider-skimmer-gegner.png",
+      "sourceSha256": "7d2c5e5e5aa33ade0f3cd83d79b7a89308e6052a8f6bb592a263045491005081",
+      "sourceBytes": 38878,
+      "sourceImage": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          256,
+          256
+        ],
+        "alphaBounds": [
+          3,
+          21,
+          254,
+          236
+        ],
+        "canvasCenter": [
+          128.0,
+          128.0
+        ]
+      },
+      "runtimePath": "assets/unit-art/sets/02-technical-illustration/wrecks/enemy/raider-skimmer.webp",
+      "runtimeSha256": "e52350205eafa0afa20e286b00f67910035716882ffb989cfeceeb9fc7e4678f",
+      "runtimeBytes": 24266,
+      "runtimeImage": {
+        "format": "WEBP",
+        "mode": "RGBA",
+        "size": [
+          192,
+          192
+        ],
+        "alphaBounds": [
+          2,
+          16,
+          191,
+          177
+        ],
+        "canvasCenter": [
+          96.0,
+          96.0
+        ]
+      },
+      "resizedPixelsLossless": true
+    }
+  ]
+}
