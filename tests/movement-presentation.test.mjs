@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import movement from '../movement-presentation.js';
+import '../fire-anchors.js';
+import '../fire-presentation.js';
 import presentation from '../presentation-state.js';
 import {createCorePresentationObserver} from '../core-presentation.mjs';
 import {createIronDustBrowserSession,dispatchIronDustBrowserAction} from '../iron-dust-browser-v2.mjs';
@@ -145,7 +147,7 @@ function browserScene(runtime='core',team='player'){
     addEventListener:add,dispatchEvent:event=>(listeners.get(event.type)??[]).forEach(fn=>fn(event)),Event:class{constructor(type){this.type=type;}},
     CustomEvent:class{constructor(type,{detail}){this.type=type;this.detail=detail;}},
     MutationObserver:class{constructor(fn){observers.push(fn);}observe(){}}});
-  for(const file of ['presentation-state.js','unit-visuals.js','assets/unit-art/marker-geometry.js','m1-unit-markers.js','movement-presentation.js'])vm.runInContext(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
+  for(const file of ['presentation-state.js','unit-visuals.js','assets/unit-art/marker-geometry.js','m1-unit-markers.js','fire-anchors.js','fire-presentation.js','movement-presentation.js'])vm.runInContext(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
   const owner=context.GoblinPresentation,unit={id:'a',name:'Guard Tank',visualKey:'guard-tank',team,x:2,y:2,hp:3,maxHp:3};
   const core={id:'core',name:'Command Core',visualKey:'command-core',team:'enemy',x:8,y:2,hp:3,maxHp:3};
   const victory={status:'ongoing',winner:null};
@@ -159,7 +161,13 @@ function browserScene(runtime='core',team='player'){
     owner.confirm(ticket,after,[],[{actorId:'a',kind:'move',from:{x:2,y:2},to:{x:3,y:2},path:[{x:3,y:2}],sourceEventIndex:0}]);
     return after;
   }
-  return {context,owner,map,body,c,move,observers,listeners};
+  function fire(mode='normal',result='D'){
+    context.GoblinPresentationPreferences={read:()=>({schemaVersion:1,mode})};
+    const before={units:[unit,core],victory},after={units:[unit,{...core,disabled:result==='D',hp:result==='X'?0:3}],victory};
+    const ticket=owner.begin({type:'Fire'},before);
+    return owner.confirm(ticket,after,[{result}],[],[{actorId:'a',targetId:'core',result,sourceEventIndex:0}])[0];
+  }
+  return {context,owner,map,body,c,move,fire,observers,listeners};
 }
 test('dust reference uses scaled cubic ease-out growth/drift, alpha power 1.4 and existing 550ms lifetime',()=>{
   const value=item(),plan=movement.plan(value.event,0),scale=Math.sqrt(3)*34/112;
@@ -232,4 +240,84 @@ test('both runtime/player/enemy SVG projections use real marker records; hiding 
     assert.equal(s.context.GoblinMovement.busy(),false);assert.equal(s.map.querySelector('#goblin-movement-layer'),null);
     s.move();assert.equal(s.context.GoblinMovement.busy(),false,'hidden commits stay instant');
   }
+});
+
+test('confirmed fire maps real side anchors, quad pair, explicit GOBLIN fallback and deferred rockets',()=>{
+  const api=globalThis.GoblinFirePresentation;
+  const event=item().event;event.kind='fire';event.weapon={usedWeaponKey:null};
+  for(const team of ['player','enemy']){
+    event.actor.team=team;event.actor.visualKey='guard-tank';
+    const mapped=api.mapping(event);assert.equal(mapped.kind,'cannon');assert.equal(mapped.fallback,false);
+    const anchor=mapped.anchors[0],base=team==='enemy'?180:0;
+    const zero=api.muzzle({x:0,y:0},anchor,base,team),rotated=api.muzzle({x:0,y:0},anchor,base+90,team);
+    assert.ok(Math.abs(rotated.x+zero.y)<1e-10);assert.ok(Math.abs(rotated.y-zero.x)<1e-10);
+  }
+  event.actor.visualKey='goblin-dreadnaught';assert.equal(api.mapping(event).anchors.length,2);
+  event.actor.visualKey='goblin-siegebreaker';event.weapon.usedWeaponKey='main';
+  assert.equal(api.mapping(event).fallback,true);assert.deepEqual(api.mapping(event).anchors,[[0,0]]);
+  event.weapon.usedWeaponKey='antipersonnel';assert.equal(api.mapping(event).kind,'light');
+  event.weapon.usedWeaponKey='missiles';assert.equal(api.mapping(event).kind,'deferred-rocket');
+  event.weapon.usedWeaponKey=null;event.actor.visualKey='rocket-artillery';assert.equal(api.mapping(event).kind,'deferred-rocket');
+  event.actor={unitId:'a',team:'player',visualKey:'goblin-dreadnaught',positionBefore:{x:2,y:2}};
+  event.targetId='t';event.before={units:[{id:'a',x:2,y:2,team:'player'},{id:'t',x:5,y:3,team:'enemy',hp:3}]};
+  event.after=event.before;event.effects=[];
+  const plan=api.plan(event,0);
+  assert.ok(plan.angle>0&&plan.angle<60,'fire uses exact target angle, not a hex heading');
+  assert.equal(plan.shots.length,2);assert.equal(plan.shots[1].at-plan.shots[0].at,70);
+  assert.equal(plan.arrival,Math.max(...plan.shots.map(shot=>shot.arrival)));
+});
+
+test('real fire SVG freezes target until arrival, applies actual D at +50ms, then cleans all effects',()=>{
+  for(const runtime of ['core','legacy']){
+    const s=browserScene(runtime),event=s.fire('high');
+    const p=s.context.GoblinFirePresentation.plan(event,0);
+    assert.ok(p.shots.length===1&&p.shots[0].arrival>p.shots[0].at);
+    s.c.advance(p.arrival-1);
+    assert.equal(s.context.GoblinMovement.projectedState().units[1].disabled,undefined);
+    const read=()=>s.map.querySelector('#goblin-movement-layer').children.at(-1);
+    assert.ok(read().children.some(node=>node.tagName==='line'),'visible confirmed tracer');
+    s.c.advance(2);assert.equal(s.context.GoblinMovement.projectedState().units[1].disabled,undefined);
+    s.c.advance(50);assert.equal(s.context.GoblinMovement.projectedState().units[1].disabled,true);
+    assert.ok(read().children.some(node=>node.tagName==='text'),'truthful status caption');
+    assert.equal(s.owner.endState().units[1].hp,3,'D never invents HP damage');
+    s.context.GoblinMovement.skip();s.c.advance(220);
+    assert.equal(s.map.querySelector('#goblin-movement-layer'),null);assert.equal(s.context.GoblinMovement.busy(),false);
+  }
+});
+
+test('NE has no target reaction; OFF is instant; Normal omits smoke/sparks; target wreck stays hidden until hit',()=>{
+  const ne=browserScene();const event=ne.fire('normal','NE'),p=ne.context.GoblinFirePresentation.plan(event,0);
+  ne.c.advance(p.arrival+60);
+  const fx=ne.map.querySelector('#goblin-movement-layer').children.at(-1);
+  assert.equal(fx.children.filter(node=>node.tagName==='text'||node.tagName==='image').length,0);
+  const off=browserScene();off.fire('off','X');assert.equal(off.context.GoblinMovement.busy(),false);
+  const normal=browserScene(),destroyed=normal.fire('normal','X'),plan=normal.context.GoblinFirePresentation.plan(destroyed,0);
+  assert.equal(normal.context.UnitVisuals.wrecksAt(8,2).length,0);
+  normal.c.advance(plan.arrival+51);assert.equal(normal.context.UnitVisuals.wrecksAt(8,2).length,1);
+  const effects=normal.map.querySelector('#goblin-movement-layer').children.at(-1);
+  assert.equal(effects.children.filter(node=>node.tagName==='line').length,0,'no sparks');
+  assert.equal(effects.children.filter(node=>node.tagName==='circle').length,0,'no smoke particles');
+  const pending=[...normal.c.callbacks.values()];normal.owner.cancel();pending.forEach(fn=>fn());
+  assert.equal(normal.map.querySelector('#goblin-movement-layer'),null);
+});
+
+test('fire ends naturally without skip and drains its following confirmed move exactly once',()=>{
+  const s=browserScene(),event=s.fire('normal'),plan=s.context.GoblinFirePresentation.plan(event,0);
+  s.move('normal');assert.equal(s.context.GoblinMovement.read().queued,1);
+  s.c.advance(plan.duration);assert.ok(s.context.GoblinMovement.read().active);
+  assert.ok(!s.context.GoblinMovement.read().active.includes('fire-'));
+  s.c.advance(500);s.c.advance(220);
+  assert.equal(s.context.GoblinMovement.busy(),false);assert.equal(s.c.callbacks.size,0);
+  assert.equal(s.map.querySelector('#goblin-movement-layer'),null);
+  assert.equal(s.owner.events().filter(item=>item.event.kind==='fire').length,1);
+});
+
+test('damage derives only actual HP/SP, system losses and disabled transition, not ammo or CRT letter',()=>{
+  const api=globalThis.GoblinFirePresentation;
+  const before={hp:5,ogreSystems:{treads:20,weapons:{main:{destroyed:0,remaining:1}}}};
+  assert.equal(api.delta({before,after:{...before,ogreSystems:{...before.ogreSystems,weapons:{main:{destroyed:0,remaining:0}}}}}).changed,false);
+  assert.equal(api.delta({before,after:{...before,ogreSystems:{...before.ogreSystems,treads:17}}}).treads,3);
+  assert.equal(api.delta({before,after:{...before,ogreSystems:{...before.ogreSystems,weapons:{main:{destroyed:1,remaining:0}}}}}).systems,1);
+  assert.equal(api.delta({before:{hp:2,infantry:true},after:{hp:1,infantry:true}}).label,'−1 SP');
+  assert.equal(api.delta({before:{hp:3,disabled:true},after:{hp:0,disabled:true}}).hp,3);
 });

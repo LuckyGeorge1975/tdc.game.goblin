@@ -2,6 +2,14 @@
 (function(root){
   const checkpoints=new WeakMap();
   const safe=fn=>(...args)=>{try{return fn(...args);}catch{return null;}};
+  let attackCapture=null;
+  const clone=value=>JSON.parse(JSON.stringify(value));
+  function finishFire(){
+    const capture=attackCapture;attackCapture=null;
+    if(capture?.ticket)try{root.GoblinPresentation.confirm(capture.ticket,snapshot(),capture.results,[],[{
+      actorId:capture.actorId,targetId:capture.targetId,weaponKey:capture.weaponKey,strategic:capture.strategic,
+      effects:capture.effects,sourceEventIndex:0}]);}catch{/* Observation cannot reject or retry gameplay. */}
+  }
   function snapshot(){
     return {units:units.map(({moveFrom,justHit,...unit})=>({...unit,
       visualKey:root.UnitVisuals.artKey(unit)})),terrain:[...terrain],terrainTypes:[...terrainTypes],
@@ -18,13 +26,34 @@
   }
   root.GoblinLegacyPresentation=Object.freeze({
     sync:safe(sync),
-    beforeResult:safe(source=>sync()?{source,beforeRevision:root.GoblinPresentationState.stamp(snapshot()),
-      animationPreference:root.GoblinPresentationPreferences?.read()??{schemaVersion:1,mode:'high'}}:null),
-    afterResult:safe(reference=>{
+    beforeResult:safe((source,attacker,target)=>{
+      if(!sync())return null;
+      const before=snapshot(),standalone=!!attacker&&!attackCapture;
+      if(standalone)attackCapture={results:[],effects:[]};
+      if(attacker&&target&&!attackCapture.ticket){
+        Object.assign(attackCapture,{actorId:attacker.id,targetId:target.id,
+          weaponKey:attacker.ogreSystems?.selectedWeapon??null,strategic:attacker.strategicMissile===true,
+          ticket:root.GoblinPresentation.begin({type:'Fire',actorId:attacker.id,targetId:target.id},attackCapture.before??before)});
+      }
+      return {source,beforeRevision:root.GoblinPresentationState.stamp(before),before,attackerId:attacker?.id,
+        targetId:target?.id,standalone,attack:attacker?.damage,
+        animationPreference:root.GoblinPresentationPreferences?.read()??{schemaVersion:1,mode:'high'}};
+    }),
+    afterResult:safe((reference,outcome)=>{
       if(!reference||!root.GoblinPresentation.owns('legacy'))return;
       const state=snapshot();
       root.GoblinPresentation.synchronize(state,{...reference,afterRevision:root.GoblinPresentationState.stamp(state)});
-      root.GoblinPresentation.transition(state);
+      if(reference.attackerId&&outcome&&attackCapture){
+        const index=attackCapture.results.length;
+        const result={...outcome,passengers:(outcome.passengers??[]).map(({unit,outcome})=>({unitId:unit.id,outcome:clone(outcome)}))};
+        attackCapture.results.push(clone({...result,attackerId:reference.attackerId,targetId:reference.targetId,attack:reference.attack}));
+        const subjects=[{id:reference.targetId,result:outcome.result,targetKey:outcome.system?.key??null},
+          ...(outcome.passengers??[]).map(({unit,outcome})=>({id:unit.id,result:outcome.result,passenger:true}))];
+        attackCapture.effects.push(...subjects.map(subject=>({subjectId:subject.id,result:subject.result,
+          role:subject.passenger?'passenger':index?'splash':subject.targetKey?'system':'primary',targetKey:subject.targetKey??null,
+          sourceResultIndex:index,before:reference.before.units.find(unit=>unit.id===subject.id),after:state.units.find(unit=>unit.id===subject.id)})));
+        if(reference.standalone)finishFire();
+      }else root.GoblinPresentation.transition(state);
     }),
     begin:safe((actor,path,kind,target)=>{
       if(!sync())return null;
@@ -50,10 +79,19 @@
   // The later roll-cache wrapper still invokes this resolver exactly once.
   const baseCombatOutcome=combatOutcome;
   combatOutcome=function(...args){
-    const reference=root.GoblinLegacyPresentation.beforeResult('legacy-combatOutcome');
+    const reference=root.GoblinLegacyPresentation.beforeResult('legacy-combatOutcome',args[0],args[1]);
     const result=baseCombatOutcome(...args);
-    root.GoblinLegacyPresentation.afterResult(reference);
+    root.GoblinLegacyPresentation.afterResult(reference,result);
     return result;
   };
+  for(const name of ['attack','enemyFire']){
+    const base=name==='attack'?attack:enemyFire;
+    const wrapped=function(...args){
+      if(attackCapture)return base(...args);
+      attackCapture={results:[],effects:[],before:snapshot()};
+      try{return base(...args);}finally{finishFire();}
+    };
+    if(name==='attack')attack=wrapped;else enemyFire=wrapped;
+  }
   root.GoblinLegacyPresentation.sync();
 })(globalThis);

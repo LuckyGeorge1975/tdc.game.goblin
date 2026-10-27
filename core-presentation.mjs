@@ -28,7 +28,11 @@ export function createCorePresentationObserver(owner,getEpoch=()=>0){
         ['UnitMoved','EnemyMoved','RamResolved'].includes(event.type)?[{
           kind:event.type==='RamResolved'?'ram':'move',actorId:event.unitId??event.actorId,
           from:event.from,to:event.to,path:event.path,sourceEventIndex}]:[]);
-      return owner.confirm(ticket,snapshot(session),results,movements);
+      const fires=results.flatMap((event,sourceEventIndex)=>
+        ['PlayerFireResolved','EnemyUnitFireResolved','EnemySystemFireResolved'].includes(event.type)?[{
+          actorId:event.attackerId,targetId:event.targetId,weaponKey:event.weaponKey??null,
+          passengerIds:event.passengerIds??[],targetKey:event.targetKey??null,result:event.result,sourceEventIndex}]:[]);
+      return owner.confirm(ticket,snapshot(session),results,movements,fires);
     })
   });
 }

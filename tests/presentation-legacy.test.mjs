@@ -143,7 +143,9 @@ test('movement-sidecar checkpoints leave active fire wrappers and Undo roll cach
   assert.equal(observed.state(),control.state());
   assert.equal(observed.rolls(),control.rolls());
   assert.equal(observed.run('phaseRolls.length'),1);
-  assert.equal(observed.events().length,0,'this foundation does not emit fire effects');
+  const fires=observed.events().filter(item=>item.event.kind==='fire');
+  assert.equal(fires.length,2,'Undo/reissue records two distinct accepted fire actions');
+  assert.notEqual(fires[0].event.eventId,fires[1].event.eventId);
 });
 
 test('real Legacy fire creates a static wreck, Undo removes it and cached reissue stays gameplay-identical',()=>{
@@ -158,6 +160,30 @@ test('real Legacy fire creates a static wreck, Undo removes it and cached reissu
   for(const game of [observed,control])game.run('attack(units[1],units[5])');
   assert.notEqual(read().wrecks.find(w=>w.unitId==='guard').wreckId,first.wreckId);
   assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
+});
+
+test('Legacy used weapon is captured before auto selection, never inferred from the next weapon',()=>{
+  const observed=scene(),control=scene(false);
+  for(const game of [observed,control])game.run("terrain.clear();units[5].x=2;units[5].y=5;setTurnPhase('fire');SiegebreakerWeapons.selectWeapon(units[0],'main');attack(units[0],units[5])");
+  assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
+  const fire=observed.events().find(item=>item.event.kind==='fire').event;
+  assert.equal(fire.weapon.usedWeaponKey,'main');
+  assert.equal(fire.weapon.attack,fire.before.units[0].ogreSystems.weapons.main.attack);
+  assert.notEqual(fire.after.units[0].ogreSystems.selectedWeapon,fire.weapon.usedWeaponKey);
+});
+
+test('Legacy strategic splash preserves one launch and per-resolver outcomes, including friendly passengers',()=>{
+  const observed=scene(),control=scene(false);
+  const setup="terrain.clear();units.splice(0,units.length,{id:'carrier',visualKey:'strategic-missile-carrier',name:'CARRIER',x:0,y:1,hp:2,maxHp:2,team:'player',strategicMissile:true,missilesRemaining:1,range:8,damage:6},{id:'target',visualKey:'guard-tank',name:'TARGET',x:2,y:3,hp:2,maxHp:2,defense:2,team:'enemy',transportCapacity:3},{id:'passenger',visualKey:'infantry-squad',name:'PASSENGER',x:2,y:3,hp:2,maxHp:2,defense:1,infantry:true,embarkedOn:'target',team:'enemy'},{id:'adjacent',visualKey:'infantry-squad',name:'FRIEND',x:3,y:4,hp:2,maxHp:2,defense:2,team:'player'});setTurnPhase('fire');attack(units[0],units[1])";
+  for(const game of [observed,control])game.run(setup);
+  assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
+  const fires=observed.events().filter(item=>item.event.kind==='fire');assert.equal(fires.length,1);
+  const fire=fires[0].event;assert.equal(fire.weapon.semanticKind,'missile');assert.equal(fire.sourceResults.length,2);
+  assert.equal(fire.before.units[0].missilesRemaining,1);assert.equal(fire.after.units[0].missilesRemaining,0);
+  assert.deepEqual(fire.effects.map(effect=>effect.role),['primary','passenger','splash']);
+  assert.equal(fire.effects[1].sourceResultIndex,0);assert.equal(fire.effects[2].sourceResultIndex,1);
+  assert.equal(observed.rolls(),fire.sourceResults.length,'passengers use their primary resolver roll without another draw');
+  assert.equal(fire.effects[2].after.team,'player');
 });
 
 test('Legacy system losses create no wreck until actual whole-unit destruction, without extra rolls',()=>{

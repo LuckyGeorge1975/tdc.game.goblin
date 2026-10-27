@@ -142,6 +142,8 @@
 
   function wrecksAt(x,y){
     try{
+      const projected=root.GoblinMovement?.wrecksAt(x,y);
+      if(projected)return projected;
       const owner=root.GoblinPresentation,sidecar=owner?.read(),state=owner?.endState();
       if(sidecar?.wreckMappingVersion!=='static-wreck-v1'||!owner.owns(sidecar.binding?.runtime)||
         sidecar.settledRevision!==root.GoblinPresentationState?.stamp(state))return [];

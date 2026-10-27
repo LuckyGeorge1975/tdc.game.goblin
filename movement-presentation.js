@@ -87,9 +87,10 @@
         const item=queue.shift();
         if(!item.event){display={state:item.after,sidecar:item.sidecar};continue;}
         const event=item.event,initial=item.beforeSidecar?.facingByUnit.find(f=>f.unitId===event.actor.unitId)?.angleDegrees??(event.actor.team==='enemy'?180:0);
-        const movement=plan(event,initial);
+        const movement=event.kind==='fire'?root.GoblinFirePresentation?.plan(event,initial):plan(event,initial);
+        if(!movement){display={state:item.after,sidecar:item.sidecar};continue;}
         if(movement.diagnostic){diagnostic({eventId:event.eventId,...movement});display={state:item.after,sidecar:item.sidecar};continue;}
-        if(event.action.animationPreference.mode==='off'||!event.path){display={state:item.after,sidecar:item.sidecar};continue;}
+        if(event.action.animationPreference.mode==='off'||event.kind!=='fire'&&!event.path){display={state:item.after,sidecar:item.sidecar};continue;}
         active={...item,movement,initial,start:time};returnAt=null;
         display={state:event.before,sidecar:item.beforeSidecar};
       }
@@ -102,6 +103,12 @@
       }
       if(active){
         const elapsed=time-active.start;
+        if(active.event.kind==='fire'){
+          const fire=root.GoblinFirePresentation.sample(active.movement,elapsed,active.event);
+          render({state:fire.state,sidecar:fire.age>=50?active.sidecar:active.beforeSidecar,event:active.event,fire,
+            motion:null,dust:false,overlayOpacity:Math.max(0,1-elapsed/120)});
+          schedule();return;
+        }
         render({...display,event:active.event,motion:sample(active.movement,elapsed,active.event.actor.positionBefore,active.initial),
           dust:active.event.action.animationPreference.mode==='high'&&active.movement.kind==='track',
           particles:active.event.action.animationPreference.mode==='high'&&active.movement.kind==='track'?
@@ -117,7 +124,7 @@
     return Object.freeze({
       enqueue(item){
         // OFF and unrelated actions need no frame or hidden layer when the queue is idle.
-        if(!active&&!queue.length&&!display&&(!item.event||item.event.action.animationPreference.mode==='off'||!item.event.path))return;
+        if(!active&&!queue.length&&!display&&(!item.event||item.event.action.animationPreference.mode==='off'||item.event.kind!=='fire'&&!item.event.path))return;
         queue.push(item);tick();
       },
       skip(){if(!active)return false;display={state:active.after,sidecar:active.sidecar};active=null;tick();return true;},
@@ -129,11 +136,13 @@
   if(typeof module!=='undefined'&&module.exports)module.exports=api;
   if(!root.document||!root.GoblinPresentation?.subscribe||!root.requestAnimationFrame)return;
   const ns='http://www.w3.org/2000/svg',tickets=new WeakMap();
-  let layer=null,displayContext=null,lastFrame=null,builtState=null,builtEvent=null,dustLayer=null,actorNode=null,markerLayer=null;
+  let layer=null,displayContext=null,lastFrame=null,builtState=null,builtEvent=null,dustLayer=null,actorNode=null,markerLayer=null,effectLayer=null,builtFireStage=null;
   let unitNodes=[],depthOrder='',dustSequence=0,dustGradientId=null;
+  let publishedState=null;
   const node=(tag,attributes={})=>{const result=document.createElementNS(ns,tag);for(const [key,value]of Object.entries(attributes))result.setAttribute(key,value);return result;};
   function finish(completed=false){layer?.remove();layer=null;displayContext=null;lastFrame=null;
-    builtState=null;builtEvent=null;actorNode=null;markerLayer=null;dustLayer=null;unitNodes=[];depthOrder='';
+    builtState=null;builtEvent=null;actorNode=null;markerLayer=null;dustLayer=null;effectLayer=null;unitNodes=[];depthOrder='';builtFireStage=null;
+    publishedState=null;
     document.body.classList.remove('goblin-moving');document.body.style.removeProperty('--movement-overlays');
     if(completed)root.dispatchEvent(new Event('goblin-movement-finished'));}
   function paint(value){
@@ -146,18 +155,22 @@
       dustGradientId=`goblin-movement-dust-${++dustSequence}`;
     }
     if(layer.parentNode!==map)map.appendChild(layer);
-    if(builtState!==value.state||builtEvent!==value.event){
+    const fireStage=value.fire?value.fire.age<120?0:1:null;
+    if(builtState!==value.state||builtEvent!==value.event||builtFireStage!==fireStage){
+    builtFireStage=fireStage;
     builtState=value.state;builtEvent=value.event;actorNode=null;unitNodes=[];depthOrder='';
     layer.replaceChildren();
     dustLayer=node('g');layer.appendChild(dustLayer);
     const units=root.UnitVisuals.sortMapUnits(value.state.units.filter(unit=>!unit.embarkedOn));
     for(const unit of units){
-      const moving=value.event?.actor.unitId===unit.id,c=center(unit),group=node('g');
+      const moving=!!value.motion&&value.event?.actor.unitId===unit.id,c=center(unit),group=node('g');
       if(moving)actorNode=group;
       group.dataset.movementUnit=unit.id;
-      if(unit.hp<=0)root.UnitVisuals.drawWreck(group,unit,c,{ns});
+      const old=value.fire?.effects.find(effect=>effect.subjectId===unit.id)?.before;
+      const artUnit=old&&old.hp>0&&unit.hp<=0&&value.fire.age<120?old:unit;
+      if(artUnit.hp<=0)root.UnitVisuals.drawWreck(group,artUnit,c,{ns});
       else{
-        root.UnitVisuals.draw(group,unit,c,{ns,map:true,color:unit.team==='enemy'?'#ee574d':'#62cadd'});
+        root.UnitVisuals.draw(group,artUnit,c,{ns,map:true,color:unit.team==='enemy'?'#ee574d':'#62cadd'});
         if(unit.disabled){group.style.opacity='.32';group.style.filter='grayscale(1)';}
         if(moving){
           group.setAttribute('transform',`translate(${value.motion.point.x-c.x} ${value.motion.point.y-c.y})`);
@@ -180,8 +193,9 @@
     markerLayer=layer.querySelector('#v2-m1-markers');
     // The live renderer queries its marker IDs across the whole map. Display clones own a namespace.
     if(markerLayer){markerLayer.id='movement-v2-m1-markers';markerLayer.setAttribute('id','movement-v2-m1-markers');}
+    effectLayer=node('g',{'data-presentation-effects':'true'});layer.appendChild(effectLayer);
     }
-    if(markerLayer)markerLayer.style.opacity=String(value.overlayOpacity);
+    if(markerLayer)markerLayer.style.opacity=String(value.fire?1:value.overlayOpacity);
     if(actorNode&&value.motion){
       const c=center(value.event.actor.positionBefore),offset=`translate(${value.motion.point.x-c.x} ${value.motion.point.y-c.y})`;
       actorNode.setAttribute('transform',offset);
@@ -195,7 +209,7 @@
       return (a.unit.hp>0?1:0)-(b.unit.hp>0?1:0)||y(a)-y(b)||String(a.unit.id).localeCompare(String(b.unit.id));
     });
     const order=ordered.map(item=>item.unit.id).join('/');
-    if(order!==depthOrder){ordered.forEach(item=>layer.appendChild(item.group));if(markerLayer)layer.appendChild(markerLayer);depthOrder=order;}
+    if(order!==depthOrder){ordered.forEach(item=>layer.appendChild(item.group));if(markerLayer)layer.appendChild(markerLayer);if(effectLayer)layer.appendChild(effectLayer);depthOrder=order;}
     dustLayer.replaceChildren();
     if(value.dust&&value.particles?.length){
       // One layer-local gradient, replaced with the puffs and removed on every settle/reset.
@@ -208,16 +222,22 @@
         dustLayer.appendChild(node('circle',{cx:puff.x,cy:puff.y,r:puff.radius,fill:`url(#${dustGradientId})`,opacity:puff.opacity}));
       }
     }
+    effectLayer.replaceChildren();
+    if(value.fire)root.GoblinFirePresentation.paint({value,layer:effectLayer,units:unitNodes,node,ns,id:dustGradientId});
+    if(publishedState!==value.state){publishedState=value.state;root.dispatchEvent(new Event('goblin-presentation-state'));}
   }
   const queue=createQueue({now:()=>performance.now(),request:fn=>requestAnimationFrame(fn),cancel:id=>cancelAnimationFrame(id),
     render:value=>{try{paint(value);}catch(error){queue.clear();console.warn('Movement display settled after render failure',error);}},
     finish,diagnostic:value=>{console.warn('Movement presentation checkpoint',value);root.dispatchEvent(new CustomEvent('goblin-movement-diagnostic',{detail:value}));}});
   root.GoblinMovement=Object.freeze({
     busy:queue.busy,skip:queue.skip,clear:queue.clear,read:queue.read,
+    projectedState:()=>displayContext?JSON.parse(JSON.stringify(displayContext.state)):null,
+    wrecksAt:(x,y)=>displayContext?(displayContext.sidecar?.wrecks??[]).filter(w=>w.position.x===x&&w.position.y===y):null,
     facingFor(unit){const item=displayContext?.sidecar?.facingByUnit.find(f=>f.unitId===unit.id);
       const actual=displayContext?.state.units.find(u=>u.id===unit.id),position=unit.position??unit;
       return actual?.x===position.x&&actual.y===position.y&&item?.team===unit.team&&
-        item.visualKey===(unit.visualKey??root.UnitVisuals.artKey(unit))?item.angleDegrees:null;},
+        item.visualKey===(unit.visualKey??root.UnitVisuals.artKey(unit))?
+          displayContext.fire&&displayContext.event.actor.unitId===unit.id?displayContext.fire.angle:item.angleDegrees:null;},
     wreckFor(unit){return displayContext?.sidecar?.wrecks.find(w=>w.unitId===unit.id&&w.position.x===unit.x&&w.position.y===unit.y)??null;}
   });
   root.GoblinPresentation.subscribe((type,value)=>{

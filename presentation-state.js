@@ -105,21 +105,27 @@
         if(facing){facing.angleDegrees=direction(from,event.path.at(-1));
           facing.sourceActionId=eventId;facing.origin='confirmed-movement';}
       }
+      if(event.kind==='fire'){
+        const target=event.before.units.find(unit=>unit.id===event.targetId);
+        const facing=sidecar.facingByUnit.find(unit=>unit.unitId===event.actor.unitId);
+        if(target&&facing){facing.angleDegrees=direction(event.actor.positionBefore,target);
+          facing.sourceActionId=eventId;facing.origin='confirmed-fire';}
+      }
       synchronize(event.after,{source:'accepted-command',command:event.action.sourceCommand,
         beforeRevision:event.action.beforeRevision,afterRevision:event.action.afterRevision},event.before);
       sidecar.settledThrough=eventId;item.status='settled';return true;
     }
-    function confirm(ticket,after,sourceResults,movements){
+    function confirm(ticket,after,sourceResults,movements,fires=[]){
       if(!tickets.has(ticket)||ticket.generation!==generation||ticket.bindingKey!==key)return [];
       tickets.delete(ticket);
       sidecar.animationPreference=preference(ticket.animationPreference);
-      if(!Array.isArray(movements)||!movements.length){
+      if((!Array.isArray(movements)||!movements.length)&&!fires.length){
         synchronize(after,{source:'accepted-command',command:ticket.command,
           beforeRevision:stamp(ticket.before),afterRevision:stamp(after)},ticket.before);
         notify('confirm',{ticket,events:[],after:immutable(after),sidecar:immutable(sidecar)});return [];}
       const acceptedSequence=++sequence,events=[];
       sidecar.acceptedSequence=sequence;
-      for(const movement of movements){
+      for(const movement of movements??[]){
         const beforeUnit=ticket.before.units.find(unit=>unit.id===movement.actorId);
         const afterUnit=after.units.find(unit=>unit.id===movement.actorId);
         if(!beforeUnit||!afterUnit||beforeUnit.x===afterUnit.x&&beforeUnit.y===afterUnit.y)continue;
@@ -142,6 +148,28 @@
         records.set(eventId,{event,status:'queued'});events.push(event);
         // Canonical observation settles synchronously; the separate visual queue projects it once.
         settleToAfter(eventId);
+      }
+      for(const fire of fires){
+        const actor=ticket.before.units.find(unit=>unit.id===fire.actorId);
+        const target=ticket.before.units.find(unit=>unit.id===fire.targetId);
+        if(!actor||!target)continue;
+        const eventId=`${sidecar.sessionInstanceId}/${sidecar.branchGeneration}/${acceptedSequence}/fire-${fire.sourceEventIndex}`;
+        if(records.has(eventId))continue;
+        const weaponKey=fire.weaponKey??null,used=actor.ogreSystems?.weapons?.[weaponKey];
+        const effects=fire.effects??[...new Set([fire.targetId,...(fire.passengerIds??[])])].map((id,index)=>({
+          subjectId:id,role:index?'passenger':fire.targetKey?'system':'primary',result:fire.result,
+          targetKey:fire.targetKey??null,before:ticket.before.units.find(unit=>unit.id===id),after:after.units.find(unit=>unit.id===id)}));
+        const event=immutable({schemaVersion:1,eventId,kind:'fire',
+          binding:{...binding,sessionInstanceId:sidecar.sessionInstanceId,branchGeneration:sidecar.branchGeneration},
+          action:{acceptedSequence,sourceCommand:ticket.command,...ticket.details,animationPreference:ticket.animationPreference,
+            turn:ticket.before.turn,phase:ticket.before.phase,beforeRevision:stamp(ticket.before),afterRevision:stamp(after)},
+          actor:{unitId:actor.id,team:actor.team,visualKey:actor.visualKey??null,positionBefore:position(actor),positionAfter:position(actor)},
+          targetId:target.id,weapon:{usedWeaponKey:weaponKey,attack:used?.attack??fire.attack??actor.damage,
+            range:used?.range??actor.range,semanticKind:fire.strategic?'missile':weaponKey==='missiles'?'rockets':null,
+            visualMappingVersion:'fire-mapping-v1'},before:ticket.before,after,sourceResults,sourceEventIndex:fire.sourceEventIndex,
+          effects:effects.filter(effect=>effect.before&&effect.after).map((effect,index)=>({...effect,
+            effectId:`${eventId}/${index}`,sourceResultIndex:effect.sourceResultIndex??fire.sourceEventIndex})),path:null});
+        records.set(eventId,{event,status:'queued'});events.push(event);settleToAfter(eventId);
       }
       synchronize(after);notify('confirm',{ticket,events,after:immutable(after),sidecar:immutable(sidecar)});return events;
     }
@@ -188,7 +216,7 @@
         if(!unit||ids.has(item.unitId)||item.team!==unit.team||item.visualKey!==(unit.visualKey??null)||
           !Number.isFinite(item.angleDegrees)||item.angleDegrees<0||item.angleDegrees>=360||
           !(item.sourceActionId===null||typeof item.sourceActionId==='string')||
-          !['baseline','confirmed-movement'].includes(item.origin))return false;
+          !['baseline','confirmed-movement','confirmed-fire'].includes(item.origin))return false;
         ids.add(item.unitId);return true;
       });
     }

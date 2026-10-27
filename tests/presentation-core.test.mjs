@@ -106,7 +106,10 @@ test('actual Core fire projects wrecks exactly for authoritative HP0 without cha
   assert.equal(result.session.projection.events[0].type,'PlayerFireResolved');
   const dead=game.session.projection.state.units.filter(unit=>unit.hp<=0).map(unit=>unit.id).sort();
   assert.deepEqual(game.owner.read().wrecks.map(w=>w.unitId).sort(),dead);
-  assert.equal(game.owner.events().some(item=>item.event.kind==='fire'),false);
+  const fire=game.owner.events().at(-1).event;
+  assert.equal(fire.kind,'fire');assert.equal(fire.targetId,'guard');
+  assert.deepEqual(fire.effects[0].after,fire.after.units.find(unit=>unit.id==='guard'));
+  assert.equal(fire.weapon.usedWeaponKey,null);
 });
 
 test('observer errors never retry or block an otherwise accepted gameplay action',()=>{
@@ -116,4 +119,25 @@ test('observer errors never retry or block an otherwise accepted gameplay action
     begin(){throw Error('capture failure');},confirm(){throw Error('capture failure');}
   });
   assert.deepEqual(actual,expected);
+});
+
+test('actual Core system weapon fire preserves used key, confirmed effects and replay through enemy responses',()=>{
+  const game=pair(1);game.apply(move('ogre',3,2));for(let i=0;i<3;i++)game.apply(end);game.enemy();
+  game.apply(move('ogre',6,2));game.apply(end);
+  const command=game.session.projection.state.units.filter(unit=>unit.team==='enemy').map(target=>({
+    type:'PlayerFire',playerId:'player',unitId:'ogre',targetId:target.id,weaponKey:'main'}))
+    .find(command=>queryIronDustProfile(game.session.profile,command).available);
+  assert.ok(command);game.apply(command);
+  const fire=game.owner.events().at(-1).event;assert.equal(fire.kind,'fire');assert.equal(fire.weapon.usedWeaponKey,'main');
+  assert.equal(fire.weapon.attack,fire.before.units.find(unit=>unit.id==='ogre').ogreSystems.weapons.main.attack);
+  assert.equal(fire.effects.length,1);assert.equal(fire.effects[0].result,fire.sourceResults[0].result);
+  game.apply(end);game.apply(end);game.enemy();
+  for(const {event}of game.owner.events().filter(item=>item.event.kind==='fire')){
+    assert.equal(Object.isFrozen(event.effects[0].before),true);
+    assert.deepEqual(event.effects[0].after,event.after.units.find(unit=>unit.id===event.targetId));
+    if(event.sourceResults[0].type==='EnemySystemFireResolved'){
+      assert.equal(event.weapon.usedWeaponKey,null);assert.equal(event.effects[0].targetKey,event.sourceResults[0].targetKey);
+    }
+  }
+  assert.deepEqual(validateIronDustProfileReplay(recordIronDustProfileReplay(1,game.commands)),recordIronDustProfileReplay(1,game.commands));
 });

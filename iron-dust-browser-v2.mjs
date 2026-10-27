@@ -1,4 +1,4 @@
-import {createCorePresentationObserver} from './core-presentation.mjs';
+import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
 
 function observePresentation(observer,method,...args){
   try{return observer?.[method]?.(...args);}catch{return null;}

@@ -83,10 +83,26 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       clearTimeout(view.phaseSkipTimer);
       view.phaseSkipTimer = setTimeout(() => { view.phaseSkip = null; render(); }, 9000);
     }
+    let idleCoreLog=[],idleLegacyLogEntries=[];
     function project() {
+      const displayed=globalThis.GoblinMovement?.projectedState();
       if (core()) {
-        const source = IronDustBrowserV2.view;
+        let source = IronDustBrowserV2.view;
+        if(displayed){
+          const roster=source.units.map(unit=>{
+            const raw=displayed.units.find(item=>item.id===unit.id);if(!raw)return unit;
+            const systems=raw.ogreSystems;
+            return {...unit,...raw,attack:raw.damage??unit.attack,treads:systems?.treads??null,maxTreads:systems?.maxTreads??null,
+              selectedWeapon:systems?.selectedWeapon??null,weapons:systems?Object.fromEntries(Object.entries(systems.weapons).map(([key,weapon])=>
+                [key,{...weapon,ready:GoblinSystems.weaponReady(weapon)}])):null};
+          });
+          const objective=roster.find(unit=>unit.id==='core');
+          source={...source,units:roster,turn:displayed.turn,phase:displayed.phase,victory:displayed.victory,
+            mode:displayed.victory.status==='ended'?'ended':displayed.activeTeam,
+            objective:{coreHp:objective.hp,coreMaxHp:objective.maxHp,progress:100*(objective.maxHp-objective.hp)/objective.maxHp}};
+        }
         const snapshotRevision = revision();
+        if(!displayed)idleCoreLog=source.events.map(event=>IronDustBrowserV2.formatEvent(event));
         return {
           revision: snapshotRevision, scenario: 'iron-dust-v2', profile: source.ruleProfileId,
           markers:M1UnitMarkers.core(source, IronDustBrowserV2.epoch, snapshotRevision),
@@ -101,27 +117,30 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           systems:source.units.filter(unit => unit.team === 'player' && unit.weapons).map(unit => ({id:unit.id,
             summary:{treads:unit.treads,weapons:Object.fromEntries(Object.entries(unit.weapons)
               .map(([key, weapon]) => [key, weapon.ready]))}})),
-          log:source.events.map(event => IronDustBrowserV2.formatEvent(event))
+          log:idleCoreLog
         };
       }
-      const objective = objectiveSnapshot(victoryProfile(legacySession.effectiveRules), units);
-      const logEntries = legacyLogEntries();
+      const roster=displayed?.units??units;
+      const shownPhase=displayed?.activeTeam??phase,shownTurnPhase=displayed?.phase??turnPhase,shownGameOver=displayed?.gameOver??gameOver;
+      const objective = objectiveSnapshot(victoryProfile(legacySession.effectiveRules), roster);
+      if(!displayed)idleLegacyLogEntries=legacyLogEntries();
+      const logEntries = idleLegacyLogEntries;
       const snapshotRevision = revision();
       return {
         revision: snapshotRevision, scenario: currentScenario, profile: legacySession.ruleProfileId,
-        markers:M1UnitMarkers.legacy(legacySession, units, snapshotRevision, objective.outcome),
+        markers:M1UnitMarkers.legacy(legacySession, roster, snapshotRevision, objective.outcome),
         mission: { title: t(`mission.${currentScenario}.title`), objective: t(`mission.${currentScenario}.objective.short`) },
-        turn, phase, turnPhase, gameOver, objective: structuredClone(objective),
+        turn:displayed?.turn??turn, phase:shownPhase, turnPhase:shownTurnPhase, gameOver:shownGameOver, objective: structuredClone(objective),
         ready: phase === 'player' && !gameOver ? phaseReadyUnits().length : 0,
         undo: { available: phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },
-        units: units.map(({ id, name, type, team, x, y, hp, maxHp, attack, defense, move, range, damage, disabled, embarkedOn, core, infantry, engineering, ogreSystems, transportCapacity, strategicMissile, missilesRemaining }) =>
+        units: roster.map(({ id, name, type, team, x, y, hp, maxHp, attack, defense, move, range, damage, disabled, embarkedOn, core, infantry, engineering, ogreSystems, transportCapacity, strategicMissile, missilesRemaining }) =>
           ({ id, name, type, team, x, y, hp, maxHp, disabled: !!disabled, embarkedOn: embarkedOn || null,
             attack: attack ?? damage ?? null, defense: defense ?? null, move: move ?? null, range: range ?? null,
             core: !!core, infantry: !!infantry, engineering:!!engineering,
             ogreSystems:ogreSystems ? structuredClone(ogreSystems) : null,
             transportCapacity: transportCapacity || 0, strategicMissile: !!strategicMissile,
             missilesRemaining: missilesRemaining ?? null })),
-        systems: units.filter(unit => unit.team === 'player' && unit.ogreSystems)
+        systems: roster.filter(unit => unit.team === 'player' && unit.ogreSystems)
           .map(unit => ({ id: unit.id, summary: GoblinSystems.summary(unit.ogreSystems) })),
         logEntries,
         log: logEntries.map(entry => [entry.time, entry.source, entry.message]
@@ -129,6 +148,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       };
     }
     function query(command) {
+      if(globalThis.GoblinMovement?.busy())return {ok:false,reason:''};
       if (core()) {
         if (GameDialogs.isOpen() || document.body.classList.contains('v2-screen-open'))
           return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
@@ -212,6 +232,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         legal: true, ratioCategory, meaning: 'crt-attack-effective-defense'});
     }
     function dispatch(command, expectedRevision) {
+      if(globalThis.GoblinMovement?.busy()){globalThis.GoblinMovement.skip();return {ok:false,reason:''};}
       startZoomPending = null;
       if (core()) {
         if (view.busy || expectedRevision !== revision()) return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
@@ -1232,6 +1253,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
     }, true);
     globalThis.addEventListener('goblin-language-change', () => render());
+    globalThis.addEventListener('goblin-presentation-state', () => render());
+    globalThis.addEventListener('goblin-movement-finished', () => render());
     globalThis.addEventListener('goblin-core-v2-render', () => {if(core()) render();});
     globalThis.addEventListener('goblin-unit-art-fallback', () => render());
     new MutationObserver(changes => {
