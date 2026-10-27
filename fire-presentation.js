@@ -32,7 +32,7 @@
       sum+Math.max(0,(b.ogreSystems?.weapons?.[key]?.destroyed??0)-(value.destroyed??0)),0);
     return {hp,treads,systems,disabled:!!(!a.disabled&&b.disabled),changed:!!(hp>0||treads>0||systems>0||!a.disabled&&b.disabled),
       label:treads?`−${treads} ${root.GoblinLanguage?.t('v2.ui.treads')??'TREADS'}`:
-        systems?`−${systems} ${root.GoblinLanguage?.t('v2.ui.weaponDamage',{count:systems})??'SYSTEM'}`:
+        systems?`−${root.GoblinLanguage?.t('v2.ui.weaponDamage',{count:systems})??`${systems} SYSTEM`}`:
           hp?`−${hp} ${a.infantry||a.engineering?'SP':'HP'}`:
             !a.disabled&&b.disabled?(root.GoblinLanguage?.t('v2.ui.disabled')??'DISABLED'):null};
   }

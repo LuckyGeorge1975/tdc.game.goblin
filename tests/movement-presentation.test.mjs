@@ -321,3 +321,15 @@ test('damage derives only actual HP/SP, system losses and disabled transition, n
   assert.equal(api.delta({before:{hp:2,infantry:true},after:{hp:1,infantry:true}}).label,'−1 SP');
   assert.equal(api.delta({before:{hp:3,disabled:true},after:{hp:0,disabled:true}}).hp,3);
 });
+
+test('system loss caption adds one minus to the existing counted locale text, with a counted neutral fallback',()=>{
+  const s=browserScene(),api=s.context.GoblinFirePresentation;
+  const dictionary=fs.readFileSync(new URL('../localization.js',import.meta.url),'utf8');
+  const template=dictionary.match(/'v2\.ui\.weaponDamage': \{de:'([^']+)'/)[1];
+  const before={hp:5,ogreSystems:{weapons:{main:{destroyed:0}}}};
+  const after={hp:5,ogreSystems:{weapons:{main:{destroyed:1}}}};
+  s.context.GoblinLanguage={t:(key,{count})=>{assert.equal(key,'v2.ui.weaponDamage');return template.replace('{count}',count);}};
+  assert.equal(api.delta({before,after}).label,'−1 Waffen zerstört');
+  delete s.context.GoblinLanguage;
+  assert.equal(api.delta({before,after}).label,'−1 SYSTEM');
+});
