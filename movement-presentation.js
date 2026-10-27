@@ -67,12 +67,12 @@
       for(let birth=drive.start+120/plan.enemy;birth<drive.end-100/plan.enemy;birth+=75/plan.enemy){
         const salt=`${drive.start}/${index++}`,age=(elapsed-birth)*plan.enemy;
         if(age<0||age>=550)continue;
-        const life=age/550,motion=sample(plan,birth,event.actor.positionBefore,drive.initial);
+        const life=age/550,out=1-(1-life)**3,motion=sample(plan,birth,event.actor.positionBefore,drive.initial);
         const angle=motion.angle*Math.PI/180;
         const jitter=(root.GoblinPresentationState?.visualRandom(event.eventId,salt)??.5)-.5;
-        result.push({x:motion.point.x-Math.cos(angle)*(30+life*14)*scale+jitter*8*scale,
-          y:motion.point.y-Math.sin(angle)*(30+life*14)*scale+jitter*8*scale,
-          radius:(5+10*life)*scale,opacity:.34*(1-life)});
+        result.push({x:motion.point.x-Math.cos(angle)*(30+out*14)*scale+jitter*8*scale,
+          y:motion.point.y-Math.sin(angle)*(30+out*14)*scale+jitter*8*scale,
+          radius:(5+10*out)*scale,opacity:.34*(1-life)**1.4});
       }
     }
     return result;
@@ -130,7 +130,7 @@
   if(!root.document||!root.GoblinPresentation?.subscribe||!root.requestAnimationFrame)return;
   const ns='http://www.w3.org/2000/svg',tickets=new WeakMap();
   let layer=null,displayContext=null,lastFrame=null,builtState=null,builtEvent=null,dustLayer=null,actorNode=null,markerLayer=null;
-  let unitNodes=[],depthOrder='';
+  let unitNodes=[],depthOrder='',dustSequence=0,dustGradientId=null;
   const node=(tag,attributes={})=>{const result=document.createElementNS(ns,tag);for(const [key,value]of Object.entries(attributes))result.setAttribute(key,value);return result;};
   function finish(completed=false){layer?.remove();layer=null;displayContext=null;lastFrame=null;
     builtState=null;builtEvent=null;actorNode=null;markerLayer=null;dustLayer=null;unitNodes=[];depthOrder='';
@@ -141,7 +141,10 @@
     lastFrame=value;displayContext=value;
     document.body.classList.add('goblin-moving');
     document.body.style.setProperty('--movement-overlays',String(value.overlayOpacity));
-    if(!layer)layer=node('g',{'id':'goblin-movement-layer','pointer-events':'none','aria-hidden':'true'});
+    if(!layer){
+      layer=node('g',{'id':'goblin-movement-layer','pointer-events':'none','aria-hidden':'true'});
+      dustGradientId=`goblin-movement-dust-${++dustSequence}`;
+    }
     if(layer.parentNode!==map)map.appendChild(layer);
     if(builtState!==value.state||builtEvent!==value.event){
     builtState=value.state;builtEvent=value.event;actorNode=null;unitNodes=[];depthOrder='';
@@ -194,10 +197,15 @@
     const order=ordered.map(item=>item.unit.id).join('/');
     if(order!==depthOrder){ordered.forEach(item=>layer.appendChild(item.group));if(markerLayer)layer.appendChild(markerLayer);depthOrder=order;}
     dustLayer.replaceChildren();
-    if(value.dust){
+    if(value.dust&&value.particles?.length){
+      // One layer-local gradient, replaced with the puffs and removed on every settle/reset.
+      const defs=node('defs'),gradient=node('radialGradient',{id:dustGradientId,cx:'50%',cy:'50%',r:'50%'});
+      gradient.appendChild(node('stop',{offset:'0%','stop-color':'#9e8a6c','stop-opacity':1}));
+      gradient.appendChild(node('stop',{offset:'100%','stop-color':'#9e8a6c','stop-opacity':0}));
+      defs.appendChild(gradient);dustLayer.appendChild(defs);
       // Reconstruct the bounded visual stream from event time, never gameplay RNG or particle timers.
       for(const puff of value.particles??[]){
-        dustLayer.appendChild(node('circle',{cx:puff.x,cy:puff.y,r:puff.radius,fill:'#9e8a6c',opacity:puff.opacity}));
+        dustLayer.appendChild(node('circle',{cx:puff.x,cy:puff.y,r:puff.radius,fill:`url(#${dustGradientId})`,opacity:puff.opacity}));
       }
     }
   }

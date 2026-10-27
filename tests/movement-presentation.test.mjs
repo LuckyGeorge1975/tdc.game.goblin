@@ -161,6 +161,37 @@ function browserScene(runtime='core',team='player'){
   }
   return {context,owner,map,body,c,move,observers,listeners};
 }
+test('dust reference uses scaled cubic ease-out growth/drift, alpha power 1.4 and existing 550ms lifetime',()=>{
+  const value=item(),plan=movement.plan(value.event,0),scale=Math.sqrt(3)*34/112;
+  const born=movement.particles(plan,120,value.event)[0],half=movement.particles(plan,395,value.event)[0];
+  assert.ok(Math.abs(born.radius-5*scale)<1e-10);assert.equal(born.opacity,.34);
+  assert.ok(Math.abs(half.radius-13.75*scale)<1e-10);
+  assert.ok(Math.abs(half.opacity-.34*Math.pow(.5,1.4))<1e-10);
+  assert.ok(Math.abs((born.x-half.x)-14*.875*scale)<1e-10);
+  assert.equal(born.y,half.y);
+  assert.deepEqual(movement.particles(plan,plan.duration+550,value.event),[]);
+});
+test('dust gradients soften center to transparent rim, stay layer-local and disappear on settle/reset',()=>{
+  const s=browserScene();s.move('high');s.c.advance(180);
+  const dust=()=>s.map.querySelector('#goblin-movement-layer').children[0];
+  const gradient=dust().children[0].children[0],puff=dust().children[1],id=gradient.getAttribute('id');
+  assert.equal(gradient.tagName,'radialGradient');assert.equal(gradient.getAttribute('r'),'50%');
+  assert.deepEqual(gradient.children.map(stop=>[stop.getAttribute('offset'),stop.getAttribute('stop-color'),stop.getAttribute('stop-opacity')]),
+    [['0%','#9e8a6c','1'],['100%','#9e8a6c','0']]);
+  assert.equal(puff.getAttribute('fill'),`url(#${id})`);
+  s.c.advance(30);assert.equal(dust().children.filter(child=>child.tagName==='defs').length,1);
+  assert.equal(dust().children[0].children[0].getAttribute('id'),id);
+  s.owner.cancel();assert.equal(s.body.querySelector(`#${id}`),null);
+  s.move('high');s.c.advance(180);
+  const nextId=dust().children[0].children[0].getAttribute('id');assert.notEqual(nextId,id);
+  s.context.GoblinMovement.skip();s.c.advance(220);assert.equal(s.body.querySelector(`#${nextId}`),null);
+  for(const mode of ['normal','off']){
+    s.move(mode);s.c.advance(180);
+    const layer=s.map.querySelector('#goblin-movement-layer');
+    assert.ok(!layer||layer.children[0].children.length===0);
+    s.owner.cancel();
+  }
+});
 test('real SVG driver shows before-position, reattaches after map rebuild, pointer skip consumes click; reset removes layer',()=>{
   const s=browserScene(),after=s.move('high');
   assert.ok(s.body.classList.contains('goblin-moving'));
