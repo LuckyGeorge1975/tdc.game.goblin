@@ -654,7 +654,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const weaponKey = previewWeaponKey(actor);
       const weapon = core() ? actor?.weapons?.[weaponKey] : runtime?.ogreSystems?.weapons?.[weaponKey];
       const key = JSON.stringify([core(), state.revision, state.phase, state.turnPhase,
-        actor?.id, mode, weaponKey, GoblinLanguage.current]);
+        actor?.id, mode, weaponKey, GoblinLanguage.current, !!globalThis.GoblinMovement?.busy()]);
       if (areaCache.key !== key) { areaCache.key = key; areaCache.value = areaData(state, actor, mode); }
       const data = areaCache.value;
       const hexWidth = Math.sqrt(3) * S;

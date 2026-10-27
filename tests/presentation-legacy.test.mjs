@@ -172,6 +172,35 @@ test('Legacy used weapon is captured before auto selection, never inferred from 
   assert.notEqual(fire.after.units[0].ogreSystems.selectedWeapon,fire.weapon.usedWeaponKey);
 });
 
+test('natural fire settle replaces busy-cached blocked area with the legal autoselected follow-up target',()=>{
+  const game=scene();
+  game.run("terrain.clear();units[5].x=2;units[5].y=5;units[6].x=2;units[6].y=4;setTurnPhase('fire');SiegebreakerWeapons.selectWeapon(units[0],'main');attack(units[0],units[5])");
+  const ui=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
+  const slice=(first,last)=>ui.slice(ui.indexOf(first),ui.indexOf(last,ui.indexOf(first)));
+  game.run(`globalThis.followBusy=true;globalThis.GoblinMovement={busy:()=>followBusy};
+    globalThis.core=()=>false;globalThis.t=key=>key;globalThis.GoblinLanguage={current:'de'};
+    globalThis.previewWeaponKey=actor=>actor.ogreSystems.selectedWeapon;
+    const areaCache={key:null,value:null};
+    ${slice('    function query(command)', '    function previewFire(command)')}
+    ${slice('    function areaQuery(', '    function freeRatioChipCenter(')}
+    function drawFollowArea(){
+      const state={revision:'same-confirmed-shot',phase,turnPhase,gameOver,units};
+      const actor=units[0],mode='fire',weaponKey=actor.ogreSystems.selectedWeapon;
+      ${slice('      const key = JSON.stringify([core()', '      const hexWidth')}
+      return JSON.stringify({key,legal:areaCache.value.legal});
+    }
+    globalThis.followBefore=drawFollowArea();`);
+  assert.equal(game.run('units[0].ogreSystems.selectedWeapon'),'secondary');
+  const during=JSON.parse(game.run('followBefore'));assert.equal(during.legal.length,0);
+  const canonical=game.state(),rolls=game.rolls();
+  game.run('followBusy=false');
+  assert.equal(game.run("query({type:'Fire',actorId:'ogre',x:2,y:4,weaponKey:'secondary'}).ok"),true);
+  const after=JSON.parse(game.run('drawFollowArea()'));
+  assert.ok(after.legal.some(cell=>cell.x===2&&cell.y===4),'render must agree with the actual legal next shot');
+  assert.notEqual(after.key,during.key,'busy and settled legalities require separate cache entries');
+  assert.equal(game.state(),canonical);assert.equal(game.rolls(),rolls);
+});
+
 test('Legacy strategic splash preserves one launch and per-resolver outcomes, including friendly passengers',()=>{
   const observed=scene(),control=scene(false);
   const setup="terrain.clear();units.splice(0,units.length,{id:'carrier',visualKey:'strategic-missile-carrier',name:'CARRIER',x:0,y:1,hp:2,maxHp:2,team:'player',strategicMissile:true,missilesRemaining:1,range:8,damage:6},{id:'target',visualKey:'guard-tank',name:'TARGET',x:2,y:3,hp:2,maxHp:2,defense:2,team:'enemy',transportCapacity:3},{id:'passenger',visualKey:'infantry-squad',name:'PASSENGER',x:2,y:3,hp:2,maxHp:2,defense:1,infantry:true,embarkedOn:'target',team:'enemy'},{id:'adjacent',visualKey:'infantry-squad',name:'FRIEND',x:3,y:4,hp:2,maxHp:2,defense:2,team:'player'});setTurnPhase('fire');attack(units[0],units[1])";
