@@ -282,3 +282,10 @@ body.ui-v2-active .v2-fire-ratio { fill: var(--v2-text); text-anchor: middle; do
   .v2-context { grid-column: 1 / -1; grid-row: 4; }
   .v2-command-card.v2-command-panel { top: max(8px, env(safe-area-inset-top)); left: auto; right: max(8px, env(safe-area-inset-right)); bottom: max(8px, env(safe-area-inset-bottom)); width: min(320px, 40vw); max-height: none; }
 }
+/* The frozen display layer owns units during accepted movement, in SVG map coordinates. */
+.goblin-moving #battlefield-map > .unit-svg,
+.goblin-moving #battlefield-map > #v2-m1-markers { visibility:hidden; }
+.goblin-moving #battlefield-map > :is(#v2-area-overlay,.move-area,.fire-area,.los-area,.focus-marker),
+.goblin-moving #battlefield-map > .hex:is(.movement-fill,.fire-range,.los-visible,.attack,.selected) {
+  opacity:var(--movement-overlays,0);
+}

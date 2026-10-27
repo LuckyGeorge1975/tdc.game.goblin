@@ -37,7 +37,9 @@
     let binding=null,key=null,sidecar=null,endState=null,generation=0,sequence=0;
     let tickets=new WeakSet();
     const records=new Map();
-    function cancel(){generation++;tickets=new WeakSet();}
+    const listeners=new Set();
+    function notify(type,value){for(const listener of listeners){try{listener(type,value);}catch{ /* Visual observers cannot reject a command. */ }}}
+    function cancel(){generation++;tickets=new WeakSet();notify('cancel');}
     function synchronize(state,destructionRef=null,confirmedBefore=null){
       if(!sidecar)return;
       if(destructionRef?.animationPreference)sidecar.animationPreference=preference(destructionRef.animationPreference);
@@ -88,7 +90,7 @@
       if(!sidecar)return null;
       synchronize(before);
       const ticket=immutable({generation,bindingKey:key,command,before,details,animationPreference:currentPreference()});
-      tickets.add(ticket);return ticket;
+      tickets.add(ticket);notify('begin',{ticket,sidecar:immutable(sidecar)});return ticket;
     }
     function settleToAfter(eventId,expectedGeneration=generation){
       const item=records.get(eventId);
@@ -113,7 +115,8 @@
       sidecar.animationPreference=preference(ticket.animationPreference);
       if(!Array.isArray(movements)||!movements.length){
         synchronize(after,{source:'accepted-command',command:ticket.command,
-          beforeRevision:stamp(ticket.before),afterRevision:stamp(after)},ticket.before);return [];}
+          beforeRevision:stamp(ticket.before),afterRevision:stamp(after)},ticket.before);
+        notify('confirm',{ticket,events:[],after:immutable(after),sidecar:immutable(sidecar)});return [];}
       const acceptedSequence=++sequence,events=[];
       sidecar.acceptedSequence=sequence;
       for(const movement of movements){
@@ -137,10 +140,10 @@
           before:ticket.before,after,sourceResults,sourceEventIndex:index,
           path:consistent?movement.path:null,diagnostic:consistent?null:'INVALID_CONFIRMED_PATH',effects:[]});
         records.set(eventId,{event,status:'queued'});events.push(event);
-        // This foundation has no animated mode: the single queue owner always settles synchronously.
+        // Canonical observation settles synchronously; the separate visual queue projects it once.
         settleToAfter(eventId);
       }
-      synchronize(after);return events;
+      synchronize(after);notify('confirm',{ticket,events,after:immutable(after),sidecar:immutable(sidecar)});return events;
     }
     function compatible(saved,state,historical=false){
       if(!saved||saved.schemaVersion!==1||JSON.stringify(saved.binding)!==JSON.stringify(binding)||
@@ -201,6 +204,8 @@
       synchronize(state);return valid;
     }
     return Object.freeze({bind,begin,confirm,cancel,synchronize,settleToAfter,rewind,
+      subscribe(listener){listeners.add(listener);return ()=>listeners.delete(listener);},
+      transition(state){notify('transition',{after:immutable(state),sidecar:sidecar?immutable(sidecar):null});},
       stop(runtime){if(runtime!==undefined&&binding?.runtime!==runtime)return;
         cancel();key=null;binding=null;sidecar=null;endState=null;records.clear();},
       read:()=>sidecar?immutable(sidecar):null,endState:()=>endState,

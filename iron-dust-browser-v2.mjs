@@ -255,7 +255,7 @@ if (typeof document !== 'undefined') {
     },
     formatError: formatIronDustV2Error,
     formatEvent: formatIronDustV2Event,
-    pause: () => {paused = true; enemyFlow.cancel();},
+    pause: () => {paused = true; enemyFlow.cancel(); globalThis.GoblinMovement?.clear();},
     resume: () => {paused = false; if (mode === 'ready') enemyFlow.start();},
     dispatch: dispatchAction,
     start, restart: () => start(), stop

@@ -33,6 +33,45 @@ function scene(enabled=true){
     state:()=>run('JSON.stringify({units,terrain:[...terrain],terrainTypes:[...terrainTypes],legacySession,turn,phase,turnPhase,gameOver,phaseRolls,phaseRollCursor})')};
 }
 
+function attachMovement(game){
+  game.run(fs.readFileSync(new URL('../movement-presentation.js',import.meta.url),'utf8'));
+  game.run(`globalThis.motionTime=0;globalThis.motionCallbacks=new Map();globalThis.motionId=0;globalThis.motionFrames=[];
+    globalThis.motionQueue=GoblinMovementMath.createQueue({now:()=>motionTime,
+      request:fn=>{motionCallbacks.set(++motionId,fn);return motionId;},cancel:id=>motionCallbacks.delete(id),
+      render:frame=>motionFrames.push(frame),finish:()=>{}});
+    const motionTickets=new WeakMap();GoblinPresentation.subscribe((type,value)=>{
+      if(type==='cancel')motionQueue.clear();
+      if(type==='begin')motionTickets.set(value.ticket,value.sidecar);
+      if(type==='confirm'){
+        if(!value.events.length)motionQueue.enqueue(value);
+        for(const event of value.events)motionQueue.enqueue({...value,event,beforeSidecar:motionTickets.get(value.ticket)});
+      }
+      if(type==='transition')motionQueue.enqueue(value);
+    });`);
+}
+
+test('actual Legacy movement/Ram/enemy queue preserves full gameplay and RNG through skip, Undo and restart',()=>{
+  for(const mode of ['high','normal','off']){
+    const observed=scene(),control=scene(false);attachMovement(observed);
+    observed.run(`GoblinPresentationPreferences.set('${mode}')`);
+    for(const game of [observed,control])game.run('terrain.clear();units[5].x=2;units[5].y=5;selected=units[0];handleHex(2,5)');
+    assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
+    assert.equal(observed.run('motionQueue.busy()'),mode!=='off');
+    observed.run('motionQueue.skip()');assert.equal(observed.state(),control.state());
+    for(const game of [observed,control])game.run('undoPhaseCommand()');
+    assert.equal(observed.state(),control.state());assert.equal(observed.run('motionQueue.busy()'),false);
+    for(const game of [observed,control]){
+      game.run('enemyTurn()');
+      const enemyTask=[...game.timers.values()].find(fn=>String(fn).includes('const foes='));assert.ok(enemyTask);enemyTask();
+    }
+    assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
+    assert.ok(observed.events().some(item=>item.event.actor.team==='enemy'));
+    observed.run('while(motionQueue.read().active)motionQueue.skip()');assert.equal(observed.state(),control.state());
+    for(const game of [observed,control])game.run("loadScenario('iron-dust')");
+    assert.equal(observed.state(),control.state());assert.equal(observed.run('motionQueue.busy()'),false);
+  }
+});
+
 test('native Legacy move uses the accepted turning path once, with identical game/RNG state',()=>{
   const observed=scene(),control=scene(false);
   observed.run('globalThis.expected=findMovementPath(units[0],{x:3,y:3},units[0].move)');

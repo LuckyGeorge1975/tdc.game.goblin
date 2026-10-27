@@ -24,6 +24,7 @@
       if(!reference||!root.GoblinPresentation.owns('legacy'))return;
       const state=snapshot();
       root.GoblinPresentation.synchronize(state,{...reference,afterRevision:root.GoblinPresentationState.stamp(state)});
+      root.GoblinPresentation.transition(state);
     }),
     begin:safe((actor,path,kind,target)=>{
       if(!sync())return null;

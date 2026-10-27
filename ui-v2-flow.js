@@ -29,6 +29,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function enterPause() {
       if (GameDialogs.isOpen() || pauseActive) return;
+      globalThis.GoblinMovement?.clear();
       savedAuto = document.querySelector('#auto-end-turn').checked;
       document.querySelector('#auto-end-turn').checked = false;
       pauseActive = true;
@@ -160,7 +161,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         list: currentPanel.querySelector('.v2-level-list, .v2-library-list')?.scrollTop || 0,
         libraryLayout: currentPanel.querySelector('.v2-library-layout')?.scrollTop || 0
       });
-      if (previous === 'play' && next !== 'play') playScrollY = globalThis.scrollY;
+      if (previous === 'play' && next !== 'play') {
+        playScrollY = globalThis.scrollY;
+        globalThis.GoblinMovement?.clear();
+      }
       screen = next;
       const overlay = next !== 'play';
       document.body.classList.toggle('v2-screen-open', overlay);
@@ -629,6 +633,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     new MutationObserver(() => { if (screen === 'levels') renderScreen(false); })
       .observe(document.querySelector('#scenario-select'), { childList: true });
     globalThis.addEventListener('goblin-v2-render', () => {
+      if (screen === 'play' && !globalThis.GoblinMovement?.busy() && GoblinUIV2.project().gameOver) show('end');
+    });
+    globalThis.addEventListener('goblin-movement-finished', () => {
       if (screen === 'play' && GoblinUIV2.project().gameOver) show('end');
     });
     globalThis.addEventListener('goblin-language-change', () => renderScreen(false));

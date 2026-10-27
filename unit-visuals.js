@@ -81,6 +81,8 @@
   // Read only the settled presentation belonging to this exact displayed unit.
   function mapAngle(unit){
     try{
+    const projected=root.GoblinMovement?.facingFor(unit);
+    if(Number.isFinite(projected))return projected-(unit.team==='enemy'?180:0);
     const owner=root.GoblinPresentation,sidecar=owner?.read(),state=owner?.endState();
     if(!sidecar||sidecar.schemaVersion!==1||!['core','legacy'].includes(sidecar.binding?.runtime)||
       sidecar.mappingVersion!=='movement-facing-v1'||
@@ -109,6 +111,8 @@
   function wreckFor(unit){
     try{
       if(!Number.isFinite(unit.hp)||unit.hp>0)return null;
+      const projected=root.GoblinMovement?.wreckFor(unit);
+      if(projected)return projected;
       const owner=root.GoblinPresentation,state=owner?.endState(),sidecar=owner?.read();
       if(sidecar?.wreckMappingVersion!=='static-wreck-v1'||!owner.owns(sidecar.binding?.runtime)||
         sidecar.settledRevision!==root.GoblinPresentationState?.stamp(state))return null;
