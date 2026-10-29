@@ -47,6 +47,18 @@
     "mission.siege-pilot.objective.short": "Zerstöre den gegnerischen Kommandokern und halte deinen Panzer am Leben.",
     "mission.siege-pilot.briefing.victory": "Zerstöre den gegnerischen Kommandokern und halte deinen Panzer am Leben.",
     "mission.siege-pilot.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kommandokern gleichzeitig zerstört wird.",
-    "mission.siege-pilot.end.victory": "Der feindliche Kommandokern ist ausgeschaltet."
+    "mission.siege-pilot.end.victory": "Der feindliche Kommandokern ist ausgeschaltet.",
+    "mission.artillery-pilot.title": "Artillerie-Erprobung",
+    "mission.artillery-pilot.briefing.short": "Feuere direkt bei eigener Sicht oder indirekt mit einem lebenden, aktiven eigenen Beobachter.",
+    "mission.artillery-pilot.budget": "Jede Artillerieeinheit hat einen Schuss pro Runde. Keine Aufstellungswartezeit.",
+    "mission.artillery-pilot.objective": "Zerstöre den gegnerischen Kommandokern und halte mindestens eine eigene Einheit am Leben.",
+    "v2.ui.artillery.direct": "Direktes Feuer",
+    "v2.ui.artillery.indirect": "Indirektes Feuer",
+    "v2.ui.artillery.indirectVia": "Indirekt über {spotter}",
+    "v2.reject.artillery.spotterRequired": "Indirektes Feuer benötigt einen lebenden, nicht deaktivierten und unverladenen eigenen Beobachter mit direkter Sicht auf das Ziel.",
+    "mission.artillery-pilot.objective.short": "Zerstöre den gegnerischen Kommandokern und halte mindestens eine eigene Einheit am Leben.",
+    "mission.artillery-pilot.briefing.victory": "Zerstöre den gegnerischen Kommandokern und halte mindestens eine eigene Einheit am Leben.",
+    "mission.artillery-pilot.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kommandokern gleichzeitig zerstört wird.",
+    "mission.artillery-pilot.end.victory": "Der feindliche Kommandokern ist ausgeschaltet."
   }
 }

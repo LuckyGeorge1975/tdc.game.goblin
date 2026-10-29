@@ -9,6 +9,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   const losProbe=Object.freeze({id:'los-supercover-probe',scenarioVersion:1,
     objective:'core',ruleProfileId:'LEGACY_SUPERCOVER_PROBE_v1',losMode:'strict-supercover'});
   const entries=Object.freeze({
+    'artillery-pilot':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_ARTILLERY_PILOT_v1',unitDataProfile:'artillery-pilot-data-v1',losMode:'strict-supercover'}),
     'siege-pilot':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_SIEGE_PILOT_v1',unitDataProfile:'siege-pilot-data-v1'}),
     'skimmer-pilot':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_SKIMMER_PILOT_v1',unitDataProfile:'skimmer-pilot-data-v1'}),
     'iron-dust':Object.freeze({scenarioVersion:2,objective:'core',ruleProfileId:correctedIronDust,
@@ -24,6 +25,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   });
   function reject(code,message){const error=new Error(`${code}: ${message}`);error.code=code;throw error}
   function validate(id,config){
+    if(id==='artillery-pilot'){if(!globalThis.GoblinArtilleryPilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinArtilleryPilot.validate(config);}
     if(id==='siege-pilot'){if(!globalThis.GoblinSiegePilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinSiegePilot.validate(config);}
     if(id==='skimmer-pilot'){if(!globalThis.GoblinSkimmerPilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinSkimmerPilot.validate(config);}
     const expected=id===losProbe.id?losProbe:id==='iron-dust'&&
@@ -72,6 +74,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
       effectiveRules:{objectiveVersion:source.objectiveVersion,objective:source.objective,
         ...(source.losMode?{losMode:source.losMode}:{}),
         ...(source.targetPolicyVersion?{targetPolicyVersion:source.targetPolicyVersion}:{}),
+        ...(id==='artillery-pilot'?{fireBudgetVersion:source.fireBudgetVersion,sourceDigest:source.sourceDigest}:{}),
         ...(id==='siege-pilot'?{fireBudgetVersion:source.fireBudgetVersion,sourceDigest:source.sourceDigest}:{}),
         ...(id==='skimmer-pilot'?{movement:source.movement,sourceDigest:source.sourceDigest}:{}),
         unitDataProfile:source.ruleProfile??null,terrain:source.terrain,

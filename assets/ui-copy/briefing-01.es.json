@@ -47,6 +47,18 @@
     "mission.siege-pilot.objective.short": "Destruye el Núcleo de mando enemigo y mantén tu tanque con vida.",
     "mission.siege-pilot.briefing.victory": "Destruye el Núcleo de mando enemigo y mantén tu tanque con vida.",
     "mission.siege-pilot.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo de mando sea destruido al mismo tiempo.",
-    "mission.siege-pilot.end.victory": "El núcleo de mando enemigo ha sido destruido."
+    "mission.siege-pilot.end.victory": "El núcleo de mando enemigo ha sido destruido.",
+    "mission.artillery-pilot.title": "Prueba de artillería",
+    "mission.artillery-pilot.briefing.short": "Dispara directamente con visión propia o indirectamente con un observador aliado vivo y activo.",
+    "mission.artillery-pilot.budget": "Cada unidad de artillería puede disparar una vez por turno. Sin espera de despliegue.",
+    "mission.artillery-pilot.objective": "Destruye el Núcleo de mando enemigo y mantén con vida al menos una unidad aliada.",
+    "v2.ui.artillery.direct": "Fuego directo",
+    "v2.ui.artillery.indirect": "Fuego indirecto",
+    "v2.ui.artillery.indirectVia": "Indirecto con {spotter}",
+    "v2.reject.artillery.spotterRequired": "El fuego indirecto requiere un observador aliado vivo, no inhabilitado y no embarcado, con línea de visión directa al objetivo.",
+    "mission.artillery-pilot.objective.short": "Destruye el Núcleo de mando enemigo y mantén con vida al menos una unidad aliada.",
+    "mission.artillery-pilot.briefing.victory": "Destruye el Núcleo de mando enemigo y mantén con vida al menos una unidad aliada.",
+    "mission.artillery-pilot.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo de mando sea destruido al mismo tiempo.",
+    "mission.artillery-pilot.end.victory": "El núcleo de mando enemigo ha sido destruido."
   }
 }

@@ -47,6 +47,18 @@
     "mission.siege-pilot.objective.short": "Destroy the enemy Command Core and keep your tank alive.",
     "mission.siege-pilot.briefing.victory": "Destroy the enemy Command Core and keep your tank alive.",
     "mission.siege-pilot.briefing.defeat": "You lose if no friendly unit survives—even if the command core is destroyed at the same time.",
-    "mission.siege-pilot.end.victory": "The enemy command core has been destroyed."
+    "mission.siege-pilot.end.victory": "The enemy command core has been destroyed.",
+    "mission.artillery-pilot.title": "Artillery Trial",
+    "mission.artillery-pilot.briefing.short": "Fire directly with your own line of sight or indirectly with a living, active friendly spotter.",
+    "mission.artillery-pilot.budget": "Each artillery unit can fire once per turn. No setup delay.",
+    "mission.artillery-pilot.objective": "Destroy the enemy Command Core and keep at least one friendly unit alive.",
+    "v2.ui.artillery.direct": "Direct fire",
+    "v2.ui.artillery.indirect": "Indirect fire",
+    "v2.ui.artillery.indirectVia": "Indirect via {spotter}",
+    "v2.reject.artillery.spotterRequired": "Indirect fire requires a living, non-disabled, unembarked friendly spotter with direct line of sight to the target.",
+    "mission.artillery-pilot.objective.short": "Destroy the enemy Command Core and keep at least one friendly unit alive.",
+    "mission.artillery-pilot.briefing.victory": "Destroy the enemy Command Core and keep at least one friendly unit alive.",
+    "mission.artillery-pilot.briefing.defeat": "You lose if no friendly unit survives—even if the command core is destroyed at the same time.",
+    "mission.artillery-pilot.end.victory": "The enemy command core has been destroyed."
   }
 }

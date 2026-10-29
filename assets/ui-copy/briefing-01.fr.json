@@ -47,6 +47,18 @@
     "mission.siege-pilot.objective.short": "Détruisez le Noyau de commandement ennemi et gardez votre char en vie.",
     "mission.siege-pilot.briefing.victory": "Détruisez le Noyau de commandement ennemi et gardez votre char en vie.",
     "mission.siege-pilot.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau de commandement est détruit au même moment.",
-    "mission.siege-pilot.end.victory": "Le noyau de commandement ennemi a été détruit."
+    "mission.siege-pilot.end.victory": "Le noyau de commandement ennemi a été détruit.",
+    "mission.artillery-pilot.title": "Essai d’artillerie",
+    "mission.artillery-pilot.briefing.short": "Tirez directement avec votre propre ligne de vue ou indirectement avec un observateur allié vivant et actif.",
+    "mission.artillery-pilot.budget": "Chaque unité d’artillerie peut tirer une fois par tour. Aucun délai de mise en batterie.",
+    "mission.artillery-pilot.objective": "Détruisez le Noyau de commandement ennemi et gardez au moins une unité alliée en vie.",
+    "v2.ui.artillery.direct": "Tir direct",
+    "v2.ui.artillery.indirect": "Tir indirect",
+    "v2.ui.artillery.indirectVia": "Tir indirect via {spotter}",
+    "v2.reject.artillery.spotterRequired": "Le tir indirect exige un observateur allié vivant, non neutralisé et non embarqué, avec une ligne de vue directe sur la cible.",
+    "mission.artillery-pilot.objective.short": "Détruisez le Noyau de commandement ennemi et gardez au moins une unité alliée en vie.",
+    "mission.artillery-pilot.briefing.victory": "Détruisez le Noyau de commandement ennemi et gardez au moins une unité alliée en vie.",
+    "mission.artillery-pilot.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau de commandement est détruit au même moment.",
+    "mission.artillery-pilot.end.victory": "Le noyau de commandement ennemi a été détruit."
   }
 }

@@ -92,6 +92,16 @@
       profile=validateProfile(await response.json());
     }catch(error){console.error('Unit rule profile unavailable:',error);addLog('Einheiten-Regelprofil konnte nicht geladen werden.',true);return}
     try{
+      const response=await fetch('assets/unit-art/levels/artillery-pilot.v1.json');
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      const config=GoblinArtilleryPilot.create(await response.json(),profile);
+      ScenarioRuleProfiles.validate('artillery-pilot',config);
+      scenarioCatalog['artillery-pilot']=config;
+      const option=document.createElement('option');option.value='artillery-pilot';option.textContent=config.title;option.dataset.titleKey='mission.artillery-pilot.title';
+      $('#scenario-select').appendChild(option);renderScenarioObjective();
+      if(new URLSearchParams(globalThis.location?.search||'').get('scenario')==='artillery-pilot')loadScenario('artillery-pilot');
+    }catch(error){console.error('Artillery pilot unavailable:',error)}
+    try{
       const response=await fetch('assets/unit-art/levels/siege-pilot.v1.json');
       if(!response.ok)throw new Error(`HTTP ${response.status}`);
       const config=GoblinSiegePilot.create(await response.json(),profile);

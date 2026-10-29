@@ -63,7 +63,7 @@ function renderUnitGuide(){
   const v2=globalThis.IronDustBrowserV2?.mode==='ready';
   const unit=unitGuideEntries[guideIndex],live=v2?
     globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.id===unit.coreUnitId):
-    units.find(item=>['skimmer-pilot','siege-pilot'].includes(currentScenario)?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
+    units.find(item=>['skimmer-pilot','siege-pilot','artillery-pilot'].includes(currentScenario)?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
   document.querySelector('.guide-information').scrollTop=0;
   document.querySelector('#guide-symbol').textContent=unit.icon;
   document.querySelector('#guide-symbol').classList.toggle('enemy',(live?.team==='enemy')||(!live&&unit.team==='HOSTILE SYSTEM'));
@@ -75,6 +75,7 @@ function renderUnitGuide(){
   document.querySelector('#guide-role').textContent=v2&&live?GoblinLanguage.t(`v2.ui.type.${live.id}`):unit.role;
   const liveDrone=unit.name==='ARTILLERY DRONE'&&live;
   document.querySelector('#guide-copy').textContent=v2&&live?GoblinLanguage.t(live.team==='player'?'v2.guide.player':'v2.guide.enemy'):liveDrone?'Field-Test-Regel: Diese Artilleriedrohne kann sich selbstständig bewegen. Die stationäre Katalogregel ist noch nicht aktiv.':unit.copy;
+  if(live?.artilleryFire)document.querySelector('#guide-copy').textContent+=' '+GoblinArtilleryWeapons.summary(live);
   if(live?.siegeFireBudget)document.querySelector('#guide-copy').textContent+=' 2 × A3/R3 + 2 × A1/R1 · '+GoblinSiegeWeapons.summary(live);
   globalThis.UnitGuideVoice.render(unit.name);
   const hp=live?(live.ogreSystems?`${live.ogreSystems.treads} ${v2?GoblinLanguage.t('v2.ui.treads'):'TREADS'}`:`${Math.max(0,live.hp)}/${live.maxHp}`):unit.hp;

@@ -2,7 +2,7 @@
   const NS='http://www.w3.org/2000/svg';
   const size=34, referenceScale=Math.sqrt(3)*size/112;
   const legacyProfiles=new Set(['FIELD_TEST_LEGACY_v1','FIELD_TEST_LEGACY_v2',
-    'LEGACY_SUPERCOVER_PROBE_v1','FIELD_TEST_SUPERCOVER_v1','CATALOG_SIEGE_PILOT_v1','CATALOG_SKIMMER_PILOT_v1']);
+    'LEGACY_SUPERCOVER_PROBE_v1','FIELD_TEST_SUPERCOVER_v1','CATALOG_ARTILLERY_PILOT_v1','CATALOG_SIEGE_PILOT_v1','CATALOG_SKIMMER_PILOT_v1']);
   const copy=value=>value==null?null:JSON.parse(JSON.stringify(value));
   const amount=(current,maximum)=>Number.isFinite(current)&&Number.isFinite(maximum)&&maximum>0
     ?{current,maximum}:null;
@@ -32,6 +32,7 @@
         !Array.isArray(rules.units))return unsupported(binding);
     if(binding.profileId==='CATALOG_SKIMMER_PILOT_v1'&&(binding.scenarioId!=='skimmer-pilot'||session.scenarioVersion!==1||rules.movement?.version!=='skimmer-pilot-budget-v1'||rules.sourceDigest!==root.GoblinSkimmerPilot?.digest))return unsupported(binding);
     if(binding.profileId==='CATALOG_SIEGE_PILOT_v1'&&(binding.scenarioId!=='siege-pilot'||session.scenarioVersion!==1||rules.fireBudgetVersion!=='siege-tank-fire-budget-v1'||rules.sourceDigest!==root.GoblinSiegePilot?.digest))return unsupported(binding);
+    if(binding.profileId==='CATALOG_ARTILLERY_PILOT_v1'&&(binding.scenarioId!=='artillery-pilot'||session.scenarioVersion!==1||rules.losMode!=='strict-supercover'||rules.fireBudgetVersion!=='artillery-spotter-v1'||rules.sourceDigest!==root.GoblinArtilleryPilot?.digest))return unsupported(binding);
     const enemies=rules.units.filter(unit=>unit.team==='enemy');
     const members=rules.objective==='core'?enemies.filter(unit=>unit.core):enemies;
     if(!members.length||(rules.objective==='core'&&members.length!==1))return unsupported(binding);

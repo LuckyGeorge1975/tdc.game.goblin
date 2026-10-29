@@ -165,7 +165,7 @@
             turn:ticket.before.turn,phase:ticket.before.phase,beforeRevision:stamp(ticket.before),afterRevision:stamp(after)},
           actor:{unitId:actor.id,team:actor.team,visualKey:actor.visualKey??null,positionBefore:position(actor),positionAfter:position(actor)},
           targetId:target.id,weapon:{usedWeaponKey:weaponKey,attack:used?.attack??fire.attack??actor.damage,
-            range:used?.range??fire.range??actor.range,semanticKind:fire.strategic?'missile':weaponKey==='missiles'?'rockets':null,
+            range:used?.range??fire.range??actor.range,...(fire.mode?{mode:fire.mode,spotterId:fire.spotterId}:{}),semanticKind:fire.strategic?'missile':weaponKey==='missiles'?'rockets':null,
             visualMappingVersion:'fire-mapping-v1'},before:ticket.before,after,sourceResults,sourceEventIndex:fire.sourceEventIndex,
           effects:effects.filter(effect=>effect.before&&effect.after).map((effect,index)=>({...effect,
             effectId:`${eventId}/${index}`,sourceResultIndex:effect.sourceResultIndex??fire.sourceEventIndex})),path:null});

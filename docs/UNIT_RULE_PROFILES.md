@@ -134,3 +134,75 @@ keine erfundenen AP-Anker. Bilder/Design/Contentpin bleiben
 Resolverbelege und normale Gewinn-/Verlustbefehlsfolgen stehen in
 `tests/siege-pilot.test.mjs`; kontrollierte Würfe sind keine native gespielte QA.
 Die unabhängige Desktopprüfung folgt erst auf einem festen Kandidatencommit.
+
+
+## Artillerie-Erprobung, ausdrückliche Ziel-HP (29.10.2026, goblin-9bj.11.10)
+
+Der Nutzer hat das Regelpaket A–G aus
+`Transformation/operations/catalog-rules-approved-2026-10-29.md` angenommen;
+Originalvorschlags-SHA256 `44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57`.
+Damit sind U08 HP2 und U09 HP3 ausdrücklich erhalten. Das wird nicht aus der
+historischen technischen Probe abgeleitet. Neues festes Szenario `artillery-pilot`
+v1 bindet `CATALOG_ARTILLERY_PILOT_v1` / `artillery-pilot-data-v1`,
+Feuerbudget `artillery-spotter-v1` und `strict-supercover`. FULL bleibt inaktiv.
+
+U08 B02: HP2/D1/A6/R8/M0 fixed. U09 B07: HP3/D2/A6/R6/M1 tracked.
+Recon F04: HP2/D2/A2/R2/M3. Gegner: Guard I02 (HP3/D3/A1/R2/M1),
+Assault H07 (HP3/D3/A4/R2/M3), Rocket Artillery E04 (HP3/D2/A3/R4/M2,
+beschlossener U03-Zielsatz, kein U08-Spotterrecht) und Kern K04 (HP5/D5/M0).
+Eigene 12×8-Karte mit bestehenden Wald-, Höhen- und Straßenbausteinen; alle Starts
+sind passierbar. Ziel bleibt Kernzerstörung plus mindestens eine eigene Einheit;
+ein allein überlebender Recon zählt, Spieler-Totalausfall hat Vorrang.
+
+Jede Artillerieeinheit feuert einmal pro Runde. setupValue2 ist Forcebudget,
+kein Aufstellungszähler. Direct verlangt eigene LOS und spotterId=null.
+Indirect verlangt einen explizit benannten anderen lebenden, aktiven, unverladenen
+eigenen Beobachter mit direkter LOS auf ein lebendes besetztes Gegnerhex.
+Keine Waffenreichweiten-/Ungeschossenheitsanforderung für den Beobachter erfinden.
+Kein Blindfeuer, Splash oder zusätzliche Mindestreichweite. Auch bei eigener LOS
+bleibt ein indirekter Schuss ohne gültigen Beobachter ungültig.
+
+Der bestehende Resolver ist inhaltlich unverändert als `artillery-spotter-rules.js`
+mit ESM-Fassade `artillery-spotter-probe.mjs` angebunden. Der Browser-Command
+`FireArtillery` hat exakt type/actorId/x/y/mode/spotterId. Generischer Fire-Bypass
+auf die beiden Pilot-Artillerieeinheiten wird abgewiesen; historische und Core-
+Commands bleiben getrennt. Query, Dispatch, Modus-/Beobachterauswahl, Quote,
+Zielfläche, beide Guides, Phasenbereitschaft, Undo und nächster Rundenreset lesen
+denselben Zustand und Resolver. Indirect überwindet den eigenen Sichtblocker als
+Feueraktion, verändert jedoch nicht die physische eigene LOS-Anzeige.
+
+Der vollständige feste Level-/Roster-/Configvergleich erfolgt vor jeder Session.
+SHA256 über rekursiv schlüsselsortiertes kompaktes UTF8-LevelJSON:
+`661aa73f005e1684ba47080176981718d1b3b6f85f07996efd4091a314f99c2d`.
+Alle alten Missionen und beide früheren Piloten behalten ihre Profile. Alte
+Schema1/Core-v3-, Iron-Dust-, U07- und Artillerie-Probereplays weisen diese neue
+Produktkennung zurück. Keine öffentliche Speicher-/Replayimportfunktion.
+
+Neue reproduzierbare Produktbelege: `tests/artillery-pilot.test.mjs` sowie
+`tests/artillery-product-trace.test.mjs`. Die eingefrorene JSON-Datei
+`tests/fixtures/artillery-product-traces.v1.json` führt vollständigen Profil-/
+Startzustand, normalisierte Quellhashes, Testseed/Xorshift32-Zustand, echte
+Browser-Commands, alle Zustände, Facing-/Wrack-Sidecar und Ereignisänderungen.
+37 Siegschritte (Seed5440, vier tatsächliche Würfe einschließlich gecachtem
+Undo-Reissue) und 18 Niederlagenschritte (Seed7) laufen über den echten
+Legacy-Lader/Query/Dispatch/Phasentaster/Gegnercallback/Observer/Undo-Stack.
+Manipulierte Seeds, Profile, Startzustände, Modus/Beobachter, Reihenfolgen und
+Ergebnisse werden abgewiesen. Kein Verweis nur auf die alte Coreprobe.
+Der Simulatorseed ist ein interner Prüfmechanismus; native Spiele behalten ihren
+normalen Zufall. Kontrolldaten sind kein nativer Desktop-QA-PASS.
+
+Fireevents erfassen tatsächlich gewählten Modus/Beobachter/A6/Reichweite vor
+Autoselect. Vorhandene Longgun-Anker/Effekte werden wiederverwendet; ein Schuss,
+ein Resultat, keine erfundenen Treffer oder neuen Grafikquellen. Contentpin bleibt
+`2fdce6ac1be30e8b2a360250b37724586469e71c`. Die native unabhängige Desktopprüfung
+folgt auf dem festen Kandidaten; danach stellt Koordination den lokalen Snapshot bereit.
+
+
+**Legacy-CRT-Grenze:** Die letzte wirksame Browser-combatOutcome-Definition zieht
+auch bei automatischem 5:1-X einen Zufallswert, bevor applyCombatRoll das Ergebnis
+festlegt. Erstschuss: ein frischer RNG-Wert und ein Rollslot; BACK/Wiederholung:
+derselbe Slot, kein zusätzlicher frischer RNG-Wert. Bei D1 plus Deckung1 gilt
+stattdessen 3:1. Der explizite isolierte Grenztest weist den tatsächlichen geladenen
+Wrapperpfad nach, nicht die früher überschriebene combatOutcome-Definition.
+Es wird keine neue Nullwurfregel eingeführt und keine Grenztest-D-Injektion als
+normale gespielte Mission ausgegeben.

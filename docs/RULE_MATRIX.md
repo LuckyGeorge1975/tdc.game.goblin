@@ -203,3 +203,16 @@ keine erfundenen AP-Anker. Bilder/Design/Contentpin bleiben
 Resolverbelege und normale Gewinn-/Verlustbefehlsfolgen stehen in
 `tests/siege-pilot.test.mjs`; kontrollierte Würfe sind keine native gespielte QA.
 Die unabhängige Desktopprüfung folgt erst auf einem festen Kandidatencommit.
+
+
+## Fester Artillerieeinsatz (goblin-9bj.11.10)
+
+`artillery-pilot` v1 verbindet U08 HP2/D1/A6/R8/M0 und U09 HP3/D2/A6/R6/M1
+mit dem angenommenen A–G-HP-Vertrag. Ein Schuss je Actor/Runde, keine Setupwartezeit.
+Direct eigene LOS; Indirect konkreter lebender aktiver unverladener eigener
+Beobachter mit direkter LOS. Neuer Pfad strict-supercover; keine Spotter-
+Waffenreichweite, kein Blindfeuer/Splash, keine Änderung alter Missionen/Piloten.
+Ziel: Kern zerstört und mindestens eine eigene Einheit lebt, Recon zählt.
+Profil-/Command-/Digest-/Undo-/RNG-/Guide-/Darstellungsgrenzen und ausführbare
+gefrorene Produkttraces stehen in [UNIT_RULE_PROFILES.md](UNIT_RULE_PROFILES.md).
+Die interne Produkttrace ist keine öffentliche Save-/Replayimportfunktion.

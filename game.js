@@ -94,8 +94,8 @@ function lineOfSight(from,to){
   const session=legacySession;
   if(!session?.effectiveRules||!Object.isFrozen(session)||!Object.isFrozen(session.effectiveRules))return false;
   if(session.ruleProfileId==='LEGACY_SUPERCOVER_PROBE_v1'||
-     session.ruleProfileId==='FIELD_TEST_SUPERCOVER_v1'){
-    if(!['los-supercover-probe','los-supercover-showcase'].includes(session.scenarioId)||
+     session.ruleProfileId==='FIELD_TEST_SUPERCOVER_v1'||session.ruleProfileId==='CATALOG_ARTILLERY_PILOT_v1'){
+    if(!['los-supercover-probe','los-supercover-showcase','artillery-pilot'].includes(session.scenarioId)||
        session.scenarioVersion!==1||
        session.effectiveRules.losMode!=='strict-supercover'||typeof GoblinHexSupercover==='undefined')return false;
     return GoblinHexSupercover.intermediateHexes(from,to)
@@ -147,9 +147,9 @@ function drawGrid(){if(!gridVisible)return;for(let y=0;y<H;y++)for(let x=0;x<W;x
     const illustrated=baked||drawTerrainArtwork(x,y);
     const p=document.createElementNS(NS,'polygon');p.setAttribute('points',hexPoints(x,y));p.classList.add('hex');p.dataset.x=x;p.dataset.y=y;
     if(illustrated)p.classList.add('terrain-illustrated');
-    const unit=units.find(u=>u.hp>0&&!u.embarkedOn&&u.x===x&&u.y===y); const attackPhase=turnPhase==='fire',canFire=!!selected,canMove=!!selected; if(attackPhase&&selected&&selected.hp>0&&unit&&unit.team==='enemy'&&dist(selected,{x,y})<=attackRange(selected)&&lineOfSight(selected,{x,y})&&(typeof canSelectedWeaponTarget!=='function'||canSelectedWeaponTarget(selected,unit))) p.classList.add('attack');
+    const unit=units.find(u=>u.hp>0&&!u.embarkedOn&&u.x===x&&u.y===y); const attackPhase=turnPhase==='fire',canFire=!!selected,canMove=!!selected; if(attackPhase&&selected&&selected.hp>0&&unit&&unit.team==='enemy'&&dist(selected,{x,y})<=attackRange(selected)&&fireTargetVisible(selected,unit)&&(typeof canSelectedWeaponTarget!=='function'||canSelectedWeaponTarget(selected,unit))) p.classList.add('attack');
     if(terrain.has(`${x},${y}`)){p.classList.add('terrain');}
-    if(selected&&selected.hp>0){const distance=dist(selected,{x,y}),moveCost=distance+(terrain.has(`${x},${y}`)?1:0);if(x===selected.x&&y===selected.y)p.classList.add('selected');const moveAllowance=movementBudget(selected,turnPhase==='gev');const blockedByUnit=unit&&unit!==selected;if(canMove&&viewMode==='movement'&&!blockedByUnit&&findMovementPath(selected,{x,y},moveAllowance))p.classList.add('movement-fill');if(canFire&&(viewMode==='fire'||viewMode==='los')&&distance<=attackRange(selected)){if(viewMode==='fire')p.classList.add('fire-range');else if(lineOfSight(selected,{x,y}))p.classList.add('los-visible')}if(attackPhase&&unit&&unit.team==='enemy'&&distance<=attackRange(selected)&&lineOfSight(selected,unit)&&(typeof canSelectedWeaponTarget!=='function'||canSelectedWeaponTarget(selected,unit)))p.classList.add('attack')}
+    if(selected&&selected.hp>0){const distance=dist(selected,{x,y}),moveCost=distance+(terrain.has(`${x},${y}`)?1:0);if(x===selected.x&&y===selected.y)p.classList.add('selected');const moveAllowance=movementBudget(selected,turnPhase==='gev');const blockedByUnit=unit&&unit!==selected;if(canMove&&viewMode==='movement'&&!blockedByUnit&&findMovementPath(selected,{x,y},moveAllowance))p.classList.add('movement-fill');if(canFire&&(viewMode==='fire'||viewMode==='los')&&distance<=attackRange(selected)){if(viewMode==='fire')p.classList.add('fire-range');else if(lineOfSight(selected,{x,y}))p.classList.add('los-visible')}if(attackPhase&&unit&&unit.team==='enemy'&&distance<=attackRange(selected)&&fireTargetVisible(selected,unit)&&(typeof canSelectedWeaponTarget!=='function'||canSelectedWeaponTarget(selected,unit)))p.classList.add('attack')}
     p.addEventListener('click',()=>handleHex(x,y));svg.appendChild(p);
     if(terrain.has(`${x},${y}`)&&!illustrated){const c=hexCenter(x,y);const r=document.createElementNS(NS,'rect');r.setAttribute('x',c.x-11);r.setAttribute('y',c.y-7);r.setAttribute('width',22);r.setAttribute('height',14);r.setAttribute('transform',`rotate(18 ${c.x} ${c.y})`);r.classList.add('ruin');r.addEventListener('click',event=>{event.stopPropagation();handleHex(x,y)});svg.appendChild(r)}
   }
@@ -242,6 +242,7 @@ function enemyTurn(){recoverDisabled('enemy');phase='enemy';turnPhase='enemy';$(
   if (accepted && !gameOver && phase === 'player' && turn === beforeTurn && turnPhase === beforePhase) action();
 }
 function closePhaseConfirm(accepted) { if (!accepted) GameDialogs.cancel('phase-end'); }
+function fireTargetVisible(unit,target){return globalThis.GoblinArtilleryWeapons?.active(unit)?GoblinArtilleryWeapons.queryChoice(unit,target).ok:lineOfSight(unit,target)}
 function attackRange(unit){return globalThis.GoblinSiegeWeapons?.active(unit)?GoblinSiegeWeapons.weapons(unit)?.[unit.siegeWeapon]?.range??0:unit.range}
 function movementBudget(unit,second=false){const budget=globalThis.GoblinSkimmerBudget?.sessionBudget(legacySession,unit);return budget?(second?budget.secondary:budget.primary):(second?(unit?.team==='player'&&isGevUnit(unit)?2:0):unit.move)}
 function isGevUnit(unit){return unit?.movementMode==='gev'||unit?.gev===true||unit?.id==='gev'}

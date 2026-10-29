@@ -48,7 +48,7 @@ function startProbe(game,blocked=[]){
 
 test('technical probe is versioned but absent from the nine visible scenarios',()=>{
   const game=legacy();
-  assert.equal(game.run("Object.keys(ScenarioRuleProfiles.entries).filter(id=>!['skimmer-pilot','siege-pilot'].includes(id)).length"),9);
+  assert.equal(game.run("Object.keys(ScenarioRuleProfiles.entries).filter(id=>!['skimmer-pilot','siege-pilot','artillery-pilot'].includes(id)).length"),9);
   assert.equal(game.run("Object.hasOwn(scenarioCatalog,'los-supercover-probe')"),false);
   assert.equal(game.run("Object.hasOwn(ScenarioRuleProfiles.entries,'los-supercover-probe')"),false);
   const config=startProbe(game);

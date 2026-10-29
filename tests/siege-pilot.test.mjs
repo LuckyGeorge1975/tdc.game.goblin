@@ -29,9 +29,9 @@ function scene(enabled=true){
     setTimeout(fn){timers.set(++id,fn);return id;},clearTimeout(key){timers.delete(key);},
     scheduleGameTask(fn){timers.set(++id,fn);return id;}});
   const run=s=>vm.runInContext(s,context);
-  const files=['unit-visuals.js','terrain-rules.js','ogre-systems.js','siege-tank-fire-budget.js','assets/unit-art/rules/siege-pilot.v1.js','skimmer-budget.js','assets/unit-art/rules/skimmer-pilot.v1.js','scenario-profile-manifest.js',
+  const files=['unit-visuals.js','terrain-rules.js','ogre-systems.js','legacy-supercover.js','artillery-spotter-rules.js','assets/unit-art/rules/artillery-pilot.v1.js','siege-tank-fire-budget.js','assets/unit-art/rules/siege-pilot.v1.js','skimmer-budget.js','assets/unit-art/rules/skimmer-pilot.v1.js','scenario-profile-manifest.js',
     ...(enabled?['presentation-preferences.js','presentation-state.js']:[]),'game.js','ogre-runtime.js','combat-feedback.js',
-    'siegebreaker-weapons.js','strategic-missile.js','siege-pilot-runtime.js','scenario.js',
+    'siegebreaker-weapons.js','strategic-missile.js','siege-pilot-runtime.js','artillery-pilot-runtime.js','scenario.js',
     ...(enabled?['legacy-presentation.js']:[]),'command-history.js'];
   for(const file of files)run(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'));
   run("draw=()=>globalThis.GoblinLegacyPresentation?.sync();updateSelection=()=>{};loadScenario('iron-dust');");
@@ -79,7 +79,7 @@ test('fixed Siege loader/session freezes exact stats, digest and all starts are 
  assert.equal(g.run('units.every(u=>u.move===0||Number.isFinite(TerrainRules.movementCost(terrainTypeAt(u.x,u.y),u)))'),true);
  for(const mutation of ["c.scenarioVersion=2","c.ruleProfileId='FULL_CATALOG_v1'","c.units[0].damage=7","c.units[0].siegeFireBudget.used=['main-1']","c.units[2].y=4","c.sourceDigest='fake'","c.fireBudgetVersion='other'"]){const before=g.state();assert.throws(()=>g.run(`{const c=JSON.parse(JSON.stringify(scenarioCatalog['siege-pilot']));${mutation};ScenarioRuleProfiles.beginSession('siege-pilot',c)}`));assert.equal(g.state(),before);}
  for(const [old,validate] of [[recordProfileReplay({...structuredClone(phaseScenario),...structuredClone(CORE_PROFILE_CONTRACT)},7,[]),validateProfileReplay],[recordSiegeTankProbeReplay(7,[]),validateSiegeTankProbeReplay],[recordArtillerySpotterProbeReplay(7,[]),validateArtillerySpotterProbeReplay],[recordIronDustProfileReplay(7,[]),validateIronDustProfileReplay]]){const changed=structuredClone(old);changed.header.ruleProfileId=level.ruleProfileId;changed.header.scenarioId=level.id;assert.throws(()=>validate(changed),/MISMATCH/);}
- g.context.fetch=async path=>({ok:true,json:async()=>JSON.parse(fs.readFileSync(new URL('../'+path,import.meta.url),'utf8'))});g.run("delete scenarioCatalog['siege-pilot']");g.run(fs.readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8'));await new Promise(r=>setImmediate(r));assert.equal(g.run('Object.keys(scenarioCatalog).length'),11);
+ g.context.fetch=async path=>({ok:true,json:async()=>JSON.parse(fs.readFileSync(new URL('../'+path,import.meta.url),'utf8'))});g.run("delete scenarioCatalog['siege-pilot']");g.run(fs.readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8'));await new Promise(r=>setImmediate(r));assert.equal(g.run("Object.keys(scenarioCatalog).filter(id=>id!=='artillery-pilot').length"),11);
 });
 
 test('four single shots, distinct main targets even after NE, one roll per shot and exact preview specs',()=>{
