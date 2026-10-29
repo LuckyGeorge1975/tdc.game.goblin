@@ -764,7 +764,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
       let message = t(mode === 'movement' && data.status === 'move' && !showCostChips
         ? 'v2.area.status.moveCompact' : `v2.area.status.${data.status}`, { count: data.legal.length });
-      if (weapon && mode === 'fire') message += ` · ${weapon.label}`;
+      if (weapon && mode === 'fire') message += ` · ${!core()&&globalThis.GoblinSpecialistsRuntime?.active()?GoblinSpecialistsUI.weaponLabel(actor,weapon):weapon.label}`;
       if (data.reason) message += ` · ${data.reason}`;
       if (mode === 'movement') {
         const focused = view.target || view.infoCell || view.focusCell;

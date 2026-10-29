@@ -1,0 +1,66 @@
+{
+  "version": "catalog-display-source-compatibility-v1",
+  "baseCommit": "2dee22c76533c9a37dc8a0b175bebed357644fa8",
+  "scopeOnlyDisplay": true,
+  "scope": "Only the two UI display changes, their cache suffixes and explicit test-source compatibility glue are authorized. All frozen gameplay/state/event/history/RNG/sidecar oracle values and fixture bytes remain unchanged. This chain normalizes source provenance only, never gameplay values.",
+  "originalTraceDigests": [
+    "3d3131f6d70f820025097d49259ac51dc3e70327686a06d42f5c00f283b0e173",
+    "d6148f6166874d57b36f0b84943fe766d4d4dc8bc86cc595171594093a3263b1",
+    "76467b8d89ce89130d6299f36e511b000a05fdd1d3fa40ca113f0f4bc78b64fd",
+    "85ec0edc41c4a3b8f84856d337947c69cfe7bf66ad840f59467fb5b4e8e8f2e0",
+    "7b926b67d121e352212c4e7a9ca4d15a801aa54a4f259a6cd5d207a31e77ddfd",
+    "22b4c9f8b6fed666570cef25f70a5d2302c9e7bdd77378454a0422289ab12ef1",
+    "75fc2524d213e1b05b542caefe57099b52af974ce312555406f5992bcd8280d5",
+    "f363b26f5e68c2c510e1997ec46a7c860e1ebdf2580f0dc48a169f82be86087a",
+    "8df47d924bc2e73642b379ab309c923a248d5f0703bb05a049169312afbde1a6",
+    "ba7bdafd71e03bbf2cff8ac24b7a7a715f581f109b3cc94f9ce381b3473565ff",
+    "b1023f222438f5f24e83fc23bf088093f8ed1c66a5b7939e9bfb4f5d104d1c3d",
+    "1e49721bc20dcf792443927f6be45356c3af9962e863046e839f65f663d37c29",
+    "2f8c8326f1f2fef605cf97b21724bc31cee42f62db7e37fd6ea7bc0c5dcc4c26",
+    "a6207b191d6d1a76d73c29062f658763ce753f2d65ad50849963fb79cec96dea",
+    "bd4e9a34e37fce6c20005e84642008bbb05995cd6b24149b148d685fde2e6cef",
+    "8258ef2c242038a40a08fc4c1358bd293c0a34fa713b66c83148eacf36159fe5",
+    "ef96512a240c6323a2baf0efee634d6f6a492e8ba0d7f215d496b9a8c2a303d9",
+    "e8cb9acf9b76af82cc4970f2d013f508dbf76954a65dcaf02ee0665648dce5eb"
+  ],
+  "originalFixtureSha256": {
+    "artillery-product-traces.v1.json": "14c27d0ff45e6bf1db09db109c5020176f9611f3a2cb197a63930303e98064ec",
+    "catalog-base-product-traces.v1.json.gz": "f1c41110bd4d3ef954672d2be901aa13a7169124efb610277e1da0f201928d68",
+    "catalog-specialists-product-traces.v1.json.gz": "270ed926a36b5dc4dea03d9f7cce88f214d7ea64d90f5195e807c20ecbb53bf5",
+    "catalog-specialists-boundary-traces.v1.json.gz": "7aa9fa3c130562755442d55a3181a1c2118ee1908b76b422e5cd2b431e5c3880"
+  },
+  "sourcePairs": {
+    "ui-v2.js": {
+      "from": "f30a3799906061db2470d56ba2cc4bcb7533d583322ab5c63cd633d3536b88af",
+      "to": "84826f2100b5ecb5edb268368bc511de5a975f79d53561dda0ad2f3476926d88"
+    },
+    "catalog-specialists-ui.js": {
+      "from": "bdd980274baddb0d76f6d80f79bba8a2e07f4bf9e8521c1cf9f16a2990101b41",
+      "to": "30ad4253cbb52330ab83ad73e7a4f49912e8cd223bf4b68854d7f3abce97bfaa"
+    },
+    "index.html": {
+      "from": "a3163bd4cbfe83baf37481a40245e5faa2fbce949f9abbf64043dfb78fe8807a",
+      "to": "64eee5846649cfc511d47180ce6ff48a06b1413d276e8b6c7425fcd123789df3"
+    },
+    "tests/artillery-product-trace.mjs": {
+      "from": "b049b921de4d6e5e9465dee8455ebcd978057a06aaa942c171bafcde2551a506",
+      "to": "5c2bbef92a4d529016ee28f7ffcd27773b150da780d77aa8d215eb702ff23f39"
+    },
+    "tests/catalog-product-trace.mjs": {
+      "from": "06a313dfd6b1abb461112689ffce54424aaab253ad63d91cd8c4f388a53e806b",
+      "to": "a8c37003426cfa272630927af42fbc94190be9d47fc2463711c5a7f3c4a55e1a"
+    },
+    "tests/catalog-specialists-trace.mjs": {
+      "from": "364b029a53b767e3d1b94f5626bc3b16b6e538aecaa42b6aab4fb4a89796023e",
+      "to": "689ea5f7b5b6c4eac698fe5ce9b50c95a4b9aaf9fb70abde0a0c6edfcd672df6"
+    },
+    "tests/catalog-specialists-boundary-trace.mjs": {
+      "from": "52c55c3cbac8aafccdfab329aa2a263796b0a070bfaae6e79665736da20eef5c",
+      "to": "33a8bc2444c5fc26587bc73d9ded6205d8959db42d73a7874c42d0296ff26dbd"
+    },
+    "tests/helpers/catalog-display-source-compatibility.mjs": {
+      "from": null,
+      "to": "969bfb89a53ea8268f466bd925b7734faf870fd5bcea306ccca7881259c5032b"
+    }
+  }
+}

@@ -74,5 +74,5 @@
   if(unit.materialMax!==undefined)facts.push([t('v2.specialists.material'),`${unit.material}/${unit.materialMax}`]);
   for(const [label,value] of facts){const row=document.createElement('div');row.className='v2-system-row';const a=document.createElement('span'),b=document.createElement('strong');a.textContent=label;b.textContent=value;row.append(a,b);host.appendChild(row)}
  }
- root.GoblinSpecialistsUI=Object.freeze({fireCommand,renderWeapons,renderTargets,commands,commandLabel,renderSystemFacts});
+ root.GoblinSpecialistsUI=Object.freeze({weaponLabel,fireCommand,renderWeapons,renderTargets,commands,commandLabel,renderSystemFacts});
 })(globalThis);

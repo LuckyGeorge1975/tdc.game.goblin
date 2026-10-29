@@ -1,3 +1,4 @@
+import {compatibleDisplaySources} from './helpers/catalog-display-source-compatibility.mjs';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -16,13 +17,13 @@ export async function record(id,seed,commands,expected=null){
  assert.ok(['catalog-siege','catalog-specialists'].includes(id));assert.ok(Number.isInteger(seed)&&seed>=0&&seed<=0xffffffff);
  const g=await specialistsScene(id,seed);g.run(fs.readFileSync(new URL('../m1-unit-markers.js',import.meta.url),'utf8'));
  const observe=observer(g);const header={scenarioId:id,ruleProfileId:'CATALOG_SPECIALISTS_v1',session:read(g,'legacySession'),sources:sources(),rng:'xorshift32-test-v1',seed},initial=observe(),steps=[];
- if(expected){assert.deepEqual(header,expected.header);assert.deepEqual(initial,expected.initial)}
+ if(expected){assert.deepEqual({...header,sources:compatibleDisplaySources(header.sources,expected.header.sources,expected.traceDigest)},expected.header);assert.deepEqual(initial,expected.initial)}
  for(const [i,command]of commands.entries()){const result=await apply(g,command,observe),step={command,result,...observe()};if(expected)assert.deepEqual(step,expected.steps[i],'full product step '+i+' differs');else steps.push(step)}
  if(expected)return expected;
  const value={version:'catalog-specialists-product-trace-v1',publicSaveFormat:false,header,initial,commands,steps};return {...value,traceDigest:digest(value)};
 }
 export async function replay(trace){
- assert.equal(trace?.version,'catalog-specialists-product-trace-v1');assert.equal(trace.publicSaveFormat,false);assert.equal(trace.header.ruleProfileId,'CATALOG_SPECIALISTS_v1');assert.deepEqual(trace.header.sources,sources());
+ assert.equal(trace?.version,'catalog-specialists-product-trace-v1');assert.equal(trace.publicSaveFormat,false);assert.equal(trace.header.ruleProfileId,'CATALOG_SPECIALISTS_v1');compatibleDisplaySources(sources(),trace.header.sources,trace.traceDigest);
  const {traceDigest,...body}=trace;assert.equal(streamDigest(body),traceDigest);assert.equal(trace.commands.length,trace.steps.length);for(const [i,s]of trace.steps.entries())assert.deepEqual(s.command,trace.commands[i]);
  return record(trace.header.scenarioId,trace.header.seed,trace.commands,trace);
 }
