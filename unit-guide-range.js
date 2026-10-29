@@ -14,7 +14,8 @@
   function profile(entry,live){
     const movement=live?number(live.move):number(entry.move);
     const skimmer=/SKIMMER/.test(entry.name)&&entry.name!=='RAIDER SKIMMER';
-    const bonus=live?(typeof movementBudget==='function'?movementBudget(live,true):0):skimmer?number(String(entry.move).split('+')[1]):0;
+    const explicitGev=typeof entry.gevPhaseEligible==='boolean';
+    const bonus=explicitGev?(entry.gevPhaseEligible?number(entry.secondaryMove):0):live?(typeof movementBudget==='function'?movementBudget(live,true):0):skimmer?number(String(entry.move).split('+')[1]):0;
     let range=live?number(live.range):number(String(entry.range).split(/[–-]/).at(-1));
     if(live?.siegeFireBudget)range=root.GoblinSiegeWeapons?.weapons(live)?.[live.siegeWeapon]?.range??0;
     let weapon=false;
@@ -28,7 +29,7 @@
     if(live?.catalogSystems){weapon=true;range=root.GoblinSpecialistsRuntime?.selectedSpec(live)?.range??0;}
     const missile=entry.name==='STRATEGIC MISSILE CARRIER';
     if(missile&&live&&(live.ammunition??live.missilesRemaining)<=0)range=0;
-    return {movement,bonus,range,weapon,missile,spent:missile&&!!live&&(live.ammunition??live.missilesRemaining)<=0,live:!!live};
+    return {movement,bonus,gevPhaseEligible:explicitGev?entry.gevPhaseEligible:bonus>0,range,weapon,missile,spent:missile&&!!live&&(live.ammunition??live.missilesRemaining)<=0,live:!!live};
   }
   const distance=(q,r)=>Math.max(Math.abs(q),Math.abs(r),Math.abs(q+r));
   function mapSvg(profile,mode){

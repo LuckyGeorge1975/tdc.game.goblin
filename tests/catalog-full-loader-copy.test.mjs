@@ -11,7 +11,7 @@ test('candidate loader stays absent from normal and Classic entries; explicit mo
 });
 test('four locale catalogs retain the exact approved 29-key E/F/G copy and complete new mission consumer keys',()=>{
  const languages=['de','en','es','fr'],catalogs=Object.fromEntries(languages.map(lang=>[lang,JSON.parse(fs.readFileSync(new URL(`../assets/ui-copy/briefing-01.${lang}.json`,import.meta.url),'utf8')).messages]));
- const bundle=Object.fromEntries(languages.map(lang=>[lang,Object.fromEntries(Object.entries(catalogs[lang]).filter(([k])=>k.startsWith('v2.full.')))]));
+ const bundle=Object.fromEntries(languages.map(lang=>[lang,Object.fromEntries(Object.entries(catalogs[lang]).filter(([k])=>k.startsWith('v2.full.')&&k!=='v2.full.wave.entries'))]));
  assert.equal(createHash('sha256').update(JSON.stringify(bundle)).digest('hex'),'bbe1ac180a31ef81822cd8662eac5c22b7729b4a61cb36c93a856080f217b9bb');
  const u2keys=['mission.catalog-full-siege.title','mission.catalog-full-siege.briefing.short','mission.catalog-full-siege.briefing.full'];
  const u2=Object.fromEntries(languages.map(lang=>[lang,Object.fromEntries(u2keys.map(key=>[key,catalogs[lang][key]]))]));assert.equal(createHash('sha256').update(JSON.stringify(u2)).digest('hex'),'537e6c49d04317e9cb7dcb3580b31ad9eeac20477d95121a66ef30123ddccc62');

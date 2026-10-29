@@ -41,7 +41,7 @@
   if(!active())return null;const r=registry().units[root.UnitVisuals.artKey(entry)];if(!r)return null;const t=r.target,system=t.systemDefinitionRef?GoblinSystems.createCatalogSystem(registry(),r.assetId??root.UnitVisuals.artKey(entry)):null;
   const values=system?system.rules.definition.components.filter(c=>c.kind==='weapon').map(c=>system.rules.weaponClasses[c.weaponClassRef]):[];
   const range=system?Math.max(0,...values.map(w=>w.range)):t.range,attack=system?Math.max(0,...values.map(w=>w.attack)):t.strengthRef?2:t.attack;
-  return {hp:system?`${system.treads}/${system.maxTreads}`:String(t.strengthRef?2:t.hp),move:t.movement.join(' + '),range:String(range),attack:String(attack),defense:system?(root.GoblinLanguage?.t('v2.ui.bySystem')??'SYSTEMS'):String(t.strengthRef?2:t.defense),copy:t.stealthRef?(root.GoblinLanguage?.t('v2.full.stealth.sensorRule',{range:2})??''):t.missileRuleRef?(root.GoblinLanguage?.t('v2.full.missile.ammoRule')??''):root.GoblinLanguage?.translate(entry.role)??entry.role,system:!!system};
+  return {hp:system?`${system.treads}/${system.maxTreads}`:String(t.strengthRef?2:t.hp),move:t.movement.join(system?' / ':' + '),gevPhaseEligible:t.gevPhaseEligible===true,secondaryMove:t.gevPhaseEligible===true?t.movement[1]:0,range:String(range),attack:String(attack),defense:system?(root.GoblinLanguage?.t('v2.ui.bySystem')??'SYSTEMS'):String(t.strengthRef?2:t.defense),copy:t.stealthRef?(root.GoblinLanguage?.t('v2.full.stealth.sensorRule',{range:2})??''):t.missileRuleRef?(root.GoblinLanguage?.t('v2.full.missile.ammoRule')??''):root.GoblinLanguage?.translate(entry.role)??entry.role,system:!!system};
  }
  function initialRoster(config){
   if(config?.ruleProfileId!==root.GoblinCatalogFullModel?.profile)return config.units;

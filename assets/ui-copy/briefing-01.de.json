@@ -246,6 +246,7 @@
     "mission.catalog-full-terrain-course.budget": "Nutze die angezeigten Bewegungsbudgets und beachte die Geländekosten.",
     "mission.catalog-full-advance.budget": "Nutze die angezeigten Bewegungsbudgets und beachte die Geländekosten.",
     "mission.catalog-full-siege.budget": "Jeder bereite Waffenslot hat sein eigenes Feuerbudget. Beachte Munition und Bereitschaft.",
-    "mission.catalog-full-specialists.budget": "Eine Pionieraktion ersetzt Bewegung und Feuer. Kosten und Vorrat werden je Aktion angezeigt."
+    "mission.catalog-full-specialists.budget": "Eine Pionieraktion ersetzt Bewegung und Feuer. Kosten und Vorrat werden je Aktion angezeigt.",
+    "v2.full.wave.entries": "Eintrittsfelder in dieser Reihenfolge: {entries}"
   }
 }

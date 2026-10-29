@@ -246,6 +246,7 @@
     "mission.catalog-full-terrain-course.budget": "Usa los puntos de movimiento indicados y ten en cuenta los costes del terreno.",
     "mission.catalog-full-advance.budget": "Usa los puntos de movimiento indicados y ten en cuenta los costes del terreno.",
     "mission.catalog-full-siege.budget": "Cada arma disponible tiene su propio límite de disparo. Comprueba la munición y la disponibilidad.",
-    "mission.catalog-full-specialists.budget": "Una acción de ingeniería sustituye al movimiento y al disparo. Cada acción muestra su coste y tus reservas."
+    "mission.catalog-full-specialists.budget": "Una acción de ingeniería sustituye al movimiento y al disparo. Cada acción muestra su coste y tus reservas.",
+    "v2.full.wave.entries": "Casillas de entrada en este orden: {entries}"
   }
 }

@@ -351,7 +351,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if(live?.artilleryFire)body.append(paragraph(GoblinArtilleryWeapons.summary(live)));
         if(live?.siegeFireBudget)body.append(paragraph(GoblinSiegeWeapons.summary(live)));
         body.append(paragraph(live?.catalogId?GoblinCatalogRuntime.summary(live,state.units):GoblinLanguage.translate(entry.copy)));
-        if (entry.move.includes('+')) body.append(paragraph(t('screen.library.value.skimmerManeuver')));
+        if (UnitGuideRange.profile(entry,live).bonus > 0) body.append(paragraph(t('screen.library.value.skimmerManeuver')));
       } else {
         const pilotLive=live&&(globalThis.GoblinCatalogFullRuntime?.active()||['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(state.scenario));
         const profile = pilotLive ? {...UnitGuideRange.profile(entry,live),bonus:live.secondaryMove??0} : UnitGuideRange.profile(entry, null);
@@ -477,7 +477,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if(missionId==='skimmer-pilot')header.append(paragraph(t('mission.skimmer-pilot.budget')));
         if(globalThis.GoblinCatalogFullModel?.has(missionId)){
           const full=scenarioCatalog[missionId].catalog.full;
-          for(const wave of full.waves.waves){const unit=full.waveTemplates.find(u=>u.id===wave.templateId);header.append(paragraph(t('v2.full.wave.announcement',{team:t(`ui.team.${wave.team}`),unit:t(`library.unit.${unit.catalogAssetId}.name`),turn:wave.dueOwnTurn})));}
+          for(const wave of full.waves.waves){const unit=full.waveTemplates.find(u=>u.id===wave.templateId);header.append(paragraph(t('v2.full.wave.announcement',{team:t(`ui.team.${wave.team}`),unit:t(`library.unit.${unit.catalogAssetId}.name`),turn:wave.dueOwnTurn})));header.append(paragraph(t('v2.full.wave.entries',{entries:wave.entries.map(cell=>`${String.fromCharCode(65+cell.x)}-${String(cell.y+1).padStart(2,'0')}`).join(' → ')})));}
           if(full.waves.waves.length)header.append(paragraph(t('v2.full.wave.retryRule',{maxAttempts:3})));
           if(full.turnLimit!==null)header.append(paragraph(t('v2.full.limit.briefing',{limit:full.turnLimit})));
         }

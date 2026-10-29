@@ -246,6 +246,7 @@
     "mission.catalog-full-terrain-course.budget": "Utilisez les budgets de mouvement affichés et tenez compte des coûts du terrain.",
     "mission.catalog-full-advance.budget": "Utilisez les budgets de mouvement affichés et tenez compte des coûts du terrain.",
     "mission.catalog-full-siege.budget": "Chaque arme prête dispose de son propre budget de tir. Vérifiez les munitions et la disponibilité.",
-    "mission.catalog-full-specialists.budget": "Une action de génie remplace le mouvement et le tir. Chaque action affiche son coût et vos réserves."
+    "mission.catalog-full-specialists.budget": "Une action de génie remplace le mouvement et le tir. Chaque action affiche son coût et vos réserves.",
+    "v2.full.wave.entries": "Cases d’entrée dans cet ordre : {entries}"
   }
 }

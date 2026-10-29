@@ -1,0 +1,78 @@
+{
+  "version": "catalog-full-display-fix-source-compatibility-v1",
+  "baseCommit": "ea4e229293555cae790359862e0b3b5f59673228",
+  "displayOnly": true,
+  "scope": "Four QA fixes: actor-null overlay; announced entry display+one key x4; existing objective.total HUD; pure catalogCard/GuideRange semantic GEV projection+system band formatting. No World/AI/objective/RNG/history/rule change. Trace checker provenance only; fixture bytes and every gameplay value immutable.",
+  "originalTraceDigests": [
+    "cb9bb007e76923d134033f4babdc0790169c5c1a1c6df136eaeb2f18c1ffd7f0",
+    "f8140d51ab9816912436d4e71c631681dfca1d602b9f544ca88b0857c736a3e0",
+    "2c58cafd2f102b881c285bfe6a301e24a0950a9f928c577192e8bbbd03943872",
+    "b821bbddf98b1dc17580e741fde3277b1c6e644c6dcc1bcfe499c46527976620",
+    "2439af2d9cf67113005c1129d87b6e98fc93eeae18ac1bdce9b667dc4062c28a",
+    "f361dda1dac460579e517ab053cd03b549ed84deeecf0b5c0828f750ff2331fe",
+    "524faf9e1c01140b1c2b607386012743710237ffb2c96836f8b4e9f2bc92b26a",
+    "ca6291a50313cf7d44ae41b8455f3c2e0ec197424c7f3ed50c282916758d8441",
+    "82aad54da0c340acb3c144e60f8fe1a79c004baac015c712bef7f09389caf2f1",
+    "e8abd5e9939450b92cf782e271554140096b772671171f0f1b83747f3c65297b"
+  ],
+  "originalFixtureSha256": {
+    "artillery-product-traces.v1.json": "14c27d0ff45e6bf1db09db109c5020176f9611f3a2cb197a63930303e98064ec",
+    "catalog-base-product-traces.v1.json.gz": "f1c41110bd4d3ef954672d2be901aa13a7169124efb610277e1da0f201928d68",
+    "catalog-specialists-product-traces.v1.json.gz": "270ed926a36b5dc4dea03d9f7cce88f214d7ea64d90f5195e807c20ecbb53bf5",
+    "catalog-specialists-boundary-traces.v1.json.gz": "7aa9fa3c130562755442d55a3181a1c2118ee1908b76b422e5cd2b431e5c3880",
+    "catalog-full/index.v2.json": "49291ebc27292f5f8fdee531565cbcd7207cb721ed61247d1b1c1fe707d4b99a",
+    "catalog-full/catalog-full-atlas-victory.v2.json.gz": "a6a209e1b339ccc5b50cc1e1fa2af38a26b78d194d421d9a8a8eaa54185ef773",
+    "catalog-full/catalog-full-atlas-defeat.v2.json.gz": "3989e02e0119bc39f8ec3201819308d63dfce01fdceea49479e8d0e797bc78bb",
+    "catalog-full/catalog-full-terrain-course-victory.v2.json.gz": "679ca496dd4f267e91276a416f8cd08b646f57f034a3aabad09a73bca14441d9",
+    "catalog-full/catalog-full-terrain-course-defeat.v2.json.gz": "1d9737156f14e42153cc19a3e4e959305067d8411446366c4e5744b5567d5fda",
+    "catalog-full/catalog-full-advance-victory.v2.json.gz": "4371bf97267a68fc498e84dea2734063d96e5289166487e6a4dba4bcab2c688b",
+    "catalog-full/catalog-full-advance-defeat.v2.json.gz": "88a114cba33dfa2da9b2dee97543fd0f29048e6e0e71c1e48c025ce1f084f471",
+    "catalog-full/catalog-full-siege-victory.v2.json.gz": "6f178f286f3d142df55a0ebf5c978ae1efdfa4a7891c315020788e77ac7fcf4d",
+    "catalog-full/catalog-full-siege-defeat.v2.json.gz": "36f38372bd73cdc88be9c1e581a67859448bbdbde14c9a45719f6e5022a149d5",
+    "catalog-full/catalog-full-specialists-victory.v2.json.gz": "6b868c3c237cf849fd440646c7cca808395a818e69adbdc47cc60c463e124679",
+    "catalog-full/catalog-full-specialists-defeat.v2.json.gz": "7ea2236748bc1c2712d09ab4bff65af3b384714de5add9c7d940cfc9e6475e54"
+  },
+  "providerSha256": "0e37447a86c476bb5092726b734a220438a7b451499ca8b1161a9221ef5a90a1",
+  "sourcePairs": {
+    "assets/ui-copy/briefing-01.de.json": {
+      "from": "3878c62471dea8e610d81ec92d50fad24688a11075cc0800b588d5ab880f5ec7",
+      "to": "d00e6756720a7562cac0bb90fb51c8d06c7178e3c0d16890519cf9ddefdc910b"
+    },
+    "assets/ui-copy/briefing-01.en.json": {
+      "from": "e53b2a4c8f84acc2d3ce3dff4e274a0dcdc171b870937a591bb1a1d5533fadca",
+      "to": "a08d9a9cd6122cb34731bde03423e14f67a53964f6d71eef09526eea9497c41c"
+    },
+    "assets/ui-copy/briefing-01.es.json": {
+      "from": "1c0af4eb19519129e8cca91cb4fa031a48312a313a970013cad55573c9dac476",
+      "to": "4c46f6a41fda25feb0806fa348358b6fd3905cba66266c2dad539611bdc69770"
+    },
+    "assets/ui-copy/briefing-01.fr.json": {
+      "from": "651ff0b30ba9c836480bb2d2ee454a46288931d9e488a98a107383e0b1e457cb",
+      "to": "a4069a177dc87cd6aa718391d0569c74f9d5d5c761140a692805c2a33c81d1fc"
+    },
+    "catalog-full-runtime.js": {
+      "from": "f29eefdfd76d028a8096bdcb6f8ef6467584d1447f0dcc4bfcfe9958f570c7e1",
+      "to": "f106a68df24c5bf0e9951e12a640ec4f8374dfba3879396f4d79682b3bfaff7a"
+    },
+    "index.html": {
+      "from": "fb0ef0879814bc3d140e26fed3eeb5f5947ef38c6f9001ce294024ef2c4587b3",
+      "to": "6b075ddf38ef3c8416fb43aca57f272b92d3967bbd3dacdf35a89bd29e1aeb0f"
+    },
+    "ui-v2-flow.js": {
+      "from": "6b83503b0416e38952dc228ff5610672c3782a99ab707023d1959fd853023c45",
+      "to": "29cb417a1721b70b5e8f982e60e0de25d1146bc7503cd97b9b52b2d76ef71646"
+    },
+    "ui-v2.js": {
+      "from": "4d31ea5ec8d58a7dfa0048ea7c5d458e24303e380649046a72fc069dcb36fe77",
+      "to": "4bff5376ecd052879a1a09baefa9bdfa7368e5b57c0a3e5108ce2bdf640ec40c"
+    },
+    "unit-guide-range.js": {
+      "from": "3f9d66cb91b821ad3c6286ebe0264acaf715f5e4f29dff80a7afc13e6a0f6178",
+      "to": "b97544296886b88ec3bf34cb69f6cffd141c06e15beb3e08f0fda90e43ba19ed"
+    },
+    "tests/catalog-full-trace.mjs": {
+      "from": "450b7180e00af5425dbcbf56677f25d68603b1bf310814e897839f12ffff0945",
+      "to": "262d6477d0ce67c3ad588cb4aff33156467fd3223bb430a65a74ab52690e7ab6"
+    }
+  }
+}

@@ -32,19 +32,19 @@
   "sourcePairs": {
     "assets/ui-copy/briefing-01.de.json": {
       "from": "0e239c8cb1282bc4f170aba31c97e2c4ed5b1f75c03f72afd49d9b1c34fdc8e4",
-      "to": "3878c62471dea8e610d81ec92d50fad24688a11075cc0800b588d5ab880f5ec7"
+      "to": "d00e6756720a7562cac0bb90fb51c8d06c7178e3c0d16890519cf9ddefdc910b"
     },
     "assets/ui-copy/briefing-01.en.json": {
       "from": "dcf46873ebfcbc0bae9d342304a39011a9adf0b3dae0fe8379ab4275d6d9c5be",
-      "to": "e53b2a4c8f84acc2d3ce3dff4e274a0dcdc171b870937a591bb1a1d5533fadca"
+      "to": "a08d9a9cd6122cb34731bde03423e14f67a53964f6d71eef09526eea9497c41c"
     },
     "assets/ui-copy/briefing-01.es.json": {
       "from": "f8656963d06cbd862fb53ed01a72883b7dd9478755502fc75d63c7ffdc137cce",
-      "to": "1c0af4eb19519129e8cca91cb4fa031a48312a313a970013cad55573c9dac476"
+      "to": "4c46f6a41fda25feb0806fa348358b6fd3905cba66266c2dad539611bdc69770"
     },
     "assets/ui-copy/briefing-01.fr.json": {
       "from": "07666f0aee773a4b9365f859fb36fd6d8944928f9a0872b96b15351363cd3ebc",
-      "to": "651ff0b30ba9c836480bb2d2ee454a46288931d9e488a98a107383e0b1e457cb"
+      "to": "a4069a177dc87cd6aa718391d0569c74f9d5d5c761140a692805c2a33c81d1fc"
     },
     "catalog-base-runtime.js": {
       "from": "460cc3f6349e04aa8affb9fc2b40d1b1755aea3b6b81f744f4cd1cd1f1ceacdd",
@@ -76,7 +76,7 @@
     },
     "index.html": {
       "from": "64eee5846649cfc511d47180ce6ff48a06b1413d276e8b6c7425fcd123789df3",
-      "to": "fb0ef0879814bc3d140e26fed3eeb5f5947ef38c6f9001ce294024ef2c4587b3"
+      "to": "6b075ddf38ef3c8416fb43aca57f272b92d3967bbd3dacdf35a89bd29e1aeb0f"
     },
     "legacy-presentation.js": {
       "from": "ff44b4017c3cbddfc61fc075b5c1e77e6a3530ac69f5aac474a2e3255ee98879",
@@ -104,7 +104,7 @@
     },
     "ui-v2-flow.js": {
       "from": "01812251a26fe75f4786ed0dfad25d9b199e516a116a6db88876e1edb0e874af",
-      "to": "6b83503b0416e38952dc228ff5610672c3782a99ab707023d1959fd853023c45"
+      "to": "29cb417a1721b70b5e8f982e60e0de25d1146bc7503cd97b9b52b2d76ef71646"
     },
     "ui-v2.css": {
       "from": "b5041a59dc10457908a59baceed34c3ee178d0fe5a69960dd6ecc82efab261d1",
@@ -112,11 +112,11 @@
     },
     "ui-v2.js": {
       "from": "84826f2100b5ecb5edb268368bc511de5a975f79d53561dda0ad2f3476926d88",
-      "to": "4d31ea5ec8d58a7dfa0048ea7c5d458e24303e380649046a72fc069dcb36fe77"
+      "to": "4bff5376ecd052879a1a09baefa9bdfa7368e5b57c0a3e5108ce2bdf640ec40c"
     },
     "unit-guide-range.js": {
       "from": "108bf81e53d203ed247ebe04ade136f405ecdf72400983f422a350153038981a",
-      "to": "3f9d66cb91b821ad3c6286ebe0264acaf715f5e4f29dff80a7afc13e6a0f6178"
+      "to": "b97544296886b88ec3bf34cb69f6cffd141c06e15beb3e08f0fda90e43ba19ed"
     },
     "unit-guide.js": {
       "from": "bdd36da51893d904ef2e6f179af072edfc6cbe9a6edbbc90f38209f343ed03c1",
@@ -136,7 +136,7 @@
     },
     "catalog-full-runtime.js": {
       "from": null,
-      "to": "f29eefdfd76d028a8096bdcb6f8ef6467584d1447f0dcc4bfcfe9958f570c7e1"
+      "to": "f106a68df24c5bf0e9951e12a640ec4f8374dfba3879396f4d79682b3bfaff7a"
     },
     "catalog-visibility.js": {
       "from": null,
@@ -168,7 +168,7 @@
     },
     "tests/catalog-full-trace.mjs": {
       "from": null,
-      "to": "450b7180e00af5425dbcbf56677f25d68603b1bf310814e897839f12ffff0945"
+      "to": "262d6477d0ce67c3ad588cb4aff33156467fd3223bb430a65a74ab52690e7ab6"
     },
     "tests/catalog-display-source-compatibility.test.mjs": {
       "from": "7e0fa01fb77059d3c2c5a50dd5acbe211394f7e11d0ce8523c9426c67f1e2ec1",
