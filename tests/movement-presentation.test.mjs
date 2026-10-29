@@ -426,3 +426,23 @@ test('rocket mode is frozen until the next action; hiding a tab settles the tail
   s.context.document.hidden=false;s.move();late.forEach(fn=>fn());assert.equal(s.c.callbacks.size,1);
   assert.equal(s.context.GoblinMovement.read().active.includes('fire-'),false);
 });
+
+test('rocket SVG body, nose, band, fins and rim use the pinned own/enemy palettes',()=>{
+  const reference={player:{body:['#FBF7EC','#D4CBB6','#756D5F'],nose:['#7D8794','#383E47','#14171B'],
+    band:['#FFC088','#F08A2E','#8E4610'],fin:['#AEB6C0','#6B737E'],rim:'#1B2026'},
+    enemy:{body:['#8A8A96','#4A4A53','#1C1C21'],nose:['#4A4A52','#222228','#0B0B0D'],
+      band:['#FF9A8A','#E8584A','#84261E'],fin:['#5C5C66','#2A2A30'],rim:'#C4BEB0'}};
+  const walk=node=>[node,...node.children.flatMap(walk)];
+  for(const team of ['player','enemy']){
+    const s=browserScene('core',team),{plan}=s.rocket('normal');s.c.advance(plan.shotAt+plan.rockets[0].flight/2);
+    const nodes=walk(s.map.querySelector('#goblin-movement-layer'));
+    for(const part of ['body','nose','band','fin']){
+      const gradient=nodes.find(node=>node.tagName==='linearGradient'&&node.id?.includes(`-${part}-`));
+      assert.ok(gradient,`${team} ${part} gradient exists`);
+      assert.deepEqual(gradient.children.map(stop=>stop.getAttribute('stop-color')),reference[team][part]);
+      if(part!=='fin')assert.deepEqual(gradient.children.map(stop=>stop.getAttribute('offset')),['0%','40%','100%']);
+    }
+    assert.ok(nodes.some(node=>node.tagName==='path'&&node.getAttribute('stroke')===reference[team].rim));
+    s.owner.cancel();
+  }
+});

@@ -224,15 +224,21 @@
         fill:gradient(`exhaust-${ri}`,[['0%','#ffbe5a',.55],['100%','#ff7830',0]])}));
       plume.appendChild(node('path',{d:`M${R(-L,-w*.5)} Q${R(-L-flame*.55,-w*.45)} ${R(-L-flame,0)} Q${R(-L-flame*.55,w*.45)} ${R(-L,w*.5)} Z`,
         fill:metal('plume',[['0%','#fffce0'],['45%','#ffaa3c'],['100%','#ff5014']])}));layer.appendChild(plume);
-      const own=value.event.actor.team!=='enemy',body=`M${R(-L,-w)} L${R(L*.42,-w)} Q${R(L*.84,-w*.86)} ${R(L,0)} Q${R(L*.84,w*.86)} ${R(L*.42,w)} L${R(-L,w)} Z`;
+      const own=value.event.actor.team!=='enemy';
+      // Exact side palettes from pinned engine.js drawRocket (2fdce6ac).
+      const palette=own?{body:['#FBF7EC','#D4CBB6','#756D5F'],band:['#FFC088','#F08A2E','#8E4610'],
+        nose:['#7D8794','#383E47','#14171B'],fin:['#AEB6C0','#6B737E'],rim:'#1B2026'}:
+        {body:['#8A8A96','#4A4A53','#1C1C21'],band:['#FF9A8A','#E8584A','#84261E'],
+          nose:['#4A4A52','#222228','#0B0B0D'],fin:['#5C5C66','#2A2A30'],rim:'#C4BEB0'};
+      const body=`M${R(-L,-w)} L${R(L*.42,-w)} Q${R(L*.84,-w*.86)} ${R(L,0)} Q${R(L*.84,w*.86)} ${R(L*.42,w)} L${R(-L,w)} Z`;
       for(const sign of [-1,1])layer.appendChild(node('path',{d:`M${R(-L*.78,sign*w*.9)} L${R(-L*1.1,sign*(w+7*sz))} L${R(-L*.96,sign*(w+7*sz))} L${R(-L*.5,sign*w*.9)} Z`,
-        fill:metal(`fin-${sign}`,[['0%','#c0c2c8'],['100%','#606264']]),stroke:own?'#181a1c':'#c8cad0','stroke-width':sz}));
-      layer.appendChild(node('path',{d:body,fill:metal('body',[['0%','#c8cace'],['35%','#80828a'],['100%','#323436']]),
-        stroke:own?'#181a1c':'#c8cad0','stroke-width':1.5*sz}));
+        fill:metal(`fin-${sign}`,[['0%',palette.fin[0]],['100%',palette.fin[1]]]),stroke:palette.rim,'stroke-width':sz}));
+      layer.appendChild(node('path',{d:body,fill:metal('body',[['0%',palette.body[0]],['40%',palette.body[1]],['100%',palette.body[2]]]),
+        stroke:palette.rim,'stroke-width':1.5*sz}));
       layer.appendChild(node('path',{d:`M${R(L*.42,-w)} Q${R(L*.84,-w*.86)} ${R(L,0)} Q${R(L*.84,w*.86)} ${R(L*.42,w)} Z`,
-        fill:metal('nose',[['0%','#eef0f2'],['40%','#a4a8ad'],['100%','#383a3c']])}));
+        fill:metal('nose',[['0%',palette.nose[0]],['40%',palette.nose[1]],['100%',palette.nose[2]]])}));
       layer.appendChild(node('path',{d:`M${R(L*.02,-w)} L${R(L*.22,-w)} L${R(L*.22,w)} L${R(L*.02,w)} Z`,
-        fill:metal('band',own?[['0%','#ffc078'],['40%','#d06810'],['100%','#603008']]:[['0%','#f08078'],['40%','#b81818'],['100%','#500c0c']])}));
+        fill:metal('band',[['0%',palette.band[0]],['40%',palette.band[1]],['100%',palette.band[2]]])}));
       layer.appendChild(node('path',{d:`M${R(-L,-w)} L${R(-L*.84,-w)} L${R(-L*.84,w)} L${R(-L,w)} Z`,fill:'#202224',opacity:.85}));
       for(const x of [-L*.55,-L*.28,L*.3])layer.appendChild(node('path',{d:`M${R(x,-w)} L${R(x,w)}`,stroke:'#181a1c','stroke-width':.8*sz,opacity:.6}));
       layer.appendChild(node('path',{d:`M${R(-L*.98,0)} L${R(-L*.5,0)}`,stroke:'#080a0e','stroke-width':2.2*sz}));
