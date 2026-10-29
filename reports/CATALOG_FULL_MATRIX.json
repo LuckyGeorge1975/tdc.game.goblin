@@ -138,6 +138,15 @@
         "system-fire",
         "ram-conventional-vehicle"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "system-fire-v1",
+          "damageModel": "system-components-v1",
+          "movementKind": "tread-thresholds"
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": null,
         "system": true,
@@ -202,6 +211,18 @@
         "fire",
         "gev-second-move"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "phase-budgets",
+          "gevPhaseEligible": true,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 3,
         "system": false,
@@ -265,6 +286,18 @@
         "move",
         "fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 3,
         "system": false,
@@ -331,6 +364,35 @@
         "disembark",
         "passenger-fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "strengthRef": "infantry-strength-v1",
+          "passengerRef": "infantry-passenger-v1",
+          "damageModel": "infantry-strength-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": true,
+          "maxSquads": 3,
+          "strength": {
+            "min": 1,
+            "max": 3,
+            "initial": "required-scenario-value",
+            "atlasInitial": 2,
+            "hp": "current-squads",
+            "attack": "current-squads",
+            "defense": "current-squads",
+            "dLoss": 1,
+            "xEffect": "destroy-counter",
+            "cargoCost": "current-squads",
+            "splitMerge": false,
+            "shotsPerCounterPerFirePhase": 1
+          }
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -392,6 +454,18 @@
         "move",
         "fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 3,
         "system": false,
@@ -455,6 +529,20 @@
         "move",
         "fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "halfUnit": true,
+          "forceBudgetWeight": 0.5,
+          "infantry": false,
+          "interpretation": "forceBudgetWeight 0.5 is deployment metadata; canonical combat values remain unchanged."
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -511,6 +599,34 @@
         "move",
         "fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "siege-tank-fire-budget-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": false,
+          "specialFire": {
+            "phase": "fire",
+            "mainSlots": 2,
+            "mainAttack": 3,
+            "mainRange": 3,
+            "combinedAttack": 6,
+            "combinedRolls": 1,
+            "combinedSlotCost": 2,
+            "mainSeparateTargets": "distinct",
+            "apSlots": 2,
+            "apAttack": 1,
+            "apRange": 1,
+            "apInfantryOnly": true,
+            "neConsumesSlot": true,
+            "neBindsMainTarget": true
+          }
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 5,
         "system": false,
@@ -566,6 +682,31 @@
       "capabilities": [
         "fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "artillery-spotter-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 2,
+          "setupValue": 2,
+          "infantry": false,
+          "specialFire": {
+            "phase": "fire",
+            "shotsPerTurn": 1,
+            "setupValue": 2,
+            "setupDelayTurns": 0,
+            "directOwnLos": true,
+            "indirectOccupiedEnemy": true,
+            "indirectSpotter": "living-active-allied-direct-los-not-embarked",
+            "blindFire": false,
+            "splash": false,
+            "additionalMinimumRange": null
+          }
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -620,6 +761,31 @@
         "move",
         "fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "artillery-spotter-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 2,
+          "setupValue": 2,
+          "infantry": false,
+          "specialFire": {
+            "phase": "fire",
+            "shotsPerTurn": 1,
+            "setupValue": 2,
+            "setupDelayTurns": 0,
+            "directOwnLos": true,
+            "indirectOccupiedEnemy": true,
+            "indirectSpotter": "living-active-allied-direct-los-not-embarked",
+            "blindFire": false,
+            "splash": false,
+            "additionalMinimumRange": null
+          }
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 3,
         "system": false,
@@ -677,6 +843,18 @@
         "fire",
         "gev-second-move"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "phase-budgets",
+          "gevPhaseEligible": true,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -734,6 +912,20 @@
         "fire",
         "gev-second-move"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "phase-budgets",
+          "gevPhaseEligible": true,
+          "halfUnit": true,
+          "forceBudgetWeight": 0.5,
+          "infantry": false,
+          "interpretation": "forceBudgetWeight 0.5 is deployment metadata; canonical combat values remain unchanged."
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 1,
         "system": false,
@@ -795,6 +987,18 @@
         "load-drone",
         "deploy-drone"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "phase-budgets",
+          "gevPhaseEligible": true,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -852,6 +1056,18 @@
         "move",
         "fire-missile-hex"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -904,6 +1120,18 @@
         "fire",
         "be-transported"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -997,6 +1225,37 @@
         "disembark",
         "passenger-fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "strengthRef": "infantry-strength-v1",
+          "passengerRef": "infantry-passenger-v1",
+          "damageModel": "infantry-strength-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "waterCombat": true,
+          "infantry": true,
+          "maxSquads": 3,
+          "strength": {
+            "min": 1,
+            "max": 3,
+            "initial": "required-scenario-value",
+            "atlasInitial": 2,
+            "hp": "current-squads",
+            "attack": "current-squads",
+            "defense": "current-squads",
+            "dLoss": 1,
+            "xEffect": "destroy-counter",
+            "cargoCost": "current-squads",
+            "splitMerge": false,
+            "shotsPerCounterPerFirePhase": 1
+          },
+          "amphibious": "Canonical waterCombat capability with existing infantry terrain handling; no GEV second movement."
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -1068,6 +1327,24 @@
         "repair",
         "salvage"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "passengerRef": "infantry-passenger-v1",
+          "damageModel": "infantry-fixed-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": true,
+          "fixedDamage": {
+            "D": "lose-one-hp",
+            "X": "destroy",
+            "attackDefenseScaleWithHp": false
+          }
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -1128,6 +1405,25 @@
         "disembark",
         "passenger-fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "passengerRef": "infantry-passenger-v1",
+          "damageModel": "infantry-fixed-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "cannonFodder": true,
+          "infantry": true,
+          "fixedDamage": {
+            "D": "lose-one-hp",
+            "X": "destroy",
+            "attackDefenseScaleWithHp": false
+          }
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -1193,6 +1489,15 @@
         "load-drone",
         "deploy-drone"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "system-fire-v1",
+          "damageModel": "system-components-v1",
+          "movementKind": "tread-thresholds"
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": null,
         "system": true,
@@ -1245,6 +1550,18 @@
       "catalogId": "U19",
       "assetId": "command-hub",
       "capabilities": [],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "no-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 5,
         "system": false,
@@ -1299,6 +1616,15 @@
         "system-fire",
         "ram-conventional-vehicle"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "system-fire-v1",
+          "damageModel": "system-components-v1",
+          "movementKind": "tread-thresholds"
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": null,
         "system": true,
@@ -1356,6 +1682,15 @@
         "system-fire",
         "stealth"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "system-fire-v1",
+          "damageModel": "system-components-v1",
+          "movementKind": "tread-thresholds"
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": null,
         "system": true,
@@ -1421,6 +1756,24 @@
         "disembark",
         "passenger-fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "passengerRef": "infantry-passenger-v1",
+          "damageModel": "infantry-fixed-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": true,
+          "fixedDamage": {
+            "D": "lose-one-hp",
+            "X": "destroy",
+            "attackDefenseScaleWithHp": false
+          }
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
@@ -1472,6 +1825,18 @@
       "catalogId": "U23",
       "assetId": "command-core",
       "capabilities": [],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "no-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 5,
         "system": false,
@@ -1541,6 +1906,18 @@
       "catalogId": "U24",
       "assetId": "relay-node",
       "capabilities": [],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "no-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 4,
         "system": false,
@@ -1592,6 +1969,18 @@
         "move",
         "fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": false
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 3,
         "system": false,
@@ -1660,6 +2049,19 @@
         "move",
         "fire"
       ],
+      "ruleCoverage": {
+        "source": "unit-profiles.catalog-approved.v1.json target and definitions, canonical digest71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+        "traits": {
+          "fireRuleRef": "single-fire-v1",
+          "damageModel": "vehicle-crt-v1",
+          "movementKind": "single-budget",
+          "gevPhaseEligible": false,
+          "forceBudgetWeight": 1,
+          "infantry": false,
+          "interpretation": "Hover terrain mode, explicitly single movement budget; no GEV second move."
+        },
+        "evidence": "Existing accepted A-D rule proofs listed in sharedAcceptedProof plus actual full-profile binding/negative checks in newProfileProof; these traits are not additional normal-route actions."
+      },
       "actualStart": {
         "hp": 2,
         "system": false,
