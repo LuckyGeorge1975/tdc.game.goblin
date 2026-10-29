@@ -286,7 +286,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (!started || state.gameOver || !['play', 'pause', 'catalog', 'catalog-detail'].includes(returnScreen))
         return {reason:'screen.library.mapUnavailable.noMission'};
       const match = state.units.find(unit => state.scenario === 'iron-dust-v2'
-        ? unit.id === entry.coreUnitId : ['skimmer-pilot','siege-pilot','artillery-pilot'].includes(state.scenario) ? unit.visualKey === libraryAssetId(entry) : unit.name === entry.name);
+        ? unit.id === entry.coreUnitId : ['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver'].includes(state.scenario) ? unit.visualKey === libraryAssetId(entry) : unit.name === entry.name);
       if (!match) return {reason:'screen.library.mapUnavailable.notPresent'};
       if (match.hp <= 0) return {unit:match,reason:'screen.library.mapUnavailable.destroyed'};
       return {unit:match};
@@ -349,10 +349,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         body.append(paragraph(`${t('v2.ui.armorHp')}: ${hpValue}`, 'v2-library-hp'));
         if(live?.artilleryFire)body.append(paragraph(GoblinArtilleryWeapons.summary(live)));
         if(live?.siegeFireBudget)body.append(paragraph(GoblinSiegeWeapons.summary(live)));
-        body.append(paragraph(GoblinLanguage.translate(entry.copy)));
+        body.append(paragraph(live?.catalogId?GoblinCatalogRuntime.summary(live,state.units):GoblinLanguage.translate(entry.copy)));
         if (entry.move.includes('+')) body.append(paragraph(t('screen.library.value.skimmerManeuver')));
       } else {
-        const pilotLive=live&&['skimmer-pilot','siege-pilot','artillery-pilot'].includes(state.scenario);
+        const pilotLive=live&&['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver'].includes(state.scenario);
         const profile = pilotLive ? {...UnitGuideRange.profile(entry,live),bonus:live.secondaryMove??0} : UnitGuideRange.profile(entry, null);
         for (const [mode, key] of [['move','v2.ui.move'], ['attack','v2.ui.attack']]) {
           const figure = document.createElement('figure'); figure.className = 'v2-library-range';
@@ -360,7 +360,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           figure.innerHTML = UnitGuideRange.mapSvg(profile, mode);
           figure.prepend(caption); body.append(figure);
         }
-        body.append(paragraph(pilotLive ? t(`mission.${state.scenario}.budget`) : t('v2.ui.catalogNote')));
+        body.append(paragraph(live?.catalogId ? t('v2.catalog.schematicNote') : pilotLive ? t(`mission.${state.scenario}.budget`) : t('v2.ui.catalogNote')));
       }
       const find = button(t('screen.library.showOnMap'), () => findUnit(target.unit.id));
       find.id = 'v2-library-find'; find.disabled = !!target.reason;
@@ -470,6 +470,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (legacyNumber) header.append(paragraph(legacyNumber, 'v2-briefing-number'));
         header.append(heading(t(`mission.${missionId}.title`)),
           paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
+        if(GoblinCatalogBase.has(missionId))header.append(paragraph(t(`mission.${missionId}.budget`)));
         if(missionId==='artillery-pilot')header.append(paragraph(t('mission.artillery-pilot.budget')));
         if(missionId==='siege-pilot')header.append(paragraph(t('mission.siege-pilot.budget')));
         if(missionId==='skimmer-pilot')header.append(paragraph(t('mission.skimmer-pilot.budget')));

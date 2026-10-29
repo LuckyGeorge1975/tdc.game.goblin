@@ -1,0 +1,2112 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "catalog-approved-data-v1",
+  "legacyProfile": "field-test-atlas-v1",
+  "targetProfile": "full-catalog-approved-v1",
+  "targetActive": false,
+  "productProfileIntent": "FULL_CATALOG_v1",
+  "provenance": {
+    "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+    "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+    "baseRegistryFileSha256": "0cd763382cfd0ef7019f2f9d84ef7606386f40528c069815607c51df1c8f3d9b",
+    "baseSystemsPath": "ogre-systems.js",
+    "baseSystemsFileSha256": "28ce762cc4ab85422eb538e3f6a9b680d43cdb7fa3d67ed9f26ad207374693cf",
+    "approvedProposalPath": ".tools/release-completion/rule-proposal-v1.md",
+    "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+    "approvedDecisionPath": "Transformation/operations/catalog-rules-approved-2026-10-29.md",
+    "approvedDecision": "Ja, Regelpaket A–G umsetzen (empfohlen)",
+    "contentPin": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+    "scope": "data-handoff-only-no-runtime-or-product-activation"
+  },
+  "profile": {
+    "version": 1,
+    "coordinateSystem": "odd-row",
+    "losMode": "strict-supercover",
+    "unitKeys": [
+      "goblin-siegebreaker",
+      "skimmer-scout",
+      "rocket-artillery",
+      "infantry-squad",
+      "assault-tank",
+      "recon-tank",
+      "siege-tank",
+      "long-range-battery",
+      "mobile-siege-gun",
+      "combat-skimmer",
+      "light-skimmer",
+      "skimmer-carrier",
+      "strategic-missile-carrier",
+      "artillery-drone",
+      "amphibious-infantry",
+      "field-engineers",
+      "local-defense",
+      "forge-engineer",
+      "command-hub",
+      "goblin-dreadnaught",
+      "phantom-platform",
+      "infantry-platoon",
+      "command-core",
+      "relay-node",
+      "guard-tank",
+      "raider-skimmer"
+    ],
+    "unitCount": 26,
+    "legacyImmutable": true,
+    "activation": "requires-complete-26-unit-integration-and-independent-final-QA",
+    "runtimeRegistryReplacement": false
+  },
+  "definitions": {
+    "weaponClasses": {
+      "main": {
+        "attack": 4,
+        "range": 3,
+        "defense": 4,
+        "expendable": false,
+        "infantryOnly": false
+      },
+      "secondary": {
+        "attack": 3,
+        "range": 2,
+        "defense": 3,
+        "expendable": false,
+        "infantryOnly": false
+      },
+      "missiles": {
+        "attack": 6,
+        "range": 5,
+        "defense": 3,
+        "expendable": true,
+        "infantryOnly": false
+      },
+      "antipersonnel": {
+        "attack": 1,
+        "range": 1,
+        "defense": 1,
+        "expendable": false,
+        "infantryOnly": true
+      }
+    },
+    "strength": {
+      "infantry-strength-v1": {
+        "min": 1,
+        "max": 3,
+        "initial": "required-scenario-value",
+        "atlasInitial": 2,
+        "hp": "current-squads",
+        "attack": "current-squads",
+        "defense": "current-squads",
+        "dLoss": 1,
+        "xEffect": "destroy-counter",
+        "cargoCost": "current-squads",
+        "splitMerge": false,
+        "shotsPerCounterPerFirePhase": 1
+      }
+    },
+    "fire": {
+      "single-fire-v1": {
+        "phase": "fire",
+        "shotsPerTurn": 1
+      },
+      "siege-tank-fire-budget-v1": {
+        "phase": "fire",
+        "mainSlots": 2,
+        "mainAttack": 3,
+        "mainRange": 3,
+        "combinedAttack": 6,
+        "combinedRolls": 1,
+        "combinedSlotCost": 2,
+        "mainSeparateTargets": "distinct",
+        "apSlots": 2,
+        "apAttack": 1,
+        "apRange": 1,
+        "apInfantryOnly": true,
+        "neConsumesSlot": true,
+        "neBindsMainTarget": true
+      },
+      "artillery-spotter-v1": {
+        "phase": "fire",
+        "shotsPerTurn": 1,
+        "setupValue": 2,
+        "setupDelayTurns": 0,
+        "directOwnLos": true,
+        "indirectOccupiedEnemy": true,
+        "indirectSpotter": "living-active-allied-direct-los-not-embarked",
+        "blindFire": false,
+        "splash": false,
+        "additionalMinimumRange": null
+      },
+      "system-fire-v1": {
+        "phase": "fire",
+        "shotsPerIntactReusableSlot": 1,
+        "missileShotsPerInitialSlotPerMission": 1,
+        "componentD": "no-effect",
+        "componentX": "destroy-one",
+        "coverDefenseBonus": 1
+      },
+      "no-fire-v1": {
+        "shotsPerTurn": 0
+      }
+    },
+    "cargo": {
+      "infantry-passenger-v1": {
+        "allowedCarrierUnitIds": [
+          "skimmer-carrier"
+        ],
+        "cargoCost": "current-hp-or-current-squads",
+        "fireAboard": true,
+        "loadPhase": "movement",
+        "loadDistance": 1,
+        "loadConsumes": "cargo-movement",
+        "unloadTo": "free-passable-adjacent-cell",
+        "moveOrReloadAfterUnloadSameTurn": false,
+        "sharedCarrierRoll": true,
+        "onCarrierDestroyed": "survivors-remain-carrier-hex"
+      },
+      "carrier-cargo-v1": {
+        "capacity": 3,
+        "infantryCost": "current-hp-or-current-squads",
+        "droneUnitId": "artillery-drone",
+        "droneCost": 3,
+        "droneMax": 1,
+        "mixedDroneAndInfantry": false,
+        "infantryFireAboard": true,
+        "droneFireAboard": false,
+        "droneSpotterAboard": false,
+        "infantryLoadConsumes": "cargo-movement",
+        "infantryLoadCarrierMayMove": true,
+        "infantryUnloadConsumes": "cargo-movement",
+        "infantryUnloadCargoMayMoveOrReloadSameTurn": false,
+        "droneLoadConsumes": [
+          "cargo-movement",
+          "cargo-fire",
+          "carrier-primary-movement"
+        ],
+        "droneDeployConsumes": [
+          "cargo-movement",
+          "cargo-fire",
+          "carrier-primary-movement"
+        ],
+        "loadDeployPhase": "movement",
+        "loadDeployDistance": 1,
+        "droneFirstFire": "next-own-turn",
+        "droneReloadSameTurn": false,
+        "droneDeployExcludedTerrain": [
+          "water",
+          "river"
+        ],
+        "sharedCarrierPassengerRoll": true,
+        "mechanicalCargoOnCarrierDestroyed": "destroy",
+        "infantryOnCarrierDestroyed": "survivors-remain-carrier-hex",
+        "createCargo": false
+      },
+      "forge-drone-bays-v1": {
+        "bayCount": 2,
+        "dronesPerBay": 1,
+        "allowedUnitIds": [
+          "artillery-drone"
+        ],
+        "infantryAllowed": false,
+        "droneTransportRuleRef": "carrier-cargo-v1",
+        "bayDestroyedCargoEffect": "destroy",
+        "createCargo": false
+      },
+      "drone-cargo-v1": {
+        "unitId": "artillery-drone",
+        "cargoCost": 3,
+        "allowedCarrierUnitIds": [
+          "skimmer-carrier",
+          "forge-engineer"
+        ],
+        "fireAboard": false,
+        "spotterAboard": false,
+        "indirectFire": false,
+        "transportRuleRef": "carrier-cargo-v1"
+      }
+    },
+    "engineering": {
+      "engineering-actions-v1": {
+        "phase": "movement",
+        "actionsPerTurn": 1,
+        "range": 1,
+        "consumes": [
+          "actor-movement",
+          "actor-all-fire"
+        ],
+        "actorRequirements": [
+          "alive",
+          "active",
+          "not-embarked",
+          "not-moved",
+          "not-disembarked"
+        ],
+        "selfRepair": false,
+        "rngRolls": 0,
+        "clear": [
+          {
+            "from": "rubble-field",
+            "to": "open-ground",
+            "materialCost": 1
+          },
+          {
+            "from": "crater",
+            "to": "open-ground",
+            "materialCost": 1
+          },
+          {
+            "from": "forest",
+            "to": "open-ground",
+            "materialCost": 2
+          }
+        ],
+        "buildPosition": {
+          "from": [
+            "open-ground",
+            "road"
+          ],
+          "to": "field-position",
+          "materialCost": 1,
+          "movementCost": 1,
+          "coverBonus": 1,
+          "blocksLos": false,
+          "stacking": false
+        },
+        "buildBridge": {
+          "from": "river",
+          "to": "bridge",
+          "materialCost": 2,
+          "spanHexes": 1,
+          "oppositePassableLandNeighborsRequired": true
+        },
+        "terrainTarget": "unoccupied-own-or-adjacent-cell",
+        "repairVehicle": {
+          "materialCost": 1,
+          "effects": [
+            "clear-disabled",
+            "restore-one-hp"
+          ],
+          "effectChoice": "one",
+          "cap": "initial-max-hp",
+          "target": "living-adjacent-allied-vehicle-or-drone",
+          "excluded": [
+            "infantry",
+            "structures",
+            "core-objectives"
+          ],
+          "revive": false,
+          "refillAmmo": false
+        },
+        "repairSystem": {
+          "treadsRestored": 3,
+          "treadsMaterialCost": 1,
+          "componentsRestored": 1,
+          "componentMaterialCost": 2,
+          "cap": "initial-max",
+          "target": "living-adjacent-allied-system",
+          "restoredModuleUsable": "next-own-turn",
+          "excluded": [
+            "expended-missiles",
+            "cargo-creation",
+            "drone-creation"
+          ]
+        },
+        "salvage": {
+          "target": "adjacent-own-or-enemy-wreck",
+          "materialGain": 1,
+          "cap": "actor-max-material",
+          "requiresFreeMaterialCapacity": true,
+          "removeWreck": true,
+          "oncePerWreckId": true,
+          "revive": false
+        },
+        "passiveMaterialRegeneration": 0
+      }
+    },
+    "stealth": {
+      "phantom-stealth-v1": {
+        "detectionDistance": 2,
+        "detectionLos": "strict-supercover",
+        "detector": "living-active-opposing-nonembarked-unit",
+        "teamWide": true,
+        "revealOn": [
+          "own-fire",
+          "incoming-direct-attack-including-NE",
+          "incoming-area-attack-including-NE",
+          "collision"
+        ],
+        "revealExpires": "end-next-observing-team-fire-phase",
+        "moveAloneReveals": false,
+        "hiddenDirectTargetAllowed": false,
+        "hiddenAreaVictimAllowed": true,
+        "hiddenMovementOccupancy": "stop-at-last-free-prefix-consume-move-reveal",
+        "ownUnitsAlwaysKnown": true,
+        "projection": "hide-unit-instance-id-position-and-live-intel",
+        "objectiveAggregateCountAllowed": true,
+        "wallClockTimers": false
+      }
+    },
+    "missile": {
+      "hex-missile-v1": {
+        "phase": "fire",
+        "ammunition": 1,
+        "attack": 6,
+        "splashAttack": 3,
+        "range": 8,
+        "blastRadius": 1,
+        "target": "any-in-bounds-hex",
+        "ownLosRequired": true,
+        "losMode": "strict-supercover",
+        "friendlyFire": true,
+        "emptyImpactConsumesAmmo": true,
+        "zeroVictimsRngRolls": 0,
+        "order": [
+          "center",
+          "neighbors-y-x",
+          "unit-id"
+        ],
+        "rollsPerAboveGroundVictim": 1,
+        "passengersShareCarrierRoll": true,
+        "systemTargetsPerVictim": 1,
+        "systemTargetPriority": [
+          "missiles",
+          "main",
+          "secondary",
+          "positive-treads",
+          "antipersonnel",
+          "tools",
+          "bays"
+        ],
+        "freezeVictimSetBeforeEffects": true,
+        "terrainDamage": false
+      }
+    },
+    "damage": {
+      "vehicle-crt-v1": {
+        "D": "disable-then-destroy-on-second-D",
+        "X": "destroy"
+      },
+      "infantry-fixed-crt-v1": {
+        "D": "lose-one-hp",
+        "X": "destroy",
+        "attackDefenseScaleWithHp": false
+      },
+      "system-components-v1": {
+        "componentRule": "system-fire-v1",
+        "genericHp": false
+      }
+    }
+  },
+  "systemDefinitions": {
+    "mkIII": {
+      "model": "mkIII",
+      "mode": "ogre",
+      "maxTreads": 45,
+      "initialTreads": 45,
+      "movementBands": [
+        {
+          "minTreads": 31,
+          "maxTreads": 45,
+          "movement": 3
+        },
+        {
+          "minTreads": 16,
+          "maxTreads": 30,
+          "movement": 2
+        },
+        {
+          "minTreads": 1,
+          "maxTreads": 15,
+          "movement": 1
+        },
+        {
+          "minTreads": 0,
+          "maxTreads": 0,
+          "movement": 0
+        }
+      ],
+      "weaponCounts": {
+        "main": 1,
+        "secondary": 4,
+        "missiles": 2,
+        "antipersonnel": 8
+      },
+      "components": [
+        {
+          "id": "main-1",
+          "kind": "weapon",
+          "weaponClassRef": "main"
+        },
+        {
+          "id": "secondary-1",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "secondary-2",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "secondary-3",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "secondary-4",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "missiles-1",
+          "kind": "weapon",
+          "weaponClassRef": "missiles"
+        },
+        {
+          "id": "missiles-2",
+          "kind": "weapon",
+          "weaponClassRef": "missiles"
+        },
+        {
+          "id": "antipersonnel-1",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-2",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-3",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-4",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-5",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-6",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-7",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-8",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        }
+      ],
+      "fireRuleRef": "system-fire-v1",
+      "componentD": "no-effect",
+      "componentX": "destroy-one",
+      "treadHit": {
+        "ratio": "1-1",
+        "successfulFaces": [
+          5,
+          6
+        ],
+        "loss": "attack-up-to-current-treads"
+      },
+      "destroyedWhen": {
+        "treads": 0,
+        "allUsableModulesGone": true
+      },
+      "genericHp": false,
+      "infantryClassification": false
+    },
+    "mkV": {
+      "model": "mkV",
+      "mode": "ogre",
+      "maxTreads": 60,
+      "initialTreads": 60,
+      "movementBands": [
+        {
+          "minTreads": 41,
+          "maxTreads": 60,
+          "movement": 3
+        },
+        {
+          "minTreads": 21,
+          "maxTreads": 40,
+          "movement": 2
+        },
+        {
+          "minTreads": 1,
+          "maxTreads": 20,
+          "movement": 1
+        },
+        {
+          "minTreads": 0,
+          "maxTreads": 0,
+          "movement": 0
+        }
+      ],
+      "weaponCounts": {
+        "main": 2,
+        "secondary": 6,
+        "missiles": 6,
+        "antipersonnel": 12
+      },
+      "components": [
+        {
+          "id": "main-1",
+          "kind": "weapon",
+          "weaponClassRef": "main"
+        },
+        {
+          "id": "main-2",
+          "kind": "weapon",
+          "weaponClassRef": "main"
+        },
+        {
+          "id": "secondary-1",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "secondary-2",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "secondary-3",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "secondary-4",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "secondary-5",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "secondary-6",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "missiles-1",
+          "kind": "weapon",
+          "weaponClassRef": "missiles"
+        },
+        {
+          "id": "missiles-2",
+          "kind": "weapon",
+          "weaponClassRef": "missiles"
+        },
+        {
+          "id": "missiles-3",
+          "kind": "weapon",
+          "weaponClassRef": "missiles"
+        },
+        {
+          "id": "missiles-4",
+          "kind": "weapon",
+          "weaponClassRef": "missiles"
+        },
+        {
+          "id": "missiles-5",
+          "kind": "weapon",
+          "weaponClassRef": "missiles"
+        },
+        {
+          "id": "missiles-6",
+          "kind": "weapon",
+          "weaponClassRef": "missiles"
+        },
+        {
+          "id": "antipersonnel-1",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-2",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-3",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-4",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-5",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-6",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-7",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-8",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-9",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-10",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-11",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-12",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        }
+      ],
+      "fireRuleRef": "system-fire-v1",
+      "componentD": "no-effect",
+      "componentX": "destroy-one",
+      "treadHit": {
+        "ratio": "1-1",
+        "successfulFaces": [
+          5,
+          6
+        ],
+        "loss": "attack-up-to-current-treads"
+      },
+      "destroyedWhen": {
+        "treads": 0,
+        "allUsableModulesGone": true
+      },
+      "genericHp": false,
+      "infantryClassification": false
+    },
+    "vulcan": {
+      "model": "vulcan",
+      "mode": "ogre",
+      "maxTreads": 45,
+      "initialTreads": 45,
+      "movementBands": [
+        {
+          "minTreads": 31,
+          "maxTreads": 45,
+          "movement": 3
+        },
+        {
+          "minTreads": 16,
+          "maxTreads": 30,
+          "movement": 2
+        },
+        {
+          "minTreads": 1,
+          "maxTreads": 15,
+          "movement": 1
+        },
+        {
+          "minTreads": 0,
+          "maxTreads": 0,
+          "movement": 0
+        }
+      ],
+      "weaponCounts": {
+        "main": 0,
+        "secondary": 0,
+        "missiles": 0,
+        "antipersonnel": 2
+      },
+      "components": [
+        {
+          "id": "antipersonnel-1",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-2",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "tool-1",
+          "kind": "tool",
+          "defense": 3,
+          "usableForSurvival": true
+        },
+        {
+          "id": "tool-2",
+          "kind": "tool",
+          "defense": 3,
+          "usableForSurvival": true
+        },
+        {
+          "id": "bay-1",
+          "kind": "drone-bay",
+          "defense": 2,
+          "dronesMax": 1,
+          "usableForSurvival": false
+        },
+        {
+          "id": "bay-2",
+          "kind": "drone-bay",
+          "defense": 2,
+          "dronesMax": 1,
+          "usableForSurvival": false
+        }
+      ],
+      "fireRuleRef": "system-fire-v1",
+      "componentD": "no-effect",
+      "componentX": "destroy-one",
+      "treadHit": {
+        "ratio": "1-1",
+        "successfulFaces": [
+          5,
+          6
+        ],
+        "loss": "attack-up-to-current-treads"
+      },
+      "destroyedWhen": {
+        "treads": 0,
+        "allUsableModulesGone": true
+      },
+      "genericHp": false,
+      "infantryClassification": false
+    },
+    "ninja": {
+      "model": "ninja",
+      "mode": "ogre",
+      "maxTreads": 30,
+      "initialTreads": 30,
+      "movementBands": [
+        {
+          "minTreads": 21,
+          "maxTreads": 30,
+          "movement": 3
+        },
+        {
+          "minTreads": 11,
+          "maxTreads": 20,
+          "movement": 2
+        },
+        {
+          "minTreads": 1,
+          "maxTreads": 10,
+          "movement": 1
+        },
+        {
+          "minTreads": 0,
+          "maxTreads": 0,
+          "movement": 0
+        }
+      ],
+      "weaponCounts": {
+        "main": 1,
+        "secondary": 2,
+        "missiles": 0,
+        "antipersonnel": 4
+      },
+      "components": [
+        {
+          "id": "main-1",
+          "kind": "weapon",
+          "weaponClassRef": "main"
+        },
+        {
+          "id": "secondary-1",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "secondary-2",
+          "kind": "weapon",
+          "weaponClassRef": "secondary"
+        },
+        {
+          "id": "antipersonnel-1",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-2",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-3",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        },
+        {
+          "id": "antipersonnel-4",
+          "kind": "weapon",
+          "weaponClassRef": "antipersonnel"
+        }
+      ],
+      "fireRuleRef": "system-fire-v1",
+      "componentD": "no-effect",
+      "componentX": "destroy-one",
+      "treadHit": {
+        "ratio": "1-1",
+        "successfulFaces": [
+          5,
+          6
+        ],
+        "loss": "attack-up-to-current-treads"
+      },
+      "destroyedWhen": {
+        "treads": 0,
+        "allUsableModulesGone": true
+      },
+      "genericHp": false,
+      "infantryClassification": false
+    }
+  },
+  "units": {
+    "goblin-siegebreaker": {
+      "catalogId": "U01",
+      "legacy": [
+        5,
+        5,
+        2,
+        3,
+        3,
+        "G",
+        "HEAVY ASSAULT"
+      ],
+      "target": {
+        "source": "OGRE_SYSTEMS.mkIII",
+        "system": "mkIII",
+        "tread": 45,
+        "movement": [
+          3,
+          2,
+          1,
+          0
+        ],
+        "mainBatteries": 1,
+        "secondaryBatteries": 4,
+        "missiles": 2,
+        "antipersonnel": 8,
+        "mode": "ogre",
+        "movementKind": "tread-thresholds",
+        "systemDefinitionRef": "mkIII",
+        "damageModel": "system-components-v1",
+        "fireRuleRef": "system-fire-v1",
+        "capabilities": [
+          "move",
+          "select-system-target",
+          "select-weapon",
+          "system-fire",
+          "ram-conventional-vehicle"
+        ]
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "OGRE_SYSTEMS.mkIII",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A",
+          "D"
+        ]
+      }
+    },
+    "skimmer-scout": {
+      "catalogId": "U02",
+      "legacy": [
+        3,
+        3,
+        3,
+        3,
+        1,
+        "S",
+        "HOVERCRAFT"
+      ],
+      "target": {
+        "source": "UNIT_RULES.gev + Guide/Legacy defense",
+        "attack": 1,
+        "range": 3,
+        "defense": 3,
+        "movement": [
+          3,
+          2
+        ],
+        "mode": "gev",
+        "infantry": false,
+        "movementKind": "phase-budgets",
+        "gevPhaseEligible": true,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire",
+          "gev-second-move"
+        ],
+        "hp": 3,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_RULES.gev + Guide/Legacy defense",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "rocket-artillery": {
+      "catalogId": "U03",
+      "legacy": [
+        3,
+        3,
+        4,
+        1,
+        2,
+        "M",
+        "ARTILLERY"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.missileTank",
+        "attack": 3,
+        "range": 4,
+        "defense": 2,
+        "movement": [
+          2
+        ],
+        "mode": "tracked",
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire"
+        ],
+        "hp": 3,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.missileTank",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "infantry-squad": {
+      "catalogId": "U04",
+      "legacy": [
+        2,
+        2,
+        1,
+        2,
+        1,
+        "I",
+        "INFANTRY"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.infantry",
+        "attack": "squads",
+        "range": 1,
+        "defense": "squads",
+        "movement": [
+          2
+        ],
+        "mode": "infantry",
+        "maxSquads": 3,
+        "infantry": true,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "infantry-strength-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire",
+          "embark",
+          "disembark",
+          "passenger-fire"
+        ],
+        "hp": "squads",
+        "strengthRef": "infantry-strength-v1",
+        "repairClass": "infantry",
+        "passengerRef": "infantry-passenger-v1"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.infantry",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "assault-tank": {
+      "catalogId": "U05",
+      "legacy": [
+        3,
+        3,
+        2,
+        3,
+        4,
+        "A",
+        "FRONTLINE ARMOR"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.heavyTank",
+        "attack": 4,
+        "range": 2,
+        "defense": 3,
+        "movement": [
+          3
+        ],
+        "mode": "tracked",
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire"
+        ],
+        "hp": 3,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.heavyTank",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "recon-tank": {
+      "catalogId": "U06",
+      "legacy": [
+        2,
+        2,
+        2,
+        3,
+        2,
+        "R",
+        "SCOUT ARMOR"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.lightTank",
+        "attack": 2,
+        "range": 2,
+        "defense": 2,
+        "movement": [
+          3
+        ],
+        "mode": "tracked",
+        "halfUnit": true,
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 0.5,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire"
+        ],
+        "hp": 2,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.lightTank",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "siege-tank": {
+      "catalogId": "U07",
+      "legacy": [
+        5,
+        5,
+        3,
+        3,
+        6,
+        "S",
+        "SIEGE ARMOR"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.superheavyTank",
+        "attack": 6,
+        "range": 3,
+        "defense": 5,
+        "movement": [
+          3
+        ],
+        "mode": "ogre",
+        "splitFire": true,
+        "antipersonnel": 2,
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "siege-tank-fire-budget-v1",
+        "capabilities": [
+          "move",
+          "fire"
+        ],
+        "hp": 5,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.superheavyTank",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "long-range-battery": {
+      "catalogId": "U08",
+      "legacy": [
+        2,
+        2,
+        6,
+        0,
+        3,
+        "B",
+        "FIXED ARTILLERY"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.howitzer",
+        "attack": 6,
+        "range": 8,
+        "defense": 1,
+        "movement": [
+          0
+        ],
+        "mode": "fixed",
+        "setupValue": 2,
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 2,
+        "fireRuleRef": "artillery-spotter-v1",
+        "capabilities": [
+          "fire"
+        ],
+        "hp": 2,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.howitzer",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "mobile-siege-gun": {
+      "catalogId": "U09",
+      "legacy": [
+        3,
+        3,
+        4,
+        1,
+        3,
+        "M",
+        "MOBILE ARTILLERY"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.mobileHowitzer",
+        "attack": 6,
+        "range": 6,
+        "defense": 2,
+        "movement": [
+          1
+        ],
+        "mode": "tracked",
+        "setupValue": 2,
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 2,
+        "fireRuleRef": "artillery-spotter-v1",
+        "capabilities": [
+          "move",
+          "fire"
+        ],
+        "hp": 3,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.mobileHowitzer",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "combat-skimmer": {
+      "catalogId": "U10",
+      "legacy": [
+        2,
+        2,
+        2,
+        3,
+        2,
+        "C",
+        "HOVERCRAFT"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.gev",
+        "attack": 2,
+        "range": 2,
+        "defense": 2,
+        "movement": [
+          4,
+          3
+        ],
+        "mode": "gev",
+        "infantry": false,
+        "movementKind": "phase-budgets",
+        "gevPhaseEligible": true,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire",
+          "gev-second-move"
+        ],
+        "hp": 2,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.gev",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "light-skimmer": {
+      "catalogId": "U11",
+      "legacy": [
+        1,
+        1,
+        2,
+        3,
+        1,
+        "L",
+        "HOVERCRAFT"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.lightGev",
+        "attack": 1,
+        "range": 2,
+        "defense": 1,
+        "movement": [
+          4,
+          3
+        ],
+        "mode": "gev",
+        "halfUnit": true,
+        "infantry": false,
+        "movementKind": "phase-budgets",
+        "gevPhaseEligible": true,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 0.5,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire",
+          "gev-second-move"
+        ],
+        "hp": 1,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.lightGev",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "skimmer-carrier": {
+      "catalogId": "U12",
+      "legacy": [
+        2,
+        2,
+        2,
+        3,
+        1,
+        "P",
+        "PERSONNEL CARRIER"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.gevPc",
+        "attack": 1,
+        "range": 2,
+        "defense": 2,
+        "movement": [
+          3,
+          2
+        ],
+        "mode": "gev",
+        "transportSquads": 3,
+        "infantry": false,
+        "movementKind": "phase-budgets",
+        "gevPhaseEligible": true,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire",
+          "gev-second-move",
+          "load-infantry",
+          "unload-infantry",
+          "load-drone",
+          "deploy-drone"
+        ],
+        "hp": 2,
+        "repairClass": "vehicle",
+        "cargoRef": "carrier-cargo-v1"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.gevPc",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A",
+          "B"
+        ]
+      }
+    },
+    "strategic-missile-carrier": {
+      "catalogId": "U13",
+      "legacy": [
+        2,
+        2,
+        8,
+        1,
+        6,
+        "C",
+        "MISSILE PLATFORM"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.missileCrawler",
+        "attack": 6,
+        "splashAttack": 3,
+        "blastRadius": 1,
+        "ammunition": 1,
+        "range": 8,
+        "defense": 2,
+        "movement": [
+          1
+        ],
+        "mode": "tracked",
+        "cruiseMissile": true,
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire-missile-hex"
+        ],
+        "hp": 2,
+        "repairClass": "vehicle",
+        "missileRuleRef": "hex-missile-v1"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.missileCrawler",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A",
+          "F"
+        ]
+      }
+    },
+    "artillery-drone": {
+      "catalogId": "U14",
+      "legacy": [
+        2,
+        2,
+        4,
+        2,
+        2,
+        "D",
+        "ARTILLERY DRONE"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.lightArtilleryDrone",
+        "attack": 2,
+        "range": 8,
+        "defense": 1,
+        "movement": [
+          0
+        ],
+        "mode": "fixed",
+        "transportable": true,
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "fire",
+          "be-transported"
+        ],
+        "hp": 2,
+        "repairClass": "vehicle",
+        "cargoRef": "drone-cargo-v1"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.lightArtilleryDrone",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A",
+          "B"
+        ]
+      }
+    },
+    "amphibious-infantry": {
+      "catalogId": "U15",
+      "legacy": [
+        2,
+        2,
+        1,
+        2,
+        1,
+        "I",
+        "AMPHIBIOUS INFANTRY"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.marines",
+        "attack": "squads",
+        "range": 1,
+        "defense": "squads",
+        "movement": [
+          2
+        ],
+        "mode": "infantry",
+        "maxSquads": 3,
+        "waterCombat": true,
+        "infantry": true,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "infantry-strength-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire",
+          "embark",
+          "disembark",
+          "passenger-fire"
+        ],
+        "hp": "squads",
+        "strengthRef": "infantry-strength-v1",
+        "repairClass": "infantry",
+        "passengerRef": "infantry-passenger-v1"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.marines",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "field-engineers": {
+      "catalogId": "U16",
+      "legacy": [
+        2,
+        2,
+        1,
+        2,
+        2,
+        "E",
+        "FIELD ENGINEERING"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.combatEngineers",
+        "attack": 2,
+        "range": 1,
+        "defense": 2,
+        "movement": [
+          2
+        ],
+        "mode": "infantry",
+        "engineering": true,
+        "infantry": true,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "infantry-fixed-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire",
+          "embark",
+          "disembark",
+          "passenger-fire",
+          "clear-terrain",
+          "build-position",
+          "build-bridge",
+          "repair",
+          "salvage"
+        ],
+        "hp": 2,
+        "repairClass": "infantry",
+        "passengerRef": "infantry-passenger-v1",
+        "engineeringRef": "engineering-actions-v1",
+        "material": {
+          "initial": 3,
+          "max": 3
+        }
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.combatEngineers",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A",
+          "C"
+        ]
+      }
+    },
+    "local-defense": {
+      "catalogId": "U17",
+      "legacy": [
+        2,
+        2,
+        2,
+        0,
+        2,
+        "L",
+        "STATIC DEFENSE"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.militia",
+        "attack": 1,
+        "range": 1,
+        "defense": 1,
+        "movement": [
+          2
+        ],
+        "mode": "infantry",
+        "cannonFodder": true,
+        "infantry": true,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "infantry-fixed-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire",
+          "embark",
+          "disembark",
+          "passenger-fire"
+        ],
+        "hp": 2,
+        "repairClass": "infantry",
+        "passengerRef": "infantry-passenger-v1"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.militia",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "forge-engineer": {
+      "catalogId": "U18",
+      "legacy": [
+        2,
+        2,
+        1,
+        2,
+        2,
+        "F",
+        "FIELD ENGINEERING"
+      ],
+      "target": {
+        "source": "OGRE_SYSTEMS.vulcan",
+        "system": "vulcan",
+        "tread": 45,
+        "movement": [
+          3,
+          2,
+          1,
+          0
+        ],
+        "engineering": true,
+        "drones": true,
+        "mode": "ogre",
+        "movementKind": "tread-thresholds",
+        "systemDefinitionRef": "vulcan",
+        "damageModel": "system-components-v1",
+        "fireRuleRef": "system-fire-v1",
+        "mainBatteries": 0,
+        "secondaryBatteries": 0,
+        "missiles": 0,
+        "antipersonnel": 2,
+        "capabilities": [
+          "move",
+          "select-system-target",
+          "select-weapon",
+          "system-fire",
+          "clear-terrain",
+          "build-position",
+          "build-bridge",
+          "repair",
+          "salvage",
+          "load-drone",
+          "deploy-drone"
+        ],
+        "engineeringRef": "engineering-actions-v1",
+        "material": {
+          "initial": 6,
+          "max": 6
+        },
+        "cargoRef": "forge-drone-bays-v1",
+        "requiredIntactToolsForEngineering": 1
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "OGRE_SYSTEMS.vulcan",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A",
+          "D",
+          "C",
+          "B"
+        ]
+      }
+    },
+    "command-hub": {
+      "catalogId": "U19",
+      "legacy": [
+        5,
+        5,
+        0,
+        0,
+        0,
+        "H",
+        "FORTIFIED TARGET"
+      ],
+      "target": {
+        "source": "UNIT_CATALOG.commandPost",
+        "attack": 0,
+        "range": 0,
+        "defense": 2,
+        "movement": [
+          0
+        ],
+        "mode": "fixed",
+        "commandUnit": true,
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "no-fire-v1",
+        "capabilities": [],
+        "hp": 5,
+        "repairClass": "structure"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "UNIT_CATALOG.commandPost",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "goblin-dreadnaught": {
+      "catalogId": "U20",
+      "legacy": [
+        6,
+        6,
+        3,
+        2,
+        4,
+        "G",
+        "HEAVY ASSAULT"
+      ],
+      "target": {
+        "source": "OGRE_SYSTEMS.mkV",
+        "system": "mkV",
+        "tread": 60,
+        "movement": [
+          3,
+          2,
+          1,
+          0
+        ],
+        "mainBatteries": 2,
+        "secondaryBatteries": 6,
+        "missiles": 6,
+        "antipersonnel": 12,
+        "mode": "ogre",
+        "movementKind": "tread-thresholds",
+        "systemDefinitionRef": "mkV",
+        "damageModel": "system-components-v1",
+        "fireRuleRef": "system-fire-v1",
+        "capabilities": [
+          "move",
+          "select-system-target",
+          "select-weapon",
+          "system-fire",
+          "ram-conventional-vehicle"
+        ]
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "OGRE_SYSTEMS.mkV",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A",
+          "D"
+        ]
+      }
+    },
+    "phantom-platform": {
+      "catalogId": "U21",
+      "legacy": [
+        3,
+        3,
+        3,
+        2,
+        2,
+        "P",
+        "MOBILE PLATFORM"
+      ],
+      "target": {
+        "source": "OGRE_SYSTEMS.ninja",
+        "system": "ninja",
+        "stealth": true,
+        "mode": "ogre",
+        "tread": 30,
+        "movement": [
+          3,
+          2,
+          1,
+          0
+        ],
+        "movementKind": "tread-thresholds",
+        "systemDefinitionRef": "ninja",
+        "damageModel": "system-components-v1",
+        "fireRuleRef": "system-fire-v1",
+        "mainBatteries": 1,
+        "secondaryBatteries": 2,
+        "missiles": 0,
+        "antipersonnel": 4,
+        "capabilities": [
+          "move",
+          "select-system-target",
+          "select-weapon",
+          "system-fire",
+          "stealth"
+        ],
+        "stealthRef": "phantom-stealth-v1"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "OGRE_SYSTEMS.ninja",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A",
+          "D",
+          "E"
+        ]
+      }
+    },
+    "infantry-platoon": {
+      "catalogId": "U22",
+      "legacy": [
+        2,
+        2,
+        1,
+        2,
+        1,
+        "I",
+        "INFANTRY"
+      ],
+      "target": {
+        "source": "Guide/Legacy U22",
+        "attack": 1,
+        "range": 1,
+        "defense": 2,
+        "movement": [
+          2
+        ],
+        "mode": "infantry",
+        "infantry": true,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "infantry-fixed-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire",
+          "embark",
+          "disembark",
+          "passenger-fire"
+        ],
+        "hp": 2,
+        "repairClass": "infantry",
+        "passengerRef": "infantry-passenger-v1"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "Guide/Legacy U22",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "command-core": {
+      "catalogId": "U23",
+      "legacy": [
+        5,
+        5,
+        0,
+        0,
+        0,
+        "X",
+        "FORTIFIED TARGET"
+      ],
+      "target": {
+        "source": "Guide/Legacy U23",
+        "attack": 0,
+        "range": 0,
+        "defense": 5,
+        "movement": [
+          0
+        ],
+        "mode": "fixed",
+        "commandUnit": true,
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "no-fire-v1",
+        "capabilities": [],
+        "hp": 5,
+        "repairClass": "structure"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "Guide/Legacy U23",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "relay-node": {
+      "catalogId": "U24",
+      "legacy": [
+        4,
+        4,
+        0,
+        0,
+        0,
+        "R",
+        "FORTIFIED TARGET"
+      ],
+      "target": {
+        "source": "Guide/Legacy U24",
+        "attack": 0,
+        "range": 0,
+        "defense": 4,
+        "movement": [
+          0
+        ],
+        "mode": "fixed",
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "no-fire-v1",
+        "capabilities": [],
+        "hp": 4,
+        "repairClass": "structure"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "Guide/Legacy U24",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "guard-tank": {
+      "catalogId": "U25",
+      "legacy": [
+        3,
+        3,
+        2,
+        1,
+        1,
+        "G",
+        "HOSTILE ARMOR"
+      ],
+      "target": {
+        "source": "Guide/Legacy U25",
+        "attack": 1,
+        "range": 2,
+        "defense": 3,
+        "movement": [
+          1
+        ],
+        "mode": "tracked",
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire"
+        ],
+        "hp": 3,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "Guide/Legacy U25",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    },
+    "raider-skimmer": {
+      "catalogId": "U26",
+      "legacy": [
+        2,
+        2,
+        2,
+        2,
+        1,
+        "R",
+        "HOVERCRAFT"
+      ],
+      "target": {
+        "source": "Guide/Legacy U26",
+        "attack": 1,
+        "range": 2,
+        "defense": 2,
+        "movement": [
+          2
+        ],
+        "mode": "gev",
+        "infantry": false,
+        "movementKind": "single-budget",
+        "gevPhaseEligible": false,
+        "damageModel": "vehicle-crt-v1",
+        "forceBudgetWeight": 1,
+        "fireRuleRef": "single-fire-v1",
+        "capabilities": [
+          "move",
+          "fire"
+        ],
+        "hp": 2,
+        "repairClass": "vehicle"
+      },
+      "provenance": {
+        "baseGameCommit": "639099155b2c7ab40ea51c786014915aa9d240c4",
+        "baseRegistryPath": "assets/unit-art/rules/unit-profiles.v1.json",
+        "baseTargetSource": "Guide/Legacy U26",
+        "approvedProposalSha256": "44b9e4f473cc3fd83eb41183d1e2e70fd29078875e2f7132995bab6ba70b5d57",
+        "approvedSections": [
+          "A"
+        ]
+      }
+    }
+  }
+}

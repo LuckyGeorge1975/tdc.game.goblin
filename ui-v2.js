@@ -133,8 +133,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         turn:displayed?.turn??turn, phase:shownPhase, turnPhase:shownTurnPhase, gameOver:shownGameOver, objective: structuredClone(objective),
         ready: phase === 'player' && !gameOver ? phaseReadyUnits().length : 0,
         undo: { available: phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },
-        units: roster.map(({ id, name, type, team, x, y, hp, maxHp, visualKey, artilleryFire, artilleryChoice, siegeFireBudget, siegeWeapon, attack, defense, move, range, damage, disabled, embarkedOn, core, infantry, engineering, ogreSystems, transportCapacity, strategicMissile, missilesRemaining }) =>
-          ({ id, name, type, team, x, y, hp, maxHp, visualKey, artilleryChoice, artilleryFire:artilleryFire?structuredClone(artilleryFire):null, siegeWeapon, siegeFireBudget:siegeFireBudget?structuredClone(siegeFireBudget):null, disabled: !!disabled, embarkedOn: embarkedOn || null,
+        units: roster.map(({ id, name, type, team, x, y, hp, maxHp, visualKey, catalogId, catalogAssetId, halfUnit, forceBudgetWeight, droneReadyTurn, artilleryFire, artilleryChoice, siegeFireBudget, siegeWeapon, attack, defense, move, range, damage, disabled, embarkedOn, core, infantry, engineering, ogreSystems, transportCapacity, strategicMissile, missilesRemaining }) =>
+          ({ id, name:catalogId?GoblinCatalogRuntime.name({id}):name, type, team, x, y, hp, maxHp, visualKey, catalogId, catalogAssetId, halfUnit, forceBudgetWeight, droneReadyTurn, artilleryChoice, artilleryFire:artilleryFire?structuredClone(artilleryFire):null, siegeWeapon, siegeFireBudget:siegeFireBudget?structuredClone(siegeFireBudget):null, disabled: !!disabled, embarkedOn: embarkedOn || null,
             attack: attack ?? damage ?? null, defense: defense ?? null, move: move ?? null, secondaryMove: movementBudget({id,team,move,gev:isGevUnit(roster.find(item=>item.id===id))},true), range: range ?? null,
             core: !!core, infantry: !!infantry, engineering:!!engineering,
             ogreSystems:ogreSystems ? structuredClone(ogreSystems) : null,
@@ -162,6 +162,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         return { ok: false, reason: t('ui.error.UNSUPPORTED_COMMAND') };
       if (GameDialogs.isOpen()) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       if (phase !== 'player' || gameOver) return { ok: false, reason: t(gameOver ? 'ui.error.GAME_ENDED' : 'ui.error.NOT_ACTIVE_TEAM') };
+      if(globalThis.GoblinCatalogRuntime?.active())return GoblinCatalogRuntime.query(command);
       if (!['Move', 'Ram', 'Fire', 'FireArtillery', 'Embark', 'Unload'].includes(command?.type)) return { ok: false, reason: t('ui.error.UNKNOWN_COMMAND') };
       const actor = units.find(unit => unit.id === command.actorId);
       if (!actor) return { ok: false, reason: t('ui.error.UNIT_NOT_FOUND') };
@@ -788,7 +789,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-map-label').textContent = GoblinLanguage.translate('TACTICAL MAP');
       at('#v2-map-caption').textContent = `${Math.max(...state.cells.map(cell => cell.x)) + 1} × ${Math.max(...state.cells.map(cell => cell.y)) + 1} · ${t('v2.ui.mapPan')}`;
       at('#v2-map').setAttribute('aria-label', `${t('ui.hud.map')}: ${t('v2.ui.selectHex')}`);
-      at('#v2-profile').textContent = state.profile;
+      at('#v2-profile').textContent = state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
       at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
         state.phase === 'enemy' ? t('v2.enemy') : t(`v2.phase.${state.turnPhase}`);
       at('#v2-turn').textContent = `${t('ui.hud.turn',{turn:state.turn})} · ${t('v2.ui.coreHp')} ${state.objective.coreHp}/${state.objective.coreMax}`;
@@ -896,7 +897,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-terrain-label').textContent = t('v2.ui.terrain');
       TerrainDisplay.fillLegend(at('#v2-terrain-list'),
         Array.from({length: H}, (_, y) => Array.from({length: W}, (_, x) => terrainTypeAt(x, y))).flat());
-      at('#v2-profile').textContent = state.profile;
+      at('#v2-profile').textContent = state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
       at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
         view.phaseSkip?.turn === state.turn ? t(view.phaseSkip.key) : t(`phase.${state.turnPhase}.label`);
       at('#v2-turn').textContent = `${t('ui.hud.turn', { turn: state.turn })} · ${state.objective.goalMode === 'core'
@@ -930,7 +931,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const carrier = unit.embarkedOn && state.units.find(item => item.id === unit.embarkedOn);
         const cargo = unit.transportCapacity ? units.find(item => item.id === unit.id) : null;
         button.textContent = `${unit.name} · ${system ? `${t('v2.ui.treads')} ${system.summary.treads}` :
-          `${unit.hp}/${unit.maxHp} ${unit.infantry ? 'SP' : 'HP'}`}${unit.hp <= 0 ? ` · ${t('v2.ui.destroyed')}` : unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}${carrier ? ` · ${t('v2.ui.embarked')} ${carrier.name}` : ''}${cargo ? ` · ${t('v2.ui.cargo')} ${carrierLoad(cargo)}/${unit.transportCapacity}` : ''}${unit.strategicMissile ? ` · ${t('v2.ui.missile')} ${unit.missilesRemaining}` : ''}`;
+          `${unit.hp}/${unit.maxHp} ${unit.infantry ? 'SP' : 'HP'}`}${unit.hp <= 0 ? ` · ${t('v2.ui.destroyed')}` : unit.disabled ? ` · ${t('v2.ui.disabled')}` : ''}${carrier ? ` · ${t('v2.ui.embarked')} ${carrier.name}` : ''}${cargo ? ` · ${t('v2.ui.cargo')} ${unit.catalogId?GoblinCatalogRuntime.loadWeight(unit,state.units):carrierLoad(cargo)}/${unit.transportCapacity}` : ''}${unit.strategicMissile ? ` · ${t('v2.ui.missile')} ${unit.missilesRemaining}` : ''}`;
         addRosterArt(button, unit);
         button.setAttribute('aria-pressed', String(unit.id === view.actorId));
         button.disabled = unit.hp <= 0;
@@ -950,7 +951,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const image = TerrainDisplay.icon(terrainId);
         if (image) line.prepend(image);
         intel.appendChild(line);
+        if(target?.catalogId){const facts=document.createElement('p');facts.textContent=GoblinCatalogRuntime.summary(target,state.units);intel.appendChild(facts);}
       }
+      if(actor?.catalogId){const facts=document.createElement('p');facts.textContent=GoblinCatalogRuntime.summary(actor,state.units);intel.appendChild(facts);}
       renderSystems(state, actor);
       renderLog(state.logEntries);
       let commands = [];
@@ -977,7 +980,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
                 { command: { type: 'Move', actorId: view.actorId, ...view.target }, label: t('v2.ui.move') },
                 ...(runtimeActor?.transportCapacity ? carrierCargo(runtimeActor).map(cargo => ({
                   command: { type: 'Unload', actorId: view.actorId, cargoId: cargo.id, ...view.target },
-                  label: `${t('v2.ui.unload')} · ${cargo.name}`
+                  label: `${globalThis.GoblinCatalogRuntime?.drone(cargo)?t('v2.ui.catalog.deployDrone'):t('v2.ui.unload')} · ${globalThis.GoblinCatalogRuntime?.record(cargo)?GoblinCatalogRuntime.name(cargo):cargo.name}`
                 })) : [])
               ];
       }

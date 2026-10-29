@@ -126,6 +126,8 @@ test('preview distinguishes stationary, skimmer, weapon and spent missile reach'
   assert.equal(profile('GOBLIN SIEGEBREAKER').range,5);
   const liveSkimmer={name:'COMBAT SKIMMER',move:4,range:2};
   context.liveSkimmer=liveSkimmer;
+  assert.equal(vm.runInContext('UnitGuideRange.profile(unitGuideEntries.find(item=>item.name===\'COMBAT SKIMMER\'),liveSkimmer)',context).bonus,0);
+  context.movementBudget=(unit,second)=>second?2:unit.move; // Explicit Legacy provider; display names confer no budget.
   assert.equal(vm.runInContext('UnitGuideRange.profile(unitGuideEntries.find(item=>item.name===\'COMBAT SKIMMER\'),liveSkimmer)',context).bonus,2);
   context.units=[{name:'STRATEGIC MISSILE CARRIER',move:1,range:8,missilesRemaining:0,hp:2,maxHp:2,team:'player',damage:6,defense:2}];
   vm.runInContext("guideIndex=unitGuideEntries.findIndex(item=>item.name==='STRATEGIC MISSILE CARRIER');renderUnitGuide()",context);

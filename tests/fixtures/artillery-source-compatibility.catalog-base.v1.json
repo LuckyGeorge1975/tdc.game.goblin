@@ -1,0 +1,103 @@
+{
+  "version": "artillery-source-compatibility-catalog-base-v1",
+  "baselineCommit": "25ecb818f3c2165ec0f2231962069ceeaf3bd6f3",
+  "scope": "Only declared source provenance differs; original full gameplay/RNG/presentation/event oracle values must match.",
+  "originalTraceDigests": [
+    "3d3131f6d70f820025097d49259ac51dc3e70327686a06d42f5c00f283b0e173",
+    "d6148f6166874d57b36f0b84943fe766d4d4dc8bc86cc595171594093a3263b1"
+  ],
+  "sourcePairs": {
+    "artillery-pilot-runtime.js": {
+      "from": "8930c7ce679d7266efb57b1e305deb7ab53ee636e531156123dc0a4319cd49f5",
+      "to": "8930c7ce679d7266efb57b1e305deb7ab53ee636e531156123dc0a4319cd49f5"
+    },
+    "artillery-spotter-rules.js": {
+      "from": "87c37d1456b79b6ba71856bdb6a177a26b1d49cdab3f72669113ee87b741d3e3",
+      "to": "87c37d1456b79b6ba71856bdb6a177a26b1d49cdab3f72669113ee87b741d3e3"
+    },
+    "assets/unit-art/levels/artillery-pilot.v1.json": {
+      "from": "41779ebe8506fda85f96435b6eedfaa1ac0d4e87f51784ab2d91d14a112dd51f",
+      "to": "41779ebe8506fda85f96435b6eedfaa1ac0d4e87f51784ab2d91d14a112dd51f"
+    },
+    "assets/unit-art/rules/artillery-pilot.v1.js": {
+      "from": "bb3a9f3f68baaad841f72f82a592f016e5de409f87345e6d5598df3af009da6e",
+      "to": "bb3a9f3f68baaad841f72f82a592f016e5de409f87345e6d5598df3af009da6e"
+    },
+    "assets/unit-art/rules/unit-profiles.catalog-approved.v1.json": {
+      "from": null,
+      "to": "644e20c424d94a3ec7f5d942292f7a3ac10384b1604bfeb456c8b1917334096d"
+    },
+    "assets/unit-art/rules/unit-profiles.v1.json": {
+      "from": "0cd763382cfd0ef7019f2f9d84ef7606386f40528c069815607c51df1c8f3d9b",
+      "to": "0cd763382cfd0ef7019f2f9d84ef7606386f40528c069815607c51df1c8f3d9b"
+    },
+    "catalog-base-model.js": {
+      "from": null,
+      "to": "8150cec2cfc544aadeca4b81a1a6a9f1fddafcdeeaf337e36e6e5223ea9b0e98"
+    },
+    "catalog-base-runtime.js": {
+      "from": null,
+      "to": "6f685963726529af8bf19b86651771fda3124ca9de8bad60ac7da9e1173206c5"
+    },
+    "combat-feedback.js": {
+      "from": "beb33697fa37a5fad5392b2b9c3e2a4e8d4a9113d2849d410783f183f68f63ba",
+      "to": "beb33697fa37a5fad5392b2b9c3e2a4e8d4a9113d2849d410783f183f68f63ba"
+    },
+    "command-history.js": {
+      "from": "c99fdaa398508f0cd7ab486532704539fe5adca8b0d982dfb325eeab3b258115",
+      "to": "c99fdaa398508f0cd7ab486532704539fe5adca8b0d982dfb325eeab3b258115"
+    },
+    "game.js": {
+      "from": "19abfbd0b756dc0626c933c245cc7c8c1ee0d221b808f49ac83d94215b336eb8",
+      "to": "a92f187a968f886582d0bfbf0d666d0cb9c4d644068b3886ee4eec9d1cbf866c"
+    },
+    "legacy-presentation.js": {
+      "from": "8822f01070a166247fd72ad720ae52a55c5a6b16a78b1605df246cfb386b63b5",
+      "to": "8822f01070a166247fd72ad720ae52a55c5a6b16a78b1605df246cfb386b63b5"
+    },
+    "legacy-supercover.js": {
+      "from": "9652d1ddcf52cadddbaca01a1dc63f5774ba526fa3446c0de3db9811d07327eb",
+      "to": "9652d1ddcf52cadddbaca01a1dc63f5774ba526fa3446c0de3db9811d07327eb"
+    },
+    "ogre-runtime.js": {
+      "from": "7ae757666dc22d432ea3b97f84fadb0c5c63128a11c3ac4049adb78aeeb02cdb",
+      "to": "7ae757666dc22d432ea3b97f84fadb0c5c63128a11c3ac4049adb78aeeb02cdb"
+    },
+    "presentation-state.js": {
+      "from": "4b12dfc2e11da383c0f5af8ec0a372bd0d78eed688f526d96c8f26765c6c30bc",
+      "to": "4b12dfc2e11da383c0f5af8ec0a372bd0d78eed688f526d96c8f26765c6c30bc"
+    },
+    "scenario-profile-manifest.js": {
+      "from": "3e7819d4f523ebad49d34aaffe997e768d454529551b6cd878133ceb93dd3376",
+      "to": "15aa4fb2e4cea11f1934a5ea761991a172e1eb1c84fd87872c3b39b4b2028845"
+    },
+    "siege-pilot-runtime.js": {
+      "from": "f7be7122102145a185cf08d7551a47729d0252bd16ad9d7a800a76ffbcc7d97f",
+      "to": "f7be7122102145a185cf08d7551a47729d0252bd16ad9d7a800a76ffbcc7d97f"
+    },
+    "siegebreaker-weapons.js": {
+      "from": "5c860345236bfde41c6478668c4ae21207b5f95f597258be1ff6ed5255519eee",
+      "to": "5c860345236bfde41c6478668c4ae21207b5f95f597258be1ff6ed5255519eee"
+    },
+    "strategic-missile.js": {
+      "from": "62c43a49dc9ffc7ac2985448d3f308e3e553457aa20f1dd26cb5af5a9195254e",
+      "to": "62c43a49dc9ffc7ac2985448d3f308e3e553457aa20f1dd26cb5af5a9195254e"
+    },
+    "terrain-rules.js": {
+      "from": "01308c0ea0d9f86db4acdd6585fd486914da83f87b303b1a082ae57cd31b1e48",
+      "to": "01308c0ea0d9f86db4acdd6585fd486914da83f87b303b1a082ae57cd31b1e48"
+    },
+    "tests/artillery-product-harness.mjs": {
+      "from": "b50caa0ebd94f08294f4f451d88d8d27cacb5d8bcf08761b96387152927eef91",
+      "to": "3e286cc45a8cc3c1a807028c0042a2c95b14f67776ff56e6fd142aa3fef2a3c9"
+    },
+    "ui-v2.js": {
+      "from": "b15601d072c0e9e18a6cf5b933f7e9fdeea1ce0cb02ec04884644a7cc4df39ce",
+      "to": "56e51d18fdc646d15295f28647579278ed88a3995f78778b2b8518f8f7c97fc6"
+    },
+    "unit-visuals.js": {
+      "from": "6aa0dd89f050529c7a7862becbe38756860c1608acb11dab545c1e188fe7f8bf",
+      "to": "6aa0dd89f050529c7a7862becbe38756860c1608acb11dab545c1e188fe7f8bf"
+    }
+  }
+}

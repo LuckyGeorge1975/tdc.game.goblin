@@ -9,6 +9,8 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   const losProbe=Object.freeze({id:'los-supercover-probe',scenarioVersion:1,
     objective:'core',ruleProfileId:'LEGACY_SUPERCOVER_PROBE_v1',losMode:'strict-supercover'});
   const entries=Object.freeze({
+    'catalog-transport':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_BASE_TRANSPORT_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'}),
+    'catalog-maneuver':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_BASE_TRANSPORT_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'}),
     'artillery-pilot':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_ARTILLERY_PILOT_v1',unitDataProfile:'artillery-pilot-data-v1',losMode:'strict-supercover'}),
     'siege-pilot':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_SIEGE_PILOT_v1',unitDataProfile:'siege-pilot-data-v1'}),
     'skimmer-pilot':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_SKIMMER_PILOT_v1',unitDataProfile:'skimmer-pilot-data-v1'}),
@@ -25,6 +27,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   });
   function reject(code,message){const error=new Error(`${code}: ${message}`);error.code=code;throw error}
   function validate(id,config){
+    if(['catalog-transport','catalog-maneuver'].includes(id)){if(!globalThis.GoblinCatalogBase)reject('SCENARIO_PROFILE_MISMATCH','Catalog contract unavailable');GoblinCatalogBase.validate(id,config);}
     if(id==='artillery-pilot'){if(!globalThis.GoblinArtilleryPilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinArtilleryPilot.validate(config);}
     if(id==='siege-pilot'){if(!globalThis.GoblinSiegePilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinSiegePilot.validate(config);}
     if(id==='skimmer-pilot'){if(!globalThis.GoblinSkimmerPilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinSkimmerPilot.validate(config);}
@@ -77,6 +80,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         ...(id==='artillery-pilot'?{fireBudgetVersion:source.fireBudgetVersion,sourceDigest:source.sourceDigest}:{}),
         ...(id==='siege-pilot'?{fireBudgetVersion:source.fireBudgetVersion,sourceDigest:source.sourceDigest}:{}),
         ...(id==='skimmer-pilot'?{movement:source.movement,sourceDigest:source.sourceDigest}:{}),
+        ...(globalThis.GoblinCatalogBase?.has(id)?{catalog:source.catalog}:{}),
         unitDataProfile:source.ruleProfile??null,terrain:source.terrain,
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;

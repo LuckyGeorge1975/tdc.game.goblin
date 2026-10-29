@@ -18,7 +18,7 @@ function renderScenarioObjective(){
   const key=`mission.${currentScenario}.objective.short`;
   const translated=globalThis.GoblinLanguage?.t(key);
   $('#mission-sub').textContent=translated&&translated!==key?translated:objectiveFallback[currentScenario]||config.sub||'';
-  if(profile.requiresAllEnemies||['siege-pilot','artillery-pilot'].includes(currentScenario)){
+  if(profile.requiresAllEnemies||['siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver'].includes(currentScenario)){
     const titleKey=`mission.${currentScenario}.title`,title=globalThis.GoblinLanguage?.t(titleKey);
     $('#mission-title').textContent=title&&title!==titleKey?title:config.title;
   }

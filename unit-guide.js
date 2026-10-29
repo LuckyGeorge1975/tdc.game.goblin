@@ -63,7 +63,7 @@ function renderUnitGuide(){
   const v2=globalThis.IronDustBrowserV2?.mode==='ready';
   const unit=unitGuideEntries[guideIndex],live=v2?
     globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.id===unit.coreUnitId):
-    units.find(item=>['skimmer-pilot','siege-pilot','artillery-pilot'].includes(currentScenario)?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
+    units.find(item=>['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver'].includes(currentScenario)?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
   document.querySelector('.guide-information').scrollTop=0;
   document.querySelector('#guide-symbol').textContent=unit.icon;
   document.querySelector('#guide-symbol').classList.toggle('enemy',(live?.team==='enemy')||(!live&&unit.team==='HOSTILE SYSTEM'));
@@ -73,8 +73,9 @@ function renderUnitGuide(){
     live?(live.team==='player'?'FRIENDLY · LIVE':'HOSTILE · LIVE'):unit.team+' · CATALOG';
   document.querySelector('#guide-name').textContent=v2&&live?GoblinLanguage.t(`v2.unit.${live.id}`):unit.name;
   document.querySelector('#guide-role').textContent=v2&&live?GoblinLanguage.t(`v2.ui.type.${live.id}`):unit.role;
-  const liveDrone=unit.name==='ARTILLERY DRONE'&&live;
+  const liveDrone=unit.name==='ARTILLERY DRONE'&&live&&!globalThis.GoblinCatalogRuntime?.record(live);
   document.querySelector('#guide-copy').textContent=v2&&live?GoblinLanguage.t(live.team==='player'?'v2.guide.player':'v2.guide.enemy'):liveDrone?'Field-Test-Regel: Diese Artilleriedrohne kann sich selbstständig bewegen. Die stationäre Katalogregel ist noch nicht aktiv.':unit.copy;
+  if(globalThis.GoblinCatalogRuntime?.record(live))document.querySelector('#guide-copy').textContent=GoblinCatalogRuntime.summary(live);
   if(live?.artilleryFire)document.querySelector('#guide-copy').textContent+=' '+GoblinArtilleryWeapons.summary(live);
   if(live?.siegeFireBudget)document.querySelector('#guide-copy').textContent+=' 2 × A3/R3 + 2 × A1/R1 · '+GoblinSiegeWeapons.summary(live);
   globalThis.UnitGuideVoice.render(unit.name);
@@ -92,7 +93,7 @@ function renderUnitGuide(){
   document.querySelector('#guide-status').textContent=v2?(live?GoblinLanguage.t(live.hp<=0?'v2.ui.destroyed':'v2.guide.live'):GoblinLanguage.t('v2.guide.absent')):live?(live.hp<=0?'DESTROYED':live.disabled?'DISABLED':currentScenario==='atlas-proving-grounds'?'ATLAS · PROTOTYPE STATS':'LIVE IN CURRENT SCENARIO'):'NOT IN CURRENT SCENARIO';
   document.querySelector('#guide-phase-status').textContent=v2?(!live?'—':live.hp<=0?GoblinLanguage.t('v2.ui.destroyed'):live.team==='enemy'?GoblinLanguage.t('v2.ui.hostileAi'):globalThis.IronDustBrowserV2.session.projection.mode==='player'?GoblinLanguage.t('v2.ui.ready'):GoblinLanguage.t('v2.ui.noAction')):!live?'—':live.hp<=0?'DESTROYED':live.team==='enemy'?'HOSTILE AI':phaseCanAct(live)?'READY':live.disabled?'DISABLED':'NO ACTION NOW';
   const list=document.querySelector('#guide-action-list');list.replaceChildren();
-  for(const action of v2?(live&&live.team==='player'?[GoblinLanguage.t('v2.guide.actions')]:[]):liveDrone?['Im Field Test bewegen und fernfeuern','Stationäre Katalogregel: geplant']:guideActions[unit.name]||[]){const item=document.createElement('li');item.textContent=action;list.appendChild(item)}
+  for(const action of v2?(live&&live.team==='player'?[GoblinLanguage.t('v2.guide.actions')]:[]):globalThis.GoblinCatalogRuntime?.record(live)?GoblinCatalogRuntime.actions(live):liveDrone?['Im Field Test bewegen und fernfeuern','Stationäre Katalogregel: geplant']:guideActions[unit.name]||[]){const item=document.createElement('li');item.textContent=action;list.appendChild(item)}
   const inV2Ui=document.body?.classList?.contains('ui-v2-active');
   document.querySelector('#guide-find').disabled=!!(!live||(v2&&!inV2Ui)||(inV2Ui&&(live.hp<=0||!globalThis.GoblinV2Flow?.hasStarted())));
   document.querySelector('#guide-count').textContent=`${String(guideIndex+1).padStart(2,'0')} / ${String(unitGuideEntries.length).padStart(2,'0')}`;
