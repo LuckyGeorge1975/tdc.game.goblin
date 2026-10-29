@@ -78,10 +78,10 @@
     return result;
   }
   function createQueue({now,request,cancel,render,finish,diagnostic=()=>{}}){
-    let queue=[],active=null,frame=null,generation=0,display=null,returnAt=null;
-    function clear(){generation++;if(frame!==null)cancel(frame);frame=null;queue=[];active=null;display=null;returnAt=null;finish(false);}
+    let queue=[],active=null,frame=null,generation=0,display=null,returnAt=null,overlayStart=null;
+    function clear(){generation++;if(frame!==null)cancel(frame);frame=null;queue=[];active=null;display=null;returnAt=null;overlayStart=null;finish(false);}
     function schedule(){if(frame!==null)return;const expected=generation;
-      frame=request(()=>{frame=null;if(expected===generation)tick();});}
+      frame=request(()=>{if(expected!==generation)return;frame=null;tick();});}
     function next(time){
       while(!active&&queue.length){
         const item=queue.shift();
@@ -92,6 +92,7 @@
         if(movement.diagnostic){diagnostic({eventId:event.eventId,...movement});display={state:item.after,sidecar:item.sidecar};continue;}
         if(event.action.animationPreference.mode==='off'||event.kind!=='fire'&&!event.path){display={state:item.after,sidecar:item.sidecar};continue;}
         active={...item,movement,initial,start:time};returnAt=null;
+        if(overlayStart===null)overlayStart=time;
         display={state:event.before,sidecar:item.beforeSidecar};
       }
     }
@@ -106,19 +107,19 @@
         if(active.event.kind==='fire'){
           const fire=root.GoblinFirePresentation.sample(active.movement,elapsed,active.event);
           render({state:fire.state,sidecar:fire.age>=50?active.sidecar:active.beforeSidecar,event:active.event,fire,
-            motion:null,dust:false,overlayOpacity:Math.max(0,1-elapsed/120)});
+            motion:null,dust:false,overlayOpacity:Math.max(0,1-(time-overlayStart)/120)});
           schedule();return;
         }
         render({...display,event:active.event,motion:sample(active.movement,elapsed,active.event.actor.positionBefore,active.initial),
           dust:active.event.action.animationPreference.mode==='high'&&active.movement.kind==='track',
           particles:active.event.action.animationPreference.mode==='high'&&active.movement.kind==='track'?
-            particles(active.movement,elapsed,active.event):[],elapsed,overlayOpacity:Math.max(0,1-elapsed/120)});
+            particles(active.movement,elapsed,active.event):[],elapsed,overlayOpacity:Math.max(0,1-(time-overlayStart)/120)});
         schedule();
       }else if(display){
         if(returnAt===null)returnAt=time;
         const opacity=Math.max(0,Math.min(1,(time-returnAt-100)/120));
         render({...display,event:null,motion:null,dust:false,overlayOpacity:opacity});
-        if(opacity<1)schedule();else{display=null;returnAt=null;finish(true);}
+        if(opacity<1)schedule();else{display=null;returnAt=null;overlayStart=null;finish(true);}
       }
     }
     return Object.freeze({
@@ -155,7 +156,7 @@
       dustGradientId=`goblin-movement-dust-${++dustSequence}`;
     }
     if(layer.parentNode!==map)map.appendChild(layer);
-    const fireStage=value.fire?value.fire.age<120?0:1:null;
+    const fireStage=value.fire?value.fire.age<340?0:1:null;
     if(builtState!==value.state||builtEvent!==value.event||builtFireStage!==fireStage){
     builtFireStage=fireStage;
     builtState=value.state;builtEvent=value.event;actorNode=null;unitNodes=[];depthOrder='';
@@ -167,7 +168,7 @@
       if(moving)actorNode=group;
       group.dataset.movementUnit=unit.id;
       const old=value.fire?.effects.find(effect=>effect.subjectId===unit.id)?.before;
-      const artUnit=old&&old.hp>0&&unit.hp<=0&&value.fire.age<120?old:unit;
+      const artUnit=old&&old.hp>0&&unit.hp<=0&&value.fire.age<340?old:unit;
       if(artUnit.hp<=0)root.UnitVisuals.drawWreck(group,artUnit,c,{ns});
       else{
         root.UnitVisuals.draw(group,artUnit,c,{ns,map:true,color:unit.team==='enemy'?'#ee574d':'#62cadd'});
@@ -179,7 +180,7 @@
         }
       }
       layer.appendChild(group);
-      unitNodes.push({unit,group});
+      unitNodes.push({unit,artUnit,group});
     }
     if(root.M1UnitMarkers){
       const core=root.IronDustBrowserV2?.mode==='ready';
@@ -223,7 +224,7 @@
       }
     }
     effectLayer.replaceChildren();
-    if(value.fire)root.GoblinFirePresentation.paint({value,layer:effectLayer,units:unitNodes,node,ns,id:dustGradientId});
+    if(value.fire)root.GoblinFirePresentation.paint({value,layer:effectLayer,ground:dustLayer,units:unitNodes,node,ns,id:dustGradientId});
     if(publishedState!==value.state){publishedState=value.state;root.dispatchEvent(new Event('goblin-presentation-state'));}
   }
   const queue=createQueue({now:()=>performance.now(),request:fn=>requestAnimationFrame(fn),cancel:id=>cancelAnimationFrame(id),

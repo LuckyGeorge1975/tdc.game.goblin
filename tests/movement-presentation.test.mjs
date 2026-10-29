@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import movement from '../movement-presentation.js';
 import '../fire-anchors.js';
 import '../fire-presentation.js';
+import '../wreck-klassen.js';
 import presentation from '../presentation-state.js';
 import {createCorePresentationObserver} from '../core-presentation.mjs';
 import {createIronDustBrowserSession,dispatchIronDustBrowserAction} from '../iron-dust-browser-v2.mjs';
@@ -147,7 +148,7 @@ function browserScene(runtime='core',team='player'){
     addEventListener:add,dispatchEvent:event=>(listeners.get(event.type)??[]).forEach(fn=>fn(event)),Event:class{constructor(type){this.type=type;}},
     CustomEvent:class{constructor(type,{detail}){this.type=type;this.detail=detail;}},
     MutationObserver:class{constructor(fn){observers.push(fn);}observe(){}}});
-  for(const file of ['presentation-state.js','unit-visuals.js','assets/unit-art/marker-geometry.js','m1-unit-markers.js','fire-anchors.js','fire-presentation.js','movement-presentation.js'])vm.runInContext(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
+  for(const file of ['presentation-state.js','unit-visuals.js','assets/unit-art/marker-geometry.js','m1-unit-markers.js','fire-anchors.js','wreck-klassen.js','fire-presentation.js','movement-presentation.js'])vm.runInContext(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
   const owner=context.GoblinPresentation,unit={id:'a',name:'Guard Tank',visualKey:'guard-tank',team,x:2,y:2,hp:3,maxHp:3};
   const core={id:'core',name:'Command Core',visualKey:'command-core',team:'enemy',x:8,y:2,hp:3,maxHp:3};
   const victory={status:'ongoing',winner:null};
@@ -167,7 +168,17 @@ function browserScene(runtime='core',team='player'){
     const ticket=owner.begin({type:'Fire'},before);
     return owner.confirm(ticket,after,[{result}],[],[{actorId:'a',targetId:'core',result,sourceEventIndex:0}])[0];
   }
-  return {context,owner,map,body,c,move,fire,observers,listeners};
+  function rocket(mode='high',strategic=false,{targetVisual='command-core',passenger=false,result='X'}={}){
+    context.GoblinPresentationPreferences={read:()=>({schemaVersion:1,mode})};
+    const actor={...unit,visualKey:strategic?'strategic-missile-carrier':'rocket-artillery'};
+    const target={...core,visualKey:targetVisual},crew={id:'crew',name:'Infantry',visualKey:'infantry-squad',team:'enemy',x:8,y:2,hp:2,maxHp:2,embarkedOn:'core'};
+    const before={units:[actor,target,...(passenger?[crew]:[])],victory};
+    const after={units:[actor,{...target,hp:result==='X'?0:3,disabled:result==='D'},...(passenger?[{...crew,hp:0}]:[])],victory};
+    const ticket=owner.begin({type:'Fire'},before);
+    const event=owner.confirm(ticket,after,[{result}],[],[{actorId:'a',targetId:'core',result,passengerIds:passenger?['crew']:[],sourceEventIndex:0}])[0];
+    return {event,plan:context.GoblinFirePresentation.plan(event,0)};
+  }
+  return {context,owner,map,body,c,move,fire,rocket,observers,listeners};
 }
 test('dust reference uses scaled cubic ease-out growth/drift, alpha power 1.4 and existing 550ms lifetime',()=>{
   const value=item(),plan=movement.plan(value.event,0),scale=Math.sqrt(3)*34/112;
@@ -332,4 +343,86 @@ test('system loss caption adds one minus to the existing counted locale text, wi
   assert.equal(api.delta({before,after}).label,'−1 Waffen zerstört');
   delete s.context.GoblinLanguage;
   assert.equal(api.delta({before,after}).label,'−1 SYSTEM');
+});
+
+test('rocket trajectory accelerates, lifts/scales in world space, and applies one result only at the final decorative arrival',()=>{
+  const s=browserScene(),{event,plan}=s.rocket('high');
+  assert.equal(plan.rockets.length,3);assert.equal(plan.rockets[1].delay,100);
+  const rocket=plan.rockets[0],pose=s.context.GoblinFirePresentation.rocketPose(rocket,.5);
+  assert.ok(Math.abs(pose.h-1)<1e-12);
+  assert.ok(Math.abs((pose.gx-rocket.start.x)/(rocket.end.x-rocket.start.x)-.3875)<1e-10);
+  assert.ok(Math.abs(pose.size/Math.sqrt(3)/34*112-rocket.apexScale)<1e-10);
+  assert.ok(pose.y<pose.gy);
+  assert.equal(plan.arrival,plan.lastArrival);assert.equal(event.effects.length,1);
+  const enemy=JSON.parse(JSON.stringify(event));enemy.actor.team='enemy';enemy.before.units[0].team='enemy';
+  const enemyPlan=s.context.GoblinFirePresentation.plan(enemy,0);
+  assert.ok(Math.abs(enemyPlan.duration*1.3-plan.duration)<1e-8,'enemy factor covers flight and the entire destruction tail');
+  s.c.advance(plan.shotAt+rocket.flight+51);
+  assert.equal(s.context.GoblinMovement.projectedState().units[1].hp,3,'first decorative impact cannot invent an early partial hit');
+  s.c.advance(200);
+  assert.equal(s.context.GoblinMovement.projectedState().units[1].hp,0);
+  const strategic=browserScene().rocket('normal',true).plan;
+  assert.equal(strategic.rockets.length,1,'actual strategic artwork class is sufficient even without a system weapon key');
+  assert.equal(strategic.rockets[0].bodyLength,42);assert.ok(strategic.rockets[0].flight<=2000);
+});
+
+test('new rocket/destruction snapshots settle identically in both runtimes and every mode, after the complete tail',()=>{
+  for(const runtime of ['core','legacy'])for(const mode of ['high','normal','off']){
+    const s=browserScene(runtime),{event,plan}=s.rocket(mode,true);
+    const canonical=JSON.stringify(s.owner.endState());
+    if(mode==='off'){assert.equal(s.context.GoblinMovement.busy(),false);assert.equal(s.map.querySelector('#goblin-movement-layer'),null);}
+    else{
+      if(mode==='high'){
+        assert.ok(plan.duration>=plan.arrival+3420);
+        s.c.advance(plan.arrival+3000);assert.equal(s.context.GoblinMovement.busy(),true);
+        const layer=s.map.querySelector('#goblin-movement-layer');assert.ok(layer.children.at(-1).children.length>1,'after-smoke still present');
+        s.c.advance(plan.duration-(plan.arrival+3000));
+      }else s.c.advance(plan.duration);
+      s.c.advance(220);
+      assert.equal(s.context.GoblinMovement.busy(),false);assert.equal(s.c.callbacks.size,0);
+      assert.equal(s.map.querySelector('#goblin-movement-layer'),null);
+    }
+    assert.equal(JSON.stringify(s.owner.endState()),canonical);assert.equal(s.owner.events().length,1);
+    assert.equal(s.owner.read().wrecks.length,1);assert.equal(event.effects[0].after.hp,0);
+  }
+});
+
+test('destruction classes retain reference counts; hidden killed cargo gets facts but no fallback image or explosion',()=>{
+  const api=globalThis.GoblinFirePresentation;
+  for(const [key,size,count,debris]of [['infantry-squad',.7,1,6],['guard-tank',1,2,11],['goblin-siegebreaker',1.3,2,11],['command-core',1.7,3,18]]){
+    const value=api.destruction({after:{visualKey:key}});assert.equal(value.size,size);assert.equal(value.detonations,count);assert.equal(value.debris,debris);
+  }
+  const s=browserScene('legacy'),{plan}=s.rocket('high',true,{passenger:true});
+  s.c.advance(plan.arrival+200);
+  const layer=s.map.querySelector('#goblin-movement-layer');
+  assert.ok(!layer.querySelectorAll('.unit-wreck-artwork').some(image=>image.getAttribute('href').includes('infantry-squad')));
+  assert.equal(s.owner.read().wrecks.find(wreck=>wreck.unitId==='crew').cargoRelation.carrierId,'core');
+  const stale=[...s.c.callbacks.values()];s.owner.cancel();s.move();stale.forEach(fn=>fn());
+  assert.equal(s.context.GoblinMovement.read().active.includes('fire-'),false);
+});
+
+test('an old RAF cannot clear the new generation scheduler; overlays never reappear between queued actions',()=>{
+  const s=queue();s.q.enqueue(item());const late=[...s.c.callbacks.values()][0];
+  s.q.clear();s.q.enqueue(item({id:'new'}));late();s.q.enqueue(item({id:'next'}));
+  assert.equal(s.c.callbacks.size,1,'one RAF owner, including after a stale callback');
+  s.c.advance(200);assert.equal(s.frames.at(-1).overlayOpacity,0);
+  s.q.skip();assert.equal(s.frames.at(-1).overlayOpacity,0,'next serial action keeps overlays out');
+  s.q.skip();s.c.advance(100);assert.equal(s.frames.at(-1).overlayOpacity,0);
+  s.c.advance(120);assert.equal(s.q.busy(),false);
+});
+
+test('rocket mode is frozen until the next action; hiding a tab settles the tail and rejects late frames',()=>{
+  const s=browserScene(),{plan}=s.rocket('high',false,{result:'NE'});
+  s.context.GoblinPresentationPreferences.read=()=>({schemaVersion:1,mode:'off'});
+  s.rocket('off',false,{result:'X'});
+  s.c.advance(plan.shotAt+200);
+  assert.equal(s.context.GoblinMovement.read().queued,1);
+  const ground=s.map.querySelector('#goblin-movement-layer').children[0];assert.ok(ground.children.length>0,'running HIGH retains particles');
+  s.c.advance(plan.duration);s.c.advance(220);
+  assert.equal(s.context.GoblinMovement.busy(),false);assert.equal(s.owner.endState().units[1].hp,0);
+  const next=s.rocket('high',true);s.c.advance(next.plan.arrival+1000);
+  const late=[...s.c.callbacks.values()];s.context.document.hidden=true;s.listeners.get('visibilitychange').forEach(fn=>fn());
+  assert.equal(s.context.GoblinMovement.busy(),false);assert.equal(s.map.querySelector('#goblin-movement-layer'),null);
+  s.context.document.hidden=false;s.move();late.forEach(fn=>fn());assert.equal(s.c.callbacks.size,1);
+  assert.equal(s.context.GoblinMovement.read().active.includes('fire-'),false);
 });

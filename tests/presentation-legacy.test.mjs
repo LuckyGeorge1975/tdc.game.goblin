@@ -34,6 +34,7 @@ function scene(enabled=true){
 }
 
 function attachMovement(game){
+  for(const file of ['fire-anchors.js','wreck-klassen.js','fire-presentation.js'])game.run(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'));
   game.run(fs.readFileSync(new URL('../movement-presentation.js',import.meta.url),'utf8'));
   game.run(`globalThis.motionTime=0;globalThis.motionCallbacks=new Map();globalThis.motionId=0;globalThis.motionFrames=[];
     globalThis.motionQueue=GoblinMovementMath.createQueue({now:()=>motionTime,
@@ -202,7 +203,7 @@ test('natural fire settle replaces busy-cached blocked area with the legal autos
 });
 
 test('Legacy strategic splash preserves one launch and per-resolver outcomes, including friendly passengers',()=>{
-  const observed=scene(),control=scene(false);
+  const observed=scene(),control=scene(false);attachMovement(observed);
   const setup="terrain.clear();units.splice(0,units.length,{id:'carrier',visualKey:'strategic-missile-carrier',name:'CARRIER',x:0,y:1,hp:2,maxHp:2,team:'player',strategicMissile:true,missilesRemaining:1,range:8,damage:6},{id:'target',visualKey:'guard-tank',name:'TARGET',x:2,y:3,hp:2,maxHp:2,defense:2,team:'enemy',transportCapacity:3},{id:'passenger',visualKey:'infantry-squad',name:'PASSENGER',x:2,y:3,hp:2,maxHp:2,defense:1,infantry:true,embarkedOn:'target',team:'enemy'},{id:'adjacent',visualKey:'infantry-squad',name:'FRIEND',x:3,y:4,hp:2,maxHp:2,defense:2,team:'player'});setTurnPhase('fire');attack(units[0],units[1])";
   for(const game of [observed,control])game.run(setup);
   assert.equal(observed.state(),control.state());assert.equal(observed.rolls(),control.rolls());
@@ -213,6 +214,14 @@ test('Legacy strategic splash preserves one launch and per-resolver outcomes, in
   assert.equal(fire.effects[1].sourceResultIndex,0);assert.equal(fire.effects[2].sourceResultIndex,1);
   assert.equal(observed.rolls(),fire.sourceResults.length,'passengers use their primary resolver roll without another draw');
   assert.equal(fire.effects[2].after.team,'player');
+  observed.run(`globalThis.rocketPlan=GoblinFirePresentation.plan(GoblinPresentation.events().at(-1).event,0);
+    globalThis.moveFrame=ms=>{motionTime+=ms;const pending=[...motionCallbacks.values()];motionCallbacks.clear();pending.forEach(fn=>fn());};`);
+  assert.equal(observed.run('rocketPlan.rockets.length'),1);
+  assert.ok(observed.run('rocketPlan.duration>=rocketPlan.arrival+3420'));
+  const final=observed.state(),rolls=observed.rolls();
+  observed.run('moveFrame(rocketPlan.arrival+3000)');assert.equal(observed.run('motionQueue.busy()'),true);
+  observed.run('moveFrame(rocketPlan.duration);moveFrame(220)');assert.equal(observed.run('motionQueue.busy()'),false);
+  assert.equal(observed.state(),final);assert.equal(observed.rolls(),rolls);
 });
 
 test('Legacy system losses create no wreck until actual whole-unit destruction, without extra rolls',()=>{
