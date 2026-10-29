@@ -22,7 +22,7 @@ test('nine new-start pairs and the historical Iron Dust pair are authorized',()=
   const entries=vm.runInContext('ScenarioRuleProfiles.entries',context);
   assert.equal(vm.runInContext('ScenarioRuleProfiles.schemaVersion',context),1);
   assert.deepEqual(Object.keys(entries).filter(id=>!['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists','catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists'].includes(id)),ids);
-  for(const id of ['catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists']){assert.equal(entries[id].ruleProfileId,'CATALOG_FULL_CANDIDATE_v1');assert.equal(entries[id].objective,'core-and-escort');}
+  for(const id of ['catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists']){assert.equal(entries[id].ruleProfileId,'FULL_CATALOG_v1');assert.equal(entries[id].objective,'core-and-escort');}
   assert.equal(entries['skimmer-pilot'].ruleProfileId,'CATALOG_SKIMMER_PILOT_v1');
   const validate=validator();
   for(const id of ids){

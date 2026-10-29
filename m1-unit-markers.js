@@ -2,7 +2,7 @@
   const NS='http://www.w3.org/2000/svg';
   const size=34, referenceScale=Math.sqrt(3)*size/112;
   const legacyProfiles=new Set(['FIELD_TEST_LEGACY_v1','FIELD_TEST_LEGACY_v2',
-    'LEGACY_SUPERCOVER_PROBE_v1','FIELD_TEST_SUPERCOVER_v1','CATALOG_ARTILLERY_PILOT_v1','CATALOG_SIEGE_PILOT_v1','CATALOG_SKIMMER_PILOT_v1','CATALOG_BASE_TRANSPORT_v1','CATALOG_SPECIALISTS_v1','CATALOG_FULL_CANDIDATE_v1']);
+    'LEGACY_SUPERCOVER_PROBE_v1','FIELD_TEST_SUPERCOVER_v1','CATALOG_ARTILLERY_PILOT_v1','CATALOG_SIEGE_PILOT_v1','CATALOG_SKIMMER_PILOT_v1','CATALOG_BASE_TRANSPORT_v1','CATALOG_SPECIALISTS_v1','CATALOG_FULL_CANDIDATE_v1','FULL_CATALOG_v1']);
   const lifeDead=u=>root.GoblinUnitLife?root.GoblinUnitLife.dead(u):u?.hp<=0;
   const copy=value=>value==null?null:JSON.parse(JSON.stringify(value));
   const amount=(current,maximum)=>Number.isFinite(current)&&Number.isFinite(maximum)&&maximum>0
@@ -36,8 +36,8 @@
     if(binding.profileId==='CATALOG_ARTILLERY_PILOT_v1'&&(binding.scenarioId!=='artillery-pilot'||session.scenarioVersion!==1||rules.losMode!=='strict-supercover'||rules.fireBudgetVersion!=='artillery-spotter-v1'||rules.sourceDigest!==root.GoblinArtilleryPilot?.digest))return unsupported(binding);
     if(binding.profileId==='CATALOG_BASE_TRANSPORT_v1'&&(!root.GoblinCatalogBase?.has(binding.scenarioId)||session.scenarioVersion!==1||rules.losMode!=='strict-supercover'||rules.catalog?.dataDigest!==root.GoblinCatalogBase.digest||!Object.isFrozen(rules.catalog.records)))return unsupported(binding);
     if(binding.profileId==='CATALOG_SPECIALISTS_v1'&&(!root.GoblinCatalogSpecialistsModel?.has(binding.scenarioId)||session.scenarioVersion!==1||rules.catalog?.dataDigest!==root.GoblinCatalogBase?.digest||rules.catalog?.mechanicsVersion!=='catalog-specialists-mechanics-v1'||!Object.isFrozen(rules.catalog.registry)))return unsupported(binding);
-    if(binding.profileId==='CATALOG_FULL_CANDIDATE_v1'&&(!root.GoblinCatalogFullModel?.has(binding.scenarioId)||rules.catalog?.mechanicsVersion!=='catalog-full-mechanics-v1'||!Object.isFrozen(rules.catalog.registry)))return unsupported(binding);
-    const enemies=(binding.profileId==='CATALOG_FULL_CANDIDATE_v1'?roster:rules.units).filter(unit=>unit.team==='enemy');
+    if(['CATALOG_FULL_CANDIDATE_v1','FULL_CATALOG_v1'].includes(binding.profileId)&&(!root.GoblinCatalogFullModel?.has(binding.scenarioId,binding.profileId)||rules.catalog?.mechanicsVersion!=='catalog-full-mechanics-v1'||!Object.isFrozen(rules.catalog.registry)))return unsupported(binding);
+    const enemies=(['CATALOG_FULL_CANDIDATE_v1','FULL_CATALOG_v1'].includes(binding.profileId)?roster:rules.units).filter(unit=>unit.team==='enemy');
     const members=rules.objective==='core'?enemies.filter(unit=>unit.core):enemies;
     if(!members.length||(rules.objective==='core'&&members.length!==1))return unsupported(binding);
     return snapshot(binding,roster,rules.objective,members.map(unit=>unit.id),outcome);

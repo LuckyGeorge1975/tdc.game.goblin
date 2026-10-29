@@ -1,0 +1,118 @@
+{
+  "version": "catalog-full-admission-v1",
+  "status": "Developer admission checks; independent targeted admission review pending fixed clean commit",
+  "basis": "868a156962e1111648e7c0a7a3e9d8f0071dc292",
+  "profiles": {
+    "public": "FULL_CATALOG_v1",
+    "internal": "CATALOG_FULL_CANDIDATE_v1"
+  },
+  "canonicalDigest": "71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+  "levelPackageDigest": "ff1e209a956dff2cf2ac9c45932e670fec643b0c5451574daf85bb863c5d9c79",
+  "rows": [
+    {
+      "scenarioId": "catalog-full-atlas",
+      "scenarioVersion": 1,
+      "publicProfile": "FULL_CATALOG_v1",
+      "internalProfile": "CATALOG_FULL_CANDIDATE_v1",
+      "objective": "core-and-escort",
+      "objectiveVersion": 1,
+      "unitDataProfile": "catalog-approved-data-v1",
+      "mechanicsVersion": "catalog-full-mechanics-v1",
+      "losMode": "strict-supercover",
+      "canonicalDigest": "71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+      "mechanicsDigest": "daebbd81a5a8a4083af72ab63480a6d60b612285af38146968c8ee1c5d0b1ad0",
+      "levelDigest": "34f248a2199d081718d2ca23661a615e3b557807c5fd36b07b02d6c3d5ca9118",
+      "rosterDigest": "3a48c386173ce8187eb9d7cbf85b07afed1928f44ee983bf343af8a406b083e2",
+      "terrainDigest": "16ac76cca1f68b367eab97b5c5679f512e9505b24d1745d1a711c485b99e0215"
+    },
+    {
+      "scenarioId": "catalog-full-terrain-course",
+      "scenarioVersion": 1,
+      "publicProfile": "FULL_CATALOG_v1",
+      "internalProfile": "CATALOG_FULL_CANDIDATE_v1",
+      "objective": "core-and-escort",
+      "objectiveVersion": 1,
+      "unitDataProfile": "catalog-approved-data-v1",
+      "mechanicsVersion": "catalog-full-mechanics-v1",
+      "losMode": "strict-supercover",
+      "canonicalDigest": "71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+      "mechanicsDigest": "daebbd81a5a8a4083af72ab63480a6d60b612285af38146968c8ee1c5d0b1ad0",
+      "levelDigest": "11514c9d257b4fa910ff796afb7594b0e8cc5fa1b6be2dbd87483b5609e00665",
+      "rosterDigest": "aeaff2178788dfe55c5e303cc6ce279df4b0cfe1dabfa60c1513aefbce3b2633",
+      "terrainDigest": "146ac3458cd52942f0ebce9178e26c8cd7e89ea37c0d619f3cd9df1587fd94c1"
+    },
+    {
+      "scenarioId": "catalog-full-advance",
+      "scenarioVersion": 1,
+      "publicProfile": "FULL_CATALOG_v1",
+      "internalProfile": "CATALOG_FULL_CANDIDATE_v1",
+      "objective": "core-and-escort",
+      "objectiveVersion": 1,
+      "unitDataProfile": "catalog-approved-data-v1",
+      "mechanicsVersion": "catalog-full-mechanics-v1",
+      "losMode": "strict-supercover",
+      "canonicalDigest": "71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+      "mechanicsDigest": "daebbd81a5a8a4083af72ab63480a6d60b612285af38146968c8ee1c5d0b1ad0",
+      "levelDigest": "ea31cc5c33841e4daa9f8051e10f509f7b224cc8ec81fb3695c7ef3ba0fa3c31",
+      "rosterDigest": "b405bd2e26988754052cce693749cd0107d8d711e219df73bd7cff37971b1af2",
+      "terrainDigest": "57839be8b07f314a215faf244d812ce65836de983faf4b8ed94960a4088b3e33"
+    },
+    {
+      "scenarioId": "catalog-full-siege",
+      "scenarioVersion": 1,
+      "publicProfile": "FULL_CATALOG_v1",
+      "internalProfile": "CATALOG_FULL_CANDIDATE_v1",
+      "objective": "core-and-escort",
+      "objectiveVersion": 1,
+      "unitDataProfile": "catalog-approved-data-v1",
+      "mechanicsVersion": "catalog-full-mechanics-v1",
+      "losMode": "strict-supercover",
+      "canonicalDigest": "71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+      "mechanicsDigest": "daebbd81a5a8a4083af72ab63480a6d60b612285af38146968c8ee1c5d0b1ad0",
+      "levelDigest": "b8ab889c01060e17b8afb4b4f4af8586a119b0989ee7c27af64bd306d31ff463",
+      "rosterDigest": "d84c372c20ebd003cfe19f972f5e10cd358a727d2bb101450077d6a2849e75dc",
+      "terrainDigest": "85d41182408c191ac95737ec0297a34901315de5795b72bd4d4d3606081e2c90"
+    },
+    {
+      "scenarioId": "catalog-full-specialists",
+      "scenarioVersion": 1,
+      "publicProfile": "FULL_CATALOG_v1",
+      "internalProfile": "CATALOG_FULL_CANDIDATE_v1",
+      "objective": "core-and-escort",
+      "objectiveVersion": 1,
+      "unitDataProfile": "catalog-approved-data-v1",
+      "mechanicsVersion": "catalog-full-mechanics-v1",
+      "losMode": "strict-supercover",
+      "canonicalDigest": "71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a",
+      "mechanicsDigest": "daebbd81a5a8a4083af72ab63480a6d60b612285af38146968c8ee1c5d0b1ad0",
+      "levelDigest": "b302600fe1849a013cd367439b98a90d96e99b64a8bc3f55fd72f15b10a4fea2",
+      "rosterDigest": "d7c8a533716a8fbd4fa65e04c6966b74b46e584edc41d439d74fbaeb99398bd0",
+      "terrainDigest": "63806eb74bf478660e046aeb62bebd1354b98c52529655ebff0daf388e331b66"
+    }
+  ],
+  "candidateMatrix": {
+    "path": "reports/CATALOG_FULL_MATRIX.json",
+    "sha256": "c7071c31749b9482f680eb73dafb17e93cd86f888525d7b34be9c9fb2559eb84",
+    "profile": "CATALOG_FULL_CANDIDATE_v1",
+    "unchanged": true
+  },
+  "evidence": [
+    "tests/catalog-full-admission.test.mjs",
+    "tests/catalog-full-display-compatibility.test.mjs",
+    "tests/fixtures/catalog-full-activation-source-compatibility.v1.json"
+  ],
+  "comparisonBoundary": "Actual separate Candidate/public execution. Exactly profile fields legacySession.ruleProfileId, legacySession.config.ruleProfileId, presentation.binding.ruleProfileId, individual emitted event.binding.ruleProfileId, wreck.binding.ruleProfileId and markers.binding.profileId are asserted per real profile then compared as the same identity. No other gameplay/state/event/RNG fields stripped; no golden values transformed.",
+  "normalEntry": "V2/default: five public missions without catalogCandidate flag; explicit catalogCandidate=1 selects only internal admission; Classic has no new Full registration; separate IronDust Core unchanged.",
+  "limitations": [
+    "No public Save/import or runtime mode switch.",
+    "No new recordings or changes to15 original fixture bytes/ten Candidate trace digests.",
+    "Prior Candidate26/26 PASS belongs to868a156; public admission needs its own targeted independent addendum.",
+    "No Developer browser/server/preview/push/tag/release or .5 Game integration."
+  ],
+  "developerChecks": {
+    "passed": 42,
+    "failed": 0,
+    "scope": "Targeted admission/loader/model/marker/LOS/historical/source/phase-skip checks; actual dual-context five starts and original Candidate bindings, Move/Undo/Hex/visibility/both waves and complete normal U1 victory. Public and internal event/world/RNG parity; no full680 or26-matrix repeat.",
+    "rootLog": ".tools/catalog-full/activation-final-tests.txt"
+  }
+}

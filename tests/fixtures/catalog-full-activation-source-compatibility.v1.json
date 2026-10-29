@@ -1,0 +1,98 @@
+{
+  "version": "catalog-full-activation-source-compatibility-v1",
+  "baseCommit": "868a156962e1111648e7c0a7a3e9d8f0071dc292",
+  "sourceProvenanceOnly": true,
+  "scope": "Exact new public FULL admission, unchanged explicit internal Candidate execution and narrow UI/profile/cache/checker provenance. Only sources are mapped through accepted868 then display basis; no old profile/session/gameplay/event/history/RNG/log value is transformed.",
+  "originalTraceDigests": [
+    "cb9bb007e76923d134033f4babdc0790169c5c1a1c6df136eaeb2f18c1ffd7f0",
+    "f8140d51ab9816912436d4e71c631681dfca1d602b9f544ca88b0857c736a3e0",
+    "2c58cafd2f102b881c285bfe6a301e24a0950a9f928c577192e8bbbd03943872",
+    "b821bbddf98b1dc17580e741fde3277b1c6e644c6dcc1bcfe499c46527976620",
+    "2439af2d9cf67113005c1129d87b6e98fc93eeae18ac1bdce9b667dc4062c28a",
+    "f361dda1dac460579e517ab053cd03b549ed84deeecf0b5c0828f750ff2331fe",
+    "524faf9e1c01140b1c2b607386012743710237ffb2c96836f8b4e9f2bc92b26a",
+    "ca6291a50313cf7d44ae41b8455f3c2e0ec197424c7f3ed50c282916758d8441",
+    "82aad54da0c340acb3c144e60f8fe1a79c004baac015c712bef7f09389caf2f1",
+    "e8abd5e9939450b92cf782e271554140096b772671171f0f1b83747f3c65297b"
+  ],
+  "originalFixtureSha256": {
+    "artillery-product-traces.v1.json": "14c27d0ff45e6bf1db09db109c5020176f9611f3a2cb197a63930303e98064ec",
+    "catalog-base-product-traces.v1.json.gz": "f1c41110bd4d3ef954672d2be901aa13a7169124efb610277e1da0f201928d68",
+    "catalog-specialists-product-traces.v1.json.gz": "270ed926a36b5dc4dea03d9f7cce88f214d7ea64d90f5195e807c20ecbb53bf5",
+    "catalog-specialists-boundary-traces.v1.json.gz": "7aa9fa3c130562755442d55a3181a1c2118ee1908b76b422e5cd2b431e5c3880",
+    "catalog-full/index.v2.json": "49291ebc27292f5f8fdee531565cbcd7207cb721ed61247d1b1c1fe707d4b99a",
+    "catalog-full/catalog-full-atlas-victory.v2.json.gz": "a6a209e1b339ccc5b50cc1e1fa2af38a26b78d194d421d9a8a8eaa54185ef773",
+    "catalog-full/catalog-full-atlas-defeat.v2.json.gz": "3989e02e0119bc39f8ec3201819308d63dfce01fdceea49479e8d0e797bc78bb",
+    "catalog-full/catalog-full-terrain-course-victory.v2.json.gz": "679ca496dd4f267e91276a416f8cd08b646f57f034a3aabad09a73bca14441d9",
+    "catalog-full/catalog-full-terrain-course-defeat.v2.json.gz": "1d9737156f14e42153cc19a3e4e959305067d8411446366c4e5744b5567d5fda",
+    "catalog-full/catalog-full-advance-victory.v2.json.gz": "4371bf97267a68fc498e84dea2734063d96e5289166487e6a4dba4bcab2c688b",
+    "catalog-full/catalog-full-advance-defeat.v2.json.gz": "88a114cba33dfa2da9b2dee97543fd0f29048e6e0e71c1e48c025ce1f084f471",
+    "catalog-full/catalog-full-siege-victory.v2.json.gz": "6f178f286f3d142df55a0ebf5c978ae1efdfa4a7891c315020788e77ac7fcf4d",
+    "catalog-full/catalog-full-siege-defeat.v2.json.gz": "36f38372bd73cdc88be9c1e581a67859448bbdbde14c9a45719f6e5022a149d5",
+    "catalog-full/catalog-full-specialists-victory.v2.json.gz": "6b868c3c237cf849fd440646c7cca808395a818e69adbdc47cc60c463e124679",
+    "catalog-full/catalog-full-specialists-defeat.v2.json.gz": "7ea2236748bc1c2712d09ab4bff65af3b384714de5add9c7d940cfc9e6475e54"
+  },
+  "providerSha256": "f8ed1369687746c61fbed60de970a5ae3aa8d6806c6a4d795640ba4dc43034ab",
+  "sourcePairs": {
+    "assets/ui-copy/briefing-01.de.json": {
+      "from": "d00e6756720a7562cac0bb90fb51c8d06c7178e3c0d16890519cf9ddefdc910b",
+      "to": "c68e116710af10b92742df2e95d0b96634506d0a2fd34b0458e147df35b44850"
+    },
+    "assets/ui-copy/briefing-01.en.json": {
+      "from": "a08d9a9cd6122cb34731bde03423e14f67a53964f6d71eef09526eea9497c41c",
+      "to": "d94ab93804fc7e7cfb7119505e159599341c849534b459d2b260333ed339f6c0"
+    },
+    "assets/ui-copy/briefing-01.es.json": {
+      "from": "4c46f6a41fda25feb0806fa348358b6fd3905cba66266c2dad539611bdc69770",
+      "to": "5f133ee3c64f8698249b6319a9f352efe492d517a17a298f66945b734cde5f13"
+    },
+    "assets/ui-copy/briefing-01.fr.json": {
+      "from": "a4069a177dc87cd6aa718391d0569c74f9d5d5c761140a692805c2a33c81d1fc",
+      "to": "439a81e26e9ffda398cd37ea61fa3560260d379eda937f8bbb2538921ed31e9d"
+    },
+    "catalog-full-model.js": {
+      "from": "836e5973f0d8368f6f60115989ca2949abc70bb0757ff50f543f53e0935c6527",
+      "to": "04c7bad7d63eb29634f897472a75b5b28b9920baa1561789f4452c117b344289"
+    },
+    "catalog-full-loader.js": {
+      "from": "4b32b1f71c1b7ee84056e9886e64dcd535694b9e193f1ee60fc6a6870ce4223e",
+      "to": "5d2ead899fcf0701fa6d3b83eff31087d41326cd97414365b8ebd79cbd335ec0"
+    },
+    "game.js": {
+      "from": "fecd5b07aed31cc2bb6bbb4be81bcc921371a8c12f0c8d452bafc212dcb3e146",
+      "to": "2e25b97bf92086949e40b1dd20fb9bf6d9253735975802a396c07e70eb95b76f"
+    },
+    "m1-unit-markers.js": {
+      "from": "3a5603e46ac2821e3db462240228cac7ecccdde2fd7b5127d7382f3d54517f85",
+      "to": "d203cec36139b7da0085e1e5c8d1895a34d7d3b3c297813af694851e7951aabd"
+    },
+    "scenario-profile-manifest.js": {
+      "from": "52f9fd31af253997595ba9fafa95bf4bac145cee167c786933d7401b8b1c44ad",
+      "to": "f9be698794dcc2b46de89757e4f2ab6a0de0d810750f988aa25a24a8b9fa87b5"
+    },
+    "ui-v2.js": {
+      "from": "7b8080f6b992d8c25f8614fa9323f99ba9653946e792abb255e340a39a350a91",
+      "to": "ed850dbf8230e9fd2f13f8170c2fb09b0e967036405aea43ac5d68c87ee6201e"
+    },
+    "ui-v2-flow.js": {
+      "from": "29cb417a1721b70b5e8f982e60e0de25d1146bc7503cd97b9b52b2d76ef71646",
+      "to": "db8f475a42287f9e852f11e74ebb61cfc08cf0d9bd1744006015e17c4d714508"
+    },
+    "index.html": {
+      "from": "58c7373afaf3850d12c15765debe550b03242c76023a1cba949f5c5a6ac49ae3",
+      "to": "9572bc1f3710f64cb3142aace722c7820d9564370e14cb91af6b2515cf3d6b8d"
+    },
+    "tests/catalog-full-harness.mjs": {
+      "from": "c43dfe1511ffaf1a70a567af5c6e0c3b3039d54574b301d955e7f25a2ca90801",
+      "to": "02d533db86443c64d2a071c28d585e98285dbf6bacaff0819c098c569c72228b"
+    },
+    "tests/catalog-full-model.test.mjs": {
+      "from": "1c47246e97f38809dbf5dc9401bd70adbac59bd47512a0d7c0fe64b9ddc1f00b",
+      "to": "946e7fda0418763a9f90595d27decc84b1b0d452002ddd989b5660337d02befa"
+    },
+    "tests/helpers/catalog-full-display-fix-source-compatibility.mjs": {
+      "from": "0e37447a86c476bb5092726b734a220438a7b451499ca8b1161a9221ef5a90a1",
+      "to": "c4113ee405c62e7bc0b64e0ebcb4b6adba2ae374cbb8cf8b80bcf82d654dec0d"
+    }
+  }
+}

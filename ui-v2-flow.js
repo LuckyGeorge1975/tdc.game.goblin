@@ -7,7 +7,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     surface.className = 'v2-screen';
     shell.appendChild(surface);
     const t = (key, params) => GoblinLanguage.t(key, params);
-    let missionId = 'iron-dust', started = false, startError = '';
+    const requestedScenario=new URLSearchParams(globalThis.location?.search||'').get('scenario');
+    let missionId = globalThis.GoblinCatalogFullModel?.has(requestedScenario)&&currentScenario===requestedScenario?requestedScenario:'iron-dust', started = false, startError = '';
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
     let libraryIndex = 0, libraryTab = 'values', libraryArtSide = 'own';
     const focusMemory = new Map(), scrollMemory = new Map();
@@ -654,6 +655,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (screen === 'play' && GoblinUIV2.project().gameOver) show('end');
     });
     globalThis.addEventListener('goblin-language-change', () => renderScreen(false));
+    globalThis.addEventListener('goblin-catalog-ready', () => {
+      const requested=new URLSearchParams(globalThis.location?.search||'').get('scenario');
+      if(!started&&GoblinCatalogFullModel.has(requested)&&missionData(requested))missionId=requested;
+      if (screen === 'levels' || screen === 'briefing') renderScreen(false);
+    });
     globalThis.addEventListener('goblin-core-v2-ready', () => {
       if (screen === 'levels' || screen === 'briefing') renderScreen(false);
     });

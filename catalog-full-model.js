@@ -1,10 +1,13 @@
-// Fixed candidate contracts. Activation is separate from the canonical data flag.
+// Fixed public and internal admissions. Canonical data activation flags remain independent.
 (function(root){
- const profile='CATALOG_FULL_CANDIDATE_v1',scope=Object.freeze(Array.from({length:26},(_,i)=>`U${String(i+1).padStart(2,'0')}`));
+ const candidateProfile='CATALOG_FULL_CANDIDATE_v1',publicProfile='FULL_CATALOG_v1',scope=Object.freeze(Array.from({length:26},(_,i)=>`U${String(i+1).padStart(2,'0')}`));
  const stable=v=>v&&typeof v==='object'?(Array.isArray(v)?v.map(stable):Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])]))):v;
  const freeze=v=>{if(v&&typeof v==='object'){Object.values(v).forEach(freeze);Object.freeze(v)}return v};
- let configs=null;
- async function initialize(data,levelData){
+ let configs=null,profile=null;
+ async function initialize(data,levelData,admission){
+  if(!admission||Object.keys(admission).length!==1||!Object.hasOwn(admission,'profile')||![candidateProfile,publicProfile].includes(admission.profile))throw Error('FULL_ADMISSION_REQUIRED');
+  const requestedProfile=admission.profile;
+  if(profile!==null&&profile!==requestedProfile)throw Error('FULL_ADMISSION_CONTEXT');
   await GoblinCatalogBase.initialize(data);data=GoblinCatalogBase.registry;
   if(levelData?.version!=='catalog-full-levels-v1'||levelData.levels?.length!==5)throw Error('FULL_LEVEL_CONTRACT');
   if(await GoblinCatalogBase.hash(levelData)!=='ff1e209a956dff2cf2ac9c45932e670fec643b0c5451574daf85bb863c5d9c79')throw Error('FULL_LEVEL_DIGEST');
@@ -23,11 +26,12 @@
    }
    if(units.filter(u=>u.core).length!==1)throw Error('FULL_CORE_COUNT');
    const catalog={dataVersion:data.dataVersion,dataDigest:GoblinCatalogBase.digest,mechanicsVersion:mechanics.version,mechanicsDigest:await GoblinCatalogBase.hash(mechanics),levelDigest:await GoblinCatalogBase.hash(level),rosterDigest:await GoblinCatalogBase.hash(units),terrainDigest:await GoblinCatalogBase.hash(level.terrain),scope,records,cargo:data.definitions.cargo,registry:data,full:{version:level.version,source:level.source,waves:level.waves,waveTemplates,turnLimit:level.turnLimit}};
-   next[level.id]=freeze({title:level.title,kicker:'G.O.B.L.I.N.',kickerKey:'screen.library.category',sub:'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',scenarioVersion:1,ruleProfileId:profile,ruleProfile:data.dataVersion,objectiveVersion:1,objective:level.objective,losMode:'strict-supercover',catalog,terrain:level.terrain.filter(c=>TerrainRules.coverBonus(c.type)).map(c=>`${c.x},${c.y}`),terrainTypes:level.terrain,units});
+   next[level.id]=freeze({title:level.title,kicker:'G.O.B.L.I.N.',kickerKey:'screen.library.category',sub:'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',scenarioVersion:1,ruleProfileId:requestedProfile,ruleProfile:data.dataVersion,objectiveVersion:1,objective:level.objective,losMode:'strict-supercover',catalog,terrain:level.terrain.filter(c=>TerrainRules.coverBonus(c.type)).map(c=>`${c.x},${c.y}`),terrainTypes:level.terrain,units});
   }
-  configs=freeze(next);return configs;
+  if(profile!==null&&profile!==requestedProfile)throw Error('FULL_ADMISSION_CONTEXT');
+  configs=freeze(next);profile=requestedProfile;return configs;
  }
- const has=id=>!!configs?.[id];
- function validate(id,config){if(!has(id)||JSON.stringify(stable(config))!==JSON.stringify(stable(configs[id])))throw Error('FULL_PROFILE_MISMATCH');return true}
- root.GoblinCatalogFullModel=Object.freeze({profile,scope,initialize,has,validate,get configs(){return configs}});
+ const has=(id,profileId=profile)=>profileId===profile&&!!configs&&Object.hasOwn(configs,id);
+ function validate(id,config){if(!has(id,config?.ruleProfileId)||JSON.stringify(stable(config))!==JSON.stringify(stable(configs[id])))throw Error('FULL_PROFILE_MISMATCH');return true}
+ root.GoblinCatalogFullModel=Object.freeze({candidateProfile,publicProfile,get profile(){return profile},scope,initialize,has,validate,get configs(){return configs}});
 })(globalThis);

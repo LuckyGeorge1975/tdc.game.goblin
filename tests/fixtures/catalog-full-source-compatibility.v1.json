@@ -32,19 +32,19 @@
   "sourcePairs": {
     "assets/ui-copy/briefing-01.de.json": {
       "from": "0e239c8cb1282bc4f170aba31c97e2c4ed5b1f75c03f72afd49d9b1c34fdc8e4",
-      "to": "d00e6756720a7562cac0bb90fb51c8d06c7178e3c0d16890519cf9ddefdc910b"
+      "to": "c68e116710af10b92742df2e95d0b96634506d0a2fd34b0458e147df35b44850"
     },
     "assets/ui-copy/briefing-01.en.json": {
       "from": "dcf46873ebfcbc0bae9d342304a39011a9adf0b3dae0fe8379ab4275d6d9c5be",
-      "to": "a08d9a9cd6122cb34731bde03423e14f67a53964f6d71eef09526eea9497c41c"
+      "to": "d94ab93804fc7e7cfb7119505e159599341c849534b459d2b260333ed339f6c0"
     },
     "assets/ui-copy/briefing-01.es.json": {
       "from": "f8656963d06cbd862fb53ed01a72883b7dd9478755502fc75d63c7ffdc137cce",
-      "to": "4c46f6a41fda25feb0806fa348358b6fd3905cba66266c2dad539611bdc69770"
+      "to": "5f133ee3c64f8698249b6319a9f352efe492d517a17a298f66945b734cde5f13"
     },
     "assets/ui-copy/briefing-01.fr.json": {
       "from": "07666f0aee773a4b9365f859fb36fd6d8944928f9a0872b96b15351363cd3ebc",
-      "to": "a4069a177dc87cd6aa718391d0569c74f9d5d5c761140a692805c2a33c81d1fc"
+      "to": "439a81e26e9ffda398cd37ea61fa3560260d379eda937f8bbb2538921ed31e9d"
     },
     "catalog-base-runtime.js": {
       "from": "460cc3f6349e04aa8affb9fc2b40d1b1755aea3b6b81f744f4cd1cd1f1ceacdd",
@@ -72,11 +72,11 @@
     },
     "game.js": {
       "from": "ff206bd5f10b02c91954532166c2c382d7039a110cec591e9ce672369913b6c9",
-      "to": "fecd5b07aed31cc2bb6bbb4be81bcc921371a8c12f0c8d452bafc212dcb3e146"
+      "to": "2e25b97bf92086949e40b1dd20fb9bf6d9253735975802a396c07e70eb95b76f"
     },
     "index.html": {
       "from": "64eee5846649cfc511d47180ce6ff48a06b1413d276e8b6c7425fcd123789df3",
-      "to": "58c7373afaf3850d12c15765debe550b03242c76023a1cba949f5c5a6ac49ae3"
+      "to": "9572bc1f3710f64cb3142aace722c7820d9564370e14cb91af6b2515cf3d6b8d"
     },
     "legacy-presentation.js": {
       "from": "ff44b4017c3cbddfc61fc075b5c1e77e6a3530ac69f5aac474a2e3255ee98879",
@@ -84,7 +84,7 @@
     },
     "m1-unit-markers.js": {
       "from": "cb7ab991a9e503b46c4500e27bebf1bc50a4032d692d29b21b1370889107c549",
-      "to": "3a5603e46ac2821e3db462240228cac7ecccdde2fd7b5127d7382f3d54517f85"
+      "to": "d203cec36139b7da0085e1e5c8d1895a34d7d3b3c297813af694851e7951aabd"
     },
     "presentation-state.js": {
       "from": "67b2d6a669c8e4b0cfb73a0dd40a0b74f5abd4638a27739fd8e435de94303b7b",
@@ -92,7 +92,7 @@
     },
     "scenario-profile-manifest.js": {
       "from": "f645e63f936c71dca330c48da7f6c4ef45ce15631f776e923e176bcb9b629009",
-      "to": "52f9fd31af253997595ba9fafa95bf4bac145cee167c786933d7401b8b1c44ad"
+      "to": "f9be698794dcc2b46de89757e4f2ab6a0de0d810750f988aa25a24a8b9fa87b5"
     },
     "scenario.js": {
       "from": "1ba1687ddae02d4d3d2cb64380ad6335936bd037768861281d66ecdab76f6573",
@@ -104,7 +104,7 @@
     },
     "ui-v2-flow.js": {
       "from": "01812251a26fe75f4786ed0dfad25d9b199e516a116a6db88876e1edb0e874af",
-      "to": "29cb417a1721b70b5e8f982e60e0de25d1146bc7503cd97b9b52b2d76ef71646"
+      "to": "db8f475a42287f9e852f11e74ebb61cfc08cf0d9bd1744006015e17c4d714508"
     },
     "ui-v2.css": {
       "from": "b5041a59dc10457908a59baceed34c3ee178d0fe5a69960dd6ecc82efab261d1",
@@ -112,7 +112,7 @@
     },
     "ui-v2.js": {
       "from": "84826f2100b5ecb5edb268368bc511de5a975f79d53561dda0ad2f3476926d88",
-      "to": "7b8080f6b992d8c25f8614fa9323f99ba9653946e792abb255e340a39a350a91"
+      "to": "ed850dbf8230e9fd2f13f8170c2fb09b0e967036405aea43ac5d68c87ee6201e"
     },
     "unit-guide-range.js": {
       "from": "108bf81e53d203ed247ebe04ade136f405ecdf72400983f422a350153038981a",
@@ -128,11 +128,11 @@
     },
     "catalog-full-loader.js": {
       "from": null,
-      "to": "4b32b1f71c1b7ee84056e9886e64dcd535694b9e193f1ee60fc6a6870ce4223e"
+      "to": "5d2ead899fcf0701fa6d3b83eff31087d41326cd97414365b8ebd79cbd335ec0"
     },
     "catalog-full-model.js": {
       "from": null,
-      "to": "836e5973f0d8368f6f60115989ca2949abc70bb0757ff50f543f53e0935c6527"
+      "to": "04c7bad7d63eb29634f897472a75b5b28b9920baa1561789f4452c117b344289"
     },
     "catalog-full-runtime.js": {
       "from": null,
@@ -156,11 +156,11 @@
     },
     "tests/catalog-full-harness.mjs": {
       "from": null,
-      "to": "c43dfe1511ffaf1a70a567af5c6e0c3b3039d54574b301d955e7f25a2ca90801"
+      "to": "02d533db86443c64d2a071c28d585e98285dbf6bacaff0819c098c569c72228b"
     },
     "tests/catalog-full-model.test.mjs": {
       "from": null,
-      "to": "1c47246e97f38809dbf5dc9401bd70adbac59bd47512a0d7c0fe64b9ddc1f00b"
+      "to": "946e7fda0418763a9f90595d27decc84b1b0d452002ddd989b5660337d02befa"
     },
     "tests/catalog-full-runtime.test.mjs": {
       "from": null,

@@ -8,7 +8,7 @@ async function model(){
  const c=vm.createContext({crypto:webcrypto,TextEncoder,console});
  for(const p of ['terrain-rules.js','ogre-systems.js','siege-tank-fire-budget.js','artillery-spotter-rules.js','catalog-specialists-fire.js','catalog-base-model.js','catalog-specialists-model.js','catalog-full-model.js','scenario-profile-manifest.js'])vm.runInContext(fs.readFileSync(new URL('../'+p,import.meta.url),'utf8'),c);
  c.data=read('assets/unit-art/rules/unit-profiles.catalog-approved.v1.json');c.levels=read('assets/unit-art/levels/catalog-full-levels.v1.json');
- await vm.runInContext('GoblinCatalogFullModel.initialize(data,levels)',c);return c;
+ await vm.runInContext('GoblinCatalogFullModel.initialize(data,levels,{profile:"CATALOG_FULL_CANDIDATE_v1"})',c);return c;
 }
 test('five fixed full candidates authorize 26 actual classes with Ninja systems and one-shot hex missile',async()=>{
  const c=await model(),configs=JSON.parse(vm.runInContext('JSON.stringify(GoblinCatalogFullModel.configs)',c));

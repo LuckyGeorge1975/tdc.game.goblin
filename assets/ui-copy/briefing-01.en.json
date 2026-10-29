@@ -247,6 +247,7 @@
     "mission.catalog-full-advance.budget": "Use the displayed movement budgets and account for terrain costs.",
     "mission.catalog-full-siege.budget": "Each ready weapon slot has its own fire budget. Check ammunition and readiness.",
     "mission.catalog-full-specialists.budget": "An engineering action replaces movement and fire. Each action shows its cost and your supply.",
-    "v2.full.wave.entries": "Entry hexes in this order: {entries}"
+    "v2.full.wave.entries": "Entry hexes in this order: {entries}",
+    "v2.full.profile": "Full catalog"
   }
 }
