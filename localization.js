@@ -824,6 +824,7 @@
   }
 
   function t(key, params = {}, lang = locale) {
+    key = globalThis.GoblinTrainingModel?.copyKey(key) || key;
     if (key === 'dialog.phaseAdvance.pending') key += params.pendingCount === 0 ? '.none' : params.pendingCount === 1 ? '.one' : '.other';
     const catalogText = contentCatalogs[lang]?.[key];
     const value = templates[key]?.[lang];

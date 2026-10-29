@@ -15,6 +15,11 @@ function renderScenarioObjective(){
   }
   if(globalThis.goblinBootProfileError||globalThis.IronDustBrowserV2?.active)return;
   const config=legacySession.config,profile=victoryProfile(legacySession.effectiveRules);
+  if(globalThis.GoblinTrainingModel?.has(currentScenario)){
+    $('#mission-kicker').textContent=globalThis.GoblinLanguage?.t(config.kickerKey)??config.kicker;
+    $('#mission-title').textContent=globalThis.GoblinLanguage?.t(config.titleKey)??config.title;
+    $('#mission-sub').textContent=globalThis.GoblinLanguage?.t(config.goalKey)??config.sub;return;
+  }
   if(globalThis.GoblinCatalogFullModel?.has(currentScenario)&&config.kickerKey){const kicker=globalThis.GoblinLanguage?.t(config.kickerKey);$('#mission-kicker').textContent=kicker&&kicker!==config.kickerKey?kicker:config.kicker;}
   const key=`mission.${currentScenario}.objective.short`;
   const translated=globalThis.GoblinLanguage?.t(key);

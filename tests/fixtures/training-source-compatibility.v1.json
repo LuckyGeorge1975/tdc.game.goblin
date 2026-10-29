@@ -1,0 +1,133 @@
+{
+  "version": "training-source-compatibility-v1",
+  "baseCommit": "e71e1969c041806c649bb77e656b5ce50bf14e0d",
+  "sourceProvenanceOnly": true,
+  "scope": "Additive fixed Field Test T01-T03 learning and optional exact Legacy Iron Dust advisory. Explicit inert wrappers in Full replay harness. Original World, events, history, RNG, profile bindings and all fixture bytes remain compared without normalization. This maps only the listed source hashes to accepted e71 before the existing chains.",
+  "providerSha256": "f72c1ba8cecceb16bd63b4421d2963cff22f996ce017101ecf2932280b46f36c",
+  "originalTraceDigests": [
+    "3d3131f6d70f820025097d49259ac51dc3e70327686a06d42f5c00f283b0e173",
+    "d6148f6166874d57b36f0b84943fe766d4d4dc8bc86cc595171594093a3263b1",
+    "76467b8d89ce89130d6299f36e511b000a05fdd1d3fa40ca113f0f4bc78b64fd",
+    "85ec0edc41c4a3b8f84856d337947c69cfe7bf66ad840f59467fb5b4e8e8f2e0",
+    "7b926b67d121e352212c4e7a9ca4d15a801aa54a4f259a6cd5d207a31e77ddfd",
+    "22b4c9f8b6fed666570cef25f70a5d2302c9e7bdd77378454a0422289ab12ef1",
+    "75fc2524d213e1b05b542caefe57099b52af974ce312555406f5992bcd8280d5",
+    "f363b26f5e68c2c510e1997ec46a7c860e1ebdf2580f0dc48a169f82be86087a",
+    "8df47d924bc2e73642b379ab309c923a248d5f0703bb05a049169312afbde1a6",
+    "ba7bdafd71e03bbf2cff8ac24b7a7a715f581f109b3cc94f9ce381b3473565ff",
+    "b1023f222438f5f24e83fc23bf088093f8ed1c66a5b7939e9bfb4f5d104d1c3d",
+    "1e49721bc20dcf792443927f6be45356c3af9962e863046e839f65f663d37c29",
+    "2f8c8326f1f2fef605cf97b21724bc31cee42f62db7e37fd6ea7bc0c5dcc4c26",
+    "a6207b191d6d1a76d73c29062f658763ce753f2d65ad50849963fb79cec96dea",
+    "bd4e9a34e37fce6c20005e84642008bbb05995cd6b24149b148d685fde2e6cef",
+    "8258ef2c242038a40a08fc4c1358bd293c0a34fa713b66c83148eacf36159fe5",
+    "ef96512a240c6323a2baf0efee634d6f6a492e8ba0d7f215d496b9a8c2a303d9",
+    "e8cb9acf9b76af82cc4970f2d013f508dbf76954a65dcaf02ee0665648dce5eb",
+    "cb9bb007e76923d134033f4babdc0790169c5c1a1c6df136eaeb2f18c1ffd7f0",
+    "f8140d51ab9816912436d4e71c631681dfca1d602b9f544ca88b0857c736a3e0",
+    "2c58cafd2f102b881c285bfe6a301e24a0950a9f928c577192e8bbbd03943872",
+    "b821bbddf98b1dc17580e741fde3277b1c6e644c6dcc1bcfe499c46527976620",
+    "2439af2d9cf67113005c1129d87b6e98fc93eeae18ac1bdce9b667dc4062c28a",
+    "f361dda1dac460579e517ab053cd03b549ed84deeecf0b5c0828f750ff2331fe",
+    "524faf9e1c01140b1c2b607386012743710237ffb2c96836f8b4e9f2bc92b26a",
+    "ca6291a50313cf7d44ae41b8455f3c2e0ec197424c7f3ed50c282916758d8441",
+    "82aad54da0c340acb3c144e60f8fe1a79c004baac015c712bef7f09389caf2f1",
+    "e8abd5e9939450b92cf782e271554140096b772671171f0f1b83747f3c65297b"
+  ],
+  "originalFixtureSha256": {
+    "artillery-product-traces.v1.json": "14c27d0ff45e6bf1db09db109c5020176f9611f3a2cb197a63930303e98064ec",
+    "catalog-base-product-traces.v1.json.gz": "f1c41110bd4d3ef954672d2be901aa13a7169124efb610277e1da0f201928d68",
+    "catalog-specialists-product-traces.v1.json.gz": "270ed926a36b5dc4dea03d9f7cce88f214d7ea64d90f5195e807c20ecbb53bf5",
+    "catalog-specialists-boundary-traces.v1.json.gz": "7aa9fa3c130562755442d55a3181a1c2118ee1908b76b422e5cd2b431e5c3880",
+    "catalog-full/index.v2.json": "49291ebc27292f5f8fdee531565cbcd7207cb721ed61247d1b1c1fe707d4b99a",
+    "catalog-full/catalog-full-atlas-victory.v2.json.gz": "a6a209e1b339ccc5b50cc1e1fa2af38a26b78d194d421d9a8a8eaa54185ef773",
+    "catalog-full/catalog-full-atlas-defeat.v2.json.gz": "3989e02e0119bc39f8ec3201819308d63dfce01fdceea49479e8d0e797bc78bb",
+    "catalog-full/catalog-full-terrain-course-victory.v2.json.gz": "679ca496dd4f267e91276a416f8cd08b646f57f034a3aabad09a73bca14441d9",
+    "catalog-full/catalog-full-terrain-course-defeat.v2.json.gz": "1d9737156f14e42153cc19a3e4e959305067d8411446366c4e5744b5567d5fda",
+    "catalog-full/catalog-full-advance-victory.v2.json.gz": "4371bf97267a68fc498e84dea2734063d96e5289166487e6a4dba4bcab2c688b",
+    "catalog-full/catalog-full-advance-defeat.v2.json.gz": "88a114cba33dfa2da9b2dee97543fd0f29048e6e0e71c1e48c025ce1f084f471",
+    "catalog-full/catalog-full-siege-victory.v2.json.gz": "6f178f286f3d142df55a0ebf5c978ae1efdfa4a7891c315020788e77ac7fcf4d",
+    "catalog-full/catalog-full-siege-defeat.v2.json.gz": "36f38372bd73cdc88be9c1e581a67859448bbdbde14c9a45719f6e5022a149d5",
+    "catalog-full/catalog-full-specialists-victory.v2.json.gz": "6b868c3c237cf849fd440646c7cca808395a818e69adbdc47cc60c463e124679",
+    "catalog-full/catalog-full-specialists-defeat.v2.json.gz": "7ea2236748bc1c2712d09ab4bff65af3b384714de5add9c7d940cfc9e6475e54"
+  },
+  "sourcePairs": {
+    "assets/ui-copy/briefing-01.de.json": {
+      "from": "c68e116710af10b92742df2e95d0b96634506d0a2fd34b0458e147df35b44850",
+      "to": "9647fb53b846bf1cf47f6d5582da7a6ed38193a94f6bb0d4be40ce07d5c94d97"
+    },
+    "assets/ui-copy/briefing-01.en.json": {
+      "from": "d94ab93804fc7e7cfb7119505e159599341c849534b459d2b260333ed339f6c0",
+      "to": "3ff7714a44d7937f1dc490abec786ad6c7b3367184a1c98a06b3ba8ee1d9b241"
+    },
+    "assets/ui-copy/briefing-01.es.json": {
+      "from": "5f133ee3c64f8698249b6319a9f352efe492d517a17a298f66945b734cde5f13",
+      "to": "f2af319d4c3219dbe44f135b8154727d515205b8a6276fe695cc9ce82d6d676b"
+    },
+    "assets/ui-copy/briefing-01.fr.json": {
+      "from": "439a81e26e9ffda398cd37ea61fa3560260d379eda937f8bbb2538921ed31e9d",
+      "to": "ea580f6e38abaa43b98973dc4507b2c2c9030f55e25cb7d1207630b2752368ab"
+    },
+    "game.js": {
+      "from": "2e25b97bf92086949e40b1dd20fb9bf6d9253735975802a396c07e70eb95b76f",
+      "to": "b1dc46bc7360b3cd54cc878dadb3aec95b89d64e9da63608700331cc8da5f4e0"
+    },
+    "index.html": {
+      "from": "9572bc1f3710f64cb3142aace722c7820d9564370e14cb91af6b2515cf3d6b8d",
+      "to": "8888198ac17be4cb1fe459fcd8500945a89bd0fb884431fa229a082d10ea2378"
+    },
+    "localization.js": {
+      "from": "561bb7721968b420e545039d4465b5f829134506a964288f73954b7b7f8ab278",
+      "to": "1fe3facfde42649d8978615d0f6aaae2acbd592889cd201639e460c7f31a348e"
+    },
+    "m1-unit-markers.js": {
+      "from": "d203cec36139b7da0085e1e5c8d1895a34d7d3b3c297813af694851e7951aabd",
+      "to": "52a4b7ceb1bfaada01ecd996cc6f94580bdd8eb86a05c50e8037bbddde686016"
+    },
+    "scenario-profile-manifest.js": {
+      "from": "f9be698794dcc2b46de89757e4f2ab6a0de0d810750f988aa25a24a8b9fa87b5",
+      "to": "c1d86d5c327e4d7081dfc776697930a9225bbf6644e5fe33a23fb30845dd0b71"
+    },
+    "scenario.js": {
+      "from": "99469e9da976a85cc2a17219a8ece5e9106f18eab3904afd54ca1e119b22f8d5",
+      "to": "d83fb795bce6fb25a62f376c01e0b7c78a225012826e97e75f52714d13d1175d"
+    },
+    "ui-v2-flow.js": {
+      "from": "db8f475a42287f9e852f11e74ebb61cfc08cf0d9bd1744006015e17c4d714508",
+      "to": "71ce91c0e7d40477467fdfbc4f3a9e6167a039a84f791006f996f3b8c248d9dc"
+    },
+    "ui-v2.css": {
+      "from": "3a2f827b69b3576362f72d53a7e73405b56d8263544e34a4cd8471709cac0eb0",
+      "to": "a76dcc9670d908186581a458a79411cc6270b195086b3be1edc08cd081a26463"
+    },
+    "ui-v2.js": {
+      "from": "ed850dbf8230e9fd2f13f8170c2fb09b0e967036405aea43ac5d68c87ee6201e",
+      "to": "76b4620c457b7649ac0cb0e50d2a2e2e0bbd9a7da33e0edc4ca0ca6460f7c697"
+    },
+    "tests/catalog-full-harness.mjs": {
+      "from": "02d533db86443c64d2a071c28d585e98285dbf6bacaff0819c098c569c72228b",
+      "to": "571174979d98e1e56ccfdeb7114b03d3c3428aaa18c6804c6badd33ed5e82bc5"
+    },
+    "tests/scenario-profile-manifest.test.mjs": {
+      "from": "8def1e4c34b8783480cdbc84061f9f8b26539b2f53f5eb4d9814e26b6919afe1",
+      "to": "687f2ce410a767a0f8eb5b1f108df7fd718f425356279af890150dcd2eece4a4"
+    },
+    "tests/helpers/catalog-full-source-compatibility.mjs": {
+      "from": "0167402f5abb2ceea3bd0c99f516994cae96bb0fd6108cce63d0b359d25d8c28",
+      "to": "6a4cc406393feef2927c19c3743d512ea8e23e3f0e662fd093f7036e22b4a6d7"
+    },
+    "tests/helpers/catalog-full-activation-source-compatibility.mjs": {
+      "from": "f8ed1369687746c61fbed60de970a5ae3aa8d6806c6a4d795640ba4dc43034ab",
+      "to": "05afe9b50d9fb454a40322dddc000453684391b276b5c265fc1119e8d9b9564c"
+    }
+  },
+  "addedSources": {
+    "training-director.js": "f0b5064ab6ce484032baf8753afaf1e89c3483eac7b4fd1358ca2c3677561654",
+    "training-model.js": "a231ed676710bc1cacd0625b3e0e2bb4778b76fe9200749e9dc7608e7bc2ae99",
+    "training-runtime.js": "cbaeccbd6b677dde4dc23e0ca7de7b5fddc6b22fc51166d47c006fbced57cbda",
+    "training-loader.js": "eeb1050534244ae0f1a3b195ff18ac48bacef4ad74785ca87306051026b1bf97",
+    "assets/training/levels.v1.json": "8e1c36afb2e687556609cd8f90b3bc3007cb60d3b0d3089243a387277ded44f6",
+    "assets/training/scripts.v1.json": "b01340222318c01e0f4e358454958cd414668e31faa78694bae7a7dd9981d7a0",
+    "tests/training-product-harness.mjs": "dcd2a8561c93dee18e90b1b2c3429b5558df8f4530017976ed84e5b37af6f4e7"
+  }
+}

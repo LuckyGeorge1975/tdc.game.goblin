@@ -5,3 +5,5 @@ assets/unit-art/sets/02-technical-illustration/anchors.json -text whitespace=bla
 assets/unit-art/sets/02-technical-illustration/wreck-classes.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Preserve the byte-bound normal-trace index across Windows and Unix checkouts.
 tests/fixtures/catalog-full/index.v2.json -text
+# Preserve the approved PureDirector contribution byte for byte.
+training-director.js -text whitespace=-blank-at-eol

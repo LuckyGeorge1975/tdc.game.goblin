@@ -7,6 +7,32 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     surface.className = 'v2-screen';
     shell.appendChild(surface);
     const t = (key, params) => GoblinLanguage.t(key, params);
+    const trainingPanel=document.createElement('section');trainingPanel.id='v2-training';trainingPanel.className='v2-card v2-training';trainingPanel.hidden=true;
+    shell.querySelector('.v2-head').after(trainingPanel);
+    function renderTraining(){
+      const v=globalThis.GoblinTrainingRuntime?.view();trainingPanel.hidden=screen!=='play'||!v;
+      document.querySelectorAll('.training-highlight').forEach(node=>node.classList.remove('training-highlight'));
+      if(!v)return;const p=v.progress,step=v.definition.steps.find(s=>s.id===p.stepId),params=Object.fromEntries(Object.entries(step.paramRefs).map(([key,ref])=>[key,v.params[ref]??'']));
+      if(v.definition.mode==='advisory'&&(!step.messageKey||p.status==='abandoned'))trainingPanel.hidden=true;
+      if(trainingPanel.hidden)return;
+      const projection=GoblinUIV2.project(),controls={back:'#v2-undo',phase:'#v2-phase-action',cancel:'#v2-command-cancel',confirm:'#v2-actions button',exit:'#v2-pause'};
+      for(const ref of step.highlightRefs){
+        if(ref.kind==='control'){document.querySelector(controls[ref.ref])?.classList.add('training-highlight');continue}
+        const cells=ref.kind==='region'?v.regions[ref.ref]:projection.units.filter(u=>u.id===v.definition.actorTags[ref.ref]);
+        cells?.forEach(c=>document.querySelector(`#battlefield-map .hex[data-x="${c.x}"][data-y="${c.y}"]`)?.classList.add('training-highlight'));
+      }
+      trainingPanel.replaceChildren();const title=document.createElement('strong');title.textContent=t(v.definition.mode==='advisory'?'ui.nav.missions':'training.learningGoal');
+      const key=p.status==='lesson-failed'?'training.failure.title':p.status==='lesson-complete'?'training.complete.title':p.recoveryOffered?'training.recovery':step.messageKey;
+      trainingPanel.append(title,paragraph(t(key,params)));
+      if(p.stepId==='terrain'&&v.params['query:cost']!=='')trainingPanel.append(paragraph(t('training.moveCost',{cost:v.params['query:cost'],available:v.params['query:available']})));
+      if(['infantry','practice'].includes(p.stepId))trainingPanel.append(paragraph(t('training.confirmMove',{region:v.params['region:practice']})));
+      if(p.status==='ready-for-debrief')trainingPanel.append(paragraph(t('training.debrief.skills',{skills:t(`mission.${currentScenario}.objective.short`)})));
+      const row=actions(button(t('training.repeatInstruction'),()=>GoblinTrainingRuntime.ack('repeat')));
+      if(step.category==='instruction'&&step.completeWhen?.op==='uiFact'&&step.completeWhen.type==='acknowledgeInstruction'||step.category==='explanation')row.append(button(t('ui.dialog.confirm'),()=>GoblinTrainingRuntime.ack()));
+      if(p.status==='ready-for-debrief')row.append(button(t('training.debrief.confirm'),async()=>{const binding=p.binding.sessionId,sequence=p.sequence;const accepted=await GameDialogs.confirm({id:'training-debrief',title:t('training.debrief.title'),message:t('training.readyForDebrief'),acceptLabel:t('training.debrief.confirm'),cancelLabel:t('ui.dialog.cancel')});const current=GoblinTrainingRuntime.view()?.progress;if(accepted&&current?.binding.sessionId===binding&&current.sequence===sequence){GoblinTrainingRuntime.ack('debrief');GoblinUIV2.refresh()}},'primary'));
+      if(v.definition.mode==='advisory')row.append(button(t('ui.dialog.cancel'),()=>GoblinTrainingRuntime.setAdvisory(false)));
+      else row.append(button(t('training.restartLesson'),confirmRestart),button(t('training.exit'),goToLevels));trainingPanel.append(row);
+    }
     const requestedScenario=new URLSearchParams(globalThis.location?.search||'').get('scenario');
     let missionId = globalThis.GoblinCatalogFullModel?.has(requestedScenario)&&currentScenario===requestedScenario?requestedScenario:'iron-dust', started = false, startError = '';
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
@@ -167,6 +193,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         globalThis.GoblinMovement?.clear();
       }
       screen = next;
+      renderTraining();
       const overlay = next !== 'play';
       document.body.classList.toggle('v2-screen-open', overlay);
       surface.hidden = !overlay;
@@ -217,13 +244,15 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     async function goToLevels() {
       if (GameDialogs.isOpen()) return;
+      const training=globalThis.GoblinTrainingRuntime?.view()?.definition.mode==='learning';
       if (screen === 'pause' || screen === 'end' || screen === 'play') {
         const accepted = await GameDialogs.confirm({
           id: 'v2-flow-leave', title: t('dialog.changeMission.title'),
-          message: t('ui.dialog.leaveMission.body'),
+          message: t(training?'training.exitConfirm':'ui.dialog.leaveMission.body'),
           acceptLabel: t('dialog.changeMission.confirm'), cancelLabel: t('dialog.changeMission.cancel')
         });
         if (!accepted) { renderScreen(false); return; }
+        if(training)GoblinTrainingRuntime.ack('exit');
         if (globalThis.IronDustBrowserV2?.mode === 'ready') {
           IronDustBrowserV2.stop();
           loadScenario('iron-dust');
@@ -512,6 +541,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             button(t('ui.details.units'), () => openSection('catalog')),
             button(t('ui.nav.settings'), () => openSection('options'))));
       } else if (screen === 'end') {
+        const training=globalThis.GoblinTrainingRuntime?.view();
+        if(training?.definition.mode==='learning'){
+          const complete=training.progress.status==='lesson-complete';
+          panel.append(heading(t(complete?'training.complete.title':'training.failure.title')),paragraph(t(`mission.${state.scenario}.objective.short`)),actions(button(t('training.restartLesson'),confirmRestart),button(t('training.exit'),goToLevels)));
+          if(complete&&training.next)panel.append(actions(button(t('training.nextLesson'),()=>{missionId=training.next;show('briefing')},'primary')));
+        }else{
         const won = state.objective.outcome === true;
         panel.append(heading(t(won ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title')),
           paragraph(t(won && state.scenario === 'iron-dust-v2' ? 'v2.win' : won ? `mission.${state.scenario}.end.victory` : globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.playerAlive?'v2.full.limit.defeat':'screen.missionEnd.defeat.allUnits')),
@@ -519,6 +554,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           actions(button(t('screen.missionEnd.action.retry'), confirmRestart, 'primary'),
             button(t('screen.missionEnd.action.chooseMission'), goToLevels),
             button(t('screen.missionEnd.action.log'), () => show('log'))));
+        }
       } else if (screen === 'log') {
         panel.append(heading(t('screen.missionEnd.action.log')));
         const entries = document.createElement('div'); entries.className = 'v2-screen-log';
@@ -655,6 +691,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (screen === 'play' && GoblinUIV2.project().gameOver) show('end');
     });
     globalThis.addEventListener('goblin-language-change', () => renderScreen(false));
+    globalThis.addEventListener('goblin-language-change',renderTraining);
+    globalThis.addEventListener('goblin-training-change',renderTraining);
+    globalThis.addEventListener('goblin-v2-render',renderTraining);
+    globalThis.addEventListener('goblin-training-ready',()=>{if(['levels','briefing'].includes(screen))renderScreen(false)});
     globalThis.addEventListener('goblin-catalog-ready', () => {
       const requested=new URLSearchParams(globalThis.location?.search||'').get('scenario');
       if(!started&&GoblinCatalogFullModel.has(requested)&&missionData(requested))missionId=requested;

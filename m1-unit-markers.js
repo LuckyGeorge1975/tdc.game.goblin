@@ -28,6 +28,10 @@
     const binding={scenarioId:session?.scenarioId,profileId:session?.ruleProfileId,
       sessionId:session?.sessionId,revision};
     const rules=session?.effectiveRules;
+    if(Object.isFrozen(session)&&Object.isFrozen(rules)&&binding.profileId==='TRAINING_FIELD_TEST_v1'&&
+        root.GoblinTrainingModel?.has(binding.scenarioId)&&session.scenarioVersion===1&&rules.objective==='learning'&&
+        rules.objectiveVersion===1&&rules.unitDataProfile==='training-field-test-data-v1'&&rules.losMode==='legacy-pixel-los-v1'&&
+        rules.training?.definition?.binding.scenarioId===binding.scenarioId)return snapshot(binding,roster,'learning',[],null);
     if(!Object.isFrozen(session)||!Object.isFrozen(rules)||!legacyProfiles.has(binding.profileId)||
         rules?.objectiveVersion!==1||!['core','core-and-escort'].includes(rules.objective)||
         !Array.isArray(rules.units))return unsupported(binding);

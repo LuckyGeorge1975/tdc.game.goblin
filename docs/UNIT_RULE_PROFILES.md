@@ -1,8 +1,8 @@
 # Versionierte Einheitenprofile
 
-## Aktueller Profilüberblick – 29.10.2026
+## Aktueller Profilüberblick – 30.10.2026
 
-Der aktuelle lokale Implementierungsstand trennt öffentliche **FULL_CATALOG_v1**-Zulassung und interne **CATALOG_FULL_CANDIDATE_v1**-Belege. Der Kandidat wurde auf `868a156` unabhängig 26/26 geprüft; der neue FULL-Einstieg benötigt den gezielten Admissionnachtrag auf seinem festen Commit. Dies ist kein neuer öffentlicher Releasebeleg.
+Der aktuelle lokale Implementierungsstand trennt öffentliche **FULL_CATALOG_v1**-Zulassung und interne **CATALOG_FULL_CANDIDATE_v1**-Belege. Der Kandidat wurde auf `868a156` unabhängig 26/26 geprüft; der FULL-Einstieg wurde auf `e71e1969` anschließend unabhängig abgenommen und als lokaler Snapshot bereitgestellt. Dies ist kein neuer öffentlicher Releasebeleg.
 
 Für beide Profile gelten dieselben fünf exakt gebundenen Szenarien, jeweils scenarioVersion 1 / objectiveVersion 1, core-and-escort, catalog-approved-data-v1, catalog-full-mechanics-v1 und strict-supercover:
 
@@ -18,7 +18,7 @@ Kanonischer Datendigest 71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b1
 
 Im FULL-Profil sind die angenommenen A–G-Familien angebunden: kanonische Klassen-/Bewegungs-/SP-/Frachtwerte, getrennte System-/Waffenslots, Pionieraktionen, Split-/AP-/Spotterfeuer, Tarn-/Sensor-/Kollisionsprojektion, freie Hexrakete und feste Verstärkungen/Limit der jeweiligen Mission. Aussagen unten wie „Split fehlt“, pauschaler Skimmer-Zusatzschritt 2 oder fehlendes Engineering/Hexfeuer/Wellen beziehen sich ausschließlich auf den jeweils historischen Legacy-/Pilotstand, **nicht** auf den aktuellen Vollkatalog. Keine dieser früheren Missionen wird rückwirkend auf neue Regeln umgestellt.
 
-Normales V2 lädt die FULL-Paare ohne Kandidatenflag, intern bleibt die explizite Candidatezulassung verfügbar. Classic und der separate IronDust-Corepfad erhalten keine stillen FULL-Regeln. Trainingsprofile T01–T03 sind noch nicht implementiert und erhalten ihren eigenen späteren .5-Nachtrag.
+Normales V2 lädt die FULL-Paare ohne Kandidatenflag, intern bleibt die explizite Candidatezulassung verfügbar. Classic und der separate IronDust-Corepfad erhalten keine stillen FULL-Regeln. Die drei festen Lernprofile T01–T03 verwenden separat `TRAINING_FIELD_TEST_v1` mit den ursprünglichen Feldtestwerten und dem Lernziel `learning`. Sie erhalten keine FULL-Regeln. Gebündelter Implementierungs- und Prüfstand: [Training-Handoff](../reports/TRAINING_HANDOFF.md); unabhängige Produktabnahme steht aus.
 
 ## Historische und profilgebundene Referenzabschnitte
 

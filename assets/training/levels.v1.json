@@ -1,0 +1,290 @@
+{
+  "version": "training-levels-v1",
+  "authority": {
+    "contractSha256": "88a2a9dde0ea9c9b4db347e09bd42d59fe2410abd8fcec0e07e1a0fcbec9b13b",
+    "contentPin": "2fdce6ac1be30e8b2a360250b37724586469e71c",
+    "status": "authored candidate; actual query/route checks required before delivery"
+  },
+  "levels": [
+    {
+      "id": "training-t01",
+      "seed": 37093377,
+      "titleKey": "training.t01.title",
+      "goalKey": "training.t01.goal",
+      "next": "training-t02",
+      "units": [
+        {
+          "id": "training-t01-tank",
+          "visualKey": "assault-tank",
+          "name": "ASSAULT TANK",
+          "type": "FRONTLINE ARMOR",
+          "team": "player",
+          "x": 1,
+          "y": 3,
+          "hp": 3,
+          "maxHp": 3,
+          "defense": 3,
+          "range": 2,
+          "move": 3,
+          "damage": 4,
+          "icon": "H",
+          "movementMode": "tracked"
+        },
+        {
+          "id": "training-t01-infantry",
+          "visualKey": "infantry-platoon",
+          "name": "INFANTRY PLATOON",
+          "type": "MOBILE INFANTRY",
+          "team": "player",
+          "x": 1,
+          "y": 5,
+          "hp": 2,
+          "maxHp": 2,
+          "defense": 2,
+          "range": 1,
+          "move": 2,
+          "damage": 1,
+          "icon": "I",
+          "infantry": true,
+          "movementMode": "infantry"
+        }
+      ],
+      "terrain": [],
+      "regions": {
+        "goal": [
+          {
+            "x": 3,
+            "y": 3
+          }
+        ],
+        "practice": [
+          {
+            "x": 2,
+            "y": 5
+          },
+          {
+            "x": 3,
+            "y": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "training-t02",
+      "seed": 37093378,
+      "titleKey": "training.t02.title",
+      "goalKey": "training.t02.goal",
+      "next": "training-t03",
+      "units": [
+        {
+          "id": "training-t02-tank",
+          "visualKey": "assault-tank",
+          "name": "ASSAULT TANK",
+          "type": "FRONTLINE ARMOR",
+          "team": "player",
+          "x": 1,
+          "y": 3,
+          "hp": 3,
+          "maxHp": 3,
+          "defense": 3,
+          "range": 2,
+          "move": 3,
+          "damage": 4,
+          "icon": "H",
+          "movementMode": "tracked"
+        },
+        {
+          "id": "training-t02-infantry",
+          "visualKey": "infantry-platoon",
+          "name": "INFANTRY PLATOON",
+          "type": "MOBILE INFANTRY",
+          "team": "player",
+          "x": 1,
+          "y": 5,
+          "hp": 2,
+          "maxHp": 2,
+          "defense": 2,
+          "range": 1,
+          "move": 2,
+          "damage": 1,
+          "icon": "I",
+          "infantry": true,
+          "movementMode": "infantry"
+        },
+        {
+          "id": "training-t02-hostile",
+          "visualKey": "guard-tank",
+          "name": "GUARD TANK",
+          "type": "HOSTILE ARMOR",
+          "team": "enemy",
+          "x": 5,
+          "y": 3,
+          "hp": 3,
+          "maxHp": 3,
+          "defense": 3,
+          "range": 2,
+          "move": 1,
+          "damage": 1,
+          "icon": "G",
+          "movementMode": "tracked"
+        }
+      ],
+      "terrain": [],
+      "regions": {
+        "goal": [
+          {
+            "x": 3,
+            "y": 3
+          }
+        ],
+        "practice": [
+          {
+            "x": 2,
+            "y": 5
+          },
+          {
+            "x": 3,
+            "y": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "training-t03",
+      "seed": 37093379,
+      "titleKey": "training.t03.title",
+      "goalKey": "training.t03.goal",
+      "next": "iron-dust",
+      "units": [
+        {
+          "id": "training-t03-tank",
+          "visualKey": "assault-tank",
+          "name": "ASSAULT TANK",
+          "type": "FRONTLINE ARMOR",
+          "team": "player",
+          "x": 1,
+          "y": 3,
+          "hp": 3,
+          "maxHp": 3,
+          "defense": 3,
+          "range": 2,
+          "move": 3,
+          "damage": 4,
+          "icon": "H",
+          "movementMode": "tracked"
+        },
+        {
+          "id": "training-t03-infantry",
+          "visualKey": "infantry-platoon",
+          "name": "INFANTRY PLATOON",
+          "type": "MOBILE INFANTRY",
+          "team": "player",
+          "x": 1,
+          "y": 5,
+          "hp": 2,
+          "maxHp": 2,
+          "defense": 2,
+          "range": 1,
+          "move": 2,
+          "damage": 1,
+          "icon": "I",
+          "infantry": true,
+          "movementMode": "infantry"
+        },
+        {
+          "id": "training-t03-hostile",
+          "visualKey": "guard-tank",
+          "name": "GUARD TANK",
+          "type": "HOSTILE ARMOR",
+          "team": "enemy",
+          "x": 5,
+          "y": 3,
+          "hp": 3,
+          "maxHp": 3,
+          "defense": 3,
+          "range": 2,
+          "move": 1,
+          "damage": 1,
+          "icon": "G",
+          "movementMode": "tracked"
+        }
+      ],
+      "terrain": [
+        {
+          "x": 2,
+          "y": 3,
+          "type": "rubble-field"
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "type": "forest"
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "type": "rubble-field"
+        },
+        {
+          "x": 5,
+          "y": 2,
+          "type": "rubble-field"
+        },
+        {
+          "x": 6,
+          "y": 2,
+          "type": "rubble-field"
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "type": "rubble-field"
+        },
+        {
+          "x": 6,
+          "y": 4,
+          "type": "rubble-field"
+        },
+        {
+          "x": 5,
+          "y": 4,
+          "type": "rubble-field"
+        }
+      ],
+      "regions": {
+        "goal": [
+          {
+            "x": 3,
+            "y": 3
+          }
+        ],
+        "practice": [
+          {
+            "x": 2,
+            "y": 5
+          },
+          {
+            "x": 3,
+            "y": 5
+          }
+        ],
+        "openFire": [
+          {
+            "x": 4,
+            "y": 3
+          },
+          {
+            "x": 5,
+            "y": 2
+          }
+        ],
+        "terrain": [
+          {
+            "x": 2,
+            "y": 3
+          }
+        ]
+      }
+    }
+  ]
+}

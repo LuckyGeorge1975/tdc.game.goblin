@@ -1,0 +1,389 @@
+{
+  "sourceSha256": "4b08f7f861494d77044a1cf4ba28fd58fa56268ed1e171f9c6ab7deb9f8f9a13",
+  "locales": {
+    "de": {
+      "sha256": "bf9b50ee706154e7998583fdddaabbea6b51b47274af028fa7f97f8764131f6a",
+      "placeholders": {
+        "training.label": [],
+        "training.learningGoal": [],
+        "training.t01.title": [],
+        "training.t01.goal": [],
+        "training.t02.title": [],
+        "training.t02.goal": [],
+        "training.t03.title": [],
+        "training.t03.goal": [],
+        "training.intro": [],
+        "training.selectActor": [
+          "unit"
+        ],
+        "training.previewMove": [],
+        "training.cancelIntent": [
+          "cancel"
+        ],
+        "training.confirmMove": [
+          "region"
+        ],
+        "training.undoMove": [
+          "back"
+        ],
+        "training.repeatMove": [
+          "region",
+          "unit"
+        ],
+        "training.infantryPractice": [
+          "unit"
+        ],
+        "training.moveCost": [
+          "available",
+          "cost"
+        ],
+        "training.enterPhase": [
+          "phase"
+        ],
+        "training.inspectShot": [
+          "attack",
+          "defense",
+          "range",
+          "target",
+          "unit"
+        ],
+        "training.confirmShot": [],
+        "training.shotResult": [
+          "effect",
+          "result"
+        ],
+        "training.result.ne": [],
+        "training.result.d": [],
+        "training.result.x": [],
+        "training.advanceRound": [],
+        "training.roundComplete": [
+          "phase"
+        ],
+        "training.inspectTerrain": [],
+        "training.coverPreview": [
+          "defense"
+        ],
+        "training.blockedSight": [],
+        "training.alternative": [],
+        "training.recovery": [
+          "back",
+          "reason"
+        ],
+        "training.undoUnavailable": [],
+        "training.requiredActorLost": [
+          "unit"
+        ],
+        "training.failure.title": [],
+        "training.scriptFailure": [],
+        "training.readyForDebrief": [],
+        "training.debrief.title": [],
+        "training.debrief.skills": [
+          "skills"
+        ],
+        "training.debrief.confirm": [],
+        "training.complete.title": [],
+        "training.nextLesson": [],
+        "training.restartLesson": [],
+        "training.exit": [],
+        "training.exitConfirm": [],
+        "training.repeatInstruction": [],
+        "training.normalIntro": [
+          "objective"
+        ],
+        "training.normalHint": [
+          "phase",
+          "remaining",
+          "unit"
+        ]
+      }
+    },
+    "en": {
+      "sha256": "09e77cd12fbdd4e5c78a38866189923e4b12c44c7a86aabce77400681d6447ec",
+      "placeholders": {
+        "training.label": [],
+        "training.learningGoal": [],
+        "training.t01.title": [],
+        "training.t01.goal": [],
+        "training.t02.title": [],
+        "training.t02.goal": [],
+        "training.t03.title": [],
+        "training.t03.goal": [],
+        "training.intro": [],
+        "training.selectActor": [
+          "unit"
+        ],
+        "training.previewMove": [],
+        "training.cancelIntent": [
+          "cancel"
+        ],
+        "training.confirmMove": [
+          "region"
+        ],
+        "training.undoMove": [
+          "back"
+        ],
+        "training.repeatMove": [
+          "region",
+          "unit"
+        ],
+        "training.infantryPractice": [
+          "unit"
+        ],
+        "training.moveCost": [
+          "available",
+          "cost"
+        ],
+        "training.enterPhase": [
+          "phase"
+        ],
+        "training.inspectShot": [
+          "attack",
+          "defense",
+          "range",
+          "target",
+          "unit"
+        ],
+        "training.confirmShot": [],
+        "training.shotResult": [
+          "effect",
+          "result"
+        ],
+        "training.result.ne": [],
+        "training.result.d": [],
+        "training.result.x": [],
+        "training.advanceRound": [],
+        "training.roundComplete": [
+          "phase"
+        ],
+        "training.inspectTerrain": [],
+        "training.coverPreview": [
+          "defense"
+        ],
+        "training.blockedSight": [],
+        "training.alternative": [],
+        "training.recovery": [
+          "back",
+          "reason"
+        ],
+        "training.undoUnavailable": [],
+        "training.requiredActorLost": [
+          "unit"
+        ],
+        "training.failure.title": [],
+        "training.scriptFailure": [],
+        "training.readyForDebrief": [],
+        "training.debrief.title": [],
+        "training.debrief.skills": [
+          "skills"
+        ],
+        "training.debrief.confirm": [],
+        "training.complete.title": [],
+        "training.nextLesson": [],
+        "training.restartLesson": [],
+        "training.exit": [],
+        "training.exitConfirm": [],
+        "training.repeatInstruction": [],
+        "training.normalIntro": [
+          "objective"
+        ],
+        "training.normalHint": [
+          "phase",
+          "remaining",
+          "unit"
+        ]
+      }
+    },
+    "es": {
+      "sha256": "1c3df923fd2036626d749754475f689779ecdf91822fc202fc68af09e32a68d6",
+      "placeholders": {
+        "training.label": [],
+        "training.learningGoal": [],
+        "training.t01.title": [],
+        "training.t01.goal": [],
+        "training.t02.title": [],
+        "training.t02.goal": [],
+        "training.t03.title": [],
+        "training.t03.goal": [],
+        "training.intro": [],
+        "training.selectActor": [
+          "unit"
+        ],
+        "training.previewMove": [],
+        "training.cancelIntent": [
+          "cancel"
+        ],
+        "training.confirmMove": [
+          "region"
+        ],
+        "training.undoMove": [
+          "back"
+        ],
+        "training.repeatMove": [
+          "region",
+          "unit"
+        ],
+        "training.infantryPractice": [
+          "unit"
+        ],
+        "training.moveCost": [
+          "available",
+          "cost"
+        ],
+        "training.enterPhase": [
+          "phase"
+        ],
+        "training.inspectShot": [
+          "attack",
+          "defense",
+          "range",
+          "target",
+          "unit"
+        ],
+        "training.confirmShot": [],
+        "training.shotResult": [
+          "effect",
+          "result"
+        ],
+        "training.result.ne": [],
+        "training.result.d": [],
+        "training.result.x": [],
+        "training.advanceRound": [],
+        "training.roundComplete": [
+          "phase"
+        ],
+        "training.inspectTerrain": [],
+        "training.coverPreview": [
+          "defense"
+        ],
+        "training.blockedSight": [],
+        "training.alternative": [],
+        "training.recovery": [
+          "back",
+          "reason"
+        ],
+        "training.undoUnavailable": [],
+        "training.requiredActorLost": [
+          "unit"
+        ],
+        "training.failure.title": [],
+        "training.scriptFailure": [],
+        "training.readyForDebrief": [],
+        "training.debrief.title": [],
+        "training.debrief.skills": [
+          "skills"
+        ],
+        "training.debrief.confirm": [],
+        "training.complete.title": [],
+        "training.nextLesson": [],
+        "training.restartLesson": [],
+        "training.exit": [],
+        "training.exitConfirm": [],
+        "training.repeatInstruction": [],
+        "training.normalIntro": [
+          "objective"
+        ],
+        "training.normalHint": [
+          "phase",
+          "remaining",
+          "unit"
+        ]
+      }
+    },
+    "fr": {
+      "sha256": "c17ae37f81bd61e7d10334cf45eef0afc07aa1a3bdf8dffbf61a19ff055aefdf",
+      "placeholders": {
+        "training.label": [],
+        "training.learningGoal": [],
+        "training.t01.title": [],
+        "training.t01.goal": [],
+        "training.t02.title": [],
+        "training.t02.goal": [],
+        "training.t03.title": [],
+        "training.t03.goal": [],
+        "training.intro": [],
+        "training.selectActor": [
+          "unit"
+        ],
+        "training.previewMove": [],
+        "training.cancelIntent": [
+          "cancel"
+        ],
+        "training.confirmMove": [
+          "region"
+        ],
+        "training.undoMove": [
+          "back"
+        ],
+        "training.repeatMove": [
+          "region",
+          "unit"
+        ],
+        "training.infantryPractice": [
+          "unit"
+        ],
+        "training.moveCost": [
+          "available",
+          "cost"
+        ],
+        "training.enterPhase": [
+          "phase"
+        ],
+        "training.inspectShot": [
+          "attack",
+          "defense",
+          "range",
+          "target",
+          "unit"
+        ],
+        "training.confirmShot": [],
+        "training.shotResult": [
+          "effect",
+          "result"
+        ],
+        "training.result.ne": [],
+        "training.result.d": [],
+        "training.result.x": [],
+        "training.advanceRound": [],
+        "training.roundComplete": [
+          "phase"
+        ],
+        "training.inspectTerrain": [],
+        "training.coverPreview": [
+          "defense"
+        ],
+        "training.blockedSight": [],
+        "training.alternative": [],
+        "training.recovery": [
+          "back",
+          "reason"
+        ],
+        "training.undoUnavailable": [],
+        "training.requiredActorLost": [
+          "unit"
+        ],
+        "training.failure.title": [],
+        "training.scriptFailure": [],
+        "training.readyForDebrief": [],
+        "training.debrief.title": [],
+        "training.debrief.skills": [
+          "skills"
+        ],
+        "training.debrief.confirm": [],
+        "training.complete.title": [],
+        "training.nextLesson": [],
+        "training.restartLesson": [],
+        "training.exit": [],
+        "training.exitConfirm": [],
+        "training.repeatInstruction": [],
+        "training.normalIntro": [
+          "objective"
+        ],
+        "training.normalHint": [
+          "phase",
+          "remaining",
+          "unit"
+        ]
+      }
+    }
+  }
+}

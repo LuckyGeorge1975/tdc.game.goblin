@@ -264,7 +264,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (view.busy) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       if (typeof expectedRevision !== 'string' || expectedRevision !== revision()) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       const check = query(command);
-      if (!check.ok) return check;
+      if (!check.ok) {globalThis.GoblinTrainingRuntime?.rejected(command);return check;}
       view.busy = true;
       try {
         const actor = units.find(unit => unit.id === command.actorId);
@@ -318,7 +318,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       globalThis.dispatchEvent(new Event('goblin-view-settings-change'));
     }
 
-    function clearContext() { view.target = null; view.intentRevision = null; view.message = '';view.componentId=null;view.componentOwner=null;view.specialFireMode='direct';view.specialSpotterId=null; }
+    function clearContext() { globalThis.GoblinTrainingRuntime?.cancel();view.target = null; view.intentRevision = null; view.message = '';view.componentId=null;view.componentOwner=null;view.specialFireMode='direct';view.specialSpotterId=null; }
     const hexLabel = cell => `${String.fromCharCode(65 + cell.x)}-${String(cell.y + 1).padStart(2, '0')}`;
     function coreOpenCount(source) {
       if (source.mode !== 'player') return 0;
@@ -442,7 +442,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         fit.onclick = () => { fitMap(); at('#v2-command-fit')?.focus({preventScroll:true}); };
         footer.append(fit);
       }
-      const cancel = document.createElement('button');cancel.textContent=t('ui.dialog.cancel');
+      const cancel = document.createElement('button');cancel.id='v2-command-cancel';cancel.textContent=t('ui.dialog.cancel');
       cancel.onclick=()=>{clearContext();render();at('#v2-map').focus({preventScroll:true});};
       const pause = document.createElement('button');pause.textContent=t('ui.nav.pause');
       pause.onclick=()=>{clearContext();render();at('#v2-pause').click();};
@@ -456,6 +456,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       view.areaMode = null; view.previewWeaponKey = null;
       if (unit) { view.focusCell = { x: unit.x, y: unit.y }; view.infoCell = { x: unit.x, y: unit.y }; }
       clearContext(); render();
+      if(unit)globalThis.GoblinTrainingRuntime?.select(unit.id);
     }
     function focusUnit(id) {
       const unit = (core() ? project().units : globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(item => item.id === id && unitAlive(item));
@@ -480,6 +481,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if(view.target?.x!==x||view.target?.y!==y){view.componentOwner=null;view.componentId=null;}
       view.target = { x, y }; view.infoCell = { x, y }; view.focusCell = { x, y };
       view.intentRevision = revision(); view.message = ''; render();
+      if(actor){const command={type:turnPhase==='fire'?'Fire':'Move',actorId:actor.id,x,y};globalThis.GoblinTrainingRuntime?.inspect(command,query(command),turnPhase==='fire'?previewFire(command):null);}
       if (view.actorId) {
         if (matchMedia('(max-width: 599px), (max-height: 500px)').matches)
           showMapCard();
@@ -810,7 +812,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-map-label').textContent = GoblinLanguage.translate('TACTICAL MAP');
       at('#v2-map-caption').textContent = `${Math.max(...state.cells.map(cell => cell.x)) + 1} × ${Math.max(...state.cells.map(cell => cell.y)) + 1} · ${t('v2.ui.mapPan')}`;
       at('#v2-map').setAttribute('aria-label', `${t('ui.hud.map')}: ${t('v2.ui.selectHex')}`);
-      at('#v2-profile').textContent = globalThis.GoblinCatalogFullRuntime?.active()?t('v2.full.profile'):state.profile==='CATALOG_SPECIALISTS_v1'?t('v2.specialists.profile'):state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
+      at('#v2-profile').textContent = state.profile==='TRAINING_FIELD_TEST_v1'?t('training.label'):globalThis.GoblinCatalogFullRuntime?.active()?t('v2.full.profile'):state.profile==='CATALOG_SPECIALISTS_v1'?t('v2.specialists.profile'):state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
       at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
         state.phase === 'enemy' ? t('v2.enemy') : t(`v2.phase.${state.turnPhase}`);
       at('#v2-turn').textContent = `${t('ui.hud.turn',{turn:state.turn})} · ${t('v2.ui.coreHp')} ${state.objective.coreHp}/${state.objective.coreMax}`;
@@ -906,6 +908,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       zoomIn.disabled = view.zoom >= 4;
       center.disabled = !view.actorId;
       if (core()) { renderCore(state); if (centerFireActor) centerSelectedActor(state); return; }
+      const learningResult=state.objective.goalMode==='learning'?t(globalThis.GoblinTrainingRuntime?.status()==='lesson-complete'?'training.complete.title':'training.failure.title'):null;
       const actor = state.units.find(unit => unit.id === view.actorId);
       if (!actor || unitDead(actor)) { view.actorId = null; clearContext(); }
       if (state.phase !== 'player' || state.gameOver) clearContext();
@@ -919,22 +922,22 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-terrain-label').textContent = t('v2.ui.terrain');
       TerrainDisplay.fillLegend(at('#v2-terrain-list'),
         Array.from({length: H}, (_, y) => Array.from({length: W}, (_, x) => terrainTypeAt(x, y))).flat());
-      at('#v2-profile').textContent = globalThis.GoblinCatalogFullRuntime?.active()?t('v2.full.profile'):state.profile==='CATALOG_SPECIALISTS_v1'?t('v2.specialists.profile'):state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
-      at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
+      at('#v2-profile').textContent = state.profile==='TRAINING_FIELD_TEST_v1'?t('training.label'):globalThis.GoblinCatalogFullRuntime?.active()?t('v2.full.profile'):state.profile==='CATALOG_SPECIALISTS_v1'?t('v2.specialists.profile'):state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
+      at('#v2-phase').textContent = state.gameOver ? learningResult??t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
         view.phaseSkip?.turn === state.turn ? t(view.phaseSkip.key) : t(`phase.${state.turnPhase}.label`);
-      at('#v2-turn').textContent = `${t('ui.hud.turn', { turn: state.turn })} · ${state.objective.goalMode === 'core'
+      at('#v2-turn').textContent = `${t('ui.hud.turn', { turn: state.turn })} · ${state.objective.goalMode === 'learning'?t('training.learningGoal'):state.objective.goalMode === 'core'
         ? t('hud.objective.progress.core', { currentHp: state.objective.coreHp, maxHp: state.objective.coreMax })
         : t('hud.objective.progress.enemies', { remainingEnemies: state.objective.enemyAlive, totalEnemies: globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.goalMode==='core-and-escort'?state.objective.total:state.objective.enemyTotal })}`;
       at('#v2-map-caption').textContent = `${W} × ${H} · ${t('v2.ui.mapPan')}`;
       at('#v2-map').setAttribute('aria-label', `${t('ui.hud.map')}: ${t('v2.ui.selectHex')}`);
       const terminal = at('#v2-terminal');
       terminal.hidden = !state.gameOver;
-      terminal.classList.toggle('v2-failed', state.gameOver && state.objective.outcome === false);
-      terminal.textContent = state.gameOver ? t(state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '';
+      terminal.classList.toggle('v2-failed', state.gameOver && (state.objective.goalMode==='learning'?globalThis.GoblinTrainingRuntime?.status()==='lesson-failed':state.objective.outcome === false));
+      terminal.textContent = state.gameOver ? learningResult??t(state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '';
       const next = { movement: 'dialog.phaseAdvance.confirm.toFire', fire: 'dialog.phaseAdvance.confirm.toGev', gev: 'dialog.phaseAdvance.confirm.toEnemy' }[state.turnPhase];
       const phaseButton = at('#v2-phase-action');
       phaseButton.textContent = next ? `${t(next)} · ${t('dialog.phaseAdvance.pending', { pendingCount: state.ready })}`
-        : t(state.gameOver ? (state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : 'phase.enemy.label');
+        : state.gameOver&&learningResult?learningResult:t(state.gameOver ? (state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : 'phase.enemy.label');
       phaseButton.setAttribute('aria-label', phaseButton.textContent);
       phaseButton.disabled = !next || state.phase !== 'player' || state.gameOver || GameDialogs.isOpen() || view.busy;
       at('#v2-pause').disabled = GameDialogs.isOpen() || view.busy;

@@ -1,0 +1,1143 @@
+{
+  "version": "training-scripts-v1",
+  "definitions": [
+    {
+      "binding": {
+        "directorSchemaVersion": 1,
+        "scenarioId": "training-t01",
+        "scenarioVersion": 1,
+        "ruleProfileId": "TRAINING_FIELD_TEST_v1",
+        "unitDataProfile": "training-field-test-data-v1",
+        "mechanicsVersion": "legacy-field-test-training-v1",
+        "objectiveVersion": 1,
+        "objective": "learning",
+        "losMode": "legacy-pixel-los-v1",
+        "scriptId": "training-t01-lesson",
+        "scriptVersion": 1,
+        "scriptDigest": "8f068d2bca442f1b52527c11d75c719c93e2e1ded3ee59a2a1b657a82cb436e3"
+      },
+      "mode": "learning",
+      "startStepId": "intro",
+      "actorTags": {
+        "tank": "training-t01-tank",
+        "infantry": "training-t01-infantry"
+      },
+      "regionRefs": [
+        "goal",
+        "practice"
+      ],
+      "steps": [
+        {
+          "id": "intro",
+          "category": "instruction",
+          "messageKey": "training.intro",
+          "paramRefs": {},
+          "highlightRefs": [],
+          "completeWhen": {
+            "op": "uiFact",
+            "type": "acknowledgeInstruction"
+          },
+          "next": "select",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "select",
+          "category": "instruction",
+          "messageKey": "training.selectActor",
+          "paramRefs": {
+            "unit": "actor:tank"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            }
+          ],
+          "completeWhen": {
+            "op": "uiFact",
+            "type": "selectActor",
+            "actorTag": "tank"
+          },
+          "next": "preview",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "preview",
+          "category": "instruction",
+          "messageKey": "training.previewMove",
+          "paramRefs": {},
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            },
+            {
+              "kind": "region",
+              "ref": "goal"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "uiFact",
+                "type": "preview",
+                "actorTag": "tank"
+              },
+              {
+                "op": "queryFact",
+                "queryId": "query",
+                "fact": "legal",
+                "value": true
+              },
+              {
+                "op": "queryFact",
+                "queryId": "query",
+                "fact": "previewAvailable",
+                "value": true
+              }
+            ]
+          },
+          "next": "cancel",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "cancel",
+          "category": "instruction",
+          "messageKey": "training.cancelIntent",
+          "paramRefs": {
+            "cancel": "control:cancel"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            },
+            {
+              "kind": "control",
+              "ref": "cancel"
+            }
+          ],
+          "completeWhen": {
+            "op": "uiFact",
+            "type": "cancelIntent",
+            "actorTag": "tank",
+            "stepId": "preview"
+          },
+          "next": "first-move",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "first-move",
+          "category": "gameplay",
+          "messageKey": "training.confirmMove",
+          "paramRefs": {
+            "region": "region:goal",
+            "reason": "recoveryReason",
+            "back": "control:back"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            },
+            {
+              "kind": "region",
+              "ref": "goal"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "acceptedAction",
+                "type": "Move",
+                "actorTag": "tank",
+                "regionRef": "goal"
+              },
+              {
+                "op": "actorInRegion",
+                "actorTag": "tank",
+                "regionRef": "goal"
+              },
+              {
+                "op": "actorState",
+                "actorTag": "tank",
+                "field": "moveSpent",
+                "value": true
+              }
+            ]
+          },
+          "next": "undo",
+          "alternatives": [],
+          "recovery": {
+            "messageKey": "training.recovery",
+            "next": null
+          },
+          "holdAutoPhase": false
+        },
+        {
+          "id": "undo",
+          "category": "instruction",
+          "messageKey": "training.undoMove",
+          "paramRefs": {
+            "back": "control:back"
+          },
+          "highlightRefs": [
+            {
+              "kind": "control",
+              "ref": "back"
+            },
+            {
+              "kind": "actor",
+              "ref": "tank"
+            }
+          ],
+          "completeWhen": {
+            "op": "undoWitness",
+            "actorTag": "tank",
+            "undoneStepId": "first-move"
+          },
+          "next": "undo-proven",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": true
+        },
+        {
+          "id": "undo-proven",
+          "category": "branch",
+          "messageKey": "training.repeatMove",
+          "paramRefs": {
+            "unit": "actor:tank",
+            "region": "region:goal"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            }
+          ],
+          "completeWhen": {
+            "op": "undoWitness",
+            "actorTag": "tank",
+            "undoneStepId": "first-move"
+          },
+          "next": "repeat-move",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "repeat-move",
+          "category": "gameplay",
+          "messageKey": "training.repeatMove",
+          "paramRefs": {
+            "unit": "actor:tank",
+            "region": "region:goal",
+            "reason": "recoveryReason",
+            "back": "control:back"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            },
+            {
+              "kind": "region",
+              "ref": "goal"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "acceptedAction",
+                "type": "Move",
+                "actorTag": "tank",
+                "regionRef": "goal"
+              },
+              {
+                "op": "actorInRegion",
+                "actorTag": "tank",
+                "regionRef": "goal"
+              },
+              {
+                "op": "actorState",
+                "actorTag": "tank",
+                "field": "moveSpent",
+                "value": true
+              }
+            ]
+          },
+          "next": "infantry",
+          "alternatives": [],
+          "recovery": {
+            "messageKey": "training.recovery",
+            "next": null
+          },
+          "holdAutoPhase": false
+        },
+        {
+          "id": "infantry",
+          "category": "gameplay",
+          "messageKey": "training.infantryPractice",
+          "paramRefs": {
+            "unit": "actor:infantry",
+            "reason": "recoveryReason",
+            "back": "control:back"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "infantry"
+            },
+            {
+              "kind": "region",
+              "ref": "practice"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "acceptedAction",
+                "type": "Move",
+                "actorTag": "infantry",
+                "regionRef": "practice"
+              },
+              {
+                "op": "actorInRegion",
+                "actorTag": "infantry",
+                "regionRef": "practice"
+              },
+              {
+                "op": "actorState",
+                "actorTag": "infantry",
+                "field": "moveSpent",
+                "value": true
+              }
+            ]
+          },
+          "next": "review",
+          "alternatives": [],
+          "recovery": {
+            "messageKey": "training.recovery",
+            "next": null
+          },
+          "holdAutoPhase": false
+        },
+        {
+          "id": "review",
+          "category": "debrief",
+          "messageKey": "training.readyForDebrief",
+          "paramRefs": {},
+          "highlightRefs": [],
+          "completeWhen": null,
+          "next": null,
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        }
+      ],
+      "onRestore": {
+        "actorTag": "tank",
+        "undoneStepId": "first-move",
+        "nextStepId": "undo-proven"
+      },
+      "terminal": {
+        "requiredStepIds": [
+          "cancel",
+          "undo-proven",
+          "repeat-move",
+          "infantry"
+        ],
+        "readyMessageKey": "training.readyForDebrief",
+        "completeMessageKey": "training.complete.title",
+        "failureMessageKey": "training.failure.title",
+        "scriptFailureMessageKey": "training.scriptFailure"
+      }
+    },
+    {
+      "binding": {
+        "directorSchemaVersion": 1,
+        "scenarioId": "training-t02",
+        "scenarioVersion": 1,
+        "ruleProfileId": "TRAINING_FIELD_TEST_v1",
+        "unitDataProfile": "training-field-test-data-v1",
+        "mechanicsVersion": "legacy-field-test-training-v1",
+        "objectiveVersion": 1,
+        "objective": "learning",
+        "losMode": "legacy-pixel-los-v1",
+        "scriptId": "training-t02-lesson",
+        "scriptVersion": 1,
+        "scriptDigest": "558d5b54a53fed8bf47424c1772806a725de8894dcd11319cceb01892821930f"
+      },
+      "mode": "learning",
+      "startStepId": "intro",
+      "actorTags": {
+        "tank": "training-t02-tank",
+        "infantry": "training-t02-infantry",
+        "hostile": "training-t02-hostile"
+      },
+      "regionRefs": [
+        "goal",
+        "practice"
+      ],
+      "steps": [
+        {
+          "id": "intro",
+          "category": "instruction",
+          "messageKey": "training.intro",
+          "paramRefs": {},
+          "highlightRefs": [],
+          "completeWhen": {
+            "op": "uiFact",
+            "type": "acknowledgeInstruction"
+          },
+          "next": "select",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "select",
+          "category": "instruction",
+          "messageKey": "training.selectActor",
+          "paramRefs": {
+            "unit": "actor:tank"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            }
+          ],
+          "completeWhen": {
+            "op": "uiFact",
+            "type": "selectActor",
+            "actorTag": "tank"
+          },
+          "next": "move",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "move",
+          "category": "gameplay",
+          "messageKey": "training.confirmMove",
+          "paramRefs": {
+            "region": "region:goal",
+            "reason": "recoveryReason",
+            "back": "control:back"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            },
+            {
+              "kind": "region",
+              "ref": "goal"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "acceptedAction",
+                "type": "Move",
+                "actorTag": "tank",
+                "regionRef": "goal"
+              },
+              {
+                "op": "actorInRegion",
+                "actorTag": "tank",
+                "regionRef": "goal"
+              },
+              {
+                "op": "actorState",
+                "actorTag": "tank",
+                "field": "moveSpent",
+                "value": true
+              }
+            ]
+          },
+          "next": "fire-phase",
+          "alternatives": [],
+          "recovery": {
+            "messageKey": "training.recovery",
+            "next": null
+          },
+          "holdAutoPhase": false
+        },
+        {
+          "id": "fire-phase",
+          "category": "instruction",
+          "messageKey": "training.enterPhase",
+          "paramRefs": {
+            "phase": "phase:fire"
+          },
+          "highlightRefs": [
+            {
+              "kind": "control",
+              "ref": "phase"
+            }
+          ],
+          "completeWhen": {
+            "op": "phaseEntered",
+            "team": "player",
+            "phase": "fire"
+          },
+          "next": "shot-preview",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "shot-preview",
+          "category": "instruction",
+          "messageKey": "training.inspectShot",
+          "paramRefs": {
+            "unit": "actor:tank",
+            "target": "actor:hostile",
+            "attack": "query:attack",
+            "defense": "query:defense",
+            "range": "query:range"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "uiFact",
+                "type": "preview",
+                "actorTag": "tank"
+              },
+              {
+                "op": "queryFact",
+                "queryId": "query",
+                "fact": "legal",
+                "value": true
+              }
+            ]
+          },
+          "next": "shot",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "shot",
+          "category": "gameplay",
+          "messageKey": "training.confirmShot",
+          "paramRefs": {
+            "reason": "recoveryReason",
+            "back": "control:back"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "acceptedAction",
+                "type": "Fire",
+                "actorTag": "tank",
+                "targetTag": "hostile"
+              },
+              {
+                "op": "shotObserved",
+                "actorTag": "tank",
+                "targetTag": "hostile"
+              },
+              {
+                "op": "actorState",
+                "actorTag": "tank",
+                "field": "fireSpent",
+                "value": true
+              }
+            ]
+          },
+          "next": "result",
+          "alternatives": [],
+          "recovery": {
+            "messageKey": "training.recovery",
+            "next": null
+          },
+          "holdAutoPhase": false
+        },
+        {
+          "id": "result",
+          "category": "explanation",
+          "messageKey": "training.shotResult",
+          "paramRefs": {
+            "result": "shot:result",
+            "effect": "shot:effect"
+          },
+          "highlightRefs": [],
+          "completeWhen": {
+            "op": "uiFact",
+            "type": "acknowledgeInstruction"
+          },
+          "next": "round",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "round",
+          "category": "instruction",
+          "messageKey": "training.advanceRound",
+          "paramRefs": {},
+          "highlightRefs": [
+            {
+              "kind": "control",
+              "ref": "phase"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "enemyTurnCompleted"
+              },
+              {
+                "op": "phaseEntered",
+                "team": "player",
+                "phase": "movement"
+              }
+            ]
+          },
+          "next": "review",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "review",
+          "category": "debrief",
+          "messageKey": "training.readyForDebrief",
+          "paramRefs": {},
+          "highlightRefs": [],
+          "completeWhen": null,
+          "next": null,
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        }
+      ],
+      "onRestore": null,
+      "terminal": {
+        "requiredStepIds": [
+          "move",
+          "shot",
+          "round"
+        ],
+        "readyMessageKey": "training.readyForDebrief",
+        "completeMessageKey": "training.complete.title",
+        "failureMessageKey": "training.failure.title",
+        "scriptFailureMessageKey": "training.scriptFailure"
+      }
+    },
+    {
+      "binding": {
+        "directorSchemaVersion": 1,
+        "scenarioId": "training-t03",
+        "scenarioVersion": 1,
+        "ruleProfileId": "TRAINING_FIELD_TEST_v1",
+        "unitDataProfile": "training-field-test-data-v1",
+        "mechanicsVersion": "legacy-field-test-training-v1",
+        "objectiveVersion": 1,
+        "objective": "learning",
+        "losMode": "legacy-pixel-los-v1",
+        "scriptId": "training-t03-lesson",
+        "scriptVersion": 1,
+        "scriptDigest": "0e16a88c07b67b4726cf3fe59c25a0053c0a150e3e25399303ec0ab676fc9044"
+      },
+      "mode": "learning",
+      "startStepId": "intro",
+      "actorTags": {
+        "tank": "training-t03-tank",
+        "infantry": "training-t03-infantry",
+        "hostile": "training-t03-hostile"
+      },
+      "regionRefs": [
+        "goal",
+        "practice",
+        "openFire",
+        "terrain"
+      ],
+      "steps": [
+        {
+          "id": "intro",
+          "category": "instruction",
+          "messageKey": "training.intro",
+          "paramRefs": {},
+          "highlightRefs": [],
+          "completeWhen": {
+            "op": "uiFact",
+            "type": "acknowledgeInstruction"
+          },
+          "next": "select",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "select",
+          "category": "instruction",
+          "messageKey": "training.selectActor",
+          "paramRefs": {
+            "unit": "actor:tank"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            }
+          ],
+          "completeWhen": {
+            "op": "uiFact",
+            "type": "selectActor",
+            "actorTag": "tank"
+          },
+          "next": "terrain",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "terrain",
+          "category": "instruction",
+          "messageKey": "training.inspectTerrain",
+          "paramRefs": {},
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            },
+            {
+              "kind": "region",
+              "ref": "terrain"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "uiFact",
+                "type": "preview",
+                "actorTag": "tank"
+              },
+              {
+                "op": "queryFact",
+                "queryId": "query",
+                "fact": "coverPresent",
+                "value": true
+              },
+              {
+                "op": "queryFact",
+                "queryId": "query",
+                "fact": "legal",
+                "value": true
+              }
+            ]
+          },
+          "next": "move",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "move",
+          "category": "gameplay",
+          "messageKey": "training.confirmMove",
+          "paramRefs": {
+            "region": "region:goal",
+            "reason": "recoveryReason",
+            "back": "control:back"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            },
+            {
+              "kind": "region",
+              "ref": "goal"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "acceptedAction",
+                "type": "Move",
+                "actorTag": "tank",
+                "regionRef": "goal"
+              },
+              {
+                "op": "actorInRegion",
+                "actorTag": "tank",
+                "regionRef": "goal"
+              },
+              {
+                "op": "actorState",
+                "actorTag": "tank",
+                "field": "moveSpent",
+                "value": true
+              }
+            ]
+          },
+          "next": "blocked",
+          "alternatives": [],
+          "recovery": {
+            "messageKey": "training.recovery",
+            "next": null
+          },
+          "holdAutoPhase": false
+        },
+        {
+          "id": "blocked",
+          "category": "instruction",
+          "messageKey": "training.blockedSight",
+          "paramRefs": {},
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "uiFact",
+                "type": "selectIntent",
+                "actorTag": "tank"
+              },
+              {
+                "op": "queryFact",
+                "queryId": "query",
+                "fact": "losBlocked",
+                "value": true
+              }
+            ]
+          },
+          "next": "blocked-read",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "blocked-read",
+          "category": "explanation",
+          "messageKey": "training.blockedSight",
+          "paramRefs": {},
+          "highlightRefs": [],
+          "completeWhen": {
+            "op": "uiFact",
+            "type": "acknowledgeInstruction"
+          },
+          "next": "round",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "round",
+          "category": "instruction",
+          "messageKey": "training.advanceRound",
+          "paramRefs": {},
+          "highlightRefs": [
+            {
+              "kind": "control",
+              "ref": "phase"
+            }
+          ],
+          "completeWhen": {
+            "op": "enemyTurnCompleted"
+          },
+          "next": "alternative",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "alternative",
+          "category": "gameplay",
+          "messageKey": "training.confirmMove",
+          "paramRefs": {
+            "region": "region:openFire",
+            "reason": "recoveryReason",
+            "back": "control:back"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            },
+            {
+              "kind": "region",
+              "ref": "openFire"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "acceptedAction",
+                "type": "Move",
+                "actorTag": "tank",
+                "regionRef": "openFire"
+              },
+              {
+                "op": "actorInRegion",
+                "actorTag": "tank",
+                "regionRef": "openFire"
+              },
+              {
+                "op": "actorState",
+                "actorTag": "tank",
+                "field": "moveSpent",
+                "value": true
+              }
+            ]
+          },
+          "next": "fire-phase",
+          "alternatives": [],
+          "recovery": {
+            "messageKey": "training.recovery",
+            "next": null
+          },
+          "holdAutoPhase": false
+        },
+        {
+          "id": "fire-phase",
+          "category": "instruction",
+          "messageKey": "training.enterPhase",
+          "paramRefs": {
+            "phase": "phase:fire"
+          },
+          "highlightRefs": [
+            {
+              "kind": "control",
+              "ref": "phase"
+            }
+          ],
+          "completeWhen": {
+            "op": "phaseEntered",
+            "team": "player",
+            "phase": "fire"
+          },
+          "next": "cover",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "cover",
+          "category": "instruction",
+          "messageKey": "training.inspectShot",
+          "paramRefs": {
+            "unit": "actor:tank",
+            "target": "actor:hostile",
+            "attack": "query:attack",
+            "defense": "query:defense",
+            "range": "query:range"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "uiFact",
+                "type": "preview",
+                "actorTag": "tank"
+              },
+              {
+                "op": "queryFact",
+                "queryId": "query",
+                "fact": "legal",
+                "value": true
+              },
+              {
+                "op": "queryFact",
+                "queryId": "query",
+                "fact": "coverPresent",
+                "value": true
+              }
+            ]
+          },
+          "next": "shot",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "shot",
+          "category": "gameplay",
+          "messageKey": "training.confirmShot",
+          "paramRefs": {
+            "reason": "recoveryReason",
+            "back": "control:back"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "tank"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "acceptedAction",
+                "type": "Fire",
+                "actorTag": "tank",
+                "targetTag": "hostile"
+              },
+              {
+                "op": "shotObserved",
+                "actorTag": "tank",
+                "targetTag": "hostile"
+              },
+              {
+                "op": "actorState",
+                "actorTag": "tank",
+                "field": "fireSpent",
+                "value": true
+              }
+            ]
+          },
+          "next": "round-practice",
+          "alternatives": [],
+          "recovery": {
+            "messageKey": "training.recovery",
+            "next": null
+          },
+          "holdAutoPhase": false
+        },
+        {
+          "id": "round-practice",
+          "category": "instruction",
+          "messageKey": "training.advanceRound",
+          "paramRefs": {},
+          "highlightRefs": [
+            {
+              "kind": "control",
+              "ref": "phase"
+            }
+          ],
+          "completeWhen": {
+            "op": "enemyTurnCompleted"
+          },
+          "next": "practice",
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        },
+        {
+          "id": "practice",
+          "category": "gameplay",
+          "messageKey": "training.infantryPractice",
+          "paramRefs": {
+            "unit": "actor:infantry",
+            "reason": "recoveryReason",
+            "back": "control:back"
+          },
+          "highlightRefs": [
+            {
+              "kind": "actor",
+              "ref": "infantry"
+            },
+            {
+              "kind": "region",
+              "ref": "practice"
+            }
+          ],
+          "completeWhen": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "acceptedAction",
+                "type": "Move",
+                "actorTag": "infantry",
+                "regionRef": "practice"
+              },
+              {
+                "op": "actorInRegion",
+                "actorTag": "infantry",
+                "regionRef": "practice"
+              },
+              {
+                "op": "actorState",
+                "actorTag": "infantry",
+                "field": "moveSpent",
+                "value": true
+              }
+            ]
+          },
+          "next": "review",
+          "alternatives": [],
+          "recovery": {
+            "messageKey": "training.recovery",
+            "next": null
+          },
+          "holdAutoPhase": false
+        },
+        {
+          "id": "review",
+          "category": "debrief",
+          "messageKey": "training.readyForDebrief",
+          "paramRefs": {},
+          "highlightRefs": [],
+          "completeWhen": null,
+          "next": null,
+          "alternatives": [],
+          "recovery": null,
+          "holdAutoPhase": false
+        }
+      ],
+      "onRestore": null,
+      "terminal": {
+        "requiredStepIds": [
+          "terrain",
+          "move",
+          "blocked",
+          "alternative",
+          "cover",
+          "shot",
+          "practice"
+        ],
+        "readyMessageKey": "training.readyForDebrief",
+        "completeMessageKey": "training.complete.title",
+        "failureMessageKey": "training.failure.title",
+        "scriptFailureMessageKey": "training.scriptFailure"
+      }
+    }
+  ]
+}

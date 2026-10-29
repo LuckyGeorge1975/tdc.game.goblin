@@ -48,7 +48,7 @@ function startProbe(game,blocked=[]){
 
 test('technical probe is versioned but absent from the nine visible scenarios',()=>{
   const game=legacy();
-  assert.equal(game.run("Object.keys(ScenarioRuleProfiles.entries).filter(id=>!['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists','catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists'].includes(id)).length"),9);
+  assert.equal(game.run("Object.keys(ScenarioRuleProfiles.entries).filter(id=>!['training-t01','training-t02','training-t03','skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists','catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists'].includes(id)).length"),9);
   for(const id of ['catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists'])assert.equal(game.run(`Object.hasOwn(scenarioCatalog,${JSON.stringify(id)})`),false);
   assert.equal(game.run("Object.hasOwn(scenarioCatalog,'los-supercover-probe')"),false);
   assert.equal(game.run("Object.hasOwn(ScenarioRuleProfiles.entries,'los-supercover-probe')"),false);

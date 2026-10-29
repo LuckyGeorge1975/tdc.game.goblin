@@ -10,7 +10,9 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     objective:'core',ruleProfileId:'LEGACY_SUPERCOVER_PROBE_v1',losMode:'strict-supercover'});
   const fullIds=['catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists'];
   const fullCandidateEntries=Object.freeze(Object.fromEntries(fullIds.map(id=>[id,Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:'CATALOG_FULL_CANDIDATE_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'})])));
+  const trainingIds=['training-t01','training-t02','training-t03'];
   const entries=Object.freeze({
+    ...Object.fromEntries(trainingIds.map(id=>[id,Object.freeze({scenarioVersion:1,objective:'learning',ruleProfileId:'TRAINING_FIELD_TEST_v1',unitDataProfile:'training-field-test-data-v1',losMode:'legacy-pixel-los-v1'})])),
     ...Object.fromEntries(fullIds.map(id=>[id,Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:'FULL_CATALOG_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'})])),
     'catalog-siege':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_SPECIALISTS_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'}),
     'catalog-specialists':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_SPECIALISTS_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'}),
@@ -32,6 +34,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   });
   function reject(code,message){const error=new Error(`${code}: ${message}`);error.code=code;throw error}
   function validate(id,config){
+    if(trainingIds.includes(id)){if(!globalThis.GoblinTrainingModel)reject('SCENARIO_PROFILE_MISMATCH','Training contract unavailable');GoblinTrainingModel.validate(id,config);return entries[id]}
     if(fullIds.includes(id)){if(!globalThis.GoblinCatalogFullModel)reject('SCENARIO_PROFILE_MISMATCH','Full contract unavailable');GoblinCatalogFullModel.validate(id,config);}
     if(['catalog-siege','catalog-specialists'].includes(id)){if(!globalThis.GoblinCatalogSpecialistsModel)reject('SCENARIO_PROFILE_MISMATCH','Specialists contract unavailable');GoblinCatalogSpecialistsModel.validate(id,config);}
     if(['catalog-transport','catalog-maneuver'].includes(id)){if(!globalThis.GoblinCatalogBase)reject('SCENARIO_PROFILE_MISMATCH','Catalog contract unavailable');GoblinCatalogBase.validate(id,config);}
@@ -76,7 +79,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
       unitIds.add(unit.id);
     }
     if(!config.units.some(unit=>unit.team==='player')||
-      config.units.filter(unit=>unit.team==='enemy'&&unit.core).length!==1)
+      (!trainingIds.includes(id)&&config.units.filter(unit=>unit.team==='enemy'&&unit.core).length!==1))
       reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} hat keine gültige Parteien- oder Kernbelegung; Partie wurde nicht geladen.`);
     const source=JSON.parse(JSON.stringify(config));
     const session=freeze({schemaVersion:1,sessionId:nextSessionId++,scenarioId:id,
@@ -88,6 +91,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         ...(id==='siege-pilot'?{fireBudgetVersion:source.fireBudgetVersion,sourceDigest:source.sourceDigest}:{}),
         ...(id==='skimmer-pilot'?{movement:source.movement,sourceDigest:source.sourceDigest}:{}),
         ...((globalThis.GoblinCatalogBase?.has(id)||globalThis.GoblinCatalogSpecialistsModel?.has(id)||globalThis.GoblinCatalogFullModel?.has(id))?{catalog:source.catalog}:{}),
+        ...(trainingIds.includes(id)?{training:source.training}:{}),
         unitDataProfile:source.ruleProfile??null,terrain:source.terrain,
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;

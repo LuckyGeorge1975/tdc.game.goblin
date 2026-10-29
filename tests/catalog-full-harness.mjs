@@ -1,7 +1,7 @@
 import fs from 'node:fs';import {webcrypto} from 'node:crypto';
 import {artilleryScene,queryBridge} from './artillery-product-harness.mjs';
 export function fullShell(seed=7,observe=false){
- const g=artilleryScene(observe,seed,true,['catalog-full-model.js','catalog-waves.js','catalog-visibility.js','catalog-full-runtime.js']);g.context.crypto=webcrypto;g.context.TextEncoder=TextEncoder;
+ const g=artilleryScene(observe,seed,true,['catalog-full-model.js','catalog-waves.js','catalog-visibility.js','catalog-full-runtime.js','training-director.js','training-model.js','training-runtime.js']);g.context.crypto=webcrypto;g.context.TextEncoder=TextEncoder;
  g.context.data=JSON.parse(fs.readFileSync(new URL('../assets/unit-art/rules/unit-profiles.catalog-approved.v1.json',import.meta.url)));
  g.context.levelData=JSON.parse(fs.readFileSync(new URL('../assets/unit-art/levels/catalog-full-levels.v1.json',import.meta.url)));
  return g;
