@@ -9,6 +9,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   const losProbe=Object.freeze({id:'los-supercover-probe',scenarioVersion:1,
     objective:'core',ruleProfileId:'LEGACY_SUPERCOVER_PROBE_v1',losMode:'strict-supercover'});
   const entries=Object.freeze({
+    'skimmer-pilot':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_SKIMMER_PILOT_v1',unitDataProfile:'skimmer-pilot-data-v1'}),
     'iron-dust':Object.freeze({scenarioVersion:2,objective:'core',ruleProfileId:correctedIronDust,
       targetPolicyVersion:correctedTargetPolicy}),
     'relay-run':Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:product}),
@@ -22,6 +23,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   });
   function reject(code,message){const error=new Error(`${code}: ${message}`);error.code=code;throw error}
   function validate(id,config){
+    if(id==='skimmer-pilot'){if(!globalThis.GoblinSkimmerPilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinSkimmerPilot.validate(config);}
     const expected=id===losProbe.id?losProbe:id==='iron-dust'&&
       config?.scenarioVersion===1&&config?.ruleProfileId===product
       ?historicalIronDust:entries[id];
@@ -68,6 +70,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
       effectiveRules:{objectiveVersion:source.objectiveVersion,objective:source.objective,
         ...(source.losMode?{losMode:source.losMode}:{}),
         ...(source.targetPolicyVersion?{targetPolicyVersion:source.targetPolicyVersion}:{}),
+        ...(id==='skimmer-pilot'?{movement:source.movement,sourceDigest:source.sourceDigest}:{}),
         unitDataProfile:source.ruleProfile??null,terrain:source.terrain,
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;

@@ -26,6 +26,14 @@
     "screen.briefing.startForces": "Starting forces",
     "screen.briefing.backToLevels": "Back to level select",
     "screen.briefing.startMission": "Start mission",
-    "screen.briefing.dataUnavailable": "Mission data unavailable."
+    "screen.briefing.dataUnavailable": "Mission data unavailable.",
+    "mission.skimmer-pilot.title": "Skimmer Trial",
+    "mission.skimmer-pilot.briefing.short": "Move, fire and pull back with your Combat Skimmer.",
+    "mission.skimmer-pilot.budget": "Up to 4 movement points before firing, up to 3 in the follow-up move.",
+    "mission.skimmer-pilot.objective": "Destroy the enemy Command Core and keep your skimmer alive.",
+    "mission.skimmer-pilot.objective.short": "Destroy the enemy Command Core and keep your skimmer alive.",
+    "mission.skimmer-pilot.briefing.victory": "Destroy the enemy Command Core and keep your skimmer alive.",
+    "mission.skimmer-pilot.briefing.defeat": "You lose if no friendly unit survives—even if the command core is destroyed at the same time.",
+    "mission.skimmer-pilot.end.victory": "The enemy command core has been destroyed."
   }
 }

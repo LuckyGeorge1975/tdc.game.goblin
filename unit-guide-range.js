@@ -14,7 +14,7 @@
   function profile(entry,live){
     const movement=live?number(live.move):number(entry.move);
     const skimmer=/SKIMMER/.test(entry.name)&&entry.name!=='RAIDER SKIMMER';
-    const bonus=skimmer?(live?2:number(String(entry.move).split('+')[1])):0;
+    const bonus=live?(typeof movementBudget==='function'?movementBudget(live,true):0):skimmer?number(String(entry.move).split('+')[1]):0;
     let range=live?number(live.range):number(String(entry.range).split(/[–-]/).at(-1));
     let weapon=false;
     if(entry.name==='GOBLIN SIEGEBREAKER'){

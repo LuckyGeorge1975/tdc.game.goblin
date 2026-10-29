@@ -58,3 +58,39 @@ Der synchrone Built-in-Start, jeder spätere `loadScenario`-Aufruf und die Regis
 Vor jedem Legacy-Partiestart erstellt `ScenarioRuleProfiles.beginSession` eine tief kopierte, unveränderliche Session mit Szenario-ID/-Version, Produktprofil und den effektiven Ziel-, Gelände- und Einheitenwerten. Der Erststart, Neustart und Levelwechsel erhalten jeweils eine neue Session. Laufende Sieg- und Zielanzeigen lesen den gebundenen Snapshot; Änderungen am äußeren Szenariokatalog schreiben die Partie nicht um. Sprache und Icon-Set ändern nur die Ansicht und starten die Mission nicht neu. Der Snapshot ist ein interner Laufzeitvertrag, kein gespeicherter Spielstand und kein Replay. Persistenz und deterministische Replay-Prüfung bleiben spätere Slices von `goblin-9bj.19`.
 
 Neue `iron-dust`-Sessions binden `targetPolicyVersion: skip-depleted-treads-v1`: automatische Systemangriffe überspringen Ketten bei Wert 0 und können danach noch vorhandenes Antipersonnel anvisieren. Die exakte historische Paarung `iron-dust` / `scenarioVersion: 1` / `FIELD_TEST_LEGACY_v1` bleibt als explizite Eingabe gültig und behält ihre bisherige Zielwahl. Die übrigen acht Legacy-Szenarien, der separate IRON-DUST-Core-v2-Pfad und Replay-Schema 1 werden durch diesen Browser-Vertrag nicht umversioniert. Für unversionierte externe Legacy-Aufzeichnungen besteht kein Importvertrag.
+
+
+## Feste Skimmer-Erprobung (29.10.2026, goblin-9bj.10.2)
+
+Die separat auswählbare Mission `skimmer-pilot` v1 bindet ausschließlich
+`CATALOG_SKIMMER_PILOT_v1` / `skimmer-pilot-data-v1`. Sie aktiviert kein FULL_CATALOG
+und verändert weder das Legacy-Register noch laufende historische Partien.
+Der eigene Combat Skimmer (U10) hat A2/R2/D2, HP2 und Bewegungskostenbudget4+3;
+Guard U25 A1/R2/D3/M1/HP3 und der stationäre Command Core U23 D5/HP5 bleiben
+bei ihren beschlossenen Werten. Start: B04 / I03 / K04. Gelände stammt aus der
+12×8 Terrain-Course-Karte, als eigenständiger versionierter Leveldatensatz.
+Sieg: Kern zerstört und eigener Skimmer lebt; der Guard ist kein Pflichtziel.
+
+`assets/unit-art/levels/skimmer-pilot.v1.json` ist durch vollständigen kanonischen
+Datenvergleich im festen Pilotvertrag geschützt; sein SHA256 über kanonisches JSON (rekursiv sortierte Schlüssel, UTF-8) lautet
+`3ac5caae85ec629444247c732eabc9267fcc53a56191faf0954acda10e4877dc`.
+Werteherkunft: `rules.mjs` UNIT_CATALOG.gev und die ausdrücklich übernommenen
+Guide-/Legacy-HP-/Gegnerwerte; Contentpin
+`2fdce6ac1be30e8b2a360250b37724586469e71c`, keine neue Grafikübernahme.
+Der gemeinsame bestehende Skimmerhelper (`skimmer-budget.js`, ESM-Fassade
+`skimmer-budget.mjs`) friert `skimmer-pilot-budget-v1` im Sessionstart ein.
+Query, Dispatch, Kostenflächen, Zusatzphase und beide Guideansichten lesen dieselbe
+Budgetquelle. Jeder andere alte Spielstart behält den Zweierbonus; U26 erhält
+keinen Spieler-Zusatzbonus. Terrainkosten sind keine Hexanzahl.
+
+Neustart und Levelwechsel erzeugen eine neue immutable Session. BACK innerhalb
+der Phase stellt Position/Budget/Facing wieder her und verwendet denselben
+gecachten Spielerwurf erneut. Es gibt keinen neuen Save- oder öffentlichen
+Replayimport. Schema1/Core-v3, Iron-Dust-Core, U07- und Artillerie-Probereplays
+lehnen die Pilotkennung ab. Der allgemeine Core und seine Orakel bleiben unverändert.
+
+Reproduzierbare Resolverbelege: `tests/skimmer-pilot.test.mjs`, einschließlich
+normaler Sieg-/Verlustpartien mit kontrolliertem CRT-Wurf6 (keine HP-/Positionsinjektion),
+4nicht5/3nicht4, Terrain, Phase, spent/disabled/dead/hostile, RNG/Undo/Restart,
+Loader-/Digestgrenzen sowie Guide/M1/Animationspfad. Diese Tests ersetzen nicht
+die unabhängige native Bedienungsabnahme oder einen Release.

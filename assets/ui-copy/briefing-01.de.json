@@ -26,6 +26,14 @@
     "screen.briefing.startForces": "Startkräfte",
     "screen.briefing.backToLevels": "Zur Levelwahl",
     "screen.briefing.startMission": "Einsatz beginnen",
-    "screen.briefing.dataUnavailable": "Missionsdaten nicht verfügbar."
+    "screen.briefing.dataUnavailable": "Missionsdaten nicht verfügbar.",
+    "mission.skimmer-pilot.title": "Skimmer-Erprobung",
+    "mission.skimmer-pilot.briefing.short": "Fahre, feuere und ziehe dich mit deinem Kampfskimmer zurück.",
+    "mission.skimmer-pilot.budget": "Bis zu 4 Bewegungspunkte vor dem Feuer, bis zu 3 beim Nachziehen.",
+    "mission.skimmer-pilot.objective": "Zerstöre den gegnerischen Kommandokern und halte deinen Skimmer am Leben.",
+    "mission.skimmer-pilot.objective.short": "Zerstöre den gegnerischen Kommandokern und halte deinen Skimmer am Leben.",
+    "mission.skimmer-pilot.briefing.victory": "Zerstöre den gegnerischen Kommandokern und halte deinen Skimmer am Leben.",
+    "mission.skimmer-pilot.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kommandokern gleichzeitig zerstört wird.",
+    "mission.skimmer-pilot.end.victory": "Der feindliche Kommandokern ist ausgeschaltet."
   }
 }

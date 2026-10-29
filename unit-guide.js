@@ -63,7 +63,7 @@ function renderUnitGuide(){
   const v2=globalThis.IronDustBrowserV2?.mode==='ready';
   const unit=unitGuideEntries[guideIndex],live=v2?
     globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.id===unit.coreUnitId):
-    units.find(item=>item.name===unit.name);
+    units.find(item=>currentScenario==='skimmer-pilot'?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
   document.querySelector('.guide-information').scrollTop=0;
   document.querySelector('#guide-symbol').textContent=unit.icon;
   document.querySelector('#guide-symbol').classList.toggle('enemy',(live?.team==='enemy')||(!live&&unit.team==='HOSTILE SYSTEM'));
@@ -77,7 +77,7 @@ function renderUnitGuide(){
   document.querySelector('#guide-copy').textContent=v2&&live?GoblinLanguage.t(live.team==='player'?'v2.guide.player':'v2.guide.enemy'):liveDrone?'Field-Test-Regel: Diese Artilleriedrohne kann sich selbstständig bewegen. Die stationäre Katalogregel ist noch nicht aktiv.':unit.copy;
   globalThis.UnitGuideVoice.render(unit.name);
   const hp=live?(live.ogreSystems?`${live.ogreSystems.treads} ${v2?GoblinLanguage.t('v2.ui.treads'):'TREADS'}`:`${Math.max(0,live.hp)}/${live.maxHp}`):unit.hp;
-  const move=live?`${live.move}${v2?live.type==='gev'?' + 2':'':isGevUnit(live)?' + 2':''}`:unit.move;
+  const move=live?`${live.move}${v2?live.type==='gev'?' + 2':'':isGevUnit(live)?` + ${movementBudget(live,true)}`:''}`:unit.move;
   const range=live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):live.range):unit.range;
   const attack=live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):v2?live.attack:live.damage):unit.attack;
   const defense=live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.bySystem'):'BY SYSTEM'):v2?live.defense:effectiveDefense(live)):unit.defense;

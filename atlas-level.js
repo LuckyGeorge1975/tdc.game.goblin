@@ -92,6 +92,16 @@
       profile=validateProfile(await response.json());
     }catch(error){console.error('Unit rule profile unavailable:',error);addLog('Einheiten-Regelprofil konnte nicht geladen werden.',true);return}
     try{
+      const response=await fetch('assets/unit-art/levels/skimmer-pilot.v1.json');
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      const config=GoblinSkimmerPilot.create(await response.json(),profile);
+      ScenarioRuleProfiles.validate('skimmer-pilot',config);
+      scenarioCatalog['skimmer-pilot']=config;
+      const option=document.createElement('option');option.value='skimmer-pilot';option.textContent=config.title;option.dataset.titleKey='mission.skimmer-pilot.title';
+      $('#scenario-select').appendChild(option);renderScenarioObjective();
+      if(new URLSearchParams(globalThis.location?.search||'').get('scenario')==='skimmer-pilot')loadScenario('skimmer-pilot');
+    }catch(error){console.error('Skimmer pilot unavailable:',error)}
+    try{
       const response=await fetch('assets/unit-art/levels/atlas-proving-grounds.json');
       if(!response.ok)throw new Error(`HTTP ${response.status}`);
       const level=await response.json();

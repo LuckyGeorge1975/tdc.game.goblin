@@ -26,6 +26,14 @@
     "screen.briefing.startForces": "Fuerzas iniciales",
     "screen.briefing.backToLevels": "Volver a niveles",
     "screen.briefing.startMission": "Iniciar misión",
-    "screen.briefing.dataUnavailable": "Datos de misión no disponibles."
+    "screen.briefing.dataUnavailable": "Datos de misión no disponibles.",
+    "mission.skimmer-pilot.title": "Prueba del deslizador",
+    "mission.skimmer-pilot.briefing.short": "Avanza, dispara y retírate con tu Deslizador de combate.",
+    "mission.skimmer-pilot.budget": "Hasta 4 puntos de movimiento antes de disparar y hasta 3 en el movimiento posterior.",
+    "mission.skimmer-pilot.objective": "Destruye el Núcleo de mando enemigo y mantén tu deslizador con vida.",
+    "mission.skimmer-pilot.objective.short": "Destruye el Núcleo de mando enemigo y mantén tu deslizador con vida.",
+    "mission.skimmer-pilot.briefing.victory": "Destruye el Núcleo de mando enemigo y mantén tu deslizador con vida.",
+    "mission.skimmer-pilot.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo de mando sea destruido al mismo tiempo.",
+    "mission.skimmer-pilot.end.victory": "El núcleo de mando enemigo ha sido destruido."
   }
 }

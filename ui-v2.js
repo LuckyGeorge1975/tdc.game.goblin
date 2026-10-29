@@ -133,9 +133,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         turn:displayed?.turn??turn, phase:shownPhase, turnPhase:shownTurnPhase, gameOver:shownGameOver, objective: structuredClone(objective),
         ready: phase === 'player' && !gameOver ? phaseReadyUnits().length : 0,
         undo: { available: phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },
-        units: roster.map(({ id, name, type, team, x, y, hp, maxHp, attack, defense, move, range, damage, disabled, embarkedOn, core, infantry, engineering, ogreSystems, transportCapacity, strategicMissile, missilesRemaining }) =>
-          ({ id, name, type, team, x, y, hp, maxHp, disabled: !!disabled, embarkedOn: embarkedOn || null,
-            attack: attack ?? damage ?? null, defense: defense ?? null, move: move ?? null, range: range ?? null,
+        units: roster.map(({ id, name, type, team, x, y, hp, maxHp, visualKey, attack, defense, move, range, damage, disabled, embarkedOn, core, infantry, engineering, ogreSystems, transportCapacity, strategicMissile, missilesRemaining }) =>
+          ({ id, name, type, team, x, y, hp, maxHp, visualKey, disabled: !!disabled, embarkedOn: embarkedOn || null,
+            attack: attack ?? damage ?? null, defense: defense ?? null, move: move ?? null, secondaryMove: movementBudget({id,team,move,gev:isGevUnit(roster.find(item=>item.id===id))},true), range: range ?? null,
             core: !!core, infantry: !!infantry, engineering:!!engineering,
             ogreSystems:ogreSystems ? structuredClone(ogreSystems) : null,
             transportCapacity: transportCapacity || 0, strategicMissile: !!strategicMissile,
@@ -188,7 +188,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const second = turnPhase === 'gev';
         if (!canMoveUnit(actor, second)) return { ok: false, reason: t('ui.error.ACTION_SPENT') };
         if (target) return { ok: false, reason: t('ui.error.INVALID_TARGET') };
-        const path = findMovementPath(actor, { x: command.x, y: command.y }, second ? 2 : actor.move, actor);
+        const path = findMovementPath(actor, { x: command.x, y: command.y }, movementBudget(actor, second), actor);
         return path?.length ? { ok: true, path: path.map(cell => ({ ...cell })) }
           : { ok: false, reason: t('ui.error.UNREACHABLE') };
       }

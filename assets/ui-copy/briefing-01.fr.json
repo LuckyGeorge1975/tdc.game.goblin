@@ -26,6 +26,14 @@
     "screen.briefing.startForces": "Forces initiales",
     "screen.briefing.backToLevels": "Retour aux niveaux",
     "screen.briefing.startMission": "Lancer la mission",
-    "screen.briefing.dataUnavailable": "Données de mission indisponibles."
+    "screen.briefing.dataUnavailable": "Données de mission indisponibles.",
+    "mission.skimmer-pilot.title": "Essai de l’aéroglisseur",
+    "mission.skimmer-pilot.briefing.short": "Avancez, tirez et repliez-vous avec votre Aéroglisseur de combat.",
+    "mission.skimmer-pilot.budget": "Jusqu’à 4 points de mouvement avant de tirer, puis jusqu’à 3 lors du déplacement supplémentaire.",
+    "mission.skimmer-pilot.objective": "Détruisez le Noyau de commandement ennemi et gardez votre aéroglisseur en vie.",
+    "mission.skimmer-pilot.objective.short": "Détruisez le Noyau de commandement ennemi et gardez votre aéroglisseur en vie.",
+    "mission.skimmer-pilot.briefing.victory": "Détruisez le Noyau de commandement ennemi et gardez votre aéroglisseur en vie.",
+    "mission.skimmer-pilot.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau de commandement est détruit au même moment.",
+    "mission.skimmer-pilot.end.victory": "Le noyau de commandement ennemi a été détruit."
   }
 }

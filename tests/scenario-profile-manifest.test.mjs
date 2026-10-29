@@ -21,7 +21,8 @@ test('nine new-start pairs and the historical Iron Dust pair are authorized',()=
   vm.runInContext(source,context);
   const entries=vm.runInContext('ScenarioRuleProfiles.entries',context);
   assert.equal(vm.runInContext('ScenarioRuleProfiles.schemaVersion',context),1);
-  assert.deepEqual(Object.keys(entries),ids);
+  assert.deepEqual(Object.keys(entries).filter(id=>id!=='skimmer-pilot'),ids);
+  assert.equal(entries['skimmer-pilot'].ruleProfileId,'CATALOG_SKIMMER_PILOT_v1');
   const validate=validator();
   for(const id of ids){
     const expected=entries[id];
