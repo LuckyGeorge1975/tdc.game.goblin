@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -26,7 +27,7 @@ const bound={profileId:'PROFILE',stateRevision:'REVISION',actorId:'ogre',targetI
 function selection({view={target:{x:4,y:3}},profile=state,preview=bound,
   key='main',cells=legal,mode='fire',isCore=true}={}) {
   let queries=0,command=null;
-  const context={view,core:()=>isCore,previewFire:value=>{queries++;command=value;return preview;}};
+  const context={...lifeGlobals,view,core:()=>isCore,previewFire:value=>{queries++;command=value;return preview;}};
   runInNewContext(`${selectionSource}\nglobalThis.select=selectedFirePreview;`,context);
   const result=context.select(profile,profile.units[0],profile.units[0],mode,key,cells);
   return {result,queries,command};
@@ -71,7 +72,7 @@ function draw(preview,pixelScale,cardHidden=false,world=state) {
     element.classList={add(value){element.classes.push(value);}};
     return element;
   }};
-  const context={selectedFirePreview:()=>preview,state:world,actor,runtime:actor,mode:'fire',
+  const context={...lifeGlobals,selectedFirePreview:()=>preview,state:world,actor,runtime:actor,mode:'fire',
     weaponKey:'main',data:{legal},document,NS:'svg',hexCenter:(x,y)=>({x:x*100,y:y*100}),
     overlay:{append(...nodes){children.push(...nodes);}},pixelScale,
     hexWidth:Math.sqrt(3)*34,referenceScale:Math.sqrt(3)*34/112,
@@ -85,7 +86,7 @@ function draw(preview,pixelScale,cardHidden=false,world=state) {
 function place(from,to,units,focusCell=null,pixelScale=1) {
   const S=34, DX=Math.sqrt(3)*S, DY=1.5*S;
   const hexCenter=(x,y)=>({x:58+x*DX+(y%2?DX/2:0),y:48+y*DY});
-  const context={S,hexCenter,view:{focusCell},nativeMap:{viewBox:{baseVal:{x:0,y:0,width:790,height:480}}}};
+  const context={...lifeGlobals,S,hexCenter,view:{focusCell},nativeMap:{viewBox:{baseVal:{x:0,y:0,width:790,height:480}}}};
   runInNewContext(`${placementSource}\nglobalThis.place=freeRatioChipCenter;`,context);
   const width=Math.max(38*DX/112,32/pixelScale),height=Math.max(22*DX/112,20/pixelScale);
   return {center:context.place(hexCenter(from.x,from.y),hexCenter(to.x,to.y),

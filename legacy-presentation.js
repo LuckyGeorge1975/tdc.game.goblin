@@ -8,7 +8,7 @@
     const capture=attackCapture;attackCapture=null;
     if(capture?.ticket)try{root.GoblinPresentation.confirm(capture.ticket,snapshot(),capture.results,[],[{
       actorId:capture.actorId,targetId:capture.targetId,weaponKey:capture.weaponKey,strategic:capture.strategic,
-      effects:capture.effects,...(capture.mode?{mode:capture.mode,spotterId:capture.spotterId}:{}),attack:capture.results[0]?.attack,range:capture.range,sourceEventIndex:0}]);}catch{/* Observation cannot reject or retry gameplay. */}
+      effects:capture.effects,...(capture.mode?{mode:capture.mode,spotterId:capture.spotterId}:{}),...(capture.targetComponentId?{targetComponentId:capture.targetComponentId}:{}),...(capture.weaponClass?{weaponClass:capture.weaponClass}:{}),attack:capture.results[0]?.attack,range:capture.range,sourceEventIndex:0}]);}catch{/* Observation cannot reject or retry gameplay. */}
   }
   function snapshot(){
     return {units:units.map(({moveFrom,justHit,...unit})=>({...unit,
@@ -29,11 +29,12 @@
     beforeResult:safe((source,attacker,target)=>{
       if(!sync())return null;
       const before=snapshot(),standalone=!!attacker&&!attackCapture;
+      const special=root.GoblinSpecialistsRuntime?.active()?root.GoblinSpecialistsRuntime.fireMetadata():null;
       if(standalone)attackCapture={results:[],effects:[]};
       if(attacker&&target&&!attackCapture.ticket){
         Object.assign(attackCapture,{actorId:attacker.id,targetId:target.id,
-          ...(attacker.artilleryFire?root.GoblinArtilleryWeapons.parse(attacker.artilleryChoice):{}),weaponKey:attacker.artilleryChoice??attacker.siegeWeapon??attacker.ogreSystems?.selectedWeapon??null,range:attacker.range,strategic:attacker.strategicMissile===true,
-          ticket:root.GoblinPresentation.begin({type:'Fire',actorId:attacker.id,targetId:target.id},attackCapture.before??before)});
+          ...(special?{mode:special.mode,spotterId:special.spotterId,targetComponentId:special.targetComponentId,weaponClass:special.weaponClass}:attacker.artilleryFire?root.GoblinArtilleryWeapons.parse(attacker.artilleryChoice):{}),weaponKey:special?.weaponKey??attacker.artilleryChoice??attacker.siegeWeapon??attacker.ogreSystems?.selectedWeapon??null,range:attacker.range,strategic:attacker.strategicMissile===true,
+          ticket:root.GoblinPresentation.begin(special?.command??{type:'Fire',actorId:attacker.id,targetId:target.id},attackCapture.before??before)});
       }
       return {source,beforeRevision:root.GoblinPresentationState.stamp(before),before,attackerId:attacker?.id,
         targetId:target?.id,standalone,attack:attacker?.damage,
@@ -57,7 +58,7 @@
     }),
     begin:safe((actor,path,kind,target)=>{
       if(!sync())return null;
-      return {ticket:root.GoblinPresentation.begin({type:kind==='ram'?'Ram':'Move',actorId:actor.id,
+      return {ticket:root.GoblinPresentation.begin(root.GoblinSpecialistsRuntime?.active()&&root.GoblinSpecialistsRuntime.fireMetadata()?.command?.type==='CatalogRam'?root.GoblinSpecialistsRuntime.fireMetadata().command:{type:kind==='ram'?'Ram':'Move',actorId:actor.id,
         to:{x:path.at(-1).x,y:path.at(-1).y},...(target?{targetId:target.id}:{})},snapshot()),
         actorId:actor.id,kind,targetId:target?.id??null,
         path:JSON.parse(JSON.stringify(path)),from:{x:actor.x,y:actor.y}};
@@ -87,6 +88,7 @@
   for(const name of ['attack','enemyFire']){
     const base=name==='attack'?attack:enemyFire;
     const wrapped=function(...args){
+      if(name==='enemyFire'&&root.GoblinSpecialistsRuntime?.active())return base(...args);
       if(attackCapture)return base(...args);
       attackCapture={results:[],effects:[],before:snapshot()};
       try{return base(...args);}finally{finishFire();}

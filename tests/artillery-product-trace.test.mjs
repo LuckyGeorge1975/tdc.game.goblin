@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {digest,replayArtilleryProductTrace} from './artillery-product-trace.mjs';
 const bundle=JSON.parse(fs.readFileSync(new URL('./fixtures/artillery-product-traces.v1.json',import.meta.url),'utf8'));
-const compatibility=JSON.parse(fs.readFileSync(new URL('./fixtures/artillery-source-compatibility.catalog-base.v1.json',import.meta.url),'utf8'));
+const compatibility=JSON.parse(fs.readFileSync(new URL('./fixtures/artillery-source-compatibility.catalog-specialists.v1.json',import.meta.url),'utf8'));
 
 test('frozen real product victory/defeat JSON replays every command, complete state, RNG, facing/wreck sidecar and event delta',async()=>{
   for(const trace of Object.values(bundle.traces))await replayArtilleryProductTrace(trace,compatibility);

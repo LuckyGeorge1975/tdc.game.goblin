@@ -206,3 +206,17 @@ stattdessen 3:1. Der explizite isolierte Grenztest weist den tatsächlichen gela
 Wrapperpfad nach, nicht die früher überschriebene combatOutcome-Definition.
 Es wird keine neue Nullwurfregel eingeführt und keine Grenztest-D-Injektion als
 normale gespielte Mission ausgegeben.
+
+## Systeme, Engineering und gemeinsames Sonderfeuer
+
+Die beiden weiteren festen Missionen `catalog-siege` und `catalog-specialists`
+verwenden `CATALOG_SPECIALISTS_v1` / `catalog-specialists-mechanics-v1` mit derselben
+kryptografisch geprüften genehmigten Datenquelle. Ihr gemeinsamer Scope enthält
+24 Klassen, darunter die tatsächlichen Systeme von U01/U18/U20, U16-Engineering
+und die instanzgebundenen U07/U08/U09-Feuerbudgets. U13, U21 und FULL bleiben
+inaktiv. Initiale Roster, Ketten/Komponenten, Fracht/Buchten, Material und Gelände
+sind im unveränderlichen Partiekopf gebunden. Plattformen erhalten keine Gesamt-HP.
+
+Details, Quellen, ausführbare Partiereferenzen und die Grenze zur noch offenen
+unabhängigen Bedienungsabnahme stehen in
+[CATALOG_SPECIALISTS_HANDOFF.md](../reports/CATALOG_SPECIALISTS_HANDOFF.md).

@@ -1,6 +1,6 @@
 // Approved A/B rules on the existing movement, CRT, history and presentation paths.
 (function(root){
- const active=()=>legacySession?.ruleProfileId===GoblinCatalogBase.profile&&GoblinCatalogBase.has(legacySession.scenarioId);
+ const active=()=>!root.IronDustBrowserV2?.active&&(legacySession?.ruleProfileId===GoblinCatalogBase.profile&&GoblinCatalogBase.has(legacySession.scenarioId)||legacySession?.ruleProfileId===root.GoblinCatalogSpecialistsModel?.profile&&root.GoblinCatalogSpecialistsModel?.has(legacySession.scenarioId));
  const record=u=>active()?legacySession.effectiveRules.catalog?.records[u?.id]:null;
  const spec=u=>record(u)?.rules;
  const drone=u=>spec(u)?.cargoRef==='drone-cargo-v1';
@@ -8,7 +8,7 @@
  const passenger=u=>spec(u)?.passengerRef==='infantry-passenger-v1';
  const bound=u=>!!u&&units.includes(u)&&!!record(u);
  const cargoDefinition=ref=>active()?legacySession.effectiveRules.catalog.cargo[ref]:null;
- const ready=u=>bound(u)&&u.hp>0&&!u.disabled;
+ const ready=u=>bound(u)&&unitAlive(u)&&!u.disabled;
  const pos=(x,y)=>Number.isInteger(x)&&x>=0&&x<W&&Number.isInteger(y)&&y>=0&&y<H;
  const text=(key,fallback=key,params={})=>{const value=root.GoblinLanguage?.t(key,params);return value&&value!==key?value:fallback};
  const name=u=>text(`library.unit.${record(u)?.assetId}.name`,u?.name??units.find(x=>x.id===u?.id)?.name??'');
@@ -29,7 +29,7 @@
   if(phase!=='player'||gameOver||turnPhase!=='movement')return fail('WRONG_PHASE','Aufstellen und Aussteigen nur in der Bewegungsphase.');
   if(!ready(c)||!ready(cargo)||c.team!=='player'||cargo.team!==c.team||!carrier(c)||cargo.embarkedOn!==c.id)return fail('UNAVAILABLE','Aktiven Transporter und aktive eigene Fracht wählen.');
   if(cargo.embarkedThisTurn||cargo.disembarkedThisTurn)return fail('CARGO_TURN','Nicht im selben Zug ein- und ausladen.');
-  if(!pos(x,y)||dist(c,{x,y})!==1||units.some(u=>u.hp>0&&!u.embarkedOn&&u.x===x&&u.y===y))return fail('DEPLOY_CELL','Freies benachbartes Feld wählen.');
+  if(!pos(x,y)||dist(c,{x,y})!==1||units.some(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y))return fail('DEPLOY_CELL','Freies benachbartes Feld wählen.');
   if(drone(cargo)){
    if(c.moved)return fail('DRONE_DEPLOY_BUDGET','Aufstellen benötigt die Hauptbewegung des Transporters.');
    if(cargoDefinition(spec(c).cargoRef).droneDeployExcludedTerrain.includes(terrainTypeAt(x,y)))return fail('DRONE_LAND','Drohne nur auf Land oder einer Brücke aufstellen.');
@@ -43,7 +43,7 @@
   if(drone(u)&&u.embarkedOn)return fail('ABOARD_FIRE','Diese Fracht kann an Bord nicht feuern.');
   if(drone(u)&&(u.droneReadyTurn??1)>turn)return fail('DRONE_NOT_READY','Drohne feuert frühestens im nächsten eigenen Zug.');
   if(u.embarkedOn&&!passenger(u))return fail('ABOARD_FIRE','Diese Fracht kann an Bord nicht feuern.');
-  if(!target||target.hp<=0||target.embarkedOn||target.team===u.team||!bound(target)||dist(u,target)>spec(u).range||!lineOfSight(u,target))return fail('FIRE_TARGET','Ziel außerhalb der Reichweite oder ohne direkte Sicht.');
+  if(!target||unitDead(target)||target.embarkedOn||target.team===u.team||!bound(target)||dist(u,target)>spec(u).range||!lineOfSight(u,target))return fail('FIRE_TARGET','Ziel außerhalb der Reichweite oder ohne direkte Sicht.');
   return ok;
  }
  function query(command){
@@ -53,7 +53,7 @@
   if(!fields||Object.keys(command).length!==fields.length||!fields.every(k=>Object.hasOwn(command,k)))return fail('INVALID_COMMAND','Befehl gehört nicht zu diesem Regelprofil.');
   const u=units.find(u=>u.id===command.actorId),{x,y}=command;
   if(phase!=='player'||gameOver||!ready(u)||u.team!=='player'||!pos(x,y))return fail('UNAVAILABLE','Einheit oder Ziel nicht verfügbar.');
-  const target=units.find(u=>u.hp>0&&!u.embarkedOn&&u.x===x&&u.y===y);
+  const target=units.find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);
   if(command.type==='Embark')return target?.id===command.carrierId?loadQuery(u,target):fail('INVALID_CARRIER','Transporter wählen.');
   if(command.type==='Unload')return unloadQuery(u,units.find(u=>u.id===command.cargoId),x,y);
   if(command.type==='Fire')return fireQuery(u,target);
@@ -99,22 +99,23 @@
  const oldOutcome=combatOutcome;combatOutcome=function(a,t){
   if(!active())return oldOutcome(a,t);
   const mechanical=carrierCargo(t).filter(drone),result=oldOutcome(a,t);
-  if(t.hp<=0)for(const u of mechanical){u.hp=0;u.embarkedOn=t.id;u.lastOutcome='X';const hit=result.passengers.find(p=>p.unit.id===u.id);if(hit){hit.outcome={...hit.outcome,directResult:hit.outcome.result,result:'X',cause:'mechanical-carrier-loss'}}}
+  if(unitDead(t))for(const u of mechanical){u.hp=0;u.embarkedOn=t.id;u.lastOutcome='X';const hit=result.passengers.find(p=>p.unit.id===u.id);if(hit){hit.outcome={...hit.outcome,directResult:hit.outcome.result,result:'X',cause:'mechanical-carrier-loss'}}}
   return result;
  };
  const oldEnemyFire=enemyFire;enemyFire=function(u){if(spec(u)&&(u.embarkedOn&&!passenger(u)||spec(u).fireRuleRef==='no-fire-v1'||drone(u)&&(u.droneReadyTurn??1)>turn))return false;return oldEnemyFire(u)};
  function syncCargo(c){if(active())for(const u of carrierCargo(c)){u.x=c.x;u.y=c.y}}
- const loadWeight=(c,roster=units)=>roster.filter(u=>u.hp>0&&u.embarkedOn===c.id).reduce((n,u)=>n+(drone(u)?cargoDefinition(spec(u).cargoRef).cargoCost:u.hp),0);
- function summary(u,roster=units){const t=spec(u);if(!t)return null;
+ const loadWeight=(c,roster=units)=>roster.filter(u=>unitAlive(u)&&u.embarkedOn===c.id).reduce((n,u)=>n+(drone(u)?cargoDefinition(spec(u).cargoRef).cargoCost:u.hp),0);
+ function summary(u,roster=units){const t=spec(u);if(!t)return null;if(root.GoblinSpecialistsRuntime?.active()&&u.catalogSystems)return root.GoblinSpecialistsRuntime.summary(u,roster);
   const chunks=[t.strengthRef?text('v2.catalog.variableStrength',`${u.hp} SP · A=D=SP`,{strength:u.hp}):t.infantry?text('v2.catalog.fixedStrength',`${u.hp}/${u.maxHp} SP · A/D fest`,{current:u.hp,max:u.maxHp}):text('v2.catalog.hitPoints',`${u.hp}/${u.maxHp} HP`,{current:u.hp,max:u.maxHp}),
    text('v2.catalog.combatValues',`A${u.damage??u.attack} D${u.defense} R${u.range}`,{attackLabel:text('v2.ui.attack','A'),defenseLabel:text('v2.ui.defense','D'),rangeLabel:text('v2.ui.range','R'),attack:u.damage??u.attack,defense:u.defense,range:u.range}),
    text(t.gevPhaseEligible?'v2.catalog.movementBonus':'v2.catalog.movement',`M${movementBudget(u)}${t.gevPhaseEligible?' + '+movementBudget(u,true):''}`,{moveLabel:text('v2.ui.move','M'),movement:movementBudget(u),bonus:movementBudget(u,true)})];
-  if(t.halfUnit)chunks.push(text('v2.catalog.forceWeight','Aufstellungswert ½',{weight:t.forceBudgetWeight}));
+  if(t.halfUnit||t.setupValue!==undefined)chunks.push(text('v2.catalog.forceWeight','Aufstellungswert ½',{weight:t.forceBudgetWeight}));
   if(carrier(u))chunks.push(text('v2.catalog.cargoSummary',`Fracht ${loadWeight(u,roster)}/3 SP oder 1 Drohne`,{current:loadWeight(u,roster),capacity:u.transportCapacity}));
   if(drone(u)){chunks.push(text('v2.catalog.droneSummary','Stationär · direktes Feuer · keine Bordaktionen'));if((u.droneReadyTurn??1)>turn)chunks.push(text('v2.catalog.fireFromTurn',`Feuer ab Zug ${u.droneReadyTurn}`,{turn:u.droneReadyTurn}))}
+  if(root.GoblinSpecialistsRuntime?.active()&&(u.materialMax!==undefined||u.catalogFire))chunks.push(root.GoblinSpecialistsRuntime.summary(u,roster));
   return chunks.join(' · ');
  }
- function actions(u){const t=spec(u);if(!t)return [];
+ function actions(u){const t=spec(u);if(!t)return [];if(root.GoblinSpecialistsRuntime?.active())return root.GoblinSpecialistsRuntime.actions(u);
   const labels={move:['v2.ui.move','Bewegen'],fire:['v2.ui.fire','Feuern'],'gev-second-move':['v2.ui.move','GEV-Manöver'],embark:['v2.ui.embark','Einsteigen'],disembark:['v2.ui.unload','Aussteigen'],'load-infantry':['v2.ui.embark','Einladen'],'unload-infantry':['v2.ui.unload','Ausladen'],'load-drone':['v2.ui.embark','Einladen'],'deploy-drone':['v2.ui.catalog.deployDrone','Drohne aufstellen'],'passenger-fire':['v2.ui.fire','Bordfeuer'],'be-transported':['v2.ui.embark','Transportieren']};
   return [...new Set(t.capabilities.filter(k=>labels[k]).map(k=>text(...labels[k])))];
  }

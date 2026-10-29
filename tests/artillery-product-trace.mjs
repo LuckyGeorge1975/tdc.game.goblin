@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {artilleryScene,queryBridge,read} from './artillery-product-harness.mjs';
 export const digest=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
-const sourceFiles=['game.js','terrain-rules.js','legacy-supercover.js','scenario-profile-manifest.js',
+const sourceFiles=['unit-life.js','ogre-systems.js','catalog-specialists-fire.js','catalog-specialists-model.js','catalog-specialists-runtime.js','catalog-specialists-ui.js','game.js','terrain-rules.js','legacy-supercover.js','scenario-profile-manifest.js',
   'artillery-spotter-rules.js','artillery-pilot-runtime.js','assets/unit-art/rules/artillery-pilot.v1.js',
   'assets/unit-art/levels/artillery-pilot.v1.json','assets/unit-art/rules/unit-profiles.v1.json','legacy-presentation.js','presentation-state.js',
   'command-history.js','combat-feedback.js','ogre-runtime.js','siegebreaker-weapons.js','strategic-missile.js',
@@ -77,7 +77,7 @@ export async function replayArtilleryProductTrace(trace,compatibility=null){
   assert.equal(trace.header?.scenarioId,'artillery-pilot');
   assert.equal(trace.header?.ruleProfileId,'CATALOG_ARTILLERY_PILOT_v1');
   if(compatibility){
-    assert.equal(compatibility.version,'artillery-source-compatibility-catalog-base-v1');
+    assert.ok(['artillery-source-compatibility-catalog-base-v1','artillery-source-compatibility-catalog-specialists-v1'].includes(compatibility.version));
     assert.ok(compatibility.originalTraceDigests.includes(trace.traceDigest),'unlisted frozen oracle');
     const current=sources(),paths=[...new Set([...Object.keys(trace.header.sources),...Object.keys(current)])].sort();
     assert.deepEqual(Object.keys(compatibility.sourcePairs).sort(),paths,'incomplete source compatibility boundary');

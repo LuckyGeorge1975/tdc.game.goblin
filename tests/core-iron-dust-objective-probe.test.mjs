@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -30,7 +31,7 @@ function legacyObjective(units) {
   const config = {objectiveVersion: IRON_DUST_CORE_DATA_V1.objectiveVersion,
     objective: IRON_DUST_CORE_DATA_V1.objective};
   let finished = null;
-  const context = vm.createContext({units: plain(units),
+  const context = vm.createContext({...lifeGlobals,units: plain(units),
     legacySession: {effectiveRules: config}, finish(value) {finished = value}});
   const game = readFileSync(new URL('../game.js', import.meta.url), 'utf8');
   vm.runInContext(['victoryProfile', 'objectiveSnapshot', 'victoryOutcome', 'checkVictory']

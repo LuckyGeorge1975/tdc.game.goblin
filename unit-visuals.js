@@ -1,4 +1,6 @@
 (function(root){
+  const lifeAlive=u=>globalThis.GoblinUnitLife?GoblinUnitLife.alive(u):u?.hp>0;
+  const lifeDead=u=>globalThis.GoblinUnitLife?GoblinUnitLife.dead(u):!!u&&Number.isFinite(u.hp)&&u.hp<=0;
   const registry=new Map();
   const defaults=Object.freeze({kind:'vector',shape:'hex',scale:1});
   const fixedStyle='02-technical-illustration';
@@ -103,14 +105,14 @@
   function sortMapUnits(units){
     return units.slice().sort((a,b)=>{
       // Keep existing wrecks below live units; only reorder inside the unit layer.
-      const layer=(a.hp>0?1:0)-(b.hp>0?1:0),depth=a.y-b.y;
+      const layer=(lifeAlive(a)?1:0)-(lifeAlive(b)?1:0),depth=a.y-b.y;
       return layer||depth||(String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0);
     });
   }
 
   function wreckFor(unit){
     try{
-      if(!Number.isFinite(unit.hp)||unit.hp>0)return null;
+      if(!lifeDead(unit))return null;
       const projected=root.GoblinMovement?.wreckFor(unit);
       if(projected)return projected;
       const owner=root.GoblinPresentation,state=owner?.endState(),sidecar=owner?.read();
@@ -154,7 +156,7 @@
 
   function drawWreck(group,unit,center,{ns}={}){
     const namespace=ns||'http://www.w3.org/2000/svg',wreck=wreckFor(unit);
-    if(!Number.isFinite(unit.hp)||unit.hp>0||unit.embarkedOn||wreck?.cargoRelation)return null;
+    if(!lifeDead(unit)||unit.embarkedOn||wreck?.cargoRelation)return null;
     const name=wreckLabel(unit),fallback=()=>{
       const container=document.createElementNS(namespace,'g'),mark=document.createElementNS(namespace,'text');
       const title=document.createElementNS(namespace,'title');title.textContent=name;container.appendChild(title);

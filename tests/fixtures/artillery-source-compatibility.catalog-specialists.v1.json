@@ -1,0 +1,127 @@
+{
+  "version": "artillery-source-compatibility-catalog-specialists-v1",
+  "baselineCommit": "25ecb818f3c2165ec0f2231962069ceeaf3bd6f3",
+  "scope": "Only explicitly pinned source provenance differs. Original complete state, selection, history, RNG, markers, presentation and event oracle must remain identical; original fixture bytes are preserved.",
+  "originalTraceDigests": [
+    "3d3131f6d70f820025097d49259ac51dc3e70327686a06d42f5c00f283b0e173",
+    "d6148f6166874d57b36f0b84943fe766d4d4dc8bc86cc595171594093a3263b1"
+  ],
+  "sourcePairs": {
+    "artillery-pilot-runtime.js": {
+      "from": "8930c7ce679d7266efb57b1e305deb7ab53ee636e531156123dc0a4319cd49f5",
+      "to": "78c59d4daf0a9cc42ec2ee0e8c8b778052f0544cdf44eddb94c50c8d1b0a981e"
+    },
+    "artillery-spotter-rules.js": {
+      "from": "87c37d1456b79b6ba71856bdb6a177a26b1d49cdab3f72669113ee87b741d3e3",
+      "to": "87c37d1456b79b6ba71856bdb6a177a26b1d49cdab3f72669113ee87b741d3e3"
+    },
+    "assets/unit-art/levels/artillery-pilot.v1.json": {
+      "from": "41779ebe8506fda85f96435b6eedfaa1ac0d4e87f51784ab2d91d14a112dd51f",
+      "to": "41779ebe8506fda85f96435b6eedfaa1ac0d4e87f51784ab2d91d14a112dd51f"
+    },
+    "assets/unit-art/rules/artillery-pilot.v1.js": {
+      "from": "bb3a9f3f68baaad841f72f82a592f016e5de409f87345e6d5598df3af009da6e",
+      "to": "bb3a9f3f68baaad841f72f82a592f016e5de409f87345e6d5598df3af009da6e"
+    },
+    "assets/unit-art/rules/unit-profiles.catalog-approved.v1.json": {
+      "from": null,
+      "to": "644e20c424d94a3ec7f5d942292f7a3ac10384b1604bfeb456c8b1917334096d"
+    },
+    "assets/unit-art/rules/unit-profiles.v1.json": {
+      "from": "0cd763382cfd0ef7019f2f9d84ef7606386f40528c069815607c51df1c8f3d9b",
+      "to": "0cd763382cfd0ef7019f2f9d84ef7606386f40528c069815607c51df1c8f3d9b"
+    },
+    "catalog-base-model.js": {
+      "from": null,
+      "to": "8150cec2cfc544aadeca4b81a1a6a9f1fddafcdeeaf337e36e6e5223ea9b0e98"
+    },
+    "catalog-base-runtime.js": {
+      "from": null,
+      "to": "460cc3f6349e04aa8affb9fc2b40d1b1755aea3b6b81f744f4cd1cd1f1ceacdd"
+    },
+    "catalog-specialists-fire.js": {
+      "from": null,
+      "to": "addc97f5000436e66851bbf367592340e98709402c333a8c7364de20fef9a6bd"
+    },
+    "catalog-specialists-model.js": {
+      "from": null,
+      "to": "ec89419eddeaf60e8d7fa087bd7da79cbf9e7f630d23205878bc7ed100388a4e"
+    },
+    "catalog-specialists-runtime.js": {
+      "from": null,
+      "to": "f99663f44f744370a83205b4100c18c05aef2624c9de7862727ef70d67a08005"
+    },
+    "catalog-specialists-ui.js": {
+      "from": null,
+      "to": "bdd980274baddb0d76f6d80f79bba8a2e07f4bf9e8521c1cf9f16a2990101b41"
+    },
+    "combat-feedback.js": {
+      "from": "beb33697fa37a5fad5392b2b9c3e2a4e8d4a9113d2849d410783f183f68f63ba",
+      "to": "beb33697fa37a5fad5392b2b9c3e2a4e8d4a9113d2849d410783f183f68f63ba"
+    },
+    "command-history.js": {
+      "from": "c99fdaa398508f0cd7ab486532704539fe5adca8b0d982dfb325eeab3b258115",
+      "to": "9f3900afeca0582238a701ae96103fd9258a3377fa3b481ed3c75f0fc780e36d"
+    },
+    "game.js": {
+      "from": "19abfbd0b756dc0626c933c245cc7c8c1ee0d221b808f49ac83d94215b336eb8",
+      "to": "ff206bd5f10b02c91954532166c2c382d7039a110cec591e9ce672369913b6c9"
+    },
+    "legacy-presentation.js": {
+      "from": "8822f01070a166247fd72ad720ae52a55c5a6b16a78b1605df246cfb386b63b5",
+      "to": "ff44b4017c3cbddfc61fc075b5c1e77e6a3530ac69f5aac474a2e3255ee98879"
+    },
+    "legacy-supercover.js": {
+      "from": "9652d1ddcf52cadddbaca01a1dc63f5774ba526fa3446c0de3db9811d07327eb",
+      "to": "9652d1ddcf52cadddbaca01a1dc63f5774ba526fa3446c0de3db9811d07327eb"
+    },
+    "ogre-runtime.js": {
+      "from": "7ae757666dc22d432ea3b97f84fadb0c5c63128a11c3ac4049adb78aeeb02cdb",
+      "to": "b4fa01db483fd6398f394efc570b7e1ff44288890a3d57d0e3022520f765c896"
+    },
+    "ogre-systems.js": {
+      "from": null,
+      "to": "1de2ab821f0021f1a8204d15783d15848ea28f3f80ce0fc705f47b094141c411"
+    },
+    "presentation-state.js": {
+      "from": "4b12dfc2e11da383c0f5af8ec0a372bd0d78eed688f526d96c8f26765c6c30bc",
+      "to": "67b2d6a669c8e4b0cfb73a0dd40a0b74f5abd4638a27739fd8e435de94303b7b"
+    },
+    "scenario-profile-manifest.js": {
+      "from": "3e7819d4f523ebad49d34aaffe997e768d454529551b6cd878133ceb93dd3376",
+      "to": "f645e63f936c71dca330c48da7f6c4ef45ce15631f776e923e176bcb9b629009"
+    },
+    "siege-pilot-runtime.js": {
+      "from": "f7be7122102145a185cf08d7551a47729d0252bd16ad9d7a800a76ffbcc7d97f",
+      "to": "9392a5f769160a47b9e31c7b908c99e58a338da22c9e107e8ab87bfc56bc939c"
+    },
+    "siegebreaker-weapons.js": {
+      "from": "5c860345236bfde41c6478668c4ae21207b5f95f597258be1ff6ed5255519eee",
+      "to": "f52f7e6727c22327526c147bfe499c8435c931e42749a5fe253f84e3895163d6"
+    },
+    "strategic-missile.js": {
+      "from": "62c43a49dc9ffc7ac2985448d3f308e3e553457aa20f1dd26cb5af5a9195254e",
+      "to": "c7d471da43b949bca431a269e9129c77085c9cdc35a466b22320dc9fb344c0f3"
+    },
+    "terrain-rules.js": {
+      "from": "01308c0ea0d9f86db4acdd6585fd486914da83f87b303b1a082ae57cd31b1e48",
+      "to": "a0f4c239d1e3de7c452976f74ad0de0d76e6ea881f7c841244b686f61d422456"
+    },
+    "tests/artillery-product-harness.mjs": {
+      "from": "b50caa0ebd94f08294f4f451d88d8d27cacb5d8bcf08761b96387152927eef91",
+      "to": "cb5de49d7ac5c06a87d5b1747e5688b878c2336265f58ecdea3c9467e5262445"
+    },
+    "ui-v2.js": {
+      "from": "b15601d072c0e9e18a6cf5b933f7e9fdeea1ce0cb02ec04884644a7cc4df39ce",
+      "to": "f30a3799906061db2470d56ba2cc4bcb7533d583322ab5c63cd633d3536b88af"
+    },
+    "unit-life.js": {
+      "from": null,
+      "to": "430b14dc7b8ffd5519b26e60f31a2e1edb516706eca5673e8339638809197e60"
+    },
+    "unit-visuals.js": {
+      "from": "6aa0dd89f050529c7a7862becbe38756860c1608acb11dab545c1e188fe7f8bf",
+      "to": "6d3295a6cbf13bb5b4e3b5977245cdd94e6c5408dc3ff6bde5b8b605e773534f"
+    }
+  }
+}

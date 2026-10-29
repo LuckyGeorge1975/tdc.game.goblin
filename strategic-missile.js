@@ -29,11 +29,11 @@
   const baseAttack=attack;
   attack=function(attacker,target){
     if(!isCarrier(attacker))return baseAttack(attacker,target);
-    if(phase!=='player'||turnPhase!=='fire'||attacker.hp<=0||attacker.disabled||attacker.fired||!ready(attacker)||!target||target.team===attacker.team||target.hp<=0||dist(attacker,target)>attacker.range||!lineOfSight(attacker,target)){
+    if(phase!=='player'||turnPhase!=='fire'||unitDead(attacker)||attacker.disabled||attacker.fired||!ready(attacker)||!target||target.team===attacker.team||unitDead(target)||dist(attacker,target)>attacker.range||!lineOfSight(attacker,target)){
       setToast('LENKFLUGKÖRPER NICHT VERFÜGBAR');return;
     }
     const impact={x:target.x,y:target.y};
-    const affected=units.filter(unit=>unit.hp>0&&!unit.embarkedOn&&dist(unit,impact)<=STRIKE.radius)
+    const affected=units.filter(unit=>unitAlive(unit)&&!unit.embarkedOn&&dist(unit,impact)<=STRIKE.radius)
       .sort((left,right)=>Number(right===target)-Number(left===target));
     attacker.missilesRemaining--;
     attacker.fired=true;

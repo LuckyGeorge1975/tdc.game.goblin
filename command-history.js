@@ -60,6 +60,7 @@ function undoPhaseCommand() {
   units.forEach(unit => { unit.moveFrom = null; unit.justHit = false; });
   terrain = new Set(before.terrain);
   terrainTypes = new Map(before.terrainTypes);
+  globalThis.GoblinSpecialistsRuntime?.validateRestoredState();
   selected = units.find(unit => unit.id === before.selectedId) || null;
   focusedCell = before.focus;
   transportLoadMode = null;
@@ -92,6 +93,7 @@ handleHex = reversibleCommand(handleHex, 'Kartenbefehl');
 attack = reversibleCommand(attack, 'Feuerbefehl');
 embark = reversibleCommand(embark, 'Verladen');
 unloadAt = reversibleCommand(unloadAt, 'Entladen');
+if(typeof executeSpecialistCommand==='function')executeSpecialistCommand=reversibleCommand(executeSpecialistCommand,'Spezialistenbefehl');
 
 // Give BACK a short opportunity to cancel the automatic phase change.
 const originalAutoAdvance = maybeAutoAdvancePhase;

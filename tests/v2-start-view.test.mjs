@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -17,7 +18,7 @@ function scene({width=323,height=205,compact=true}={}){
   const mapPanel={scrollTo(){effects.push('scroll-origin')},
     get clientWidth(){return size.width-(parseFloat(nativeMap.style.height)>size.height?15:0)},
     get clientHeight(){return size.height-(parseFloat(nativeMap.style.width)>this.clientWidth?15:0)}};
-  const context={view,state,mapPanel,nativeMap,S:34,startZoomMission:null,startZoomPending:null,
+  const context={...lifeGlobals,view,state,mapPanel,nativeMap,S:34,startZoomMission:null,startZoomPending:null,
     project:()=>state,revision:()=>context.rev,rev:'initial',
     matchMedia:()=>({matches:compact}),requestAnimationFrame:fn=>frames.push(fn),
     document:{body:{classList:{contains:()=>false}}},GameDialogs:{isOpen:()=>false},
@@ -83,7 +84,7 @@ test('only a successful start or accepted restart requests the initial view afte
   const restart=flow.slice(flow.indexOf('    async function confirmRestart() {'),flow.indexOf('    async function goToLevels() {'));
   for(const accepted of [false,true])for(const engine of ['core','legacy']){
     const calls=[];
-    const context={GameDialogs:{isOpen:()=>false,confirm:async()=>accepted},t:key=>key,
+    const context={...lifeGlobals,GameDialogs:{isOpen:()=>false,confirm:async()=>accepted},t:key=>key,
       currentScenario:'relay-run',loadScenario:id=>calls.push('load:'+id),
       IronDustBrowserV2:{mode:engine==='core'?'ready':'inactive',restart(){calls.push('restart')}},
       GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},

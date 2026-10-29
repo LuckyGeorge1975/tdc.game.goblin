@@ -1,0 +1,20 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {specialistsScene,read} from './catalog-specialists-harness.mjs';
+const deploy=(cargoId='bay-drone-one',bayId='bay-1',x=0,y=3)=>({type:'CatalogDeploy',actorId:'forge',cargoId,bayId,x,y});
+const execute=(g,c)=>read(g,`executeSpecialistCommand(${JSON.stringify(c)})`);
+test('Forge has two individual bays; deploy preserves identity, spends main movement and delays fire; Undo restores exact manifest',async()=>{
+ const g=await specialistsScene('catalog-specialists'),before=read(g,'units'),rng=g.rng();assert.deepEqual(read(g,"GoblinSpecialistsRuntime.bayCargo(units.find(u=>u.id==='forge'))").map(b=>[b.id,b.cargo]),[['bay-1','bay-drone-one'],['bay-2','bay-drone-two']]);
+ execute(g,deploy());assert.deepEqual(read(g,"units.filter(u=>u.id==='bay-drone-one').map(u=>[u.embarkedOn,u.cargoBay,u.moved,u.fired,u.droneReadyTurn])"),[[null,null,true,true,2]]);assert.equal(read(g,`GoblinSpecialistsRuntime.query(${JSON.stringify(deploy('bay-drone-two','bay-2',0,2))})`).ok,false);g.run('undoPhaseCommand()');assert.deepEqual(read(g,'units'),before);assert.deepEqual(g.rng(),rng);
+});
+test('wrong bay, same turn load/deploy, occupied terrain, disabled cargo and infantry reject without state or RNG',async()=>{
+ for(const change of ["units.find(u=>u.id==='bay-drone-one').disabled=true","units.find(u=>u.id==='forge').catalogSystems=structuredClone(units.find(u=>u.id==='forge').catalogSystems);units.find(u=>u.id==='forge').catalogSystems.components.find(c=>c.id==='bay-1').destroyed=true","units.find(u=>u.id==='bay-drone-one').embarkedThisTurn=true"]){const g=await specialistsScene('catalog-specialists');g.run(change);const before=g.state(),rng=g.rng();assert.equal(read(g,`GoblinSpecialistsRuntime.query(${JSON.stringify(deploy())})`).ok,false);assert.equal(g.state(),before);assert.deepEqual(g.rng(),rng)}
+ const g=await specialistsScene('catalog-specialists');assert.equal(read(g,`GoblinSpecialistsRuntime.query(${JSON.stringify({type:'CatalogLoad',actorId:'engineers',carrierId:'forge',bayId:'bay-1'})})`).ok,false);
+});
+test('one shared attack roll, bay destruction loses only its cargo even if that drone direct result is NE',async()=>{
+ const g=await specialistsScene('catalog-specialists');g.run("const f=units.find(u=>u.id==='forge');f.team='enemy';units.find(u=>u.id==='ground-drone').damage=10;for(const u of carrierCargo(f))u.defense=20;setTurnPhase('fire')");g.context.rollQueue=[0];const c={type:'CatalogFire',actorId:'ground-drone',target:{kind:'component',runtimeUnitId:'forge',componentId:'bay-1'},weaponId:null,mode:'direct',spotterId:null};execute(g,c);
+ assert.equal(g.rolls(),1);assert.deepEqual(read(g,"units.filter(u=>['bay-drone-one','bay-drone-two'].includes(u.id)).map(u=>u.hp)"),[0,2]);assert.equal(g.run("unitAlive(units.find(u=>u.id==='forge'))"),true);const e=g.events().at(-1).event;assert.equal(e.sourceResults[0].passengers[0].outcome.directResult,'NE');assert.equal(e.sourceResults[0].passengers[0].outcome.result,'X');
+});
+test('system AP cannot target Forge or ordinary armor, but can target actual engineering infantry',async()=>{
+ const g=await specialistsScene();g.run("const f=units.find(u=>u.id==='defender');f.x=2;f.y=1;setTurnPhase('fire')");const c={type:'CatalogFire',actorId:'alpha',target:{kind:'component',runtimeUnitId:'defender',componentId:'main-1'},weaponId:'antipersonnel-1',mode:'direct',spotterId:null};assert.equal(read(g,`GoblinSpecialistsRuntime.query(${JSON.stringify(c)})`).ok,false);
+ const h=await specialistsScene('catalog-specialists');h.run("units.find(u=>u.id==='platoon').x=0;units.find(u=>u.id==='platoon').y=3;units.find(u=>u.id==='rocket').x=1;units.find(u=>u.id==='rocket').y=2;setTurnPhase('fire')");
+ const ap={type:'CatalogFire',actorId:'forge',target:{kind:'unit',runtimeUnitId:'platoon'},weaponId:'antipersonnel-1',mode:'direct',spotterId:null};assert.equal(read(h,`GoblinSpecialistsRuntime.query(${JSON.stringify(ap)})`).ok,true);ap.target.runtimeUnitId='rocket';assert.equal(read(h,`GoblinSpecialistsRuntime.query(${JSON.stringify(ap)})`).ok,false);
+});

@@ -1,3 +1,5 @@
+const guideAlive=unit=>globalThis.GoblinUnitLife?GoblinUnitLife.alive(unit):unit?.hp>0;
+const guideDead=unit=>globalThis.GoblinUnitLife?GoblinUnitLife.dead(unit):unit?.hp<=0;
 const unitGuideEntries=[
   {name:'GOBLIN SIEGEBREAKER',coreUnitId:'ogre',role:'AUTONOMOUS ASSAULT FORTRESS',team:'FRIENDLY SYSTEM',icon:'G',hp:'SYSTEMS',move:'3 → 0',range:'1–5',attack:'1–6',defense:'BY SYSTEM',copy:'Autonome Belagerungsplattform mit getrennt verwalteten Batterien, Lenkflugkörpern, Nahbereichsschutz und Kettensegmenten. Kettenschäden reduzieren die Bewegung stufenweise.'},
   {name:'SKIMMER SCOUT',coreUnitId:'gev',role:'HOVER RECON · PROTOTYPE',team:'FRIENDLY SYSTEM',icon:'G',hp:'3',move:'3 + 2',range:'3',attack:'1',defense:'3',copy:'Schnelles Aufklärungsfahrzeug für Flankenmanöver. Sein zusätzlicher Manöverschritt macht es beweglich, verlangt aber eine vorausschauende Positionierung.'},
@@ -63,11 +65,11 @@ function renderUnitGuide(){
   const v2=globalThis.IronDustBrowserV2?.mode==='ready';
   const unit=unitGuideEntries[guideIndex],live=v2?
     globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.id===unit.coreUnitId):
-    units.find(item=>['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver'].includes(currentScenario)?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
+    units.find(item=>['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(currentScenario)?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
   document.querySelector('.guide-information').scrollTop=0;
   document.querySelector('#guide-symbol').textContent=unit.icon;
   document.querySelector('#guide-symbol').classList.toggle('enemy',(live?.team==='enemy')||(!live&&unit.team==='HOSTILE SYSTEM'));
-  document.querySelector('#guide-kicker').textContent=v2&&live?(live.hp<=0?
+  document.querySelector('#guide-kicker').textContent=v2&&live?(guideDead(live)?
     `${GoblinLanguage.t(live.team==='player'?'ui.team.player':'ui.team.enemy')} · ${GoblinLanguage.t('v2.ui.destroyed')}`:
     GoblinLanguage.t(live.team==='player'?'v2.ui.guideFriendlyLive':'v2.ui.guideHostileLive')):
     live?(live.team==='player'?'FRIENDLY · LIVE':'HOSTILE · LIVE'):unit.team+' · CATALOG';
@@ -79,23 +81,24 @@ function renderUnitGuide(){
   if(live?.artilleryFire)document.querySelector('#guide-copy').textContent+=' '+GoblinArtilleryWeapons.summary(live);
   if(live?.siegeFireBudget)document.querySelector('#guide-copy').textContent+=' 2 × A3/R3 + 2 × A1/R1 · '+GoblinSiegeWeapons.summary(live);
   globalThis.UnitGuideVoice.render(unit.name);
-  const hp=live?(live.ogreSystems?`${live.ogreSystems.treads} ${v2?GoblinLanguage.t('v2.ui.treads'):'TREADS'}`:`${Math.max(0,live.hp)}/${live.maxHp}`):unit.hp;
+  const hp=live?(live.catalogSystems?`${live.catalogSystems.treads}/${live.catalogSystems.maxTreads} ${GoblinLanguage.t('v2.ui.treads')}`:live.ogreSystems?`${live.ogreSystems.treads} ${v2?GoblinLanguage.t('v2.ui.treads'):'TREADS'}`:`${Math.max(0,live.hp)}/${live.maxHp}`):unit.hp;
   const move=live?`${live.move}${v2?live.type==='gev'?' + 2':'':isGevUnit(live)?` + ${movementBudget(live,true)}`:''}`:unit.move;
   const siegeSpec=live?.siegeFireBudget?GoblinSiegeWeapons.weapons(live)?.[live.siegeWeapon]:null;
-  const range=siegeSpec?siegeSpec.range:live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):live.range):unit.range;
-  const attack=siegeSpec?siegeSpec.attack:live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):v2?live.attack:live.damage):unit.attack;
-  const defense=live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.bySystem'):'BY SYSTEM'):v2?live.defense:effectiveDefense(live)):unit.defense;
+  const range=live?.catalogSystems?GoblinSpecialistsRuntime.selectedSpec(live)?.range??0:siegeSpec?siegeSpec.range:live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):live.range):unit.range;
+  const attack=live?.catalogSystems?GoblinSpecialistsRuntime.selectedSpec(live)?.attack??0:siegeSpec?siegeSpec.attack:live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):v2?live.attack:live.damage):unit.attack;
+  const defense=live?(live.catalogSystems?GoblinLanguage.t('v2.ui.bySystem'):live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.bySystem'):'BY SYSTEM'):v2?live.defense:effectiveDefense(live)):unit.defense;
   const guideFacts=v2?['v2.ui.armorHp','v2.ui.move','v2.ui.range','v2.ui.attackDef'].map(key=>GoblinLanguage.t(key)):['ARMOR / HP','MOVE','RANGE','ATTACK / DEF'];
+  if(live?.catalogSystems)guideFacts[0]=GoblinLanguage.t('v2.ui.treads');
   document.querySelector('#guide-facts').innerHTML=`<div class="guide-fact"><span>${guideFacts[0]}</span><b>${hp}</b></div><div class="guide-fact"><span>${guideFacts[1]}</span><b>${move}</b></div><div class="guide-fact"><span>${guideFacts[2]}</span><b>${range}</b></div><div class="guide-fact"><span>${guideFacts[3]}</span><b>${attack} / ${defense}</b></div>`;
   globalThis.UnitGuideRange.render(unit,v2?null:live);
   const scenarios=Object.entries(scenarioCatalog).filter(([,config])=>config.units.some(item=>item.name===unit.name)).map(([id])=>id.toUpperCase().replaceAll('-',' '));
   document.querySelector('#guide-scenarios').textContent=v2?'IRON DUST v2':scenarios.join(' · ')||'CATALOG ONLY';
-  document.querySelector('#guide-status').textContent=v2?(live?GoblinLanguage.t(live.hp<=0?'v2.ui.destroyed':'v2.guide.live'):GoblinLanguage.t('v2.guide.absent')):live?(live.hp<=0?'DESTROYED':live.disabled?'DISABLED':currentScenario==='atlas-proving-grounds'?'ATLAS · PROTOTYPE STATS':'LIVE IN CURRENT SCENARIO'):'NOT IN CURRENT SCENARIO';
-  document.querySelector('#guide-phase-status').textContent=v2?(!live?'—':live.hp<=0?GoblinLanguage.t('v2.ui.destroyed'):live.team==='enemy'?GoblinLanguage.t('v2.ui.hostileAi'):globalThis.IronDustBrowserV2.session.projection.mode==='player'?GoblinLanguage.t('v2.ui.ready'):GoblinLanguage.t('v2.ui.noAction')):!live?'—':live.hp<=0?'DESTROYED':live.team==='enemy'?'HOSTILE AI':phaseCanAct(live)?'READY':live.disabled?'DISABLED':'NO ACTION NOW';
+  document.querySelector('#guide-status').textContent=v2?(live?GoblinLanguage.t(guideDead(live)?'v2.ui.destroyed':'v2.guide.live'):GoblinLanguage.t('v2.guide.absent')):live?(guideDead(live)?'DESTROYED':live.disabled?'DISABLED':currentScenario==='atlas-proving-grounds'?'ATLAS · PROTOTYPE STATS':'LIVE IN CURRENT SCENARIO'):'NOT IN CURRENT SCENARIO';
+  document.querySelector('#guide-phase-status').textContent=v2?(!live?'—':guideDead(live)?GoblinLanguage.t('v2.ui.destroyed'):live.team==='enemy'?GoblinLanguage.t('v2.ui.hostileAi'):globalThis.IronDustBrowserV2.session.projection.mode==='player'?GoblinLanguage.t('v2.ui.ready'):GoblinLanguage.t('v2.ui.noAction')):!live?'—':guideDead(live)?'DESTROYED':live.team==='enemy'?'HOSTILE AI':phaseCanAct(live)?'READY':live.disabled?'DISABLED':'NO ACTION NOW';
   const list=document.querySelector('#guide-action-list');list.replaceChildren();
   for(const action of v2?(live&&live.team==='player'?[GoblinLanguage.t('v2.guide.actions')]:[]):globalThis.GoblinCatalogRuntime?.record(live)?GoblinCatalogRuntime.actions(live):liveDrone?['Im Field Test bewegen und fernfeuern','Stationäre Katalogregel: geplant']:guideActions[unit.name]||[]){const item=document.createElement('li');item.textContent=action;list.appendChild(item)}
   const inV2Ui=document.body?.classList?.contains('ui-v2-active');
-  document.querySelector('#guide-find').disabled=!!(!live||(v2&&!inV2Ui)||(inV2Ui&&(live.hp<=0||!globalThis.GoblinV2Flow?.hasStarted())));
+  document.querySelector('#guide-find').disabled=!!(!live||(v2&&!inV2Ui)||(inV2Ui&&(guideDead(live)||!globalThis.GoblinV2Flow?.hasStarted())));
   document.querySelector('#guide-count').textContent=`${String(guideIndex+1).padStart(2,'0')} / ${String(unitGuideEntries.length).padStart(2,'0')}`;
 }
 function openUnitGuide(){
@@ -126,7 +129,7 @@ document.querySelector('#guide-find').onclick=()=>{
   const entry=unitGuideEntries[guideIndex];
   const unit=core?globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.id===entry.coreUnitId):
     units.find(item=>item.name===entry.name);
-  if(!unit||(core&&unit.hp<=0)||(inV2Ui&&!globalThis.GoblinV2Flow?.hasStarted()))return;
+  if(!unit||(core&&guideDead(unit))||(inV2Ui&&!globalThis.GoblinV2Flow?.hasStarted()))return;
   closeUnitGuide();
   if(inV2Ui){globalThis.GoblinV2Flow.findUnit(unit.id);return}
   selected=unit;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);

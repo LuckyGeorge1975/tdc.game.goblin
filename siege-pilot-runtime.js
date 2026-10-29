@@ -31,7 +31,7 @@
     if(!list[unit.siegeWeapon]?.ready)unit.siegeWeapon=keys.find(key=>list[key].ready&&hasTarget(unit,key))??keys.find(key=>list[key].ready)??null;
   }
   function selectWeapon(unit,key){
-    if(!active(unit)||root.GoblinMovement?.busy()||phase!=='player'||turnPhase!=='fire'||gameOver||unit.hp<=0||unit.disabled||!weapons(unit)?.[key]?.ready)return false;
+    if(!active(unit)||root.GoblinMovement?.busy()||phase!=='player'||turnPhase!=='fire'||gameOver||unitDead(unit)||unit.disabled||!weapons(unit)?.[key]?.ready)return false;
     unit.siegeWeapon=key;updateSelection();draw();return true;
   }
   function summary(unit){return Object.entries(weapons(unit)??{}).filter(([key])=>key!=='main-both').map(([key,w])=>`${label(key)}: ${w.ready}`).join(' · ')}
@@ -42,7 +42,7 @@
     for(const [key,w] of Object.entries(weapons(selected))){
       const button=document.createElement('button');button.type='button';button.className='weapon-control'+(selected.siegeWeapon===key?' active':'');
       button.textContent=`${w.label} · A${w.attack} R${w.range} · ${w.ready}/1`;
-      button.disabled=!w.ready||selected.disabled||selected.hp<=0;
+      button.disabled=!w.ready||selected.disabled||unitDead(selected);
       button.title=hasTarget(selected,key)?w.label:message(w.ready?'TARGET_NOT_ATTACKABLE':'WEAPON_SPENT',key);
       button.onclick=event=>{event.stopPropagation();selectWeapon(selected,key)};panel.appendChild(button);
     }
@@ -50,7 +50,7 @@
   const oldTarget=root.canSelectedWeaponTarget;
   root.canSelectedWeaponTarget=(unit,target)=>active(unit)?query(unit,target).ok:oldTarget(unit,target);
   const oldPhase=phaseCanAct;
-  phaseCanAct=function(unit,name=turnPhase){if(active(unit)&&name==='fire')return unit.team==='player'&&unit.hp>0&&!unit.disabled&&keys.some(key=>hasTarget(unit,key));return oldPhase(unit,name)};
+  phaseCanAct=function(unit,name=turnPhase){if(active(unit)&&name==='fire')return unit.team==='player'&&unitAlive(unit)&&!unit.disabled&&keys.some(key=>hasTarget(unit,key));return oldPhase(unit,name)};
   const oldReset=resetActionState;
   resetActionState=function(){oldReset();for(const unit of units.filter(active)){
     if(unit.siegeFireBudget.turn!==turn)unit.siegeFireBudget=GoblinSiegeBudget.resetSiegeTankFireBudget(unit.siegeFireBudget,turn);
@@ -66,7 +66,7 @@
     const result=query(selected,target);if(result.ok)return false;setToast(result.reason);return true;
   }
   const oldHex=handleHex;
-  handleHex=function(x,y){const target=units.find(u=>u.hp>0&&!u.embarkedOn&&u.x===x&&u.y===y);if(!rejectPick(target))return oldHex(x,y)};
+  handleHex=function(x,y){const target=units.find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);if(!rejectPick(target))return oldHex(x,y)};
   const oldClick=handleUnitClick;
   handleUnitClick=function(unit){if(!rejectPick(unit))return oldClick(unit)};
   const oldAttack=attack;

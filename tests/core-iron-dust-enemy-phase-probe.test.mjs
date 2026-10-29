@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -36,7 +37,7 @@ function legacyNoActionCycle() {
     moveCount: 0, moveFrom: null, acted: false, disabled: false, justHit: false,
     moved: false, fired: false, secondMoved: false,
     embarkedThisTurn: false, disembarkedThisTurn: false}));
-  const context = vm.createContext({units, phase: 'player', turnPhase: 'movement',
+  const context = vm.createContext({...lifeGlobals,currentScenario:'iron-dust',gameOver:false,units, phase: 'player', turnPhase: 'movement',
     turn: 1, selected: null, transportLoadMode: null, transportUnloadMode: null,
     $: node, setViewMode() {}, updatePhaseControls() {}, setToast() {},
     showPhaseTransition() {}, updateSelection() {}, draw() {}, setTimeout() {},

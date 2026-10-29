@@ -2,6 +2,7 @@
   // Independent G.O.B.L.I.N. playtest rules. A cell's artwork and mechanics
   // share this stable type key; no visual theme changes gameplay.
   const rules=Object.freeze({
+    'field-position':{label:'FELDSTELLUNG',cost:1,cover:1,blocksLos:false,note:'Bewegungskosten 1, Deckung +1; keine Sichtblockade.'},
     'open-ground':{label:'OFFENES GELÄNDE',cost:1,cover:0,blocksLos:false,note:'Normale Bewegung; keine Deckung.'},
     'rubble-field':{label:'TRÜMMERFELD',cost:2,cover:1,blocksLos:true,note:'Schwer passierbar, Deckung +1; blockiert Sichtlinien dahinter.'},
     mountain:{label:'BERG',cost:2,cover:1,blocksLos:true,note:'Passierbar mit Kosten 2, Deckung +1; blockiert Sichtlinien dahinter.'},

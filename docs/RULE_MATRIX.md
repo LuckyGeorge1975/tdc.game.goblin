@@ -216,3 +216,9 @@ Ziel: Kern zerstört und mindestens eine eigene Einheit lebt, Recon zählt.
 Profil-/Command-/Digest-/Undo-/RNG-/Guide-/Darstellungsgrenzen und ausführbare
 gefrorene Produkttraces stehen in [UNIT_RULE_PROFILES.md](UNIT_RULE_PROFILES.md).
 Die interne Produkttrace ist keine öffentliche Save-/Replayimportfunktion.
+
+### Katalog-Erprobung: Systeme und Engineering
+
+Die Missionen `catalog-siege` und `catalog-specialists` verwenden `CATALOG_SPECIALISTS_v1` mit 24 genehmigten Klassen. U13 und U21 sowie das vollständige Katalogprofil bleiben inaktiv. Systemplattformen haben echte Ketten- und Komponentenbestände statt Gesamt-HP. Ein Kettentreffer wirkt nur bei 5 oder 6; D/NE zerstören keine Komponenten. Wiederverwendbare Waffen besitzen je einen Schuss pro eigener Feuerphase, Raketen bleiben nach Gebrauch verbraucht.
+
+Die Feldstellung (`field-position`) ist ein virtuelles Engineeringgelände: Bewegungskosten 1, Deckung +1, keine Sichtblockade. Sie entsteht für 1 Material auf freiem, unbesetztem offenem Gelände oder Straße. Engineering ersetzt Bewegung und Feuer; reparierte Waffen, Werkzeuge und Buchten stehen erst ab dem nächsten eigenen Zug bereit. Forge-Buchten führen jeweils genau eine vorhandene Drohne und erzeugen keine neuen Einheiten.

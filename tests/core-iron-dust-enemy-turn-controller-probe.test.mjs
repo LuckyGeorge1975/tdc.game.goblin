@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -54,7 +55,7 @@ function legacyTurn(seed, changes = {}) {
     return (rng % 6) / 6;
   }});
   const node = {};
-  const context = vm.createContext({units, W: map.width, H: map.height,
+  const context = vm.createContext({...lifeGlobals,currentScenario:'iron-dust',gameOver:false,units, W: map.width, H: map.height,
     turn: 1, phase: 'player', turnPhase: 'gev', Math: math,
     $: () => node, scheduleGameTask: callback => callback(),
     showPhaseTransition() {}, setToast() {}, addLog() {},

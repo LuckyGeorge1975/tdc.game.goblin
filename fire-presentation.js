@@ -1,5 +1,7 @@
 // Accepted fire facts -> a pure timeline. No resolver, command, or gameplay randomness.
 (function(root){
+  const lifeAlive=u=>globalThis.GoblinUnitLife?GoblinUnitLife.alive(u):u?.hp>0;
+  const lifeDead=u=>globalThis.GoblinUnitLife?GoblinUnitLife.dead(u):!!u&&Number.isFinite(u.hp)&&u.hp<=0;
   const scale=Math.sqrt(3)*34/112,iconScale=100*scale/256;
   const center=u=>({x:58+Math.sqrt(3)*34*(u.x+(u.y%2)/2),y:48+51*u.y});
   const copy=value=>JSON.parse(JSON.stringify(value));
@@ -15,7 +17,8 @@
     if(event.weapon.semanticKind||used==='missiles'||['rockets','missile'].includes(record?.klasse))
       return {version:'fire-mapping-v1',kind:'deferred-rocket',anchors:[],fallback:false};
     // The supplied GOBLIN twin group has no per-weapon provenance. Do not reuse it for main/AP/etc.
-    const fallback=!record||record.klasse==='none'||key==='goblin-siegebreaker'&&used!==null||key==='siege-tank'&&used?.startsWith('ap-');
+    const catalogSystem=!!event.before?.units.find(u=>u.id===event.actor.unitId)?.catalogSystems;
+    const fallback=catalogSystem||!record||record.klasse==='none'||key==='goblin-siegebreaker'&&used!==null||key==='siege-tank'&&used?.startsWith('ap-');
     const anchors=record&&key==='siege-tank'&&['main-1','main-2'].includes(used)?[record[side][used==='main-1'?0:1]]:record?.[side];
     return {version:'fire-mapping-v1',kind:fallback?'light':record.klasse,
       anchors:fallback?[[0,0]]:anchors,fallback,
@@ -28,12 +31,12 @@
   }
   function delta(effect){
     const a=effect.before,b=effect.after;
-    const hp=Math.max(0,a.hp-b.hp),treads=Math.max(0,(a.ogreSystems?.treads??0)-(b.ogreSystems?.treads??0));
-    const systems=Object.entries(a.ogreSystems?.weapons??{}).reduce((sum,[key,value])=>
+    const hp=a.catalogSystems?0:Math.max(0,a.hp-b.hp),treads=Math.max(0,(a.catalogSystems?.treads??a.ogreSystems?.treads??0)-(b.catalogSystems?.treads??b.ogreSystems?.treads??0));
+    const systems=a.catalogSystems?a.catalogSystems.components.filter((c,i)=>!c.destroyed&&b.catalogSystems?.components[i]?.destroyed).length:Object.entries(a.ogreSystems?.weapons??{}).reduce((sum,[key,value])=>
       sum+Math.max(0,(b.ogreSystems?.weapons?.[key]?.destroyed??0)-(value.destroyed??0)),0);
     return {hp,treads,systems,disabled:!!(!a.disabled&&b.disabled),changed:!!(hp>0||treads>0||systems>0||!a.disabled&&b.disabled),
       label:treads?`−${treads} ${root.GoblinLanguage?.t('v2.ui.treads')??'TREADS'}`:
-        systems?`−${root.GoblinLanguage?.t('v2.ui.weaponDamage',{count:systems})??`${systems} SYSTEM`}`:
+        systems&&a.catalogSystems?`−${root.GoblinSpecialistsRuntime?.slotLabel(b,effect.targetKey)??'SYSTEM'}`:systems?`−${root.GoblinLanguage?.t('v2.ui.weaponDamage',{count:systems})??`${systems} SYSTEM`}`:
           hp?`−${hp} ${a.infantry||a.engineering?'SP':'HP'}`:
             !a.disabled&&b.disabled?(root.GoblinLanguage?.t('v2.ui.disabled')??'DISABLED'):null};
   }
@@ -70,7 +73,7 @@
     const rockets=[];
     if(map.kind==='deferred-rocket'){
       const strategic=event.weapon.semanticKind==='missile'||root.GoblinFireAnchors?.[event.actor.visualKey]?.klasse==='missile';
-      const count=strategic?1:3,rocketInterval=strategic?160:100;
+      const count=strategic||event.weapon.weaponClass==='missiles'?1:3,rocketInterval=strategic?160:100;
       const apexScale=strategic?2.1:1.6,apexOffset=strategic?44:30,bodyLength=strategic?42:32,bodyWidth=strategic?12:9;
       const launch={x:a.x+Math.cos(angle*Math.PI/180)*8*scale,y:a.y+Math.sin(angle*Math.PI/180)*8*scale};
       const screenDist=Math.hypot(b.x-launch.x,b.y-launch.y),hexDist=screenDist/(Math.sqrt(3)*34);
@@ -93,7 +96,7 @@
       if(index>=0)hitState.units[index]=copy(effect.after);}
     const facing={...event.actor,angle},speed=actor.team==='enemy'?1.3:1;
     const high=event.action.animationPreference.mode==='high';
-    const deaths=event.effects.filter(effect=>effect.before.hp>0&&effect.after.hp<=0&&!effect.after.embarkedOn);
+    const deaths=event.effects.filter(effect=>lifeAlive(effect.before)&&lifeDead(effect.after)&&!effect.after.embarkedOn);
     const end=Math.max(arrival+(rockets.length||deaths.length?900:850),rockets.length?lastArrival+(high?2200:400):0,
       deaths.length?arrival+(high?3420:340):0);
     return {kind:'fire',map,config,actor,target,angle,initial,turnDelta,turn,shotAt,shots,rockets,arrival,
@@ -248,15 +251,15 @@
     for(const [index,effect]of fire.effects.entries()){
       const {delta,age}=effect;if(!delta.changed||age<0||effect.after.embarkedOn)continue;
       const c=center(effect.after),old=effect.before,art=units.find(item=>item.unit.id===effect.subjectId);
-      const dying=old.hp>0&&effect.after.hp<=0;
-      const dead=effect.after.hp<=0&&age>=120,knock=age<50?4*out(age/50):age<250?4*(1-io((age-50)/200)):0;
+      const dying=lifeAlive(old)&&lifeDead(effect.after);
+      const dead=lifeDead(effect.after)&&age>=120,knock=age<50?4*out(age/50):age<250?4*(1-io((age-50)/200)):0;
       const shake=fire.high&&age<300?3*(1-age/300):0;
       const rocket=p.map.kind==='deferred-rocket';
       const offset={x:(rocket?0:Math.cos(a)*knock)*scale+Math.sin(age*.001*34*2*Math.PI)*shake*scale,
         y:(rocket?0:Math.sin(a)*knock)*scale+Math.sin(age*.001*29*2*Math.PI)*shake*.65*scale};
       if(dying&&fire.high&&age>=100){const amplitude=6.5*(1-out(clamp((age-100)/420)))*scale;
         offset.x=Math.sin(age*.214)*amplitude;offset.y=Math.sin(age*.182)*amplitude*.65;}
-      if(art&&(!dead||art.artUnit?.hp>0))art.group.setAttribute('transform',`translate(${offset.x} ${offset.y})`);
+      if(art&&(!dead||lifeAlive(art.artUnit)))art.group.setAttribute('transform',`translate(${offset.x} ${offset.y})`);
       if(dying&&fire.high&&age>=80&&age<340&&art){
         const image=art.group.querySelector('.unit-artwork');
         if(image){
@@ -270,7 +273,7 @@
       }
       if(dead&&dying){
         const timeline=destruction(effect),S=timeline.size,explAge=age-timeline.start,fade=clamp(explAge/timeline.fade);
-        const liveSprite=art?.artUnit?.hp>0;
+        const liveSprite=lifeAlive(art?.artUnit);
         if(art){
           art.group.setAttribute('opacity',liveSprite?1-fade:1);
         }
@@ -323,7 +326,7 @@
           for(let j=0;j<3;j++){
             const x=c.x+((j-1)*14-5.5)*scale,y=c.y-.7*34-2.5*scale;
             layer.appendChild(node('rect',{x,y,width:11*scale,height:5*scale,fill:'#28222c',stroke:'#b8a9e0','stroke-width':scale,opacity:damageOpacity}));
-            const maximum=old.ogreSystems?.maxTreads??old.maxHp,before=old.ogreSystems?.treads??old.hp,fill=clamp(3*before/maximum-j);
+            const maximum=old.catalogSystems?.maxTreads??old.ogreSystems?.maxTreads??old.maxHp,before=old.catalogSystems?.treads??old.ogreSystems?.treads??old.hp,fill=clamp(3*before/maximum-j);
             if(fill>0&&age<500&&Math.floor((age-50)/90)%2===0)layer.appendChild(node('rect',{x:x-1.925*scale,y:y-.875*scale,width:14.85*scale*fill,height:6.75*scale,fill:'#ff4f43',opacity:damageOpacity}));
           }
         }
@@ -362,9 +365,9 @@
       if(!rocket&&fire.high&&age>=30&&age<480){const k=(age-30)/450;
         puff({x:c.x,y:c.y-out(k)*10*scale},(5+11*out(k))*scale,.5*(1-k)**1.4,'#5a5652',`impact-${index}`);}
       if(root.GoblinUIV2?.damageVisible!==false&&age>=50&&age<500&&Math.floor((age-50)/90)%2===0){
-        const before=old.ogreSystems?old.ogreSystems.treads:old.hp;
-        const after=effect.after.ogreSystems?effect.after.ogreSystems.treads:effect.after.hp;
-        const max=old.ogreSystems?old.ogreSystems.maxTreads:old.maxHp;
+        const before=old.catalogSystems?old.catalogSystems.treads:old.ogreSystems?old.ogreSystems.treads:old.hp;
+        const after=effect.after.catalogSystems?effect.after.catalogSystems.treads:effect.after.ogreSystems?effect.after.ogreSystems.treads:effect.after.hp;
+        const max=old.catalogSystems?old.catalogSystems.maxTreads:old.ogreSystems?old.ogreSystems.maxTreads:old.maxHp;
         if(max>0&&before>after){
           for(let j=0;j<3;j++){
             const oldFill=clamp(3*before/max-j),newFill=clamp(3*after/max-j);

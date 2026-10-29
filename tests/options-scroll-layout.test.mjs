@@ -9,7 +9,7 @@ const rule=selector=>{
   return css.slice(start,css.indexOf('}',start)+1);
 };
 function node(tag='div'){
-  return {tag,children:[],className:'',classList:{add(){}},setAttribute(){},
+  return {tag,children:[],dataset:{},className:'',classList:{add(){},toggle(){}},setAttribute(){},
     append(...children){this.children.push(...children)}};
 }
 test('Options alone gets separate header, content scrollport and non-sticky footer',()=>{
@@ -23,6 +23,7 @@ test('Options alone gets separate header, content scrollport and non-sticky foot
     document:{createElement:node,createTextNode:text=>({text})},goBack(){},
     GoblinLanguage:{languages:['de','en','es','fr'],current:'fr'},
     GoblinUIV2:{gridVisible:false,targetsVisible:true,damageVisible:true}};
+  vm.runInNewContext(readFileSync(new URL('../presentation-preferences.js',import.meta.url),'utf8'),context);
   vm.runInNewContext(flow.slice(start,end),context);
   assert.deepEqual(classes,['v2-options-panel']);
   assert.deepEqual(panel.children.map(el=>el.className),['v2-screen-header','v2-screen-main v2-options-main','v2-screen-footer']);

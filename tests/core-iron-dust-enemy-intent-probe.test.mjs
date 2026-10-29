@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -37,7 +38,7 @@ function legacy(changes = {}) {
   const units = clone(IRON_DUST_CORE_DATA_V1.units);
   for (const [id, change] of Object.entries(changes)) Object.assign(units.find(u => u.id === id), change);
   const shots = [], map = IRON_DUST_CORE_DATA_V1.map;
-  const context = vm.createContext({units, W: map.width, H: map.height,
+  const context = vm.createContext({...lifeGlobals,units, W: map.width, H: map.height,
     terrain: new Set(map.terrain.map(cell => `${cell.x},${cell.y}`)),
     movementCost(unit, key) {
       const [x, y] = key.split(',').map(Number);

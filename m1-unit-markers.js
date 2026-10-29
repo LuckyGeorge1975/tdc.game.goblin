@@ -2,24 +2,25 @@
   const NS='http://www.w3.org/2000/svg';
   const size=34, referenceScale=Math.sqrt(3)*size/112;
   const legacyProfiles=new Set(['FIELD_TEST_LEGACY_v1','FIELD_TEST_LEGACY_v2',
-    'LEGACY_SUPERCOVER_PROBE_v1','FIELD_TEST_SUPERCOVER_v1','CATALOG_ARTILLERY_PILOT_v1','CATALOG_SIEGE_PILOT_v1','CATALOG_SKIMMER_PILOT_v1','CATALOG_BASE_TRANSPORT_v1']);
+    'LEGACY_SUPERCOVER_PROBE_v1','FIELD_TEST_SUPERCOVER_v1','CATALOG_ARTILLERY_PILOT_v1','CATALOG_SIEGE_PILOT_v1','CATALOG_SKIMMER_PILOT_v1','CATALOG_BASE_TRANSPORT_v1','CATALOG_SPECIALISTS_v1']);
+  const lifeDead=u=>root.GoblinUnitLife?root.GoblinUnitLife.dead(u):u?.hp<=0;
   const copy=value=>value==null?null:JSON.parse(JSON.stringify(value));
   const amount=(current,maximum)=>Number.isFinite(current)&&Number.isFinite(maximum)&&maximum>0
     ?{current,maximum}:null;
 
   function snapshot(binding,roster,code,memberIds,outcome){
     const units=roster.map(unit=>{
-      const systems=copy(unit.ogreSystems);
+      const systems=copy(unit.catalogSystems??unit.ogreSystems);
       return {unitId:unit.id,name:unit.name,team:unit.team,type:unit.type,visualKey:unit.visualKey,
         position:{x:unit.x,y:unit.y},mapVisible:!unit.embarkedOn,
-        status:unit.hp<=0?'destroyed':unit.disabled?'disabled':'active',
+        status:lifeDead(unit)?'destroyed':unit.disabled?'disabled':'active',
         vitality:{kind:systems?'system-carrier':unit.infantry?'infantry-strength':'hp',
           ...(amount(unit.hp,unit.maxHp)||{current:null,maximum:null})},systems};
     });
     return {binding:{...binding},supported:true,units,objective:{code,outcome,
       members:memberIds.map(unitId=>{
         const unit=roster.find(item=>item.id===unitId);
-        return {unitId,requirement:'destroy',state:!unit?'unsupported':unit.hp<=0?'satisfied':'pending'};
+        return {unitId,requirement:'destroy',state:!unit?'unsupported':lifeDead(unit)?'satisfied':'pending'};
       })}};
   }
   const unsupported=binding=>({binding:{...binding},supported:false,units:[],objective:null});
@@ -34,6 +35,7 @@
     if(binding.profileId==='CATALOG_SIEGE_PILOT_v1'&&(binding.scenarioId!=='siege-pilot'||session.scenarioVersion!==1||rules.fireBudgetVersion!=='siege-tank-fire-budget-v1'||rules.sourceDigest!==root.GoblinSiegePilot?.digest))return unsupported(binding);
     if(binding.profileId==='CATALOG_ARTILLERY_PILOT_v1'&&(binding.scenarioId!=='artillery-pilot'||session.scenarioVersion!==1||rules.losMode!=='strict-supercover'||rules.fireBudgetVersion!=='artillery-spotter-v1'||rules.sourceDigest!==root.GoblinArtilleryPilot?.digest))return unsupported(binding);
     if(binding.profileId==='CATALOG_BASE_TRANSPORT_v1'&&(!root.GoblinCatalogBase?.has(binding.scenarioId)||session.scenarioVersion!==1||rules.losMode!=='strict-supercover'||rules.catalog?.dataDigest!==root.GoblinCatalogBase.digest||!Object.isFrozen(rules.catalog.records)))return unsupported(binding);
+    if(binding.profileId==='CATALOG_SPECIALISTS_v1'&&(!root.GoblinCatalogSpecialistsModel?.has(binding.scenarioId)||session.scenarioVersion!==1||rules.catalog?.dataDigest!==root.GoblinCatalogBase?.digest||rules.catalog?.mechanicsVersion!=='catalog-specialists-mechanics-v1'||!Object.isFrozen(rules.catalog.registry)))return unsupported(binding);
     const enemies=rules.units.filter(unit=>unit.team==='enemy');
     const members=rules.objective==='core'?enemies.filter(unit=>unit.core):enemies;
     if(!members.length||(rules.objective==='core'&&members.length!==1))return unsupported(binding);
@@ -51,7 +53,7 @@
       amount(unit.vitality.current,unit.vitality.maximum);
     return {kind:unit.systems?'treads':unit.vitality.kind,...value,
       segments:value?Array.from({length:3},(_,i)=>Math.max(0,Math.min(1,3*value.current/value.maximum-i))):null,
-      destroyedWeapons:unit.systems?Object.values(unit.systems.weapons||{})
+      destroyedWeapons:unit.systems?.version==='catalog-systems-state-v1'?unit.systems.components.filter((c,i)=>c.destroyed&&unit.systems.rules.definition.components[i].kind==='weapon').length:unit.systems?Object.values(unit.systems.weapons||{})
         .reduce((sum,weapon)=>sum+(Number.isFinite(weapon.destroyed)?weapon.destroyed:0),0):0};
   }
   const node=(tag,attrs={})=>{

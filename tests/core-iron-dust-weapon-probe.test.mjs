@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -17,7 +18,7 @@ const reset = {type: 'ResetWeaponPhase'};
 const source = IRON_DUST_CORE_DATA_V1.units.find(unit => unit.id === 'ogre');
 
 function legacySystems() {
-  const context = vm.createContext({});
+  const context = vm.createContext({...lifeGlobals,});
   vm.runInContext(readFileSync(new URL('../ogre-systems.js', import.meta.url), 'utf8'), context);
   return context.GoblinSystems;
 }
@@ -35,7 +36,7 @@ function legacyTargetAllowed(systems) {
     }
     throw new Error(`unclosed Legacy function ${name}`);
   });
-  const context = vm.createContext({GoblinSystems: systems, dist: hexDistance,
+  const context = vm.createContext({...lifeGlobals,GoblinSystems: systems, dist: hexDistance,
     lineOfSight: (a, b) => hasIronDustLegacyLineOfSight(IRON_DUST_LEGACY_LOS_PROBE_V1, a, b)});
   vm.runInContext(functions.join('\n'), context);
   return vm.runInContext('targetAllowed', context);

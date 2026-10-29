@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import TerrainRules from '../terrain-rules.js';
 import {readFileSync} from 'node:fs';
 
-test('all twelve artwork terrain types have explicit gameplay rules',()=>{
-  assert.equal(Object.keys(TerrainRules.rules).length,12);
+test('all twelve artwork types and the virtual field position have explicit gameplay rules',()=>{
+  assert.equal(Object.keys(TerrainRules.rules).filter(type=>type!=='field-position').length,12);
   for(const [type,rule] of Object.entries(TerrainRules.rules)){
     assert.ok(rule.label&&rule.note,type);
     assert.equal(typeof rule.blocksLos,'boolean',type);

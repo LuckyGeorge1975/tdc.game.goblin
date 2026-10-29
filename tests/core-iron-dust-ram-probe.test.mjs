@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -26,7 +27,7 @@ function legacyRam(state, targetId) {
   const units = plain(state.units), actor = units.find(unit => unit.id === 'ogre');
   const target = units.find(unit => unit.id === targetId);
   const logs = [], toasts = [];
-  const context = vm.createContext({
+  const context = vm.createContext({...lifeGlobals,attackRange:u=>u.range,
     units, selected: actor, phase: state.phase, turnPhase: state.turnPhase,
     gameOver: false, focusedCell: null, transportLoadMode: null,
     transportUnloadMode: null, W: IRON_DUST_CORE_DATA_V1.map.width,

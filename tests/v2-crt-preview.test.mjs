@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -95,7 +96,7 @@ test('Legacy adapter shares legal query, effective cover, selected attack and CR
   const actor={id:'ogre',team:'player',hp:8,x:1,y:1,damage:4,range:6,
     ogreSystems:{weapons:{main:{attack:6,range:6,label:'Main'},secondary:{attack:10,range:6,label:'Secondary'}}}};
   const target={id:'guard',team:'enemy',hp:3,x:3,y:4,defense:2};
-  const context={units:[actor,target],currentScenario:'iron-dust',scenarioCatalog:{'iron-dust':{}},
+  const context={...lifeGlobals,units:[actor,target],currentScenario:'iron-dust',scenarioCatalog:{'iron-dust':{}},
     ScenarioRuleProfiles:{entries:{'iron-dust':{ruleProfileId:'LEGACY'}}},
     legacySession:{scenarioId:'iron-dust',ruleProfileId:'LEGACY'},
     IronDustBrowserV2:null,GameDialogs:{isOpen:()=>false},phase:'player',turnPhase:'fire',

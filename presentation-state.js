@@ -1,4 +1,6 @@
 (function(root){
+  const lifeAlive=u=>globalThis.GoblinUnitLife?GoblinUnitLife.alive(u):u?.hp>0;
+  const lifeDead=u=>globalThis.GoblinUnitLife?GoblinUnitLife.dead(u):!!u&&Number.isFinite(u.hp)&&u.hp<=0;
   const copy=value=>JSON.parse(JSON.stringify(value));
   function freeze(value){
     if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}
@@ -51,13 +53,13 @@
             angleDegrees:unit.team==='enemy'?180:0,sourceActionId:null,origin:'baseline'};
       });
       const oldWrecks=new Map(sidecar.wrecks.map(item=>[item.unitId,item]));
-      sidecar.wrecks=state.units.filter(unit=>Number.isFinite(unit.hp)&&unit.hp<=0).map(unit=>{
+      sidecar.wrecks=state.units.filter(unit=>lifeDead(unit)&&!unit.salvaged).map(unit=>{
         const old=oldWrecks.get(unit.id),prior=endState?.units.find(item=>item.id===unit.id);
         const same=old&&old.team===unit.team&&old.visualKey===(unit.visualKey??null);
         const beforeUnit=confirmedBefore?.units.find(item=>item.id===unit.id);
         // A draw may have reconstructed this death before the accepted Ram settles.
         const enrich=same&&old.origin==='reconstructed-state-transition'&&old.destructionRef===null&&
-          destructionRef?.source==='accepted-command'&&beforeUnit?.hp>0&&
+          destructionRef?.source==='accepted-command'&&lifeAlive(beforeUnit)&&
           beforeUnit.team===unit.team&&(beforeUnit.visualKey??null)===(unit.visualKey??null)&&
           old.position.x===unit.x&&old.position.y===unit.y&&
           destructionRef.beforeRevision===stamp(confirmedBefore)&&destructionRef.afterRevision===stamp(state);
@@ -69,7 +71,7 @@
           binding:{...binding,sessionInstanceId:sidecar.sessionInstanceId,branchGeneration:sidecar.branchGeneration},
           destructionRef:destructionRef?copy(destructionRef):null,
           cargoRelation:carrierId?{carrierId}:null,
-          origin:destructionRef?'confirmed-end-state':prior?.hp>0?'reconstructed-state-transition':'reconstructed-default'}),
+          origin:destructionRef?'confirmed-end-state':lifeAlive(prior)?'reconstructed-state-transition':'reconstructed-default'}),
           ...(enrich?{destructionRef:copy(destructionRef),origin:'confirmed-end-state'}:{}),
           position:position(unit),facingDegrees:facing.angleDegrees};
       });
@@ -165,7 +167,7 @@
             turn:ticket.before.turn,phase:ticket.before.phase,beforeRevision:stamp(ticket.before),afterRevision:stamp(after)},
           actor:{unitId:actor.id,team:actor.team,visualKey:actor.visualKey??null,positionBefore:position(actor),positionAfter:position(actor)},
           targetId:target.id,weapon:{usedWeaponKey:weaponKey,attack:used?.attack??fire.attack??actor.damage,
-            range:used?.range??fire.range??actor.range,...(fire.mode?{mode:fire.mode,spotterId:fire.spotterId}:{}),semanticKind:fire.strategic?'missile':weaponKey==='missiles'?'rockets':null,
+            range:used?.range??fire.range??actor.range,...(fire.mode?{mode:fire.mode,spotterId:fire.spotterId}:{}),...(fire.targetComponentId?{targetComponentId:fire.targetComponentId}:{}),...(fire.weaponClass?{weaponClass:fire.weaponClass}:{}),semanticKind:fire.strategic?'missile':fire.weaponClass==='missiles'||weaponKey==='missiles'?'rockets':null,
             visualMappingVersion:'fire-mapping-v1'},before:ticket.before,after,sourceResults,sourceEventIndex:fire.sourceEventIndex,
           effects:effects.filter(effect=>effect.before&&effect.after).map((effect,index)=>({...effect,
             effectId:`${eventId}/${index}`,sourceResultIndex:effect.sourceResultIndex??fire.sourceEventIndex})),path:null});
@@ -187,7 +189,7 @@
           saved.facingByUnit.length!==state.units.length)return false;
       const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
       if(!saved.wrecks.every(object)||!saved.facingByUnit.every(object))return false;
-      const dead=state.units.filter(unit=>Number.isFinite(unit.hp)&&unit.hp<=0),wreckIds=new Set(),wreckUnits=new Set();
+      const dead=state.units.filter(unit=>lifeDead(unit)&&!unit.salvaged),wreckIds=new Set(),wreckUnits=new Set();
       if(saved.wrecks.length!==dead.length||!saved.wrecks.every(item=>{
         const unit=dead.find(unit=>unit.id===item.unitId),facing=saved.facingByUnit.find(f=>f.unitId===item.unitId);
         const carrierId=unit?.embarkedOn??null;

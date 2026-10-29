@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -14,7 +15,7 @@ async function scene(lang,runtime){
   let currentLang=lang;
   const node=()=>({children:[],textContent:'',replaceChildren(){this.children=[];},
     appendChild(child){this.children.push(child);},append(child){this.children.push(child);},prepend(){}});
-  const intel=node(),context=vm.createContext({console,URL,URLSearchParams,
+  const intel=node(),context=vm.createContext({...lifeGlobals,actor:null,console,URL,URLSearchParams,
     document:{currentScript:{src:'http://127.0.0.1/localization.js'},readyState:'loading',title:'',
       addEventListener(){},createElement:node},
     location:{href:'http://127.0.0.1/',search:''},navigator:{language:'de'},

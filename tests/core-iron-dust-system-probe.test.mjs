@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -13,7 +14,7 @@ const source = IRON_DUST_CORE_DATA_V1.units.find(unit => unit.id === 'ogre');
 const hit = (targetKey, attackerId = 'guard') => ({type: 'ResolveSystemAttack', attackerId, targetKey});
 
 function legacy() {
-  const context = vm.createContext({units: [], showUnitInfo() {}, draw() {},
+  const context = vm.createContext({...lifeGlobals,units: [], showUnitInfo() {}, draw() {},
     Math: Object.assign(Object.create(Math), {random: () => 0}),
     terrainTypeAt: () => 'open-ground'});
   const game = readFileSync(new URL('../game.js', import.meta.url), 'utf8');

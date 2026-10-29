@@ -52,8 +52,8 @@
   draw=function(){units.forEach(syncUnit);return baseDraw()};
 
   enemyFire=function(foe){
-    if(foe.hp<=0||foe.disabled)return false;
-    const targets=units.filter(unit=>unit.team==='player'&&unit.hp>0&&!unit.embarkedOn).sort((a,b)=>dist(foe,a)-dist(foe,b));
+    if(unitDead(foe)||foe.disabled)return false;
+    const targets=units.filter(unit=>unit.team==='player'&&unitAlive(unit)&&!unit.embarkedOn).sort((a,b)=>dist(foe,a)-dist(foe,b));
     const target=targets.find(unit=>dist(foe,unit)<=foe.range&&lineOfSight(foe,unit));
     if(!target)return false;
     if(ensureState(target)){

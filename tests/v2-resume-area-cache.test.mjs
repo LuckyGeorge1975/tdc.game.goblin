@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -34,7 +35,7 @@ function scene() {
   command({type:'EndPhase'});
   command({type:'SelectWeapon', unitId:'ogre', weaponKey:'missiles'});
   const records = [];
-  const context = {
+  const context = {...lifeGlobals,
     mode:'ready', paused:false, pauseActive:false, screen:'play', savedAuto:false, waiting:[],
     get session() { return session; }, enemyFlow:{running:false,start(){}}, queryIronDustProfile,
     areaCache:{key:null,value:null}, GoblinLanguage:{current:'de'}, core:()=>true,

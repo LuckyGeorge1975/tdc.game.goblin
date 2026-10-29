@@ -1,5 +1,7 @@
 // A display-only queue. Input consists exclusively of accepted snapshots and original paths.
 (function(root){
+  const lifeAlive=u=>globalThis.GoblinUnitLife?GoblinUnitLife.alive(u):u?.hp>0;
+  const lifeDead=u=>globalThis.GoblinUnitLife?GoblinUnitLife.dead(u):!!u&&Number.isFinite(u.hp)&&u.hp<=0;
   const center=cell=>({x:58+Math.sqrt(3)*34*(cell.x+(cell.y%2)/2),y:48+51*cell.y});
   const heading=(a,b)=>(Math.atan2(center(b).y-center(a).y,center(b).x-center(a).x)*180/Math.PI+360)%360;
   const shortest=angle=>((angle%360)+540)%360-180===-180?180:((angle%360)+540)%360-180;
@@ -168,8 +170,8 @@
       if(moving)actorNode=group;
       group.dataset.movementUnit=unit.id;
       const old=value.fire?.effects.find(effect=>effect.subjectId===unit.id)?.before;
-      const artUnit=old&&old.hp>0&&unit.hp<=0&&value.fire.age<340?old:unit;
-      if(artUnit.hp<=0)root.UnitVisuals.drawWreck(group,artUnit,c,{ns});
+      const artUnit=old&&lifeAlive(old)&&lifeDead(unit)&&value.fire.age<340?old:unit;
+      if(lifeDead(artUnit))root.UnitVisuals.drawWreck(group,artUnit,c,{ns});
       else{
         root.UnitVisuals.draw(group,artUnit,c,{ns,map:true,color:unit.team==='enemy'?'#ee574d':'#62cadd'});
         if(unit.disabled){group.style.opacity='.32';group.style.filter='grayscale(1)';}
@@ -207,7 +209,7 @@
     }
     const ordered=unitNodes.slice().sort((a,b)=>{
       const y=item=>item.group===actorNode&&value.motion?value.motion.point.y:center(item.unit).y;
-      return (a.unit.hp>0?1:0)-(b.unit.hp>0?1:0)||y(a)-y(b)||String(a.unit.id).localeCompare(String(b.unit.id));
+      return (lifeAlive(a.unit)?1:0)-(lifeAlive(b.unit)?1:0)||y(a)-y(b)||String(a.unit.id).localeCompare(String(b.unit.id));
     });
     const order=ordered.map(item=>item.unit.id).join('/');
     if(order!==depthOrder){ordered.forEach(item=>layer.appendChild(item.group));if(markerLayer)layer.appendChild(markerLayer);if(effectLayer)layer.appendChild(effectLayer);depthOrder=order;}

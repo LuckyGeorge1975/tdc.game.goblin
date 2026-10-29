@@ -20,14 +20,16 @@ async function load(bundle=showcase,search='',registry=profiles){
     TerrainRules:(await import('../terrain-rules.js')).default,updateRoster:()=>{},terrain:new Set(),currentScenario:'iron-dust',
     $:()=>({appendChild:option=>options.push(option)}),renderScenarioObjective:()=>{},
     document:{createElement:()=>({dataset:{}})},
-    fetch:async url=>({ok:true,json:async()=>url.includes('unit-profiles')?registry:url.includes('showcase-levels')?bundle:atlas}),
+    fetch:async url=>({ok:true,json:async()=>url.includes('unit-profiles')?registry:url.includes('showcase-levels')?bundle:url.includes('-pilot.v1.json')?JSON.parse(readFileSync(new URL('../'+url,import.meta.url),'utf8')):atlas}),
     console:{error:(...items)=>errors.push(items)},addLog:()=>{},
     location:{search},loadScenario:id=>loaded.push(id),URLSearchParams
   });
+  for(const file of ['artillery-spotter-rules.js','siege-tank-fire-budget.js','skimmer-budget.js','assets/unit-art/rules/artillery-pilot.v1.js','assets/unit-art/rules/siege-pilot.v1.js','assets/unit-art/rules/skimmer-pilot.v1.js'])vm.runInContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
   vm.runInContext(manifestSource,context);
   vm.runInContext(source,context);
   await new Promise(resolve=>setImmediate(resolve));
-  return {context,options,errors,loaded};
+  // These historical ATLAS assertions retain their original six-level boundary. The three pilots are validated above and checked by their own suites.
+  return {context,options:options.filter(o=>!['artillery-pilot','siege-pilot','skimmer-pilot'].includes(o.value)),errors,loaded};
 }
 
 test('ATLAS and five smaller scenarios load with complete roster and terrain coverage',async()=>{

@@ -3,7 +3,7 @@
   function weaponEntries(unit){const state=stateFor(unit);return state?Object.entries(state.weapons).map(([key,weapon])=>({key,weapon})):[]}
   function targetAllowed(unit,target,key){
     const state=stateFor(unit),weapon=state?.weapons[key];
-    return !!(weapon&&GoblinSystems.weaponReady(weapon)>0&&target?.hp>0&&target.team!==unit.team&&dist(unit,target)<=weapon.range&&lineOfSight(unit,target)&&(!weapon.infantryOnly||target.infantry===true||target.engineering===true));
+    return !!(weapon&&GoblinSystems.weaponReady(weapon)>0&&unitAlive(target)&&target.team!==unit.team&&dist(unit,target)<=weapon.range&&lineOfSight(unit,target)&&(!weapon.infantryOnly||target.infantry===true||target.engineering===true));
   }
   function weaponHasTarget(unit,key){return units.some(target=>targetAllowed(unit,target,key))}
   function hasFireAction(unit){return weaponEntries(unit).some(({key,weapon})=>GoblinSystems.weaponReady(weapon)>0&&weaponHasTarget(unit,key))}
@@ -21,13 +21,13 @@
   function renderControls(){
     const panel=$('#weapon-controls');if(!panel)return;
     const unit=selected,state=stateFor(unit);
-    if(!state||turnPhase!=='fire'||phase!=='player'||unit.hp<=0){panel.classList.add('hidden');panel.innerHTML='';return}
+    if(!state||turnPhase!=='fire'||phase!=='player'||unitDead(unit)){panel.classList.add('hidden');panel.innerHTML='';return}
     selectDefaultWeapon(unit);panel.classList.remove('hidden');panel.innerHTML='';
     weaponEntries(unit).forEach(({key,weapon})=>{const ready=GoblinSystems.weaponReady(weapon),button=document.createElement('button');button.type='button';button.className='weapon-control'+(state.selectedWeapon===key?' active':'');button.disabled=ready<=0;button.innerHTML=`<b>${weapon.label}</b><small>A${weapon.attack} · R${weapon.range} · READY ${ready}</small>`;button.title=ready<=0?'Keine Systeme verfügbar':weaponHasTarget(unit,key)?'Waffe auswählen':'Kein Ziel in Reichweite';button.onclick=event=>{event.stopPropagation();selectWeapon(unit,key)};panel.appendChild(button)});
   }
   root.canSelectedWeaponTarget=function(attacker,target){const state=stateFor(attacker);return !state||targetAllowed(attacker,target,state.selectedWeapon)};
   const basePhaseCanAct=phaseCanAct;
-  phaseCanAct=function(unit,phaseName=turnPhase){if(stateFor(unit)&&phaseName==='fire')return unit.team==='player'&&unit.hp>0&&!unit.disabled&&hasFireAction(unit);return basePhaseCanAct(unit,phaseName)};
+  phaseCanAct=function(unit,phaseName=turnPhase){if(stateFor(unit)&&phaseName==='fire')return unit.team==='player'&&unitAlive(unit)&&!unit.disabled&&hasFireAction(unit);return basePhaseCanAct(unit,phaseName)};
   const basePhaseDoneLabel=phaseDoneLabel;
   phaseDoneLabel=function(unit){if(stateFor(unit)&&turnPhase==='fire')return weaponEntries(unit).some(({weapon})=>GoblinSystems.weaponReady(weapon)>0)?'NO TARGET':'FIRE DONE';return basePhaseDoneLabel(unit)};
   const baseResetActionState=resetActionState;

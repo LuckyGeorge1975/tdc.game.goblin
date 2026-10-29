@@ -1,3 +1,4 @@
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -30,7 +31,7 @@ function extractFunction(text, name) {
 }
 
 function legacyAllowed(state, command) {
-  const context = vm.createContext({dist: hexDistance,
+  const context = vm.createContext({...lifeGlobals,dist: hexDistance,
     lineOfSight: (from, to) => hasIronDustLegacyLineOfSight(
       IRON_DUST_LEGACY_LOS_PROBE_V1, from, to)});
   vm.runInContext(readFileSync(new URL('../ogre-systems.js', import.meta.url), 'utf8'), context);

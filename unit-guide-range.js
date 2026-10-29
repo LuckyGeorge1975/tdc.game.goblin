@@ -25,6 +25,7 @@
         range=available.length?Math.max(...available):0;
       }
     }
+    if(live?.catalogSystems){weapon=true;range=root.GoblinSpecialistsRuntime?.selectedSpec(live)?.range??0;}
     const missile=entry.name==='STRATEGIC MISSILE CARRIER';
     if(missile&&live&&live.missilesRemaining<=0)range=0;
     return {movement,bonus,range,weapon,missile,spent:missile&&!!live&&live.missilesRemaining<=0,live:!!live};
