@@ -76,7 +76,7 @@
     },
     "index.html": {
       "from": "64eee5846649cfc511d47180ce6ff48a06b1413d276e8b6c7425fcd123789df3",
-      "to": "6b075ddf38ef3c8416fb43aca57f272b92d3967bbd3dacdf35a89bd29e1aeb0f"
+      "to": "58c7373afaf3850d12c15765debe550b03242c76023a1cba949f5c5a6ac49ae3"
     },
     "legacy-presentation.js": {
       "from": "ff44b4017c3cbddfc61fc075b5c1e77e6a3530ac69f5aac474a2e3255ee98879",
@@ -112,7 +112,7 @@
     },
     "ui-v2.js": {
       "from": "84826f2100b5ecb5edb268368bc511de5a975f79d53561dda0ad2f3476926d88",
-      "to": "4bff5376ecd052879a1a09baefa9bdfa7368e5b57c0a3e5108ce2bdf640ec40c"
+      "to": "7b8080f6b992d8c25f8614fa9323f99ba9653946e792abb255e340a39a350a91"
     },
     "unit-guide-range.js": {
       "from": "108bf81e53d203ed247ebe04ade136f405ecdf72400983f422a350153038981a",

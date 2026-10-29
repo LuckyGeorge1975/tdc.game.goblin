@@ -81,8 +81,13 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function notifyPhaseSkip(phaseName) {
       if (!['movement', 'fire', 'gev'].includes(phaseName) || core()) return;
       const key = `v2.phaseSkip.${phaseName}`;
-      addLog(t(key));
-      logEl.firstElementChild.dataset.phaseSkipKey = key;
+      if (globalThis.GoblinCatalogFullRuntime?.active()) GoblinCatalogFullRuntime.log(key, {}, []);
+      else {
+        const previous = logEl.firstElementChild;
+        addLog(t(key));
+        const line = logEl.firstElementChild;
+        if (line && line !== previous) line.dataset.phaseSkipKey = key;
+      }
       view.phaseSkip = {key, turn};
       clearTimeout(view.phaseSkipTimer);
       view.phaseSkipTimer = setTimeout(() => { view.phaseSkip = null; render(); }, 9000);

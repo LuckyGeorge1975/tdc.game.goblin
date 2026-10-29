@@ -48,3 +48,12 @@ Unterscheidende tatsächliche Quell-Render-Gegenproben waren rot und sind grün;
 Die zehn Full-v2-Dateien einschließlich Index/TraceDigests und vier historischen Orakel bleiben bytegleich. Eine explizite DisplaySourceCompat bindet genau zehn UI-/Copy-/Cache-/Checkerpfade mit Before/Afterhashes und separatem Providerhash; im gemischten catalog-full-runtime.js ändert sich ausschließlich catalogCard. Alle Quellenheader/Bytegates, Negativgates und der komplette kurze normale U1-Siegreplay sind geprüft. Kein neuer Recorderlauf oder Spielwertnormalisierung. Die vorherigen zehn vollständigen Replays mit1907Schritten bleiben als vorausgehender Beleg mit diesem engen Displaydelta erhalten.
 
 Native U3-Fortsetzung/Wellen/Niederlage und der gezielte gemeinsame UI-Retest bleiben beim unabhängigen Prüfer nach Koordinationsstart auf fester sauberer Fix-SHA. Daraus folgt noch kein Candidate-/FULL-PASS, keine Aktivierung oder Previewveröffentlichung.
+
+
+## QA-Restfix .4.8: automatischer Phasenhinweis
+
+Der native Turn19-Fehler auf803a888 ist im tatsächlichen notifyPhaseSkip-Code rot reproduziert und behoben: Full meldet über vorhandenes Full.log(key,{},[]), der unterdrückte Legacy-Rohlog wird nicht angesprochen. NonFull markiert nur eine tatsächlich neu eingefügte Zeile. Viewhinweis/Timeout und der reguläre maybeAutoAdvancePhase-Aufrufer bleiben unverändert; keine Timer-/AI-/Wellen-/Limit-/RNGregelkorrektur.
+
+Bewusstes Darstellungsdelta: genau eine subjectfreie typisierte Nachrichtenzeile in Full.logs pro tatsächlichem Hinweis, damit ebenfalls im bestehenden Fullsnapshot. Kein pauschaler identischer-Fullsnapshot-Claim. Eigene World-/Historycommands-/Wellen-/Sicht-/Feueruhren-/RNGdaten bleiben durch notify unverändert. Die echte anschließende reguläre Phase/Gegnerstart wird genau einmal erreicht.
+
+Acht gezielte Prüfungen bestehen einschließlich leerem/altem Log, NonFull/Core/unknownphase, normalem Aufrufer,15unverändertenFixturebytes/10Header-/Foreigngates und vollständigem OriginalU1-Replay. Kein altes Logoracle verändert oder normalisiert, keine Neuaufnahme. Native Fortsetzung überTurn19 bis Enemy20/Limitende und Ergebnis bleibt nach festem Fixcommit beim unabhängigen Reviewer. Bugs/QAchild/Parent bleiben bis zuständiger Abnahme offen; FULL-Aktivierung weiterhin gesperrt.
