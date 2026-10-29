@@ -8,7 +8,9 @@ function terrainTypeAt(x,y){const key=`${x},${y}`;return terrainTypes.get(key)||
 function drawTerrainArtwork(x,y){
   const type=terrainTypeAt(x,y);
   if(type==='field-position'&&typeof TerrainDisplay!=='undefined'){const c=hexCenter(x,y),marker=TerrainDisplay.svgIcon(type,c.x-14,c.y-14,28);marker.classList.add('terrain-artwork');svg.appendChild(marker);return true}
-  if(type==='open-ground'&&currentScenario!=='atlas-proving-grounds')return false;
+  if(type==='open-ground'&&currentScenario!=='atlas-proving-grounds'&&
+    !(['training-t01','training-t02','training-t03'].includes(currentScenario)&&legacySession?.scenarioId===currentScenario&&
+      legacySession.ruleProfileId==='TRAINING_FIELD_TEST_v1'&&globalThis.GoblinTrainingModel?.has(currentScenario)))return false;
   const asset=UnitVisuals.terrainAssetFor(type);
   if(!asset)return false;
   const c=hexCenter(x,y),image=document.createElementNS(NS,'image');

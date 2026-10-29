@@ -297,7 +297,8 @@ body.ui-v2-active .v2-fire-ratio { fill: var(--v2-text); text-anchor: middle; do
 .v2-full-blast{pointer-events:none;stroke:#ffb15c;stroke-width:2;vector-effect:non-scaling-stroke}
 .v2-full-blast-center{fill:rgba(255,111,48,.35)}
 .v2-full-blast-adjacent{fill:rgba(255,177,92,.17);stroke-dasharray:4 3}
-.v2-training{margin-block:1rem;padding:1rem;max-width:100%;overflow-wrap:anywhere}
+.v2-shell:has(> #v2-training:not([hidden])){grid-template-rows:auto auto minmax(0,1fr)}
+.v2-training{margin:0;padding:1rem;min-height:min-content;max-width:100%;overflow-wrap:anywhere}
 .v2-training[hidden]{display:none}
 .v2-training p{margin:.5rem 0;line-height:1.5;max-width:90ch}
 .v2-training .v2-screen-actions{flex-wrap:wrap}

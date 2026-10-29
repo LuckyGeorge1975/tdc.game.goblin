@@ -1,0 +1,86 @@
+{
+  "version": "training-ui-fix-source-compatibility-v1",
+  "baseCommit": "2dcd4bac91d7912bc59f913566994fd296a2fe56",
+  "sourceProvenanceOnly": true,
+  "scope": "Natural third shell row for a visible teaching panel, content minimum/margin and cache. game.js changes only drawTerrainArtwork open-ground rendering for the three exact admitted training IDs using the existing terrain asset; historical Atlas and other scenes retain their previous gate. Exact required checker wiring only; no gameplay, profile, script, seed, World, Receipt, history or RNG value changes. All original training and older fixture bytes preserved.",
+  "references": [
+    "3d3131f6d70f820025097d49259ac51dc3e70327686a06d42f5c00f283b0e173",
+    "d6148f6166874d57b36f0b84943fe766d4d4dc8bc86cc595171594093a3263b1",
+    "76467b8d89ce89130d6299f36e511b000a05fdd1d3fa40ca113f0f4bc78b64fd",
+    "85ec0edc41c4a3b8f84856d337947c69cfe7bf66ad840f59467fb5b4e8e8f2e0",
+    "7b926b67d121e352212c4e7a9ca4d15a801aa54a4f259a6cd5d207a31e77ddfd",
+    "22b4c9f8b6fed666570cef25f70a5d2302c9e7bdd77378454a0422289ab12ef1",
+    "75fc2524d213e1b05b542caefe57099b52af974ce312555406f5992bcd8280d5",
+    "f363b26f5e68c2c510e1997ec46a7c860e1ebdf2580f0dc48a169f82be86087a",
+    "8df47d924bc2e73642b379ab309c923a248d5f0703bb05a049169312afbde1a6",
+    "ba7bdafd71e03bbf2cff8ac24b7a7a715f581f109b3cc94f9ce381b3473565ff",
+    "b1023f222438f5f24e83fc23bf088093f8ed1c66a5b7939e9bfb4f5d104d1c3d",
+    "1e49721bc20dcf792443927f6be45356c3af9962e863046e839f65f663d37c29",
+    "2f8c8326f1f2fef605cf97b21724bc31cee42f62db7e37fd6ea7bc0c5dcc4c26",
+    "a6207b191d6d1a76d73c29062f658763ce753f2d65ad50849963fb79cec96dea",
+    "bd4e9a34e37fce6c20005e84642008bbb05995cd6b24149b148d685fde2e6cef",
+    "8258ef2c242038a40a08fc4c1358bd293c0a34fa713b66c83148eacf36159fe5",
+    "ef96512a240c6323a2baf0efee634d6f6a492e8ba0d7f215d496b9a8c2a303d9",
+    "e8cb9acf9b76af82cc4970f2d013f508dbf76954a65dcaf02ee0665648dce5eb",
+    "cb9bb007e76923d134033f4babdc0790169c5c1a1c6df136eaeb2f18c1ffd7f0",
+    "f8140d51ab9816912436d4e71c631681dfca1d602b9f544ca88b0857c736a3e0",
+    "2c58cafd2f102b881c285bfe6a301e24a0950a9f928c577192e8bbbd03943872",
+    "b821bbddf98b1dc17580e741fde3277b1c6e644c6dcc1bcfe499c46527976620",
+    "2439af2d9cf67113005c1129d87b6e98fc93eeae18ac1bdce9b667dc4062c28a",
+    "f361dda1dac460579e517ab053cd03b549ed84deeecf0b5c0828f750ff2331fe",
+    "524faf9e1c01140b1c2b607386012743710237ffb2c96836f8b4e9f2bc92b26a",
+    "ca6291a50313cf7d44ae41b8455f3c2e0ec197424c7f3ed50c282916758d8441",
+    "82aad54da0c340acb3c144e60f8fe1a79c004baac015c712bef7f09389caf2f1",
+    "e8abd5e9939450b92cf782e271554140096b772671171f0f1b83747f3c65297b",
+    "training-t01",
+    "training-t02",
+    "training-t03"
+  ],
+  "priorManifestSha256": "5371a7ad3bfd8ca4354e879b2cabf3d8b0d9335aa5d31684c418e5f9880318da",
+  "providerSha256": "d5ff6f019ca2602df589ca6d1a679d57d5f58979d1fc76e0c149be2188a03114",
+  "sourcePairs": {
+    "ui-v2.css": {
+      "from": "a76dcc9670d908186581a458a79411cc6270b195086b3be1edc08cd081a26463",
+      "to": "2ec9431d42adc6543263e49e7efb7d1fb44716310b8390c0987a1f684ec0ff1a"
+    },
+    "index.html": {
+      "from": "8888198ac17be4cb1fe459fcd8500945a89bd0fb884431fa229a082d10ea2378",
+      "to": "7d5c30a57157f439977fba6f65bb87727594f7f4c42a8273d9155018ae6590df"
+    },
+    "game.js": {
+      "from": "b1dc46bc7360b3cd54cc878dadb3aec95b89d64e9da63608700331cc8da5f4e0",
+      "to": "4dc62cb777db44338d67b22aa0b99760a4835ad1968ca35d99002e96f7bd56f9"
+    },
+    "tests/helpers/training-source-compatibility.mjs": {
+      "from": "f72c1ba8cecceb16bd63b4421d2963cff22f996ce017101ecf2932280b46f36c",
+      "to": "a465a86bdb53738975ee1449cf649753bb5281ddc5731f9b7cfef34b524373cd"
+    },
+    "tests/training-product-trace.test.mjs": {
+      "from": "09c8c67e6a132039bc086cadf8f53647b01677d09a1a767298d16a2284aad923",
+      "to": "cd62193404830afa7d0b5bcfb1955a2dfa9380a23e042e42c681c709a20047de"
+    }
+  },
+  "addedSources": {
+    "tests/training-ui-fix-source-compatibility.test.mjs": "5e6b602a751f1006a1b4f223f5f8d3369c5d73281174a0b423f81b1ab5a856e9"
+  },
+  "immutableFixtures": {
+    "artillery-product-traces.v1.json": "14c27d0ff45e6bf1db09db109c5020176f9611f3a2cb197a63930303e98064ec",
+    "catalog-base-product-traces.v1.json.gz": "f1c41110bd4d3ef954672d2be901aa13a7169124efb610277e1da0f201928d68",
+    "catalog-specialists-product-traces.v1.json.gz": "270ed926a36b5dc4dea03d9f7cce88f214d7ea64d90f5195e807c20ecbb53bf5",
+    "catalog-specialists-boundary-traces.v1.json.gz": "7aa9fa3c130562755442d55a3181a1c2118ee1908b76b422e5cd2b431e5c3880",
+    "catalog-full/index.v2.json": "49291ebc27292f5f8fdee531565cbcd7207cb721ed61247d1b1c1fe707d4b99a",
+    "catalog-full/catalog-full-atlas-victory.v2.json.gz": "a6a209e1b339ccc5b50cc1e1fa2af38a26b78d194d421d9a8a8eaa54185ef773",
+    "catalog-full/catalog-full-atlas-defeat.v2.json.gz": "3989e02e0119bc39f8ec3201819308d63dfce01fdceea49479e8d0e797bc78bb",
+    "catalog-full/catalog-full-terrain-course-victory.v2.json.gz": "679ca496dd4f267e91276a416f8cd08b646f57f034a3aabad09a73bca14441d9",
+    "catalog-full/catalog-full-terrain-course-defeat.v2.json.gz": "1d9737156f14e42153cc19a3e4e959305067d8411446366c4e5744b5567d5fda",
+    "catalog-full/catalog-full-advance-victory.v2.json.gz": "4371bf97267a68fc498e84dea2734063d96e5289166487e6a4dba4bcab2c688b",
+    "catalog-full/catalog-full-advance-defeat.v2.json.gz": "88a114cba33dfa2da9b2dee97543fd0f29048e6e0e71c1e48c025ce1f084f471",
+    "catalog-full/catalog-full-siege-victory.v2.json.gz": "6f178f286f3d142df55a0ebf5c978ae1efdfa4a7891c315020788e77ac7fcf4d",
+    "catalog-full/catalog-full-siege-defeat.v2.json.gz": "36f38372bd73cdc88be9c1e581a67859448bbdbde14c9a45719f6e5022a149d5",
+    "catalog-full/catalog-full-specialists-victory.v2.json.gz": "6b868c3c237cf849fd440646c7cca808395a818e69adbdc47cc60c463e124679",
+    "catalog-full/catalog-full-specialists-defeat.v2.json.gz": "7ea2236748bc1c2712d09ab4bff65af3b384714de5add9c7d940cfc9e6475e54",
+    "training-t01.game-teaching.v1.json.gz": "d1205b720598c076d6e55130db75fe8886676d37b637e67204765126e83ee383",
+    "training-t02.game-teaching.v1.json.gz": "4fdc68177dc05fc4c0ff9e6c8113d7f8df438d25d6bfc6c6a7f9ce55ff3c9ee3",
+    "training-t03.game-teaching.v1.json.gz": "60b763d19565bded99c522697cce2224f8ea34292a989b70eb5a04aa3cf1e3ac"
+  }
+}
