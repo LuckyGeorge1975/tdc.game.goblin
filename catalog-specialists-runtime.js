@@ -1,6 +1,6 @@
 // One world adapter for the approved specialists slice. Pure system/fire modules own their rules.
 (function(root){
- const active=()=>!root.IronDustBrowserV2?.active&&legacySession?.ruleProfileId==='CATALOG_SPECIALISTS_v1'&&GoblinCatalogSpecialistsModel.has(legacySession.scenarioId);
+ const active=()=>!root.IronDustBrowserV2?.active&&(legacySession?.ruleProfileId==='CATALOG_SPECIALISTS_v1'&&GoblinCatalogSpecialistsModel.has(legacySession.scenarioId)||root.GoblinCatalogFullRuntime?.active());
  const registry=()=>legacySession.effectiveRules.catalog.registry;
  const record=u=>active()?legacySession.effectiveRules.catalog.records[u?.id]:null;
  const rules=u=>record(u)?.rules;
@@ -16,9 +16,9 @@
  function sync(u){if(!system(u))return;validateOwner(u);GoblinSystems.validateCatalogSystem(u.catalogSystems,registry());u.alive=!GoblinSystems.catalogIsHelpless(u.catalogSystems,registry());u.move=GoblinSystems.catalogMovement(u.catalogSystems,registry())}
  const worldPhase=(u,required)=>!gameOver&&(u.team==='player'?phase==='player'&&turnPhase===required:phase==='enemy'&&required==='fire');
  const targetKey=t=>GoblinCatalogSpecialistFire.targetKey(t);
- function resolveTarget(t){
+ function resolveTarget(t,viewerTeam='player'){
   require(exact(t,t?.kind==='unit'?['kind','runtimeUnitId']:['kind','runtimeUnitId','componentId']),'INVALID_TYPED_TARGET');
-  const u=units.find(u=>u.id===t.runtimeUnitId);require(alive(u)&&!u.embarkedOn,'TARGET_UNAVAILABLE');
+  const u=units.find(u=>u.id===t.runtimeUnitId);require(alive(u)&&!u.embarkedOn&&(!root.GoblinCatalogFullRuntime?.active()||root.GoblinCatalogFullRuntime.known(u.id,viewerTeam)),'TARGET_UNAVAILABLE');
   if(system(u)){validateOwner(u);require(t.kind==='component'&&typeof t.componentId==='string'&&!!t.componentId,'COMPONENT_REQUIRED');const c=GoblinSystems.catalogTargets(u.catalogSystems,registry()).find(c=>c.id===t.componentId);require(c,'COMPONENT_UNAVAILABLE');return {unit:u,component:c}}
   require(t.kind==='unit','INVALID_COMPONENT_OWNER');return {unit:u,component:null};
  }
@@ -26,7 +26,7 @@
   require(exact(command,['type','actorId','target','weaponId','mode','spotterId'])&&command.type==='CatalogFire','INVALID_SPECIALISTS_FIRE');
   const u=units.find(u=>u.id===command.actorId);require(alive(u)&&!u.disabled&&(!u.embarkedOn||rules(u).passengerRef),'ACTOR_UNAVAILABLE');
   require((u.team==='player'||allowEnemy)&&worldPhase(u,'fire'),'WRONG_FIRE_PHASE');
-  const target=resolveTarget(command.target),t=target.unit;require(u.team!==t.team,'FRIENDLY_DIRECT_TARGET');
+  const target=resolveTarget(command.target,u.team),t=target.unit;require(u.team!==t.team,'FRIENDLY_DIRECT_TARGET');
   const rule=rules(u),distance=dist(u,t),los=lineOfSight(u,t);let attack,nextSystem=null,nextFire=null,effects=[];
   if(system(u)){
    validateOwner(u);require(command.mode==='direct'&&command.spotterId===null&&typeof command.weaponId==='string','INVALID_SYSTEM_FIRE');
@@ -45,7 +45,7 @@
    }
    const out=GoblinCatalogSpecialistFire.resolve(u.catalogFire,u.id,request,registry());attack={...out.attack,key:command.weaponId};nextFire=out.state;
   }else{
-   require(rule.fireRuleRef==='single-fire-v1'&&command.weaponId===null&&command.mode==='direct'&&command.spotterId===null,'NO_FIRE_CAPABILITY');
+   require(!rule.missileRuleRef&&rule.fireRuleRef==='single-fire-v1'&&command.weaponId===null&&command.mode==='direct'&&command.spotterId===null,'NO_FIRE_CAPABILITY');
    require(!u.fired,'FIRE_SPENT');require(rule.cargoRef!=='drone-cargo-v1'||!u.embarkedOn&&(u.droneReadyTurn??1)<=turn,'DRONE_NOT_READY');
    require(distance>=1&&distance<=rule.range,'TARGET_OUT_OF_RANGE');require(los,'DIRECT_LOS_REQUIRED');attack={attack:u.damage,range:rule.range,key:null};
   }
@@ -61,19 +61,25 @@
  const oldOutcome=combatOutcome;
  combatOutcome=function(attacker,target){
   if(!active()||!system(target))return oldOutcome(attacker,target);
-  require(intent?.command.target?.runtimeUnitId===target.id,'SYSTEM_TARGET_INTENT_REQUIRED');
-  const component=GoblinSystems.catalogTargets(target.catalogSystems,registry()).find(c=>c.id===intent.command.target.componentId);require(component,'COMPONENT_UNAVAILABLE');
+  const targetIntent=intent?.area?intent.areaTarget:intent?.command.target;require(targetIntent?.runtimeUnitId===target.id,'SYSTEM_TARGET_INTENT_REQUIRED');
+  const component=GoblinSystems.catalogTargets(target.catalogSystems,registry()).find(c=>c.id===targetIntent.componentId);require(component,'COMPONENT_UNAVAILABLE');
   const passengers=[...carrierCargo(target)],roll=Math.floor(Math.random()*6),ratio=component.type==='treads'?'1-1':combatRatio(attacker.damage,component.defense+TerrainRules.coverBonus(terrainTypeAt(target.x,target.y))),result=component.type==='treads'?(roll>=4?'X':'NE'):ratio==='5-1'?'X':COMBAT_RULES.crt[ratio][roll];
-  const applied=GoblinSystems.catalogApplyHit(target.catalogSystems,{targetId:component.id,result,attackStrength:attacker.damage,cause:{kind:'direct',commandId:intent.commandId,attackerId:attacker.id}},registry());
+  const applied=GoblinSystems.catalogApplyHit(target.catalogSystems,{targetId:component.id,result,attackStrength:attacker.damage,cause:{kind:intent.area?'area':'direct',commandId:intent.commandId,attackerId:attacker.id}},registry());
   target.catalogSystems=applied.state;const hits=passengers.map(unit=>({unit,outcome:applyCombatRoll(attacker,unit,roll)}));applyEffects(target,applied.effects);
   for(const hit of hits)if(unitDead(hit.unit)&&hit.outcome.result!=='X')hit.outcome={...hit.outcome,directResult:hit.outcome.result,result:'X',cause:'mechanical-cargo-loss'};
   return {system:{...component,label:component.id},ratio,result,roll,loss:applied.hit.loss,remaining:applied.hit.remaining,passengers:hits,effects:applied.effects};
  };
- function appendJournal(u,command,result){u.specialistSerial=(u.specialistSerial??0)+1;(u.specialistJournal??=[]).push({id:`${legacySession.sessionId}/${u.id}/${u.specialistSerial}`,turn,team:u.team,command:structuredClone(command),result:structuredClone(result)})}
+ function areaOutcome(attacker,target,componentId,commandId,command){
+  require(root.GoblinCatalogFullRuntime?.active(),'FULL_AREA_PROFILE_REQUIRED');
+  const previous=intent;intent={area:true,commandId,command:structuredClone(command),areaTarget:{runtimeUnitId:target.id,componentId}};
+  try{return combatOutcome(attacker,target)}finally{intent=previous}
+ }
+ function appendJournal(u,command,result){u.specialistSerial=(u.specialistSerial??0)+1;(u.specialistJournal??=[]).push({id:`${legacySession.sessionId}/${u.id}/${u.specialistSerial}`,turn,team:u.team,command:structuredClone(command),result:structuredClone(result)});root.GoblinCatalogFullRuntime?.recordAction(u,command,result)}
  const oldAttack=attack;
  attack=function(u,t){
   if(!active())return oldAttack(u,t);if(intent?.command.type!=='CatalogFire'){setToast('Waffe und konkretes Ziel wählen.');return}
-  const q=fireQuery(intent.command,u.team==='enemy'),outcome=combatOutcome({...u,damage:q.weapon.attack,range:q.weapon.range},t);
+  const q=fireQuery(intent.command,u.team==='enemy');root.GoblinCatalogFullRuntime?.reveal(u.id,'own-fire');const outcome=combatOutcome({...u,damage:q.weapon.attack,range:q.weapon.range},t);
+  root.GoblinCatalogFullRuntime?.reveal(t.id,'incoming-direct',outcome.result);
   if(q.nextSystem){u.catalogSystems=q.nextSystem;applyEffects(u,q.effects)}else if(q.nextFire)u.catalogFire=q.nextFire;else u.fired=true;
   u.acted=true;t.lastOutcome=outcome.result;t.justHit=true;appendJournal(u,intent.command,{kind:'fire',weapon:q.weapon,target:intent.command.target,outcome:{...outcome,passengers:(outcome.passengers??[]).map(h=>({unitId:h.unit.id,outcome:h.outcome}))}});
   addLog(`${GoblinCatalogRuntime.name(u)} / ${system(u)?slotLabel(u,intent.command.weaponId):u.catalogFire?.ruleRef==='siege-tank-fire-budget-v1'?GoblinSiegeWeapons.label(intent.command.weaponId):text(intent.command.mode==='indirect'?'v2.ui.artillery.indirect':'v2.ui.fire')} → ${GoblinCatalogRuntime.name(t)}${q.component?' / '+slotLabel(t,q.component.id):''}: ${outcome.result} (${outcome.ratio})`);reportPassengerHits(u,outcome,u.team==='enemy');selected=u.team==='player'?u:null;updateSelection();draw();setTimeout(()=>{t.justHit=false;draw()},560);if(!checkVictory()&&u.team==='player')maybeAutoAdvancePhase();
@@ -156,7 +162,7 @@
   return [{id:null,attack:u.damage??u.attack,range:u.range,ready:u.catalogFire?(u.catalogFire.state.fired?0:1):u.fired?0:1}];
  }
  function candidateCommands(u,weaponId){
-  const targets=units.filter(t=>unitAlive(t)&&!t.embarkedOn&&t.team!==u.team).sort((a,b)=>dist(u,a)-dist(u,b)||(a.id<b.id?-1:1));
+  const targets=(root.GoblinCatalogFullRuntime?.active()?root.GoblinCatalogFullRuntime.roster(u.team):units).filter(t=>unitAlive(t)&&!t.embarkedOn&&t.team!==u.team).sort((a,b)=>dist(u,a)-dist(u,b)||(a.id<b.id?-1:1));
   const commands=[];
   for(const t of targets){const component=system(t)?GoblinSystems.catalogChooseTarget(t.catalogSystems,registry()):null;if(system(t)&&!component)continue;
    const target=component?{kind:'component',runtimeUnitId:t.id,componentId:component.id}:{kind:'unit',runtimeUnitId:t.id};
@@ -166,10 +172,10 @@
   return commands;
  }
  const legalFire=c=>{try{return fireQuery(c,true).ok}catch{return false}};
- const hasFireAction=u=>weapons(u).some(w=>w.ready&&candidateCommands(u,w.id).some(legalFire));
+ const hasFireAction=u=>root.GoblinCatalogFullRuntime?.active()&&u.catalogId==='U13'?root.GoblinCatalogFullRuntime.hasHexAction(u):weapons(u).some(w=>w.ready&&candidateCommands(u,w.id).some(legalFire));
  function executeFire(command,allowEnemy=false){const legal=fireQuery(command,allowEnemy);intent={command:structuredClone(command),weaponClass:legal.weapon.weaponClass??(legal.actor.catalogFire?.ruleRef==='siege-tank-fire-budget-v1'?(GoblinSiegeBudget.WEAPONS[command.weaponId].infantryOnly?'antipersonnel':'main'):null),commandId:`${legacySession.sessionId}/${command.actorId}/${(legal.actor.specialistSerial??0)+1}`};try{attack(legal.actor,legal.target)}finally{intent=null}return {ok:true}}
  const oldEnemy=enemyFire;enemyFire=function(u){
-  if(!active())return oldEnemy(u);if(!alive(u)||u.disabled||u.embarkedOn&&!rules(u).passengerRef)return false;let fired=false;
+  if(!active())return oldEnemy(u);if(root.GoblinCatalogFullRuntime?.active()&&u.catalogId==='U13')return root.GoblinCatalogFullRuntime.enemyHex(u);if(!alive(u)||u.disabled||u.embarkedOn&&!rules(u).passengerRef)return false;let fired=false;
   for(const w of weapons(u)){if(!unitAlive(u)||gameOver)break;if(!w.ready)continue;const c=candidateCommands(u,w.id).find(legalFire);if(c){executeFire(c,true);fired=true}}
   return fired;
  };
@@ -202,16 +208,19 @@
  function ramQuery(c){
   require(exact(c,['type','actorId','targetId','x','y'])&&c.type==='CatalogRam','INVALID_RAM_COMMAND');const u=units.find(u=>u.id===c.actorId),t=units.find(t=>t.id===c.targetId);
   require(alive(u)&&u.team==='player'&&worldPhase(u,'movement')&&['U01','U20'].includes(record(u).catalogId)&&!u.disabled&&!u.embarkedOn&&!u.moved,'RAM_ACTOR_UNAVAILABLE');
-  require(alive(t)&&t.team!==u.team&&!t.embarkedOn&&!t.core&&!system(t)&&!rules(t).infantry&&rules(t).repairClass==='vehicle'&&c.x===t.x&&c.y===t.y,'RAM_TARGET_UNAVAILABLE');
+  require(alive(t)&&(!root.GoblinCatalogFullRuntime?.active()||root.GoblinCatalogFullRuntime.known(t.id,u.team))&&t.team!==u.team&&!t.embarkedOn&&!t.core&&!system(t)&&!rules(t).infantry&&rules(t).repairClass==='vehicle'&&c.x===t.x&&c.y===t.y,'RAM_TARGET_UNAVAILABLE');
   const path=findMovementPath(u,t,movementBudget(u),u);require(path?.length,'RAM_UNREACHABLE');return {ok:true,actor:u,target:t,path};
  }
- function executeRam(c){const q=ramQuery(c),u=q.actor,t=q.target;intent={command:structuredClone(c),commandId:`${legacySession.sessionId}/${u.id}/${(u.specialistSerial??0)+1}`};
+ function executeRam(c){const q=ramQuery(c),u=q.actor,t=q.target;if(root.GoblinCatalogFullRuntime?.ramCollision(c,q))return {ok:true};intent={command:structuredClone(c),commandId:`${legacySession.sessionId}/${u.id}/${(u.specialistSerial??0)+1}`};
   try{const capture=root.GoblinLegacyPresentation?.begin(u,q.path,'ram',t);u.moveFrom={x:u.x,y:u.y};u.x=t.x;u.y=t.y;u.moved=true;u.acted=true;u.moveCount=(u.moveCount??0)+1;carrierCargo(u).forEach(cargo=>{cargo.x=u.x;cargo.y=u.y});t.hp=0;t.lastOutcome='X';
    for(const cargo of carrierCargo(t)){if(rules(cargo).cargoRef==='drone-cargo-v1')cargo.hp=0;else{cargo.embarkedOn=null;cargo.embarkedThisTurn=false;cargo.disembarkedThisTurn=true;cargo.moved=true;cargo.x=t.x;cargo.y=t.y}}
    appendJournal(u,c,{kind:'ram',targetId:t.id,path:q.path});selected=u;updateSelection();draw();checkVictory();root.GoblinLegacyPresentation?.confirm(capture);return {ok:true};
   }finally{intent=null}
  }
  function execute(command){
+  if(root.GoblinCatalogFullRuntime?.active())require(!root.GoblinMovement?.busy(),'PRESENTATION_BUSY');
+  if(root.GoblinCatalogFullRuntime?.active()&&command?.type==='CatalogHexFire')return root.GoblinCatalogFullRuntime.executeHex(command);
+  if(root.GoblinCatalogFullRuntime?.active()&&command?.type==='Move')return root.GoblinCatalogFullRuntime.executeMove(command);
   require(active(),'UNSUPPORTED_SPECIALISTS_PROFILE');require(!root.GoblinMovement?.busy(),'PRESENTATION_BUSY');
   if(command?.type==='Engineer')return executeEngineering(command);
   if(['CatalogLoad','CatalogDeploy'].includes(command?.type))return executeCargo(command);
@@ -227,7 +236,7 @@
    if(r.rules.material)require(Number.isInteger(u.material)&&u.material>=0&&u.material<=r.rules.material.max&&u.materialMax===r.rules.material.max,'RESTORE_MATERIAL_MISMATCH');
    if(unitAlive(u)&&u.embarkedOn){const owner=units.find(c=>c.id===u.embarkedOn);require(alive(owner)&&owner.team===u.team&&owner.x===u.x&&owner.y===u.y,'RESTORE_CARGO_OWNER');if(forge(owner))require(r.rules.cargoRef==='drone-cargo-v1'&&!bayState(owner,u.cargoBay).destroyed,'RESTORE_BAY_CARGO')}
   }
-  require(ids.size===Object.keys(legacySession.effectiveRules.catalog.records).length,'RESTORE_ROSTER_MISMATCH');
+  if(root.GoblinCatalogFullRuntime?.active())root.GoblinCatalogFullRuntime.validateRoster(ids);else require(ids.size===Object.keys(legacySession.effectiveRules.catalog.records).length,'RESTORE_ROSTER_MISMATCH');
   for(const u of units.filter(forge)){const cargo=carrierCargo(u),bays=new Set();for(const c of cargo){require(!bays.has(c.cargoBay),'RESTORE_BAY_CAPACITY');bays.add(c.cargoBay)}}
   for(const [key,type] of terrainTypes){const [x,y]=key.split(',').map(Number);require(inside({x,y})&&Object.hasOwn(TerrainRules.rules,type),'RESTORE_TERRAIN_MISMATCH');require(terrain.has(key)===(TerrainRules.coverBonus(type)>0),'RESTORE_COVER_MISMATCH')}
   return true;
@@ -257,12 +266,13 @@
   if(u.materialMax!==undefined)list.push(text('v2.specialists.resource',{label:text('v2.specialists.material'),current:u.material,max:u.materialMax}));
   if(forge(u))for(const b of bayCargo(u,roster))list.push(text('v2.specialists.bayCargo',{bay:slotLabel(u,b.id),cargo:b.cargo?GoblinCatalogRuntime.name(roster.find(c=>c.id===b.cargo)):text('v2.specialists.bayEmpty')}));
   if(u.catalogFire)list.push(rules(u).fireRuleRef==='siege-tank-fire-budget-v1'?text('mission.siege-pilot.budget'):text('mission.artillery-pilot.budget'));
+  if(rules(u)?.stealthRef&&root.GoblinCatalogFullRuntime?.active())list.push(root.GoblinCatalogFullRuntime.stealthText(u));
   return list.join(' · ');
  }
- function projectUnit(u,preferred){const spec=selectedSpec(u,preferred);return {...(u.catalogSystems?{catalogSystems:structuredClone(u.catalogSystems),alive:u.alive,selectedSlot:preferred??u.selectedSlot,systemSummary:GoblinSystems.catalogSummary(u.catalogSystems,registry()),attack:spec?.attack??null,range:spec?.range??0}:{}),...(u.catalogFire?{catalogFire:structuredClone(u.catalogFire),selectedWeapon:preferred??u.selectedWeapon,attack:spec?.attack??u.damage,range:spec?.range??u.range}:{}),...(u.materialMax!==undefined?{material:u.material,materialMax:u.materialMax}:{}),...(u.droneBays?{droneBays:[...u.droneBays]}:{}),...(u.cargoBay?{cargoBay:u.cargoBay}:{})}}
+ function projectUnit(u,preferred){const spec=selectedSpec(u,preferred);return {...(rules(u)?.missileRuleRef?{ammunition:u.ammunition,cruiseMissile:true}:{}),...(u.catalogSystems?{catalogSystems:structuredClone(u.catalogSystems),alive:u.alive,selectedSlot:preferred??u.selectedSlot,systemSummary:GoblinSystems.catalogSummary(u.catalogSystems,registry()),attack:spec?.attack??null,range:spec?.range??0}:{}),...(u.catalogFire?{catalogFire:root.GoblinCatalogFullRuntime?.active()?root.GoblinCatalogFullRuntime.fireView(u.catalogFire):structuredClone(u.catalogFire),selectedWeapon:preferred??u.selectedWeapon,attack:spec?.attack??u.damage,range:spec?.range??u.range}:{}),...(u.materialMax!==undefined?{material:u.material,materialMax:u.materialMax}:{}),...(u.droneBays?{droneBays:[...u.droneBays]}:{}),...(u.cargoBay?{cargoBay:u.cargoBay}:{})}}
  function actions(u){return [...(movementBudget(u)>0?[text('v2.ui.move')]:[]),...(weapons(u).length?[text('v2.ui.fire')]:[]),...(rules(u).engineeringRef?['clear','position','bridge','repair-disabled','repair-hp','repair-treads','repair-component','salvage'].map(k=>text('v2.engineer.'+k)):[]),...(forge(u)?[text('v2.ui.embark'),text('v2.ui.catalog.deployDrone')]:[])]}
  const oldInfo=showUnitInfo;showUnitInfo=function(u){if(active()&&system(u)){$('#unit-intel-title').textContent=GoblinCatalogRuntime.name(u);$('#unit-intel-facts').textContent=summary(u);return}oldInfo(u)};
  function fireMetadata(){return intent?{command:intent.command,weaponClass:intent.weaponClass??null,weaponKey:intent.command.weaponId,mode:intent.command.mode,spotterId:intent.command.spotterId,targetComponentId:intent.command.target?.componentId??null}:null}
- root.GoblinSpecialistsRuntime=Object.freeze({active,registry,record,rules,system,sync,query,fireQuery,resolveTarget,applyEffects,execute,engineeringQuery,wreckKey,forge,bayCargo,cargoQuery,ramQuery,weapons,candidateCommands,hasFireAction,resetOwned,validateRestoredState,slotLabel,selectedSpec,summary,projectUnit,actions,appendJournal,fireMetadata});
+ root.GoblinSpecialistsRuntime=Object.freeze({active,registry,record,rules,system,sync,areaOutcome,query,fireQuery,resolveTarget,applyEffects,execute,engineeringQuery,wreckKey,forge,bayCargo,cargoQuery,ramQuery,weapons,candidateCommands,hasFireAction,resetOwned,validateRestoredState,slotLabel,selectedSpec,summary,projectUnit,actions,appendJournal,fireMetadata});
 })(globalThis);
 function executeSpecialistCommand(command){return GoblinSpecialistsRuntime.execute(command)}

@@ -108,7 +108,7 @@
           facing.sourceActionId=eventId;facing.origin='confirmed-movement';}
       }
       if(event.kind==='fire'){
-        const target=event.before.units.find(unit=>unit.id===event.targetId);
+        const target=event.targetHex??event.before.units.find(unit=>unit.id===event.targetId);
         const facing=sidecar.facingByUnit.find(unit=>unit.unitId===event.actor.unitId);
         if(target&&facing){facing.angleDegrees=direction(event.actor.positionBefore,target);
           facing.sourceActionId=eventId;facing.origin='confirmed-fire';}
@@ -153,7 +153,8 @@
       }
       for(const fire of fires){
         const actor=ticket.before.units.find(unit=>unit.id===fire.actorId);
-        const target=ticket.before.units.find(unit=>unit.id===fire.targetId);
+        const hexFire=['CATALOG_FULL_CANDIDATE_v1','FULL_CATALOG_v1'].includes(binding.ruleProfileId)&&ticket.command?.type==='CatalogHexFire'&&Object.keys(ticket.command).length===4&&Object.keys(ticket.command).every(k=>['type','actorId','x','y'].includes(k))&&fire.targetHex?.x===ticket.command.x&&fire.targetHex?.y===ticket.command.y&&Number.isInteger(fire.targetHex.x)&&Number.isInteger(fire.targetHex.y)&&fire.targetHex.x>=0&&fire.targetHex.x<12&&fire.targetHex.y>=0&&fire.targetHex.y<8;
+        const target=hexFire?{id:null,...fire.targetHex}:ticket.before.units.find(unit=>unit.id===fire.targetId);
         if(!actor||!target)continue;
         const eventId=`${sidecar.sessionInstanceId}/${sidecar.branchGeneration}/${acceptedSequence}/fire-${fire.sourceEventIndex}`;
         if(records.has(eventId))continue;
@@ -166,7 +167,7 @@
           action:{acceptedSequence,sourceCommand:ticket.command,...ticket.details,animationPreference:ticket.animationPreference,
             turn:ticket.before.turn,phase:ticket.before.phase,beforeRevision:stamp(ticket.before),afterRevision:stamp(after)},
           actor:{unitId:actor.id,team:actor.team,visualKey:actor.visualKey??null,positionBefore:position(actor),positionAfter:position(actor)},
-          targetId:target.id,weapon:{usedWeaponKey:weaponKey,attack:used?.attack??fire.attack??actor.damage,
+          targetId:target.id,...(hexFire?{targetHex:{...fire.targetHex}}:{}),weapon:{usedWeaponKey:weaponKey,attack:used?.attack??fire.attack??actor.damage,
             range:used?.range??fire.range??actor.range,...(fire.mode?{mode:fire.mode,spotterId:fire.spotterId}:{}),...(fire.targetComponentId?{targetComponentId:fire.targetComponentId}:{}),...(fire.weaponClass?{weaponClass:fire.weaponClass}:{}),semanticKind:fire.strategic?'missile':fire.weaponClass==='missiles'||weaponKey==='missiles'?'rockets':null,
             visualMappingVersion:'fire-mapping-v1'},before:ticket.before,after,sourceResults,sourceEventIndex:fire.sourceEventIndex,
           effects:effects.filter(effect=>effect.before&&effect.after).map((effect,index)=>({...effect,

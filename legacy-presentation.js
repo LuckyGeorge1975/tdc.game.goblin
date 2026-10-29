@@ -8,10 +8,10 @@
     const capture=attackCapture;attackCapture=null;
     if(capture?.ticket)try{root.GoblinPresentation.confirm(capture.ticket,snapshot(),capture.results,[],[{
       actorId:capture.actorId,targetId:capture.targetId,weaponKey:capture.weaponKey,strategic:capture.strategic,
-      effects:capture.effects,...(capture.mode?{mode:capture.mode,spotterId:capture.spotterId}:{}),...(capture.targetComponentId?{targetComponentId:capture.targetComponentId}:{}),...(capture.weaponClass?{weaponClass:capture.weaponClass}:{}),attack:capture.results[0]?.attack,range:capture.range,sourceEventIndex:0}]);}catch{/* Observation cannot reject or retry gameplay. */}
+      effects:capture.effects,...(capture.targetHex?{targetHex:capture.targetHex}:{}),...(capture.mode?{mode:capture.mode,spotterId:capture.spotterId}:{}),...(capture.targetComponentId?{targetComponentId:capture.targetComponentId}:{}),...(capture.weaponClass?{weaponClass:capture.weaponClass}:{}),attack:capture.attack??capture.results[0]?.attack,range:capture.range,sourceEventIndex:0}]);}catch{/* Observation cannot reject or retry gameplay. */}
   }
   function snapshot(){
-    return {units:units.map(({moveFrom,justHit,...unit})=>({...unit,
+    return {units:(root.GoblinCatalogFullRuntime?.active()?root.GoblinCatalogFullRuntime.roster().map(root.GoblinCatalogFullRuntime.viewerUnit):units).map(({moveFrom,justHit,...unit})=>({...unit,
       visualKey:root.UnitVisuals.artKey(unit)})),terrain:[...terrain],terrainTypes:[...terrainTypes],
       turn,phase:turnPhase,activeTeam:phase,gameOver};
   }
@@ -26,8 +26,10 @@
   }
   root.GoblinLegacyPresentation=Object.freeze({
     sync:safe(sync),
+    beginHex:safe((command,actor)=>{if(attackCapture||!sync())return false;const before=snapshot();attackCapture={hex:true,results:[],effects:[],before,actorId:actor.id,targetId:null,targetHex:{x:command.x,y:command.y},weaponKey:null,strategic:true,attack:6,range:8,ticket:root.GoblinPresentation.begin(command,before)};return true;}),
+    endHex:safe(token=>{if(token&&attackCapture?.hex)finishFire()}),
     beforeResult:safe((source,attacker,target)=>{
-      if(!sync())return null;
+      if(!attackCapture?.hex&&!sync())return null;
       const before=snapshot(),standalone=!!attacker&&!attackCapture;
       const special=root.GoblinSpecialistsRuntime?.active()?root.GoblinSpecialistsRuntime.fireMetadata():null;
       if(standalone)attackCapture={results:[],effects:[]};
@@ -43,7 +45,7 @@
     afterResult:safe((reference,outcome)=>{
       if(!reference||!root.GoblinPresentation.owns('legacy'))return;
       const state=snapshot();
-      root.GoblinPresentation.synchronize(state,{...reference,afterRevision:root.GoblinPresentationState.stamp(state)});
+      if(!attackCapture?.hex)root.GoblinPresentation.synchronize(state,{...reference,afterRevision:root.GoblinPresentationState.stamp(state)});
       if(reference.attackerId&&outcome&&attackCapture){
         const index=attackCapture.results.length;
         const result={...outcome,passengers:(outcome.passengers??[]).map(({unit,outcome})=>({unitId:unit.id,outcome:clone(outcome)}))};
@@ -57,15 +59,17 @@
       }else root.GoblinPresentation.transition(state);
     }),
     begin:safe((actor,path,kind,target)=>{
+      if(root.GoblinCatalogFullRuntime?.active()&&!root.GoblinCatalogFullRuntime.known(actor.id))return null;
       if(!sync())return null;
       return {ticket:root.GoblinPresentation.begin(root.GoblinSpecialistsRuntime?.active()&&root.GoblinSpecialistsRuntime.fireMetadata()?.command?.type==='CatalogRam'?root.GoblinSpecialistsRuntime.fireMetadata().command:{type:kind==='ram'?'Ram':'Move',actorId:actor.id,
-        to:{x:path.at(-1).x,y:path.at(-1).y},...(target?{targetId:target.id}:{})},snapshot()),
+        to:{x:(path.at(-1)??actor).x,y:(path.at(-1)??actor).y},...(target?{targetId:target.id}:{})},snapshot()),
         actorId:actor.id,kind,targetId:target?.id??null,
         path:JSON.parse(JSON.stringify(path)),from:{x:actor.x,y:actor.y}};
     }),
     confirm:safe(capture=>{
       if(!capture)return;
       const after=snapshot(),actor=after.units.find(unit=>unit.id===capture.actorId);
+      if(!actor&&root.GoblinCatalogFullRuntime?.active()){root.GoblinPresentation.cancel();sync();return;}
       const result={type:capture.kind==='ram'?'RamResolved':'UnitMoved',actorId:actor.id,
         from:capture.from,to:{x:actor.x,y:actor.y},path:capture.path,
         ...(capture.targetId?{targetId:capture.targetId,

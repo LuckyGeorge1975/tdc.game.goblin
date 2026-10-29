@@ -294,3 +294,6 @@ body.ui-v2-active .v2-fire-ratio { fill: var(--v2-text); text-anchor: middle; do
 .v2-specialist-select select {max-width:100%;min-height:2.5rem;padding:.45rem .6rem;border:1px solid var(--v2-line);border-radius:.25rem;background:var(--v2-surface);color:var(--v2-text);font:inherit}
 .v2-specialist-select select:focus-visible {outline:2px solid var(--v2-signal);outline-offset:2px}
 #v2-specialist-target-controls {display:grid;gap:.5rem;margin:.5rem 0}
+.v2-full-blast{pointer-events:none;stroke:#ffb15c;stroke-width:2;vector-effect:non-scaling-stroke}
+.v2-full-blast-center{fill:rgba(255,111,48,.35)}
+.v2-full-blast-adjacent{fill:rgba(255,177,92,.17);stroke-dasharray:4 3}

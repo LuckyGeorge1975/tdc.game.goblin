@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 const level=JSON.parse(fs.readFileSync(new URL('../assets/unit-art/levels/artillery-pilot.v1.json',import.meta.url),'utf8'));
 const registry=JSON.parse(fs.readFileSync(new URL('../assets/unit-art/rules/unit-profiles.v1.json',import.meta.url),'utf8'));
-export function artilleryScene(enabled=true, initialSeed=7,entrypointOrder=false){
+export function artilleryScene(enabled=true, initialSeed=7,entrypointOrder=false,additionalFiles=[]){
   const nodes=new Map(),timers=new Map();let id=0,rolls=0,animations=0,rngState=initialSeed>>>0;
   function element(){const classes=new Set();return {innerHTML:'',textContent:'',checked:false,
     disabled:false,style:{},dataset:{},classList:{add:n=>classes.add(n),remove:n=>classes.delete(n),
@@ -23,7 +23,7 @@ export function artilleryScene(enabled=true, initialSeed=7,entrypointOrder=false
   const files=['unit-life.js','unit-visuals.js','terrain-rules.js','ogre-systems.js','legacy-supercover.js','artillery-spotter-rules.js','assets/unit-art/rules/artillery-pilot.v1.js','siege-tank-fire-budget.js','assets/unit-art/rules/siege-pilot.v1.js','skimmer-budget.js','assets/unit-art/rules/skimmer-pilot.v1.js','catalog-specialists-fire.js','catalog-base-model.js','catalog-specialists-model.js','scenario-profile-manifest.js',
     ...(enabled?['presentation-preferences.js','presentation-state.js']:[]),'game.js','ogre-runtime.js','combat-feedback.js',
     'siegebreaker-weapons.js','strategic-missile.js','siege-pilot-runtime.js','artillery-pilot-runtime.js','catalog-base-runtime.js','catalog-specialists-runtime.js','catalog-specialists-ui.js','scenario.js',
-    ...(enabled?['legacy-presentation.js']:[]),'command-history.js'];
+    ...(enabled?['legacy-presentation.js']:[]),'command-history.js',...additionalFiles];
   const ordered=entrypointOrder?[...fs.readFileSync(new URL('../index.html',import.meta.url),'utf8').matchAll(/<script[^>]+src="([^"?]+)(?:[^"]*)"/g)].map(m=>m[1]).filter(file=>files.includes(file)):files;
   if(entrypointOrder&&new Set(ordered).size!==files.length)throw Error('ENTRYPOINT_DEPENDENCY_MISSING');
   for(const file of ordered)run(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'));

@@ -59,7 +59,7 @@
       size:(1+(rocket.apexScale-1)*h)*scale,angle:Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI};
   }
   function plan(event,initial){
-    const target=event.before.units.find(unit=>unit.id===event.targetId),actor=event.before.units.find(unit=>unit.id===event.actor.unitId);
+    const target=event.targetHex??event.before.units.find(unit=>unit.id===event.targetId),actor=event.before.units.find(unit=>unit.id===event.actor.unitId);
     if(!target||!actor)return {diagnostic:'INCOMPLETE_CONFIRMED_FIRE',duration:0};
     const a=center(actor),b=center(target),angle=normalize(Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI),turnDelta=shortest(angle-initial);
     const turn=Math.abs(turnDelta)<1.5?0:60+50*Math.abs(turnDelta)/60,shotAt=turn+(turn?30:0);

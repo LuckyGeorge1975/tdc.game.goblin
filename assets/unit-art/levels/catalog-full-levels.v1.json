@@ -1,0 +1,998 @@
+{
+  "version": "catalog-full-levels-v1",
+  "levels": [
+    {
+      "id": "catalog-full-atlas",
+      "version": "catalog-full-levels-v1",
+      "source": {
+        "path": "assets/unit-art/levels/atlas-proving-grounds.json",
+        "sha256": "1f4e6a6303e9e835f41556e57595cf6d2646bb30d028fb412e090b7ff223673d",
+        "levelId": "atlas-proving-grounds"
+      },
+      "width": 12,
+      "height": 8,
+      "title": "ATLAS / PROVING GROUNDS",
+      "objective": "core-and-escort",
+      "turnLimit": null,
+      "terrain": [
+        {
+          "x": 5,
+          "y": 0,
+          "type": "open-ground"
+        },
+        {
+          "x": 5,
+          "y": 1,
+          "type": "rubble-field"
+        },
+        {
+          "x": 3,
+          "y": 4,
+          "type": "rubble-field"
+        },
+        {
+          "x": 4,
+          "y": 2,
+          "type": "mountain"
+        },
+        {
+          "x": 5,
+          "y": 2,
+          "type": "mountain"
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "type": "ridge"
+        },
+        {
+          "x": 8,
+          "y": 3,
+          "type": "ridge"
+        },
+        {
+          "x": 4,
+          "y": 0,
+          "type": "forest"
+        },
+        {
+          "x": 4,
+          "y": 1,
+          "type": "forest"
+        },
+        {
+          "x": 5,
+          "y": 7,
+          "type": "marsh"
+        },
+        {
+          "x": 6,
+          "y": 7,
+          "type": "marsh"
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "type": "water"
+        },
+        {
+          "x": 7,
+          "y": 0,
+          "type": "water"
+        },
+        {
+          "x": 6,
+          "y": 1,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 2,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 4,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "type": "river"
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 7,
+          "y": 5,
+          "type": "road"
+        },
+        {
+          "x": 8,
+          "y": 5,
+          "type": "road"
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "type": "bridge"
+        },
+        {
+          "x": 9,
+          "y": 1,
+          "type": "urban"
+        },
+        {
+          "x": 10,
+          "y": 2,
+          "type": "urban"
+        },
+        {
+          "x": 7,
+          "y": 4,
+          "type": "crater"
+        },
+        {
+          "x": 8,
+          "y": 4,
+          "type": "crater"
+        }
+      ],
+      "units": [
+        {
+          "assetId": "goblin-siegebreaker",
+          "name": "GOBLIN SIEGEBREAKER",
+          "team": "player",
+          "x": 1,
+          "y": 3,
+          "id": "catalog-full-atlas-1"
+        },
+        {
+          "assetId": "skimmer-scout",
+          "name": "SKIMMER SCOUT",
+          "team": "player",
+          "x": 2,
+          "y": 1,
+          "id": "catalog-full-atlas-2"
+        },
+        {
+          "assetId": "rocket-artillery",
+          "name": "ROCKET ARTILLERY",
+          "team": "player",
+          "x": 2,
+          "y": 4,
+          "id": "catalog-full-atlas-3"
+        },
+        {
+          "assetId": "infantry-squad",
+          "name": "INFANTRY SQUAD",
+          "team": "player",
+          "x": 1,
+          "y": 5,
+          "id": "catalog-full-atlas-4",
+          "squads": 2
+        },
+        {
+          "assetId": "assault-tank",
+          "name": "ASSAULT TANK",
+          "team": "player",
+          "x": 3,
+          "y": 3,
+          "id": "catalog-full-atlas-5"
+        },
+        {
+          "assetId": "recon-tank",
+          "name": "RECON TANK",
+          "team": "player",
+          "x": 3,
+          "y": 1,
+          "id": "catalog-full-atlas-6"
+        },
+        {
+          "assetId": "siege-tank",
+          "name": "SIEGE TANK",
+          "team": "player",
+          "x": 2,
+          "y": 6,
+          "id": "catalog-full-atlas-7"
+        },
+        {
+          "assetId": "long-range-battery",
+          "name": "LONG-RANGE BATTERY",
+          "team": "player",
+          "x": 0,
+          "y": 2,
+          "id": "catalog-full-atlas-8"
+        },
+        {
+          "assetId": "mobile-siege-gun",
+          "name": "MOBILE SIEGE GUN",
+          "team": "player",
+          "x": 0,
+          "y": 5,
+          "id": "catalog-full-atlas-9"
+        },
+        {
+          "assetId": "combat-skimmer",
+          "name": "COMBAT SKIMMER",
+          "team": "player",
+          "x": 3,
+          "y": 6,
+          "id": "catalog-full-atlas-10"
+        },
+        {
+          "assetId": "light-skimmer",
+          "name": "LIGHT SKIMMER",
+          "team": "player",
+          "x": 1,
+          "y": 7,
+          "id": "catalog-full-atlas-11"
+        },
+        {
+          "assetId": "skimmer-carrier",
+          "name": "SKIMMER CARRIER",
+          "team": "player",
+          "x": 0,
+          "y": 6,
+          "id": "catalog-full-atlas-12"
+        },
+        {
+          "assetId": "strategic-missile-carrier",
+          "name": "STRATEGIC MISSILE CARRIER",
+          "team": "player",
+          "x": 0,
+          "y": 0,
+          "id": "catalog-full-atlas-13"
+        },
+        {
+          "assetId": "artillery-drone",
+          "name": "ARTILLERY DRONE",
+          "team": "player",
+          "x": 1,
+          "y": 1,
+          "id": "catalog-full-atlas-14"
+        },
+        {
+          "assetId": "amphibious-infantry",
+          "name": "AMPHIBIOUS INFANTRY",
+          "team": "player",
+          "x": 4,
+          "y": 7,
+          "id": "catalog-full-atlas-15",
+          "squads": 2
+        },
+        {
+          "assetId": "field-engineers",
+          "name": "FIELD ENGINEERS",
+          "team": "player",
+          "x": 4,
+          "y": 5,
+          "id": "catalog-full-atlas-16"
+        },
+        {
+          "assetId": "local-defense",
+          "name": "LOCAL DEFENSE",
+          "team": "player",
+          "x": 0,
+          "y": 7,
+          "id": "catalog-full-atlas-17"
+        },
+        {
+          "assetId": "forge-engineer",
+          "name": "FORGE ENGINEER",
+          "team": "player",
+          "x": 2,
+          "y": 2,
+          "id": "catalog-full-atlas-18"
+        },
+        {
+          "assetId": "command-hub",
+          "name": "COMMAND HUB",
+          "team": "enemy",
+          "x": 10,
+          "y": 1,
+          "id": "catalog-full-atlas-19"
+        },
+        {
+          "assetId": "goblin-dreadnaught",
+          "name": "GOBLIN DREADNAUGHT",
+          "team": "enemy",
+          "x": 9,
+          "y": 4,
+          "id": "catalog-full-atlas-20"
+        },
+        {
+          "assetId": "phantom-platform",
+          "name": "PHANTOM PLATFORM",
+          "team": "enemy",
+          "x": 8,
+          "y": 6,
+          "id": "catalog-full-atlas-21"
+        },
+        {
+          "assetId": "infantry-platoon",
+          "name": "INFANTRY PLATOON",
+          "team": "enemy",
+          "x": 10,
+          "y": 4,
+          "id": "catalog-full-atlas-22"
+        },
+        {
+          "assetId": "command-core",
+          "name": "COMMAND CORE",
+          "team": "enemy",
+          "x": 11,
+          "y": 3,
+          "id": "core"
+        },
+        {
+          "assetId": "relay-node",
+          "name": "RELAY NODE",
+          "team": "enemy",
+          "x": 11,
+          "y": 6,
+          "id": "catalog-full-atlas-24"
+        },
+        {
+          "assetId": "guard-tank",
+          "name": "GUARD TANK",
+          "team": "enemy",
+          "x": 8,
+          "y": 2,
+          "id": "catalog-full-atlas-25"
+        },
+        {
+          "assetId": "raider-skimmer",
+          "name": "RAIDER SKIMMER",
+          "team": "enemy",
+          "x": 9,
+          "y": 7,
+          "id": "catalog-full-atlas-26"
+        },
+        {
+          "assetId": "artillery-drone",
+          "id": "catalog-full-atlas-18-drone-1",
+          "team": "player",
+          "x": 2,
+          "y": 2,
+          "embarkedOn": "catalog-full-atlas-18",
+          "cargoBay": "bay-1"
+        },
+        {
+          "assetId": "artillery-drone",
+          "id": "catalog-full-atlas-18-drone-2",
+          "team": "player",
+          "x": 2,
+          "y": 2,
+          "embarkedOn": "catalog-full-atlas-18",
+          "cargoBay": "bay-2"
+        }
+      ],
+      "waves": {
+        "version": "catalog-wave-config-v1",
+        "waves": []
+      },
+      "waveTemplates": []
+    },
+    {
+      "id": "catalog-full-terrain-course",
+      "version": "catalog-full-levels-v1",
+      "source": {
+        "path": "assets/unit-art/levels/showcase-levels.json",
+        "sha256": "eea48c2a044beb2c07ee852b6cfcfe6297ab91d810f85d033bebc72331e8c140",
+        "levelId": "showcase-terrain-course"
+      },
+      "width": 12,
+      "height": 8,
+      "title": "TERRAIN COURSE",
+      "objective": "core-and-escort",
+      "turnLimit": null,
+      "terrain": [
+        {
+          "x": 3,
+          "y": 3,
+          "type": "rubble-field"
+        },
+        {
+          "x": 4,
+          "y": 2,
+          "type": "mountain"
+        },
+        {
+          "x": 7,
+          "y": 2,
+          "type": "ridge"
+        },
+        {
+          "x": 4,
+          "y": 4,
+          "type": "forest"
+        },
+        {
+          "x": 5,
+          "y": 5,
+          "type": "marsh"
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "type": "water"
+        },
+        {
+          "x": 7,
+          "y": 0,
+          "type": "water"
+        },
+        {
+          "x": 6,
+          "y": 1,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 2,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 4,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "type": "river"
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 8,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "type": "bridge"
+        },
+        {
+          "x": 9,
+          "y": 3,
+          "type": "urban"
+        },
+        {
+          "x": 8,
+          "y": 5,
+          "type": "crater"
+        }
+      ],
+      "units": [
+        {
+          "assetId": "assault-tank",
+          "team": "player",
+          "x": 1,
+          "y": 3,
+          "id": "catalog-full-terrain-course-1"
+        },
+        {
+          "assetId": "skimmer-scout",
+          "team": "player",
+          "x": 2,
+          "y": 2,
+          "id": "catalog-full-terrain-course-2"
+        },
+        {
+          "assetId": "amphibious-infantry",
+          "team": "player",
+          "x": 1,
+          "y": 5,
+          "id": "catalog-full-terrain-course-3",
+          "squads": 2
+        },
+        {
+          "assetId": "rocket-artillery",
+          "team": "player",
+          "x": 2,
+          "y": 5,
+          "id": "catalog-full-terrain-course-4"
+        },
+        {
+          "assetId": "guard-tank",
+          "team": "enemy",
+          "x": 8,
+          "y": 2,
+          "id": "catalog-full-terrain-course-5"
+        },
+        {
+          "assetId": "raider-skimmer",
+          "team": "enemy",
+          "x": 9,
+          "y": 6,
+          "id": "catalog-full-terrain-course-6"
+        },
+        {
+          "assetId": "command-core",
+          "team": "enemy",
+          "x": 10,
+          "y": 3,
+          "id": "core"
+        }
+      ],
+      "waves": {
+        "version": "catalog-wave-config-v1",
+        "waves": []
+      },
+      "waveTemplates": []
+    },
+    {
+      "id": "catalog-full-advance",
+      "version": "catalog-full-levels-v1",
+      "source": {
+        "path": "assets/unit-art/levels/showcase-levels.json",
+        "sha256": "eea48c2a044beb2c07ee852b6cfcfe6297ab91d810f85d033bebc72331e8c140",
+        "levelId": "showcase-advance"
+      },
+      "width": 12,
+      "height": 8,
+      "title": "ADVANCE",
+      "objective": "core-and-escort",
+      "turnLimit": null,
+      "terrain": [
+        {
+          "x": 5,
+          "y": 2,
+          "type": "rubble-field"
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "type": "crater"
+        }
+      ],
+      "units": [
+        {
+          "assetId": "goblin-siegebreaker",
+          "team": "player",
+          "x": 1,
+          "y": 3,
+          "id": "catalog-full-advance-1"
+        },
+        {
+          "assetId": "skimmer-scout",
+          "team": "player",
+          "x": 2,
+          "y": 1,
+          "id": "catalog-full-advance-2"
+        },
+        {
+          "assetId": "rocket-artillery",
+          "team": "player",
+          "x": 1,
+          "y": 5,
+          "id": "catalog-full-advance-3"
+        },
+        {
+          "assetId": "infantry-squad",
+          "team": "player",
+          "x": 2,
+          "y": 5,
+          "id": "catalog-full-advance-4",
+          "squads": 2
+        },
+        {
+          "assetId": "assault-tank",
+          "team": "player",
+          "x": 3,
+          "y": 3,
+          "id": "catalog-full-advance-5"
+        },
+        {
+          "assetId": "recon-tank",
+          "team": "player",
+          "x": 3,
+          "y": 1,
+          "id": "catalog-full-advance-6"
+        },
+        {
+          "assetId": "guard-tank",
+          "team": "enemy",
+          "x": 8,
+          "y": 2,
+          "id": "catalog-full-advance-7"
+        },
+        {
+          "assetId": "raider-skimmer",
+          "team": "enemy",
+          "x": 8,
+          "y": 5,
+          "id": "catalog-full-advance-8"
+        },
+        {
+          "assetId": "command-core",
+          "team": "enemy",
+          "x": 10,
+          "y": 3,
+          "id": "core"
+        }
+      ],
+      "waves": {
+        "version": "catalog-wave-config-v1",
+        "waves": []
+      },
+      "waveTemplates": []
+    },
+    {
+      "id": "catalog-full-siege",
+      "version": "catalog-full-levels-v1",
+      "source": {
+        "path": "assets/unit-art/levels/showcase-levels.json",
+        "sha256": "eea48c2a044beb2c07ee852b6cfcfe6297ab91d810f85d033bebc72331e8c140",
+        "levelId": "showcase-siege"
+      },
+      "width": 12,
+      "height": 8,
+      "title": "System Duel and Siege",
+      "objective": "core-and-escort",
+      "turnLimit": null,
+      "terrain": [
+        {
+          "x": 4,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 7,
+          "y": 4,
+          "type": "rubble-field"
+        }
+      ],
+      "units": [
+        {
+          "assetId": "siege-tank",
+          "team": "player",
+          "x": 2,
+          "y": 3,
+          "id": "catalog-full-siege-1"
+        },
+        {
+          "assetId": "long-range-battery",
+          "team": "player",
+          "x": 4,
+          "y": 2,
+          "id": "catalog-full-siege-2"
+        },
+        {
+          "assetId": "mobile-siege-gun",
+          "team": "player",
+          "x": 2,
+          "y": 5,
+          "id": "catalog-full-siege-3"
+        },
+        {
+          "assetId": "combat-skimmer",
+          "team": "player",
+          "x": 3,
+          "y": 4,
+          "id": "catalog-full-siege-4"
+        },
+        {
+          "assetId": "light-skimmer",
+          "team": "player",
+          "x": 1,
+          "y": 6,
+          "id": "catalog-full-siege-5"
+        },
+        {
+          "assetId": "goblin-siegebreaker",
+          "team": "player",
+          "x": 3,
+          "y": 5,
+          "id": "catalog-full-siege-6"
+        },
+        {
+          "assetId": "infantry-squad",
+          "team": "player",
+          "x": 3,
+          "y": 6,
+          "id": "catalog-full-siege-7",
+          "squads": 2
+        },
+        {
+          "assetId": "command-hub",
+          "team": "enemy",
+          "x": 9,
+          "y": 1,
+          "id": "catalog-full-siege-8"
+        },
+        {
+          "assetId": "goblin-dreadnaught",
+          "team": "enemy",
+          "x": 8,
+          "y": 4,
+          "id": "catalog-full-siege-9"
+        },
+        {
+          "assetId": "infantry-platoon",
+          "team": "enemy",
+          "x": 9,
+          "y": 5,
+          "id": "catalog-full-siege-10"
+        },
+        {
+          "assetId": "command-core",
+          "team": "enemy",
+          "x": 10,
+          "y": 3,
+          "id": "core"
+        }
+      ],
+      "waves": {
+        "version": "catalog-wave-config-v1",
+        "waves": []
+      },
+      "waveTemplates": [],
+      "adjustments": [
+        {
+          "id": "u2-system-duel-buffer-v1",
+          "authorization": "Koordination 2026-10-29 / goblin-upe.4",
+          "runtimeUnitId": "catalog-full-siege-6",
+          "position": {
+            "x": 3,
+            "y": 5
+          },
+          "fromAssetId": "skimmer-carrier",
+          "toAssetId": "goblin-siegebreaker",
+          "reason": "Replace the unused carrier role with an approved MkIII system-duel buffer; all other positions, opponents, terrain, objectives and canonical unit values unchanged."
+        }
+      ]
+    },
+    {
+      "id": "catalog-full-specialists",
+      "version": "catalog-full-levels-v1",
+      "source": {
+        "path": "assets/unit-art/levels/showcase-levels.json",
+        "sha256": "eea48c2a044beb2c07ee852b6cfcfe6297ab91d810f85d033bebc72331e8c140",
+        "levelId": "showcase-specialists"
+      },
+      "width": 12,
+      "height": 8,
+      "title": "SPECIALISTS",
+      "objective": "core-and-escort",
+      "turnLimit": 20,
+      "terrain": [
+        {
+          "x": 6,
+          "y": 4,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "type": "bridge"
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 8,
+          "y": 2,
+          "type": "urban"
+        }
+      ],
+      "units": [
+        {
+          "assetId": "strategic-missile-carrier",
+          "team": "player",
+          "x": 1,
+          "y": 1,
+          "id": "catalog-full-specialists-1"
+        },
+        {
+          "assetId": "artillery-drone",
+          "team": "player",
+          "x": 1,
+          "y": 3,
+          "id": "catalog-full-specialists-2"
+        },
+        {
+          "assetId": "amphibious-infantry",
+          "team": "player",
+          "x": 2,
+          "y": 6,
+          "id": "catalog-full-specialists-3",
+          "squads": 2
+        },
+        {
+          "assetId": "field-engineers",
+          "team": "player",
+          "x": 2,
+          "y": 4,
+          "id": "catalog-full-specialists-4"
+        },
+        {
+          "assetId": "local-defense",
+          "team": "player",
+          "x": 0,
+          "y": 5,
+          "id": "catalog-full-specialists-5"
+        },
+        {
+          "assetId": "forge-engineer",
+          "team": "player",
+          "x": 3,
+          "y": 5,
+          "id": "catalog-full-specialists-6"
+        },
+        {
+          "assetId": "skimmer-carrier",
+          "team": "player",
+          "x": 2,
+          "y": 5,
+          "id": "catalog-full-specialists-7"
+        },
+        {
+          "assetId": "phantom-platform",
+          "team": "enemy",
+          "x": 9,
+          "y": 2,
+          "id": "catalog-full-specialists-8"
+        },
+        {
+          "assetId": "relay-node",
+          "team": "enemy",
+          "x": 9,
+          "y": 5,
+          "id": "catalog-full-specialists-9"
+        },
+        {
+          "assetId": "command-core",
+          "team": "enemy",
+          "x": 10,
+          "y": 3,
+          "id": "core"
+        },
+        {
+          "assetId": "artillery-drone",
+          "id": "catalog-full-specialists-6-drone-1",
+          "team": "player",
+          "x": 3,
+          "y": 5,
+          "embarkedOn": "catalog-full-specialists-6",
+          "cargoBay": "bay-1"
+        },
+        {
+          "assetId": "artillery-drone",
+          "id": "catalog-full-specialists-6-drone-2",
+          "team": "player",
+          "x": 3,
+          "y": 5,
+          "embarkedOn": "catalog-full-specialists-6",
+          "cargoBay": "bay-2"
+        },
+        {
+          "assetId": "phantom-platform",
+          "id": "u3-player-ninja",
+          "team": "player",
+          "x": 2,
+          "y": 1
+        }
+      ],
+      "waves": {
+        "version": "catalog-wave-config-v1",
+        "waves": [
+          {
+            "id": "u3-guard-3",
+            "team": "enemy",
+            "dueOwnTurn": 3,
+            "templateId": "u3-wave-guard",
+            "entries": [
+              {
+                "x": 11,
+                "y": 0
+              },
+              {
+                "x": 11,
+                "y": 1
+              },
+              {
+                "x": 11,
+                "y": 2
+              }
+            ],
+            "maxAttempts": 3
+          },
+          {
+            "id": "u3-drone-5",
+            "team": "player",
+            "dueOwnTurn": 5,
+            "templateId": "u3-wave-drone",
+            "entries": [
+              {
+                "x": 0,
+                "y": 5
+              },
+              {
+                "x": 0,
+                "y": 6
+              },
+              {
+                "x": 0,
+                "y": 7
+              }
+            ],
+            "maxAttempts": 3
+          }
+        ]
+      },
+      "waveTemplates": [
+        {
+          "assetId": "guard-tank",
+          "id": "u3-wave-guard",
+          "team": "enemy",
+          "x": 11,
+          "y": 0
+        },
+        {
+          "assetId": "artillery-drone",
+          "id": "u3-wave-drone",
+          "team": "player",
+          "x": 0,
+          "y": 5
+        }
+      ]
+    }
+  ]
+}

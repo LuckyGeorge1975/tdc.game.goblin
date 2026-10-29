@@ -1,0 +1,127 @@
+{
+  "version": "catalog-full-product-traces-v2",
+  "publicSaveFormat": false,
+  "profile": "CATALOG_FULL_CANDIDATE_v1",
+  "traces": {
+    "catalog-full-atlas-victory": {
+      "file": "catalog-full-atlas-victory.v2.json.gz",
+      "scenarioId": "catalog-full-atlas",
+      "seed": 7,
+      "outcome": true,
+      "turn": 31,
+      "steps": 395,
+      "rngDraws": 287,
+      "traceDigest": "cb9bb007e76923d134033f4babdc0790169c5c1a1c6df136eaeb2f18c1ffd7f0",
+      "sha256": "a6a209e1b339ccc5b50cc1e1fa2af38a26b78d194d421d9a8a8eaa54185ef773",
+      "bytes": 296915
+    },
+    "catalog-full-atlas-defeat": {
+      "file": "catalog-full-atlas-defeat.v2.json.gz",
+      "scenarioId": "catalog-full-atlas",
+      "seed": 7,
+      "outcome": false,
+      "turn": 36,
+      "steps": 187,
+      "rngDraws": 258,
+      "traceDigest": "f8140d51ab9816912436d4e71c631681dfca1d602b9f544ca88b0857c736a3e0",
+      "sha256": "3989e02e0119bc39f8ec3201819308d63dfce01fdceea49479e8d0e797bc78bb",
+      "bytes": 204515
+    },
+    "catalog-full-terrain-course-victory": {
+      "file": "catalog-full-terrain-course-victory.v2.json.gz",
+      "scenarioId": "catalog-full-terrain-course",
+      "seed": 7,
+      "outcome": true,
+      "turn": 7,
+      "steps": 53,
+      "rngDraws": 14,
+      "traceDigest": "2c58cafd2f102b881c285bfe6a301e24a0950a9f928c577192e8bbbd03943872",
+      "sha256": "679ca496dd4f267e91276a416f8cd08b646f57f034a3aabad09a73bca14441d9",
+      "bytes": 30731
+    },
+    "catalog-full-terrain-course-defeat": {
+      "file": "catalog-full-terrain-course-defeat.v2.json.gz",
+      "scenarioId": "catalog-full-terrain-course",
+      "seed": 7,
+      "outcome": false,
+      "turn": 10,
+      "steps": 50,
+      "rngDraws": 15,
+      "traceDigest": "b821bbddf98b1dc17580e741fde3277b1c6e644c6dcc1bcfe499c46527976620",
+      "sha256": "1d9737156f14e42153cc19a3e4e959305067d8411446366c4e5744b5567d5fda",
+      "bytes": 26293
+    },
+    "catalog-full-advance-victory": {
+      "file": "catalog-full-advance-victory.v2.json.gz",
+      "scenarioId": "catalog-full-advance",
+      "seed": 7,
+      "outcome": true,
+      "turn": 2,
+      "steps": 28,
+      "rngDraws": 14,
+      "traceDigest": "2439af2d9cf67113005c1129d87b6e98fc93eeae18ac1bdce9b667dc4062c28a",
+      "sha256": "4371bf97267a68fc498e84dea2734063d96e5289166487e6a4dba4bcab2c688b",
+      "bytes": 27610
+    },
+    "catalog-full-advance-defeat": {
+      "file": "catalog-full-advance-defeat.v2.json.gz",
+      "scenarioId": "catalog-full-advance",
+      "seed": 7,
+      "outcome": false,
+      "turn": 135,
+      "steps": 551,
+      "rngDraws": 269,
+      "traceDigest": "f361dda1dac460579e517ab053cd03b549ed84deeecf0b5c0828f750ff2331fe",
+      "sha256": "88a114cba33dfa2da9b2dee97543fd0f29048e6e0e71c1e48c025ce1f084f471",
+      "bytes": 134460
+    },
+    "catalog-full-siege-victory": {
+      "file": "catalog-full-siege-victory.v2.json.gz",
+      "scenarioId": "catalog-full-siege",
+      "seed": 7,
+      "outcome": true,
+      "turn": 34,
+      "steps": 293,
+      "rngDraws": 201,
+      "traceDigest": "524faf9e1c01140b1c2b607386012743710237ffb2c96836f8b4e9f2bc92b26a",
+      "sha256": "6f178f286f3d142df55a0ebf5c978ae1efdfa4a7891c315020788e77ac7fcf4d",
+      "bytes": 157576
+    },
+    "catalog-full-siege-defeat": {
+      "file": "catalog-full-siege-defeat.v2.json.gz",
+      "scenarioId": "catalog-full-siege",
+      "seed": 7,
+      "outcome": false,
+      "turn": 16,
+      "steps": 73,
+      "rngDraws": 121,
+      "traceDigest": "ca6291a50313cf7d44ae41b8455f3c2e0ec197424c7f3ed50c282916758d8441",
+      "sha256": "36f38372bd73cdc88be9c1e581a67859448bbdbde14c9a45719f6e5022a149d5",
+      "bytes": 68476
+    },
+    "catalog-full-specialists-victory": {
+      "file": "catalog-full-specialists-victory.v2.json.gz",
+      "scenarioId": "catalog-full-specialists",
+      "seed": 7,
+      "outcome": true,
+      "turn": 17,
+      "steps": 185,
+      "rngDraws": 103,
+      "traceDigest": "82aad54da0c340acb3c144e60f8fe1a79c004baac015c712bef7f09389caf2f1",
+      "sha256": "6b868c3c237cf849fd440646c7cca808395a818e69adbdc47cc60c463e124679",
+      "bytes": 122972
+    },
+    "catalog-full-specialists-defeat": {
+      "file": "catalog-full-specialists-defeat.v2.json.gz",
+      "scenarioId": "catalog-full-specialists",
+      "seed": 7,
+      "outcome": false,
+      "turn": 20,
+      "steps": 92,
+      "rngDraws": 60,
+      "traceDigest": "e8abd5e9939450b92cf782e271554140096b772671171f0f1b83747f3c65297b",
+      "sha256": "7ea2236748bc1c2712d09ab4bff65af3b384714de5add9c7d940cfc9e6475e54",
+      "bytes": 57187
+    }
+  }
+}

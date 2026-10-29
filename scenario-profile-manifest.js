@@ -8,7 +8,9 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   const historicalIronDust=Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:product});
   const losProbe=Object.freeze({id:'los-supercover-probe',scenarioVersion:1,
     objective:'core',ruleProfileId:'LEGACY_SUPERCOVER_PROBE_v1',losMode:'strict-supercover'});
+  const fullIds=['catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists'];
   const entries=Object.freeze({
+    ...Object.fromEntries(fullIds.map(id=>[id,Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:'CATALOG_FULL_CANDIDATE_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'})])),
     'catalog-siege':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_SPECIALISTS_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'}),
     'catalog-specialists':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_SPECIALISTS_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'}),
     'catalog-transport':Object.freeze({scenarioVersion:1,objective:'core',ruleProfileId:'CATALOG_BASE_TRANSPORT_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'}),
@@ -29,6 +31,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   });
   function reject(code,message){const error=new Error(`${code}: ${message}`);error.code=code;throw error}
   function validate(id,config){
+    if(fullIds.includes(id)){if(!globalThis.GoblinCatalogFullModel)reject('SCENARIO_PROFILE_MISMATCH','Full contract unavailable');GoblinCatalogFullModel.validate(id,config);}
     if(['catalog-siege','catalog-specialists'].includes(id)){if(!globalThis.GoblinCatalogSpecialistsModel)reject('SCENARIO_PROFILE_MISMATCH','Specialists contract unavailable');GoblinCatalogSpecialistsModel.validate(id,config);}
     if(['catalog-transport','catalog-maneuver'].includes(id)){if(!globalThis.GoblinCatalogBase)reject('SCENARIO_PROFILE_MISMATCH','Catalog contract unavailable');GoblinCatalogBase.validate(id,config);}
     if(id==='artillery-pilot'){if(!globalThis.GoblinArtilleryPilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinArtilleryPilot.validate(config);}
@@ -66,7 +69,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         !Number.isInteger(unit.x)||unit.x<0||unit.x>=12||!Number.isInteger(unit.y)||unit.y<0||unit.y>=8||
         !Number.isInteger(unit.move)||unit.move<0||
         (unit.catalogSystems?
-          (!['catalog-siege','catalog-specialists'].includes(id)||Object.hasOwn(unit,'hp')||Object.hasOwn(unit,'maxHp')||Object.hasOwn(unit,'infantry')||unit.alive!==true||!GoblinSystems.validateCatalogSystem(unit.catalogSystems,config.catalog.registry)):
+          (!['catalog-siege','catalog-specialists',...fullIds].includes(id)||Object.hasOwn(unit,'hp')||Object.hasOwn(unit,'maxHp')||Object.hasOwn(unit,'infantry')||unit.alive!==true||!GoblinSystems.validateCatalogSystem(unit.catalogSystems,config.catalog.registry)):
           (!Number.isInteger(unit.hp)||unit.hp<1||!Number.isInteger(unit.maxHp)||unit.maxHp<unit.hp||!Number.isInteger(unit.defense)||unit.defense<1||!Number.isInteger(unit.range)||unit.range<0||!Number.isInteger(unit.damage)||unit.damage<0)))
         reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} hat ungültige Einheitenwerte; Partie wurde nicht geladen.`);
       unitIds.add(unit.id);
@@ -83,7 +86,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         ...(id==='artillery-pilot'?{fireBudgetVersion:source.fireBudgetVersion,sourceDigest:source.sourceDigest}:{}),
         ...(id==='siege-pilot'?{fireBudgetVersion:source.fireBudgetVersion,sourceDigest:source.sourceDigest}:{}),
         ...(id==='skimmer-pilot'?{movement:source.movement,sourceDigest:source.sourceDigest}:{}),
-        ...((globalThis.GoblinCatalogBase?.has(id)||globalThis.GoblinCatalogSpecialistsModel?.has(id))?{catalog:source.catalog}:{}),
+        ...((globalThis.GoblinCatalogBase?.has(id)||globalThis.GoblinCatalogSpecialistsModel?.has(id)||globalThis.GoblinCatalogFullModel?.has(id))?{catalog:source.catalog}:{}),
         unitDataProfile:source.ruleProfile??null,terrain:source.terrain,
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;

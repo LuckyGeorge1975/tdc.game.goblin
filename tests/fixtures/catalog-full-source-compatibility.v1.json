@@ -1,0 +1,186 @@
+{
+  "version": "catalog-full-source-compatibility-v1",
+  "baseCommit": "1fef6ed55eda88681ba17d2d6c307c1f33f23312",
+  "additiveProfileOnly": true,
+  "scope": "Explicit new full candidate mechanics/UI and shared profile gates; historical profiles retain every original gameplay/state/history/event/RNG value. Source provenance only is normalized through the accepted display-patch chain. No old fixture regeneration, dropped values, profile retargeting or gameplay normalization.",
+  "originalTraceDigests": [
+    "3d3131f6d70f820025097d49259ac51dc3e70327686a06d42f5c00f283b0e173",
+    "d6148f6166874d57b36f0b84943fe766d4d4dc8bc86cc595171594093a3263b1",
+    "76467b8d89ce89130d6299f36e511b000a05fdd1d3fa40ca113f0f4bc78b64fd",
+    "85ec0edc41c4a3b8f84856d337947c69cfe7bf66ad840f59467fb5b4e8e8f2e0",
+    "7b926b67d121e352212c4e7a9ca4d15a801aa54a4f259a6cd5d207a31e77ddfd",
+    "22b4c9f8b6fed666570cef25f70a5d2302c9e7bdd77378454a0422289ab12ef1",
+    "75fc2524d213e1b05b542caefe57099b52af974ce312555406f5992bcd8280d5",
+    "f363b26f5e68c2c510e1997ec46a7c860e1ebdf2580f0dc48a169f82be86087a",
+    "8df47d924bc2e73642b379ab309c923a248d5f0703bb05a049169312afbde1a6",
+    "ba7bdafd71e03bbf2cff8ac24b7a7a715f581f109b3cc94f9ce381b3473565ff",
+    "b1023f222438f5f24e83fc23bf088093f8ed1c66a5b7939e9bfb4f5d104d1c3d",
+    "1e49721bc20dcf792443927f6be45356c3af9962e863046e839f65f663d37c29",
+    "2f8c8326f1f2fef605cf97b21724bc31cee42f62db7e37fd6ea7bc0c5dcc4c26",
+    "a6207b191d6d1a76d73c29062f658763ce753f2d65ad50849963fb79cec96dea",
+    "bd4e9a34e37fce6c20005e84642008bbb05995cd6b24149b148d685fde2e6cef",
+    "8258ef2c242038a40a08fc4c1358bd293c0a34fa713b66c83148eacf36159fe5",
+    "ef96512a240c6323a2baf0efee634d6f6a492e8ba0d7f215d496b9a8c2a303d9",
+    "e8cb9acf9b76af82cc4970f2d013f508dbf76954a65dcaf02ee0665648dce5eb"
+  ],
+  "originalFixtureSha256": {
+    "artillery-product-traces.v1.json": "14c27d0ff45e6bf1db09db109c5020176f9611f3a2cb197a63930303e98064ec",
+    "catalog-base-product-traces.v1.json.gz": "f1c41110bd4d3ef954672d2be901aa13a7169124efb610277e1da0f201928d68",
+    "catalog-specialists-product-traces.v1.json.gz": "270ed926a36b5dc4dea03d9f7cce88f214d7ea64d90f5195e807c20ecbb53bf5",
+    "catalog-specialists-boundary-traces.v1.json.gz": "7aa9fa3c130562755442d55a3181a1c2118ee1908b76b422e5cd2b431e5c3880"
+  },
+  "sourcePairs": {
+    "assets/ui-copy/briefing-01.de.json": {
+      "from": "0e239c8cb1282bc4f170aba31c97e2c4ed5b1f75c03f72afd49d9b1c34fdc8e4",
+      "to": "3878c62471dea8e610d81ec92d50fad24688a11075cc0800b588d5ab880f5ec7"
+    },
+    "assets/ui-copy/briefing-01.en.json": {
+      "from": "dcf46873ebfcbc0bae9d342304a39011a9adf0b3dae0fe8379ab4275d6d9c5be",
+      "to": "e53b2a4c8f84acc2d3ce3dff4e274a0dcdc171b870937a591bb1a1d5533fadca"
+    },
+    "assets/ui-copy/briefing-01.es.json": {
+      "from": "f8656963d06cbd862fb53ed01a72883b7dd9478755502fc75d63c7ffdc137cce",
+      "to": "1c0af4eb19519129e8cca91cb4fa031a48312a313a970013cad55573c9dac476"
+    },
+    "assets/ui-copy/briefing-01.fr.json": {
+      "from": "07666f0aee773a4b9365f859fb36fd6d8944928f9a0872b96b15351363cd3ebc",
+      "to": "651ff0b30ba9c836480bb2d2ee454a46288931d9e488a98a107383e0b1e457cb"
+    },
+    "catalog-base-runtime.js": {
+      "from": "460cc3f6349e04aa8affb9fc2b40d1b1755aea3b6b81f744f4cd1cd1f1ceacdd",
+      "to": "526469157f2916df223f448967b09310a7ffd57fa6efa66d4ba78a76da3a76c5"
+    },
+    "catalog-specialists-model.js": {
+      "from": "ec89419eddeaf60e8d7fa087bd7da79cbf9e7f630d23205878bc7ed100388a4e",
+      "to": "ed7c82c37d6ccd99b095e43cb9dc95100d4df782481988c2320baadde95d97d3"
+    },
+    "catalog-specialists-runtime.js": {
+      "from": "f99663f44f744370a83205b4100c18c05aef2624c9de7862727ef70d67a08005",
+      "to": "62aa07a552d47420c9bb12f33703bfed438a07fc026911922d5e2460531c5e0b"
+    },
+    "catalog-specialists-ui.js": {
+      "from": "30ad4253cbb52330ab83ad73e7a4f49912e8cd223bf4b68854d7f3abce97bfaa",
+      "to": "053b770aecbb3c542f44d55c0a60b967b5e4de260b61be496e6bc85464e62c7c"
+    },
+    "command-history.js": {
+      "from": "9f3900afeca0582238a701ae96103fd9258a3377fa3b481ed3c75f0fc780e36d",
+      "to": "f37784b39f8a9ef8ba7c75e5599fdceedb9a21cfb954045faab21f70166a5522"
+    },
+    "fire-presentation.js": {
+      "from": "679d5e0af1b6c8bd05132c54751cb7a860ca208cde3b274f8e9d89a1e6ff4d0c",
+      "to": "0ae86d4b760ca504a0895d75f4417effa35b369a4b4c6844e38a24b764989944"
+    },
+    "game.js": {
+      "from": "ff206bd5f10b02c91954532166c2c382d7039a110cec591e9ce672369913b6c9",
+      "to": "fecd5b07aed31cc2bb6bbb4be81bcc921371a8c12f0c8d452bafc212dcb3e146"
+    },
+    "index.html": {
+      "from": "64eee5846649cfc511d47180ce6ff48a06b1413d276e8b6c7425fcd123789df3",
+      "to": "fb0ef0879814bc3d140e26fed3eeb5f5947ef38c6f9001ce294024ef2c4587b3"
+    },
+    "legacy-presentation.js": {
+      "from": "ff44b4017c3cbddfc61fc075b5c1e77e6a3530ac69f5aac474a2e3255ee98879",
+      "to": "cf8d948c0cf4cba1d503779b83f3faf58a2aef9d70e13f3ba47c3a1a926b174e"
+    },
+    "m1-unit-markers.js": {
+      "from": "cb7ab991a9e503b46c4500e27bebf1bc50a4032d692d29b21b1370889107c549",
+      "to": "3a5603e46ac2821e3db462240228cac7ecccdde2fd7b5127d7382f3d54517f85"
+    },
+    "presentation-state.js": {
+      "from": "67b2d6a669c8e4b0cfb73a0dd40a0b74f5abd4638a27739fd8e435de94303b7b",
+      "to": "b1e6898f51ba503d16220867f1dba795dd4d96ef4e60eadc74824a160a040529"
+    },
+    "scenario-profile-manifest.js": {
+      "from": "f645e63f936c71dca330c48da7f6c4ef45ce15631f776e923e176bcb9b629009",
+      "to": "52f9fd31af253997595ba9fafa95bf4bac145cee167c786933d7401b8b1c44ad"
+    },
+    "scenario.js": {
+      "from": "1ba1687ddae02d4d3d2cb64380ad6335936bd037768861281d66ecdab76f6573",
+      "to": "99469e9da976a85cc2a17219a8ece5e9106f18eab3904afd54ca1e119b22f8d5"
+    },
+    "tests/artillery-product-harness.mjs": {
+      "from": "cb5de49d7ac5c06a87d5b1747e5688b878c2336265f58ecdea3c9467e5262445",
+      "to": "d2b19b92ee2b4da55a0caed2dbb63415e7ec6678789c0e82d51cc87733704bd6"
+    },
+    "ui-v2-flow.js": {
+      "from": "01812251a26fe75f4786ed0dfad25d9b199e516a116a6db88876e1edb0e874af",
+      "to": "6b83503b0416e38952dc228ff5610672c3782a99ab707023d1959fd853023c45"
+    },
+    "ui-v2.css": {
+      "from": "b5041a59dc10457908a59baceed34c3ee178d0fe5a69960dd6ecc82efab261d1",
+      "to": "3a2f827b69b3576362f72d53a7e73405b56d8263544e34a4cd8471709cac0eb0"
+    },
+    "ui-v2.js": {
+      "from": "84826f2100b5ecb5edb268368bc511de5a975f79d53561dda0ad2f3476926d88",
+      "to": "4d31ea5ec8d58a7dfa0048ea7c5d458e24303e380649046a72fc069dcb36fe77"
+    },
+    "unit-guide-range.js": {
+      "from": "108bf81e53d203ed247ebe04ade136f405ecdf72400983f422a350153038981a",
+      "to": "3f9d66cb91b821ad3c6286ebe0264acaf715f5e4f29dff80a7afc13e6a0f6178"
+    },
+    "unit-guide.js": {
+      "from": "bdd36da51893d904ef2e6f179af072edfc6cbe9a6edbbc90f38209f343ed03c1",
+      "to": "55db161daebc6758ddd130c3679de0536a5b97b8c1c15f8ffc05829ef37d5ab3"
+    },
+    "assets/unit-art/levels/catalog-full-levels.v1.json": {
+      "from": null,
+      "to": "1c16d0af2b71b14f1e6de125e5f877132ed513fb401915e49937cf5059029b27"
+    },
+    "catalog-full-loader.js": {
+      "from": null,
+      "to": "4b32b1f71c1b7ee84056e9886e64dcd535694b9e193f1ee60fc6a6870ce4223e"
+    },
+    "catalog-full-model.js": {
+      "from": null,
+      "to": "836e5973f0d8368f6f60115989ca2949abc70bb0757ff50f543f53e0935c6527"
+    },
+    "catalog-full-runtime.js": {
+      "from": null,
+      "to": "f29eefdfd76d028a8096bdcb6f8ef6467584d1447f0dcc4bfcfe9958f570c7e1"
+    },
+    "catalog-visibility.js": {
+      "from": null,
+      "to": "3e9c05509d88acbc0546a428c966520cb8edfb0efaf247a2fc2a5b6e72003fcd"
+    },
+    "catalog-waves.js": {
+      "from": null,
+      "to": "a481fd5c3f1601019f91b55644d73003b78b75f12bb635b00e7828767e10dc29"
+    },
+    "tests/catalog-full-boundaries.test.mjs": {
+      "from": null,
+      "to": "411e48a4052421213477362c7b3d22ef402a97e0a75186363d7a408f1043935c"
+    },
+    "tests/catalog-full-capabilities.test.mjs": {
+      "from": null,
+      "to": "76da9094f7983d475f14910aef18e3eded6ff9a8acb309d5e050ff2e0981a5c7"
+    },
+    "tests/catalog-full-harness.mjs": {
+      "from": null,
+      "to": "c43dfe1511ffaf1a70a567af5c6e0c3b3039d54574b301d955e7f25a2ca90801"
+    },
+    "tests/catalog-full-model.test.mjs": {
+      "from": null,
+      "to": "1c47246e97f38809dbf5dc9401bd70adbac59bd47512a0d7c0fe64b9ddc1f00b"
+    },
+    "tests/catalog-full-runtime.test.mjs": {
+      "from": null,
+      "to": "502d01dfe0cb302dd851ad6aa113b1b6e9326f4cfbe1ef0e28ebb281f864336a"
+    },
+    "tests/catalog-full-trace.mjs": {
+      "from": null,
+      "to": "450b7180e00af5425dbcbf56677f25d68603b1bf310814e897839f12ffff0945"
+    },
+    "tests/catalog-display-source-compatibility.test.mjs": {
+      "from": "7e0fa01fb77059d3c2c5a50dd5acbe211394f7e11d0ce8523c9426c67f1e2ec1",
+      "to": "364d13f34db511ba9663c8f15515c3a62dcd7ec8d5008bdd30c2cd44f44679bd"
+    },
+    "tests/helpers/catalog-display-source-compatibility.mjs": {
+      "from": "969bfb89a53ea8268f466bd925b7734faf870fd5bcea306ccca7881259c5032b",
+      "to": "9f078f503f0f72a74837e126d5224e725c982cc930b8012772b5d9a18aabef24"
+    },
+    "tests/helpers/catalog-full-source-compatibility.mjs": {
+      "from": null,
+      "to": "0167402f5abb2ceea3bd0c99f516994cae96bb0fd6108cce63d0b359d25d8c28"
+    }
+  }
+}

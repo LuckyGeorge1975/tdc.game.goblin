@@ -3,3 +3,5 @@ scripts/export-wrecks.py text eol=lf
 # These are byte-identical archive metadata; preserve their provenance hashes.
 assets/unit-art/sets/02-technical-illustration/anchors.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 assets/unit-art/sets/02-technical-illustration/wreck-classes.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the byte-bound normal-trace index across Windows and Unix checkouts.
+tests/fixtures/catalog-full/index.v2.json -text

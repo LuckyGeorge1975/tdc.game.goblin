@@ -25,6 +25,7 @@ function commandSnapshot(label) {
   const snapshot = { label, units: structuredClone(units), terrain: [...terrain], terrainTypes: [...terrainTypes],
     selectedId: selected?.id, focus: focusedCell && {...focusedCell},
     log: logEl.innerHTML, rollCursor: phaseRollCursor };
+  if(globalThis.GoblinCatalogFullRuntime?.active())snapshot.catalogFull=GoblinCatalogFullRuntime.snapshot();
   globalThis.GoblinLegacyPresentation?.checkpoint(snapshot);
   return snapshot;
 }
@@ -60,6 +61,7 @@ function undoPhaseCommand() {
   units.forEach(unit => { unit.moveFrom = null; unit.justHit = false; });
   terrain = new Set(before.terrain);
   terrainTypes = new Map(before.terrainTypes);
+  if(globalThis.GoblinCatalogFullRuntime?.active())GoblinCatalogFullRuntime.restore(before.catalogFull);
   globalThis.GoblinSpecialistsRuntime?.validateRestoredState();
   selected = units.find(unit => unit.id === before.selectedId) || null;
   focusedCell = before.focus;

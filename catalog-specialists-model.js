@@ -14,8 +14,8 @@
    units:[e('forge-engineer','forge','player',1,3),e('field-engineers','engineers','player',2,3),e('artillery-drone','bay-drone-one','player',1,3,{embarkedOn:'forge',cargoBay:'bay-1'}),e('artillery-drone','bay-drone-two','player',1,3,{embarkedOn:'forge',cargoBay:'bay-2'}),e('artillery-drone','ground-drone','player',1,4),e('skimmer-carrier','carrier','player',0,4),e('amphibious-infantry','marines','player',0,5,{squads:3}),e('local-defense','defense','player',2,5),e('infantry-squad','squad','player',2,6,{squads:2}),e('skimmer-scout','scout','player',1,6),e('rocket-artillery','rocket','enemy',8,1),e('assault-tank','assault','enemy',8,6),e('combat-skimmer','combat','enemy',7,2),e('light-skimmer','light','enemy',8,4),e('infantry-platoon','platoon','enemy',7,5),e('command-hub','hub','enemy',10,7),e('relay-node','relay','enemy',10,0),e('forge-engineer','hostile-forge','enemy',9,4),e('artillery-drone','hostile-bay-one','enemy',9,4,{embarkedOn:'hostile-forge',cargoBay:'bay-1'}),e('artillery-drone','hostile-bay-two','enemy',9,4,{embarkedOn:'hostile-forge',cargoBay:'bay-2'}),e('command-core','core','enemy',10,3)]}
  ];
  let configs=null;
- function createUnit(entry,data,records){
-  const r=data.units[entry.assetId],t=r?.target;if(!r||!scope.includes(r.catalogId))throw Error('UNSUPPORTED_SPECIALISTS_CLASS');
+ function createUnit(entry,data,records,allowedScope=scope){
+  const r=data.units[entry.assetId],t=r?.target;if(!r||!allowedScope.includes(r.catalogId))throw Error('UNSUPPORTED_SPECIALISTS_CLASS');
   records[entry.id]={assetId:entry.assetId,catalogId:r.catalogId,rules:t};
   const common={id:entry.id,catalogAssetId:entry.assetId,catalogId:r.catalogId,visualKey:entry.assetId,name:entry.assetId.replaceAll('-',' ').toUpperCase(),type:r.catalogId,icon:r.catalogId.slice(1),team:entry.team,x:entry.x,y:entry.y,movementMode:t.mode,...(entry.id==='core'?{core:true}:{})};
   if(t.systemDefinitionRef){const catalogSystems=GoblinSystems.createCatalogSystem(data,entry.assetId);return {...common,catalogSystems,alive:true,move:GoblinSystems.catalogMovement(catalogSystems,data),selectedSlot:catalogSystems.components.find(c=>GoblinSystems.catalogWeaponReady(catalogSystems,c.id,data))?.id??null,...(t.material?{material:t.material.initial,materialMax:t.material.max}:{}),...(t.cargoRef==='forge-drone-bays-v1'?{droneBays:catalogSystems.rules.definition.components.filter(c=>c.kind==='drone-bay').map(c=>c.id)}:{})}}
@@ -40,5 +40,5 @@
  }
  const has=id=>levels.some(level=>level.id===id);
  const validate=(id,config)=>{if(!configs?.[id]||!same(config,configs[id]))throw Error('SPECIALISTS_PROFILE_MISMATCH');return true};
- root.GoblinCatalogSpecialistsModel=Object.freeze({profile,scope:freeze(scope),initialize,has,validate,get configs(){return configs}});
+ root.GoblinCatalogSpecialistsModel=Object.freeze({profile,scope:freeze(scope),createUnit,initialize,has,validate,get configs(){return configs}});
 })(globalThis);

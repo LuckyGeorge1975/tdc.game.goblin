@@ -63,9 +63,9 @@ const guideBackground=[document.querySelector('.app-shell'),document.querySelect
 let guideReturnFocus=null,guidePreviousInert=[];
 function renderUnitGuide(){
   const v2=globalThis.IronDustBrowserV2?.mode==='ready';
-  const unit=unitGuideEntries[guideIndex],live=v2?
+  const baseEntry=unitGuideEntries[guideIndex],card=globalThis.GoblinCatalogFullRuntime?.catalogCard(baseEntry),unit=card?{...baseEntry,...card}:baseEntry,live=v2?
     globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.id===unit.coreUnitId):
-    units.find(item=>['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(currentScenario)?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
+    (globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(item=>['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(currentScenario)||globalThis.GoblinCatalogFullRuntime?.active()?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
   document.querySelector('.guide-information').scrollTop=0;
   document.querySelector('#guide-symbol').textContent=unit.icon;
   document.querySelector('#guide-symbol').classList.toggle('enemy',(live?.team==='enemy')||(!live&&unit.team==='HOSTILE SYSTEM'));
@@ -88,7 +88,7 @@ function renderUnitGuide(){
   const attack=live?.catalogSystems?GoblinSpecialistsRuntime.selectedSpec(live)?.attack??0:siegeSpec?siegeSpec.attack:live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):v2?live.attack:live.damage):unit.attack;
   const defense=live?(live.catalogSystems?GoblinLanguage.t('v2.ui.bySystem'):live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.bySystem'):'BY SYSTEM'):v2?live.defense:effectiveDefense(live)):unit.defense;
   const guideFacts=v2?['v2.ui.armorHp','v2.ui.move','v2.ui.range','v2.ui.attackDef'].map(key=>GoblinLanguage.t(key)):['ARMOR / HP','MOVE','RANGE','ATTACK / DEF'];
-  if(live?.catalogSystems)guideFacts[0]=GoblinLanguage.t('v2.ui.treads');
+  if(live?.catalogSystems||card?.system)guideFacts[0]=GoblinLanguage.t('v2.ui.treads');
   document.querySelector('#guide-facts').innerHTML=`<div class="guide-fact"><span>${guideFacts[0]}</span><b>${hp}</b></div><div class="guide-fact"><span>${guideFacts[1]}</span><b>${move}</b></div><div class="guide-fact"><span>${guideFacts[2]}</span><b>${range}</b></div><div class="guide-fact"><span>${guideFacts[3]}</span><b>${attack} / ${defense}</b></div>`;
   globalThis.UnitGuideRange.render(unit,v2?null:live);
   const scenarios=Object.entries(scenarioCatalog).filter(([,config])=>config.units.some(item=>item.name===unit.name)).map(([id])=>id.toUpperCase().replaceAll('-',' '));
@@ -128,7 +128,7 @@ document.querySelector('#guide-find').onclick=()=>{
   if(core&&!inV2Ui)return;
   const entry=unitGuideEntries[guideIndex];
   const unit=core?globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.id===entry.coreUnitId):
-    units.find(item=>item.name===entry.name);
+    (globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(item=>globalThis.GoblinCatalogFullRuntime?.active()?item.visualKey===UnitVisuals.artKey(entry):item.name===entry.name);
   if(!unit||(core&&guideDead(unit))||(inV2Ui&&!globalThis.GoblinV2Flow?.hasStarted()))return;
   closeUnitGuide();
   if(inV2Ui){globalThis.GoblinV2Flow.findUnit(unit.id);return}

@@ -46,8 +46,8 @@
  function commands(state,actor,cell,view){
   if(!actor||!cell)return [];
   const target=state.units.find(u=>alive(u)&&!u.embarkedOn&&u.x===cell.x&&u.y===cell.y),result=[];
-  const add=command=>result.push({command,label:commandLabel(command),...(command.type==='CatalogFire'?{keepTarget:true}:{})}),job=(name,target,option=null)=>add({type:'Engineer',actorId:actor.id,job:name,target,option});
-  if(state.turnPhase==='fire'){if(target&&target.team!==actor.team)add(fireCommand(actor,target,view));return result}
+  const add=command=>result.push({command,label:commandLabel(command),...(command.type==='CatalogFire'?{keepTarget:true}:command.type==='CatalogHexFire'?{confirmSplash:true}:{})}),job=(name,target,option=null)=>add({type:'Engineer',actorId:actor.id,job:name,target,option});
+  if(state.turnPhase==='fire'){if(root.GoblinCatalogFullRuntime?.active()&&actor.catalogId==='U13'){add({type:'CatalogHexFire',actorId:actor.id,...cell});return result}if(target&&target.team!==actor.team)add(fireCommand(actor,target,view));return result}
   if(!['movement','gev'].includes(state.turnPhase))return result;
   if(!target)add({type:'Move',actorId:actor.id,...cell});
   if(state.turnPhase==='gev')return result;

@@ -45,15 +45,18 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       let status=at('#v2-objective-members');
       if(!status){status=document.createElement('p');status.id='v2-objective-members';at('#v2-objective').after(status);}
       status.textContent=members.length?t('v2.ui.objectiveMembers',{done,total:members.length}):'';
+      if(state.fullStatus){if(state.fullStatus.pendingEnemy)status.textContent+=' · '+t('v2.full.objective.pendingWaves');if(state.fullStatus.turnLimit!==null)status.textContent+=' · '+t('v2.full.limit.status',{current:state.fullStatus.enemyTurns,limit:state.fullStatus.turnLimit});}
       status.title=members.map(member => `${state.units.find(unit=>unit.id===member.unitId)?.name || member.unitId}: ${t(member.state==='satisfied'?'v2.ui.destroyed':'v2.ui.objectivePending')}`).join('\n');
     }
 
     function revision() {
       if (core()) return `core:${IronDustBrowserV2.epoch}:${IronDustBrowserV2.session.profile.digest}`;
+      if(globalThis.GoblinCatalogFullRuntime?.active())return GoblinCatalogFullRuntime.commandRevision();
       return JSON.stringify([currentScenario, legacySession?.sessionId, legacySession?.ruleProfileId, turn, phase, turnPhase, gameOver,
         [...terrain], [...terrainTypes], units.map(({ moveFrom, justHit, ...unit }) => unit)]);
     }
     function legacyLogEntries() {
+      if(globalThis.GoblinCatalogFullRuntime?.active())return GoblinCatalogFullRuntime.logEntries();
       return [...logEl.querySelectorAll('.log-line')].slice(0, 4).map(line => ({
         time:line.querySelector('.log-time')?.textContent.trim() || '',
         source:line.querySelector('strong')?.textContent.trim() || '',
@@ -121,13 +124,15 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           log:idleCoreLog
         };
       }
-      const roster=displayed?.units??units;
+      if(globalThis.GoblinCatalogFullRuntime?.active()&&view.componentOwner&&!GoblinCatalogFullRuntime.known(view.componentOwner)){view.componentOwner=null;view.componentId=null;view.target=null;view.intentRevision=null;view.message='';}
+      const roster=displayed?.units??(globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units);
       const shownPhase=displayed?.activeTeam??phase,shownTurnPhase=displayed?.phase??turnPhase,shownGameOver=displayed?.gameOver??gameOver;
-      const objective = objectiveSnapshot(victoryProfile(legacySession.effectiveRules), roster);
+      const objective = objectiveSnapshot(victoryProfile(legacySession.effectiveRules), globalThis.GoblinCatalogFullRuntime?.active()?units:roster);
       if(!displayed)idleLegacyLogEntries=legacyLogEntries();
       const logEntries = idleLegacyLogEntries;
       const snapshotRevision = revision();
       return {
+        ...(globalThis.GoblinCatalogFullRuntime?.active()?{fullStatus:GoblinCatalogFullRuntime.status()}:{}),
         revision: snapshotRevision, scenario: currentScenario, profile: legacySession.ruleProfileId,
         markers:M1UnitMarkers.legacy(legacySession, roster, snapshotRevision, objective.outcome),
         mission: { title: t(`mission.${currentScenario}.title`), objective: t(`mission.${currentScenario}.objective.short`) },
@@ -162,6 +167,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         return { ok: false, reason: t('ui.error.UNSUPPORTED_COMMAND') };
       if (GameDialogs.isOpen()) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };
       if (phase !== 'player' || gameOver) return { ok: false, reason: t(gameOver ? 'ui.error.GAME_ENDED' : 'ui.error.NOT_ACTIVE_TEAM') };
+      if(globalThis.GoblinCatalogFullRuntime?.active()){if(command?.type==='CatalogHexFire'){const q=GoblinCatalogFullRuntime.hexQuery(command);return q.ok?{ok:true,footprint:q.footprint,friendlies:q.friendlies,weapon:q.weapon}:q}if(command?.type==='Move')return GoblinCatalogFullRuntime.moveQuery(command);}
       if(globalThis.GoblinSpecialistsRuntime?.active()){if(['CatalogFire','CatalogRam','CatalogLoad','CatalogDeploy','Engineer'].includes(command?.type))return GoblinSpecialistsRuntime.query(command);if(['Fire','FireArtillery','Ram'].includes(command?.type))return {ok:false,reason:t('ui.error.UNSUPPORTED_COMMAND')};}
       if(globalThis.GoblinCatalogRuntime?.active())return GoblinCatalogRuntime.query(command);
       if (!['Move', 'Ram', 'Fire', 'FireArtillery', 'Embark', 'Unload'].includes(command?.type)) return { ok: false, reason: t('ui.error.UNKNOWN_COMMAND') };
@@ -258,7 +264,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const actor = units.find(unit => unit.id === command.actorId);
         selected = actor;
         const beforeExecution = revision();
-        if(['CatalogFire','CatalogRam','CatalogLoad','CatalogDeploy','Engineer'].includes(command.type)){executeSpecialistCommand(command);return revision()!==beforeExecution?{ok:true}:{ok:false,reason:t('ui.error.INVALID_COMMAND')};}
+        if(['CatalogFire','CatalogRam','CatalogLoad','CatalogDeploy','Engineer','CatalogHexFire'].includes(command.type)||globalThis.GoblinCatalogFullRuntime?.active()&&command.type==='Move'){executeSpecialistCommand(command);return revision()!==beforeExecution?{ok:true}:{ok:false,reason:t('ui.error.INVALID_COMMAND')};}
         if (command.type === 'Unload') {
           const cargo = units.find(unit => unit.id === command.cargoId);
           unloadAt(actor, cargo, command.x, command.y);
@@ -358,7 +364,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const point = nativeMap.createSVGPoint();
       Object.assign(point, hexCenter(view.target.x, view.target.y));
       const target = point.matrixTransform(nativeMap.getScreenCTM());
-      const occupied = state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn)
+      const occupied = (globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():state.units).filter(unit => unitAlive(unit) && !unit.embarkedOn)
         .map(unit => {const node=nativeMap.createSVGPoint();Object.assign(node,hexCenter(unit.x,unit.y));
           return node.matrixTransform(nativeMap.getScreenCTM());});
       const inset = 8, gap = 44, w = box.width, h = box.height;
@@ -401,7 +407,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           const expectedRevision = view.intentRevision;
           if (confirmSplash) {
             const strike = globalThis.StrategicMissile.STRIKE;
-            const affected = state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn &&
+            const affected = state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && (command.type!=='CatalogHexFire'||unit.team==='player') &&
               dist(unit, view.target) <= strike.radius).map(unit => `${unit.name} (${t(unit.team === 'player' ? 'ui.team.player' : 'ui.team.enemy')})`);
             const accepted = await GameDialogs.confirm({id:'v2-splash-confirm',title:t('v2.ui.missile'),
               message:`${t('v2.ui.sector')} ${hexLabel(view.target)} · ${t('v2.ui.missileSplash')} · ${t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.splashAttack})}${affected.length ? ` · ${affected.join(', ')}` : ''}`,
@@ -439,14 +445,14 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function chooseActor(id) {
       startZoomPending = null;
-      const unit = (core() ? project().units : units).find(item => item.id === id && item.team === 'player' && unitAlive(item));
+      const unit = (core() ? project().units : globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(item => item.id === id && item.team === 'player' && unitAlive(item));
       view.actorId = unit?.id || null;
       view.areaMode = null; view.previewWeaponKey = null;
       if (unit) { view.focusCell = { x: unit.x, y: unit.y }; view.infoCell = { x: unit.x, y: unit.y }; }
       clearContext(); render();
     }
     function focusUnit(id) {
-      const unit = (core() ? project().units : units).find(item => item.id === id && unitAlive(item));
+      const unit = (core() ? project().units : globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(item => item.id === id && unitAlive(item));
       if (!unit) return;
       if (unit.team === 'player') chooseActor(id);
       else {
@@ -459,10 +465,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function chooseHex(x, y) {
       startZoomPending = null;
-      const roster = core() ? project().units : units;
+      const roster = core() ? project().units : globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units;
       const unit = roster.find(item => unitAlive(item) && !item.embarkedOn && item.x === x && item.y === y);
       const actor = roster.find(item => item.id === view.actorId);
-      if (unit?.team === 'player' && !(actor && unit.id !== actor.id && unit.transportCapacity && canEmbark(actor, unit))&&!(globalThis.GoblinSpecialistsRuntime?.active()&&actor&&actor.id!==unit.id&&(GoblinSpecialistsRuntime.rules(actor)?.engineeringRef||unit.droneBays&&GoblinSpecialistsRuntime.rules(actor)?.cargoRef==='drone-cargo-v1'))) {
+      if (unit?.team === 'player' && !(globalThis.GoblinCatalogFullRuntime?.active()&&actor?.catalogId==='U13'&&turnPhase==='fire') && !(actor && unit.id !== actor.id && unit.transportCapacity && canEmbark(actor, unit))&&!(globalThis.GoblinSpecialistsRuntime?.active()&&actor&&actor.id!==unit.id&&(GoblinSpecialistsRuntime.rules(actor)?.engineeringRef||unit.droneBays&&GoblinSpecialistsRuntime.rules(actor)?.cargoRef==='drone-cargo-v1'))) {
         chooseActor(unit.id); return;
       }
       if(view.target?.x!==x||view.target?.y!==y){view.componentOwner=null;view.componentId=null;}
@@ -575,6 +581,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         return data;
       }
       const weaponKey = previewWeaponKey(actor);
+      if(globalThis.GoblinCatalogFullRuntime?.active()&&actor.catalogId==='U13'){for(let y=0;y<H;y++)for(let x=0;x<W;x++){const result=areaQuery({type:'CatalogHexFire',actorId:actor.id,x,y});(result.ok?data.legal:data.blocked).push({x,y});}data.status=data.legal.length?'fire':'blocked';return data;}
       for (const target of state.units.filter(unit => unit.team === 'enemy' && unitAlive(unit) && !unit.embarkedOn)) {
         const command = globalThis.GoblinSpecialistsRuntime?.active()?GoblinSpecialistsUI.fireCommand(actor,target,view,true):globalThis.GoblinArtilleryWeapons?.active(runtime)?GoblinArtilleryWeapons.command(runtime,target,weaponKey):core() ? { type: 'PlayerFire', playerId: 'player', unitId: actor.id,
           targetId: target.id, ...(weaponKey ? { weaponKey } : {}) } :
@@ -721,6 +728,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
       for (const cell of data.legal) mark(cell, mode === 'movement' ? 'movement' : mode === 'fire' ? 'fire' : 'sight');
       if (mode !== 'los') for (const cell of data.blocked) mark(cell, 'blocked');
+      if(globalThis.GoblinCatalogFullRuntime?.active()&&actor.catalogId==='U13'&&mode==='fire'&&view.target){const strike=GoblinCatalogFullRuntime.hexQuery({type:'CatalogHexFire',actorId:actor.id,...view.target});if(strike.ok)for(const [i,cell] of strike.footprint.entries()){const shape=document.createElementNS(NS,'polygon');shape.setAttribute('points',hexPoints(cell.x,cell.y));shape.classList.add('v2-full-blast',i===0?'v2-full-blast-center':'v2-full-blast-adjacent');shape.setAttribute('aria-hidden','true');overlay.append(shape);}}
       const firePreview = selectedFirePreview(state, actor, runtime, mode, weaponKey, data.legal);
       if (firePreview) {
         const from = hexCenter(firePreview.from.x, firePreview.from.y);
@@ -967,7 +975,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       let commands = [];
       if (view.target && view.actorId) {
         const runtimeActor = units.find(unit => unit.id === view.actorId);
-        const target = units.find(unit => unitAlive(unit) && !unit.embarkedOn && unit.x === view.target.x && unit.y === view.target.y);
+        const target = (globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(unit => unitAlive(unit) && !unit.embarkedOn && unit.x === view.target.x && unit.y === view.target.y);
         commands = state.turnPhase === 'fire'
           ? globalThis.GoblinArtilleryWeapons?.active(runtimeActor)
             ? (()=>{const key=previewWeaponKey(actor),weapon=GoblinArtilleryWeapons.weapons(actor)?.[key];return [{command:GoblinArtilleryWeapons.command(runtimeActor,view.target,key),label:weapon?`${weapon.label} · A6 R${weapon.range} · ${weapon.ready}/1`:t('v2.ui.fire')}];})()
@@ -1105,12 +1113,12 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         at('#v2-log-details').open = !compact;
         compactDetails = compact;
       }
-      if (view.target && view.actorId) positionCommandMenu({units:core()?IronDustBrowserV2.view.units:units});
+      if (view.target && view.actorId) positionCommandMenu({units:core()?IronDustBrowserV2.view.units:(globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units)});
     }
     syncLayout();
     window.addEventListener('resize', syncLayout);
     mapPanel.addEventListener('scroll', () => {
-      if (view.target && view.actorId) positionCommandMenu({units:core()?IronDustBrowserV2.view.units:units});
+      if (view.target && view.actorId) positionCommandMenu({units:core()?IronDustBrowserV2.view.units:(globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units)});
     }, {passive:true});
     at('#v2-command-card').addEventListener('keydown', event => {
       if (event.key !== 'Tab') return;
@@ -1219,7 +1227,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       startZoomPending = null;
       event.preventDefault();
       setZoom(view.zoom * (event.deltaY < 0 ? 1.1 : 0.9), event.clientX, event.clientY);
-      if (view.target && view.actorId) positionCommandMenu({units:core()?IronDustBrowserV2.view.units:units});
+      if (view.target && view.actorId) positionCommandMenu({units:core()?IronDustBrowserV2.view.units:(globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units)});
     }, { passive: false });
     mapPanel.addEventListener('contextmenu', event => {
       event.preventDefault();

@@ -1,7 +1,8 @@
 // Approved A/B rules on the existing movement, CRT, history and presentation paths.
 (function(root){
- const active=()=>!root.IronDustBrowserV2?.active&&(legacySession?.ruleProfileId===GoblinCatalogBase.profile&&GoblinCatalogBase.has(legacySession.scenarioId)||legacySession?.ruleProfileId===root.GoblinCatalogSpecialistsModel?.profile&&root.GoblinCatalogSpecialistsModel?.has(legacySession.scenarioId));
- const record=u=>active()?legacySession.effectiveRules.catalog?.records[u?.id]:null;
+ const active=()=>!root.IronDustBrowserV2?.active&&(root.GoblinCatalogFullRuntime?.active()||legacySession?.ruleProfileId===GoblinCatalogBase.profile&&GoblinCatalogBase.has(legacySession.scenarioId)||legacySession?.ruleProfileId===root.GoblinCatalogSpecialistsModel?.profile&&root.GoblinCatalogSpecialistsModel?.has(legacySession.scenarioId));
+ const fullActive=()=>root.GoblinCatalogFullRuntime?.active()===true;
+ const record=u=>(active()||fullActive())?legacySession.effectiveRules.catalog?.records[u?.id]:null;
  const spec=u=>record(u)?.rules;
  const drone=u=>spec(u)?.cargoRef==='drone-cargo-v1';
  const carrier=u=>spec(u)?.cargoRef==='carrier-cargo-v1';
@@ -53,7 +54,7 @@
   if(!fields||Object.keys(command).length!==fields.length||!fields.every(k=>Object.hasOwn(command,k)))return fail('INVALID_COMMAND','Befehl gehört nicht zu diesem Regelprofil.');
   const u=units.find(u=>u.id===command.actorId),{x,y}=command;
   if(phase!=='player'||gameOver||!ready(u)||u.team!=='player'||!pos(x,y))return fail('UNAVAILABLE','Einheit oder Ziel nicht verfügbar.');
-  const target=units.find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);
+  const target=(root.GoblinCatalogFullRuntime?.active()?root.GoblinCatalogFullRuntime.roster(u.team):units).find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);
   if(command.type==='Embark')return target?.id===command.carrierId?loadQuery(u,target):fail('INVALID_CARRIER','Transporter wählen.');
   if(command.type==='Unload')return unloadQuery(u,units.find(u=>u.id===command.cargoId),x,y);
   if(command.type==='Fire')return fireQuery(u,target);
@@ -71,12 +72,14 @@
   if(!active())return oldEmbark(u,c);const check=loadQuery(u,c);if(!check.ok){setToast(check.reason);return}
   transportLoadMode=null;transportUnloadMode=null;u.embarkedOn=c.id;u.embarkedThisTurn=true;u.x=c.x;u.y=c.y;u.moved=true;u.acted=true;
   if(drone(u)){u.fired=true;c.moved=true;c.acted=true}
+  if(root.GoblinCatalogFullRuntime?.active()){root.GoblinCatalogFullRuntime.recordAction(u,{type:'Embark'},{kind:'cargo'});root.GoblinCatalogFullRuntime.refresh()}
   addLog(text('v2.catalog.loaded',`${u.name} → ${c.name} · Fracht ${carrierLoad(c)}/3`,{cargo:name(u),carrier:name(c),current:carrierLoad(c),capacity:c.transportCapacity}));selected=c;updateSelection();draw();maybeAutoAdvancePhase();
  };
  const oldUnload=unloadAt;unloadAt=function(c,u,x,y){
   if(!active())return oldUnload(c,u,x,y);const check=unloadQuery(c,u,x,y);if(!check.ok){setToast(check.reason);return}
   transportUnloadMode=null;u.embarkedOn=null;u.embarkedThisTurn=false;u.disembarkedThisTurn=true;u.x=x;u.y=y;u.moved=true;u.acted=true;
   if(drone(u)){u.fired=true;u.droneReadyTurn=turn+1;c.moved=true;c.acted=true}
+  if(root.GoblinCatalogFullRuntime?.active()){root.GoblinCatalogFullRuntime.recordAction(u,{type:'Unload'},{kind:'cargo'});root.GoblinCatalogFullRuntime.refresh()}
   addLog(drone(u)?text('v2.catalog.deployed',`${u.name} aufgestellt · Feuer ab Zug ${turn+1}.`,{unit:name(u),turn:turn+1}):`${name(u)} · ${text('v2.ui.unload','Aussteigen')}`);selected=c;updateSelection();draw();maybeAutoAdvancePhase();
  };
  const oldPhase=phaseCanAct;phaseCanAct=function(u,name=turnPhase){
@@ -110,6 +113,7 @@
    text('v2.catalog.combatValues',`A${u.damage??u.attack} D${u.defense} R${u.range}`,{attackLabel:text('v2.ui.attack','A'),defenseLabel:text('v2.ui.defense','D'),rangeLabel:text('v2.ui.range','R'),attack:u.damage??u.attack,defense:u.defense,range:u.range}),
    text(t.gevPhaseEligible?'v2.catalog.movementBonus':'v2.catalog.movement',`M${movementBudget(u)}${t.gevPhaseEligible?' + '+movementBudget(u,true):''}`,{moveLabel:text('v2.ui.move','M'),movement:movementBudget(u),bonus:movementBudget(u,true)})];
   if(t.halfUnit||t.setupValue!==undefined)chunks.push(text('v2.catalog.forceWeight','Aufstellungswert ½',{weight:t.forceBudgetWeight}));
+  if(t.missileRuleRef)chunks.push(text('v2.specialists.resource','Munition',{label:text('v2.specialists.ammo','Munition'),current:u.ammunition,max:1}),text('v2.full.missile.impact','Zentrum A6 / Nachbarn A3',{center:6,adjacent:3}));
   if(carrier(u))chunks.push(text('v2.catalog.cargoSummary',`Fracht ${loadWeight(u,roster)}/3 SP oder 1 Drohne`,{current:loadWeight(u,roster),capacity:u.transportCapacity}));
   if(drone(u)){chunks.push(text('v2.catalog.droneSummary','Stationär · direktes Feuer · keine Bordaktionen'));if((u.droneReadyTurn??1)>turn)chunks.push(text('v2.catalog.fireFromTurn',`Feuer ab Zug ${u.droneReadyTurn}`,{turn:u.droneReadyTurn}))}
   if(root.GoblinSpecialistsRuntime?.active()&&(u.materialMax!==undefined||u.catalogFire))chunks.push(root.GoblinSpecialistsRuntime.summary(u,roster));

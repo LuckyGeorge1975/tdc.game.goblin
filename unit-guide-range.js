@@ -27,8 +27,8 @@
     }
     if(live?.catalogSystems){weapon=true;range=root.GoblinSpecialistsRuntime?.selectedSpec(live)?.range??0;}
     const missile=entry.name==='STRATEGIC MISSILE CARRIER';
-    if(missile&&live&&live.missilesRemaining<=0)range=0;
-    return {movement,bonus,range,weapon,missile,spent:missile&&!!live&&live.missilesRemaining<=0,live:!!live};
+    if(missile&&live&&(live.ammunition??live.missilesRemaining)<=0)range=0;
+    return {movement,bonus,range,weapon,missile,spent:missile&&!!live&&(live.ammunition??live.missilesRemaining)<=0,live:!!live};
   }
   const distance=(q,r)=>Math.max(Math.abs(q),Math.abs(r),Math.abs(q+r));
   function mapSvg(profile,mode){
