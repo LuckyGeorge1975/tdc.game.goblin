@@ -34,6 +34,19 @@
     "mission.skimmer-pilot.objective.short": "Destroy the enemy Command Core and keep your skimmer alive.",
     "mission.skimmer-pilot.briefing.victory": "Destroy the enemy Command Core and keep your skimmer alive.",
     "mission.skimmer-pilot.briefing.defeat": "You lose if no friendly unit survives—even if the command core is destroyed at the same time.",
-    "mission.skimmer-pilot.end.victory": "The enemy command core has been destroyed."
+    "mission.skimmer-pilot.end.victory": "The enemy command core has been destroyed.",
+    "mission.siege-pilot.title": "Siege Tank Trial",
+    "mission.siege-pilot.briefing.short": "Use your Siege Tank’s main guns and anti-personnel weapons.",
+    "mission.siege-pilot.budget": "Two main-gun shots at different targets or one combined shot. Plus two AP shots against infantry.",
+    "mission.siege-pilot.objective": "Destroy the enemy Command Core and keep your tank alive.",
+    "v2.ui.siege.mainGun": "Main gun {number}",
+    "v2.ui.siege.combined": "Combined",
+    "v2.ui.siege.ap": "AP {number}",
+    "v2.reject.siege.sameMainTarget": "A main gun has already fired at this target this turn.",
+    "v2.reject.siege.combinedNotReady": "Both main guns must be ready for combined fire.",
+    "mission.siege-pilot.objective.short": "Destroy the enemy Command Core and keep your tank alive.",
+    "mission.siege-pilot.briefing.victory": "Destroy the enemy Command Core and keep your tank alive.",
+    "mission.siege-pilot.briefing.defeat": "You lose if no friendly unit survives—even if the command core is destroyed at the same time.",
+    "mission.siege-pilot.end.victory": "The enemy command core has been destroyed."
   }
 }

@@ -63,7 +63,7 @@ function renderUnitGuide(){
   const v2=globalThis.IronDustBrowserV2?.mode==='ready';
   const unit=unitGuideEntries[guideIndex],live=v2?
     globalThis.IronDustBrowserV2.session.projection.state.units.find(item=>item.id===unit.coreUnitId):
-    units.find(item=>currentScenario==='skimmer-pilot'?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
+    units.find(item=>['skimmer-pilot','siege-pilot'].includes(currentScenario)?item.visualKey===UnitVisuals.artKey(unit):item.name===unit.name);
   document.querySelector('.guide-information').scrollTop=0;
   document.querySelector('#guide-symbol').textContent=unit.icon;
   document.querySelector('#guide-symbol').classList.toggle('enemy',(live?.team==='enemy')||(!live&&unit.team==='HOSTILE SYSTEM'));
@@ -75,11 +75,13 @@ function renderUnitGuide(){
   document.querySelector('#guide-role').textContent=v2&&live?GoblinLanguage.t(`v2.ui.type.${live.id}`):unit.role;
   const liveDrone=unit.name==='ARTILLERY DRONE'&&live;
   document.querySelector('#guide-copy').textContent=v2&&live?GoblinLanguage.t(live.team==='player'?'v2.guide.player':'v2.guide.enemy'):liveDrone?'Field-Test-Regel: Diese Artilleriedrohne kann sich selbstständig bewegen. Die stationäre Katalogregel ist noch nicht aktiv.':unit.copy;
+  if(live?.siegeFireBudget)document.querySelector('#guide-copy').textContent+=' 2 × A3/R3 + 2 × A1/R1 · '+GoblinSiegeWeapons.summary(live);
   globalThis.UnitGuideVoice.render(unit.name);
   const hp=live?(live.ogreSystems?`${live.ogreSystems.treads} ${v2?GoblinLanguage.t('v2.ui.treads'):'TREADS'}`:`${Math.max(0,live.hp)}/${live.maxHp}`):unit.hp;
   const move=live?`${live.move}${v2?live.type==='gev'?' + 2':'':isGevUnit(live)?` + ${movementBudget(live,true)}`:''}`:unit.move;
-  const range=live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):live.range):unit.range;
-  const attack=live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):v2?live.attack:live.damage):unit.attack;
+  const siegeSpec=live?.siegeFireBudget?GoblinSiegeWeapons.weapons(live)?.[live.siegeWeapon]:null;
+  const range=siegeSpec?siegeSpec.range:live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):live.range):unit.range;
+  const attack=siegeSpec?siegeSpec.attack:live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.byWeapon'):'BY WEAPON'):v2?live.attack:live.damage):unit.attack;
   const defense=live?(live.ogreSystems?(v2?GoblinLanguage.t('v2.ui.bySystem'):'BY SYSTEM'):v2?live.defense:effectiveDefense(live)):unit.defense;
   const guideFacts=v2?['v2.ui.armorHp','v2.ui.move','v2.ui.range','v2.ui.attackDef'].map(key=>GoblinLanguage.t(key)):['ARMOR / HP','MOVE','RANGE','ATTACK / DEF'];
   document.querySelector('#guide-facts').innerHTML=`<div class="guide-fact"><span>${guideFacts[0]}</span><b>${hp}</b></div><div class="guide-fact"><span>${guideFacts[1]}</span><b>${move}</b></div><div class="guide-fact"><span>${guideFacts[2]}</span><b>${range}</b></div><div class="guide-fact"><span>${guideFacts[3]}</span><b>${attack} / ${defense}</b></div>`;

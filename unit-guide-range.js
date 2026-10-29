@@ -16,6 +16,7 @@
     const skimmer=/SKIMMER/.test(entry.name)&&entry.name!=='RAIDER SKIMMER';
     const bonus=live?(typeof movementBudget==='function'?movementBudget(live,true):0):skimmer?number(String(entry.move).split('+')[1]):0;
     let range=live?number(live.range):number(String(entry.range).split(/[–-]/).at(-1));
+    if(live?.siegeFireBudget)range=root.GoblinSiegeWeapons?.weapons(live)?.[live.siegeWeapon]?.range??0;
     let weapon=false;
     if(entry.name==='GOBLIN SIEGEBREAKER'){
       weapon=true;

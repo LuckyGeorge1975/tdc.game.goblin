@@ -94,3 +94,43 @@ normaler Sieg-/Verlustpartien mit kontrolliertem CRT-Wurf6 (keine HP-/Positionsi
 4nicht5/3nicht4, Terrain, Phase, spent/disabled/dead/hostile, RNG/Undo/Restart,
 Loader-/Digestgrenzen sowie Guide/M1/Animationspfad. Diese Tests ersetzen nicht
 die unabhängige native Bedienungsabnahme oder einen Release.
+
+
+## Feste Siege-Tank-Erprobung (29.10.2026, goblin-9bj.11.9)
+
+`siege-pilot` v1 ist ein eigener normal spielbarer Legacy-Einsatz unter
+`CATALOG_SIEGE_PILOT_v1` / `siege-pilot-data-v1`, kein generisches Teilprofil.
+U07 startet B04 mit HP5/D5/R3/M3/A6. Gegner: Guard F04 (HP3/D3/A1/R2/M1),
+Recon G04 (HP2/D2/A2/R2/M3), Infanterie D05 (HP2/D2/A1/R1/M2, bestehender
+Legacy-SP-Verlustpfad) und stationärer Kern K04 (HP5/D5). Alle Startfelder sind
+passierbar. Die bestehende 12×8-Terrain-Course-Karte liegt als eigener Leveldatensatz
+vor. Sieg verlangt Kernzerstörung und Spielerüberleben, nicht sämtliche Begleitziele.
+
+Der bisherige `siege-tank-fire-budget.mjs`-Resolver wird jetzt über eine gemeinsame
+Classic-JS-Implementierung und ESM-Fassade tatsächlich genutzt. Regelversion bleibt
+`siege-tank-fire-budget-v1`: main-1/main-2 je A3/R3 auf verschiedene Ziele;
+main-both A6/R3 verbraucht beide Slots mit einem Wurf. Auch NE bindet das Hauptziel.
+Zusätzlich ap-1/ap-2 je A1/R1 nur Infanterie. Kein neues Ogre-Systemmodell.
+Verfügbare Slots, gewählte Waffe, Query/Dispatch, Quote, Kartenfläche, beide Guides,
+Autophase, Rundenzurücksetzung und BACK hängen an demselben Zustand/Spec.
+Jede akzeptierte Feueraktion verwendet genau einen bestehenden CRT-Wurf; abgelehnte
+Aktionen und Waffenwahl verbrauchen keinen. BACK stellt Slots/Hauptzielhistorie und
+Rollcursor wieder her. Neue Runde setzt Slots genau einmal zurück.
+
+Der exakte Level-/Roster-/Versionsvergleich erfolgt vor jeder neuen Session.
+SHA256 über rekursiv schlüsselsortiertes kompaktes UTF8-LevelJSON:
+`d3892981633e5b1d8fcc35eb40e087738231e5a48b64fcebb14ebf3a7c00204c`.
+Die Session friert Herkunft, Feuerbudgetversion, Anfangsbudget, Gelände und Werte ein.
+Laufende Partien, alte Missionen und die Skimmer-Erprobung werden nicht umgeschaltet;
+`targetActive:false` bleibt bestehen. Kein neuer Save- oder öffentlicher Replayimport;
+Schema1/Core-v3-, Iron-Dust-, U07- und Artillerie-Replayheader lehnen die Pilotkennung ab.
+
+Die Darstellung erfasst die tatsächlich gewählte Waffe vor Autoselect: einzelne
+Mains nutzen jeweils einen der vorhandenen Twinanker, Bündelfeuer beide Mündungen
+mit nur einem Regelergebnis. AP nutzt den expliziten leichten zentralen Spec6-Fallback,
+keine erfundenen AP-Anker. Bilder/Design/Contentpin bleiben
+`2fdce6ac1be30e8b2a360250b37724586469e71c`.
+
+Resolverbelege und normale Gewinn-/Verlustbefehlsfolgen stehen in
+`tests/siege-pilot.test.mjs`; kontrollierte Würfe sind keine native gespielte QA.
+Die unabhängige Desktopprüfung folgt erst auf einem festen Kandidatencommit.

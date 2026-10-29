@@ -34,6 +34,19 @@
     "mission.skimmer-pilot.objective.short": "Détruisez le Noyau de commandement ennemi et gardez votre aéroglisseur en vie.",
     "mission.skimmer-pilot.briefing.victory": "Détruisez le Noyau de commandement ennemi et gardez votre aéroglisseur en vie.",
     "mission.skimmer-pilot.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau de commandement est détruit au même moment.",
-    "mission.skimmer-pilot.end.victory": "Le noyau de commandement ennemi a été détruit."
+    "mission.skimmer-pilot.end.victory": "Le noyau de commandement ennemi a été détruit.",
+    "mission.siege-pilot.title": "Essai du char de siège",
+    "mission.siege-pilot.briefing.short": "Utilisez les canons principaux et les armes antipersonnel de votre Char de siège.",
+    "mission.siege-pilot.budget": "Deux tirs principaux sur des cibles différentes ou un tir groupé. Plus deux tirs AP contre l’infanterie.",
+    "mission.siege-pilot.objective": "Détruisez le Noyau de commandement ennemi et gardez votre char en vie.",
+    "v2.ui.siege.mainGun": "Canon principal {number}",
+    "v2.ui.siege.combined": "Groupé",
+    "v2.ui.siege.ap": "AP {number}",
+    "v2.reject.siege.sameMainTarget": "Un canon principal a déjà tiré sur cette cible pendant ce tour.",
+    "v2.reject.siege.combinedNotReady": "Les deux canons principaux doivent être prêts pour le tir groupé.",
+    "mission.siege-pilot.objective.short": "Détruisez le Noyau de commandement ennemi et gardez votre char en vie.",
+    "mission.siege-pilot.briefing.victory": "Détruisez le Noyau de commandement ennemi et gardez votre char en vie.",
+    "mission.siege-pilot.briefing.defeat": "Vous perdez si aucune unité alliée ne survit, même si le noyau de commandement est détruit au même moment.",
+    "mission.siege-pilot.end.victory": "Le noyau de commandement ennemi a été détruit."
   }
 }

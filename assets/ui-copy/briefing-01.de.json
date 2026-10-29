@@ -34,6 +34,19 @@
     "mission.skimmer-pilot.objective.short": "Zerstöre den gegnerischen Kommandokern und halte deinen Skimmer am Leben.",
     "mission.skimmer-pilot.briefing.victory": "Zerstöre den gegnerischen Kommandokern und halte deinen Skimmer am Leben.",
     "mission.skimmer-pilot.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kommandokern gleichzeitig zerstört wird.",
-    "mission.skimmer-pilot.end.victory": "Der feindliche Kommandokern ist ausgeschaltet."
+    "mission.skimmer-pilot.end.victory": "Der feindliche Kommandokern ist ausgeschaltet.",
+    "mission.siege-pilot.title": "Siege-Tank-Erprobung",
+    "mission.siege-pilot.briefing.short": "Setze die Hauptgeschütze und die Infanterieabwehr deines Belagerungspanzers ein.",
+    "mission.siege-pilot.budget": "Zwei Hauptschüsse auf verschiedene Ziele oder ein gebündelter Schuss. Zusätzlich zwei AP-Schüsse gegen Infanterie.",
+    "mission.siege-pilot.objective": "Zerstöre den gegnerischen Kommandokern und halte deinen Panzer am Leben.",
+    "v2.ui.siege.mainGun": "Hauptgeschütz {number}",
+    "v2.ui.siege.combined": "Gebündelt",
+    "v2.ui.siege.ap": "AP {number}",
+    "v2.reject.siege.sameMainTarget": "Dieses Ziel wurde in dieser Runde bereits mit einem Hauptgeschütz beschossen.",
+    "v2.reject.siege.combinedNotReady": "Für Bündelfeuer müssen beide Hauptgeschütze bereit sein.",
+    "mission.siege-pilot.objective.short": "Zerstöre den gegnerischen Kommandokern und halte deinen Panzer am Leben.",
+    "mission.siege-pilot.briefing.victory": "Zerstöre den gegnerischen Kommandokern und halte deinen Panzer am Leben.",
+    "mission.siege-pilot.briefing.defeat": "Du verlierst, wenn keine eigene Einheit mehr lebt – auch wenn der Kommandokern gleichzeitig zerstört wird.",
+    "mission.siege-pilot.end.victory": "Der feindliche Kommandokern ist ausgeschaltet."
   }
 }

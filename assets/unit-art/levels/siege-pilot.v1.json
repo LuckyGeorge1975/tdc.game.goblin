@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "id": "siege-pilot",
+  "scenarioVersion": 1,
+  "ruleProfileId": "CATALOG_SIEGE_PILOT_v1",
+  "title": "Siege-Tank-Testeinsatz",
+  "kicker": "Siege-Tank-Testeinsatz",
+  "objective": "core",
+  "width": 12,
+  "height": 8,
+  "defaultTerrain": "open-ground",
+  "terrain": [
+    {
+      "x": 3,
+      "y": 3,
+      "type": "rubble-field"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "type": "mountain"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "ridge"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "water"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "type": "water"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "type": "river"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "river"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "river"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "type": "river"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "bridge"
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "type": "crater"
+    }
+  ],
+  "units": [
+    {
+      "assetId": "siege-tank",
+      "id": "siege-tank",
+      "team": "player",
+      "x": 1,
+      "y": 3
+    },
+    {
+      "assetId": "guard-tank",
+      "id": "guard-tank",
+      "team": "enemy",
+      "x": 5,
+      "y": 3
+    },
+    {
+      "assetId": "recon-tank",
+      "id": "recon-tank",
+      "team": "enemy",
+      "x": 6,
+      "y": 3
+    },
+    {
+      "assetId": "infantry-squad",
+      "id": "infantry",
+      "team": "enemy",
+      "x": 3,
+      "y": 4
+    },
+    {
+      "assetId": "command-core",
+      "id": "core",
+      "team": "enemy",
+      "x": 10,
+      "y": 3
+    }
+  ]
+}

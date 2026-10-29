@@ -29,9 +29,9 @@ function scene(enabled=true){
     setTimeout(fn){timers.set(++id,fn);return id;},clearTimeout(key){timers.delete(key);},
     scheduleGameTask(fn){timers.set(++id,fn);return id;}});
   const run=s=>vm.runInContext(s,context);
-  const files=['unit-visuals.js','terrain-rules.js','ogre-systems.js','skimmer-budget.js','assets/unit-art/rules/skimmer-pilot.v1.js','scenario-profile-manifest.js',
+  const files=['unit-visuals.js','terrain-rules.js','ogre-systems.js','siege-tank-fire-budget.js','assets/unit-art/rules/siege-pilot.v1.js','skimmer-budget.js','assets/unit-art/rules/skimmer-pilot.v1.js','scenario-profile-manifest.js',
     ...(enabled?['presentation-preferences.js','presentation-state.js']:[]),'game.js','ogre-runtime.js','combat-feedback.js',
-    'siegebreaker-weapons.js','strategic-missile.js','scenario.js',
+    'siegebreaker-weapons.js','strategic-missile.js','siege-pilot-runtime.js','scenario.js',
     ...(enabled?['legacy-presentation.js']:[]),'command-history.js'];
   for(const file of files)run(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'));
   run("draw=()=>globalThis.GoblinLegacyPresentation?.sync();updateSelection=()=>{};loadScenario('iron-dust');");
@@ -133,7 +133,7 @@ test('actual async loader registers the distinct fixed mission and preserves eve
  const g=scene();g.context.fetch=async path=>({ok:true,json:async()=>JSON.parse(fs.readFileSync(new URL('../'+path,import.meta.url),'utf8'))});
  g.run("delete scenarioCatalog['skimmer-pilot']");g.run(fs.readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8'));
  await new Promise(resolve=>setImmediate(resolve));
- assert.equal(g.run('Object.keys(scenarioCatalog).length'),10);g.run("loadScenario('skimmer-pilot')");assert.equal(g.run('units.length'),3);assert.equal(g.run("scenarioCatalog['showcase-terrain-course'].units.length"),7);
+ assert.equal(g.run("Object.keys(scenarioCatalog).filter(id=>id!=='siege-pilot').length"),10);g.run("loadScenario('skimmer-pilot')");assert.equal(g.run('units.length'),3);assert.equal(g.run("scenarioCatalog['showcase-terrain-course'].units.length"),7);
 });
 test('overlay costs, native Guide, M1 and animation paths agree with the frozen session and Undo',()=>{
  const g=scene();queryBridge(g);attachMovement(g);

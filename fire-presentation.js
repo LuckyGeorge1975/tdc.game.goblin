@@ -15,9 +15,10 @@
     if(event.weapon.semanticKind||used==='missiles'||['rockets','missile'].includes(record?.klasse))
       return {version:'fire-mapping-v1',kind:'deferred-rocket',anchors:[],fallback:false};
     // The supplied GOBLIN twin group has no per-weapon provenance. Do not reuse it for main/AP/etc.
-    const fallback=!record||record.klasse==='none'||key==='goblin-siegebreaker'&&used!==null;
+    const fallback=!record||record.klasse==='none'||key==='goblin-siegebreaker'&&used!==null||key==='siege-tank'&&used?.startsWith('ap-');
+    const anchors=record&&key==='siege-tank'&&['main-1','main-2'].includes(used)?[record[side][used==='main-1'?0:1]]:record?.[side];
     return {version:'fire-mapping-v1',kind:fallback?'light':record.klasse,
-      anchors:fallback?[[0,0]]:record[side],fallback,
+      anchors:fallback?[[0,0]]:anchors,fallback,
       provenance:fallback?'spec-6-explicit-center-fallback':'pinned-anchors.json'};
   }
   function muzzle(point,anchor,angle,team){

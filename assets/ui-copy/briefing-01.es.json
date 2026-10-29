@@ -34,6 +34,19 @@
     "mission.skimmer-pilot.objective.short": "Destruye el Núcleo de mando enemigo y mantén tu deslizador con vida.",
     "mission.skimmer-pilot.briefing.victory": "Destruye el Núcleo de mando enemigo y mantén tu deslizador con vida.",
     "mission.skimmer-pilot.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo de mando sea destruido al mismo tiempo.",
-    "mission.skimmer-pilot.end.victory": "El núcleo de mando enemigo ha sido destruido."
+    "mission.skimmer-pilot.end.victory": "El núcleo de mando enemigo ha sido destruido.",
+    "mission.siege-pilot.title": "Prueba del tanque de asedio",
+    "mission.siege-pilot.briefing.short": "Usa los cañones principales y las armas antipersonal de tu Tanque de asedio.",
+    "mission.siege-pilot.budget": "Dos disparos principales contra objetivos distintos o un disparo combinado. Además, dos disparos AP contra infantería.",
+    "mission.siege-pilot.objective": "Destruye el Núcleo de mando enemigo y mantén tu tanque con vida.",
+    "v2.ui.siege.mainGun": "Cañón principal {number}",
+    "v2.ui.siege.combined": "Combinado",
+    "v2.ui.siege.ap": "AP {number}",
+    "v2.reject.siege.sameMainTarget": "Ya se ha disparado a este objetivo con un cañón principal durante este turno.",
+    "v2.reject.siege.combinedNotReady": "Ambos cañones principales deben estar listos para el fuego combinado.",
+    "mission.siege-pilot.objective.short": "Destruye el Núcleo de mando enemigo y mantén tu tanque con vida.",
+    "mission.siege-pilot.briefing.victory": "Destruye el Núcleo de mando enemigo y mantén tu tanque con vida.",
+    "mission.siege-pilot.briefing.defeat": "Pierdes si no sobrevive ninguna unidad aliada, aunque el núcleo de mando sea destruido al mismo tiempo.",
+    "mission.siege-pilot.end.victory": "El núcleo de mando enemigo ha sido destruido."
   }
 }

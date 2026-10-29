@@ -8,7 +8,7 @@
     const capture=attackCapture;attackCapture=null;
     if(capture?.ticket)try{root.GoblinPresentation.confirm(capture.ticket,snapshot(),capture.results,[],[{
       actorId:capture.actorId,targetId:capture.targetId,weaponKey:capture.weaponKey,strategic:capture.strategic,
-      effects:capture.effects,sourceEventIndex:0}]);}catch{/* Observation cannot reject or retry gameplay. */}
+      effects:capture.effects,attack:capture.results[0]?.attack,range:capture.range,sourceEventIndex:0}]);}catch{/* Observation cannot reject or retry gameplay. */}
   }
   function snapshot(){
     return {units:units.map(({moveFrom,justHit,...unit})=>({...unit,
@@ -32,7 +32,7 @@
       if(standalone)attackCapture={results:[],effects:[]};
       if(attacker&&target&&!attackCapture.ticket){
         Object.assign(attackCapture,{actorId:attacker.id,targetId:target.id,
-          weaponKey:attacker.ogreSystems?.selectedWeapon??null,strategic:attacker.strategicMissile===true,
+          weaponKey:attacker.siegeWeapon??attacker.ogreSystems?.selectedWeapon??null,range:attacker.range,strategic:attacker.strategicMissile===true,
           ticket:root.GoblinPresentation.begin({type:'Fire',actorId:attacker.id,targetId:target.id},attackCapture.before??before)});
       }
       return {source,beforeRevision:root.GoblinPresentationState.stamp(before),before,attackerId:attacker?.id,
