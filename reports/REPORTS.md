@@ -4,11 +4,12 @@ Alle Berichte werden unverändert im Repository aufbewahrt und über diese Über
 
 | Bericht | Berichtsversion | Bezugsstand | Status | Folgebuild |
 |---|---|---|---|---|
+| [Herkunfts-/Clearance-Zusatz Desktop Build 27](CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md) | `1` | Abgenommene Runtime `df1ba35`, lokales Paket 0.1.27 vom 30.10.2026 | 52 Wrackderivate + 2 Metadaten auf festem Sourcepin; finaler unabhängiger Legal- und Bild-/Paketreview steht aus | `0.1.27` |
 | [Herkunfts-/Clearance-Zusatz UI Build 26](CONTENT-CLEARANCE-UI-0.1.26-2026-10-23.md) | `1` | Runtime `74e594d`, lokales Paket 0.1.26 | 118 Runtimehashes zugeordnet; Developer-Nachtrag zum Legal-Vorbefund, unabhängiger Endreview offen | `0.1.26` |
 | [Spieletestbericht 2026-09-26](PLAYTEST-REPORT-2026-09-26.md) | `1` | `0.1.4` | Ausgewertet; verständlichere Treffer-, Deaktivierungs- und Core-Anzeige umgesetzt | `0.1.6` |
 | [Legal Review 2026-09-26](LEGAL-REVIEW.md) | `1` | Repository vor `0.1.5` | Offen; technischer Zugriff war blockiert, daher keine inhaltliche Freigabe | noch offen |
 | [Content Clearance 2026-09-26](CONTENT-CLEARANCE.md) | `1` | Content-Branch auf Basis `0.1.5` | Development Review abgeschlossen; formale Legal-Freigabe ausstehend | `0.1.7` |
-| [Content & Asset Notices](../docs/CONTENT-NOTICES.md) | `19` | Lokaler Build-26-Kandidat auf Runtime `74e594d` | Datierter Herkunftsnachtrag für Karten-/Terrain-/Gegnerbilder und Screenshot; abschließender Legal-Paketreview offen, keine Veröffentlichungsfreigabe | `0.1.26` |
+| [Content & Asset Notices](../docs/CONTENT-NOTICES.md) | `20` | Abgenommene Runtime `df1ba35`, lokales Build-27-Paket | Additiver Herkunftsnachtrag für 52 Code-Wrackderivate + 2 Metadaten; frühere Quellenpins erhalten, finaler Legal-/Bild-/Paketreview offen | `0.1.27` |
 | [Content-Clearance-Nachtrag Terrain-Preview 2026-09-30](CONTENT-CLEARANCE-TERRAIN-PREVIEW-2026-09-30.md) | `2` | Lokaler GitHub-Pages-Previewkandidat Build 0.1.13 mit vier Terrain-Stilen | Herkunft und bedingte Legal-Risikoeinschätzung dokumentiert; keine verbindliche Rechts- oder Produktfreigabe | offen |
 | [Spieletestbericht Build 0.1.7](PLAYTEST-REPORT-0.1.7-2026-09-26.md) | `1` | `0.1.7` | Bestanden; Nomenklatur, Unit Guide, Systemschriften und Herkunftshinweise bestätigt | `0.1.8` |
 | [Spieletestbericht Build 0.1.9](PLAYTEST-REPORT-0.1.9-2026-09-26.md) | `1` | `0.1.9` | Veröffentlichter Field Test; Strategic Missile Carrier gezielt geprüft | `0.1.10` |

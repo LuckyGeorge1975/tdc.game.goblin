@@ -2,6 +2,16 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden im jeweiligen Release-Issue nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.27] - 2026-10-30
+
+- Lokales Releasepaket auf der unabhängig abgenommenen Runtime `df1ba35d935971f7cc28835ae7d8d32f3d65178a`. Version/Build und Paketdatum sind gesetzt; neues Tag, öffentlicher Deploy und finale Releaseabnahme stehen aus. Öffentlich bestätigter Rückfallpunkt bleibt `v0.1.26` auf `195c2bc5a0c8dd97d6263430114d183cfd2aa082`. Der Desktoprelease ist vom Nutzer bereits bedingt beauftragt.
+- Fünf normale FULL-Missionen verbinden den genehmigten 26er-Projektkatalog mit versionierten Bewegungs-/Fracht-/System-/Engineering-/Tarn-/Feuer-/Raketen-/Verstärkungsregeln. Historische Missionen und Pilotprofile behalten ihre bisherigen Regeln; der separate IronDust-Corepfad bleibt getrennt. Candidate- und öffentliche Admissionbelege werden nicht rückwirkend umetikettiert.
+- Drei kurze Feldtestlektionen T01–T03 mit Briefing, echten Vorschau-/Cancel-/Move-/Fire-/Enemy-/BACK-Belegen, rücknehmbarem Rückblick und Retry/Next/Exit. Ein optionales Intro und ein bedingter Hinweis unterstützen die normale Legacy-IronDust-Mission ohne geänderte Welt-/RNG-Regeln. Trainingswerte bleiben ausdrücklich vom FULL-Katalog getrennt.
+- Die abgenommene Oberfläche enthält aktuelle Einheitendarstellung/Animation, Sicht-/Ziel-/Waffen-/Guideanbindung und die native Korrektur des Trainingspanels/offenen Geländes. ResizeObserver-Schreibgrenzen sind über bestehende Frames entkoppelt; der finale beobachtete Produktlauf hatte 0 Errors/0 Rejections. Frühere Meldungen bleiben dokumentiert; keine universelle Layoutfreiheit. Bei langer französischer Recovery auf 1280×720 ist der Fit-Kartenüberblick klein, Zoom/Pan bleiben verfügbar.
+- Notices v20 und datierter Clearance-Zusatz dokumentieren 52 Code-Wrackderivate plus zwei Metadaten auf festem Contentpin und vorhandenen Einzelhashbelegen. Historische 118er-Matrix und frühere Herkunfts-/Rechtegrenzen bleiben bestehen. Keine neue Fremdquelle, offizielle Zugehörigkeit, kommerzielle oder pauschale Regel-/Markenfreigabe wird behauptet.
+- Finale unabhängige Paket-/Gesamtregression beider Testerrollen, Legal-Endreview und neues echtes README-Kartenbild aus dem sichtbaren festen Build folgen vor Veröffentlichung. Dieses erste Paket ändert keine Spielruntime und erzeugt keine neuen Spielorakel. Aktuelle Bezüge und Grenzen: [Tester-Handoff](reports/TEST_HANDOFF.md#build-0127--erstes-lokales-releasepaket).
+
+
 ## [0.1.26] - 2026-10-23
 
 - **Unveröffentlichter lokaler Releasekandidat, keine Veröffentlichungsfreigabe.** Baut auf der öffentlichen Version 0.1.25 auf. Der feste geprüfte Runtimecommit ist `74e594d4627598898b9fb81e02881c427dda6497`; Builddaten, Cacheparameter, README und Handoff werden für Build 26 vorbereitet. Das Tag `v0.1.26` ist lediglich vorgesehen und wurde nicht angelegt. Öffentlicher Stand und Rückfallpunkt bleiben unverändert.

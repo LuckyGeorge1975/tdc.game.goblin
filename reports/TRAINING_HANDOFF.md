@@ -1,3 +1,5 @@
+Aktuelle Zuordnung 30.10.2026: Das vollständige .5-Paket einschließlich beider UI-Fixstände ist unabhängig auf `df1ba35d935971f7cc28835ae7d8d32f3d65178a` abgenommen und auf Root4183 bereitgestellt. Der folgende Developer-Kandidatentext bleibt als damaliger Stand erhalten; seine offenen Abnahmemarker sind historisch. Aktuelle Releasebezüge und Grenzen stehen im [Build-27-Handoff](TEST_HANDOFF.md#build-0127--erstes-lokales-releasepaket).
+
 # T01–T03 und Mission Control – gebündelter Kandidat
 
 30.10.2026 · `goblin-upe.5` · Basis `e71e1969c041806c649bb77e656b5ce50bf14e0d`. Developer-Selbstprüfung; unabhängige Produkt- und Bedienabnahme steht aus. Kein öffentlicher Releasebeleg.

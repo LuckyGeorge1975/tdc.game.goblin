@@ -1,6 +1,6 @@
 # Content & Asset Notices
 
-**Document version:** 19
+**Document version:** 20
 
 G.O.B.L.I.N. is an independent original prototype by Tactical Design Cell. It is not affiliated with, endorsed by, or presented as an official adaptation of any third-party game or product line.
 
@@ -43,3 +43,19 @@ This dated addition describes the currently integrated project artwork without r
 - **README screenshot:** a genuine French Atlas Proving Grounds view from runtime `74e594d`, preserved as a lossless 1440 × 900 WebP; source and derivative hashes are in the [current tester handoff](../reports/TEST_HANDOFF.md). It is an actual view check, not an additional full Atlas playthrough or generated mockup.
 
 The [dated clearance supplement](../reports/CONTENT-CLEARANCE-UI-0.1.26-2026-10-23.md) separates technical provenance from the still-required independent Legal package review. Earlier limited noncommercial-preview assessments retain their original scope. This addition makes no new third-party licence claim, guarantee of originality/uniqueness, commercial clearance, clearance of every rule or mark, or general legal/product release authorization. The local Build 26 candidate has no publication authorization, tag or deployment from this task. Historical masters, design collections and the Unit-Art branch must not be pushed as part of this release package.
+
+## Addendum — 30 October 2026, desktop candidate 0.1.27
+
+This addition records 52 wreck images and two anchor/class metadata files added since Build 0.1.26. Their fixed project design source is Content commit `2fdce6ac1be30e8b2a360250b37724586469e71c`. The retained [wreck export receipt](../assets/unit-art/wrecks-source.json) identifies the source archive hashes, all 54 source/runtime paths and SHA-256 values, processing settings and the project export script.
+
+The wrecks are code-generated derivatives of the existing shadowless project map icons, as documented in `beratung-ui-ux/design-exports/BAUEN.md` at that source commit. They are distinct from the previously documented ChatGPT-generated Unit Guide/Library artwork. The user-confirmed project authorship of the Claude-assisted design concepts remains the provenance basis; this statement does not independently establish rights to every reference input.
+
+The 52 transparent 256 × 256 PNG sources under `beratung-ui-ux/design-exports/einheitengrafiken/wracks/` produce 192 × 192 lossless RGBA WebP files in `assets/unit-art/sets/02-technical-illustration/wrecks/own/` and `wrecks/enemy/`. The project script `scripts/export-wrecks.py` resizes the complete canvas with Lanczos without cropping. The unchanged retained receipt records 2,383,835 source-image bytes and 1,444,610 runtime-image bytes.
+
+The alpha-derived anchors and wreck classes come from `beratung-ui-ux/design-exports/einheitengrafiken/anchors.json` and `beratung-ui-ux/design-exports/einheitengrafiken/wracks/klassen.json`. Runtime copies are `assets/unit-art/sets/02-technical-illustration/anchors.json` and `wreck-classes.json`. Their receipt hashes identify the archived entries copied to runtime; Git archive text line-ending conversion is documented rather than presented as raw Git-blob byte identity.
+
+The earlier [118-file provenance matrix](../reports/CONTENT-PROVENANCE-0.1.26.json) and its [dated supplement](../reports/CONTENT-CLEARANCE-UI-0.1.26-2026-10-23.md) remain historical records. The additional 54 associations are recorded in the wreck receipt; no replacement full inventory is implied. Private source masters, design collections and historical Unit-Art branches are not part of the public game package. Build, CI and Pages delivery use the game repository and optimized runtime assets without access to the private Content repository.
+
+The current desktop implementation and functional training/help texts are project-authored with AI assistance. Training reuses existing terrain artwork, including open-ground tiles; it introduces no new external media source. The FULL profile describes the project's approved versioned rules, not an official third-party adaptation. The README still labels the earlier Build-26 image as historical; an actual Build-27 capture and its hashes will be included by the separately reviewed image/document follow-up before publication.
+
+The [current dated supplement](../reports/CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md) records the accepted runtime SHA and remaining package/Legal gates. This addition retains the scope of the earlier limited noncommercial public browser-preview assessment under the G.O.B.L.I.N. project identity. It makes no new third-party licence, official affiliation, exclusivity or originality guarantee, commercial clearance, or general rules/trademark/product-rights clearance claim. Publication follows the user's existing conditional desktop-release instruction after all applicable gates; it has not occurred through this addition. Earlier candidate statements above remain dated historical records.

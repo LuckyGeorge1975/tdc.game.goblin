@@ -2,6 +2,34 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## Build 0.1.27 · erstes lokales Releasepaket
+
+| Feld | Stand am 30.10.2026 |
+|---|---|
+| Version | `0.1.27` |
+| Build | `27` |
+| Status | `release-candidate`; Paketdatum 2026-10-30, noch kein öffentlicher Deploy und kein neues Tag |
+| Abgenommene, eingefrorene Runtimebasis | `df1ba35d935971f7cc28835ae7d8d32f3d65178a`, main; vollständiges .5-Paket unabhängig abgenommen (`goblin-upe.5.5` / `.5`) |
+| Öffentlich bestätigte Basis / Rückfall | `v0.1.26` auf `195c2bc5a0c8dd97d6263430114d183cfd2aa082`; main, annotiertes Tag und öffentliche release.js am 30.10.2026 00:15:38 UTC bestätigt. v0.1.26 bleibt unverändert; vor dem tatsächlichen Push erneut prüfen. |
+| Lokale Testversion | Root hat die abgenommene Runtime am 30.10.2026 00:23:31 UTC auf 4183 bereitgestellt; Snapshot `df1ba35d935971f7cc28835ae7d8d32f3d65178a-4188e4c3eb92`, Manifest `4ebee66655dfb704dc14c5c1b43aa5aaa8c789a2001c490aeaef40b5ff11b831`, sechs Eintrittsgrenzen bestanden. Das neue Metadatenpaket ist dadurch noch nicht öffentlich ausgeliefert. |
+| Paket- und Tagzuordnung | Bekannte Runtimebasis und geplantes `v0.1.27` stehen hier fest. Die tatsächliche SHA dieses ersten Paketcommits und später des finalen Bild-/Dokumentcommits werden nach deren Erstellung extern in `goblin-upe.6` dokumentiert; keine Selbstreferenz-SHA. |
+| Paketdelta | Build-/Fallback-/Cachemetadaten, aktueller Changelog/README/Handoff, additive Notices v20, datierter Clearance-Zusatz/Register sowie exakt begrenzte technische Quellprovenienz. Keine Spiel-/UI-/Regel-/Daten-/Seed-/RNG-/Historyänderung an der abgenommenen Runtime. |
+| Aktive Profile | Fünf normale `FULL_CATALOG_v1`-Missionen mit genehmigtem 26er-Projektkatalog und A–G-Fähigkeiten; interne Candidatebindung bleibt historisch. Drei feste `TRAINING_FIELD_TEST_v1`-Lektionen und optionaler Legacy-IronDust-Hinweis; historische Field-Test-/Pilotprofile und separater Corepfad bleiben getrennt. |
+| FULL-Abnahmebezüge | Candidate auf `868a156962e1111648e7c0a7a3e9d8f0071dc292` unabhängig 26/26 geprüft, öffentlicher FULL-Einstieg auf `e71e1969c041806c649bb77e656b5ce50bf14e0d` abgenommen. [Matrix](CATALOG_FULL_MATRIX.json) und [Admissionbeleg](CATALOG_FULL_ADMISSION.json) behalten ihren damaligen Candidate-/Developerstatus; die späteren unabhängigen Ergebnisse sind in `goblin-upe.4` dokumentiert. Keine rückwirkende Umdeutung ihrer Profile/Orakel. |
+| .5-Regression / Quellen | Tester Release bestätigte auf df1ba35 44/44 gezielte Observer-/Zoom-/Start-/Controls-/Training-/Profilprüfungen einschließlich drei vollständiger ursprünglicher Game-/Teaching-Replays, dazu 3/3 Original-FULL-U1/Index/Foreign. 27 FROM-Quellenpaare direkt gegen feste Gitobjekte geprüft; 18 Fixturedateien und zehn FULL-Digests unverändert. 47 Copykeys × DE/EN/ES/FR exakt gegen autorisierte Lieferung. Überlappende Entwickler-/Testerzahlen nicht addieren. |
+| .5-Nativeprodukt | Ein durchgehend beobachtetes Dokument qa-training-observed: T01 mit Preview/Cancel/BACK/Witness/ReMove/Infanterie und Rückblick-BACK/Bestätigung; T02 echter Schuss D und reguläre Gegnerabschlüsse; T03 Kosten/Deckung/LOS/Alternative/echter Schuss D; Normalmission/optionaler Hinweis, Recovery/Retry/Next/Exit/Pause/Hilfe sowie gezielter Sprach-/Größenwechsel. Keine Spielcallbacks, Ack-/World-/RNG-Injektion. |
+| Fehler- und Layoutgrenze | Im genannten finalen Dokument durchgehend 0 ErrorEvents und 0 unhandledRejections ohne Reload-/Counterreset, 36 monotone Maßbeobachtungen. Frühere 868/e71-Einzelmeldungen und die zwei stacklosen Meldungen auf 039 bleiben historische Befunde; keine vollständige Einzelcallbackattribution oder universelle Layout-/Gerätefreiheit behauptet. |
+| Bekannte Bediengrenze | Bei 1280×720 und langer französischer Recovery ist die Karte in Fit nur ungefähr 64 px hoch; Zoom/Pan verfügbar, Anweisung/Buttons nativ treffbar. Keine allgemeine Kleindesktop-Komfort-, Mobil- oder Hardwaregarantie. 390×720 war eine begrenzte Toolbar-/Escape-/Zoomprobe, keine vollständige mobile Partie. |
+| Übernommene ältere Prüfungen | Legacy55/Base213/Specialists318/Shared54/FULL-Parität sowie frühere 26er-Belege gelten in ihren fest benannten unveränderten Grenzen; keine neue pauschale Vollsuite aus Text-/Paketänderungen. |
+| Content / Herkunft | Sourcepin `2fdce6ac1be30e8b2a360250b37724586469e71c`, [Wrackreceipt](../assets/unit-art/wrecks-source.json), 52 Wrackderivate + zwei Anker-/Klassenmetadaten; [aktueller Clearance-Zusatz](CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md). Historische 118er-Matrix bleibt erhalten. Unabhängiger Legal-Endreview auf final zugeordneter Paket-SHA steht aus. |
+| Cache / Paketprüfungen | `release.js?v=27`, Fallback FIELD TEST 0.1.27. Bestehende Runtimecachekeys unverändert. Enger zusätzlicher Paketquellnachweis von df1ba35 bindet nur index-Metadaten und nötige Checker; keine Orakelneuaufnahme oder Spielwertnormalisierung. Verifier gegen tatsächliches v0.1.26, Release-/Link-/Quellgates am festen Paket nachweisen. |
+| README-Bildfolge | Noch keine neue Aufnahme und kein Build-27-Bild behauptet. Tester Release nimmt erst diesen sichtbaren festen Build in einer normalen FULL-Atlas-Ansicht mit eigenen/gegnerischen Einheiten auf. Danach separat beauftragter optimierter Bild-/README-/Handoffnachlauf mit Quellcommit, Original-/Ableitungshash, Pixelmaß, Bytes und Kompressionsparametern; historisches Build-26-Bild bleibt als solches erhalten. |
+| Finale Releasegates | Beide Testerrollen auf genau zugeordneten SHAs; einmalige finale Gesamtregression durch Tester Regression, unabhängige Bedien-/Bild-/Paketprüfung und Legal. Nach reinem Bild-/Dokumentnachlauf Runtimebytegleichheit begründet übernehmen. Noch kein öffentlicher Release-PASS. |
+| Veröffentlichung / Ende | Bedingt beauftragter Release erst nach allen Gates: saubere finale SHA, unveränderliches annotiertes v0.1.27 auf genau dieser SHA, erfolgreicher Actions-/Pageslauf und öffentliche Nachprüfung. Danach Produktstopp/30-Minuten-Koordination PAUSED; tägliche 09:00-Maintenance unabhängig. Kein Zwischenpush aus diesem Paket. |
+
+Der [Trainingshandoff](TRAINING_HANDOFF.md), die Candidate-Matrix und der Admissionbericht sind feste historische Implementierungsbelege. Ihre damaligen offenen QA-Aussagen sind keine heutigen Sperren; diese aktuelle Zuordnung und die SHA-gebundenen Beads-Abnahmen sind maßgeblich. Die nachfolgenden Build-26- und älteren Abschnitte bleiben unverändert als Zeitstände erhalten.
+
+
 ## Build 0.1.26 · lokales Releasepaket, keine Veröffentlichung
 
 | Feld | Stand am 23.10.2026 |

@@ -4,17 +4,27 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-Der Prototyp ist spielbar. Öffentlich verfügbar ist **0.1.25 / Build 25**, Tag `v0.1.25`, Commit `1f52b2dfabd694c84726e9401460794caad79ca5` (`goblin-b22.7`). Remote-main und das bestehende Tag wurden am 23.10.2026 erneut lesend bestätigt; die öffentlichen Pages-Metadaten liefern Build 25. `v0.1.24` auf `ceaf301c99ec35623dcf3dd323f9a7d7ee69137d` bleibt dessen Rückfallpunkt.
+Öffentlich bestätigt ist **0.1.26 / Build 26**, Tag `v0.1.26` auf `195c2bc5a0c8dd97d6263430114d183cfd2aa082`; Remote-main, annotiertes Tag und öffentliche Builddaten wurden am 30.10.2026 erneut lesend geprüft. Dieser Stand bleibt der Rückfallpunkt.
 
-**0.1.26 / Build 26 ist ein unveröffentlichter lokaler Releasekandidat.** Der unabhängig geprüfte Runtimestand ist `74e594d4627598898b9fb81e02881c427dda6497`: vollständige Regression 453/453 und je eine vollständige IRON-DUST-Core- sowie Legacy-Partie bis zum Sieg. Das neue Paket ergänzt konsistente Builddaten und den folgenden Screenshot. Paketreview, finaler Einstiegssmoke, Content-/Legal-Delta und ausdrückliche Veröffentlichungsfreigabe sind noch erforderlich. Es gibt keinen Push, kein Tag `v0.1.26` und keinen Deploy. Echte Geräteprüfungen und die offenen Sicherungs-/Neucheckoutgrenzen sind damit nicht abgeschlossen.
+**0.1.27 / Build 27 ist das erste lokale Releasepaket vom 30.10.2026.** Es verwendet die unabhängig abgenommene, eingefrorene Runtime `df1ba35d935971f7cc28835ae7d8d32f3d65178a`. Der Desktoprelease ist bereits bedingt beauftragt; finale Paketprüfung beider Testerrollen, Legal-Endreview, neues echtes README-Bild und öffentliche Auslieferung stehen aus. Aus diesem Paket wurde kein Push, neues Tag oder Deploy durchgeführt.
 
-![Build 0.1.26 – Atlas Proving Grounds mit aktueller Karte, eigenen und gegnerischen Einheiten sowie Zielmarkern](docs/images/field-test-0.1.26-atlas.webp)
+Der normale V2-Einstieg bietet fünf FULL-Missionen (`catalog-full-atlas`, `catalog-full-terrain-course`, `catalog-full-advance`, `catalog-full-siege`, `catalog-full-specialists`) mit dem genehmigten 26er-Projektregelprofil einschließlich Systemen, Engineering, Transport/Drohnen, Sicht/Tarnung, Feuer-/Raketenregeln und festen Verstärkungen. Drei kurze T01–T03-Lektionen führen durch Auswahl, Vorschau/Abbruch, Bewegung/BACK, Feuer/Phasen und Gelände/Sicht; Rückblick, Wiederholen und Missionswechsel sind integriert. Die Lektionen behalten ihre festen Field-Test-Werte. Historische Missionen/Piloten und der getrennte IronDust-Corepfad bleiben ausdrücklich bei ihren jeweiligen Regeln.
 
-*Build-26-Kandidat: Atlas Proving Grounds, französische Oberfläche, echte Sichtprobe vom geprüften Runtimecommit `74e594d`. Keine Fixture und keine zusätzliche vollständige Atlas-Partie. Die verlustfrei komprimierte Aufnahme zeigt die unveränderte Spielansicht dieses Paketstands; [Quelle und Prüfgrenzen](reports/TEST_HANDOFF.md#build-0126--lokales-releasepaket-keine-veröffentlichung).*
+Der unabhängige .5-Produktlauf auf df1ba35 absolvierte die drei Lektionen, normale Legacy-Hinweise und Recovery-/Navigationswege in einem durchgehend beobachteten Browserdokument mit 0 Errors/0 Rejections. Ältere ResizeObserver-Befunde bleiben historisch dokumentiert. Dies ist keine universelle Geräte-/Layoutfreigabe: Bei 1280×720 und langer französischer Recovery ist die Fit-Karte etwa 64 px hoch; Zoom/Pan bleiben verfügbar. Fingerproben und eine allgemeine Kleindesktop-/Mobilkomfortgarantie sind nicht Bestandteil dieses Belegs.
 
-Änderungen stehen im [Changelog](CHANGELOG.md), aktuelle Prüfbelege und ausstehende Gates im [Developer → Tester Handoff](reports/TEST_HANDOFF.md). Historische Prüfberichte bleiben in der [Berichtsübersicht](reports/REPORTS.md) erhalten. Karte und Bibliothek nutzen Technische Illustration mit getrennten Gegnerbildern und Markern; Master-/Designquellen liegen außerhalb des normalen Buildpfads.
+Die aktuelle Build-27-Aufnahme mit Karte und sichtbaren Einheiten folgt erst aus diesem festen sichtbaren Paket durch Tester Release und wird anschließend als geprüfter Bild-/Dokumentnachlauf ergänzt. Das folgende Bild ist bis dahin ausdrücklich **historisch, aus Build 26**:
 
-Enthalten sind:
+![Historische Build-26-Aufnahme – Atlas Proving Grounds mit Karte und eigenen/gegnerischen Einheiten](docs/images/field-test-0.1.26-atlas.webp)
+
+*Historische Atlas-Sichtprobe in französischer Oberfläche aus Runtime `74e594d`, 1440×900, lossless WebP. Dieses Bild zeigt nicht Build 27. Seine damaligen Quell-/Ableitungshashes bleiben im Build-26-Abschnitt des [Tester-Handoffs](reports/TEST_HANDOFF.md) erhalten.*
+
+Änderungen stehen im [Changelog](CHANGELOG.md), aktuelle Abnahmebezüge und verbleibende Releasegates im [Build-27-Handoff](reports/TEST_HANDOFF.md#build-0127--erstes-lokales-releasepaket). [Notices v20](docs/CONTENT-NOTICES.md) und [datierter Herkunftszusatz](reports/CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md) beschreiben die 52 zusätzlichen Code-Wrackderivate plus zwei Metadaten; historische Quellenbelege bleiben erhalten. Normale Builds und Pages brauchen das private Content-Repository nicht.
+
+### Historische Field-Test-Funktionen und weiterhin verfügbare alte Profile
+
+Die folgende ursprüngliche Funktionsliste beschreibt diese älteren Profile; ihre früheren Einschränkungen sind keine Aussage über den neuen FULL-Katalog:
+
+
 
 - Hexfeldkarte mit zwölf Terrainarten im ATLAS-Showcase: modusspezifische Bewegung, Deckung +1 auf Verteidigung und unterschiedliche Sichtblocker
 - Bewegung mit Gelände- und Belegungskosten sowie expliziten Bewegungsmodi für Kettenfahrzeuge, Infanterie, Skimmer und stationäre Einheiten
