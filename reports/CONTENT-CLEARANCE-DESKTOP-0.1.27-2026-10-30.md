@@ -1,6 +1,6 @@
 # Herkunfts-/Clearance-Zusatz zum Desktoppaket 0.1.27
 
-**Berichtsversion:** 1
+**Berichtsversion:** 2
 
 Paketdatum 30.10.2026 · bekannte abgenommene Runtime `df1ba35d935971f7cc28835ae7d8d32f3d65178a` · Version 0.1.27 / Build 27 / vorgesehenes Tag v0.1.27 · `goblin-upe.1` / `goblin-upe.6`.
 
@@ -21,6 +21,6 @@ Belegter Nutzungsscope bleibt die nichtkommerzielle öffentliche G.O.B.L.I.N.-Br
 
 Build, CI und Pages benötigen nur das Spielrepo und seine optimierten Ableitungen. Private Quellenmaster, Designsammlungen und historische Unit-Art-Branches werden nicht öffentlich mitgepusht. Die bisherigen Quellenpins und Freigaben werden nicht rückwirkend umgeschrieben.
 
-Das aktuelle README-Kartenbild mit sichtbaren Einheiten entsteht erst aus dem festen sichtbaren Build-27-Paket. Es ist in diesem ersten Paket noch nicht aufgenommen. Der folgende reine Bild-/Dokumentnachlauf muss Quellcommit, Original-/Ableitungshash, Auflösung, Größe, Format und Kompressionsbeleg im [aktuellen Handoff](TEST_HANDOFF.md#build-0127--erstes-lokales-releasepaket) nachweisen. Das bestehende Build-26-Bild bleibt ausdrücklich historisch.
+Das aktuelle README-Kartenbild stammt aus dem unabhängig nachgeprüften Renderstand `637c423af98cab8a13b6c7d41904516e18479a18`: normale FULL-Atlas-Ansicht, Build27, Deutsch/High,1902×984, keine Sichtfreischaltung. Das verlustfreie WebP (204.844 Bytes) ist decodiert RGBA-pixelgleich zum Original-PNG; keine Skalierung, kein Crop, keine Retusche. Original-/Ableitungshash und Encoderparameter stehen im [finalen Bildbeleg](TEST_HANDOFF.md#finaler-bild--und-dokumentnachlauf). Die frühere594-Aufnahme wird nicht als finales Bild übernommen, Build26-Datei und historische Belege bleiben erhalten. Das finale Bild-/Dokumentdelta benötigt noch den unabhängigen Legalnachtrag auf genau zugeordneter SHA; es behauptet keinen Deployabschluss.
 
 Legal prüft das tatsächliche finale Asset-/Trainings-/Hilfs-/Regel-/Namens-/Screenshotdelta auf exakt zugeordneten SHAs und hält Ergebnis/Grenzen in `goblin-upe.1` fest. Beide Testerrollen bestätigen die passende finale Paketabnahme in `.6`; Koordination dokumentiert finalen Commit, Tag, tatsächlichen Deploy und öffentliche Pagesprüfung separat. Dieser Zusatz ist kein Veröffentlichungsabschluss.

@@ -4,7 +4,7 @@ Alle Berichte werden unverändert im Repository aufbewahrt und über diese Über
 
 | Bericht | Berichtsversion | Bezugsstand | Status | Folgebuild |
 |---|---|---|---|---|
-| [Herkunfts-/Clearance-Zusatz Desktop Build 27](CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md) | `1` | Abgenommene Runtime `df1ba35`, lokales Paket 0.1.27 vom 30.10.2026 | 52 Wrackderivate + 2 Metadaten auf festem Sourcepin; finaler unabhängiger Legal- und Bild-/Paketreview steht aus | `0.1.27` |
+| [Herkunfts-/Clearance-Zusatz Desktop Build 27](CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md) | `2` | Gameplaybasis df1ba35, Paket594cd33, abgenommener Renderstand637c423; Build27 vom30.10.2026 | 52 Wrackderivate + 2 Metadaten unverändert; finales pixelgleiches Kartenbild aus637; enger Legal-/Bild-/Dokumentnachtrag ausstehend | `0.1.27` |
 | [Herkunfts-/Clearance-Zusatz UI Build 26](CONTENT-CLEARANCE-UI-0.1.26-2026-10-23.md) | `1` | Runtime `74e594d`, lokales Paket 0.1.26 | 118 Runtimehashes zugeordnet; Developer-Nachtrag zum Legal-Vorbefund, unabhängiger Endreview offen | `0.1.26` |
 | [Spieletestbericht 2026-09-26](PLAYTEST-REPORT-2026-09-26.md) | `1` | `0.1.4` | Ausgewertet; verständlichere Treffer-, Deaktivierungs- und Core-Anzeige umgesetzt | `0.1.6` |
 | [Legal Review 2026-09-26](LEGAL-REVIEW.md) | `1` | Repository vor `0.1.5` | Offen; technischer Zugriff war blockiert, daher keine inhaltliche Freigabe | noch offen |

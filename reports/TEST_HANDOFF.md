@@ -4,6 +4,27 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
 ## Build 0.1.27 · erstes lokales Releasepaket
 
+### Finaler Bild- und Dokumentnachlauf
+
+Build 0.1.27/27 vom 30.10.2026, exakt eingefrorener letzter Runtime-/Metadatenstand `637c423af98cab8a13b6c7d41904516e18479a18`. Der nachfolgende Commit ändert ausschließlich Bild und zugehörige Dokumentation; seine tatsächliche SHA und die unabhängigen Nachträge werden nach Erstellung extern in `goblin-upe.6` zugeordnet. Kein neuer Runtime-, Index-, Metadaten-, Sourcechecker- oder Regelstand entsteht daraus.
+
+QA-Zuordnung: vollständige .5-Produktabnahme auf df1ba35; einmalige 749/749-Gesamtregression auf `594cd33a1184d0d2b0f8017371693a0200fc44c7`; danach gezielt abgenommener FULL-OpenGround-Renderfix auf637c423 (Regression15 gezielte +3 Original-FULL/Verifier/Audit, Release7 gezielte +native Sicht-/Hit-/Overlay-/Cancelprobe). World, History, Rollcache und FULL-Sidecar blieben bei der nativen Probe unverändert. Die Runtime637 ist wegen des Render-/Cachefixes nicht bytegleich zu594/df1. Ausschließlich der finale Bild-/Dokumentnachlauf erhält die Runtime637 exakt bytegleich. Keine weitere Gesamtregression oder Partie ist für den Bildcontainerwechsel behauptet.
+
+| Bildbeleg | Fester Wert |
+|---|---|
+| Aufnahmequelle | Tester Release, Source637c423, normales `catalog-full-atlas` / `FULL_CATALOG_v1`, Build0.1.27/27, Deutsch/High |
+| Echter Projektpfad | `http://127.0.0.1:4182/tdc.game.goblin/?ui=v2&lang=de`; temporäre QA-Ressource nach Aufnahme beendet |
+| Sichtumfang | 20 projizierte eigene und sieben bekannte gegnerische Einheiten, 25 Unitimages; 96 Terrainimages/71OpenGround, keine Sichtfreischaltung oder Pixelergänzung |
+| Original | `build27-full-atlas-final-original.png`, PNG,1902×984,376.339 Bytes; SHA256 `59deb757d35439ccb46e48bae9a7c8084b890dad8ded8e7088159f16be39d5ad` |
+| Ausgelieferte Ableitung | [field-test-0.1.27-full-atlas.webp](../docs/images/field-test-0.1.27-full-atlas.webp), WebP,1902×984,204.844 Bytes; SHA256 `0af62d66f83e8f6b6a24f0a1bc416cc13bfe47ef916aaee7a923b25ee1a3c157` |
+| Kompression | Pillow12.3.0/libwebp1.6.0, lossless=true, quality=100, method=6, exact=true; keine Skalierung, kein Crop, keine Retusche; 171.495 Bytes weniger als PNG |
+| Pixelbeleg | Original und Ableitung vollständig nach RGBA decodiert und bytegleich; gemeinsamer RGBA-SHA256 `7ba301b0823ec25a33d4ad8c39ab1c32a0bf1b85cb9c756b61fa5c7cc220d727` |
+| Grenzen | Ältere Aufnahme aus594 bleibt historische QA-Datei; vorhandenes Build26-WebP und seine Herkunftsbelege unverändert erhalten. Kein neuer Runtimeassetimport oder Herkunftswechsel. |
+
+Die Bildquelle samt Aufnahmezustand und Kompressions-/Pixelnachweis ist im Verwaltungsroot unter `.tools/qa-release-027/final-readme-original-manifest.json`, `final-readme-capture-state.txt` und `.tools/release-completion/final-image-evidence.json` erhalten. Finale unabhängige Bild-/Dokument-/Legalnachträge, tatsächliches unveränderliches Tag, Actions/Pages und öffentliche Nachprüfung werden separat SHA-genau dokumentiert. Der am30.10.2026 vor Build27 bestätigte veröffentlichte Vorgänger v0.1.26 auf195c2bc bleibt Rückfallpunkt; dieser Zeitstand nimmt keinen späteren Deploy vorweg.
+
+Die nachfolgenden Abschnitte bleiben als chronologische erste Paket-/Renderstände erhalten; ihre damaligen offenen Bild-/QA-Schritte werden durch die obige Zuordnung konkretisiert.
+
 ### Rendernachlauf FULL OpenGround (`goblin-upe.6.3`)
 
 Der erste feste Paketcommit ist `594cd33a1184d0d2b0f8017371693a0200fc44c7`. Auf genau diesem Stand bestätigte Tester Regression einmalig 749/749 Prüfungen (Exit 0); Tester Release absolvierte den echten FULL-Sieg in Runde 3, Retry, Einstiege und Paketprüfung. Diese Ergebnisse sind Vorbelege auf 594cd33, keine auf einen späteren Rendercommit umgeschriebene Gesamtregression.
