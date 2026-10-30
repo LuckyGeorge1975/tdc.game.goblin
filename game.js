@@ -10,7 +10,10 @@ function drawTerrainArtwork(x,y){
   if(type==='field-position'&&typeof TerrainDisplay!=='undefined'){const c=hexCenter(x,y),marker=TerrainDisplay.svgIcon(type,c.x-14,c.y-14,28);marker.classList.add('terrain-artwork');svg.appendChild(marker);return true}
   if(type==='open-ground'&&currentScenario!=='atlas-proving-grounds'&&
     !(['training-t01','training-t02','training-t03'].includes(currentScenario)&&legacySession?.scenarioId===currentScenario&&
-      legacySession.ruleProfileId==='TRAINING_FIELD_TEST_v1'&&globalThis.GoblinTrainingModel?.has(currentScenario)))return false;
+      legacySession.ruleProfileId==='TRAINING_FIELD_TEST_v1'&&globalThis.GoblinTrainingModel?.has(currentScenario))&&
+    !(['catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists'].includes(currentScenario)&&
+      legacySession?.scenarioId===currentScenario&&['FULL_CATALOG_v1','CATALOG_FULL_CANDIDATE_v1'].includes(legacySession.ruleProfileId)&&
+      globalThis.GoblinCatalogFullModel?.profile===legacySession.ruleProfileId&&GoblinCatalogFullModel.has(currentScenario,legacySession.ruleProfileId)))return false;
   const asset=UnitVisuals.terrainAssetFor(type);
   if(!asset)return false;
   const c=hexCenter(x,y),image=document.createElementNS(NS,'image');

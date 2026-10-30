@@ -4,6 +4,8 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
+**Build-27-Rendernachlauf:** Nach dem ersten Paket `594cd33` erhält die vorhandene OpenGroundkachel einen eng auf fünf gültige FULL-Missionen gebundenen Anschluss. Die dort bestandene unabhängige Gesamtregression (749/749) bleibt diesem Ausgangscommit zugeordnet; der Darstellungsnachlauf benötigt eigene gezielte Abnahme und anschließend eine neue echte Kartenaufnahme. Seine Runtime ist wegen dieses Renderer-/Cache-Deltas nicht bytegleich zur vorherigen Basis. [Zuordnung und Prüfgrenzen](reports/TEST_HANDOFF.md#rendernachlauf-full-openground-goblin-upe63).
+
 Öffentlich bestätigt ist **0.1.26 / Build 26**, Tag `v0.1.26` auf `195c2bc5a0c8dd97d6263430114d183cfd2aa082`; Remote-main, annotiertes Tag und öffentliche Builddaten wurden am 30.10.2026 erneut lesend geprüft. Dieser Stand bleibt der Rückfallpunkt.
 
 **0.1.27 / Build 27 ist das erste lokale Releasepaket vom 30.10.2026.** Es verwendet die unabhängig abgenommene, eingefrorene Runtime `df1ba35d935971f7cc28835ae7d8d32f3d65178a`. Der Desktoprelease ist bereits bedingt beauftragt; finale Paketprüfung beider Testerrollen, Legal-Endreview, neues echtes README-Bild und öffentliche Auslieferung stehen aus. Aus diesem Paket wurde kein Push, neues Tag oder Deploy durchgeführt.

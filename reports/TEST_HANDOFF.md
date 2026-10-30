@@ -4,6 +4,18 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
 ## Build 0.1.27 · erstes lokales Releasepaket
 
+### Rendernachlauf FULL OpenGround (`goblin-upe.6.3`)
+
+Der erste feste Paketcommit ist `594cd33a1184d0d2b0f8017371693a0200fc44c7`. Auf genau diesem Stand bestätigte Tester Regression einmalig 749/749 Prüfungen (Exit 0); Tester Release absolvierte den echten FULL-Sieg in Runde 3, Retry, Einstiege und Paketprüfung. Diese Ergebnisse sind Vorbelege auf 594cd33, keine auf einen späteren Rendercommit umgeschriebene Gesamtregression.
+
+Die dabei aufgenommene Atlas-PNG zeigte fehlende OpenGroundgrafik. Der folgende eng beauftragte Rendernachlauf erweitert ausschließlich das bestehende Artwork-Gate auf die fünf exakten FULL-Missionen mit passender Session-ID, bereits zugelassenem FULL-/Candidateprofil und initialisiertem passenden Model. Training, historischer Atlas und andere Legacy-Ausnahmen bleiben erhalten. Bestehende SVG-Kachel/Abmessungen, Assets, CSS und Bakes bleiben unverändert; Gamecache ist nun 65. Build 27, Datum und Releasecache bleiben erhalten. **game.js und index.html sind gegenüber 594cd33/df1 geändert; eine pauschale Runtimebytegleichheit gilt deshalb nicht.** Model, World, Regeln, Daten, RNG, Seed, Script und History wurden nicht geändert.
+
+Die additive technische Quellbindung beruht exakt auf 594cd33 und bindet game.js, index.html sowie den notwendigen Paketcheckeranschluss. Vorige Manifeste, 18 Originalfixturedateien und zehn FULL-Digests bleiben erhalten; keine Neuaufnahme oder Spielwertnormalisierung. Eigene gezielte Render-/Profil-/Quellproben einschließlich dreier vollständiger ursprünglicher Trainings-Replays sowie Original-FULL-U1/Index/Foreign werden dem festen Rendercommit extern in `goblin-upe.6.3` zugeordnet. Der tatsächliche eigene Commit wird nach Erstellung extern dokumentiert.
+
+Beide Tester prüfen diesen begrenzten Nachlauf auf fester SHA. Erst danach entsteht die neue echte FULL-Atlas-Aufnahme vom letzten Sichtstand; die PNG aus 594cd33 bleibt historisch und wird nicht als finales README-Bild übernommen. Separater Bild-/Dokumentauftrag und Legal-Endreview folgen. Die 749er-Gesamtregression wird wegen dieses begrenzten Nachlaufs nicht automatisch wiederholt. Die 54 Assethashes und bisherigen Pfadprüfungen gelten nur für ihre unveränderten Dateien weiter.
+
+Die folgende Tabelle beschreibt das erste Paket vor diesem Rendernachlauf; Änderungen und aktuelle Grenzen stehen unmittelbar darüber.
+
 | Feld | Stand am 30.10.2026 |
 |---|---|
 | Version | `0.1.27` |
