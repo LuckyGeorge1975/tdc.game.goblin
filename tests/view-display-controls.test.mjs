@@ -6,13 +6,14 @@ const source=readFileSync(new URL('../view-display-controls.js',import.meta.url)
 const ui=readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
 const flow=readFileSync(new URL('../ui-v2-flow.js',import.meta.url),'utf8');
 function scene(width=779,widths=[90,52,49,58,54,65]){
-  let resized;
+  let resized;const frames=[];
   const document={activeElement:null};
   class Node{
     constructor(){this.children=[];this.dataset={};this.attrs={};this.width=0;this.hidden=false;}
     append(...nodes){this.children.push(...nodes)}
     replaceChildren(...nodes){this.children=nodes}
     setAttribute(key,value){this.attrs[key]=String(value)}
+    getAttribute(key){return this.attrs[key]??null}
     removeAttribute(key){delete this.attrs[key]}
     contains(node){return node===this||this.children.some(child=>child.contains(node))}
     cloneNode(){const clone=new Node();clone.width=this.width;return clone}
@@ -23,10 +24,10 @@ function scene(width=779,widths=[90,52,49,58,54,65]){
   const container=new Node();container.clientWidth=width;
   const disclosure=new Node(),panel=new Node(),buttons=widths.map(width=>{const node=new Node();node.width=width;return node});
   container.append(...buttons.slice(0,3),disclosure,panel);panel.append(...buttons.slice(3));
-  const context=vm.createContext({document,ResizeObserver:class{constructor(fn){resized=fn}observe(){}}});
+  const context=vm.createContext({document,requestAnimationFrame:fn=>{frames.push(fn);return frames.length},ResizeObserver:class{constructor(fn){resized=fn}observe(){}}});
   vm.runInContext(source,context);
   const control=context.GoblinDisplayControls.create(container,{disclosure,panel,buttons});
-  return {control,container,disclosure,panel,buttons,document,resize:()=>resized()};
+  return {control,container,disclosure,panel,buttons,document,frames,notify:()=>resized(),flush:()=>frames.shift()?.(),resize:()=>{resized();frames.shift()?.()}};
 }
 
 test('actual six-button intrinsic width selects direct access or inline disclosure, regardless of viewport rule',()=>{
@@ -100,4 +101,16 @@ test('all four languages provide visible display labels and a distinct mission-p
   }
   assert.match(ui,/<button type="button" id="v2-display-toggle" aria-expanded="false" aria-controls="v2-display-controls" hidden>/);
   assert.match(localization,/'v2\.display\.missionTargets':/);
+});
+test('actual control observer defers measurement and show mutations, coalesces, and keeps stable properties unchanged',()=>{
+ const model=scene(),track=model.container.children.at(-1).children[0];let writes=0;
+ for(const node of [model.panel,model.disclosure]){let hidden=node.hidden;Object.defineProperty(node,'hidden',{get:()=>hidden,set:value=>{writes++;hidden=value}})}
+ const attrs=model.disclosure.setAttribute.bind(model.disclosure);model.disclosure.setAttribute=(key,value)=>{writes++;attrs(key,value)};
+ const dataset=model.container.dataset;model.container.dataset=new Proxy(dataset,{set(target,key,value){writes++;target[key]=value;return true}});
+ model.notify();model.notify();model.notify();assert.equal(model.frames.length,1);assert.equal(track.children.length,0);assert.equal(writes,0);
+ model.flush();assert.equal(track.children.length,6);assert.equal(model.disclosure.hidden,true);const stable=writes;
+ model.notify();model.flush();assert.equal(writes,stable);assert.equal(model.frames.length,0);
+ model.container.clientWidth=0;model.notify();model.flush();assert.equal(writes,stable);
+ model.container.clientWidth=255;model.notify();model.flush();assert.equal(model.panel.hidden,true);assert.equal(model.disclosure.hidden,false);
+ model.container.clientWidth=779;model.control.update();assert.equal(model.disclosure.hidden,true,'explicit rendering update remains synchronous');
 });

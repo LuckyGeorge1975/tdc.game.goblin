@@ -1,16 +1,17 @@
 (function(root){
   function create(container,{disclosure,panel,buttons}){
-    let compact=false,open=false;
+    let compact=false,open=false,resizeFrame=null;
     const measure=document.createElement('div');
     measure.className='v2-control-measure';measure.inert=true;
     measure.setAttribute('aria-hidden','true');container.append(measure);
     const track=document.createElement('div');track.className='v2-control-measure-track';measure.append(track);
     function show(){
       if(compact&&!open&&panel.contains(document.activeElement))disclosure.focus({preventScroll:true});
-      panel.hidden=compact&&!open;
-      disclosure.hidden=!compact;
-      disclosure.setAttribute('aria-expanded',String(compact&&open));
-      container.dataset.compact=String(compact);
+      if(panel.hidden!==(compact&&!open))panel.hidden=compact&&!open;
+      if(disclosure.hidden!==!compact)disclosure.hidden=!compact;
+      const expanded=String(compact&&open),mode=String(compact);
+      if(disclosure.getAttribute('aria-expanded')!==expanded)disclosure.setAttribute('aria-expanded',expanded);
+      if(container.dataset.compact!==mode)container.dataset.compact=mode;
     }
     function update(){
       const available=container.clientWidth;
@@ -31,7 +32,11 @@
       open=false;show();disclosure.focus({preventScroll:true});
       event.preventDefault();event.stopImmediatePropagation();return true;
     }
-    new ResizeObserver(update).observe(container);
+    function scheduleUpdate(){
+      if(resizeFrame!==null)return;
+      resizeFrame=requestAnimationFrame(()=>{resizeFrame=null;update();});
+    }
+    new ResizeObserver(scheduleUpdate).observe(container);
     return Object.freeze({update,handleKeydown});
   }
   root.GoblinDisplayControls=Object.freeze({create});

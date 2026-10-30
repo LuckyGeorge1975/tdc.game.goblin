@@ -1103,16 +1103,25 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       return view.zoom > originalZoom + 0.0001;
     }
     function applyMapSize() {
-      if (!mapPanel.clientWidth || !mapPanel.clientHeight) return;
+      const panelWidth=mapPanel.clientWidth,panelHeight=mapPanel.clientHeight;
+      if (!panelWidth || !panelHeight) return;
       const box = nativeMap.viewBox.baseVal;
       const width = box.width || 790, height = box.height || 480;
-      const fit = Math.min(mapPanel.clientWidth / width, mapPanel.clientHeight / height);
+      const fit = Math.min(panelWidth / width, panelHeight / height);
       const scaledWidth = width * fit * view.zoom, scaledHeight = height * fit * view.zoom;
-      nativeMap.style.width = `${scaledWidth}px`;
-      nativeMap.style.height = `${scaledHeight}px`;
-      nativeMap.style.marginTop = `${Math.max(0, (mapPanel.clientHeight - scaledHeight) / 2)}px`;
+      const desired={width:scaledWidth,height:scaledHeight,marginTop:Math.max(0,(panelHeight-scaledHeight)/2)};
+      for(const [key,value]of Object.entries(desired)){
+        const current=Number.parseFloat(nativeMap.style[key]);
+        // CSSOM may serialize fewer decimals; avoid rewriting the same visual size.
+        if(!Number.isFinite(current)||Math.abs(current-value)>=0.01)nativeMap.style[key]=`${value}px`;
+      }
     }
-    new ResizeObserver(() => applyMapSize()).observe(mapPanel);
+    let mapResizeFrame=null;
+    function scheduleMapSize(){
+      if(mapResizeFrame!==null)return;
+      mapResizeFrame=requestAnimationFrame(()=>{mapResizeFrame=null;applyMapSize();});
+    }
+    new ResizeObserver(scheduleMapSize).observe(mapPanel);
     let compactDetails = null;
     function syncLayout() {
       const compact = matchMedia('(max-width: 599px), (max-height: 500px)').matches;
