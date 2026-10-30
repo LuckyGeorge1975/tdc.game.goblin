@@ -41,7 +41,7 @@
   "sourcePairs": {
     "ui-v2.js": {
       "from": "76b4620c457b7649ac0cb0e50d2a2e2e0bbd9a7da33e0edc4ca0ca6460f7c697",
-      "to": "78dbb3b8a2810b16353adc0c3e36c1d5418d55041eba72b1996f32080a0f9e8c"
+      "to": "d02ef59c87dad4368e66d8fec97d73b7f7ec4afd90fc6272af1902836519d22b"
     },
     "view-display-controls.js": {
       "from": "5f1dac19436c2ccfe0c808314c8a1579f08477ae0b8503c51d5f2118555ce086",
@@ -61,7 +61,7 @@
     }
   },
   "addedSources": {
-    "tests/resize-observer-geometry.test.mjs": "39ef9feb79a630dc1a6db13d0a44ed92abe696dbe84274aef94b8e17c08b9072"
+    "tests/resize-observer-geometry.test.mjs": "974565998d0263cdbea84044c4379b519eebf9d1b093ebba268a7128cc642b96"
   },
   "immutableFixtures": {
     "artillery-product-traces.v1.json": "14c27d0ff45e6bf1db09db109c5020176f9611f3a2cb197a63930303e98064ec",

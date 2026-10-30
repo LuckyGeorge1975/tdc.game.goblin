@@ -4,12 +4,13 @@ const ui=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
 const source=ui.slice(ui.indexOf('    function applyMapSize() {'),ui.indexOf('    let compactDetails = null;'));
 function scene(width=323,height=205,zoom=1){
  let callback,notifying=false,nextFrame=0;const frames=[],writes=[],reads=[];const size={width,height},values={};
+ const frameById=new Map();
  function geometry(){const vertical=parseFloat(values.height)>size.height,horizontal=parseFloat(values.width)>size.width-(vertical?15:0);return {width:Math.max(0,size.width-(vertical?15:0)),height:Math.max(0,size.height-(horizontal?15:0))}}
  const mapPanel={get clientWidth(){reads.push('width');return geometry().width},get clientHeight(){reads.push('height');return geometry().height}};
  const nativeMap={viewBox:{baseVal:{width:790,height:480}},style:new Proxy(values,{set(target,key,value){assert.equal(notifying,false,'no CSS writes inside RO delivery');writes.push([key,value]);target[key]=value;return true}})};
- const context=vm.createContext({mapPanel,nativeMap,view:{zoom},requestAnimationFrame:fn=>{frames.push(fn);return ++nextFrame},ResizeObserver:class{constructor(fn){callback=fn}observe(node){assert.equal(node,mapPanel)}}});
+ const context=vm.createContext({mapPanel,nativeMap,view:{zoom},requestAnimationFrame:fn=>{const id=++nextFrame;frames.push(fn);frameById.set(id,fn);return id},cancelAnimationFrame:id=>{const fn=frameById.get(id);if(fn){const idx=frames.indexOf(fn);if(idx>=0)frames.splice(idx,1);frameById.delete(id)}},ResizeObserver:class{constructor(fn){callback=fn}observe(node){assert.equal(node,mapPanel)}}});
  vm.runInContext(source+'\nglobalThis.sizeMap=applyMapSize;',context);
- return {context,size,values,writes,reads,frames,notify(){notifying=true;try{callback()}finally{notifying=false}},flush(){frames.shift()?.()},direct(){context.sizeMap()},geometry};
+ return {context,size,values,writes,reads,frames,notify(){notifying=true;try{callback()}finally{notifying=false}},flush(){const fn=frames.shift();fn?.()},direct(){context.sizeMap()},geometry};
 }
 test('actual map observer performs no writes on delivery and coalesces to one frame with latest size',()=>{
  const g=scene();g.notify();g.notify();g.notify();assert.equal(g.frames.length,1);assert.equal(g.writes.length,0);assert.equal(g.reads.length,0);

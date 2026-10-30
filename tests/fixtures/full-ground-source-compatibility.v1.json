@@ -37,7 +37,7 @@
     "training-t02",
     "training-t03"
   ],
-  "priorManifestSha256": "892a97f0083303ecd973e3d63c6194ad8364a92decc602b7bbd7a692a41edfb5",
+  "priorManifestSha256": "6ddf0fdea362b34faa1a842d7b998487acc9f1f8efd4002deeca2a7894fbf92a",
   "providerSha256": "54165b4324e4903bf9efe62c82b37084e1307ed41433b5b450213e2d50606501",
   "sourcePairs": {
     "game.js": {

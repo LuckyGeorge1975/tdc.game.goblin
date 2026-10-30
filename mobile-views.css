@@ -11,7 +11,7 @@
   .game-layout>[data-mobile-panel]{scroll-margin-top:55px}
   .battlefield-head{gap:8px}
   .battlefield{padding-bottom:62px}
-  .battlefield-footer .action-row{position:fixed;left:0;right:0;bottom:0;z-index:12;justify-content:center;background:#142024;border-top:1px solid #506548;padding:6px}
+  .battlefield-footer .action-row{position:fixed;left:0;right:0;bottom:0;z-index:12;justify-content:center;background:#142024;border-top:1px solid #506548;padding:6px;overflow:hidden}
   [data-mobile-view="force"] .battlefield-footer .action-row,
   [data-mobile-view="intel"] .battlefield-footer .action-row{display:none}
 }

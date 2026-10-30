@@ -1103,6 +1103,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       return view.zoom > originalZoom + 0.0001;
     }
     function applyMapSize() {
+      if(mapResizeFrame!==null){cancelAnimationFrame(mapResizeFrame);mapResizeFrame=null;}
       const panelWidth=mapPanel.clientWidth,panelHeight=mapPanel.clientHeight;
       if (!panelWidth || !panelHeight) return;
       const box = nativeMap.viewBox.baseVal;

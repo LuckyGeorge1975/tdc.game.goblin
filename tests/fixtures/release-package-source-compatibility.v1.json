@@ -37,7 +37,7 @@
     "training-t02",
     "training-t03"
   ],
-  "priorManifestSha256": "bba90a0d82a473d5eea92f6f1c810862e4bb7ae4d8ea11e2a15b8b52228df449",
+  "priorManifestSha256": "dd4d7f6e2af170af84a053a9b0c3c9728490518e40c5209d017c0c64bf340205",
   "providerSha256": "8c2e94fb0a5b22ed71808a3d562446c396e1417f3c657cc19a500d6e802f8dc6",
   "sourcePairs": {
     "index.html": {
