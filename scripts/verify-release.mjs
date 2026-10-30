@@ -3,6 +3,8 @@ import {execFileSync} from 'node:child_process';
 import {relative} from 'node:path';
 import vm from 'node:vm';
 
+const gitExe = process.env.GIT_EXECUTABLE || process.argv.find(a=>a.startsWith('--git='))?.slice(6) || 'git';
+
 function parseRelease(source){
   const context=vm.createContext({globalThis:{}});
   vm.runInContext(source,context);
@@ -22,7 +24,7 @@ if(!changelog.includes(`## [${release.version}] - ${release.releasedAt}`))throw 
 if(!handoff.includes(`| Version | \`${release.version}\` |`)||!handoff.includes(`| Build | \`${release.build}\` |`))throw new Error('Tester-Handoff enthält nicht die aktuelle Version.');
 if(!index.includes(`release.js?v=${release.build}`)||!index.includes('id="build-version"'))throw new Error('Versionsanzeige ist nicht korrekt in index.html eingebunden.');
 const safeDirectory=process.cwd().replaceAll('\\','/');
-const trackedMarkdown=execFileSync('git',['-c',`safe.directory=${safeDirectory}`,'ls-files','--cached','--','*.md'],{encoding:'utf8'}).trim().split(/\r?\n/);
+const trackedMarkdown=execFileSync(gitExe,['-c',`safe.directory=${safeDirectory}`,'ls-files','--cached','--','*.md'],{encoding:'utf8'}).trim().split(/\r?\n/);
 for(const report of trackedMarkdown.filter(name=>/(?:REPORT|REVIEW|CLEARANCE|NOTICES).*\.md$/i.test(name.split('/').at(-1))&&name!=='reports/REPORTS.md')){
   const source=readFileSync(report,'utf8');
   const reportLink=relative('reports',report).replaceAll('\\','/');
@@ -38,7 +40,7 @@ const previousArg=process.argv.find(arg=>arg.startsWith('--previous='));
 if(previousArg){
   const previousRef=previousArg.slice('--previous='.length);
   try{
-    const previousSource=execFileSync('git',['-c',`safe.directory=${safeDirectory}`,'show',`${previousRef}:release.js`],{encoding:'utf8',stdio:['ignore','pipe','pipe']});
+    const previousSource=execFileSync(gitExe,['-c',`safe.directory=${safeDirectory}`,'show',`${previousRef}:release.js`],{encoding:'utf8',stdio:['ignore','pipe','pipe']});
     const previous=parseRelease(previousSource);
     if(release.build<=previous.build)throw new Error(`Build ${release.build} ist nicht höher als der veröffentlichte Build ${previous.build}.`);
   }catch(error){
