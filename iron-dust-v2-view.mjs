@@ -197,12 +197,17 @@ function renderMap(view, rerender, onAction) {
     selectedUnitId = occupant?.id ?? null;
     rerender();
   };
+  const cellTypes = new Map(view.cells.map(cell => [`${cell.x},${cell.y}`, cell.type]));
+  const tiled = globalThis.TerrainTiles?.drawBoard(map, (x, y) => cellTypes.get(`${x},${y}`) ?? null,
+    Math.max(...view.cells.map(cell => cell.x)) + 1, Math.max(...view.cells.map(cell => cell.y)) + 1,
+    center, HEX_DX) ?? new Set();
   for (const cell of view.cells) {
     const polygon = svgElement('polygon');
+    const illustrated = tiled.has(`${cell.x},${cell.y}`);
     polygon.dataset.x = String(cell.x);
     polygon.dataset.y = String(cell.y);
     polygon.setAttribute('points', points(cell.x, cell.y));
-    polygon.setAttribute('fill', cell.type === 'open-ground' ? '#0e2022' : '#243d3a');
+    polygon.setAttribute('fill', illustrated ? 'transparent' : cell.type === 'open-ground' ? '#0e2022' : '#243d3a');
     polygon.setAttribute('stroke', '#2d464b');
     polygon.classList.add('hex');
     if (selectedCell?.x === cell.x && selectedCell?.y === cell.y)
@@ -210,7 +215,7 @@ function renderMap(view, rerender, onAction) {
     polygon.addEventListener('click', () => activateCell(cell));
     map.appendChild(polygon);
     const asset = globalThis.UnitVisuals.terrainAssetFor(cell.type);
-    if (asset && cell.type !== 'open-ground') {
+    if (asset && !illustrated && cell.type !== 'open-ground') {
       const c = center(cell.x, cell.y), image = svgElement('image');
       image.setAttribute('href', asset);
       image.setAttribute('x', c.x - 36); image.setAttribute('y', c.y - 36);

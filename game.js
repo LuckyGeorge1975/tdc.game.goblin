@@ -158,8 +158,9 @@ function drawGrid(){if(!gridVisible)return;for(let y=0;y<H;y++)for(let x=0;x<W;x
     image.setAttribute('class','terrain-bake');
     svg.appendChild(image);
   }
+  const tiled=!baked&&typeof TerrainTiles!=='undefined'?TerrainTiles.drawBoard(svg,terrainTypeAt,W,H,hexCenter,DX):new Set();
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){
-    const illustrated=baked||drawTerrainArtwork(x,y);
+    const illustrated=baked||tiled.has(`${x},${y}`)||drawTerrainArtwork(x,y);
     const p=document.createElementNS(NS,'polygon');p.setAttribute('points',hexPoints(x,y));p.classList.add('hex');p.dataset.x=x;p.dataset.y=y;
     if(illustrated)p.classList.add('terrain-illustrated');
     const unit=visibleUnits.find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y); const attackPhase=turnPhase==='fire',canFire=!!selected,canMove=!!selected; if(attackPhase&&selected&&unitAlive(selected)&&unit&&unit.team==='enemy'&&dist(selected,{x,y})<=attackRange(selected)&&fireTargetVisible(selected,unit)&&(typeof canSelectedWeaponTarget!=='function'||canSelectedWeaponTarget(selected,unit))) p.classList.add('attack');

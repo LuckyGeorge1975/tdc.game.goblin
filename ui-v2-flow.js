@@ -117,22 +117,25 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       svg.setAttribute('aria-label', t('v2.ui.previewMap'));
       const terrain = new Map(data.terrain.map(cell => [`${cell.x},${cell.y}`, cell.type]));
       const shown = new Set();
+      const tiled = globalThis.TerrainTiles?.drawBoard(svg, (x, y) => terrain.get(`${x},${y}`) || data.defaultTerrain,
+        data.width, data.height, (x, y) => ({x: 23 + x * 36 + (y % 2 ? 18 : 0), y: 20 + y * 30}), 36) ?? new Set();
       for (let y = 0; y < data.height; y++) for (let x = 0; x < data.width; x++) {
         const cx = 23 + x * 36 + (y % 2 ? 18 : 0), cy = 20 + y * 30;
         const type = terrain.get(`${x},${y}`) || data.defaultTerrain;
+        const illustrated = tiled.has(`${x},${y}`);
         shown.add(type);
         const polygon = document.createElementNS(svg.namespaceURI, 'polygon');
         polygon.setAttribute('points', Array.from({length: 6}, (_, i) => {
           const angle = Math.PI / 3 * i + Math.PI / 6;
           return `${cx + 20 * Math.cos(angle)},${cy + 20 * Math.sin(angle)}`;
         }).join(' '));
-        polygon.setAttribute('class', type !== data.defaultTerrain ? 'v2-preview-terrain' : 'v2-preview-open');
+        polygon.setAttribute('class', illustrated ? 'v2-preview-tiled' : type !== data.defaultTerrain ? 'v2-preview-terrain' : 'v2-preview-open');
         polygon.setAttribute('data-terrain-id', type);
         const title = document.createElementNS(svg.namespaceURI, 'title');
         title.textContent = TerrainDisplay.label(type);
         polygon.append(title);
         svg.append(polygon);
-        const icon = TerrainDisplay.svgIcon(type, cx - 18, cy - 21);
+        const icon = illustrated ? null : TerrainDisplay.svgIcon(type, cx - 18, cy - 21);
         if (icon) svg.append(icon);
       }
       for (const unit of data.units) {

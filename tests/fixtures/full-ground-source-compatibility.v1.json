@@ -38,15 +38,23 @@
     "training-t03"
   ],
   "priorManifestSha256": "6ddf0fdea362b34faa1a842d7b998487acc9f1f8efd4002deeca2a7894fbf92a",
-  "providerSha256": "54165b4324e4903bf9efe62c82b37084e1307ed41433b5b450213e2d50606501",
+  "providerSha256": "5f75ceae2b329d3333f2ef10e2cd880595e87e50e0f82c4efa3b6d3656354533",
   "sourcePairs": {
     "game.js": {
       "from": "4dc62cb777db44338d67b22aa0b99760a4835ad1968ca35d99002e96f7bd56f9",
-      "to": "41750e985d485d9e9457df14228204111f2de7816ab232291e136ff6a4324165"
+      "to": "fc61857a5a65d9449030021ad301ce95cce90817c2e06029ee282de3ba50c837"
     },
     "index.html": {
       "from": "48890cf553498ac4427316ceceef5ee4b2ce9d0200ea6b5f62e9c1c89ce05201",
-      "to": "42d3903e000dc5da942a40f68c6761cecc02f09434ed93ccb46dce391c9f8d5f"
+      "to": "9286e82e76f99ad4d29b26aaea6bfdb044f729434591952fb20236a6113ea04c"
+    },
+    "ui-v2-flow.js": {
+      "from": "71ce91c0e7d40477467fdfbc4f3a9e6167a039a84f791006f996f3b8c248d9dc",
+      "to": "dd8cb7ef1b4e667c7141c8aa9ea367c2c48d1bf2b6665786c52762a75bdd406a"
+    },
+    "ui-v2.css": {
+      "from": "2ec9431d42adc6543263e49e7efb7d1fb44716310b8390c0987a1f684ec0ff1a",
+      "to": "f9fddd4dd8ddf3d025d24ee7d7abf9b059af83ccbccf8b854eb4f9d11901663e"
     },
     "tests/helpers/release-package-source-compatibility.mjs": {
       "from": "8c2e94fb0a5b22ed71808a3d562446c396e1417f3c657cc19a500d6e802f8dc6",
