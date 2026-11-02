@@ -29,18 +29,34 @@ function roundHex(q, r) {
   else z = -x - y;
   return offset({ q: x, r: z });
 }
+// Legacy pixel-sampling LOS: interpolates pixel centers at 8x hex-distance resolution.
+const PIXEL_S = 34, PIXEL_DX = Math.sqrt(3) * PIXEL_S, PIXEL_DY = 1.5 * PIXEL_S;
+function pixelCenter(x, y) { return { px: 58 + x * PIXEL_DX + (y & 1 ? PIXEL_DX / 2 : 0), py: 48 + y * PIXEL_DY }; }
+function nearestHexPixel(map, px, py) {
+  let best = null, bestD = Infinity;
+  for (let y = 0; y < map.height; y++) for (let x = 0; x < map.width; x++) {
+    const c = pixelCenter(x, y), d = (c.px - px) ** 2 + (c.py - py) ** 2;
+    if (d < bestD) { bestD = d; best = { x, y }; }
+  }
+  return best;
+}
+function legacyPixelLos(state, from, to) {
+  const steps = Math.max(2, Math.max(Math.abs(from.x - to.x), Math.abs(from.y - to.y),
+    Math.abs((from.x + from.y) - (to.x + to.y))) * 8);
+  const a = pixelCenter(from.x, from.y), b = pixelCenter(to.x, to.y);
+  for (let i = 1; i < steps; i++) {
+    const t = i / steps, cell = nearestHexPixel(state.map, a.px + (b.px - a.px) * t, a.py + (b.py - a.py) * t);
+    if ((cell.x !== from.x || cell.y !== from.y) && (cell.x !== to.x || cell.y !== to.y) &&
+        TerrainRules.blocksLos(terrainAt(state, cell))) return false;
+  }
+  return true;
+}
 export function hasLineOfSight(state, from, to) {
   if (!inside(state.map, from) || !inside(state.map, to)) return false;
   if (state.rulesVersion === CORE_SUPERCOVER_CONTRACT.rulesVersion)
     return supercoverIntermediateHexes(from, to)
       .every(cell => !TerrainRules.blocksLos(terrainAt(state, cell)));
-  const distance = hexDistance(from, to), a = axial(from), b = axial(to);
-  for (let step = 1; step < distance; step++) {
-    const t = step / distance;
-    const p = roundHex(a.q + (b.q - a.q) * t + 1e-7, a.r + (b.r - a.r) * t + 1e-7);
-    if (TerrainRules.blocksLos(terrainAt(state, p))) return false;
-  }
-  return true;
+  return legacyPixelLos(state, from, to);
 }
 export function movementPaths(state, unit, allowance = unit.move) {
   const start = { x: unit.x, y: unit.y }, occupied = new Set(state.units.filter(u => u.id !== unit.id && u.hp > 0 && !u.embarkedOn).map(key));
