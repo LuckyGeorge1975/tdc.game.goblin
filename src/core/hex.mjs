@@ -93,11 +93,17 @@ export function queryAreas(state, unitId) {
   const fireRange = cells(state.map).filter(p => hexDistance(origin, p) > 0 && hexDistance(origin, p) <= unit.range);
   const lineOfSight = cells(state.map).filter(p => key(p) !== key(origin) && hasLineOfSight(state, origin, p));
   const inRange = new Set(fireRange.map(key)), visible = new Set(lineOfSight.map(key));
+  const unitHasWeapons = Array.isArray(unit.weapons) && unit.weapons.length > 0;
+  const maxWeaponRange = unitHasWeapons ? Math.max(...unit.weapons.map(w => w.range)) : unit.range;
+  const weaponFireRange = unitHasWeapons
+    ? cells(state.map).filter(p => hexDistance(origin, p) > 0 && hexDistance(origin, p) <= maxWeaponRange)
+    : fireRange;
+  const weaponInRange = unitHasWeapons ? new Set(weaponFireRange.map(key)) : inRange;
   const attackableTargets = !gevProbe &&
     state.rulesVersion !== CORE_SIEGE_TANK_PROBE_CONTRACT.rulesVersion &&
     state.rulesVersion !== CORE_ARTILLERY_SPOTTER_PROBE_CONTRACT.rulesVersion &&
     state.phase === 'fire' && state.activeTeam === unit.team && !unit.fired && !unit.disabled
-    ? state.units.filter(target => target.team !== unit.team && target.hp > 0 && !target.embarkedOn && inRange.has(key(target)) && visible.has(key(target))).map(target => target.id)
+    ? state.units.filter(target => target.team !== unit.team && target.hp > 0 && !target.embarkedOn && weaponInRange.has(key(target)) && visible.has(key(target))).map(target => target.id)
     : [];
   return { movementReachable, fireRange, lineOfSight, attackableTargets };
 }
