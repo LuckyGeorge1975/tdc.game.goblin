@@ -49,6 +49,16 @@
         "index.html"
       ]
     },
+    "goblin-6ddh": {
+      "title": "UR-D game layout: compact head, map overlay controls, unit list, switchable field intel, terrain in the library",
+      "sources": [
+        "ui-v2.js",
+        "ui-v2.css",
+        "ui-v2-flow.js",
+        "localization.js",
+        "index.html"
+      ]
+    },
     "provenance": {
       "title": "ground link resolves through this link",
       "sources": [
@@ -98,23 +108,23 @@
     },
     "index.html": {
       "from": "42d3903e000dc5da942a40f68c6761cecc02f09434ed93ccb46dce391c9f8d5f",
-      "to": "d45a52c85d75e394182380e841557cb2d3ef36b8796065240521c81e02c33a06"
+      "to": "73ba162f8994dda24a0b09588b8a691fa9a64583f933fb3b0ef1fdd840af9ed8"
     },
     "localization.js": {
       "from": "1fe3facfde42649d8978615d0f6aaae2acbd592889cd201639e460c7f31a348e",
-      "to": "bcfdbc9ac56f6ffbdad53fa6d12c9577ff515184486adee82d37b75a62224615"
+      "to": "4ec656cf711ff05124c4af25e1d414251c691ec9ff752e683f445ef23d581e6b"
     },
     "ui-v2-flow.js": {
       "from": "71ce91c0e7d40477467fdfbc4f3a9e6167a039a84f791006f996f3b8c248d9dc",
-      "to": "e3b0bae1b18a649719ed93e68ce5fce832475823356dcd066edda91fe421e381"
+      "to": "5c6c63d189df3c2d7d0ff29fd7566753861e79ba04779b285f9db459f92750b8"
     },
     "ui-v2.css": {
       "from": "2ec9431d42adc6543263e49e7efb7d1fb44716310b8390c0987a1f684ec0ff1a",
-      "to": "a56ee36f2776b27902ff50f92b95afe8e609c8a90133554cded494d90f016674"
+      "to": "a199ac6c7a130155f24c55b11e45e9e45b22a62db1ecbd3103fdf9bc0ce510e9"
     },
     "ui-v2.js": {
       "from": "d02ef59c87dad4368e66d8fec97d73b7f7ec4afd90fc6272af1902836519d22b",
-      "to": "54eec8d11d094655007ec6f60f25ce1c8ed18b0f57fcd036f9425b24d3759d22"
+      "to": "93edd53962452fe09448a014210325e6a459c5c51d164e61a8a25579dc517e45"
     },
     "tests/helpers/full-ground-source-compatibility.mjs": {
       "from": "54165b4324e4903bf9efe62c82b37084e1307ed41433b5b450213e2d50606501",
