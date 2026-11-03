@@ -518,6 +518,7 @@
     'v2.ui.list.down': {de:'Liste nach unten blättern',en:'Scroll list down',es:'Desplazar lista hacia abajo',fr:'Faire défiler la liste vers le bas'},
     'v2.ui.nextUnit': {de:'Nächste Einheit · {count} können noch handeln',en:'Next unit · {count} can still act',es:'Siguiente unidad · {count} aún pueden actuar',fr:'Unité suivante · {count} peuvent encore agir'},
     'v2.ui.nextUnitShort': {de:'Nächste',en:'Next',es:'Siguiente',fr:'Suivante'},
+    'v2.display.overlayAlpha': {de:'Deckkraft der Reichweiten',en:'Range overlay opacity',es:'Opacidad de los alcances',fr:'Opacité des portées'},
     'v2.ui.legalNotices': {de:'Rechtliche Hinweise',en:'Legal notices',es:'Avisos legales',fr:'Informations légales'},
     'v2.ui.legalEnglish': {de:'Die vollständigen Hinweise liegen auf Englisch vor.',en:'Full notices are available in English.',es:'Los avisos completos están disponibles en inglés.',fr:'Les informations complètes sont disponibles en anglais.'},
     'v2.ui.legalLoading': {de:'Hinweise werden geladen…',en:'Loading notices…',es:'Cargando avisos…',fr:'Chargement des informations…'},

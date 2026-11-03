@@ -5,9 +5,9 @@ import {runInNewContext} from 'node:vm';
 
 const source = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
 const localization = readFileSync(new URL('../localization.js', import.meta.url), 'utf8');
-const match = source.match(/      function mark\(cell, kind\) \{[\s\S]*?\n      \}\n      for \(const cell of data\.legal\)/);
+const match = source.match(/      function mark\(cell, kind\) \{[\s\S]*?\n      \}\n      const areaKind/);
 assert.ok(match, 'area mark must remain inside renderAreaPreview');
-const markSource = match[0].slice(0, -'      for (const cell of data.legal)'.length);
+const markSource = match[0].slice(0, -'      const areaKind'.length);
 
 function scene(pixelScale, showCostChips) {
   const children = [];
@@ -32,7 +32,7 @@ test('movement keeps the legal cost in a bottom chip at readable projected size'
   const {mark,children}=scene(1.2,true);
   mark({x:3,y:4,cost:2},'movement');
   assert.deepEqual(children.map(node=>node.tag),['polygon','rect','text']);
-  assert.equal(children[0].attrs['stroke-width']*112/(Math.sqrt(3)*34),2);
+  assert.equal(children[0].attrs['stroke-width'],undefined,'cells carry no own outline');
   assert.equal(children[1].classes[0],'v2-area-cost-chip');
   assert.equal(children[2].textContent,'2');
   assert.equal(children[1].dataset.x,'3');
@@ -70,24 +70,31 @@ test('focused legal field keeps its authoritative cost in the existing status vi
   assert.equal(context.message,'Reachable · SECTOR D-05 · MOVE COST 2');
 });
 
-test('fire uses a centered inner ring with reference-width proportions', () => {
-  const {mark,children}=scene(2,true);
-  mark({x:5,y:2},'fire');
-  assert.deepEqual(children.map(node=>node.classes[0]),['v2-area-fire-underlay','v2-area-fire']);
-  const refToSvg = 112/(Math.sqrt(3)*34);
-  assert.equal(children[0].attrs['stroke-width']*refToSvg,5.5);
-  assert.equal(children[1].attrs['stroke-width']*refToSvg,2.5);
-  assert.equal(children[0].attrs.points,children[1].attrs.points);
-  const xs=children[0].attrs.points.split(' ').map(pair=>Number(pair.split(',')[0]));
-  assert.equal(Math.max(...xs)-Math.min(...xs),92);
-  assert.equal((Math.max(...xs)+Math.min(...xs))/2,100);
+test('fire and sight fill the whole cell like movement, without per-cell outline', () => {
+  for (const kind of ['fire','sight']) {
+    const {mark,children}=scene(2,true);
+    mark({x:5,y:2},kind);
+    assert.deepEqual(children.map(node=>node.classes[0]),[`v2-area-${kind}`]);
+    assert.equal(children[0].attrs.points,'44,100 72,52 128,52 156,100 128,148 72,148');
+    assert.equal(children[0].attrs['stroke-width'],undefined);
+  }
 });
 
-test('tiny fire ring keeps a visible projected stroke floor', () => {
-  const {mark,children}=scene(.3,true);
-  mark({x:5,y:2},'fire');
-  assert.ok(Math.abs(children[0].attrs['stroke-width']*.3-3.5)<1e-9);
-  assert.ok(Math.abs(children[1].attrs['stroke-width']*.3-1.5)<1e-9);
+test('the area outline keeps only sides that are not shared by two cells of the range', () => {
+  const edge=source.match(/    function areaEdge\(cells, kind\) \{[\s\S]*?\n    \}\n/);
+  assert.ok(edge,'areaEdge must stay a renderAreaPreview helper');
+  const S=10,W=Math.sqrt(3)*S;
+  const hexPoints=(x,y)=>{const cx=x*W+(y%2?W/2:0),cy=y*1.5*S;
+    return Array.from({length:6},(_,i)=>{const a=Math.PI/180*(60*i-30);return `${cx+S*Math.cos(a)},${cy+S*Math.sin(a)}`;}).join(' ');};
+  const document={createElementNS:()=>({attrs:{},classes:[],setAttribute(k,v){this.attrs[k]=v;},classList:{add(...v){document.last.classes.push(...v);}}})};
+  const create=document.createElementNS;document.createElementNS=(...a)=>(document.last=create(...a));
+  const context={document,NS:'svg',hexPoints};
+  runInNewContext(`${edge[0]}\nglobalThis.areaEdge=areaEdge;`,context);
+  const segments=cells=>context.areaEdge(cells,'fire').attrs.d.match(/M/g).length;
+  assert.equal(segments([{x:0,y:0}]),6);
+  assert.equal(segments([{x:0,y:0},{x:1,y:0}]),10);
+  assert.equal(segments([{x:0,y:0},{x:1,y:0},{x:0,y:1}]),12);
+  assert.deepEqual(context.areaEdge([{x:0,y:0}],'movement').classes,['v2-area-edge','v2-area-edge-movement']);
 });
 
 test('hidden chips expose only current legal focus cost above the map and in open move intel', () => {

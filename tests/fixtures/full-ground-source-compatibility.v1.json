@@ -38,31 +38,15 @@
     "training-t03"
   ],
   "priorManifestSha256": "6ddf0fdea362b34faa1a842d7b998487acc9f1f8efd4002deeca2a7894fbf92a",
-  "providerSha256": "e32e9b3ca30cf1fcbc773af29c7501c6fd0f2b396aef9389d5e9e1356e47f94b",
+  "providerSha256": "54165b4324e4903bf9efe62c82b37084e1307ed41433b5b450213e2d50606501",
   "sourcePairs": {
     "game.js": {
       "from": "4dc62cb777db44338d67b22aa0b99760a4835ad1968ca35d99002e96f7bd56f9",
-      "to": "fc61857a5a65d9449030021ad301ce95cce90817c2e06029ee282de3ba50c837"
+      "to": "41750e985d485d9e9457df14228204111f2de7816ab232291e136ff6a4324165"
     },
     "index.html": {
       "from": "48890cf553498ac4427316ceceef5ee4b2ce9d0200ea6b5f62e9c1c89ce05201",
-      "to": "0d20e08cb4839edd1118912513f0d473458277acf006b210002b17a992209884"
-    },
-    "localization.js": {
-      "from": "1fe3facfde42649d8978615d0f6aaae2acbd592889cd201639e460c7f31a348e",
-      "to": "03af635e698ad5a26fd5bb147c7d5dbcedcc3b4d93000e64874cf76cf7d1b3c3"
-    },
-    "ui-v2-flow.js": {
-      "from": "71ce91c0e7d40477467fdfbc4f3a9e6167a039a84f791006f996f3b8c248d9dc",
-      "to": "1330c2e193af68135fb2c89fc0632a65f038d0c9fe5498501e7eb8f7f5d8ff99"
-    },
-    "ui-v2.css": {
-      "from": "2ec9431d42adc6543263e49e7efb7d1fb44716310b8390c0987a1f684ec0ff1a",
-      "to": "35956b2587bd480231f378e1e712a44677820e358ca4f9a09f282e015c5020bc"
-    },
-    "ui-v2.js": {
-      "from": "d02ef59c87dad4368e66d8fec97d73b7f7ec4afd90fc6272af1902836519d22b",
-      "to": "6b8360e9a58361e9cfed1d7913f1c759aebb5c926b375ca01e871427539158fb"
+      "to": "42d3903e000dc5da942a40f68c6761cecc02f09434ed93ccb46dce391c9f8d5f"
     },
     "tests/helpers/release-package-source-compatibility.mjs": {
       "from": "8c2e94fb0a5b22ed71808a3d562446c396e1417f3c657cc19a500d6e802f8dc6",

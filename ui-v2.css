@@ -14,6 +14,11 @@ body.ui-v2-active {
   --v2-danger: #f2726a;
   --v2-danger-text: #ff9b96;
   --v2-success: #a8cf8b;
+  --v2-range-move: #4fd6a0;
+  --v2-range-fire: #f2726a;
+  --v2-range-los: #b07cff;
+  --v2-select: #ffffff;
+  --v2-overlay-alpha: .28;
   background: var(--v2-bg);
   color: var(--v2-text);
 }
@@ -187,7 +192,8 @@ body.ui-v2-active .language-picker select { min-width: 88px; min-height: 44px; p
 .v2-label { display: block; color: var(--v2-accent-text); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .v2-layout { display: grid; grid-template-columns: minmax(220px, 240px) minmax(560px, 1fr) minmax(220px, 250px); gap: 12px; min-height: 0; }
 .v2-map-card { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto auto; gap: 8px; min-width: 0; min-height: 0; }
-.v2-map { min-width: 0; min-height: 0; overflow: auto; border: 1px solid var(--v2-line); border-radius: 10px; background: #102226; touch-action: none; }
+.v2-map { min-width: 0; min-height: 0; overflow: auto; scrollbar-width: none; border: 1px solid var(--v2-line); border-radius: 10px; background: #102226; touch-action: none; }
+.v2-map::-webkit-scrollbar { display: none; }
 .v2-map svg { display: block; min-width: 0; min-height: 0; max-width: none; margin-inline: auto; }
 body.ui-v2-active #battlefield-map { min-width: 0; min-height: 0; }
 .v2-map-tools { display: grid; grid-template-columns: 48px 48px minmax(0, 1fr) minmax(0, 1fr); gap: 6px; min-width: 0; }
@@ -195,6 +201,7 @@ body.ui-v2-active #battlefield-map { min-width: 0; min-height: 0; }
 body.ui-v2-active #battlefield-map .unit-svg.acted-unit,
 body.ui-v2-active #battlefield-map .unit-svg.disabled-unit,
 body.ui-v2-active #battlefield-map .unit-svg.transport-unavailable { opacity: 1 !important; filter: none !important; }
+body.ui-v2-active #battlefield-map .unit-svg.acted-unit:not(.disabled-unit) { filter: brightness(1.35) saturate(.7) !important; }
 body.ui-v2-active #v2-focus-marker { fill: none; stroke: var(--v2-text); stroke-width: 2; stroke-dasharray: 3 5; }
 body.ui-v2-active #battlefield-map .m1-replaced-hp,
 body.ui-v2-active #battlefield-map .target-ring,
@@ -207,7 +214,8 @@ body.ui-v2-active #battlefield-map .hex.attack { stroke: transparent; stroke-wid
 .m1-damage-border { fill: none; stroke: #0b0e12; stroke-width: .526; }
 .m1-ring { fill: none; }
 .m1-ring-outer { stroke: #0b0e12; }
-.m1-ring-inner.m1-ring-selected { stroke: var(--v2-signal); }
+.m1-ring-inner.m1-ring-selected { stroke: var(--v2-select); stroke-width: 4px; vector-effect: non-scaling-stroke; fill: #ffffff1f; }
+.m1-ring-outer.m1-ring-selected { stroke-width: 7px; vector-effect: non-scaling-stroke; }
 .m1-ring-inner.m1-ring-target { stroke: var(--v2-danger); }
 .m1-status, .m1-weapon-damage { font: 700 8px system-ui,sans-serif; text-anchor: middle; fill: var(--v2-danger-text); paint-order: stroke; stroke: #0b0e12; stroke-width: 1.5; }
 .v2-own, .v2-target { display: grid; align-content: start; gap: 12px; min-height: 0; overflow: auto; }
@@ -263,10 +271,17 @@ body.ui-v2-active #battlefield-map .hex.attack { stroke: transparent; stroke-wid
 .v2-area-legend { min-height: 1.4em; font-size: 13px; }
 body.ui-v2-active #v2-grid-overlay, body.ui-v2-active #v2-area-overlay { pointer-events: none; }
 body.ui-v2-active .v2-grid-line { fill: none; stroke: var(--v2-line-strong); stroke-width: 1.5; stroke-dasharray: 4 4; }
-body.ui-v2-active .v2-area-movement { fill: var(--v2-accent); fill-opacity: .22; stroke: var(--v2-accent); }
-body.ui-v2-active .v2-area-fire-underlay { fill: none; stroke: var(--v2-bg); }
-body.ui-v2-active .v2-area-fire { fill: none; stroke: var(--v2-danger-text); }
-body.ui-v2-active .v2-area-sight { fill: var(--v2-accent); fill-opacity: .27; stroke: var(--v2-accent-text); stroke-width: 2; }
+/* Ranges: the cells fill in the range colour with configurable opacity, only the outer edge is outlined. */
+body.ui-v2-active .v2-area-movement { fill: var(--v2-range-move); fill-opacity: var(--v2-overlay-alpha); stroke: none; }
+body.ui-v2-active .v2-area-fire { fill: var(--v2-range-fire); fill-opacity: var(--v2-overlay-alpha); stroke: none; }
+body.ui-v2-active .v2-area-sight { fill: var(--v2-range-los); fill-opacity: var(--v2-overlay-alpha); stroke: none; }
+body.ui-v2-active .v2-area-edge { fill: none; stroke-width: 3px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+body.ui-v2-active .v2-area-edge-movement { stroke: var(--v2-range-move); }
+body.ui-v2-active .v2-area-edge-fire { stroke: var(--v2-range-fire); }
+body.ui-v2-active .v2-area-edge-sight { stroke: var(--v2-range-los); }
+.v2-screen-panel label.v2-setting-range { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.v2-setting-range input { grid-column: 1; accent-color: var(--v2-accent); }
+.v2-setting-range output { grid-column: 2; grid-row: 2; color: var(--v2-text); font-variant-numeric: tabular-nums; }
 body.ui-v2-active .v2-area-blocked { fill: none; stroke: var(--v2-muted); stroke-width: 2; stroke-dasharray: 5 5; }
 body.ui-v2-active .v2-area-cost-chip { fill: var(--v2-bg); fill-opacity: .94; stroke: var(--v2-line-strong); stroke-width: .8; }
 body.ui-v2-active .v2-area-cost { fill: var(--v2-text); text-anchor: middle; dominant-baseline: central; font-family: system-ui,sans-serif; font-weight: 700; }

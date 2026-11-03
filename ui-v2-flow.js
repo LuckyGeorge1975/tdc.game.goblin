@@ -201,6 +201,18 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       return stats;
     }
+    // Range overlay opacity (UR-F), a local display preference between 10 % and 60 %.
+    const overlayAlphaKey = 'goblin.v2.overlayAlpha';
+    function overlayAlpha() {
+      let value = NaN;
+      try { value = Number(localStorage.getItem(overlayAlphaKey)); } catch {}
+      return Number.isFinite(value) && value >= .1 && value <= .6 ? value : .28;
+    }
+    function applyOverlayAlpha(value) {
+      document.body.style.setProperty('--v2-overlay-alpha', String(value));
+      try { localStorage.setItem(overlayAlphaKey, String(value)); } catch {}
+    }
+    document.body.style.setProperty('--v2-overlay-alpha', String(overlayAlpha()));
     function show(next, focus = true) {
       const previous = screen;
       const active = document.activeElement;
@@ -677,7 +689,14 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           input.onchange=()=>GoblinUIV2[key==='targets'?'setTargetsVisible':'setDamageVisible'](input.checked);
           row.append(input,document.createTextNode(t(`v2.display.${key}`)));displayOptions.push(row);
         }
-        content.append(language, animation, grid, ...displayOptions, paragraph(t('ui.settings.note')));
+        const alpha = document.createElement('label'); alpha.className = 'v2-setting-range';
+        const alphaValue = document.createElement('output');
+        const alphaInput = document.createElement('input'); alphaInput.type = 'range'; alphaInput.id = 'v2-overlay-alpha';
+        alphaInput.min = '10'; alphaInput.max = '60'; alphaInput.step = '2';
+        alphaInput.value = String(Math.round(overlayAlpha() * 100)); alphaValue.textContent = `${alphaInput.value} %`;
+        alphaInput.oninput = () => { applyOverlayAlpha(Number(alphaInput.value) / 100); alphaValue.textContent = `${alphaInput.value} %`; };
+        alpha.append(document.createTextNode(t('v2.display.overlayAlpha')), alphaInput, alphaValue);
+        content.append(language, animation, grid, ...displayOptions, alpha, paragraph(t('ui.settings.note')));
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-options-back';
         footer.append(actions(back));

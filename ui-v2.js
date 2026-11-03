@@ -668,7 +668,34 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
       return null;
     }
+    // Outline of a range: hex sides that belong to exactly one cell of the area.
+    function areaEdge(cells, kind) {
+      const sides = new Map();
+      for (const cell of cells) {
+        const corners = hexPoints(cell.x, cell.y).split(' ');
+        corners.forEach((corner, index) => {
+          const ends = [corner, corners[(index + 1) % corners.length]];
+          const key = ends.map(end => end.split(',').map(value => Number(value).toFixed(1)).join(',')).sort().join('|');
+          sides.set(key, sides.has(key) ? null : ends);
+        });
+      }
+      const path = document.createElementNS(NS, 'path');
+      path.setAttribute('d', [...sides.values()].filter(Boolean).map(([from, to]) => `M${from}L${to}`).join(''));
+      path.classList.add('v2-area-edge', `v2-area-edge-${kind}`);
+      return path;
+    }
+    // Own units that already acted this phase are drawn brighter (legacy marks them in game.js).
+    function syncActedUnits(state) {
+      if (!core()) return;
+      const open = new Set(state.phase === 'player' && !state.gameOver ? readyUnitIds() : []);
+      for (const group of nativeMap.querySelectorAll('.unit-svg[data-unit-id]')) {
+        const unit = state.units.find(item => item.id === group.dataset.unitId);
+        group.classList.toggle('acted-unit', !!unit && unit.team === 'player' && unitAlive(unit) && !unit.disabled &&
+          state.phase === 'player' && !state.gameOver && !open.has(unit.id));
+      }
+    }
     function renderAreaPreview(state, actor) {
+      syncActedUnits(state);
       renderWeaponControls(state, actor, at('#v2-weapon-controls'));
       const mode = activeAreaMode(state);
       for (const button of at('#v2-area-controls').querySelectorAll('[data-area]')) {
@@ -721,23 +748,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const pixelScale = mapWidth / nativeMap.viewBox.baseVal.width;
       const showCostChips = hexWidth * pixelScale >= 50 && !matchMedia('(max-width: 599px)').matches;
       function mark(cell, kind) {
-        const outerPoints = hexPoints(cell.x, cell.y);
-        const center = kind === 'fire' ? hexCenter(cell.x, cell.y) : null;
-        const points = center ? outerPoints.split(' ').map(pair => {
-          const [x, y] = pair.split(',').map(Number);
-          return `${center.x + (x - center.x) * 92 / 112},${center.y + (y - center.y) * 92 / 112}`;
-        }).join(' ') : outerPoints;
-        if (kind === 'fire') {
-          const underlay = document.createElementNS(NS, 'polygon');
-          underlay.setAttribute('points', points); underlay.classList.add('v2-area-fire-underlay');
-          underlay.setAttribute('stroke-width', Math.max(5.5 * referenceScale, 3.5 / pixelScale));
-          underlay.dataset.x = String(cell.x); underlay.dataset.y = String(cell.y);
-          overlay.append(underlay);
-        }
         const shape = document.createElementNS(NS, 'polygon');
-        shape.setAttribute('points', points); shape.classList.add(`v2-area-${kind}`);
-        if (kind === 'movement') shape.setAttribute('stroke-width', 2 * referenceScale);
-        if (kind === 'fire') shape.setAttribute('stroke-width', Math.max(2.5 * referenceScale, 1.5 / pixelScale));
+        shape.setAttribute('points', hexPoints(cell.x, cell.y)); shape.classList.add(`v2-area-${kind}`);
         shape.dataset.x = String(cell.x); shape.dataset.y = String(cell.y);
         overlay.append(shape);
         if (kind === 'movement' && showCostChips && Number.isFinite(cell.cost)) {
@@ -760,7 +772,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           overlay.append(chip, label);
         }
       }
-      for (const cell of data.legal) mark(cell, mode === 'movement' ? 'movement' : mode === 'fire' ? 'fire' : 'sight');
+      const areaKind = mode === 'movement' ? 'movement' : mode === 'fire' ? 'fire' : 'sight';
+      for (const cell of data.legal) mark(cell, areaKind);
+      if (data.legal.length) overlay.append(areaEdge(data.legal, areaKind));
       if (mode !== 'los') for (const cell of data.blocked) mark(cell, 'blocked');
       if(globalThis.GoblinCatalogFullRuntime?.active()&&actor?.catalogId==='U13'&&mode==='fire'&&view.target){const strike=GoblinCatalogFullRuntime.hexQuery({type:'CatalogHexFire',actorId:actor.id,...view.target});if(strike.ok)for(const [i,cell] of strike.footprint.entries()){const shape=document.createElementNS(NS,'polygon');shape.setAttribute('points',hexPoints(cell.x,cell.y));shape.classList.add('v2-full-blast',i===0?'v2-full-blast-center':'v2-full-blast-adjacent');shape.setAttribute('aria-hidden','true');overlay.append(shape);}}
       const firePreview = selectedFirePreview(state, actor, runtime, mode, weaponKey, data.legal);
