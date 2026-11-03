@@ -514,6 +514,8 @@
     'v2.ui.previewMap': {de:'Vorschau der Missionskarte mit Startpositionen',en:'Mission map preview with starting positions',es:'Vista previa del mapa con posiciones iniciales',fr:'Aperçu de la carte avec positions initiales'},
     'v2.ui.preview.own': {de:'EIGENE EINHEITEN',en:'FRIENDLY UNITS',es:'UNIDADES ALIADAS',fr:'UNITÉS ALLIÉES'},
     'v2.ui.preview.enemy': {de:'GEGNER',en:'ENEMIES',es:'ENEMIGOS',fr:'ENNEMIS'},
+    'v2.ui.list.up': {de:'Liste nach oben blättern',en:'Scroll list up',es:'Desplazar lista hacia arriba',fr:'Faire défiler la liste vers le haut'},
+    'v2.ui.list.down': {de:'Liste nach unten blättern',en:'Scroll list down',es:'Desplazar lista hacia abajo',fr:'Faire défiler la liste vers le bas'},
     'v2.ui.legalNotices': {de:'Rechtliche Hinweise',en:'Legal notices',es:'Avisos legales',fr:'Informations légales'},
     'v2.ui.legalEnglish': {de:'Die vollständigen Hinweise liegen auf Englisch vor.',en:'Full notices are available in English.',es:'Los avisos completos están disponibles en inglés.',fr:'Les informations complètes sont disponibles en anglais.'},
     'v2.ui.legalLoading': {de:'Hinweise werden geladen…',en:'Loading notices…',es:'Cargando avisos…',fr:'Chargement des informations…'},

@@ -48,6 +48,14 @@ body.ui-v2-active.v2-screen-open .v2-layout { display: none; }
 .v2-level-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); gap: 18px; min-height: 0; }
 .v2-foundation .v2-level-layout { flex: none; }
 .v2-level-list { max-height: min(70dvh, 690px); grid-auto-rows: max-content; align-content: start; }
+.v2-stepped-list { display: flex; flex-direction: column; gap: 6px; min-width: 0; min-height: 0; }
+.v2-stepped-list > :is(.v2-level-list, .v2-library-list) { scrollbar-width: none; }
+.v2-stepped-list > :is(.v2-level-list, .v2-library-list)::-webkit-scrollbar { display: none; }
+.v2-foundation button.v2-list-step { display: none; flex: none; align-items: center; justify-content: center; width: 100%; min-height: 36px; padding: 0; border: 1px solid var(--v2-line); border-radius: 9px; background: var(--v2-surface2); color: var(--v2-accent-text); }
+.v2-stepped-list.v2-overflowing > button.v2-list-step { display: flex; }
+.v2-list-step svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.v2-foundation button.v2-list-step:disabled { opacity: .3; cursor: default; }
+.v2-foundation button.v2-list-step:not(:disabled):hover { border-color: var(--v2-accent-text); background: var(--v2-surface3); }
 .v2-level-choice { display: grid; gap: 2px; width: 100%; min-height: 68px; text-align: left; overflow-wrap: anywhere; }
 .v2-level-choice span { color: var(--v2-muted); font-size: 13px; line-height: 1.3; }
 .v2-level-choice[aria-pressed="true"] { border-color: var(--v2-accent-text); background: var(--v2-surface3); box-shadow: inset 4px 0 var(--v2-accent); }
@@ -55,11 +63,9 @@ body.ui-v2-active.v2-screen-open .v2-layout { display: none; }
 .v2-level-detail h3 { margin: 0 0 12px; font-size: clamp(22px, 3vw, 30px); overflow-wrap: anywhere; }
 .v2-mission-map { margin: 0; overflow: hidden; border: 1px solid var(--v2-line); border-radius: 8px; background: #151b2b; }
 .v2-mission-map svg { display: block; width: 100%; height: auto; }
-.v2-preview-legend { padding: 8px 10px; border-top: 1px solid var(--v2-line); }
 .v2-terrain-list { list-style: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: 5px 8px; margin: 8px 0 0; padding: 0; }
 .v2-terrain-list li { display: flex; align-items: center; gap: 5px; min-width: 0; font-size: 11px; line-height: 1.15; color: var(--v2-text); overflow-wrap: normal; word-break: normal; }
 .v2-terrain-icon { display: block; width: 32px; height: 37.333px; flex: none; object-fit: contain; }
-.v2-preview-legend .v2-terrain-list { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 .v2-terrain-info { display: flex; align-items: center; gap: 8px; }
 .v2-terrain-info .v2-terrain-icon { width: 48px; height: 56px; }
 #intel-terrain-icon .legacy-terrain-icon { display: block; width: 48px; height: 56px; object-fit: contain; }
@@ -75,16 +81,19 @@ body.ui-v2-active.v2-screen-open .v2-layout { display: none; }
 .v2-screen-panel:has(.v2-briefing-main) { width: min(1180px, 100%); height: min(820px, calc(100dvh - 24px)); overflow: hidden; }
 .v2-briefing-number { margin: 0 0 4px; color: var(--v2-accent-text); font-size: 12px; font-weight: 800; letter-spacing: .1em; }
 .v2-briefing-intro { margin: 0 0 12px; line-height: 1.35; }
-.v2-briefing-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; min-height: 0; overflow: auto; }
-.v2-briefing-conditions { display: grid; align-content: start; gap: 10px; }
-.v2-briefing-conditions > div { min-width: 0; padding: 14px; border: 1px solid var(--v2-line); border-radius: 9px; background: var(--v2-surface2); }
+.v2-briefing-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto max-content auto; align-content: safe center; gap: 12px 18px; flex: 1 1 auto; min-height: 0; overflow: auto; }
+/* The conditions share the map row: they stretch to the map height, a taller column centres the map instead. */
+.v2-briefing-conditions { grid-column: 1; grid-row: 2; display: grid; grid-auto-rows: 1fr; gap: 10px; }
+.v2-briefing-conditions > div { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 14px; border: 1px solid var(--v2-line); border-radius: 9px; background: var(--v2-surface2); }
 .v2-briefing-conditions h3 { margin: 0 0 6px; color: var(--v2-text); }
 .v2-briefing-conditions p { margin: 0; line-height: 1.35; }
 .v2-briefing-victory { border-left: 4px solid var(--v2-signal) !important; }
 .v2-briefing-defeat { border-left: 4px solid var(--v2-accent) !important; }
-.v2-briefing-preview { min-width: 0; display: grid; align-content: start; gap: 12px; }
-.v2-briefing-preview .v2-mission-map { width: 100%; }
-.v2-briefing-preview .v2-mission-stats { margin: 0; }
+.v2-briefing-preview { display: contents; }
+.v2-briefing-preview > * { grid-column: 2; min-width: 0; margin: 0; }
+.v2-briefing-preview > h3 { grid-row: 1; align-self: end; }
+.v2-briefing-preview > :nth-child(2) { grid-row: 2; align-self: center; }
+.v2-briefing-preview > .v2-mission-stats { grid-row: 3; }
 .v2-briefing-main + .v2-screen-footer button { min-height: 56px; }
 .v2-legal-text { max-height: min(62dvh, 600px); overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.55 system-ui, sans-serif; color: var(--v2-text); }
 .v2-screen-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
@@ -270,9 +279,10 @@ body.ui-v2-active .v2-fire-ratio { fill: var(--v2-text); text-anchor: middle; do
 @media (max-width: 360px) { .v2-map-tools { grid-template-columns: 48px 48px minmax(0, 1fr); } #v2-zoom-center { grid-column: 1 / -1; } }
 @media (max-width: 850px) { .v2-level-layout { grid-template-columns: minmax(0, 1fr); } .v2-level-list { max-height: min(44dvh, 390px); } }
 @media (min-width: 600px) and (max-height: 500px) { .v2-level-list { max-height: none; overflow: visible; } }
+@media (min-width: 851px) and (min-height: 501px) { .v2-screen-panel:has(.v2-level-layout) { height: min(820px, calc(100dvh - 24px)); overflow: hidden; } .v2-foundation .v2-level-layout { flex: 1 1 auto; } .v2-level-layout > .v2-stepped-list > .v2-level-list { flex: 1 1 auto; max-height: none; } .v2-level-detail { display: flex; flex-direction: column; gap: 10px; align-self: start; min-height: 0; max-height: 100%; overflow: hidden; } .v2-level-detail > * { margin: 0; } .v2-level-detail .v2-mission-map { flex: 0 1 auto; min-height: 120px; } .v2-level-detail .v2-mission-map svg { height: 100%; } }
 @media (max-width: 599px) { .v2-screen-panel:has(.v2-menu-links) { min-height: calc(100dvh - 24px); justify-content: flex-end; padding: 24px; } .v2-screen-panel:has(.v2-menu-links)::after { inset: 0 0 48% 0; mask-image: linear-gradient(180deg, #000, transparent); } .v2-menu-intro h2 { font-size: clamp(31px, 10vw, 48px); } .v2-menu-links { margin-top: 18px; } .v2-menu-links button { min-height: 52px; } .v2-level-choice { min-height: 56px; } .v2-level-detail { padding: 12px; } }
-@media (max-width: 599px) { .v2-briefing-main { grid-template-columns: minmax(0, 1fr); } .v2-briefing-main + .v2-screen-footer .v2-screen-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .v2-briefing-main + .v2-screen-footer button { min-width: 0; } }
-@media (min-width: 600px) and (max-height: 500px) { .v2-screen-panel:has(.v2-briefing-main) { padding: 12px; } .v2-briefing-main { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; } .v2-briefing-preview { overflow: auto; } .v2-briefing-intro { margin-bottom: 4px; font-size: 12px; line-height: 1.2; } .v2-screen-panel:has(.v2-briefing-main) h2 { margin-bottom: 3px; font-size: 22px; } .v2-briefing-conditions { gap: 6px; } .v2-briefing-conditions > div { padding: 7px 9px; } .v2-briefing-conditions h3 { margin-bottom: 3px; font-size: 14px; } .v2-briefing-conditions p { font-size: 12px; line-height: 1.2; } .v2-briefing-preview h3 { margin: 0; font-size: 14px; } }
+@media (max-width: 599px) { .v2-briefing-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-auto-rows: max-content; } .v2-briefing-conditions, .v2-briefing-main .v2-briefing-preview > * { grid-column: auto; grid-row: auto; } .v2-briefing-main + .v2-screen-footer .v2-screen-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .v2-briefing-main + .v2-screen-footer button { min-width: 0; } }
+@media (min-width: 600px) and (max-height: 500px) { .v2-screen-panel:has(.v2-briefing-main) { padding: 12px; } .v2-briefing-main { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 10px; } .v2-briefing-intro { margin-bottom: 4px; font-size: 12px; line-height: 1.2; } .v2-screen-panel:has(.v2-briefing-main) h2 { margin-bottom: 3px; font-size: 22px; } .v2-briefing-conditions { gap: 6px; } .v2-briefing-conditions > div { padding: 7px 9px; } .v2-briefing-conditions h3 { margin-bottom: 3px; font-size: 14px; } .v2-briefing-conditions p { font-size: 12px; line-height: 1.2; } .v2-briefing-preview h3 { margin: 0; font-size: 14px; } }
 @media (min-width: 600px) and (max-height: 500px) {
   .v2-map-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto auto auto; }
   .v2-row { grid-column: 1 / -1; grid-row: 1; }

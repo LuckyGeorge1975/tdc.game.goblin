@@ -38,7 +38,7 @@
     "training-t03"
   ],
   "priorManifestSha256": "6ddf0fdea362b34faa1a842d7b998487acc9f1f8efd4002deeca2a7894fbf92a",
-  "providerSha256": "5f75ceae2b329d3333f2ef10e2cd880595e87e50e0f82c4efa3b6d3656354533",
+  "providerSha256": "55ef978a51401fbdd00dbf151a0a0f5b3e75b123a97efe45264156cd54006b63",
   "sourcePairs": {
     "game.js": {
       "from": "4dc62cb777db44338d67b22aa0b99760a4835ad1968ca35d99002e96f7bd56f9",
@@ -46,15 +46,19 @@
     },
     "index.html": {
       "from": "48890cf553498ac4427316ceceef5ee4b2ce9d0200ea6b5f62e9c1c89ce05201",
-      "to": "9286e82e76f99ad4d29b26aaea6bfdb044f729434591952fb20236a6113ea04c"
+      "to": "c3d347011de7d24a976d807413735db907a5995921b856dde16514a0dce8a486"
+    },
+    "localization.js": {
+      "from": "1fe3facfde42649d8978615d0f6aaae2acbd592889cd201639e460c7f31a348e",
+      "to": "b61b9ed663ff0628dc5dc0fca5b9e0740b03cd700e1f0c945617bb5e93bb4cae"
     },
     "ui-v2-flow.js": {
       "from": "71ce91c0e7d40477467fdfbc4f3a9e6167a039a84f791006f996f3b8c248d9dc",
-      "to": "dd8cb7ef1b4e667c7141c8aa9ea367c2c48d1bf2b6665786c52762a75bdd406a"
+      "to": "1330c2e193af68135fb2c89fc0632a65f038d0c9fe5498501e7eb8f7f5d8ff99"
     },
     "ui-v2.css": {
       "from": "2ec9431d42adc6543263e49e7efb7d1fb44716310b8390c0987a1f684ec0ff1a",
-      "to": "f9fddd4dd8ddf3d025d24ee7d7abf9b059af83ccbccf8b854eb4f9d11901663e"
+      "to": "ab69afb49a7acf31613fe37cc35c753bdd64b1e701d5ef18de7e8dc61aa9d6c1"
     },
     "tests/helpers/release-package-source-compatibility.mjs": {
       "from": "8c2e94fb0a5b22ed71808a3d562446c396e1417f3c657cc19a500d6e802f8dc6",

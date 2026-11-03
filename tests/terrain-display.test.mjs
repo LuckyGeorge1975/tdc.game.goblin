@@ -118,7 +118,7 @@ test('missing translation and icon cannot expose a raw key or remove the type la
   assert.equal(name.textContent, 'RIVER');
 });
 
-test('actual mission preview uses each canonical type and small icon, with a matching caption', () => {
+test('actual mission preview uses each canonical type and small icon, without a terrain legend', () => {
   const {display, context} = setup();
   const source = readFileSync(new URL('ui-v2-flow.js', root), 'utf8');
   const match = source.match(/    function missionPreview\(data\) \{[\s\S]*?\n    \}\n    function missionStats/);
@@ -132,18 +132,13 @@ test('actual mission preview uses each canonical type and small icon, with a mat
   const ids = Object.keys(manifest.types);
   const figure = context.preview({width:12,height:1,defaultTerrain:'open-ground',
     terrain:ids.map((type,x)=>({x,y:0,type})),units:[]});
-  const [svg, caption] = figure.children;
+  const [svg] = figure.children;
+  assert.equal(figure.children.length, 1);
   const polygons = svg.children.filter(node=>node.tag==='polygon');
   const images = svg.children.filter(node=>node.tag==='image');
   assert.deepEqual(polygons.map(node=>node.getAttribute('data-terrain-id')), ids);
   assert.deepEqual(images.map(node=>node.getAttribute('href')),
     ids.map(id=>`assets/terrain-icons/${id}.webp`));
   assert.equal(images.every(node=>node.getAttribute('width')==='36' && node.getAttribute('height')==='42'), true);
-  assert.equal(caption.children[1].children.length, 12);
   assert.equal(svg.children.some(node=>node.getAttribute('href')?.includes('map-bakes')), false);
-  context.missionId = 'iron-dust-v2';
-  const core = context.preview({width:2,height:1,defaultTerrain:'open-ground',
-    terrain:[{x:1,y:0,type:'rubble-field'}],units:[]});
-  assert.deepEqual(core.children[1].children[1].children.map(item=>item.children[1].textContent),
-    ['de:open-ground','de:rubble-field']);
 });

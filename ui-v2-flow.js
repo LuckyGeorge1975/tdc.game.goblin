@@ -116,14 +116,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       svg.setAttribute('role', 'img');
       svg.setAttribute('aria-label', t('v2.ui.previewMap'));
       const terrain = new Map(data.terrain.map(cell => [`${cell.x},${cell.y}`, cell.type]));
-      const shown = new Set();
       const tiled = globalThis.TerrainTiles?.drawBoard(svg, (x, y) => terrain.get(`${x},${y}`) || data.defaultTerrain,
         data.width, data.height, (x, y) => ({x: 23 + x * 36 + (y % 2 ? 18 : 0), y: 20 + y * 30}), 36) ?? new Set();
       for (let y = 0; y < data.height; y++) for (let x = 0; x < data.width; x++) {
         const cx = 23 + x * 36 + (y % 2 ? 18 : 0), cy = 20 + y * 30;
         const type = terrain.get(`${x},${y}`) || data.defaultTerrain;
         const illustrated = tiled.has(`${x},${y}`);
-        shown.add(type);
         const polygon = document.createElementNS(svg.namespaceURI, 'polygon');
         polygon.setAttribute('points', Array.from({length: 6}, (_, i) => {
           const angle = Math.PI / 3 * i + Math.PI / 6;
@@ -162,11 +160,35 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           image.setAttribute('href', artwork);
         }
       }
-      const caption = document.createElement('figcaption');
-      caption.className = 'v2-preview-legend';
-      TerrainDisplay.fillLegend(caption, shown, missionId === 'iron-dust-v2', true);
-      figure.append(svg, caption);
+      figure.append(svg);
       return figure;
+    }
+    // Lists scroll without system scrollbars; step buttons above and below page through the items.
+    function steppedList(list) {
+      // Start as overflowing so a restored scroll position is not clamped before the first measurement.
+      const frame = document.createElement('div'); frame.className = 'v2-stepped-list v2-overflowing';
+      const step = direction => {
+        const node = button('', () => list.scrollBy({
+          top: direction * Math.max(list.clientHeight - 72, 48), behavior: 'smooth'
+        }), 'v2-list-step');
+        // Disabled until measured, out of tab order and never focused by a click: focus restore skips them.
+        node.tabIndex = -1; node.disabled = true;
+        node.onpointerdown = event => event.preventDefault();
+        node.setAttribute('aria-label', t(direction < 0 ? 'v2.ui.list.up' : 'v2.ui.list.down'));
+        node.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${direction < 0 ? 'M5 15l7-7 7 7' : 'M5 9l7 7 7-7'}"/></svg>`;
+        return node;
+      };
+      const up = step(-1), down = step(1);
+      const sync = () => {
+        const overflowing = list.scrollHeight > list.clientHeight + 1;
+        frame.classList.toggle('v2-overflowing', overflowing);
+        up.disabled = !overflowing || list.scrollTop <= 1;
+        down.disabled = !overflowing || list.scrollTop + list.clientHeight >= list.scrollHeight - 1;
+      };
+      list.addEventListener('scroll', sync, {passive: true});
+      new ResizeObserver(sync).observe(list);
+      frame.append(up, list, down);
+      return frame;
     }
     function missionStats(data) {
       if (!data) return document.createElement('div');
@@ -427,7 +449,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function renderScreen(focus = true) {
       if (screen === 'play') return;
       const lastFocus = focus ? null : document.activeElement?.id;
-      const lastIndex = focus ? -1 : [...surface.querySelectorAll('button, select, input')].indexOf(document.activeElement);
+      const lastIndex = focus ? -1 : [...surface.querySelectorAll('button:not(.v2-list-step), select, input')].indexOf(document.activeElement);
       const currentPanel = surface.querySelector('.v2-screen-panel');
       if (!focus && currentPanel?.dataset.screen === screen) scrollMemory.set(screen, {
         panel: currentPanel.scrollTop,
@@ -487,7 +509,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         detail.append(detailTitle, missionPreview(data),
           paragraph(t(missionId === 'iron-dust-v2' ? 'v2.objective' : `mission.${missionId}.objective.short`)),
           missionStats(data));
-        layout.append(list, detail);
+        layout.append(steppedList(list), detail);
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), () => show('menu')); back.id = 'v2-levels-back';
         const select = button(t('ui.levels.select'), () => show('briefing'), 'primary');
