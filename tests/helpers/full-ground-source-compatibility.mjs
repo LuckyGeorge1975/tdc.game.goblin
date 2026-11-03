@@ -1,6 +1,6 @@
 // Render-only FULL OpenGround provenance, exact accepted Build27 package basis.
 import fs from 'node:fs';import assert from 'node:assert/strict';import{createHash}from 'node:crypto';
-const paths=['game.js','index.html','localization.js','ui-v2-flow.js','ui-v2.css','tests/helpers/release-package-source-compatibility.mjs'];
+const paths=['game.js','index.html','localization.js','ui-v2-flow.js','ui-v2.css','ui-v2.js','tests/helpers/release-package-source-compatibility.mjs'];
 const added=['tests/full-ground-render.test.mjs'];
 const m=JSON.parse(fs.readFileSync(new URL('../fixtures/full-ground-source-compatibility.v1.json',import.meta.url))),prior=JSON.parse(fs.readFileSync(new URL('../fixtures/release-package-source-compatibility.v1.json',import.meta.url)));
 const hash=b=>createHash('sha256').update(b).digest('hex'),source=p=>fs.readFileSync(new URL('../../'+p,import.meta.url),'utf8').replaceAll('\r\n','\n');
