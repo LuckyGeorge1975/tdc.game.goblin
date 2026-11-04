@@ -91,6 +91,8 @@ node scripts/verify-release.mjs
 node --test tests/*.test.mjs
 ```
 
+Für die tägliche Arbeit ist die Suite geteilt: `node scripts/run-tests.mjs` führt die schnelle Suite aus (rund eine Minute), `--slow` die aufgezeichneten Produkt-Replays mit Quellprovenienz, `--all` beides wie der Release-Workflow. Testlevel ist `catalog-full-atlas` mit allen 26 Katalogeinheiten und allen zwölf Geländetypen; nur seine Routen werden im Full-Profil vollständig nachgespielt.
+
 Die Tests decken unter anderem Szenariostatus, zwölf Terrainregeln, Wasserpassage, Deckungsbonus, Sichtlinie, Kampf, Transport, Undo und die Einheitenbibliothek ab.
 
 ## Versionierung und Tester-Übergabe
