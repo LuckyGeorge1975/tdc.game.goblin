@@ -59,10 +59,29 @@
         "index.html"
       ]
     },
+    "goblin-1md1.2": {
+      "title": "UR-D2 event log behind a command bar button next to back",
+      "sources": [
+        "ui-v2.js",
+        "ui-v2.css",
+        "ui-v2-flow.js",
+        "localization.js",
+        "index.html"
+      ]
+    },
     "provenance": {
       "title": "ground link resolves through this link",
       "sources": [
         "tests/helpers/full-ground-source-compatibility.mjs"
+      ]
+    },
+    "goblin-lg7w": {
+      "title": "UR-G compact action menu above the selected unit: icon slots greyed without action, label chip, weapon row",
+      "sources": [
+        "ui-v2.js",
+        "ui-v2.css",
+        "localization.js",
+        "index.html"
       ]
     }
   },
@@ -108,23 +127,23 @@
     },
     "index.html": {
       "from": "42d3903e000dc5da942a40f68c6761cecc02f09434ed93ccb46dce391c9f8d5f",
-      "to": "73ba162f8994dda24a0b09588b8a691fa9a64583f933fb3b0ef1fdd840af9ed8"
+      "to": "5be8db45549a1ab97b39c5aff98ae532000ba733188da11a02cc83655fe72caf"
     },
     "localization.js": {
       "from": "1fe3facfde42649d8978615d0f6aaae2acbd592889cd201639e460c7f31a348e",
-      "to": "4ec656cf711ff05124c4af25e1d414251c691ec9ff752e683f445ef23d581e6b"
+      "to": "92115be9eabbfb9c59e2ccd98f498c6a885161a1a97e573aad1d68f6384a19ab"
     },
     "ui-v2-flow.js": {
       "from": "71ce91c0e7d40477467fdfbc4f3a9e6167a039a84f791006f996f3b8c248d9dc",
-      "to": "5c6c63d189df3c2d7d0ff29fd7566753861e79ba04779b285f9db459f92750b8"
+      "to": "9bcaf09d60ee14df6c25d96a44ecf063efe14231691b805d72605c570bd9bb92"
     },
     "ui-v2.css": {
       "from": "2ec9431d42adc6543263e49e7efb7d1fb44716310b8390c0987a1f684ec0ff1a",
-      "to": "a199ac6c7a130155f24c55b11e45e9e45b22a62db1ecbd3103fdf9bc0ce510e9"
+      "to": "97cfa4477e094bea437c28c3eff57d626e762ecf0277a65eb44d470e6e8d65d1"
     },
     "ui-v2.js": {
       "from": "d02ef59c87dad4368e66d8fec97d73b7f7ec4afd90fc6272af1902836519d22b",
-      "to": "93edd53962452fe09448a014210325e6a459c5c51d164e61a8a25579dc517e45"
+      "to": "4011a6d3884fcd92e739135b0ef2afa1369d24e975defa394061e5f6cb3391fc"
     },
     "tests/helpers/full-ground-source-compatibility.mjs": {
       "from": "54165b4324e4903bf9efe62c82b37084e1307ed41433b5b450213e2d50606501",

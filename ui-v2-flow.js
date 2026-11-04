@@ -644,14 +644,25 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           paragraph(t('ui.hud.turn', { turn: state.turn })),
           actions(button(t('screen.missionEnd.action.retry'), confirmRestart, 'primary'),
             button(t('screen.missionEnd.action.chooseMission'), goToLevels),
-            button(t('screen.missionEnd.action.log'), () => show('log'))));
+            button(t('screen.missionEnd.action.log'), () => openSection('log'))));
         }
       } else if (screen === 'log') {
-        panel.append(heading(t('screen.missionEnd.action.log')));
+        panel.append(heading(t(state.gameOver ? 'screen.missionEnd.action.log' : 'ui.details.log')));
         const entries = document.createElement('div'); entries.className = 'v2-screen-log';
-        (state.scenario === 'iron-dust-v2' ? state.log : globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.logEntries(true).map(e=>e.message): [...document.querySelectorAll('#combat-log .log-line')].map(line => line.textContent.trim()))
-          .forEach(line => entries.append(paragraph(line)));
-        panel.append(entries, actions(button(t('ui.nav.back'), () => show('end'))));
+        // Newest entry first in every runtime; reachable during play from the command bar and after the mission.
+        (state.scenario === 'iron-dust-v2' ? state.log.toReversed().map(message => ({message})) : globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.logEntries(true):
+          [...document.querySelectorAll('#combat-log .log-line')].map(line => ({time: line.querySelector('.log-time')?.textContent.trim() || '',
+            message: [line.querySelector('strong')?.textContent.trim(), line.dataset.phaseSkipKey ? t(line.dataset.phaseSkipKey) :
+              [...line.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join('').trim()].filter(Boolean).join(' ')})))
+          .forEach(entry => {
+            const line = paragraph('', 'v2-log-entry');
+            if (entry.time) { const time = document.createElement('time'); time.className = 'v2-log-time'; time.textContent = entry.time; line.append(time); }
+            line.append(Object.assign(document.createElement('span'), {className: 'v2-log-message', textContent: entry.message}));
+            entries.append(line);
+          });
+        if (!entries.childElementCount) entries.append(paragraph(t('v2.log.empty'), 'v2-screen-log-empty'));
+        const back = button(t('ui.nav.back'), goBack); back.id = 'v2-log-back';
+        panel.append(entries, actions(back));
       } else if (screen === 'catalog') {
         const header = document.createElement('header'); header.className = 'v2-screen-header';
         header.append(heading(GoblinLanguage.translate('UNIT GUIDE')),
@@ -790,6 +801,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     document.querySelector('#v2-pause').onclick = enterPause;
     document.querySelector('#v2-settings').onclick = () => { if (!GameDialogs.isOpen()) openSection('options'); };
     document.querySelector('#v2-home').onclick = () => leaveMission('menu');
+    document.querySelector('#v2-log-open').onclick = () => { if (!GameDialogs.isOpen()) openSection('log'); };
     globalThis.addEventListener('goblin-view-settings-change',()=>{
       for(const key of ['grid','targets','damage']){
         const input=surface.querySelector(`#v2-${key}`);
@@ -825,7 +837,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         else if (screen === 'catalog-detail') returnToLibrary();
         else if (screen === 'levels') show('menu');
         else if (screen === 'pause') { show('play'); releasePause(); }
-        else if (screen === 'log') show('end');
+        else if (screen === 'log') goBack();
         event.preventDefault(); event.stopImmediatePropagation();
       }
     }, true);

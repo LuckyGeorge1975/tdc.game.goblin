@@ -84,19 +84,3 @@ test('nonfire, hidden panels, and already readable manual zoom do not alter the 
   hidden.size.width=323; hidden.size.height=205;
   assert.equal(hidden.enter(fire).target,50);
 });
-
-test('the fire dialog fit button uses the shared fit handler and restores keyboard focus', () => {
-  const start=source.indexOf("      if (state.turnPhase === 'fire') {\n        const fit = document.createElement('button');");
-  const end=source.indexOf('      const cancel = document.createElement',start);
-  assert.ok(start>0 && end>start);
-  const buttons=[]; let fitted=0,focused=0;
-  const context={state:fire,document:{createElement:()=>({})},
-    t:()=> 'Fit',fitMap:()=>fitted++,at:()=>({focus:()=>focused++}),
-    footer:{append:button=>buttons.push(button)}};
-  runInNewContext(source.slice(start,end),context);
-  assert.equal(buttons.length,1);
-  assert.equal(buttons[0].textContent,'Fit');
-  buttons[0].onclick();
-  assert.equal(fitted,1);
-  assert.equal(focused,1);
-});
