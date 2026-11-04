@@ -2,7 +2,7 @@
   "sourceSha256": "4b08f7f861494d77044a1cf4ba28fd58fa56268ed1e171f9c6ab7deb9f8f9a13",
   "locales": {
     "de": {
-      "sha256": "bf9b50ee706154e7998583fdddaabbea6b51b47274af028fa7f97f8764131f6a",
+      "sha256": "ea5e2ca3b6b435a0691f0b342862c30a36e4ec10fc7cc672d5f74a8b7fff4c20",
       "placeholders": {
         "training.label": [],
         "training.learningGoal": [],
@@ -98,7 +98,7 @@
       }
     },
     "en": {
-      "sha256": "09e77cd12fbdd4e5c78a38866189923e4b12c44c7a86aabce77400681d6447ec",
+      "sha256": "a3d6b0f518b4fe12ad4c75dccc8b30b8c0e0664bd7b4a29394f5d6723ba905b2",
       "placeholders": {
         "training.label": [],
         "training.learningGoal": [],
@@ -194,7 +194,7 @@
       }
     },
     "es": {
-      "sha256": "1c3df923fd2036626d749754475f689779ecdf91822fc202fc68af09e32a68d6",
+      "sha256": "5e92c04dafefb1122d1d835849962159e194e3ddaaaf70add5075b5270ce9196",
       "placeholders": {
         "training.label": [],
         "training.learningGoal": [],
@@ -290,7 +290,7 @@
       }
     },
     "fr": {
-      "sha256": "c17ae37f81bd61e7d10334cf45eef0afc07aa1a3bdf8dffbf61a19ff055aefdf",
+      "sha256": "e2ddc7cef4b0b818acea205daeac21235b7ff627e541b56d155050a653e1e806",
       "placeholders": {
         "training.label": [],
         "training.learningGoal": [],

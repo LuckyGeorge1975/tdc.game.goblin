@@ -2,6 +2,14 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden im jeweiligen Release-Issue nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.28] - 2026-11-04
+
+- **Field-Test-Build nach dem User Report vom 02.11.2026** (Epic `goblin-1md1`), vom Nutzer am 04.11.2026 zur Veröffentlichung auf GitHub Pages beauftragt; Feintest und Bericht folgen auf diesem Build. Rückfallpunkt ist `v0.1.27` auf `9985e09513eb6ad5e1865f34b3d615f6d0e6aeb4`.
+- Spieloberfläche: aktuelles v4-Terrainset auf Karte und Missionsvorschau; Missionsauswahl und Briefing mit Schrittknöpfen statt Systemscrollleisten; kompakte Kopfzeile mit Pause, Einstellungen und Hauptmenü; Kartenwerkzeuge als Overlay; Einheitenliste mit Bereitschaft; schaltbare Feldinfo (Einheit/Feld) mit Werten als Balken; Gelände in der Bibliothek; Zurück und Nächste Einheit um den zweizeiligen Phasenknopf; Reichweiten als gefüllte Fläche mit Außenkontur und einstellbarer Deckkraft; Ereignisliste per Button neben Zurück.
+- Aktionsablauf: Einheit antippen öffnet das Aktionsmenü über der Einheit (ausgegraut ohne mögliche Aktion), die gewählte Aktion steht als Chip in der Befehlsleiste, ein Ziel öffnet eine Zielkarte mit Schritten bzw. Kampfquote, Treffer- und Zerstörungschance; erst „Ausführen“ führt aus, ein anderer Klick bricht ab. Die Lektionen T01–T03 beschreiben diesen Ablauf.
+- Corepfad IronDust v2: Legacy-Pixel-Sichtlinie und generisches Mehrwaffenfeuer. Legacy-/FULL-Regeln, Missionen und Trainingswerte bleiben unverändert.
+- Tests: schnelle Suite (`node scripts/run-tests.mjs`, etwa eine Minute) und Replay-Suite (`--slow`); Testlevel `catalog-full-atlas` mit allen 26 Einheiten und zwölf Geländetypen. Aufgezeichnete Partien sind nur noch an Regel-/Runtimequellen gebunden (`tests/helpers/replay-source-binding.mjs`); die frühere Kette von Quellkompatibilitätsnachweisen entfällt. Gesamtsuite 749/749.
+
 ## [0.1.27] - 2026-10-30
 
 - Lokales Releasepaket auf der unabhängig abgenommenen Runtime `df1ba35d935971f7cc28835ae7d8d32f3d65178a`. Version/Build und Paketdatum sind gesetzt; neues Tag, öffentlicher Deploy und finale Releaseabnahme stehen aus. Öffentlich bestätigter Rückfallpunkt bleibt `v0.1.26` auf `195c2bc5a0c8dd97d6263430114d183cfd2aa082`. Der Desktoprelease ist vom Nutzer bereits bedingt beauftragt.

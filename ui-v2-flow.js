@@ -15,7 +15,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if(!v)return;const p=v.progress,step=v.definition.steps.find(s=>s.id===p.stepId),params=Object.fromEntries(Object.entries(step.paramRefs).map(([key,ref])=>[key,v.params[ref]??'']));
       if(v.definition.mode==='advisory'&&(!step.messageKey||p.status==='abandoned'))trainingPanel.hidden=true;
       if(trainingPanel.hidden)return;
-      const projection=GoblinUIV2.project(),controls={back:'#v2-undo',phase:'#v2-phase-action',cancel:'#v2-command-cancel',confirm:'#v2-actions button',exit:'#v2-pause'};
+      const projection=GoblinUIV2.project(),controls={back:'#v2-undo',phase:'#v2-phase-action',cancel:'#v2-target-cancel',confirm:'#v2-action-execute',exit:'#v2-pause'};
       for(const ref of step.highlightRefs){
         if(ref.kind==='control'){document.querySelector(controls[ref.ref])?.classList.add('training-highlight');continue}
         const cells=ref.kind==='region'?v.regions[ref.ref]:projection.units.filter(u=>u.id===v.definition.actorTags[ref.ref]);

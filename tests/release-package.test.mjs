@@ -2,8 +2,8 @@ import test from 'node:test';import assert from 'node:assert/strict';import fs f
 const file=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8'),hash=b=>createHash('sha256').update(b).digest('hex');
 test('release metadata, fallback, notices, dated supplement and current handoff have concrete consistent values',()=>{
  const context=vm.createContext({});vm.runInContext(file('release.js'),context);const r=context.GOBLIN_RELEASE;
- assert.deepEqual(JSON.parse(JSON.stringify(r)),{version:'0.1.27',build:27,releasedAt:'2026-10-30',tag:'v0.1.27',status:'release-candidate'});
- const index=file('index.html');assert.match(index,/id="build-version" class="build">FIELD TEST 0\.1\.27</);assert.match(index,/release\.js\?v=27/);
+ assert.deepEqual(JSON.parse(JSON.stringify(r)),{version:'0.1.28',build:28,releasedAt:'2026-11-04',tag:'v0.1.28',status:'release-candidate'});
+ const index=file('index.html');assert.match(index,/id="build-version" class="build">FIELD TEST 0\.1\.28</);assert.match(index,/release\.js\?v=28/);
  assert.match(file('docs/CONTENT-NOTICES.md'),/\*\*Document version:\*\* 20/);assert.match(file('reports/REPORTS.md'),/CONTENT-CLEARANCE-DESKTOP-0\.1\.27-2026-10-30\.md/);
  for(const p of ['README.md','CHANGELOG.md','reports/TEST_HANDOFF.md','docs/CONTENT-NOTICES.md','reports/CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md'])assert.doesNotMatch(file(p),/\[(?:RELEASEVERSION|PAKETDATUM|RUNTIME-SHA|PAKET-SHA|ZUSATZ-DATEI)\]/);
  assert.match(file('reports/TEST_HANDOFF.md'),/df1ba35d935971f7cc28835ae7d8d32f3d65178a/);assert.match(file('README.md'),/historisch, aus Build 26/);

@@ -682,7 +682,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       execute.onclick = () => runCommand(state, entry);
       const back = el('button', 'v2-icon-button v2-action-cancel'); back.type = 'button'; back.id = 'v2-target-cancel';
       back.innerHTML = svgIcon('close'); back.title = t('v2.target.other'); back.setAttribute('aria-label', back.title);
-      back.onclick = () => { view.target = null; render(); };
+      // Dropping the target also cancels the pending order for the tutorial.
+      back.onclick = () => { globalThis.GoblinTrainingRuntime?.cancel(); view.target = null; render(); };
       actions.append(execute, back);
       card.append(actions);
       const placed = state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn);

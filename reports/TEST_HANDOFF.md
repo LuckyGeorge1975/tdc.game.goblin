@@ -2,6 +2,21 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## Build 0.1.28 · Field-Test nach User Report 02.11.
+
+| Feld | Stand am 04.11.2026 |
+|---|---|
+| Version | `0.1.28` |
+| Build | `28` |
+| Status | `release-candidate`; vom Nutzer am 04.11.2026 zur Veröffentlichung auf GitHub Pages beauftragt, Feintest und Bericht folgen auf dem veröffentlichten Build |
+| Tag / Rückfall | Tag `v0.1.28` auf dem Releasecommit; Rückfallpunkt `v0.1.27` auf `9985e09513eb6ad5e1865f34b3d615f6d0e6aeb4` |
+| Inhalt | User Report 02.11. (`goblin-1md1`): UR-A Terrainset, UR-B/C Missionsauswahl und Briefing, UR-D Spiel-Layout mit Feldinfo, UR-D2 Ereignisliste per Button, UR-E Zurück/Nächste Einheit, UR-F Reichweiten, UR-G/G2 Aktionsmenü mit Zielkarte und Trefferchance; Lektionstexte an den neuen Ablauf angepasst |
+| Regeln | Legacy-/FULL-Regeln, Missionen, Trainingswerte und Aufnahmen unverändert; Corepfad IronDust v2 mit Legacy-Pixel-Sichtlinie und generischem Mehrwaffenfeuer (seit `c488fd0`) |
+| Automatische Prüfung | Gesamtsuite 749/749 (`node scripts/run-tests.mjs --all`, etwa vier Minuten), davon 20 Replays aller aufgezeichneten Partien; Testlevel `catalog-full-atlas` |
+| Browser-QA (lokal, Koordination) | Aktionsablauf 134/134, Spiel-Layout 184/184, Zurück/Nächste 65/65, Reichweiten 17/17, Terrain 52/52, Missionsauswahl/Briefing 293/293; Viewports 1440×900, 1280×800, 390×844, 844×390; T01-Vorschau/Abbruch im Browser durchlaufen |
+| Bekannte Grenzen | Quote je Waffe in der Waffenzeile (Soll-Variante C) fehlt, die Quote steht in der Zielkarte. Restliche Missionsvorschauen werden noch nicht vorgebacken (`goblin-1md1.1`). Hochformat zeigt die Feldinfo vollständig statt kompakt. Keine Geräte-, Leistungs- oder Legalfreigabe aus dieser Übergabe. |
+| Testschwerpunkte für den Bericht | Aktionsablauf auf Desktop und Touch (Menü über der Einheit, Chip in der Befehlsleiste, Zielkarte, Abbruch durch anderen Klick), Trefferchance gegen tatsächliche Ergebnisse, Feldinfo-Bereiche, Ereignisliste, Zurück/Nächste Einheit, Reichweitendeckkraft in den Optionen, Lektionen T01–T03 mit den neuen Texten |
+
 ## Build 0.1.27 · erstes lokales Releasepaket
 
 ### Finaler Bild- und Dokumentnachlauf
