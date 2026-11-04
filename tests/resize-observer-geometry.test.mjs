@@ -1,5 +1,4 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
-import{createHash}from 'node:crypto';import{resizeBasisHash,resizeBasisSources}from './helpers/resize-observer-source-compatibility.mjs';
 const ui=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
 const source=ui.slice(ui.indexOf('    function applyMapSize() {'),ui.indexOf('    let compactDetails = null;'));
 function scene(width=323,height=205,zoom=1){
@@ -24,12 +23,4 @@ test('actual map sizing remains synchronous for explicit zoom, handles scrollbar
  const saved={...g.values};g.size.width=0;g.size.height=0;g.notify();g.flush();assert.deepEqual(g.values,saved);
  g.size.width=500;g.size.height=300;g.notify();g.size.width=600;g.flush();assert.notDeepEqual(g.values,saved);
  const serialization=scene(300,500,1);serialization.direct();serialization.values.height=String(parseFloat(serialization.values.height)+0.001)+'px';const before=serialization.writes.length;serialization.direct();assert.equal(serialization.writes.length,before);
-});
-test('resize provenance rejects foreign references and every forged observer/cache/provider fingerprint',()=>{
- const m=JSON.parse(fs.readFileSync(new URL('./fixtures/resize-observer-source-compatibility.v1.json',import.meta.url))),hash=b=>createHash('sha256').update(b).digest('hex');
- const current=Object.fromEntries(Object.keys(m.sourcePairs).map(path=>[path,hash(fs.readFileSync(new URL('../'+path,import.meta.url),'utf8').replaceAll('\r\n','\n'))])),expected=Object.fromEntries(Object.entries(m.sourcePairs).map(([path,pair])=>[path,pair.from]));
- assert.deepEqual(resizeBasisSources(current,'training-t01'),expected);assert.throws(()=>resizeBasisSources(current,'foreign'));
- for(const path of Object.keys(current))assert.throws(()=>resizeBasisSources({...current,[path]:'forged'},'training-t01'));
- const incomplete={...current};delete incomplete['ui-v2.js'];assert.throws(()=>assert.deepEqual(resizeBasisSources(incomplete,'training-t01'),expected));
- assert.throws(()=>resizeBasisHash('tests/helpers/training-ui-fix-source-compatibility.mjs','forged','training-t01'));
 });

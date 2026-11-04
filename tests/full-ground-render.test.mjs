@@ -1,5 +1,5 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import{createHash}from 'node:crypto';
-import{fullScene,fullShell}from './catalog-full-harness.mjs';import{trainingScene}from './training-product-harness.mjs';import{groundBasisHash,groundBasisSources}from './helpers/full-ground-source-compatibility.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+import{fullScene,fullShell}from './catalog-full-harness.mjs';import{trainingScene}from './training-product-harness.mjs';
 const ids=['atlas','terrain-course','advance','siege','specialists'].map(s=>'catalog-full-'+s),profiles=['FULL_CATALOG_v1','CATALOG_FULL_CANDIDATE_v1'];
 const facts=g=>({world:g.state(),rng:g.rng(),history:g.run('JSON.stringify(phaseCommands)')});
 function observe(g){g.run("globalThis.rendered=[];svg.appendChild=n=>rendered.push(n);document.createElementNS=()=>({attrs:{},setAttribute(k,v){this.attrs[k]=v},classList:{add(){}}})")}
@@ -13,8 +13,4 @@ test('FULL rendering fails closed for absent uninitialized foreign or mismatched
 });
 test('historical Atlas Training3 and ordinary Legacy exceptions are retained',async()=>{
  for(const id of ['training-t01','training-t02','training-t03']){const g=await trainingScene(id);observe(g);assert.equal(g.run('drawTerrainArtwork(0,0)'),true);for(const probe of ['iron-dust','relay-run','unit-trial',...ids,'training-t04']){g.context.probe=probe;assert.equal(g.run('(()=>{const old=currentScenario;try{currentScenario=probe;return drawTerrainArtwork(0,0)}finally{currentScenario=old}})()'),false)}assert.equal(g.run("(()=>{currentScenario='atlas-proving-grounds';return drawTerrainArtwork(0,0)})()"),true)}
-});
-test('exact render provenance rejects forged sources and foreign references',()=>{
- const m=JSON.parse(fs.readFileSync(new URL('./fixtures/full-ground-source-compatibility.v1.json',import.meta.url))),hash=p=>createHash('sha256').update(fs.readFileSync(new URL('../'+p,import.meta.url),'utf8').replaceAll('\r\n','\n')).digest('hex'),current=Object.fromEntries(Object.keys(m.sourcePairs).map(p=>[p,hash(p)]));
- assert.deepEqual(groundBasisSources(current,'training-t01'),Object.fromEntries(Object.entries(m.sourcePairs).map(([p,v])=>[p,v.from])));assert.throws(()=>groundBasisSources(current,'foreign'));for(const p of Object.keys(current))assert.throws(()=>groundBasisHash(p,'forged','training-t01'));
 });

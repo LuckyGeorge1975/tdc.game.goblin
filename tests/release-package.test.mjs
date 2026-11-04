@@ -1,12 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';import{createHash}from 'node:crypto';
-import{packageBasisHash,packageBasisSources}from './helpers/release-package-source-compatibility.mjs';
 const file=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8'),hash=b=>createHash('sha256').update(b).digest('hex');
-test('Build27 package binds the accepted df1 runtime and rejects foreign/index/checker fingerprints',()=>{
- const m=JSON.parse(file('tests/fixtures/release-package-source-compatibility.v1.json')),current=Object.fromEntries(Object.keys(m.sourcePairs).map(p=>[p,hash(file(p).replaceAll('\r\n','\n'))])),expected=Object.fromEntries(Object.entries(m.sourcePairs).map(([p,v])=>[p,v.from]));
- assert.equal(m.baseCommit,'df1ba35d935971f7cc28835ae7d8d32f3d65178a');assert.deepEqual(packageBasisSources(current,'training-t01'),expected);assert.throws(()=>packageBasisSources(current,'foreign'));
- for(const p of Object.keys(current))assert.throws(()=>packageBasisSources({...current,[p]:'forged'},'training-t01'));
- const incomplete={...current};delete incomplete['index.html'];assert.throws(()=>assert.deepEqual(packageBasisSources(incomplete,'training-t01'),expected));assert.throws(()=>packageBasisHash('tests/helpers/resize-observer-source-compatibility.mjs','forged','training-t01'));
-});
 test('release metadata, fallback, notices, dated supplement and current handoff have concrete consistent values',()=>{
  const context=vm.createContext({});vm.runInContext(file('release.js'),context);const r=context.GOBLIN_RELEASE;
  assert.deepEqual(JSON.parse(JSON.stringify(r)),{version:'0.1.27',build:27,releasedAt:'2026-10-30',tag:'v0.1.27',status:'release-candidate'});

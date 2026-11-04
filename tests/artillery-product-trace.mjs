@@ -1,17 +1,12 @@
-import {displayBasisSources} from './helpers/catalog-display-source-compatibility.mjs';
+import {bindReplaySources,gameplaySourceHashes} from './helpers/replay-source-binding.mjs';
 // Executable internal product evidence, not a browser save/import format or the old Core probe.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {artilleryScene,queryBridge,read} from './artillery-product-harness.mjs';
 export const digest=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
-const sourceFiles=['tests/helpers/catalog-display-source-compatibility.mjs','unit-life.js','ogre-systems.js','catalog-specialists-fire.js','catalog-specialists-model.js','catalog-specialists-runtime.js','catalog-specialists-ui.js','game.js','terrain-rules.js','legacy-supercover.js','scenario-profile-manifest.js',
-  'artillery-spotter-rules.js','artillery-pilot-runtime.js','assets/unit-art/rules/artillery-pilot.v1.js',
-  'assets/unit-art/levels/artillery-pilot.v1.json','assets/unit-art/rules/unit-profiles.v1.json','legacy-presentation.js','presentation-state.js',
-  'command-history.js','combat-feedback.js','ogre-runtime.js','siegebreaker-weapons.js','strategic-missile.js',
-  'siege-pilot-runtime.js','ui-v2.js','unit-visuals.js','tests/artillery-product-harness.mjs','catalog-base-model.js','catalog-base-runtime.js','assets/unit-art/rules/unit-profiles.catalog-approved.v1.json'];
-export const sources=()=>Object.fromEntries(sourceFiles.map(path=>[path,createHash('sha256')
-  .update(fs.readFileSync(new URL('../'+path,import.meta.url),'utf8').replaceAll('\r\n','\n')).digest('hex')]));
+// New recordings bind the gameplay sources; recorded traces keep their original header (see replay-source-binding).
+export const sources=()=>gameplaySourceHashes();
 const state=g=>read(g,`({units,terrain:[...terrain],terrainTypes:[...terrainTypes],turn,phase,turnPhase,gameOver,
   selectedId:selected?.id??null,focusedCell,phaseRolls,phaseRollCursor,
   history:phaseCommands.map(({log,...snapshot})=>snapshot)})`);
@@ -72,18 +67,12 @@ export async function recordArtilleryProductTrace(seed,commands){
     publicSaveFormat:false,header,initial,commands,steps};
   return {...value,traceDigest:digest(value)};
 }
-export async function replayArtilleryProductTrace(trace,compatibility=null){
+export async function replayArtilleryProductTrace(trace){
   assert.equal(trace?.traceVersion,'artillery-product-trace-v1');
   assert.equal(trace.publicSaveFormat,false);
   assert.equal(trace.header?.scenarioId,'artillery-pilot');
   assert.equal(trace.header?.ruleProfileId,'CATALOG_ARTILLERY_PILOT_v1');
-  if(compatibility){
-    assert.ok(['artillery-source-compatibility-catalog-base-v1','artillery-source-compatibility-catalog-specialists-v1'].includes(compatibility.version));
-    assert.ok(compatibility.originalTraceDigests.includes(trace.traceDigest),'unlisted frozen oracle');
-    const current=displayBasisSources(sources(),trace.traceDigest),paths=[...new Set([...Object.keys(trace.header.sources),...Object.keys(current)])].sort();
-    assert.deepEqual(Object.keys(compatibility.sourcePairs).sort(),paths,'incomplete source compatibility boundary');
-    for(const path of paths)assert.deepEqual(compatibility.sourcePairs[path],{from:trace.header.sources[path]??null,to:current[path]??null},'unauthorized source drift: '+path);
-  }else assert.deepEqual(trace.header.sources,sources(),'different product source boundary');
+  bindReplaySources(trace.header.sources,trace.traceDigest);
   const {traceDigest,...value}=trace;assert.equal(digest(value),traceDigest,'tampered trace envelope');
   const initialGame=artilleryScene(true,trace.header.seed);queryBridge(initialGame);
   assert.deepEqual(trace.header.productSession,read(initialGame,'legacySession'),'different product profile or initial roster');
@@ -92,11 +81,9 @@ export async function replayArtilleryProductTrace(trace,compatibility=null){
   assert.equal(trace.steps.length,trace.commands.length);
   trace.steps.forEach((step,index)=>assert.deepEqual(step.command,trace.commands[index],'different command/order'));
   const rebuilt=await recordArtilleryProductTrace(trace.header.seed,trace.commands);
-  if(compatibility){
-    // Only declared source provenance changes; every original gameplay/presentation value stays the oracle.
-    rebuilt.header.sources=structuredClone(trace.header.sources);
-    const {traceDigest:unused,...actual}=rebuilt;rebuilt.traceDigest=digest(actual);
-  }
+  // The bound recorded source header stays the oracle; every gameplay/presentation value is compared.
+  rebuilt.header.sources=structuredClone(trace.header.sources);
+  const {traceDigest:unused,...actual}=rebuilt;rebuilt.traceDigest=digest(actual);
   assert.deepEqual(rebuilt,trace,'product state, events, header, seed, selection, budget or RNG differs');
   return rebuilt;
 }

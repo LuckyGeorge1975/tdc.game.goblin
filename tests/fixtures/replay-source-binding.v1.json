@@ -1,0 +1,187 @@
+{
+  "version": "replay-source-binding-v1",
+  "baseCommit": "24783bf6de7afe0fd24bf22a84d280a42508333a",
+  "note": "Gameplay-only binding of recorded product traces; UI, presentation and harness files are unbound.",
+  "gameplaySources": {
+    "artillery-pilot-runtime.js": "78c59d4daf0a9cc42ec2ee0e8c8b778052f0544cdf44eddb94c50c8d1b0a981e",
+    "artillery-spotter-rules.js": "87c37d1456b79b6ba71856bdb6a177a26b1d49cdab3f72669113ee87b741d3e3",
+    "assets/training/levels.v1.json": "8e1c36afb2e687556609cd8f90b3bc3007cb60d3b0d3089243a387277ded44f6",
+    "assets/training/scripts.v1.json": "b01340222318c01e0f4e358454958cd414668e31faa78694bae7a7dd9981d7a0",
+    "assets/unit-art/levels/artillery-pilot.v1.json": "41779ebe8506fda85f96435b6eedfaa1ac0d4e87f51784ab2d91d14a112dd51f",
+    "assets/unit-art/levels/catalog-full-levels.v1.json": "1c16d0af2b71b14f1e6de125e5f877132ed513fb401915e49937cf5059029b27",
+    "assets/unit-art/rules/artillery-pilot.v1.js": "bb3a9f3f68baaad841f72f82a592f016e5de409f87345e6d5598df3af009da6e",
+    "assets/unit-art/rules/siege-pilot.v1.js": "b111bf41b1331581cdbd1620716b7eda45f97b9835df3389ce792306d403aa0d",
+    "assets/unit-art/rules/skimmer-pilot.v1.js": "37884f21bcbf3394b58e3cabdf9a29de446c67fb41aec7e1b76af213247f40e1",
+    "assets/unit-art/rules/unit-profiles.catalog-approved.v1.json": "644e20c424d94a3ec7f5d942292f7a3ac10384b1604bfeb456c8b1917334096d",
+    "assets/unit-art/rules/unit-profiles.v1.json": "0cd763382cfd0ef7019f2f9d84ef7606386f40528c069815607c51df1c8f3d9b",
+    "catalog-base-loader.js": "975c70d42bf3a01469b8bd4443f56efdf51dcb128190863d86e6f70983db714b",
+    "catalog-base-model.js": "8150cec2cfc544aadeca4b81a1a6a9f1fddafcdeeaf337e36e6e5223ea9b0e98",
+    "catalog-base-runtime.js": "526469157f2916df223f448967b09310a7ffd57fa6efa66d4ba78a76da3a76c5",
+    "catalog-full-loader.js": "5d2ead899fcf0701fa6d3b83eff31087d41326cd97414365b8ebd79cbd335ec0",
+    "catalog-full-model.js": "04c7bad7d63eb29634f897472a75b5b28b9920baa1561789f4452c117b344289",
+    "catalog-full-runtime.js": "f106a68df24c5bf0e9951e12a640ec4f8374dfba3879396f4d79682b3bfaff7a",
+    "catalog-specialists-fire.js": "addc97f5000436e66851bbf367592340e98709402c333a8c7364de20fef9a6bd",
+    "catalog-specialists-loader.js": "41e556e041d3213d94d0eb3581f886802fba4ed59bf072bbbb6c8161e82c8f56",
+    "catalog-specialists-model.js": "ed7c82c37d6ccd99b095e43cb9dc95100d4df782481988c2320baadde95d97d3",
+    "catalog-specialists-runtime.js": "62aa07a552d47420c9bb12f33703bfed438a07fc026911922d5e2460531c5e0b",
+    "catalog-visibility.js": "3e9c05509d88acbc0546a428c966520cb8edfb0efaf247a2fc2a5b6e72003fcd",
+    "catalog-waves.js": "a481fd5c3f1601019f91b55644d73003b78b75f12bb635b00e7828767e10dc29",
+    "command-history.js": "f37784b39f8a9ef8ba7c75e5599fdceedb9a21cfb954045faab21f70166a5522",
+    "game.js": "fc61857a5a65d9449030021ad301ce95cce90817c2e06029ee282de3ba50c837",
+    "legacy-supercover.js": "9652d1ddcf52cadddbaca01a1dc63f5774ba526fa3446c0de3db9811d07327eb",
+    "ogre-runtime.js": "b4fa01db483fd6398f394efc570b7e1ff44288890a3d57d0e3022520f765c896",
+    "ogre-systems.js": "1de2ab821f0021f1a8204d15783d15848ea28f3f80ce0fc705f47b094141c411",
+    "scenario-profile-manifest.js": "c1d86d5c327e4d7081dfc776697930a9225bbf6644e5fe33a23fb30845dd0b71",
+    "scenario.js": "d83fb795bce6fb25a62f376c01e0b7c78a225012826e97e75f52714d13d1175d",
+    "siege-pilot-runtime.js": "9392a5f769160a47b9e31c7b908c99e58a338da22c9e107e8ab87bfc56bc939c",
+    "siege-tank-fire-budget.js": "86cbd5102c964cbadf5ce87b51dd601e650eaad3db55c6ce8309127bd39a5c4e",
+    "siegebreaker-weapons.js": "f52f7e6727c22327526c147bfe499c8435c931e42749a5fe253f84e3895163d6",
+    "skimmer-budget.js": "9e44bbc03e9a008f9679ea0ea7e63c8f4529b75c6492e4d6164c5b589b69d31b",
+    "strategic-missile.js": "c7d471da43b949bca431a269e9129c77085c9cdc35a466b22320dc9fb344c0f3",
+    "terrain-rules.js": "a0f4c239d1e3de7c452976f74ad0de0d76e6ea881f7c841244b686f61d422456",
+    "training-director.js": "f0b5064ab6ce484032baf8753afaf1e89c3483eac7b4fd1358ca2c3677561654",
+    "training-loader.js": "eeb1050534244ae0f1a3b195ff18ac48bacef4ad74785ca87306051026b1bf97",
+    "training-model.js": "a231ed676710bc1cacd0625b3e0e2bb4778b76fe9200749e9dc7608e7bc2ae99",
+    "training-runtime.js": "cbaeccbd6b677dde4dc23e0ca7de7b5fddc6b22fc51166d47c006fbced57cbda",
+    "unit-life.js": "430b14dc7b8ffd5519b26e60f31a2e1edb516706eca5673e8339638809197e60"
+  },
+  "ignoredPaths": {
+    "assets/ui-copy/briefing-01.de.json": "ui",
+    "assets/ui-copy/briefing-01.en.json": "ui",
+    "assets/ui-copy/briefing-01.es.json": "ui",
+    "assets/ui-copy/briefing-01.fr.json": "ui",
+    "catalog-specialists-ui.js": "ui",
+    "combat-feedback.js": "presentation",
+    "fire-presentation.js": "presentation",
+    "index.html": "ui",
+    "legacy-presentation.js": "presentation",
+    "localization.js": "ui",
+    "m1-unit-markers.js": "presentation",
+    "presentation-state.js": "presentation",
+    "tests/artillery-product-harness.mjs": "harness",
+    "tests/catalog-full-harness.mjs": "harness",
+    "tests/catalog-full-trace.mjs": "harness",
+    "tests/catalog-product-harness.mjs": "harness",
+    "tests/catalog-product-trace.mjs": "harness",
+    "tests/catalog-specialists-boundary-trace.mjs": "harness",
+    "tests/catalog-specialists-harness.mjs": "harness",
+    "tests/catalog-specialists-trace.mjs": "harness",
+    "tests/helpers/catalog-display-source-compatibility.mjs": "harness",
+    "tests/helpers/catalog-full-source-compatibility.mjs": "harness",
+    "tests/helpers/trace-object-table.mjs": "harness",
+    "tests/training-product-harness.mjs": "harness",
+    "ui-v2-flow.js": "ui",
+    "ui-v2.css": "ui",
+    "ui-v2.js": "ui",
+    "unit-guide-range.js": "ui",
+    "unit-guide.js": "ui",
+    "unit-visuals.js": "presentation"
+  },
+  "traces": {
+    "3d3131f6d70f820025097d49259ac51dc3e70327686a06d42f5c00f283b0e173": "e346113e81aa68d57d3bfef2d95d60af0b8066b13ada76e4b88cb043290078b6",
+    "d6148f6166874d57b36f0b84943fe766d4d4dc8bc86cc595171594093a3263b1": "e346113e81aa68d57d3bfef2d95d60af0b8066b13ada76e4b88cb043290078b6",
+    "76467b8d89ce89130d6299f36e511b000a05fdd1d3fa40ca113f0f4bc78b64fd": "6fe8f1fd26adca0c0fece3c9b83ce181c6bd0650c7e21cb58aac9df37df92b82",
+    "85ec0edc41c4a3b8f84856d337947c69cfe7bf66ad840f59467fb5b4e8e8f2e0": "6fe8f1fd26adca0c0fece3c9b83ce181c6bd0650c7e21cb58aac9df37df92b82",
+    "7b926b67d121e352212c4e7a9ca4d15a801aa54a4f259a6cd5d207a31e77ddfd": "6fe8f1fd26adca0c0fece3c9b83ce181c6bd0650c7e21cb58aac9df37df92b82",
+    "22b4c9f8b6fed666570cef25f70a5d2302c9e7bdd77378454a0422289ab12ef1": "6fe8f1fd26adca0c0fece3c9b83ce181c6bd0650c7e21cb58aac9df37df92b82",
+    "75fc2524d213e1b05b542caefe57099b52af974ce312555406f5992bcd8280d5": "e4692c48e8bd205894305e3c89a426a37beac86c68bb5cddde3c0ee0352d46c7",
+    "f363b26f5e68c2c510e1997ec46a7c860e1ebdf2580f0dc48a169f82be86087a": "e4692c48e8bd205894305e3c89a426a37beac86c68bb5cddde3c0ee0352d46c7",
+    "8df47d924bc2e73642b379ab309c923a248d5f0703bb05a049169312afbde1a6": "e4692c48e8bd205894305e3c89a426a37beac86c68bb5cddde3c0ee0352d46c7",
+    "ba7bdafd71e03bbf2cff8ac24b7a7a715f581f109b3cc94f9ce381b3473565ff": "e4692c48e8bd205894305e3c89a426a37beac86c68bb5cddde3c0ee0352d46c7",
+    "b1023f222438f5f24e83fc23bf088093f8ed1c66a5b7939e9bfb4f5d104d1c3d": "aa6280040ec06588c8f271f463256fab2ed3f3d91ceedc3d422c3851314851e9",
+    "1e49721bc20dcf792443927f6be45356c3af9962e863046e839f65f663d37c29": "aa6280040ec06588c8f271f463256fab2ed3f3d91ceedc3d422c3851314851e9",
+    "2f8c8326f1f2fef605cf97b21724bc31cee42f62db7e37fd6ea7bc0c5dcc4c26": "aa6280040ec06588c8f271f463256fab2ed3f3d91ceedc3d422c3851314851e9",
+    "a6207b191d6d1a76d73c29062f658763ce753f2d65ad50849963fb79cec96dea": "aa6280040ec06588c8f271f463256fab2ed3f3d91ceedc3d422c3851314851e9",
+    "bd4e9a34e37fce6c20005e84642008bbb05995cd6b24149b148d685fde2e6cef": "aa6280040ec06588c8f271f463256fab2ed3f3d91ceedc3d422c3851314851e9",
+    "8258ef2c242038a40a08fc4c1358bd293c0a34fa713b66c83148eacf36159fe5": "aa6280040ec06588c8f271f463256fab2ed3f3d91ceedc3d422c3851314851e9",
+    "ef96512a240c6323a2baf0efee634d6f6a492e8ba0d7f215d496b9a8c2a303d9": "e4692c48e8bd205894305e3c89a426a37beac86c68bb5cddde3c0ee0352d46c7",
+    "e8cb9acf9b76af82cc4970f2d013f508dbf76954a65dcaf02ee0665648dce5eb": "e4692c48e8bd205894305e3c89a426a37beac86c68bb5cddde3c0ee0352d46c7",
+    "cb9bb007e76923d134033f4babdc0790169c5c1a1c6df136eaeb2f18c1ffd7f0": "e6507d9e8a8d32d415801d702dbb1e8561bc78f191b74a697a4de0931a750296",
+    "f8140d51ab9816912436d4e71c631681dfca1d602b9f544ca88b0857c736a3e0": "e6507d9e8a8d32d415801d702dbb1e8561bc78f191b74a697a4de0931a750296",
+    "2c58cafd2f102b881c285bfe6a301e24a0950a9f928c577192e8bbbd03943872": "e6507d9e8a8d32d415801d702dbb1e8561bc78f191b74a697a4de0931a750296",
+    "b821bbddf98b1dc17580e741fde3277b1c6e644c6dcc1bcfe499c46527976620": "e6507d9e8a8d32d415801d702dbb1e8561bc78f191b74a697a4de0931a750296",
+    "2439af2d9cf67113005c1129d87b6e98fc93eeae18ac1bdce9b667dc4062c28a": "e6507d9e8a8d32d415801d702dbb1e8561bc78f191b74a697a4de0931a750296",
+    "f361dda1dac460579e517ab053cd03b549ed84deeecf0b5c0828f750ff2331fe": "e6507d9e8a8d32d415801d702dbb1e8561bc78f191b74a697a4de0931a750296",
+    "524faf9e1c01140b1c2b607386012743710237ffb2c96836f8b4e9f2bc92b26a": "e6507d9e8a8d32d415801d702dbb1e8561bc78f191b74a697a4de0931a750296",
+    "ca6291a50313cf7d44ae41b8455f3c2e0ec197424c7f3ed50c282916758d8441": "e6507d9e8a8d32d415801d702dbb1e8561bc78f191b74a697a4de0931a750296",
+    "82aad54da0c340acb3c144e60f8fe1a79c004baac015c712bef7f09389caf2f1": "e6507d9e8a8d32d415801d702dbb1e8561bc78f191b74a697a4de0931a750296",
+    "e8abd5e9939450b92cf782e271554140096b772671171f0f1b83747f3c65297b": "e6507d9e8a8d32d415801d702dbb1e8561bc78f191b74a697a4de0931a750296",
+    "training-t01": "33daf7e48fd22a37a5b57bfd4349021e668bf5f7b17364ab59359e4b7ea752cc",
+    "training-t02": "33daf7e48fd22a37a5b57bfd4349021e668bf5f7b17364ab59359e4b7ea752cc",
+    "training-t03": "33daf7e48fd22a37a5b57bfd4349021e668bf5f7b17364ab59359e4b7ea752cc"
+  },
+  "immutableFixtures": {
+    "artillery-product-traces.v1.json": "14c27d0ff45e6bf1db09db109c5020176f9611f3a2cb197a63930303e98064ec",
+    "catalog-base-product-traces.v1.json.gz": "f1c41110bd4d3ef954672d2be901aa13a7169124efb610277e1da0f201928d68",
+    "catalog-specialists-product-traces.v1.json.gz": "270ed926a36b5dc4dea03d9f7cce88f214d7ea64d90f5195e807c20ecbb53bf5",
+    "catalog-specialists-boundary-traces.v1.json.gz": "7aa9fa3c130562755442d55a3181a1c2118ee1908b76b422e5cd2b431e5c3880",
+    "catalog-full/index.v2.json": "49291ebc27292f5f8fdee531565cbcd7207cb721ed61247d1b1c1fe707d4b99a",
+    "catalog-full/catalog-full-atlas-victory.v2.json.gz": "a6a209e1b339ccc5b50cc1e1fa2af38a26b78d194d421d9a8a8eaa54185ef773",
+    "catalog-full/catalog-full-atlas-defeat.v2.json.gz": "3989e02e0119bc39f8ec3201819308d63dfce01fdceea49479e8d0e797bc78bb",
+    "catalog-full/catalog-full-terrain-course-victory.v2.json.gz": "679ca496dd4f267e91276a416f8cd08b646f57f034a3aabad09a73bca14441d9",
+    "catalog-full/catalog-full-terrain-course-defeat.v2.json.gz": "1d9737156f14e42153cc19a3e4e959305067d8411446366c4e5744b5567d5fda",
+    "catalog-full/catalog-full-advance-victory.v2.json.gz": "4371bf97267a68fc498e84dea2734063d96e5289166487e6a4dba4bcab2c688b",
+    "catalog-full/catalog-full-advance-defeat.v2.json.gz": "88a114cba33dfa2da9b2dee97543fd0f29048e6e0e71c1e48c025ce1f084f471",
+    "catalog-full/catalog-full-siege-victory.v2.json.gz": "6f178f286f3d142df55a0ebf5c978ae1efdfa4a7891c315020788e77ac7fcf4d",
+    "catalog-full/catalog-full-siege-defeat.v2.json.gz": "36f38372bd73cdc88be9c1e581a67859448bbdbde14c9a45719f6e5022a149d5",
+    "catalog-full/catalog-full-specialists-victory.v2.json.gz": "6b868c3c237cf849fd440646c7cca808395a818e69adbdc47cc60c463e124679",
+    "catalog-full/catalog-full-specialists-defeat.v2.json.gz": "7ea2236748bc1c2712d09ab4bff65af3b384714de5add9c7d940cfc9e6475e54",
+    "training-t01.game-teaching.v1.json.gz": "d1205b720598c076d6e55130db75fe8886676d37b637e67204765126e83ee383",
+    "training-t02.game-teaching.v1.json.gz": "4fdc68177dc05fc4c0ff9e6c8113d7f8df438d25d6bfc6c6a7f9ce55ff3c9ee3",
+    "training-t03.game-teaching.v1.json.gz": "60b763d19565bded99c522697cce2224f8ea34292a989b70eb5a04aa3cf1e3ac"
+  },
+  "supersedes": [
+    {
+      "file": "tests/fixtures/artillery-source-compatibility.catalog-base.v1.json",
+      "sha256": "3f9c361d6fb5d4eaabdabb92f6ad31086eb2245758b943fe39c70686d29e7996"
+    },
+    {
+      "file": "tests/fixtures/artillery-source-compatibility.catalog-specialists.v1.json",
+      "sha256": "249ad5da53704604f473f1f9ae979bb072c7e2b175a595c562d7a871ef82c13f"
+    },
+    {
+      "file": "tests/fixtures/catalog-base-source-compatibility.catalog-specialists.v1.json",
+      "sha256": "a24bf1fb43f2dd70a52b247b192ceeac5c075ad285b5bea10b821a642a9076b3"
+    },
+    {
+      "file": "tests/fixtures/catalog-full-activation-source-compatibility.v1.json",
+      "sha256": "7e4ef41796db3c74f01994602e5da5dae50558518e66217535e33566a1e53020"
+    },
+    {
+      "file": "tests/fixtures/catalog-full-display-fix-source-compatibility.v1.json",
+      "sha256": "63a95711fdabfa0afbf5e72a6979e979042396fef7b63a34392b9c9083b65897"
+    },
+    {
+      "file": "tests/fixtures/catalog-full-source-compatibility.v1.json",
+      "sha256": "73c82022fa4a9ee06c14c0d7c26a0351f5ebf0c08d53ad227a60998898025574"
+    },
+    {
+      "file": "tests/fixtures/catalog-specialists-display-source-compatibility.v1.json",
+      "sha256": "7ac3ef2d37171db0ffb8825d05ada06080e2e76a8708531f85e7bfc4f06f5b75"
+    },
+    {
+      "file": "tests/fixtures/full-ground-source-compatibility.v1.json",
+      "sha256": "ad90ab32ad89c5ec0799d43c3b6be1f7ce6ac404ed5a5186ef55506ca11dabc9"
+    },
+    {
+      "file": "tests/fixtures/release-package-source-compatibility.v1.json",
+      "sha256": "9b7c14783a9330ade2c05a8e6031e7166e93405eec7ec0f7498d2cf00a1b8b79"
+    },
+    {
+      "file": "tests/fixtures/resize-observer-source-compatibility.v1.json",
+      "sha256": "6ffffaeca811254ae69ecf664a534316673ea17c67ca25ca9cecf8e28678a258"
+    },
+    {
+      "file": "tests/fixtures/training-source-compatibility.v1.json",
+      "sha256": "95bf791153e7067fe1c08607bc5df09f400485f48574f9088af0ec67f7574e2b"
+    },
+    {
+      "file": "tests/fixtures/training-ui-fix-source-compatibility.v1.json",
+      "sha256": "797a9c045109a49239542cea00cae83ab10c0c45d8cf05797a94f3549c2fac8f"
+    },
+    {
+      "file": "tests/fixtures/user-report-source-compatibility.v1.json",
+      "sha256": "6ef32ec5e1adeb9f02d755c4953ceb1f615e425403d6d832b82392ef10a6d6d1"
+    }
+  ]
+}
