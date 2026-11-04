@@ -642,13 +642,16 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       cancel.onclick = () => { clearContext(); view.menuOpen = true; render(); };
       chip.append(cancel);
     }
-    // Chance to affect the target from the combat results table; tread hits need a 5 or 6.
-    function hitChance(preview) {
+    // Chance to affect the target from the combat results table; tread hits need a 5 or 6. A "D" destroys an
+    // already disabled vehicle and removes an infantry step, so it counts as destroyed for those targets.
+    function hitChance(preview, target) {
       if (!preview) return null;
       if (preview.meaning === 'tread-roll-5-6') return {ratio: '5–6', hit: 2 / 6, destroy: null};
       const band = preview.ratioCategory === '5-1' ? Array(6).fill('X') : COMBAT_RULES.crt[preview.ratioCategory];
+      const infantry = target?.infantry === true || target?.engineering === true || target?.type === 'infantry' || target?.id === 'infantry';
+      const lastStep = !!target && (infantry ? Number(target.hp) <= 1 : target.disabled === true);
       return band ? {ratio: preview.ratioCategory.replace('-', ':'), hit: band.filter(result => result !== 'NE').length / 6,
-        destroy: band.filter(result => result === 'X').length / 6} : null;
+        destroy: band.filter(result => result === 'X' || result === 'D' && lastStep).length / 6} : null;
     }
     // Card over the chosen target: what happens (path, odds), extra choices, and the confirmation.
     function renderTargetCard(state, actor) {
@@ -666,7 +669,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       card.append(head, el('p', 'v2-target-where', [occupant ? occupant.name : '', hexLabel(view.target)].filter(Boolean).join(' · ')));
       const facts = el('div', 'v2-target-facts');
       if (availability.ok && entry.command.type === 'Move' && availability.path) facts.append(el('span', '', t('v2.ui.pathSteps', {count: availability.path.length})));
-      const chance = availability.ok && pending.icon === 'fire' ? hitChance(previewFire(entry.command)) : null;
+      const chance = availability.ok && pending.icon === 'fire' ? hitChance(previewFire(entry.command), occupant) : null;
       if (chance) {
         facts.append(el('span', 'v2-target-ratio', chance.ratio), el('strong', 'v2-target-chance', t('v2.target.hit', {percent: Math.round(chance.hit * 100)})));
         if (chance.destroy !== null) facts.append(el('span', '', t('v2.target.destroy', {percent: Math.round(chance.destroy * 100)})));
