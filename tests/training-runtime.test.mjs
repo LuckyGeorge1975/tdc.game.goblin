@@ -61,13 +61,13 @@ test('copy has exactly the supplied 47 keys in four languages; source admission 
  const g=await trainingScene();const before=snapshot(g);assert.throws(()=>g.run("ScenarioRuleProfiles.beginSession('iron-dust',GoblinTrainingModel.configs['training-t01'])"));assert.deepEqual(snapshot(g),before);
  g.run(fs.readFileSync(new URL('../m1-unit-markers.js',import.meta.url),'utf8'));assert.equal(read(g,"M1UnitMarkers.legacy(legacySession,units,'test',null).supported"),true);assert.deepEqual(read(g,"M1UnitMarkers.legacy(legacySession,units,'test',null).objective.members"),[]);
 });
-test('actual V2 chooseActor/chooseHex/clearContext handlers prove the T01 preview/cancel sequence',async()=>{
+test('actual V2 chooseActor/aimAction/clearContext handlers prove the T01 preview/cancel sequence',async()=>{
  const g=await trainingScene(),source=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
  const clear=source.slice(source.indexOf('    function clearContext()'),source.indexOf('    const hexLabel'));
  const select=source.slice(source.indexOf('    function chooseActor('),source.indexOf('    function focusUnit('));
  const hex=source.slice(source.indexOf('    function chooseHex('),source.indexOf('    const areaCache'));
- g.context.matchMedia=()=>({matches:false});g.run("const at=s=>document.querySelector(s);document.querySelector('#v2-actions button:not(:disabled)').focus=()=>{};");
- g.run(clear+select+hex);g.run("GoblinTrainingRuntime.ack();chooseActor('training-t01-tank');chooseHex(3,3)");assert.equal(progress(g).stepId,'cancel');
+ g.context.matchMedia=()=>({matches:false});g.run("const at=s=>document.querySelector(s);document.querySelector('#v2-actions button:not(:disabled)').focus=()=>{};document.querySelector('#v2-action-execute').focus=()=>{};");
+ g.run(clear+select+hex);g.run("GoblinTrainingRuntime.ack();chooseActor('training-t01-tank');aimAction(units.find(u=>u.id==='training-t01-tank'),{x:3,y:3})");assert.equal(progress(g).stepId,'cancel');
  const before=snapshot(g).world;g.run('clearContext()');assert.equal(progress(g).stepId,'first-move');assert.deepEqual(snapshot(g).world,before);
 });
 test('all friendly losses take priority over a previously ready learning debrief',async()=>{

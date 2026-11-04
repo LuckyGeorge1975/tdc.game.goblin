@@ -134,7 +134,7 @@ test('movement button labels path length as steps in all four languages', () => 
   const labels=runInNewContext(`(${match[1]})`);
   assert.deepEqual(Object.keys(labels),['de','en','es','fr']);
   for (const label of Object.values(labels)) assert.match(label,/\{count\}/);
-  assert.match(source,/command\.type === 'Move' && availability\.path \? ` · \$\{t\('v2\.ui\.pathSteps', \{count:availability\.path\.length\}\)\}`/);
+  assert.match(source,/entry\.command\.type === 'Move' && availability\.path\) facts\.append\(el\('span', '', t\('v2\.ui\.pathSteps', \{count: availability\.path\.length\}\)\)\)/);
   const compact=localization.match(/'v2\.area\.status\.moveCompact': (\{[^\n]+\}),/);
   assert.ok(compact);
   assert.deepEqual(Object.keys(runInNewContext(`(${compact[1]})`)),['de','en','es','fr']);

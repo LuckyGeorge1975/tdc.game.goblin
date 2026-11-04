@@ -44,5 +44,5 @@ test('action menu is not modal: no focus trap, map clicks retarget and the bar f
   const position=source.slice(source.indexOf('    function positionCommandMenu(state) {'),source.indexOf('    const COMMAND_ICONS'));
   assert.match(position,/if \(card\.hidden \|\| !view\.actorId\) return;/);
   assert.match(position,/pointer:'down'/);
-  assert.match(source,/function syncLayout\(\) \{\n      if \(view\.actorId\) positionCommandMenu/);
+  assert.match(source,/function syncLayout\(\) \{\n      if \(view\.target && view\.pendingAction\) render\(\);\n      else if \(view\.actorId\) positionCommandMenu/);
 });

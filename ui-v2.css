@@ -433,4 +433,27 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 @media (max-width: 599px), (max-height: 500px) { .v2-head { gap: 8px; padding: 6px 8px; } .v2-head-turn { flex: 1; gap: 8px; } .v2-head-turn p { font-size: 12px; white-space: nowrap; } #v2-phase { padding: 4px 8px; font-size: 12px; } .v2-head-goal { order: 5; flex: 1 1 100%; text-align: left; } .v2-head-goal p { font-size: 12px; } }
 @media (max-width: 1199px) { .v2-target { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; } #v2-intel { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); align-items: start; } }
 @media (max-width: 599px), (max-height: 500px) { .v2-target { grid-template-columns: minmax(0, 1fr); } .v2-head-turn { overflow: hidden; } #v2-phase { min-width: 0; overflow: hidden; text-overflow: ellipsis; } }
-@media (max-width: 599px), (max-height: 500px) { #v2-selection { display: none; } .v2-controls .v2-context:has(#v2-message:empty):has(#v2-terminal[hidden]) { display: none; } }
+@media (max-width: 599px), (max-height: 500px) { #v2-selection { display: none; } .v2-controls .v2-context:has(#v2-message:empty):has(#v2-terminal[hidden]):not(:has(#v2-action-chip:not([hidden]))) { display: none; } }
+/* Active action (UR-G2): chosen in the menu, shown in the command bar; the target card confirms the order. */
+.v2-action-chip { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 2px 2px 2px 8px; border: 1px solid var(--v2-accent-text); border-radius: 10px; background: var(--v2-surface2); }
+.v2-action-chip[hidden] { display: none; }
+.v2-context:has(#v2-action-chip:not([hidden])) #v2-selection { display: none; }
+.v2-action-icon { display: inline-grid; place-items: center; color: var(--v2-accent-text); }
+.v2-action-text { display: grid; min-width: 0; line-height: 1.2; }
+.v2-action-text strong, .v2-target-head strong { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
+.v2-action-detail { color: var(--v2-signal); font-size: 12px; overflow-wrap: anywhere; }
+.v2-shell .v2-action-cancel { min-width: 40px; min-height: 40px; border-color: transparent; background: transparent; }
+.v2-target-card { position: fixed; z-index: 20; display: grid; gap: 6px; width: max-content; max-width: min(320px, calc(100vw - 16px)); padding: 8px 10px; border-color: var(--v2-accent-text); box-shadow: 0 8px 30px #000b; }
+.v2-target-card[hidden] { display: none !important; }
+.v2-target-head { display: flex; align-items: center; gap: 8px; }
+.v2-card .v2-target-where { margin: 0; color: var(--v2-muted); font-size: 12px; }
+.v2-target-facts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 13px; }
+.v2-target-ratio { padding: 1px 6px; border: 1px solid var(--v2-line-strong); border-radius: 4px; font-variant-numeric: tabular-nums; }
+.v2-target-chance { color: var(--v2-signal); }
+.v2-target-blocked { color: var(--v2-danger-text); }
+.v2-target-options { display: grid; gap: 6px; }
+.v2-target-actions { display: flex; gap: 6px; }
+.v2-shell .v2-action-execute { flex: 1; min-height: 44px; border-color: var(--v2-accent-text); background: var(--v2-accent); font-weight: 700; }
+.v2-target-card[data-pointer="down"]::after, .v2-target-card[data-pointer="up"]::after { content: ""; position: absolute; left: var(--v2-pointer-x, 50%); width: 0; height: 0; border: 8px solid transparent; transform: translateX(-50%); }
+.v2-target-card[data-pointer="down"]::after { bottom: -16px; border-top-color: var(--v2-accent-text); }
+.v2-target-card[data-pointer="up"]::after { top: -16px; border-bottom-color: var(--v2-accent-text); }
