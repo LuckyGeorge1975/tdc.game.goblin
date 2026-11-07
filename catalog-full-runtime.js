@@ -6,7 +6,23 @@
  let state=null;
  let commandKey=null,commandSerial=0;
  function revision(){return JSON.stringify([legacySession.sessionId,turn,phase,turnPhase,units.map(u=>[u.id,u.x,u.y,unitAlive(u),!!u.disabled,u.embarkedOn??null]),[...terrainTypes]])}
- function commandRevision(){const s=ensure(),key=JSON.stringify([legacySession.sessionId,turn,phase,turnPhase,gameOver,[...terrain],[...terrainTypes],units.map(({moveFrom,justHit,specialistJournal,...u})=>u),s.visibility,s.waves,s.ownTurns,s.terminalOutcome]);if(key!==commandKey){commandKey=key;commandSerial++}return `full:${legacySession.sessionId}:${commandSerial}`}
+ function ruleStateKey(s) {
+  return JSON.stringify([legacySession.sessionId, turn, phase, turnPhase, gameOver, [...terrain], [...terrainTypes],
+   units.map(({moveFrom, justHit, specialistJournal, ...unit}) => unit), s.visibility, s.waves, s.ownTurns, s.terminalOutcome]);
+ }
+ function commandRevision(){const key=ruleStateKey(ensure());if(key!==commandKey){commandKey=key;commandSerial++}return `full:${legacySession.sessionId}:${commandSerial}`}
+
+ let readinessCache = null;
+ function readyUnits() {
+  // The complete rule inputs also cover specialist fire, repairs and cargo actions.
+  // Readiness must never advance the command revision counter.
+  const key = ruleStateKey(ensure());
+  if (readinessCache?.session !== legacySession || readinessCache.key !== key) {
+   const ids = new Set(units.filter(unit => phaseCanAct(unit)).map(unit => unit.id));
+   readinessCache = {session: legacySession, key, ids};
+  }
+  return units.filter(unit => readinessCache.ids.has(unit.id));
+ }
  function facts(clocks){
   const actors=units.map(u=>({runtimeUnitId:u.id,assetId:u.catalogAssetId,team:u.team,alive:unitAlive(u),disabled:!!u.disabled,embarkedOn:u.embarkedOn??null,x:u.x,y:u.y}));
   const sensorPairs=[];
@@ -24,8 +40,33 @@
   }
   return state;
  }
- function known(id,team='player'){if(!active())return true;const s=ensure();return GoblinCatalogVisibility.isKnown(s.visibility,team,id,facts(s.visibility.teamFire),registry())}
- function roster(team='player'){if(!active())return units;const s=ensure(),ids=new Set(GoblinCatalogVisibility.project(s.visibility,team,facts(s.visibility.teamFire),registry()).knownIds);return units.filter(u=>ids.has(u.id))}
+ let projectionCache = null;
+ function projectionContext() {
+  const visibility = ensure().visibility;
+  const key = JSON.stringify([revision(), W, H, [...terrain], visibility,
+   units.map(u => [u.catalogId, u.catalogAssetId, u.team])]);
+  if (projectionCache?.session !== legacySession || projectionCache.key !== key) {
+   projectionCache = {session: legacySession, key, visibility, facts: null, teams: new Map()};
+  }
+  return projectionCache;
+ }
+ function projectedIds(team) {
+  const cache = projectionContext();
+  if (!cache.teams.has(team)) {
+   cache.facts ??= facts(cache.visibility.teamFire);
+   const {knownIds} = GoblinCatalogVisibility.project(cache.visibility, team, cache.facts, registry());
+   cache.teams.set(team, new Set(knownIds));
+  }
+  return cache.teams.get(team);
+ }
+ function known(id, team = 'player') {
+  return !active() || projectedIds(team).has(id);
+ }
+ function roster(team = 'player') {
+  if (!active()) return units;
+  const ids = projectedIds(team);
+  return units.filter(unit => ids.has(unit.id));
+ }
  function fireView(binding){const out=copy(binding);if(out?.state)delete out.state.mainTargets;return out}
  function viewerUnit(u){const {specialistJournal,specialistSerial,...publicUnit}=u,out=copy(publicUnit);if(out.catalogFire)out.catalogFire=fireView(out.catalogFire);if(out.spotterId&&!known(out.spotterId))out.spotterId=null;return out}
  function event(type,fields={},clocks=null){const s=ensure();if(!s)return;const seq=s.visibility.sequence+1,result=GoblinCatalogVisibility.reduce(s.visibility,{type,id:`full-${s.sessionId}-${seq}`,seq,...fields},facts(clocks??s.visibility.teamFire),registry());s.visibility=result.state;return result}
@@ -153,7 +194,7 @@
   if(config.waves.length){GoblinCatalogWaves.validate(value.waves,config);if(JSON.stringify(value.ownTurns)!==JSON.stringify(value.waves.ownTurns))throw Error('FULL_RESTORE_TURNS')}else if(value.waves!==null)throw Error('FULL_RESTORE_WAVES');
   state=copy(value);
  }
- root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,catalogCard,initialRoster,status,stealthText});
+ root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,catalogCard,initialRoster,status,stealthText});
  const oldSetPhase=setTurnPhase;setTurnPhase=function(next){if(active()&&phase==='player'){if(turnPhase==='fire'&&next!=='fire')fireBoundary('player',false);if(next==='fire'&&turnPhase!=='fire')fireBoundary('player',true)}return oldSetPhase(next)};
  const oldFinish=finish;finish=function(win){if(active()){const s=ensure();s.terminalOutcome=win;for(const team of ['player','enemy'])if(s.visibility.teamFire[team].active)fireBoundary(team,false);if(s.waves){const result=GoblinCatalogWaves.discardPending(s.waves);s.waves=result.state;s.journal.push({type:'mission-end',outcome:win,effects:copy(result.effects)})}}return oldFinish(win)};
  const oldHex=handleHex;handleHex=function(x,y){if(!active())return oldHex(x,y);focusedCell={x,y};const occupant=roster().find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);if(!occupant&&selected?.team==='player'&&['movement','gev'].includes(turnPhase))return executeSpecialistCommand({type:'Move',actorId:selected.id,x,y});if(occupant)return handleUnitClick(occupant);showFieldInfo(x,y);draw()};
