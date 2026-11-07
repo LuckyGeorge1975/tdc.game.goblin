@@ -7,7 +7,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const view = { actorId: null, target: null, infoCell: null, focusCell: null,
       intentRevision: null, busy: false, message: '', zoom: 1, areaMode: null, gridVisible: false,
       targetsVisible:true,damageVisible:true,
-      phaseSkip: null, targetGroup: null, targetOption: null, afterWeaponSwitch: false };
+      phaseSkip: null, targetGroup: null, targetWeapon: null, targetOption: null, afterWeaponSwitch: false };
     const shell = document.createElement('div');
     shell.className = 'v2-shell';
     // Line icons for the game shell; every icon button carries its text as aria-label and title.
@@ -346,7 +346,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       globalThis.dispatchEvent(new Event('goblin-view-settings-change'));
     }
 
-    function clearContext() { globalThis.GoblinTrainingRuntime?.cancel();view.targetGroup = null; view.targetOption = null; view.afterWeaponSwitch = false; view.target = null; view.intentRevision = null; view.message = ''; }
+    function clearContext() { globalThis.GoblinTrainingRuntime?.cancel();view.targetGroup = null; view.targetWeapon = null; view.targetOption = null; view.afterWeaponSwitch = false; view.target = null; view.intentRevision = null; view.message = ''; }
     const hexLabel = cell => `${String.fromCharCode(65 + cell.x)}-${String(cell.y + 1).padStart(2, '0')}`;
     function coreOpenCount(source) { return coreOpenUnits(source).length; }
     function coreOpenUnits(source) {
@@ -646,21 +646,29 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           const button = el('button'); button.type = 'button';
           button.append(Object.assign(el('span', 'v2-action-icon'), {innerHTML:svgIcon(kind)}), document.createTextNode(t(actionNames[kind] ?? 'v2.action.execute')));
           button.setAttribute('aria-pressed', String(group === kind));
-          button.onclick = () => { view.targetGroup = kind; view.targetOption = null; render(); focusTargetCard(); };
+          button.onclick = () => { view.targetGroup = kind; view.targetWeapon = null; view.targetOption = null; render(); focusTargetCard(); };
           actions.append(button);
         }
         card.append(actions);
       }
-      const options = groups.get(group) ?? [];
+      const groupOptions = groups.get(group) ?? [];
+      const components = group === 'fire' ? renderComponentWeapons(card, groupOptions) : null;
+      const options = components ?? groupOptions;
       const legal = options.filter(entry => entryResult(entry).ok);
       const chosen = legal.find(entry => commandKey(entry) === view.targetOption) ?? (legal.length === 1 ? legal[0] : null);
       if (options.length > 1) {
         const list = el('div', 'v2-target-choices');
+        if (components) {
+          list.setAttribute('data-target-components', '');
+          list.setAttribute('role', 'group');
+          list.setAttribute('aria-label', t('v2.target.componentChoice'));
+          card.append(el('strong', '', t('v2.target.componentChoice')));
+        }
         for (const option of options) {
-          const result = entryResult(option), chance = group === 'fire' ? entryChance(option, occupant) : null;
+          const result = entryResult(option), chance = group === 'fire' && !components ? entryChance(option, occupant) : null;
           const button = el('button'); button.type = 'button'; button.disabled = !result.ok;
           button.append(Object.assign(el('span', 'v2-action-icon'), {innerHTML:svgIcon(group)}),
-            document.createTextNode([option.label, chance && t('v2.target.hit', {percent:Math.round(chance.hit * 100)})].filter(Boolean).join(' · ')));
+            document.createTextNode([components ? option.componentLabel : option.label, chance && t('v2.target.hit', {percent:Math.round(chance.hit * 100)})].filter(Boolean).join(' · ')));
           button.setAttribute('aria-pressed', String(chosen === option));
           if (!result.ok) button.title = result.reason;
           button.onclick = () => { view.targetOption = commandKey(option); render(); focusTargetCard(); };
@@ -707,8 +715,38 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       controls.append(back); card.append(controls);
       placeNearHex(card, cell, state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && unit.id !== actor.id && unit !== occupant), [actor]);
     }
+    function renderComponentWeapons(card, options) {
+      if (!options.length || !options.every(entry => entry.command.target?.kind === 'component')) return null;
+      const weapons = new Map();
+      for (const entry of options) {
+        const {weaponId, mode, spotterId} = entry.command;
+        const key = JSON.stringify([weaponId, mode, spotterId]);
+        if (!weapons.has(key)) weapons.set(key, {key, label:entry.weaponLabel, legal:[]});
+        if (entryResult(entry).ok) weapons.get(key).legal.push(entry);
+      }
+      const ready = [...weapons.values()].filter(weapon => weapon.legal.length);
+      const selected = weapons.get(view.targetWeapon) ?? (ready.length === 1 ? ready[0] : null);
+      const list = el('div', 'v2-target-choices');
+      list.setAttribute('role', 'group');
+      list.setAttribute('aria-label', t('v2.target.weaponChoice'));
+      for (const weapon of [...ready, ...[...weapons.values()].filter(item => !item.legal.length)]) {
+        const status = t('v2.target.legalComponents', {count:weapon.legal.length});
+        const button = el('button', '', weapon.label + ' · ' + status);
+        button.type = 'button';
+        button.disabled = !weapon.legal.length;
+        button.setAttribute('aria-pressed', String(selected === weapon));
+        button.onclick = () => {
+          view.targetWeapon = weapon.key;
+          view.targetOption = weapon.legal.length === 1 ? commandKey(weapon.legal[0]) : null;
+          render(); focusTargetCard();
+        };
+        list.append(button);
+      }
+      card.append(el('strong', '', t('v2.target.weaponChoice')), list);
+      return selected?.legal ?? [];
+    }
     function focusTargetCard() {
-      (at('#v2-action-execute') || at('#v2-target-card button:not(:disabled)'))?.focus({preventScroll:true});
+      (at('#v2-action-execute') || at('[data-target-components] button') || at('#v2-target-card button:not(:disabled)'))?.focus({preventScroll:true});
     }
     async function runCommand(state, entry) {
       const {command, confirmSplash} = entry;

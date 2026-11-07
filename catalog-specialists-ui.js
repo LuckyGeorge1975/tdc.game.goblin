@@ -31,8 +31,11 @@
      ({weaponId:null,mode:'indirect',spotterId:u.id,label:t('v2.ui.artillery.indirectVia',{spotter:u.name})}))
    ]:api().weapons(actor).map(w=>({weaponId:w.id,mode:'direct',spotterId:null,label:`${weaponLabel(actor,w)} · A${w.attack} R${w.range} · ${statusLabel(actor,w)}`}));
    for(const {label,...weapon} of options)for(const aim of targets){
-    const detail=aim.componentId?`${label} · ${api().slotLabel(target,aim.componentId)}`:label;
-    add({type:'CatalogFire',actorId:actor.id,target:aim,...weapon},detail);
+    const command={type:'CatalogFire',actorId:actor.id,target:aim,...weapon};
+    if(aim.kind==='component'){
+     const componentLabel=api().slotLabel(target,aim.componentId);
+     result.push({command,label:`${label} · ${componentLabel}`,weaponLabel:label,componentLabel});
+    }else add(command,label);
    }
    return result;
   }

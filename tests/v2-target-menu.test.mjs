@@ -144,3 +144,58 @@ test('Iron Dust Core D-04 opens the legal move confirmation after pointer hover'
   assert.ok(children().some(child => child.id === 'v2-action-execute'));
   assert.ok(children().some(child => child.text === 'MOVE COST 3'));
 });
+
+test('component fire groups weapon and spotter choices before aiming and confirming', async () => {
+  function el(tag, className = '', text = '') {
+    return {tag, className, text, children: [], append(...nodes) { this.children.push(...nodes); },
+      replaceChildren() { this.children = []; }, setAttribute() {}, focus() {}};
+  }
+  const card = el('section');
+  const nodes = (root = card) => [root, ...root.children.flatMap(node => nodes(node))];
+  const execute = () => nodes().find(node => node.id === 'v2-action-execute');
+  const choose = text => nodes().find(node => node.tag === 'button' &&
+    (node.text.startsWith(text) || node.children.some(child => child.text.startsWith(text))));
+  const actor = {id: 'battery'}, target = {id: 'defender', x: 8, y: 4, team: 'enemy'};
+  const view = {target, intentRevision: 1};
+  const state = {revision: 1, units: [actor, target]};
+  const options = ['Blocked', 'Scout', 'Tank'].flatMap(spotterId =>
+    ['Main', 'Treads'].map(componentId => ({
+      command: {type: 'CatalogFire', mode: 'indirect', spotterId, weaponId: null, target: {kind: 'component', componentId}},
+      label: spotterId + ' · ' + componentId, weaponLabel: spotterId, componentLabel: componentId
+    })));
+  const dispatched = [], previews = [];
+  const query = command => ({ok: command.spotterId !== 'Blocked'});
+  const context = {
+    at: selector => selector === '#v2-target-card' ? card : selector === '#v2-map' ? el('div') : execute(),
+    document: {body: {classList: {contains: () => false}}, createTextNode: text => el('#text', '', text)},
+    GameDialogs: {isOpen: () => false}, state, actor, view, el, core: () => false,
+    terrainTypeAt: () => null, targetOccupant: () => target, hexLabel: () => 'I-05', unitAlive: () => true,
+    entriesAt: () => options, entryResult: entry => query(entry.command), query, commandIcon: () => 'fire',
+    commandKey: entry => JSON.stringify(entry.command), entryChance(entry) { previews.push(entry.command); },
+    t: key => key, svgIcon: () => '', placeNearHex() {}, revision: () => 1,
+    clearContext() { view.target = null; },
+    dispatch(command) { dispatched.push(command); return {ok: true}; }
+  };
+  runInNewContext(targetCard + '\nfunction render() { renderTargetCard(state, actor); }', context);
+
+  context.render();
+  assert.equal(nodes().filter(node => node.className === 'v2-target-choices')[0].children.length, 3);
+  assert.equal(choose('Blocked').disabled, true);
+  assert.equal(choose('Main'), undefined);
+  assert.equal(execute(), undefined);
+  assert.deepEqual(previews, []);
+
+  choose('Scout').onclick();
+  assert.ok(choose('Main'));
+  assert.ok(choose('Treads'));
+  assert.equal(execute(), undefined);
+  assert.deepEqual(previews, []);
+  choose('Main').onclick();
+  assert.equal(previews.at(-1).target.componentId, 'Main');
+  choose('Tank').onclick();
+  assert.equal(execute(), undefined);
+  choose('Treads').onclick();
+  assert.deepEqual(dispatched, []);
+  await execute().onclick();
+  assert.deepEqual(dispatched, [options[5].command]);
+});
