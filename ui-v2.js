@@ -1034,7 +1034,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const own = {playerId:'player', unitId:actor.id};
       if (state.turnPhase !== 'fire') {
         if (target?.team === 'enemy') return [{command:{type:'Ram', ...own, targetId:target.id}, label:t('v2.ui.ram')}];
-        return target ? [] : [{command:{type:'Move', ...own, to:{...cell}}, label:t('v2.ui.move')}];
+        return target ? [] : [{command:{type:'Move', ...own, to:{x:cell.x,y:cell.y}}, label:t('v2.ui.move')}];
       }
       if (target?.team !== 'enemy') return [];
       const shot = {type:'PlayerFire', ...own, targetId:target.id};

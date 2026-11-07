@@ -2,6 +2,11 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import test from 'node:test';
 import {runInNewContext} from 'node:vm';
+import {createIronDustBrowserSession} from '../iron-dust-browser-v2.mjs';
+import {buildIronDustV2View} from '../iron-dust-v2-view.mjs';
+import {queryIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
+import {lifeGlobals} from './helpers/unit-life-context.mjs';
+import {targetOptionsSource} from './helpers/target-options-source.mjs';
 
 const ui = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
 const targetCard = ui.slice(ui.indexOf('    function renderTargetCard('), ui.indexOf('    function chooseActor('));
@@ -84,3 +89,58 @@ for (const [profile, type] of [['FULL U13', 'CatalogHexFire'], ['Legacy', 'Fire'
     assert.equal(view.target, target);
   });
 }
+
+test('Iron Dust Core D-04 opens the legal move confirmation after pointer hover', () => {
+  const session = createIronDustBrowserSession();
+  const source = buildIronDustV2View(session.projection, session.profile.header.ruleProfileId);
+  const slice = (start, end) => ui.slice(ui.indexOf(start), ui.indexOf(end));
+  const node = (tag, className = '', text = '') => ({
+    tag, className, text, children: [], append(...nodes) { this.children.push(...nodes); },
+    replaceChildren() { this.children = []; }, setAttribute() {}, focus() {}
+  });
+  const card = node('section');
+  const children = (root = card) => [root, ...(root.children || []).flatMap(child => children(child))];
+  const calls = [];
+  const context = {
+    ...lifeGlobals, view: {}, core: () => true,
+    IronDustBrowserV2: {
+      epoch: 1, session, view: source, formatError: code => code,
+      query(command) { const result = queryIronDustProfile(session.profile, command); calls.push({command, result}); return result; }
+    },
+    GoblinLanguage: {current: 'de', translate: key => key}, GameDialogs: {isOpen: () => false},
+    document: {body: {classList: {contains: () => false}}},
+    M1UnitMarkers: {core() {}}, TerrainDisplay: {label: type => type},
+    S: 5, hexCenter: (x, y) => ({x: x * 10, y: y * 10}),
+    nativeMap: {
+      createSVGPoint: () => ({matrixTransform() { return this; }}),
+      getScreenCTM: () => ({inverse() {}})
+    },
+    el: node, svgIcon: () => '', t: key => key, placeNearHex() {},
+    at: selector => selector === '#v2-target-card' ? card : children().find(child => '#' + child.id === selector)
+  };
+  runInNewContext([
+    slice('    function revision(', '    function legacyLogEntries('),
+    slice('    let idleCoreLog=', '    function previewFire('),
+    slice('    function clearContext(', '    function coreOpenCount('),
+    slice('    function coreOpenCount(', '    // Own units'),
+    targetOptionsSource,
+    slice('    function inspectTrainingTarget(', '    const areaCache'),
+    slice('    function cellAt(', '    function clearMapHover('),
+    'let startZoomPending; function render() { const state = project(); renderTargetCard(state, state.units.find(unit => unit.id === view.actorId)); }'
+  ].join('\n'), context);
+  context.chooseActor('ogre');
+  calls.length = 0;
+  const projected = context.project();
+  const actor = projected.units.find(unit => unit.id === context.view.actorId);
+  const hovered = context.cellAt(30.5, 30);
+  const [option] = context.entriesAt(projected, actor, hovered);
+  context.entryResult(option);
+  context.chooseHex(3, 3);
+  const move = calls.find(({command}) => command.type === 'Move' && command.unitId === 'ogre' && command.to.x === 3 && command.to.y === 3);
+  assert.equal(move?.result.available, true, JSON.stringify(move));
+  assert.equal(move.result.cost, 3);
+  assert.deepEqual(Object.keys(move.command.to).sort(), ['x', 'y']);
+  assert.equal(card.hidden, false);
+  assert.ok(children().some(child => child.id === 'v2-action-execute'));
+  assert.ok(children().some(child => child.text === 'MOVE COST 3'));
+});
