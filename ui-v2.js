@@ -217,14 +217,16 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if(command.type==='FireArtillery')return globalThis.GoblinArtilleryWeapons?.active(actor)?GoblinArtilleryWeapons.query(actor,target,command):{ok:false,reason:t('ui.error.UNSUPPORTED_COMMAND')};
       if(command.type==='Fire'&&globalThis.GoblinArtilleryWeapons?.active(actor))return {ok:false,reason:t('ui.error.UNSUPPORTED_COMMAND')};
       if (command.type === 'Embark') {
-        if (target?.id !== command.carrierId || !canEmbark(actor, target))
-          return { ok: false, reason: t('ui.error.INVALID_TARGET') };
-        return { ok: true };
+        if (target?.id === command.carrierId && canEmbark(actor, target)) return { ok: true };
+        const reason = target?.disabled ? 'ui.error.UNIT_DISABLED' :
+          target?.transportCapacity && carrierLoad(target) + Math.max(1, actor.hp) > target.transportCapacity ?
+            'v2.target.transportFull' : 'v2.reject.catalog.cargoNotReady';
+        return { ok: false, reason: t(reason) };
       }
       if (command.type === 'Unload') {
         const cargo = units.find(unit => unit.id === command.cargoId);
         if (!actor.transportCapacity || !canUnloadTo(actor, cargo, command.x, command.y))
-          return { ok: false, reason: t('ui.error.INVALID_TARGET') };
+          return { ok: false, reason: t(cargo?.embarkedThisTurn ? 'v2.reject.catalog.sameTurn' : 'v2.reject.catalog.deployCell') };
         return { ok: true };
       }
       if (command.type === 'Move') {
@@ -300,6 +302,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         selected = actor;
         const beforeExecution = revision();
         if(['CatalogFire','CatalogRam','CatalogLoad','CatalogDeploy','Engineer','CatalogHexFire'].includes(command.type)||globalThis.GoblinCatalogFullRuntime?.active()&&command.type==='Move'){executeSpecialistCommand(command);return revision()!==beforeExecution?{ok:true}:{ok:false,reason:t('ui.error.INVALID_COMMAND')};}
+        if (command.type === 'Embark') {
+          const carrier = units.find(unit => unit.id === command.carrierId);
+          embark(actor, carrier);
+          return revision() !== beforeExecution ? { ok: true } : { ok: false, reason: t('ui.error.INVALID_COMMAND') };
+        }
         if (command.type === 'Unload') {
           const cargo = units.find(unit => unit.id === command.cargoId);
           unloadAt(actor, cargo, command.x, command.y);
@@ -680,6 +687,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const shot = options.find(entry => entry.command.type === 'PlayerFire');
         if (shot && !entryResult(shot).ok) card.append(el('p', 'v2-target-blocked', entryResult(shot).reason));
       }
+      for (const entry of entries.filter(option => option.transport && !entryResult(option).ok)) {
+        const cargo = entry.command.type === 'CatalogDeploy' && units.find(unit => unit.id === entry.command.cargoId);
+        const reason = cargo?.embarkedThisTurn ? t('v2.reject.catalog.sameTurn') : entryResult(entry).reason;
+        card.append(el('p', 'v2-target-blocked', [entry.label, reason].filter(Boolean).join(' · ')));
+      }
       const controls = el('div', 'v2-target-actions');
       if (chosen) {
         const result = entryResult(chosen);
@@ -800,7 +812,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       startZoomPending = null;
       const state = project(), cell = {x,y};
       const unit = targetOccupant(state, cell), actor = state.units.find(item => item.id === view.actorId);
-      const available = entriesAt(state, actor, cell).some(entry => entryResult(entry).ok);
+      const available = entriesAt(state, actor, cell).some(entry => entry.transport || entryResult(entry).ok);
       if (!available && unit?.team === 'player') { chooseActor(unit.id); return; }
       clearContext(); view.infoCell = cell; view.focusCell = cell;
       inspectTrainingTarget(actor, cell, state.turnPhase);
@@ -840,8 +852,18 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (mode === 'movement') {
         if (state.turnPhase !== 'movement' && state.turnPhase !== 'gev') { data.status = 'phase'; return data; }
         if (runtime.embarkedOn) { data.status = 'unavailable'; data.reason = t('ui.error.UNIT_EMBARKED'); return data; }
+        if (!core() && state.turnPhase === 'movement') {
+          const neighbors = hexNeighbors(actor.x, actor.y).filter(cell => cell.x >= 0 && cell.x < W && cell.y >= 0 && cell.y < H);
+          data.load = neighbors.filter(cell => entriesAt(state, actor, cell).some(entry =>
+            commandIcon(entry.command) === 'embark' && entryResult(entry).ok));
+          if (actor.transportCapacity || actor.droneBays) data.unload = neighbors.filter(cell => entriesAt(state, actor, cell).some(entry =>
+            commandIcon(entry.command) === 'unload' && entryResult(entry).ok));
+        }
+        const transport = data.load?.length || data.unload?.length;
         if (state.turnPhase === 'movement' && runtime.moved || state.turnPhase === 'gev' && runtime.secondMoved) {
-          data.status = 'unavailable'; data.reason = t('ui.error.ACTION_SPENT'); return data;
+          data.status = transport ? 'move' : 'unavailable';
+          if (!transport) data.reason = t('ui.error.ACTION_SPENT');
+          return data;
         }
         const width = core() ? Math.max(...state.cells.map(cell => cell.x)) + 1 : W;
         const height = core() ? Math.max(...state.cells.map(cell => cell.y)) + 1 : H;
@@ -852,9 +874,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           if (result.ok) data.legal.push({ x, y, cost: core() ? result.cost :
             result.path.reduce((sum, step) => sum + movementCost(runtime, `${step.x},${step.y}`), 0) });
         }
-        data.load = state.units.filter(unit => unit.team === actor.team && unit.id !== actor.id && unitAlive(unit) && !unit.embarkedOn &&
-          (unit.transportCapacity || unit.droneBays) && entriesAt(state, actor, {x:unit.x,y:unit.y}).some(entry => commandIcon(entry.command) === 'embark' && entryResult(entry).ok));
-        data.status = data.legal.length || data.load.length ? 'move' : 'blocked';
+        data.status = data.legal.length || transport ? 'move' : 'blocked';
         return data;
       }
       if (mode === 'fire' && state.turnPhase !== 'fire') { data.status = 'phase'; return data; }
@@ -1007,6 +1027,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const areaKind = mode === 'movement' ? 'movement' : mode === 'fire' ? 'fire' : 'sight';
       for (const cell of data.legal) mark(cell, areaKind);
       for (const cell of data.load ?? []) mark(cell, 'load');
+      for (const cell of data.unload ?? []) mark(cell, 'unload');
       if (data.legal.length) overlay.append(areaEdge(data.legal, areaKind));
       if (mode !== 'los') for (const cell of data.blocked) mark(cell, 'blocked');
       if(globalThis.GoblinCatalogFullRuntime?.active()&&actor?.catalogId==='U13'&&mode==='fire'&&view.target){const strike=GoblinCatalogFullRuntime.hexQuery({type:'CatalogHexFire',actorId:actor.id,...view.target});if(strike.ok)for(const [i,cell] of strike.footprint.entries()){const shape=document.createElementNS(NS,'polygon');shape.setAttribute('points',hexPoints(cell.x,cell.y));shape.classList.add('v2-full-blast',i===0?'v2-full-blast-center':'v2-full-blast-adjacent');shape.setAttribute('aria-hidden','true');overlay.append(shape);}}
@@ -1106,10 +1127,19 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         return [{command:{type:'Fire', ...intent}, label:t(runtime?.strategicMissile ? 'v2.ui.missile' : 'v2.ui.fire'), confirmSplash:!!runtime?.strategicMissile}];
       }
       if (target?.team === 'enemy') return [{command:{type:'Ram', ...intent}, label:t('v2.ui.ram')}];
-      if (target?.team === 'player' && target.transportCapacity) return [{command:{type:'Embark', ...intent, carrierId:target.id}, label:t('v2.ui.embark')}];
+      if (target?.team === 'player' && target.id !== actor.id && state.turnPhase === 'movement' && dist(actor,target) === 1) {
+        const carrier = actor.transportCapacity ? actor : target;
+        const cargo = carrier === actor ? target : actor;
+        const catalog = globalThis.GoblinCatalogRuntime;
+        const compatible = catalog?.active() ? catalog.passenger(cargo) || catalog.drone(cargo) : cargo.infantry || cargo.engineering;
+        if (carrier.transportCapacity && compatible)
+          return [{command:{type:'Embark',actorId:cargo.id,carrierId:carrier.id,x:carrier.x,y:carrier.y},
+            label:t('v2.ui.embark') + ' · ' + cargo.name,transport:true}];
+      }
       if (target) return [];
       return [{command:{type:'Move', ...intent}, label:t('v2.ui.move')},
-        ...(runtime?.transportCapacity ? carrierCargo(runtime).map(cargo => ({command:{type:'Unload', ...intent, cargoId:cargo.id},
+        ...(runtime?.transportCapacity && state.turnPhase === 'movement' && dist(actor,cell) === 1 ?
+          carrierCargo(runtime).map(cargo => ({command:{type:'Unload', ...intent, cargoId:cargo.id},transport:true,
           label:t(globalThis.GoblinCatalogRuntime?.drone(cargo) ? 'v2.ui.catalog.deployDrone' : 'v2.ui.unload') + ' · ' +
             (globalThis.GoblinCatalogRuntime?.record(cargo) ? GoblinCatalogRuntime.name(cargo) : cargo.name)})) : [])];
     }

@@ -12,6 +12,18 @@
   const key=command.job==='repair-vehicle'?(command.option==='disabled'?'repair-disabled':'repair-hp'):command.job;
   return t('v2.engineer.'+key);
  }
+ function addLoadOptions(result,cargo,carrier){
+  if(dist(cargo,carrier)!==1)return;
+  const rules=api().rules(cargo),drone=rules?.cargoRef==='drone-cargo-v1';
+  const label=t('v2.ui.embark')+' · '+cargo.name;
+  if(drone&&carrier.droneBays){
+   for(const bayId of carrier.droneBays)
+    result.push({command:{type:'CatalogLoad',actorId:cargo.id,carrierId:carrier.id,bayId},
+     label:label+' · '+api().slotLabel(carrier,bayId),transport:true});
+  }else if(carrier.transportCapacity&&(drone||rules?.passengerRef==='infantry-passenger-v1')){
+   result.push({command:{type:'Embark',actorId:cargo.id,carrierId:carrier.id,x:carrier.x,y:carrier.y},label,transport:true});
+  }
+ }
  function commands(state,actor,cell){
   if(!actor||!cell)return [];
   const target=state.units.find(u=>alive(u)&&!u.embarkedOn&&u.x===cell.x&&u.y===cell.y),result=[];
@@ -44,8 +56,8 @@
   if(state.turnPhase==='gev')return result;
   if(target?.team!==actor.team&&target&&actor.catalogSystems&&['U01','U20'].includes(actor.catalogId))add({type:'CatalogRam',actorId:actor.id,targetId:target.id,...cell});
   if(target?.team===actor.team&&target.id!==actor.id){
-   if(target.droneBays&&api().rules(actor)?.cargoRef==='drone-cargo-v1')for(const bayId of target.droneBays){const c={type:'CatalogLoad',actorId:actor.id,carrierId:target.id,bayId};result.push({command:c,label:`${t('v2.ui.embark')} · ${api().slotLabel(target,bayId)}`})}
-   else if(target.transportCapacity)add({type:'Embark',actorId:actor.id,carrierId:target.id,...cell});
+   addLoadOptions(result,actor,target);
+   addLoadOptions(result,target,actor);
    if(api().rules(actor)?.engineeringRef){
     if(target.catalogSystems){
      job('repair-treads',{kind:'unit',runtimeUnitId:target.id});
@@ -57,9 +69,14 @@
    }
   }
   if(!target){
-   if(actor.droneBays)for(const cargo of state.units.filter(u=>alive(u)&&u.embarkedOn===actor.id)){const command={type:'CatalogDeploy',actorId:actor.id,cargoId:cargo.id,bayId:cargo.cargoBay,...cell};result.push({command,label:`${t('v2.ui.catalog.deployDrone')} · ${api().slotLabel(actor,cargo.cargoBay)} · ${cargo.name}`})}
-   else if(actor.transportCapacity)for(const cargo of state.units.filter(u=>alive(u)&&u.embarkedOn===actor.id))
-    add({type:'Unload',actorId:actor.id,cargoId:cargo.id,...cell},`${t('v2.ui.unload')} · ${cargo.name}`);
+   if((actor.droneBays||actor.transportCapacity)&&dist(actor,cell)===1){
+    for(const cargo of state.units.filter(u=>alive(u)&&u.embarkedOn===actor.id)){
+     const command=actor.droneBays?{type:'CatalogDeploy',actorId:actor.id,cargoId:cargo.id,bayId:cargo.cargoBay,...cell}:
+      {type:'Unload',actorId:actor.id,cargoId:cargo.id,...cell};
+     const label=actor.droneBays?t('v2.ui.catalog.deployDrone')+' · '+api().slotLabel(actor,cargo.cargoBay):t('v2.ui.unload');
+     result.push({command,label:label+' · '+cargo.name,transport:true});
+    }
+   }
    if(api().rules(actor)?.engineeringRef){const terrain=terrainTypeAt(cell.x,cell.y),d=api().registry().definitions.engineering['engineering-actions-v1'];if(d.clear.some(c=>c.from===terrain))job('clear',{kind:'cell',...cell});if(d.buildPosition.from.includes(terrain))job('position',{kind:'cell',...cell});if(terrain===d.buildBridge.from)job('bridge',{kind:'cell',...cell});for(const wreck of state.units.filter(u=>root.GoblinUnitLife.dead(u)&&!u.embarkedOn&&!u.salvaged&&u.x===cell.x&&u.y===cell.y))job('salvage',{kind:'wreck',wreckId:api().wreckKey(wreck)})}
   }
   return result;

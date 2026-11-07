@@ -464,7 +464,8 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-target-choices button { display: flex; gap: 6px; align-items: center; text-align: left; overflow-wrap: anywhere; }
 .v2-map-hover { position: absolute; z-index: 3; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; width: max-content; max-width: min(300px, 95%); padding: 5px 8px; border: 1px solid var(--v2-line); border-radius: 8px; background: var(--v2-surface); color: var(--v2-text); font-size: 12px; pointer-events: none; }
 .v2-map-hover[hidden] { display: none; }
-.v2-area-load { fill: none; stroke: var(--v2-signal); stroke-width: 2; stroke-dasharray: 5 3; }
+.v2-area-load, .v2-area-unload { fill: none; stroke: var(--v2-signal); stroke-width: 2; stroke-dasharray: 5 3; }
+.v2-area-unload { stroke-dasharray: 2 3; }
 .v2-target-head { display: flex; align-items: center; gap: 8px; }
 .v2-card .v2-target-where { margin: 0; color: var(--v2-muted); font-size: 12px; }
 .v2-target-facts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 13px; }
