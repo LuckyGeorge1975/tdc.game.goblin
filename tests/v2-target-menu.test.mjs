@@ -55,3 +55,32 @@ test('target choices and cancel issue no commands, and a Core weapon switch requ
   assert.deepEqual(dispatched, [['SelectWeapon', 1], ['PlayerFire', 2]]);
   assert.equal(card.hidden, true);
 });
+
+const runCommand = ui.slice(ui.indexOf('    async function runCommand('), ui.indexOf('    function chooseActor('));
+
+for (const [profile, type] of [['FULL U13', 'CatalogHexFire'], ['Legacy', 'Fire']]) {
+  test(`${profile} missile warns of attack 6 direct and 3 adjacent before dispatch`, async () => {
+    const target = {x: 4, y: 0};
+    const view = {target, intentRevision: 1};
+    const state = {units: []};
+    const warnings = [];
+    const context = {
+      view, state, URL, URLSearchParams, location: {href: import.meta.url}, document: {readyState: 'loading', addEventListener() {}},
+      phaseCanAct() {}, phaseDoneLabel() {}, weaponTargetAllowed() {}, showUnitInfo() {}, attack() {},
+      revision: () => 1, query: () => ({ok: true}), hexLabel: () => 'E-01', render() {},
+      GameDialogs: {confirm(warning) { warnings.push(warning); return false; }},
+      dispatch() { assert.fail('Cancel must not dispatch a missile strike'); }
+    };
+    for (const file of ['strategic-missile.js', 'localization.js']) {
+      runInNewContext(readFileSync(new URL('../' + file, import.meta.url), 'utf8'), context);
+    }
+    context.t = (key, params) => context.GoblinLanguage.t(key, params, 'de');
+    runInNewContext(runCommand, context);
+
+    await context.runCommand(state, {command: {type, ...target}, confirmSplash: true});
+    assert.equal(warnings.length, 1);
+    assert.equal(warnings[0].title, context.t('v2.ui.missile'));
+    assert.match(warnings[0].message, /E-01.*Angriff 6 direkt, 3 auf Nachbarfeldern/);
+    assert.equal(view.target, target);
+  });
+}

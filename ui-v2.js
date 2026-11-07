@@ -719,7 +719,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const affected = state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && (command.type!=='CatalogHexFire'||unit.team==='player') &&
           dist(unit, cell) <= strike.radius).map(unit => unit.name + ' (' + t(unit.team === 'player' ? 'ui.team.player' : 'ui.team.enemy') + ')');
         const accepted = await GameDialogs.confirm({id:'v2-splash-confirm',title:t('v2.ui.missile'),
-          message:[t('v2.ui.sector') + ' ' + hexLabel(cell), t('v2.ui.missileSplash'), t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.adjacentAttack}), affected.join(', ')].filter(Boolean).join(' · '),
+          message:[t('v2.ui.sector') + ' ' + hexLabel(cell), t('v2.ui.missileSplash'), t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.splashAttack}), affected.join(', ')].filter(Boolean).join(' · '),
           acceptLabel:t('ui.hud.intent.confirm'),cancelLabel:t('ui.dialog.cancel')});
         if (!accepted || view.target !== cell || expectedRevision !== revision()) { render(); return; }
       }
