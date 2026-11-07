@@ -630,7 +630,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             button(t('ui.nav.restart'), confirmRestart)),
           actions(button(t('ui.nav.missions'), goToLevels),
             button(t('ui.details.units'), () => openSection('catalog')),
-            button(t('ui.nav.settings'), () => openSection('options'))));
+            button(t('ui.nav.settings'), () => openSection('options')),
+            button(t('v2.ui.mainMenu'), () => leaveMission('menu'))));
       } else if (screen === 'end') {
         const training=globalThis.GoblinTrainingRuntime?.view();
         if(training?.definition.mode==='learning'){
@@ -775,7 +776,15 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         alphaInput.value = String(Math.round(overlayAlpha() * 100)); alphaValue.textContent = `${alphaInput.value} %`;
         alphaInput.oninput = () => { applyOverlayAlpha(Number(alphaInput.value) / 100); alphaValue.textContent = `${alphaInput.value} %`; };
         alpha.append(document.createTextNode(t('v2.display.overlayAlpha')), alphaInput, alphaValue);
-        content.append(language, animation, grid, ...displayOptions, alpha, paragraph(t('ui.settings.note')));
+        const phaseNotice = document.createElement('label');
+        phaseNotice.className = 'v2-setting-check';
+        const phaseInput = document.createElement('input');
+        phaseInput.type = 'checkbox';
+        phaseInput.id = 'v2-phase-notice-option';
+        phaseInput.checked = GoblinUIV2.phaseNoticeEnabled;
+        phaseInput.onchange = () => GoblinUIV2.setPhaseNoticeEnabled(phaseInput.checked);
+        phaseNotice.append(phaseInput, document.createTextNode(t('v2.phaseNotice.setting')));
+        content.append(language, animation, grid, ...displayOptions, phaseNotice, alpha, paragraph(t('ui.settings.note')));
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-options-back';
         footer.append(actions(back));
@@ -799,8 +808,6 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         ?.focus({ preventScroll: true });
     }
     document.querySelector('#v2-pause').onclick = enterPause;
-    document.querySelector('#v2-settings').onclick = () => { if (!GameDialogs.isOpen()) openSection('options'); };
-    document.querySelector('#v2-home').onclick = () => leaveMission('menu');
     document.querySelector('#v2-log-open').onclick = () => { if (!GameDialogs.isOpen()) openSection('log'); };
     globalThis.addEventListener('goblin-view-settings-change',()=>{
       for(const key of ['grid','targets','damage']){

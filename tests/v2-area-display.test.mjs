@@ -54,15 +54,15 @@ function focusScene({view,legal,showCostChips,mode='movement',cardHidden=false})
   const start = source.indexOf("      if (mode === 'movement') {\n        const focused");
   const end = source.indexOf('      if (view.target && mode', start);
   assert.ok(start > 0 && end > start);
-  const caption={textContent:'12 × 8 · Pan'}, intel={textContent:'Unit → D-05 · Mountain'};
+  const intel={textContent:'Unit → D-05 · Mountain'};
   const card={hidden:cardHidden};
   const context = {mode,view,data:{legal},message:'Reachable',showCostChips,
     t:key=>key==='v2.ui.sector'?'SECTOR':key,
     hexLabel:()=> 'D-05',
     GoblinLanguage:{translate:()=> 'MOVE COST'},
-    at:key=>({'#v2-map-caption':caption,'#v2-command-intel':intel,'#v2-command-card':card})[key]};
+    at:key=>({'#v2-command-intel':intel,'#v2-command-card':card})[key]};
   runInNewContext(`${source.slice(start,end)}\nglobalThis.result = message;`,context);
-  return {message:context.result,caption:caption.textContent,intel:intel.textContent};
+  return {message:context.result,intel:intel.textContent};
 }
 
 test('focused legal field keeps its authoritative cost in the existing status view', () => {
@@ -101,30 +101,29 @@ test('hidden chips expose only current legal focus cost above the map and in ope
   const legal=[{x:3,y:4,cost:2}];
   const selected=focusScene({view:{target:{x:3,y:4}},legal,showCostChips:false});
   assert.equal(selected.message,'Reachable · SECTOR D-05 · MOVE COST 2');
-  assert.equal(selected.caption,'D-05 · MOVE COST 2');
   assert.equal(selected.intel,'Unit → D-05 · Mountain · MOVE COST 2');
   const focused=focusScene({view:{focusCell:{x:3,y:4}},legal,showCostChips:false,cardHidden:true});
-  assert.equal(focused.caption,'D-05 · MOVE COST 2');
+  assert.equal(focused.message,'Reachable · SECTOR D-05 · MOVE COST 2');
   assert.equal(focused.intel,'Unit → D-05 · Mountain');
   const stale=focusScene({view:{target:{x:7,y:7},infoCell:{x:3,y:4}},legal,showCostChips:false});
-  assert.equal(stale.caption,'12 × 8 · Pan');
+  assert.equal(stale.message,'Reachable');
   assert.equal(stale.intel,'Unit → D-05 · Mountain');
   const phase=focusScene({view:{target:{x:3,y:4}},legal,showCostChips:false,mode:'fire'});
-  assert.equal(phase.caption,'12 × 8 · Pan');
+  assert.equal(phase.message,'Reachable');
   assert.equal(phase.intel,'Unit → D-05 · Mountain');
 });
 
-test('compact movement status points to the focused cost instead of claiming a visible number', () => {
+test('movement and empty selection have no redundant status prompt or reachable count', () => {
   assert.match(source,/const showCostChips = hexWidth \* pixelScale >= 50 && !matchMedia\('\(max-width: 599px\)'\)\.matches;/);
-  const start=source.indexOf('      let message = t(mode ===');
+  const start=source.indexOf('      let message = ');
   const end=source.indexOf("      if (weapon && mode === 'fire')",start);
   assert.ok(start>0 && end>start);
   const status=source.slice(start,end);
-  for (const [visible,key] of [[true,'v2.area.status.move'],[false,'v2.area.status.moveCompact']]) {
-    const context={mode:'movement',data:{status:'move',legal:[{},{}]},showCostChips:visible,
+  for (const [state,expected] of [['move',''],['select',''],['blocked','v2.area.status.blocked:2']]) {
+    const context={data:{status:state,legal:[{},{}]},
       t:(name,{count})=>`${name}:${count}`};
     runInNewContext(`${status}\nglobalThis.result=message;`,context);
-    assert.equal(context.result,`${key}:2`);
+    assert.equal(context.result,expected);
   }
 });
 

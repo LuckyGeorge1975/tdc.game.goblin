@@ -71,7 +71,7 @@ test('view flags default on and synchronize current option inputs and pressed to
   const context=vm.createContext({Event:class{constructor(type){this.type=type}},
     at:selector=>{if(!nodes.has(selector))nodes.set(selector,{attrs:{},setAttribute(key,value){this.attrs[key]=String(value)}});return nodes.get(selector)},
     displayControls:{update(){}},t:key=>key,clearContext(){},clearTimeout(){},applyMapSize(){},
-    startZoomPending:null,fireZoomPhase:null,surface:{querySelector:selector=>inputs[selector]}});
+    startZoomPending:null,fireZoomPhase:null,phaseNoticeKey:null,hidePhaseNotice(){},surface:{querySelector:selector=>inputs[selector]}});
   context.addEventListener=(type,fn)=>events.set(type,fn);
   context.dispatchEvent=event=>events.get(event.type)?.();
   vm.runInContext(viewSource+setter+reset+'\nglobalThis.flags=view;globalThis.set=setViewFlag;globalThis.reset=resetView;',context);

@@ -30,6 +30,14 @@ body.ui-v2-active.v2-screen-open .v2-shell > .v2-controls { display: none; }
 .v2-screen { display: grid; place-items: center; min-width: 0; }
 .v2-screen-panel { width: min(780px, 100%); max-height: calc(100dvh - 24px); overflow: auto; padding: clamp(16px, 3vw, 30px); border: 1px solid var(--v2-line-strong); border-radius: 14px; background: var(--v2-surface); }
 .v2-screen-panel.v2-foundation { display: flex; flex-direction: column; min-width: 0; font: 16px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+body.ui-v2-active .game-dialog { border-color: var(--v2-line-strong); border-radius: 14px; background: var(--v2-surface); color: var(--v2-text); font: 16px/1.4 system-ui, sans-serif; }
+body.ui-v2-active .game-dialog :is(h2, .dialog-kind) { color: var(--v2-accent-text); font-family: inherit; }
+body.ui-v2-active .game-dialog p { color: var(--v2-muted); }
+body.ui-v2-active .game-dialog button { border: 1px solid var(--v2-line-strong); border-radius: 8px; background: var(--v2-surface2); color: var(--v2-text); }
+body.ui-v2-active .game-dialog button.primary { background: var(--v2-accent); color: var(--v2-bg); }
+body.ui-v2-active .game-dialog button:focus-visible { outline-color: var(--v2-signal); }
+body.v2-screen-open :is(.v2-command-card, .v2-target-card),
+body.ui-v2-active:has(.game-dialog[open]) :is(.v2-command-card, .v2-target-card, .v2-phase-notice) { visibility: hidden; }
 .v2-foundation .v2-screen-header, .v2-foundation .v2-screen-main, .v2-foundation .v2-screen-footer { min-width: 0; }
 .v2-foundation .v2-screen-footer { position: sticky; bottom: 0; z-index: 2; margin-top: auto; padding-top: 12px; background: var(--v2-surface); }
 .v2-foundation .v2-screen-footer .v2-screen-actions { margin-top: 0; }
@@ -351,7 +359,12 @@ button.training-highlight{outline:2px solid var(--v2-signal);outline-offset:3px}
 .v2-head h1 { font-size: clamp(18px, 2vw, 24px); }
 .v2-head-turn { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .v2-head-turn p { margin: 0; }
-#v2-phase { padding: 6px 12px; border: 1px solid var(--v2-signal); border-radius: 8px; background: var(--v2-surface2); color: var(--v2-signal); font-size: 14px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+#v2-phase { position: absolute; z-index: 2; inset: 10px 10px auto auto; width: max-content; max-width: var(--v2-phase-width); box-sizing: border-box; padding: 6px 10px; border: 1px solid var(--v2-signal); border-radius: 8px; background: var(--v2-surface2); color: var(--v2-signal); font-size: 14px; letter-spacing: .06em; text-align: center; text-transform: uppercase; overflow-wrap: anywhere; pointer-events: none; }
+.v2-phase-notice { position: absolute; z-index: 3; top: clamp(72px, 18%, 150px); left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: 8px; width: max-content; max-width: calc(100% - 32px); box-sizing: border-box; padding: 12px; border: 1px solid var(--v2-signal); border-radius: 10px; background: var(--v2-surface); color: var(--v2-signal); text-align: center; pointer-events: none; }
+.v2-phase-notice[hidden] { display: none; }
+.v2-phase-notice button { pointer-events: auto; max-width: 100%; }
+:is(#v2-phase, .v2-phase-notice)[data-phase="movement"] { border-color: var(--v2-success); color: var(--v2-success); }
+:is(#v2-phase, .v2-phase-notice)[data-phase="fire"] { border-color: var(--v2-danger-text); color: var(--v2-danger-text); }
 .v2-head-goal { flex: 1; min-width: 0; text-align: right; }
 .v2-head-goal p { margin: 2px 0; }
 body.ui-v2-active .v2-head .language-picker { display: none; }
@@ -370,15 +383,14 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-unit-embarked .v2-unit-mark { border: 2px dashed var(--v2-muted); }
 .v2-units .v2-unit[aria-pressed="true"] { border-color: var(--v2-accent-text); background: var(--v2-accent); box-shadow: inset 0 0 0 1px var(--v2-accent-text); }
 .v2-units .v2-unit:is(.v2-unit-done, .v2-unit-static, .v2-unit-disabled, .v2-unit-destroyed):not([aria-pressed="true"]) { opacity: .72; }
-.v2-map-frame { position: relative; flex: 1; min-height: 0; }
+.v2-map-frame { position: relative; flex: 1; min-height: 0; --v2-phase-width: clamp(80px, 21%, 180px); }
 .v2-map-overlay { position: absolute; z-index: 2; display: flex; gap: 8px; pointer-events: none; }
 .v2-map-overlay > * { pointer-events: auto; }
-.v2-map-overlay-top { top: 10px; left: 10px; right: 10px; flex-direction: column; align-items: flex-start; }
+.v2-map-overlay-top { top: 10px; left: 10px; right: calc(var(--v2-phase-width) + 20px); flex-direction: column; align-items: flex-start; }
 .v2-map-overlay-bottom { left: 10px; right: 10px; bottom: 10px; justify-content: space-between; align-items: flex-end; }
 .v2-area-controls button[aria-pressed="true"] { border-color: var(--v2-accent-text); background: var(--v2-surface2); color: var(--v2-accent-text); }
 .v2-area-controls .v2-icon-button:not([aria-pressed="true"]) { border-color: transparent; background: transparent; color: var(--v2-muted); }
-.v2-area-legend:empty, .v2-map-caption:empty { display: none; }
-.v2-map-caption { padding: 6px 10px; border: 1px solid var(--v2-line); border-radius: 8px; background: color-mix(in srgb, var(--v2-bg) 86%, transparent); font-size: 12px; }
+.v2-area-legend:empty { display: none; }
 .v2-target { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow: auto; }
 .v2-intel-switches { display: flex; gap: 4px; }
 .v2-intel-switches button { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 2px 10px; border-radius: 16px; color: var(--v2-muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
@@ -412,7 +424,7 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-intel-section p { margin: 0; }
 .v2-intel-wreck, .v2-intel-cargo, .v2-intel-facts { padding: 6px 8px; border-radius: 6px; background: var(--v2-surface); font-size: 12px; }
 .v2-context p { margin: 0; }
-.v2-context #v2-selection { font-weight: 700; }
+#v2-message:empty { min-height: 0; }
 #v2-phase-action:has(.v2-phase-title) { display: grid; justify-items: center; gap: 2px; line-height: 1.15; }
 .v2-phase-title { font-size: 15px; letter-spacing: .06em; text-transform: uppercase; }
 .v2-phase-sub { font-size: 12px; font-weight: 400; opacity: .85; }
@@ -432,12 +444,11 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 }
 @media (max-width: 599px), (max-height: 500px) { .v2-head { gap: 8px; padding: 6px 8px; } .v2-head-turn { flex: 1; gap: 8px; } .v2-head-turn p { font-size: 12px; white-space: nowrap; } #v2-phase { padding: 4px 8px; font-size: 12px; } .v2-head-goal { order: 5; flex: 1 1 100%; text-align: left; } .v2-head-goal p { font-size: 12px; } }
 @media (max-width: 1199px) { .v2-target { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; } #v2-intel { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); align-items: start; } }
-@media (max-width: 599px), (max-height: 500px) { .v2-target { grid-template-columns: minmax(0, 1fr); } .v2-head-turn { overflow: hidden; } #v2-phase { min-width: 0; overflow: hidden; text-overflow: ellipsis; } }
-@media (max-width: 599px), (max-height: 500px) { #v2-selection { display: none; } .v2-controls .v2-context:has(#v2-message:empty):has(#v2-terminal[hidden]):not(:has(#v2-action-chip:not([hidden]))) { display: none; } }
+@media (max-width: 599px), (max-height: 500px) { .v2-target { grid-template-columns: minmax(0, 1fr); } .v2-head-turn { overflow: hidden; } #v2-phase { font-size: 11px; padding: 5px; } }
+@media (max-width: 599px), (max-height: 500px) { .v2-controls .v2-context:has(#v2-message:empty):has(#v2-terminal[hidden]):not(:has(#v2-action-chip:not([hidden]))) { display: none; } }
 /* Active action (UR-G2): chosen in the menu, shown in the command bar; the target card confirms the order. */
 .v2-action-chip { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 2px 2px 2px 8px; border: 1px solid var(--v2-accent-text); border-radius: 10px; background: var(--v2-surface2); }
 .v2-action-chip[hidden] { display: none; }
-.v2-context:has(#v2-action-chip:not([hidden])) #v2-selection { display: none; }
 .v2-action-icon { display: inline-grid; place-items: center; color: var(--v2-accent-text); }
 .v2-action-text { display: grid; min-width: 0; line-height: 1.2; }
 .v2-action-text strong, .v2-target-head strong { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }

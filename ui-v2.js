@@ -38,9 +38,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const svgIcon = name => `<svg class="v2-icon" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]}</svg>`;
     const iconButton = (id, name, extra = '') => `<button type="button" class="v2-icon-button" id="${id}"${extra}>${svgIcon(name)}</button>`;
     shell.innerHTML = `
-      <header class="v2-head">${iconButton('v2-pause', 'pause')}<div class="v2-head-mission"><span class="v2-label" id="v2-profile"></span><h1 id="v2-mission"></h1></div><div class="v2-head-turn"><p id="v2-turn"></p><strong id="v2-phase" role="status" aria-live="polite"></strong></div><div class="v2-head-goal"><p id="v2-objective"></p></div>${iconButton('v2-settings', 'settings')}${iconButton('v2-home', 'home')}</header>
-      <div class="v2-layout"><aside class="v2-own"><section class="v2-card v2-units-card"><div class="v2-card-head"><span class="v2-label" id="v2-units-label"></span><span class="v2-units-ready" id="v2-units-ready"></span></div><div class="v2-units" id="v2-units"></div></section></aside><main class="v2-card v2-map-card"><span class="v2-sr" id="v2-map-label"></span><div class="v2-map-frame"><div class="v2-map" id="v2-map" tabindex="0"></div><div class="v2-map-overlay v2-map-overlay-top"><div class="v2-area-controls" role="group" id="v2-area-controls">${iconButton('v2-mode-movement', 'movement', ' data-area="movement"')}${iconButton('v2-mode-fire', 'fire', ' data-area="fire"')}${iconButton('v2-mode-los', 'los', ' data-area="los"')}<button type="button" id="v2-display-toggle" aria-expanded="false" aria-controls="v2-display-controls" hidden></button><div id="v2-display-controls" class="v2-display-controls" role="group">${iconButton('v2-area-grid', 'grid')}${iconButton('v2-area-targets', 'targets')}${iconButton('v2-area-damage', 'damage')}</div></div><div class="v2-weapon-controls" id="v2-weapon-controls" hidden></div><p id="v2-area-legend" class="v2-area-legend" role="status"></p></div><div class="v2-map-overlay v2-map-overlay-bottom"><strong class="v2-map-caption" id="v2-map-caption"></strong><div class="v2-map-tools" role="group" id="v2-map-tools">${iconButton('v2-zoom-in', 'zoomIn')}${iconButton('v2-zoom-out', 'zoomOut')}${iconButton('v2-zoom-center', 'center')}${iconButton('v2-zoom-fit', 'fit')}</div></div></div></main><aside class="v2-target"><section class="v2-card v2-intel-card"><div class="v2-card-head"><span class="v2-label" id="v2-intel-label"></span><div class="v2-intel-switches" role="group" id="v2-intel-switches"><button type="button" id="v2-intel-unit-toggle" data-section="unit">${svgIcon('los')}<span></span></button><button type="button" id="v2-intel-field-toggle" data-section="field">${svgIcon('los')}<span></span></button></div></div><div id="v2-intel"></div></section></aside></div>
-      <footer class="v2-controls"><div class="v2-context"><div class="v2-action-chip" id="v2-action-chip" role="status" hidden></div><span id="v2-selection"></span><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div>${iconButton('v2-log-open', 'log')}<button type="button" id="v2-undo"></button><button type="button" id="v2-phase-action"></button><button type="button" id="v2-next-unit"></button></footer><section class="v2-card v2-command-card" id="v2-command-card" role="group" aria-labelledby="v2-command-target" hidden><p class="v2-command-hint"><strong id="v2-command-target"></strong> <span id="v2-command-intel"></span></p><div class="v2-command-body" id="v2-command-body"><div class="v2-weapon-controls" id="v2-command-weapons" hidden></div></div><div class="v2-command-bar"><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></div></section><section class="v2-card v2-target-card" id="v2-target-card" role="group" aria-labelledby="v2-target-title" hidden></section>`;
+      <header class="v2-head"><div class="v2-head-mission"><span class="v2-label" id="v2-profile"></span><h1 id="v2-mission"></h1></div><div class="v2-head-turn"><p id="v2-turn"></p></div><div class="v2-head-goal"><p id="v2-objective"></p></div>${iconButton('v2-pause', 'settings')}</header>
+      <div class="v2-layout"><aside class="v2-own"><section class="v2-card v2-units-card"><div class="v2-card-head"><span class="v2-label" id="v2-units-label"></span><span class="v2-units-ready" id="v2-units-ready"></span></div><div class="v2-units" id="v2-units"></div></section></aside><main class="v2-card v2-map-card"><span class="v2-sr" id="v2-map-label"></span><div class="v2-map-frame"><div class="v2-map" id="v2-map" tabindex="0"></div><strong id="v2-phase" role="status" aria-live="polite"></strong><div id="v2-phase-notice" class="v2-phase-notice" hidden><strong></strong><button type="button"></button></div><div class="v2-map-overlay v2-map-overlay-top"><div class="v2-area-controls" role="group" id="v2-area-controls">${iconButton('v2-mode-movement', 'movement', ' data-area="movement"')}${iconButton('v2-mode-fire', 'fire', ' data-area="fire"')}${iconButton('v2-mode-los', 'los', ' data-area="los"')}<button type="button" id="v2-display-toggle" aria-expanded="false" aria-controls="v2-display-controls" hidden></button><div id="v2-display-controls" class="v2-display-controls" role="group">${iconButton('v2-area-grid', 'grid')}${iconButton('v2-area-targets', 'targets')}${iconButton('v2-area-damage', 'damage')}</div></div><div class="v2-weapon-controls" id="v2-weapon-controls" hidden></div><p id="v2-area-legend" class="v2-area-legend" role="status"></p></div><div class="v2-map-overlay v2-map-overlay-bottom"><div class="v2-map-tools" role="group" id="v2-map-tools">${iconButton('v2-zoom-in', 'zoomIn')}${iconButton('v2-zoom-out', 'zoomOut')}${iconButton('v2-zoom-center', 'center')}${iconButton('v2-zoom-fit', 'fit')}</div></div></div></main><aside class="v2-target"><section class="v2-card v2-intel-card"><div class="v2-card-head"><div class="v2-intel-switches" role="group" id="v2-intel-switches"><button type="button" id="v2-intel-unit-toggle" data-section="unit">${svgIcon('los')}<span></span></button><button type="button" id="v2-intel-field-toggle" data-section="field">${svgIcon('los')}<span></span></button></div></div><div id="v2-intel"></div></section></aside></div>
+      <footer class="v2-controls"><div class="v2-context"><div class="v2-action-chip" id="v2-action-chip" role="status" hidden></div><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div>${iconButton('v2-log-open', 'log')}<button type="button" id="v2-undo"></button><button type="button" id="v2-phase-action"></button><button type="button" id="v2-next-unit"></button></footer><section class="v2-card v2-command-card" id="v2-command-card" role="group" aria-labelledby="v2-command-target" hidden><p class="v2-command-hint"><strong id="v2-command-target"></strong> <span id="v2-command-intel"></span></p><div class="v2-command-body" id="v2-command-body"><div class="v2-weapon-controls" id="v2-command-weapons" hidden></div></div><div class="v2-command-bar"><div class="v2-actions" id="v2-actions"></div><div class="v2-command-footer" id="v2-command-footer"></div></div></section><section class="v2-card v2-target-card" id="v2-target-card" role="group" aria-labelledby="v2-target-title" hidden></section>`;
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
     document.body.classList.add('ui-v2-active');
@@ -61,6 +61,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         : `${unit.hp}/${unit.maxHp} ${unit.infantry ? 'SP' : 'HP'}`;
     }
     function renderM1Markers(state, actor) {
+      renderUnitHoverNames(state.units);
       nativeMap.querySelectorAll('.target-ring,.unit-selection-ring,.focus-marker').forEach(node => node.remove());
       M1UnitMarkers.render(nativeMap, state.markers, {actor, target:view.target, focus:view.focusCell, t,
         targetsVisible:view.targetsVisible,damageVisible:view.damageVisible});
@@ -71,6 +72,24 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       status.textContent=members.length?t('v2.ui.objectiveMembers',{done,total:members.length}):'';
       if(state.fullStatus){if(state.fullStatus.pendingEnemy)status.textContent+=' · '+t('v2.full.objective.pendingWaves');if(state.fullStatus.turnLimit!==null)status.textContent+=' · '+t('v2.full.limit.status',{current:state.fullStatus.enemyTurns,limit:state.fullStatus.turnLimit});}
       status.title=members.map(member => `${state.units.find(unit=>unit.id===member.unitId)?.name || member.unitId}: ${t(member.state==='satisfied'?'v2.ui.destroyed':'v2.ui.objectivePending')}`).join('\n');
+    }
+
+    function renderUnitHoverNames(projectedUnits) {
+      const names = new Map();
+      for (const unit of projectedUnits) {
+        if (unitAlive(unit) && !unit.embarkedOn) names.set(`${unit.x},${unit.y}`, unit.name);
+      }
+      for (const hex of nativeMap.querySelectorAll('.hex[data-x][data-y]')) {
+        const name = names.get(`${hex.dataset.x},${hex.dataset.y}`);
+        let title = hex.querySelector('title[data-v2-unit-name]');
+        if (!name) { title?.remove(); continue; }
+        if (!title) {
+          title = document.createElementNS(NS, 'title');
+          title.setAttribute('data-v2-unit-name', '');
+          hex.prepend(title);
+        }
+        if (title.textContent !== name) title.textContent = name;
+      }
     }
 
     function revision() {
@@ -315,6 +334,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       view.actorId = null; view.infoCell = null; view.focusCell = null; clearContext();
       view.zoom = 1; view.areaMode = null; view.previewWeaponKey = null;
       fireZoomPhase = null;
+      phaseNoticeKey = null;
+      hidePhaseNotice();
       view.phaseSkip = null; clearTimeout(view.phaseSkipTimer); applyMapSize();
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
@@ -323,6 +344,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       get gridVisible() { return view.gridVisible; }, setGridVisible(value) { setViewFlag('gridVisible',value); },
       get targetsVisible() { return view.targetsVisible; }, setTargetsVisible(value) { setViewFlag('targetsVisible',value); },
       get damageVisible() { return view.damageVisible; }, setDamageVisible(value) { setViewFlag('damageVisible',value); },
+      get phaseNoticeEnabled() { return phaseNoticeEnabled; }, setPhaseNoticeEnabled,
       refresh: () => { areaCache.key = null; render(); } });
     function setViewFlag(key,value){
       view[key]=!!value;render();
@@ -461,7 +483,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       return button;
     }
     function renderFieldInfo(state, actor, terrainAt) {
-      for (const button of at('#v2-intel-switches').querySelectorAll('[data-section]')) {
+      const switches = at('#v2-intel-switches');
+      switches.setAttribute('aria-label', t('v2.ui.fieldIntel'));
+      for (const button of switches.querySelectorAll('[data-section]')) {
         const section = button.dataset.section, label = t(`v2.intel.${section}`);
         button.lastElementChild.textContent = label;
         button.setAttribute('aria-pressed', String(intelSections[section]));
@@ -729,7 +753,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       startZoomPending = null;
       const unit = (core() ? project().units : globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(item => item.id === id && item.team === 'player' && unitAlive(item));
       view.actorId = unit?.id || null;
-      view.areaMode = null; view.previewWeaponKey = null;
+      if (view.areaMode !== 'none') view.areaMode = null;
+      view.previewWeaponKey = null;
       if (unit) { view.focusCell = { x: unit.x, y: unit.y }; view.infoCell = { x: unit.x, y: unit.y }; }
       clearContext(); view.menuOpen = !!unit && openMenu; render();
       if(unit)globalThis.GoblinTrainingRuntime?.select(unit.id);
@@ -962,15 +987,15 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const mode = activeAreaMode(state);
       for (const button of at('#v2-area-controls').querySelectorAll('[data-area]')) {
         const key = button.dataset.area;
-        button.title = t(`v2.area.${key}`); button.setAttribute('aria-label', button.title);
+        button.title = t(`v2.overlayHint.${key}`); button.setAttribute('aria-label', t(`v2.area.${key}`));
         button.setAttribute('aria-pressed', String(mode === key));
       }
       const gridButton = at('#v2-area-grid');
-      gridButton.title = t('v2.area.grid'); gridButton.setAttribute('aria-label', gridButton.title);
+      gridButton.title = t('v2.overlayHint.grid'); gridButton.setAttribute('aria-label', t('v2.area.grid'));
       gridButton.setAttribute('aria-pressed', String(view.gridVisible));
       for(const [key,label] of [['targets','missionTargets'],['damage','damage']]){
         const button=at(`#v2-area-${key}`);
-        button.title=t(`v2.display.${key}`);
+        button.title=t(`v2.overlayHint.${key}`);
         button.setAttribute('aria-label',t(`v2.display.${label}`));
         button.setAttribute('aria-pressed',String(view[`${key}Visible`]));
       }
@@ -1080,8 +1105,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           }
         }
       }
-      let message = t(mode === 'movement' && data.status === 'move' && !showCostChips
-        ? 'v2.area.status.moveCompact' : `v2.area.status.${data.status}`, { count: data.legal.length });
+      let message = ['select', 'move'].includes(data.status) ? '' : t(`v2.area.status.${data.status}`, { count: data.legal.length });
       if (weapon && mode === 'fire') message += ` · ${!core()&&globalThis.GoblinSpecialistsRuntime?.active()?GoblinSpecialistsUI.weaponLabel(actor,weapon):weapon.label}`;
       if (data.reason) message += ` · ${data.reason}`;
       if (mode === 'movement') {
@@ -1089,9 +1113,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const cell = focused && data.legal.find(item => item.x === focused.x && item.y === focused.y);
         if (cell && Number.isFinite(cell.cost)) {
           const costText = `${hexLabel(focused)} · ${GoblinLanguage.translate('MOVE COST')} ${cell.cost}`;
-          message += ` · ${t('v2.ui.sector')} ${costText}`;
+          message = [message, `${t('v2.ui.sector')} ${costText}`].filter(Boolean).join(' · ');
           if (!showCostChips) {
-            at('#v2-map-caption').textContent = costText;
             if (view.target && !at('#v2-command-card').hidden)
               at('#v2-command-intel').textContent += ` · ${GoblinLanguage.translate('MOVE COST')} ${cell.cost}`;
           }
@@ -1157,6 +1180,49 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       return commands;
     }
     const targetCommands = (state, actor, cell) => actor && cell ? (core() ? coreCommands : legacyCommands)(state, actor, cell) : [];
+    const phaseNotice = at('#v2-phase-notice');
+    const phaseNoticePreference = 'goblin.v2.phaseNotice';
+    let phaseNoticeEnabled = true, phaseNoticeKey = null, phaseNoticeTimer = null;
+    try { phaseNoticeEnabled = localStorage.getItem(phaseNoticePreference) !== 'off'; } catch {}
+    function hidePhaseNotice() {
+      clearTimeout(phaseNoticeTimer);
+      phaseNotice.hidden = true;
+    }
+    function setPhaseNoticeEnabled(enabled) {
+      phaseNoticeEnabled = !!enabled;
+      try { localStorage.setItem(phaseNoticePreference, enabled ? 'on' : 'off'); } catch {}
+      if (!phaseNoticeEnabled) hidePhaseNotice();
+    }
+    phaseNotice.querySelector('button').onclick = () => {
+      setPhaseNoticeEnabled(false);
+      at('#v2-map').focus({preventScroll:true});
+    };
+    function renderPhaseNotice(state) {
+      const phase = state.phase === 'enemy' ? 'enemy' : state.turnPhase;
+      const label = at('#v2-phase');
+      label.dataset.phase = state.gameOver ? '' : phase;
+      if (state.gameOver || document.body.classList.contains('v2-screen-open')) {
+        hidePhaseNotice();
+        return;
+      }
+      const {sessionId, epoch} = state.markers?.binding ?? {};
+      const key = JSON.stringify([state.scenario, sessionId, epoch, state.turn, phase]);
+      if (phaseNoticeKey !== key) {
+        phaseNoticeKey = key;
+        hidePhaseNotice();
+        if (!phaseNoticeEnabled || GameDialogs.isOpen()) return;
+        phaseNotice.dataset.phase = phase;
+        phaseNotice.hidden = false;
+        phaseNoticeTimer = setTimeout(() => {
+          if (!phaseNotice.contains(document.activeElement)) hidePhaseNotice();
+        }, 5000);
+      }
+      if (!phaseNotice.hidden) {
+        phaseNotice.querySelector('strong').textContent = t(phase === 'enemy' ? 'phase.enemy.label' : `v2.phase.${phase}`);
+        phaseNotice.querySelector('button').textContent = t('v2.phaseNotice.disable');
+      }
+    }
+
     function renderCore(state) {
       const actor = state.units.find(unit => unit.id === view.actorId && unitAlive(unit));
       if (!actor) {view.actorId = null; clearContext();}
@@ -1164,11 +1230,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-mission').textContent = state.mission.title;
       at('#v2-objective').textContent = state.mission.objective;
       at('#v2-map-label').textContent = GoblinLanguage.translate('TACTICAL MAP');
-      at('#v2-map-caption').textContent = `${Math.max(...state.cells.map(cell => cell.x)) + 1} × ${Math.max(...state.cells.map(cell => cell.y)) + 1} · ${t('v2.ui.mapPan')}`;
       at('#v2-map').setAttribute('aria-label', `${t('ui.hud.map')}: ${t('v2.ui.selectHex')}`);
       at('#v2-profile').textContent = state.profile==='TRAINING_FIELD_TEST_v1'?t('training.label'):globalThis.GoblinCatalogFullRuntime?.active()?t('v2.full.profile'):state.profile==='CATALOG_SPECIALISTS_v1'?t('v2.specialists.profile'):state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
       at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
         state.phase === 'enemy' ? t('v2.enemy') : t(`v2.phase.${state.turnPhase}`);
+      renderPhaseNotice(state);
       at('#v2-turn').textContent = `${t('ui.hud.turn',{turn:state.turn})} · ${t('v2.ui.coreHp')} ${state.objective.coreHp}/${state.objective.coreMax}`;
       const terminal = at('#v2-terminal'); terminal.hidden = !state.gameOver;
       terminal.classList.toggle('v2-failed', state.gameOver && !state.objective.outcome);
@@ -1188,8 +1254,6 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       backLabel(coreUndo, 0);
       renderTurnControls(state);
       at('#v2-units-label').textContent = t('ui.hud.units');
-      at('#v2-intel-label').textContent = t('v2.ui.fieldIntel');
-      at('#v2-selection').textContent = actor?.name || t('ui.hud.noSelection');
       at('#v2-message').textContent = view.message;
       renderRoster(state, unit => [strengthText(unit), unit.secondMoved ? t('v2.ui.secondMoved') :
         unit.fired ? t('v2.ui.fired') : unit.moved ? t('v2.ui.moved') : '']);
@@ -1212,8 +1276,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const zoomOut = at('#v2-zoom-out'), zoomIn = at('#v2-zoom-in');
       const fit = at('#v2-zoom-fit'), center = at('#v2-zoom-center');
       for (const [button, key] of [[zoomOut, 'ui.hud.zoomOut'], [zoomIn, 'ui.hud.zoomIn'], [fit, 'v2.ui.mapFit'],
-        [center, 'v2.ui.centerSelection'], [at('#v2-pause'), 'ui.nav.pause'], [at('#v2-settings'), 'ui.nav.settings'],
-        [at('#v2-home'), 'v2.ui.mainMenu'], [at('#v2-log-open'), 'ui.details.log']]) { button.title = t(key); button.setAttribute('aria-label', button.title); }
+        [center, 'v2.ui.centerSelection'], [at('#v2-pause'), 'ui.nav.pause'], [at('#v2-log-open'), 'ui.details.log']]) { button.title = t(key); button.setAttribute('aria-label', button.title); }
       at('#v2-map-tools').setAttribute('aria-label', t('ui.hud.map'));
       zoomOut.disabled = view.zoom <= 1;
       zoomIn.disabled = view.zoom >= 4;
@@ -1227,14 +1290,13 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-objective').textContent = state.mission.objective;
       at('#v2-map-label').textContent = GoblinLanguage.translate('TACTICAL MAP');
       at('#v2-units-label').textContent = t('ui.hud.units');
-      at('#v2-intel-label').textContent = t('v2.ui.fieldIntel');
       at('#v2-profile').textContent = state.profile==='TRAINING_FIELD_TEST_v1'?t('training.label'):globalThis.GoblinCatalogFullRuntime?.active()?t('v2.full.profile'):state.profile==='CATALOG_SPECIALISTS_v1'?t('v2.specialists.profile'):state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
       at('#v2-phase').textContent = state.gameOver ? learningResult??t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
         view.phaseSkip?.turn === state.turn ? t(view.phaseSkip.key) : t(`phase.${state.turnPhase}.label`);
+      renderPhaseNotice(state);
       at('#v2-turn').textContent = `${t('ui.hud.turn', { turn: state.turn })} · ${state.objective.goalMode === 'learning'?t('training.learningGoal'):state.objective.goalMode === 'core'
         ? t('hud.objective.progress.core', { currentHp: state.objective.coreHp, maxHp: state.objective.coreMax })
         : t('hud.objective.progress.enemies', { remainingEnemies: state.objective.enemyAlive, totalEnemies: globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.goalMode==='core-and-escort'?state.objective.total:state.objective.enemyTotal })}`;
-      at('#v2-map-caption').textContent = `${W} × ${H} · ${t('v2.ui.mapPan')}`;
       at('#v2-map').setAttribute('aria-label', `${t('ui.hud.map')}: ${t('v2.ui.selectHex')}`);
       const terminal = at('#v2-terminal');
       terminal.hidden = !state.gameOver;
@@ -1253,7 +1315,6 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       undoButton.disabled = !state.undo.available || view.busy;
       backLabel(undoButton, state.undo.count);
       renderTurnControls(state);
-      at('#v2-selection').textContent = actor ? actor.name : t('ui.hud.noSelection');
       at('#v2-message').textContent = view.message;
       renderRoster(state, unit => {
         const system = state.systems.find(item => item.id === unit.id);
