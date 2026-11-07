@@ -291,7 +291,7 @@ body.v2-menu-open .v2-map-overlay .v2-weapon-controls { display: none; }
 @media (max-width: 599px) { .v2-map-overlay .v2-weapon-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .v2-area-legend { max-width: min(100%, 560px); margin: 0; padding: 6px 10px; border: 1px solid var(--v2-line-strong); border-radius: 8px; background: color-mix(in srgb, var(--v2-bg) 86%, transparent); color: var(--v2-text); font-size: 12px; }
 body.ui-v2-active #v2-grid-overlay, body.ui-v2-active #v2-area-overlay { pointer-events: none; }
-body.ui-v2-active .v2-grid-line { fill: none; stroke: var(--v2-line-strong); stroke-width: 1.5; stroke-dasharray: 4 4; }
+body.ui-v2-active .v2-grid-line { fill: none; stroke: var(--v2-line-strong); stroke-width: 1.5; stroke-linejoin: round; }
 /* Ranges: the cells fill in the range colour with configurable opacity, only the outer edge is outlined. */
 body.ui-v2-active .v2-area-movement { fill: var(--v2-range-move); fill-opacity: var(--v2-overlay-alpha); stroke: none; }
 body.ui-v2-active .v2-area-fire { fill: var(--v2-range-fire); fill-opacity: var(--v2-overlay-alpha); stroke: none; }
@@ -300,6 +300,7 @@ body.ui-v2-active .v2-area-edge { fill: none; stroke-width: 3px; stroke-linecap:
 body.ui-v2-active .v2-area-edge-movement { stroke: var(--v2-range-move); }
 body.ui-v2-active .v2-area-edge-fire { stroke: var(--v2-range-fire); }
 body.ui-v2-active .v2-area-edge-sight { stroke: var(--v2-range-los); }
+body.ui-v2-active .v2-area-edge-plan { stroke: var(--v2-muted); stroke-width: 2; stroke-dasharray: 5 4; }
 .v2-screen-panel label.v2-setting-range { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
 .v2-setting-range input { grid-column: 1; accent-color: var(--v2-accent); }
 .v2-setting-range output { grid-column: 2; grid-row: 2; color: var(--v2-text); font-variant-numeric: tabular-nums; }

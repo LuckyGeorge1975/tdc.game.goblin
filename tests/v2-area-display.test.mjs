@@ -45,7 +45,7 @@ test('small fit omits illegible chips without changing the legal movement shape'
 
 function focusScene({view,legal,showCostChips,mode='movement',cardHidden=false}) {
   const start = source.indexOf("      if (mode === 'movement') {\n        const focused");
-  const end = source.indexOf('      if (view.target && mode', start);
+  const end = source.indexOf('      legend.textContent = ', start);
   assert.ok(start > 0 && end > start);
   const intel={textContent:'Unit → D-05 · Mountain'};
   const card={hidden:cardHidden};
