@@ -122,7 +122,7 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-catalog-list img { width: 40px; height: 40px; object-fit: contain; }
 .v2-catalog-entry { display: flex; gap: 8px; min-width: 0; }
 .v2-catalog-entry button:first-child { flex: 1; min-width: 0; }
-.v2-screen-panel:has(.v2-library-layout), .v2-screen-panel:has(.v2-library-footer) { width: min(1240px, 100%); height: min(820px, calc(100dvh - 24px)); overflow: hidden; }
+.v2-screen-panel[data-screen="catalog"], .v2-screen-panel:has(.v2-library-footer) { width: min(1240px, 100%); height: min(820px, calc(100dvh - 24px)); overflow: hidden; }
 .v2-library-layout { display: grid; grid-template-columns: minmax(240px, 2fr) minmax(0, 3fr); gap: 18px; min-height: 0; overflow: hidden; }
 .v2-library-list { display: grid; align-content: start; gap: 8px; min-width: 0; min-height: 0; overflow: auto; }
 .v2-library-choice { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 60px; text-align: left; }
@@ -432,7 +432,11 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-intel-systems .v2-system-row span { overflow-wrap: normal; hyphens: auto; }
 .v2-intel-systems .v2-system-row strong { font-weight: 600; text-align: right; }
 .v2-units .v2-unit[aria-pressed="true"] .v2-unit-text small { color: var(--v2-text); }
-.v2-library-kinds { display: flex; gap: 6px; margin-top: 8px; }
+.v2-library-kinds { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.v2-library-reference { margin-top: 12px; }
+.v2-library-reference :is(h3, h4, p, ul) { margin: 0; }
+.v2-library-reference ul { padding-inline-start: 22px; }
+.v2-library-reference li + li { margin-top: 6px; }
 .v2-library-terrain-tile { width: min(160px, 30vw); aspect-ratio: 1; border-radius: 10px; object-fit: cover; }
 @media (max-width: 599px) {
   .v2-units { flex-direction: row; overflow-x: auto; overflow-y: hidden; max-height: none; }

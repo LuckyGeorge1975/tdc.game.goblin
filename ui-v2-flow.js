@@ -255,6 +255,27 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function openSection(next) { returnScreen = screen; show(next); }
     function goBack() { show(returnScreen === 'play' && GoblinUIV2.project().gameOver ? 'end' : returnScreen); }
+    function selectLevel(id) {
+      missionId = id;
+      startError = '';
+      renderScreen(false);
+    }
+    function stepLevelSelection(event) {
+      const direction = {ArrowUp: -1, ArrowDown: 1}[event.key];
+      if (!direction || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || GameDialogs.isOpen()) return;
+      const list = event.currentTarget;
+      const focused = event.target.closest('.v2-level-choice');
+      if (!focused || !list.contains(focused)) return;
+      const rows = [...list.querySelectorAll('.v2-level-choice:not(:disabled)')];
+      const active = rows.findIndex(row => row.id === `v2-level-${missionId}`);
+      const next = rows[(active < 0 ? rows.indexOf(focused) : active) + direction];
+      event.preventDefault();
+      if (!next) return;
+      selectLevel(next.id.slice('v2-level-'.length));
+      const row = document.getElementById(next.id);
+      row?.scrollIntoView({block:'nearest', inline:'nearest'});
+      row?.focus({preventScroll:true});
+    }
     function returnToSelectedLevel() {
       show('levels', false);
       const row = document.getElementById(`v2-level-${missionId}`);
@@ -488,13 +509,39 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function libraryKindSwitch() {
       const kinds = document.createElement('div'); kinds.className = 'v2-library-kinds'; kinds.setAttribute('role', 'group');
-      for (const kind of ['units', 'terrain']) {
+      kinds.setAttribute('aria-label', t('v2.library.title'));
+      for (const kind of ['rules', 'units', 'terrain', 'tips']) {
         const choice = button(t(`v2.library.kind.${kind}`), () => { libraryKind = kind; renderScreen(false); });
         choice.id = `v2-library-kind-${kind}`;
         choice.setAttribute('aria-pressed', String(libraryKind === kind));
         kinds.append(choice);
       }
       return kinds;
+    }
+    function libraryReference(kind) {
+      const section = document.createElement('section');
+      section.className = 'v2-library-detail v2-library-reference v2-screen-main';
+      const title = document.createElement('h3');
+      title.textContent = t(`v2.library.${kind}.status`);
+      section.append(title, paragraph(t(`v2.library.${kind}.intro`)));
+      if (kind === 'rules') {
+        for (const [topic, items] of [
+          ['general', ['turns', 'combat']],
+          ['profiles', ['profiles', 'specials']],
+          ['examples', ['training', 'core', 'siege', 'atlas']]
+        ]) {
+          const label = document.createElement('h4');
+          label.textContent = t(`v2.library.rules.heading.${topic}`);
+          const list = document.createElement('ul');
+          for (const item of items) {
+            const row = document.createElement('li');
+            row.textContent = t(`v2.library.rules.item.${item}`);
+            list.append(row);
+          }
+          section.append(label, list);
+        }
+      }
+      return section;
     }
     // Opens the library from the field intel at the given unit or terrain type.
     function openLibrary(kind, key) {
@@ -543,7 +590,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const menu = document.createElement('nav'); menu.className = 'v2-menu-links v2-screen-main';
         menu.setAttribute('aria-label', t('ui.start.title'));
         const choose = button(t('ui.start.choose'), () => show('levels'), 'primary'); choose.id = 'v2-menu-choose';
-        const units = button(t('ui.details.units'), () => openSection('catalog')); units.id = 'v2-menu-units';
+        const units = button(t('v2.library.title'), () => openSection('catalog')); units.id = 'v2-menu-units';
         const settings = button(t('ui.nav.settings'), () => openSection('options')); settings.id = 'v2-menu-settings';
         const legal = button(t('v2.ui.legalNotices'), () => openSection('legal')); legal.id = 'v2-menu-legal';
         menu.append(choose, units, settings, legal);
@@ -556,13 +603,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         panel.append(header);
         const layout = document.createElement('div'); layout.className = 'v2-level-layout v2-screen-main';
         const list = document.createElement('div'); list.className = 'v2-level-list';
+        list.addEventListener('keydown', stepLevelSelection);
         const ids = [...Object.keys(ScenarioRuleProfiles.entries), 'iron-dust-v2'];
         if (!ids.includes(missionId)) missionId = ids[0];
         for (const id of ids) {
           const available = !!missionData(id);
-          const choose = button('', () => {
-            missionId = id; startError = ''; renderScreen(false);
-          }, 'v2-level-choice');
+          const choose = button('', () => selectLevel(id), 'v2-level-choice');
           const title = document.createElement('strong'); title.textContent = t(`mission.${id}.title`);
           const summary = document.createElement('span');
           summary.textContent = t(id === 'iron-dust-v2' ? 'v2.objective' : `mission.${id}.objective.short`);
@@ -634,7 +680,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           actions(button(t('ui.nav.resume'), () => { show('play'); releasePause(); }, 'primary'),
             button(t('ui.nav.restart'), confirmRestart)),
           actions(button(t('ui.nav.missions'), goToLevels),
-            button(t('ui.details.units'), () => openSection('catalog')),
+            button(t('v2.library.title'), () => openSection('catalog')),
             button(t('ui.nav.settings'), () => openSection('options')),
             button(t('v2.ui.mainMenu'), () => leaveMission('menu'))));
       } else if (screen === 'end') {
@@ -671,38 +717,42 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         panel.append(entries, actions(back));
       } else if (screen === 'catalog') {
         const header = document.createElement('header'); header.className = 'v2-screen-header';
-        header.append(heading(GoblinLanguage.translate('UNIT GUIDE')),
-          paragraph(t(libraryKind === 'terrain' ? 'v2.library.terrain.note' : 'v2.ui.catalogNote')), libraryKindSwitch());
-        const layout = document.createElement('div'); layout.className = 'v2-library-layout v2-screen-main';
-        const list = document.createElement('div'); list.className = 'v2-library-list';
-        if (libraryKind === 'terrain') terrainIds.forEach((id, index) => {
-          const item = button(TerrainDisplay.label(id), () => {
-            terrainIndex = index;
-            if (matchMedia('(max-width: 900px)').matches) show('catalog-detail'); else renderScreen(false);
-          }, 'v2-library-choice');
-          item.id = `v2-library-terrain-${id}`;
-          item.setAttribute('aria-current', index === terrainIndex ? 'true' : 'false');
-          const tile = TerrainDisplay.icon(id, 'v2-library-map-icon');
-          if (tile) item.prepend(tile);
-          list.append(item);
-        });
-        else unitGuideEntries.forEach((entry, index) => {
-          const item = button(libraryName(entry), () => openLibraryEntry(index), 'v2-library-choice');
-          item.id = `v2-library-${libraryAssetId(entry)}`;
-          item.setAttribute('aria-current', index === libraryIndex ? 'true' : 'false');
-          if (UnitVisuals.resolve(entry).asset ||
-              (UnitVisuals.artKey(entry) && ['player', 'enemy'].includes(entry.team)))
-            item.prepend(UnitVisuals.iconElement(entry, 'v2-library-map-icon'));
-          list.append(item);
-        });
-        layout.append(list);
-        if (!matchMedia('(max-width: 900px)').matches)
-          layout.append(libraryKind === 'terrain' ? terrainDetail(terrainIds[terrainIndex], false)
-            : libraryDetail(unitGuideEntries[libraryIndex], libraryIndex, state, false));
+        header.append(heading(t('v2.library.title')), libraryKindSwitch());
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-library-exit';
         footer.append(actions(back));
-        panel.append(header, layout, footer);
+        if (libraryKind === 'rules' || libraryKind === 'tips') {
+          panel.append(header, libraryReference(libraryKind), footer);
+        } else {
+          header.append(paragraph(t(libraryKind === 'terrain' ? 'v2.library.terrain.note' : 'v2.ui.catalogNote')));
+          const layout = document.createElement('div'); layout.className = 'v2-library-layout v2-screen-main';
+          const list = document.createElement('div'); list.className = 'v2-library-list';
+          if (libraryKind === 'terrain') terrainIds.forEach((id, index) => {
+            const item = button(TerrainDisplay.label(id), () => {
+              terrainIndex = index;
+              if (matchMedia('(max-width: 900px)').matches) show('catalog-detail'); else renderScreen(false);
+            }, 'v2-library-choice');
+            item.id = `v2-library-terrain-${id}`;
+            item.setAttribute('aria-current', index === terrainIndex ? 'true' : 'false');
+            const tile = TerrainDisplay.icon(id, 'v2-library-map-icon');
+            if (tile) item.prepend(tile);
+            list.append(item);
+          });
+          else unitGuideEntries.forEach((entry, index) => {
+            const item = button(libraryName(entry), () => openLibraryEntry(index), 'v2-library-choice');
+            item.id = `v2-library-${libraryAssetId(entry)}`;
+            item.setAttribute('aria-current', index === libraryIndex ? 'true' : 'false');
+            if (UnitVisuals.resolve(entry).asset ||
+                (UnitVisuals.artKey(entry) && ['player', 'enemy'].includes(entry.team)))
+              item.prepend(UnitVisuals.iconElement(entry, 'v2-library-map-icon'));
+            list.append(item);
+          });
+          layout.append(list);
+          if (!matchMedia('(max-width: 900px)').matches)
+            layout.append(libraryKind === 'terrain' ? terrainDetail(terrainIds[terrainIndex], false)
+              : libraryDetail(unitGuideEntries[libraryIndex], libraryIndex, state, false));
+          panel.append(header, layout, footer);
+        }
       } else if (screen === 'catalog-detail') {
         const terrain = libraryKind === 'terrain';
         const detail = terrain ? terrainDetail(terrainIds[terrainIndex], true)
