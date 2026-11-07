@@ -200,8 +200,8 @@ body.ui-v2-active #battlefield-map { min-width: 0; min-height: 0; }
 .v2-map-tools { display: flex; gap: 6px; margin-left: auto; }
 .v2-map-tools button { background: color-mix(in srgb, var(--v2-surface) 90%, transparent); }
 body.ui-v2-active #battlefield-map .unit-svg.acted-unit,
-body.ui-v2-active #battlefield-map .unit-svg.disabled-unit,
 body.ui-v2-active #battlefield-map .unit-svg.transport-unavailable { opacity: 1 !important; filter: none !important; }
+body.ui-v2-active #battlefield-map .unit-svg.disabled-unit { opacity: .32 !important; filter: grayscale(1) !important; }
 body.ui-v2-active #battlefield-map .unit-svg.acted-unit:not(.disabled-unit) { filter: brightness(1.35) saturate(.7) !important; }
 body.ui-v2-active #v2-focus-marker { fill: none; stroke: var(--v2-text); stroke-width: 2; stroke-dasharray: 3 5; }
 body.ui-v2-active #battlefield-map .m1-replaced-hp,
@@ -221,7 +221,7 @@ body.ui-v2-active #battlefield-map .hex.attack { stroke: transparent; stroke-wid
 .m1-status, .m1-weapon-damage { font: 700 8px system-ui,sans-serif; text-anchor: middle; fill: var(--v2-danger-text); paint-order: stroke; stroke: #0b0e12; stroke-width: 1.5; }
 .v2-own, .v2-target { display: grid; align-content: start; gap: 12px; min-height: 0; overflow: auto; }
 .v2-units { display: flex; flex-direction: column; gap: 6px; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
-.v2-units .v2-unit { display: grid; grid-template-columns: 32px minmax(0, 1fr) 20px; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; text-align: left; }
+.v2-units .v2-unit { display: grid; flex: none; grid-template-columns: 32px minmax(0, 1fr) 20px; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; text-align: left; }
 .v2-roster-art { width: 32px; height: 32px; object-fit: contain; flex: none; }
 .v2-system-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-top: 1px solid var(--v2-line); padding: 4px 0; font-size: 13px; }
 .v2-system-row span { overflow-wrap: anywhere; }

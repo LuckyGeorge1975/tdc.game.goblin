@@ -1201,6 +1201,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       globalThis.dispatchEvent(new Event('goblin-v2-render'));
     }
     function render() {
+      resumeMapSize();
       const state = project();
       syncAreaPhase(state);
       const fireZoom = fireZoomEntry(state);
@@ -1334,7 +1335,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }));
     }
     function fireZoomEntry(state) {
-      if (state.phase !== 'player' || state.turnPhase !== 'fire' || state.gameOver ||
+      if (globalThis.GoblinMovement?.presentingFire?.() || state.phase !== 'player' || state.turnPhase !== 'fire' || state.gameOver ||
           activeAreaMode(state) !== 'fire' || !mapPanel.clientWidth || !mapPanel.clientHeight) return null;
       const key = `${state.scenario}:${state.turn}:${state.phase}:${state.turnPhase}`;
       if (fireZoomPhase === key) return null;
@@ -1359,6 +1360,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function applyMapSize() {
       if(mapResizeFrame!==null){cancelAnimationFrame(mapResizeFrame);mapResizeFrame=null;}
+      mapResizeDeferred = false;
       const panelWidth=mapPanel.clientWidth,panelHeight=mapPanel.clientHeight;
       if (!panelWidth || !panelHeight) return;
       const box = nativeMap.viewBox.baseVal;
@@ -1373,9 +1375,21 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
     }
     let mapResizeFrame=null;
+    let mapResizeDeferred = false;
     function scheduleMapSize(){
       if(mapResizeFrame!==null)return;
-      mapResizeFrame=requestAnimationFrame(()=>{mapResizeFrame=null;applyMapSize();});
+      mapResizeFrame=requestAnimationFrame(()=>{
+        mapResizeFrame=null;
+        // A command can resize the footer while the shot still uses the current map scale.
+        if (globalThis.GoblinMovement?.presentingFire?.()) {
+          mapResizeDeferred = true;
+          return;
+        }
+        applyMapSize();
+      });
+    }
+    function resumeMapSize() {
+      if (mapResizeDeferred && !globalThis.GoblinMovement?.presentingFire?.()) scheduleMapSize();
     }
     new ResizeObserver(scheduleMapSize).observe(mapPanel);
     // Unused since the event log moved behind its button; the line ends the map sizing source read by resize-observer-geometry.
@@ -1552,6 +1566,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     globalThis.addEventListener('goblin-core-v2-render', () => {if(core()) render();});
     globalThis.addEventListener('goblin-unit-art-fallback', () => render());
     new MutationObserver(changes => {
+      resumeMapSize();
       const own = node => node.nodeType === 1 && /^(goblin-movement-layer|v2-(m1-markers|team-markers|actor-marker|target-marker|focus-marker|grid-overlay|area-overlay))$/.test(node.id);
       if (changes.some(change => [...change.addedNodes, ...change.removedNodes].some(node => !own(node)))) render();
     }).observe(nativeMap, { childList: true });

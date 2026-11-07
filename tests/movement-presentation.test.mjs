@@ -281,6 +281,7 @@ test('confirmed fire maps real side anchors, quad pair, explicit GOBLIN fallback
 test('real fire SVG freezes target until arrival, applies actual D at +50ms, then cleans all effects',()=>{
   for(const runtime of ['core','legacy']){
     const s=browserScene(runtime),event=s.fire('high');
+    assert.equal(s.context.GoblinMovement.presentingFire(),true);
     const p=s.context.GoblinFirePresentation.plan(event,0);
     assert.ok(p.shots.length===1&&p.shots[0].arrival>p.shots[0].at);
     s.c.advance(p.arrival-1);
@@ -292,6 +293,7 @@ test('real fire SVG freezes target until arrival, applies actual D at +50ms, the
     assert.ok(read().children.some(node=>node.tagName==='text'),'truthful status caption');
     assert.equal(s.owner.endState().units[1].hp,3,'D never invents HP damage');
     s.context.GoblinMovement.skip();s.c.advance(220);
+    assert.equal(s.context.GoblinMovement.presentingFire(),false);
     assert.equal(s.map.querySelector('#goblin-movement-layer'),null);assert.equal(s.context.GoblinMovement.busy(),false);
   }
 });

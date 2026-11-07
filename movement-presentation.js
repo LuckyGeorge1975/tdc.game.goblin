@@ -234,6 +234,7 @@
     finish,diagnostic:value=>{console.warn('Movement presentation checkpoint',value);root.dispatchEvent(new CustomEvent('goblin-movement-diagnostic',{detail:value}));}});
   root.GoblinMovement=Object.freeze({
     busy:queue.busy,skip:queue.skip,clear:queue.clear,read:queue.read,
+    presentingFire:()=>!!displayContext?.fire,
     projectedState:()=>displayContext?JSON.parse(JSON.stringify(displayContext.state)):null,
     wrecksAt:(x,y)=>displayContext?(displayContext.sidecar?.wrecks??[]).filter(w=>w.position.x===x&&w.position.y===y):null,
     facingFor(unit){const item=displayContext?.sidecar?.facingByUnit.find(f=>f.unitId===unit.id);
