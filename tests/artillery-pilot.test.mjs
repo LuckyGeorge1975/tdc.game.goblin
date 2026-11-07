@@ -1,3 +1,4 @@
+import {targetOptionsSource} from './helpers/target-options-source.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -63,11 +64,13 @@ test('exact R8/R6 boundaries, no hidden spotter weapon-range requirement and gen
 test('actual V2 mode/spotter button builds FireArtillery, chosen preview/CRT and used event metadata; classic handles indirect LOS honestly',()=>{
  const g=scene();queryBridge(g);phase(g);g.run(fs.readFileSync(new URL('../m1-unit-markers.js',import.meta.url),'utf8'));
  const ui=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');g.run('const legacyLogEntries=()=>[];'+ui.slice(ui.indexOf('    let idleCoreLog='),ui.indexOf('    function query(command)')));
- const a=ui.indexOf('    function previewWeaponKey('),b=ui.indexOf('    function freeRatioChipCenter(',a);g.run(ui.slice(a,b));
- g.run("document.body={classList:{contains:()=>false}};globalThis.state=project();globalThis.actor=state.units[0];globalThis.testContainer={replaceChildren(){this.children=[]},append(b){this.children.push(b)},setAttribute(){}};view.actorId='long-range-battery';view.target={x:8,y:1};renderWeaponControls(state,actor,testContainer)");
- assert.equal(g.run('state.markers.supported'),true);assert.ok(g.run('testContainer.children.length')>=3);g.run("testContainer.children.find(b=>b.dataset.weapon==='indirect/recon-tank').onclick({stopPropagation(){}})");
- g.run("globalThis.area=areaData(state,actor,'fire');globalThis.chip=selectedFirePreview(state,actor,units[0],'fire',previewWeaponKey(actor),area.legal)");assert.equal(g.run('chip.weaponKey'),'indirect/recon-tank');assert.equal(g.run('chip.ratioCategory'),'2-1');
- const c=ui.indexOf("        commands = state.turnPhase === 'fire'"),d=ui.indexOf("          : target?.team === 'enemy'",c);g.run("let commands;const runtimeActor=units[0],cell=view.target;"+ui.slice(c,d)+':[];');assert.equal(g.run('commands[0].command.type'),'FireArtillery');assert.equal(g.run('commands[0].command.spotterId'),'recon-tank');g.context.rollQueue=[0];assert.equal(g.run('dispatch(commands[0].command,revision()).ok'),true);assert.equal(g.events().at(-1).event.weapon.spotterId,'recon-tank');assert.equal(g.rolls(),1);
+ g.run("const GoblinLanguage={current:'de'};"+targetOptionsSource);
+ const before=g.state(), rng=g.rng();
+ g.run("globalThis.options=targetCommands(project(),units[0],{x:8,y:1});globalThis.shot=options.find(entry=>entry.command.spotterId==='recon-tank')");
+ assert.ok(g.run('options.length>=3'));assert.equal(g.run('shot.command.type'),'FireArtillery');
+ const chip=read(g,'previewFire(shot.command)');assert.equal(chip.weaponKey,'indirect/recon-tank');assert.equal(chip.ratioCategory,'2-1');
+ assert.equal(g.state(),before);assert.deepEqual(g.rng(),rng);
+ g.context.rollQueue=[0];assert.equal(g.run('dispatch(shot.command,revision()).ok'),true);assert.equal(g.events().at(-1).event.weapon.spotterId,'recon-tank');assert.equal(g.rolls(),1);
  const classic=scene();queryBridge(classic);phase(classic);classic.context.rollQueue=[0];classic.run("selected=units[0];GoblinArtilleryWeapons.selectWeapon(selected,'indirect/recon-tank');handleHex(8,1)");assert.equal(classic.rolls(),1);assert.equal(classic.run('lineOfSight(units[0],units[3])'),false);assert.equal(classic.events().at(-1).event.weapon.mode,'indirect');
 });
 

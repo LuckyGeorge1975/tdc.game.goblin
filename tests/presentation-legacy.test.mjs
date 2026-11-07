@@ -1,3 +1,4 @@
+import {targetOptionsSource} from './helpers/target-options-source.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -180,7 +181,7 @@ test('natural fire settle replaces busy-cached blocked area with the legal autos
   const slice=(first,last)=>ui.slice(ui.indexOf(first),ui.indexOf(last,ui.indexOf(first)));
   game.run(`globalThis.followBusy=true;globalThis.GoblinMovement={busy:()=>followBusy};
     globalThis.core=()=>false;globalThis.t=key=>key;globalThis.GoblinLanguage={current:'de'};
-    globalThis.previewWeaponKey=actor=>actor.ogreSystems.selectedWeapon;
+    ${targetOptionsSource}
     const areaCache={key:null,value:null};
     ${slice('    function query(command)', '    function previewFire(command)')}
     ${slice('    function areaQuery(', '    function freeRatioChipCenter(')}

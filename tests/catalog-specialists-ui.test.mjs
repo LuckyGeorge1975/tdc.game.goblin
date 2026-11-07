@@ -11,5 +11,8 @@ test('treads preview declares its special die contract and never a generic CRT p
 test('context menu builds real engineer and bay actions, while selecting a platform requires an explicit component',async()=>{
  const g=await specialistsScene('catalog-specialists');projection(g);g.context.state=read(g,'project()');const menus=read(g,"GoblinSpecialistsUI.commands(state,state.units.find(u=>u.id==='engineers'),{x:2,y:2},{})");assert.ok(menus.some(m=>m.command.type==='Engineer'&&m.command.job==='clear'));
  const bays=read(g,"GoblinSpecialistsUI.commands(state,state.units.find(u=>u.id==='forge'),{x:0,y:3},{})");assert.equal(bays.filter(c=>c.command.type==='CatalogDeploy').length,2);assert.ok(bays.every(c=>!c.label.includes('bay-1')));
- const h=await specialistsScene();projection(h);h.context.state=read(h,'project()');const c=read(h,"GoblinSpecialistsUI.fireCommand(state.units.find(u=>u.id==='alpha'),state.units.find(u=>u.id==='defender'),{})");assert.equal(c.target.componentId,'');h.run("setTurnPhase('fire')");assert.equal(read(h,`query(${JSON.stringify(c)})`).code,'COMPONENT_REQUIRED');
+ const h=await specialistsScene();projection(h);h.run("setTurnPhase('fire')");h.context.state=read(h,'project()');
+ const choices=read(h,"GoblinSpecialistsUI.commands(state,state.units.find(u=>u.id==='alpha'),state.units.find(u=>u.id==='defender'))");
+ assert.ok(choices.some(entry=>entry.command.target.componentId==='main-1'));
+ assert.ok(choices.every(entry=>entry.command.target.kind==='component'&&entry.command.target.componentId));
 });

@@ -29,7 +29,7 @@ test('Options alone gets separate header, content scrollport and non-sticky foot
   assert.deepEqual(classes,['v2-options-panel']);
   assert.deepEqual(panel.children.map(el=>el.className),['v2-screen-header','v2-screen-main v2-options-main','v2-screen-footer']);
   const descendants=el=>el.children?.flatMap(child=>[child,...descendants(child)])||[];
-  assert.deepEqual(descendants(panel.children[1]).filter(el=>el.tag==='input').map(el=>el.id),['v2-grid','v2-targets','v2-damage','v2-overlay-alpha']);
+  assert.deepEqual(descendants(panel.children[1]).filter(el=>el.tag==='input').map(el=>el.id),['v2-grid','v2-targets','v2-damage','v2-phase-notice-option','v2-overlay-alpha']);
   assert.equal(descendants(panel.children[2]).find(el=>el.tag==='button').id,'v2-options-back');
   assert.match(rule('.v2-screen-panel.v2-foundation.v2-options-panel'),/grid-template-rows:\s*auto minmax\(0, 1fr\) auto/);
   assert.match(rule('.v2-screen-panel.v2-foundation.v2-options-panel'),/overflow:\s*hidden/);

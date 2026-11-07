@@ -1,3 +1,4 @@
+import {targetOptionsSource} from './helpers/target-options-source.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -135,10 +136,10 @@ test('V2 chosen weapon controls, range area and CRT chip use AP/main selection r
  const g=scene();prepare(g);g.run(fs.readFileSync(new URL('../m1-unit-markers.js',import.meta.url),'utf8'));
  const ui=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
  g.run('const legacyLogEntries=()=>[];'+ui.slice(ui.indexOf('    let idleCoreLog='),ui.indexOf('    function query(command)')));
- const start=ui.indexOf('    function previewWeaponKey('),end=ui.indexOf('    function freeRatioChipCenter(',start);g.run(ui.slice(start,end));
- g.run("view.target={x:3,y:4};view.previewWeaponKey='ap-2';globalThis.state=project();globalThis.actor=state.units[0];globalThis.area=areaData(state,actor,'fire');globalThis.chip=selectedFirePreview(state,actor,units[0],'fire',previewWeaponKey(actor),area.legal)");
- assert.equal(g.run('chip.weaponKey'),'ap-2');assert.equal(g.run('chip.ratioCategory'),'1-1');assert.equal(g.run('area.legal.length'),1);
- g.run("view.previewWeaponKey='main-both';view.target={x:5,y:3};state=project();actor=state.units[0];area=areaData(state,actor,'fire');chip=selectedFirePreview(state,actor,units[0],'fire',previewWeaponKey(actor),area.legal)");assert.equal(g.run('chip.weaponKey'),'main-both');assert.equal(g.run('chip.ratioCategory'),'2-1');
+ g.run("const GoblinLanguage={current:'de'};"+targetOptionsSource+ui.slice(ui.indexOf('    function activeAreaMode('),ui.indexOf('    function freeRatioChipCenter(')));
+ g.run("view.target={x:3,y:4};globalThis.state=project();globalThis.actor=state.units[0];view.targetOption=commandKey(entriesAt(state,actor,view.target).find(e=>e.command.weaponKey==='ap-2'));globalThis.area=areaData(state,actor,'fire');globalThis.chip=selectedFirePreview(state,actor,'fire',area.legal)");
+ assert.equal(g.run('chip.weaponKey'),'ap-2');assert.equal(g.run('chip.ratioCategory'),'1-1');assert.equal(g.run('area.legal.some(cell=>cell.x===3&&cell.y===4)'),true);
+ g.run("view.target={x:5,y:3};view.targetOption=commandKey(entriesAt(state,actor,view.target).find(e=>e.command.weaponKey==='main-both'));chip=selectedFirePreview(state,actor,'fire',area.legal)");assert.equal(g.run('chip.weaponKey'),'main-both');assert.equal(g.run('chip.ratioCategory'),'2-1');
  // Guide projection carries all four slots and the actual selected weapon.
  assert.equal(g.run('actor.siegeFireBudget.used.length'),0);assert.equal(g.run('actor.siegeWeapon'),'main-1');
  g.run(fs.readFileSync(new URL('../unit-guide-range.js',import.meta.url),'utf8'));
@@ -161,9 +162,8 @@ test('classic rejection explains main-target binding; native map reference range
 test('real V2 weapon button builds and dispatches the chosen AP command, with five explicit slot choices',()=>{
  const g=scene();prepare(g);g.run(fs.readFileSync(new URL('../m1-unit-markers.js',import.meta.url),'utf8'));
  const ui=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');g.run('const legacyLogEntries=()=>[];'+ui.slice(ui.indexOf('    let idleCoreLog='),ui.indexOf('    function query(command)')));
- g.run(ui.slice(ui.indexOf('    function previewWeaponKey('),ui.indexOf('    function activeAreaMode(')));
- g.run("document.body={classList:{contains:()=>false}};globalThis.state=project();globalThis.actor=state.units[0];globalThis.testContainer={replaceChildren(){this.children=[]},append(b){this.children.push(b)},setAttribute(){}};view.actorId='siege-tank';view.target={x:3,y:4};renderWeaponControls(state,actor,testContainer)");
- assert.equal(g.run('testContainer.children.length'),5);g.run("testContainer.children.find(b=>b.dataset.weapon==='ap-2').onclick({stopPropagation(){}})");assert.equal(g.run('view.previewWeaponKey'),'ap-2');
- const a=ui.indexOf("        commands = state.turnPhase === 'fire'"),b=ui.indexOf("          : target?.team === 'enemy'",a);assert.ok(a>0&&b>a);
- g.run("let commands;const runtimeActor=units[0],cell=view.target;"+ui.slice(a,b)+':[];');assert.equal(g.run('commands[0].command.weaponKey'),'ap-2');assert.equal(g.run('dispatch(commands[0].command,revision()).ok'),true);assert.equal(g.events().at(-1).event.weapon.usedWeaponKey,'ap-2');assert.equal(g.rolls(),1);
+ g.run("const GoblinLanguage={current:'de'};"+targetOptionsSource);
+ g.run("globalThis.options=targetCommands(project(),units[0],{x:3,y:4});globalThis.shot=options.find(entry=>entry.command.weaponKey==='ap-2')");
+ assert.equal(g.run('options.length'),5);assert.equal(g.run('shot.command.weaponKey'),'ap-2');
+ assert.equal(g.run('dispatch(shot.command,revision()).ok'),true);assert.equal(g.events().at(-1).event.weapon.usedWeaponKey,'ap-2');assert.equal(g.rolls(),1);
 });

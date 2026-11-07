@@ -27,9 +27,10 @@ const bound={profileId:'PROFILE',stateRevision:'REVISION',actorId:'ogre',targetI
 function selection({view={target:{x:4,y:3}},profile=state,preview=bound,
   key='main',cells=legal,mode='fire',isCore=true}={}) {
   let queries=0,command=null;
-  const context={...lifeGlobals,view,core:()=>isCore,previewFire:value=>{queries++;command=value;return preview;}};
+  const entry={command:isCore?{type:'PlayerFire',playerId:'player',unitId:'ogre',targetId:'guard',weaponKey:key}:{type:'Fire',actorId:'ogre',x:4,y:3,weaponKey:key}};
+  const context={...lifeGlobals,view,entriesAt:()=>[entry],entryResult:()=>({ok:true}),commandIcon:()=> 'fire',commandKey:()=>'',previewFire:value=>{queries++;command=value;return preview;}};
   runInNewContext(`${selectionSource}\nglobalThis.select=selectedFirePreview;`,context);
-  const result=context.select(profile,profile.units[0],profile.units[0],mode,key,cells);
+  const result=context.select(profile,profile.units[0],mode,cells);
   return {result,queries,command};
 }
 
@@ -60,7 +61,7 @@ test('selection clears invalid targets and every stale binding', () => {
 });
 
 const drawStart=source.indexOf('      const firePreview = selectedFirePreview(');
-const drawEnd=source.indexOf('      let message = t(',drawStart);
+const drawEnd=source.indexOf('      let message = ',drawStart);
 assert.ok(drawStart>0 && drawEnd>drawStart);
 const drawSource=source.slice(drawStart,drawEnd);
 function draw(preview,pixelScale,cardHidden=false,world=state) {
@@ -124,14 +125,14 @@ test('connection uses paired 8/4 reference strokes and centered 38x22 CRT chip',
   assert.equal(children[2].attrs.height*scale,22);
   assert.equal(children[3].textContent,'2:1');
   assert.equal(children[3].attrs.x,(children[0].attrs.x1+children[0].attrs.x2)/2);
-  assert.equal(intel,'Target info · CRT 2:1');
+  assert.equal(intel,'Target info');
   assert.match(css,/#v2-grid-overlay, body\.ui-v2-active #v2-area-overlay \{ pointer-events: none; \}/);
 });
 
-test('tiny fit keeps readable CRT in command intel; unknown quote keeps line only', () => {
+test('tiny fit and unknown quote keep the connection without a chip', () => {
   const small=draw(bound,.4);
   assert.deepEqual(small.children.map(node=>node.tag),['line','line']);
-  assert.equal(small.intel,'Target info · CRT 2:1');
+  assert.equal(small.intel,'Target info');
   const unknown=draw({...bound,ratioCategory:null},2);
   assert.deepEqual(unknown.children.map(node=>node.tag),['line','line']);
   assert.equal(unknown.intel,'Target info');
@@ -141,5 +142,5 @@ test('tiny fit keeps readable CRT in command intel; unknown quote keeps line onl
   const adjacent=draw({...bound,from:{x:2,y:1},to:{x:2,y:0}},1,false,
     {units:[{x:2,y:1},{x:2,y:0}]});
   assert.deepEqual(adjacent.children.map(node=>node.tag),['line','line']);
-  assert.equal(adjacent.intel,'Target info · CRT 2:1');
+  assert.equal(adjacent.intel,'Target info');
 });

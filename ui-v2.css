@@ -36,8 +36,8 @@ body.ui-v2-active .game-dialog p { color: var(--v2-muted); }
 body.ui-v2-active .game-dialog button { border: 1px solid var(--v2-line-strong); border-radius: 8px; background: var(--v2-surface2); color: var(--v2-text); }
 body.ui-v2-active .game-dialog button.primary { background: var(--v2-accent); color: var(--v2-bg); }
 body.ui-v2-active .game-dialog button:focus-visible { outline-color: var(--v2-signal); }
-body.v2-screen-open :is(.v2-command-card, .v2-target-card),
-body.ui-v2-active:has(.game-dialog[open]) :is(.v2-command-card, .v2-target-card, .v2-phase-notice) { visibility: hidden; }
+body.v2-screen-open .v2-target-card,
+body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice, .v2-map-hover) { visibility: hidden; }
 .v2-foundation .v2-screen-header, .v2-foundation .v2-screen-main, .v2-foundation .v2-screen-footer { min-width: 0; }
 .v2-foundation .v2-screen-footer { position: sticky; bottom: 0; z-index: 2; margin-top: auto; padding-top: 12px; background: var(--v2-surface); }
 .v2-foundation .v2-screen-footer .v2-screen-actions { margin-top: 0; }
@@ -456,6 +456,11 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-shell .v2-action-cancel { min-width: 40px; min-height: 40px; border-color: transparent; background: transparent; }
 .v2-target-card { position: fixed; z-index: 20; display: grid; gap: 6px; width: max-content; max-width: min(320px, calc(100vw - 16px)); padding: 8px 10px; border-color: var(--v2-accent-text); box-shadow: 0 8px 30px #000b; }
 .v2-target-card[hidden] { display: none !important; }
+.v2-target-choices { display: grid; gap: 4px; overflow: auto; max-height: min(28dvh, 220px); padding: 3px; }
+.v2-target-choices button { display: flex; gap: 6px; align-items: center; text-align: left; overflow-wrap: anywhere; }
+.v2-map-hover { position: absolute; z-index: 3; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; width: max-content; max-width: min(300px, 95%); padding: 5px 8px; border: 1px solid var(--v2-line); border-radius: 8px; background: var(--v2-surface); color: var(--v2-text); font-size: 12px; pointer-events: none; }
+.v2-map-hover[hidden] { display: none; }
+.v2-area-load { fill: none; stroke: var(--v2-signal); stroke-width: 2; stroke-dasharray: 5 3; }
 .v2-target-head { display: flex; align-items: center; gap: 8px; }
 .v2-card .v2-target-where { margin: 0; color: var(--v2-muted); font-size: 12px; }
 .v2-target-facts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 13px; }

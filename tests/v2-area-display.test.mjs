@@ -28,18 +28,11 @@ function scene(pixelScale, showCostChips) {
   return {mark:context.mark, children};
 }
 
-test('movement keeps the legal cost in a bottom chip at readable projected size', () => {
+test('movement keeps the area shape without cost digits at desktop scale', () => {
   const {mark,children}=scene(1.2,true);
   mark({x:3,y:4,cost:2},'movement');
-  assert.deepEqual(children.map(node=>node.tag),['polygon','rect','text']);
-  assert.equal(children[0].attrs['stroke-width'],undefined,'cells carry no own outline');
-  assert.equal(children[1].classes[0],'v2-area-cost-chip');
-  assert.equal(children[2].textContent,'2');
-  assert.equal(children[1].dataset.x,'3');
-  assert.equal(children[1].attrs.width*1.2>=24,true);
-  assert.equal(children[1].attrs.height*1.2>=20,true);
-  assert.equal(children[2].attrs['font-size']*1.2>=11,true);
-  assert.equal(children[1].attrs.y>100,true);
+  assert.deepEqual(children.map(node=>node.tag),['polygon']);
+  assert.equal(children[0].attrs['stroke-width'],undefined);
 });
 
 test('small fit omits illegible chips without changing the legal movement shape', () => {
@@ -101,7 +94,7 @@ test('hidden chips expose only current legal focus cost above the map and in ope
   const legal=[{x:3,y:4,cost:2}];
   const selected=focusScene({view:{target:{x:3,y:4}},legal,showCostChips:false});
   assert.equal(selected.message,'Reachable · SECTOR D-05 · MOVE COST 2');
-  assert.equal(selected.intel,'Unit → D-05 · Mountain · MOVE COST 2');
+  assert.equal(selected.intel,'Unit → D-05 · Mountain');
   const focused=focusScene({view:{focusCell:{x:3,y:4}},legal,showCostChips:false,cardHidden:true});
   assert.equal(focused.message,'Reachable · SECTOR D-05 · MOVE COST 2');
   assert.equal(focused.intel,'Unit → D-05 · Mountain');
@@ -114,9 +107,8 @@ test('hidden chips expose only current legal focus cost above the map and in ope
 });
 
 test('movement and empty selection have no redundant status prompt or reachable count', () => {
-  assert.match(source,/const showCostChips = hexWidth \* pixelScale >= 50 && !matchMedia\('\(max-width: 599px\)'\)\.matches;/);
   const start=source.indexOf('      let message = ');
-  const end=source.indexOf("      if (weapon && mode === 'fire')",start);
+  const end=source.indexOf("      if (data.reason)",start);
   assert.ok(start>0 && end>start);
   const status=source.slice(start,end);
   for (const [state,expected] of [['move',''],['select',''],['blocked','v2.area.status.blocked:2']]) {
@@ -133,7 +125,7 @@ test('movement button labels path length as steps in all four languages', () => 
   const labels=runInNewContext(`(${match[1]})`);
   assert.deepEqual(Object.keys(labels),['de','en','es','fr']);
   for (const label of Object.values(labels)) assert.match(label,/\{count\}/);
-  assert.match(source,/entry\.command\.type === 'Move' && availability\.path\) facts\.append\(el\('span', '', t\('v2\.ui\.pathSteps', \{count: availability\.path\.length\}\)\)\)/);
+  assert.match(source,/v2\.ui\.pathSteps/);
   const compact=localization.match(/'v2\.area\.status\.moveCompact': (\{[^\n]+\}),/);
   assert.ok(compact);
   assert.deepEqual(Object.keys(runInNewContext(`(${compact[1]})`)),['de','en','es','fr']);

@@ -9,6 +9,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     const t = (key, params) => GoblinLanguage.t(key, params);
     const trainingPanel=document.createElement('section');trainingPanel.id='v2-training';trainingPanel.className='v2-card v2-training';trainingPanel.hidden=true;
     shell.querySelector('.v2-head').after(trainingPanel);
+    const targetTrainingCopy = {
+      'training.selectActor':'v2.training.selectActor', 'training.previewMove':'v2.training.previewMove',
+      'training.confirmMove':'v2.training.confirmMove', 'training.inspectShot':'v2.training.inspectShot'
+    };
     function renderTraining(){
       const v=globalThis.GoblinTrainingRuntime?.view();trainingPanel.hidden=screen!=='play'||!v;
       document.querySelectorAll('.training-highlight').forEach(node=>node.classList.remove('training-highlight'));
@@ -23,9 +27,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       trainingPanel.replaceChildren();const title=document.createElement('strong');title.textContent=t(v.definition.mode==='advisory'?'ui.nav.missions':'training.learningGoal');
       const key=p.status==='lesson-failed'?'training.failure.title':p.status==='lesson-complete'?'training.complete.title':p.recoveryOffered?'training.recovery':step.messageKey;
-      trainingPanel.append(title,paragraph(t(key,params)));
+      trainingPanel.append(title,paragraph(t(targetTrainingCopy[key] ?? key,params)));
       if(p.stepId==='terrain'&&v.params['query:cost']!=='')trainingPanel.append(paragraph(t('training.moveCost',{cost:v.params['query:cost'],available:v.params['query:available']})));
-      if(['infantry','practice'].includes(p.stepId))trainingPanel.append(paragraph(t('training.confirmMove',{region:v.params['region:practice']})));
+      if(['infantry','practice'].includes(p.stepId))trainingPanel.append(paragraph(t('v2.training.confirmMove',{region:v.params['region:practice']})));
       if(p.status==='ready-for-debrief')trainingPanel.append(paragraph(t('training.debrief.skills',{skills:t(`mission.${currentScenario}.objective.short`)})));
       const row=actions(button(t('training.repeatInstruction'),()=>GoblinTrainingRuntime.ack('repeat')));
       if(step.category==='instruction'&&step.completeWhen?.op==='uiFact'&&step.completeWhen.type==='acknowledgeInstruction'||step.category==='explanation')row.append(button(t('ui.dialog.confirm'),()=>GoblinTrainingRuntime.ack()));
@@ -228,6 +232,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       });
       if (previous === 'play' && next !== 'play') {
         playScrollY = globalThis.scrollY;
+        GoblinUIV2.closeTarget();
         globalThis.GoblinMovement?.clear();
       }
       screen = next;

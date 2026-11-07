@@ -4,12 +4,21 @@ for(const valid of [true,false])test('actual specialists loader '+(valid?'valida
  const g=artilleryScene();g.context.crypto=webcrypto;g.context.TextEncoder=TextEncoder;g.context.console={error(){}};g.context.fetch=async()=>({ok:true,json:async()=>valid?data:{...data,targetActive:true}});const before=g.state();await g.run(loader);assert.equal(g.run("Object.hasOwn(scenarioCatalog,'catalog-siege')"),valid);assert.equal(g.run("Object.hasOwn(scenarioCatalog,'catalog-specialists')"),valid);assert.equal(g.state(),before);
  if(valid){g.run("loadScenario('catalog-specialists')");assert.equal(g.run('legacySession.ruleProfileId'),'CATALOG_SPECIALISTS_v1')}
 });
-function dom(g){g.run(`globalThis.created=[];document.createElement=tag=>{const n={tag,children:[],disabled:false,hidden:false,value:'',textContent:'',setAttribute(k,v){this[k]=v},appendChild(n){this.children.push(n)},append(...ns){this.children.push(...ns)},replaceChildren(){this.children=[]}};created.push(n);return n};globalThis.host=document.createElement('div');globalThis.refreshCount=0;globalThis.refresh=()=>refreshCount++;`)}
-test('real grouped weapon DOM selects a ready exact slot, disables spent/destroyed slots and updates the command',async()=>{
- const g=await specialistsScene();dom(g);g.run(`{const u=units.find(u=>u.id==='alpha'),s=structuredClone(u.catalogSystems);s.components.find(c=>c.id==='missiles-1').spent=true;s.components.find(c=>c.id==='main-1').destroyed=true;u.catalogSystems=s;setTurnPhase('fire')}globalThis.actor=units.find(u=>u.id==='alpha');globalThis.uiView={};GoblinSpecialistsUI.renderWeapons(host,{phase,turnPhase,units},actor,uiView,refresh)`);
- assert.equal(g.run("created.filter(n=>n.tag==='select').length"),1);assert.equal(g.run("created.filter(n=>n.tag==='optgroup').length"),4);assert.equal(g.run("created.filter(n=>n.tag==='option'&&n.disabled).length"),2);g.run("const selector=created.find(n=>n.tag==='select');selector.value='secondary-2';selector.onchange()");assert.equal(g.run('uiView.previewWeaponKey'),'secondary-2');assert.equal(g.run('refreshCount'),1);const c=read(g,"GoblinSpecialistsUI.fireCommand(actor,units.find(u=>u.id==='guard'),uiView)");assert.equal(c.weaponId,'secondary-2');
+test('target weapon options include distinct ready, spent and destroyed slots without dispatch',async()=>{
+ const g=await specialistsScene();
+ g.run("const u=units.find(u=>u.id==='alpha'),s=structuredClone(u.catalogSystems);s.components.find(c=>c.id==='missiles-1').spent=true;s.components.find(c=>c.id==='main-1').destroyed=true;u.catalogSystems=s;setTurnPhase('fire')");
+ const before=g.state(), rng=g.rng();
+ const entries=read(g,"GoblinSpecialistsUI.commands({turnPhase,units},units.find(u=>u.id==='alpha'),units.find(u=>u.id==='guard'))");
+ assert.ok(entries.some(entry=>entry.command.weaponId==='secondary-2'));
+ assert.ok(entries.find(entry=>entry.command.weaponId==='missiles-1').label.includes('v2.specialists.spent'));
+ assert.ok(entries.find(entry=>entry.command.weaponId==='main-1').label.includes('v2.ui.destroyed'));
+ assert.equal(g.state(),before);assert.deepEqual(g.rng(),rng);
 });
-test('real target DOM selects exact component; artillery mode and spotter controls compose runtime IDs',async()=>{
- const g=await specialistsScene();dom(g);g.run(`globalThis.uiView={};globalThis.actor=units.find(u=>u.id==='siege');globalThis.target=units.find(u=>u.id==='defender');setTurnPhase('fire');GoblinSpecialistsUI.renderTargets(host,{phase,turnPhase,units},actor,target,uiView,refresh);const selector=created.find(n=>n.tag==='select');selector.value='main-1';selector.onchange()`);assert.equal(g.run('uiView.componentOwner'),'defender');assert.equal(read(g,'GoblinSpecialistsUI.fireCommand(actor,target,uiView)').target.componentId,'main-1');
- g.run(`created.length=0;actor=units.find(u=>u.id==='battery');GoblinSpecialistsUI.renderWeapons(host,{phase,turnPhase,units},actor,uiView,refresh);created.find(n=>n.tag==='select').value='indirect';created.find(n=>n.tag==='select').onchange();created.length=0;GoblinSpecialistsUI.renderWeapons(host,{phase,turnPhase,units},actor,uiView,refresh);const selectors=created.filter(n=>n.tag==='select');selectors[1].value='observer';selectors[1].onchange()`);const c=read(g,'GoblinSpecialistsUI.fireCommand(actor,target,uiView)');assert.equal(c.mode,'indirect');assert.equal(c.spotterId,'observer');assert.equal(c.weaponId,null);
+
+test('target options enumerate explicit components, direct fire and observer-specific indirect fire',async()=>{
+ const g=await specialistsScene();g.run("setTurnPhase('fire')");
+ const entries=read(g,"GoblinSpecialistsUI.commands({turnPhase,units},units.find(u=>u.id==='battery'),units.find(u=>u.id==='defender'))");
+ assert.ok(entries.some(({command})=>command.target.componentId==='main-1'&&command.mode==='direct'&&command.spotterId===null));
+ assert.ok(entries.some(({command})=>command.target.componentId==='main-1'&&command.mode==='indirect'&&command.spotterId==='observer'));
+ assert.ok(entries.every(({command})=>command.weaponId===null&&command.target.componentId));
 });
