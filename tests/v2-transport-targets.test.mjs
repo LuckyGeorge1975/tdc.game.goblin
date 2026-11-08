@@ -20,7 +20,7 @@ test('Atlas carrier and cargo target each other through the same reversible load
     const project=projected;
     const el=(tag,className='',text='')=>({tag,className,text,children:[],
       append(...nodes){this.children.push(...nodes)},replaceChildren(){this.children=[]},setAttribute(){}});
-    const card=el('section'), at=selector=>selector==='#v2-target-card'?card:null;
+    const card=el('section'), at=selector=>selector==='#v2-target-card'?card:selector==='#v2-map'?{focus(){}}:null;
     const svgIcon=()=>'', placeNearHex=()=>{}, TerrainDisplay={label:type=>type,icon:()=>null};
     document.body={classList:{contains:()=>false}};
     document.createTextNode=text=>el('#text','',text);
@@ -36,10 +36,12 @@ test('Atlas carrier and cargo target each other through the same reversible load
   assert.equal(g.state(), before);
   assert.deepEqual(read(g, 'areaData(projected(),carrier,"movement").load'), [{x:0,y:7}]);
 
-  for (const command of [reverse, forward]) {
-    assert.equal(execute(g, command).ok, true);
+  for (const [actor,target] of [['carrier','cargo'],['cargo','carrier']]) {
+    g.run(`view.actorId=${actor}.id;chooseHex(${target}.x,${target}.y);renderTargetCard(projected(),${actor})`);
+    await g.run("card.children.flatMap(node=>node.children).find(node=>node.id==='v2-action-execute').onclick()");
     assert.equal(g.run('cargo.embarkedOn'), forward.carrierId);
     assert.equal(g.run('phaseCommands.length'), 1);
+    assert.equal(g.run('phaseCommands[0].label'), 'Verladen');
     assert.equal(g.rolls(), 0);
     const blocked = read(g, "options(carrier,{x:0,y:7}).find(entry=>entry.command.type==='Unload')");
     assert.equal(blocked.transport, true);

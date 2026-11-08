@@ -280,7 +280,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         from: {x: actor.x, y: actor.y}, to: {x: target.x, y: target.y},
         legal: true, ratioCategory, ...(command.type==='CatalogFire'&&command.target.componentId==='treads'?{attack,meaning:'tread-roll-5-6'}:{meaning:'crt-attack-effective-defense'})});
     }
-    function dispatch(command, expectedRevision) {
+    function dispatch(command, expectedRevision, confirmedTarget = false) {
       if(globalThis.GoblinMovement?.busy()){globalThis.GoblinMovement.skip();return {ok:false,reason:''};}
       startZoomPending = null;
       if (core()) {
@@ -303,6 +303,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         selected = actor;
         const beforeExecution = revision();
         if(['CatalogFire','CatalogRam','CatalogLoad','CatalogDeploy','Engineer','CatalogHexFire'].includes(command.type)||globalThis.GoblinCatalogFullRuntime?.active()&&command.type==='Move'){executeSpecialistCommand(command);return revision()!==beforeExecution?{ok:true}:{ok:false,reason:t('ui.error.INVALID_COMMAND')};}
+        // A confirmed target-card load has its own undo label. A map command retains its history and focus.
+        if (confirmedTarget && command.type === 'Embark') {
+          embark(actor, units.find(unit => unit.id === command.carrierId));
+          return revision() !== beforeExecution ? { ok: true } : { ok: false, reason: t('ui.error.INVALID_COMMAND') };
+        }
         if (command.type === 'Unload') {
           const cargo = units.find(unit => unit.id === command.cargoId);
           unloadAt(actor, cargo, command.x, command.y);
@@ -769,7 +774,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           acceptLabel:t('ui.hud.intent.confirm'),cancelLabel:t('ui.dialog.cancel')});
         if (!accepted || view.target !== cell || expectedRevision !== revision()) { render(); return; }
       }
-      const result = dispatch(command, expectedRevision);
+      const result = dispatch(command, expectedRevision, true);
       if (result.ok) {
         clearContext();
         if (command.type === 'SelectWeapon') {
