@@ -3,7 +3,14 @@
  const copy=x=>JSON.parse(JSON.stringify(x));
  let session=null,serial=0,depth=0,rootWork=null,deferredAuto=false,advisoryEnabled=true;
  function active(){return !!session&&session.scenarioId===currentScenario&&!root.IronDustBrowserV2?.active}
- function worldKey(){const facts=JSON.stringify({units:units.map(({moveFrom,justHit,lastOutcome,...u})=>u),terrain:[...terrain],terrainTypes:[...terrainTypes],turn,phase,turnPhase,gameOver});if(!session.stateKeys.has(facts))session.stateKeys.set(facts,session.binding.sessionId+':state:'+session.stateKeys.size);return session.stateKeys.get(facts)}
+ function worldUnit({moveFrom,justHit,lastOutcome,...unit}){
+  if(session.definition.mode!=='advisory'||!unit.ogreSystems)return unit;
+  // The weapon picker mirrors the selected weapon's stats before an action begins.
+  // Track the systems and their budgets while ignoring the current picker choice.
+  const {damage,range,ogreSystems:{selectedWeapon,...systems},...facts}=unit;
+  return {...facts,ogreSystems:systems};
+ }
+ function worldKey(){const facts=JSON.stringify({units:units.map(worldUnit),terrain:[...terrain],terrainTypes:[...terrainTypes],turn,phase,turnPhase,gameOver});if(!session.stateKeys.has(facts))session.stateKeys.set(facts,session.binding.sessionId+':state:'+session.stateKeys.size);return session.stateKeys.get(facts)}
  function descriptor(){return {branchId:session.branch,revision:session.revision,stateKey:worldKey(),rngCursor:session.rng.cursor}}
  function phaseFact(){if(phase==='player'||phase==='enemy')session.lastTeam=phase;return {team:session.lastTeam,phase:turnPhase,turn}}
  function actors(){return Object.fromEntries(Object.entries(session.definition.actorTags).map(([tag,id])=>{const u=units.find(u=>u.id===id);return [tag,{id,x:u?.x??0,y:u?.y??0,alive:!!u&&unitAlive(u),disabled:!!u?.disabled,embarked:!!u?.embarkedOn,moveSpent:!!u?.moved,fireSpent:!!u?.fired}]}))}
