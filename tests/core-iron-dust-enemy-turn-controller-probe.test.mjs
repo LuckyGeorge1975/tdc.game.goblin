@@ -20,6 +20,9 @@ import {createIronDustEnemyTurnController, validateIronDustEnemyTurnController,
   '../src/core/iron-dust-enemy-turn-controller-probe.mjs';
 import {createGame} from '../src/core/game-core.mjs';
 import {recordProfileReplay} from '../src/core/replay-contract.mjs';
+import {createIronDustProfile, dispatchIronDustProfile, projectIronDustProfile} from
+  '../src/core/iron-dust-executable-profile.mjs';
+import {artilleryScene, enemy as runLegacyEnemy, read} from './artillery-product-harness.mjs';
 
 const clone = value => JSON.parse(JSON.stringify(value));
 const unit = (state, id) => state.units.find(item => item.id === id);
@@ -171,6 +174,58 @@ test('complete source and move-retry turns match the actual Legacy VM', () => {
     }
     assert.equal(controller.state.rng.state, old.rng);
     assert.equal(controller.state.turn, old.turn);
+  }
+});
+
+test('executable Iron Dust matches the current Legacy enemy turn from the source start', () => {
+  const seed = 2;
+  const legacy = artilleryScene(false, seed, true);
+  legacy.run("loadScenario('iron-dust')");
+  let legacyRng = seed;
+  const legacyRolls = [];
+  // Feed the Legacy resolver the same seeded die stream as the Core profile.
+  legacy.context.Math.random = () => {
+    legacyRng = (Math.imul(1664525, legacyRng) + 1013904223) >>> 0;
+    const roll = legacyRng % 6;
+    legacyRolls.push(roll);
+    return roll / 6;
+  };
+  let profile = createIronDustProfile(seed);
+  const unitFacts = units => units.map(actor => [actor.id, actor.x, actor.y,
+    actor.hp, !!actor.disabled, actor.disabledUntil ?? 0]);
+  assert.deepEqual(unitFacts(projectIronDustProfile(profile).state.units),
+    unitFacts(read(legacy, 'units')));
+
+  const advance = command => {
+    const result = dispatchIronDustProfile(profile, command);
+    assert.ok(result.profile, JSON.stringify(result.error));
+    profile = result.profile;
+    return result.events;
+  };
+  for (let round = 1; round <= 3; round++) {
+    for (let phase = 0; phase < 3; phase++) advance(end);
+    assert.equal(profile.entry.mode, 'enemy');
+    const events = [];
+    for (let step = 0; step < 5 && profile.entry.mode === 'enemy'; step++) {
+      events.push(...advance({type: 'AutoEnemyAdvance', playerId: 'enemy'}));
+    }
+    assert.equal(profile.entry.mode, 'player');
+    legacy.timers.clear();
+    legacyRolls.length = 0;
+    runLegacyEnemy(legacy);
+
+    const state = projectIronDustProfile(profile).state;
+    assert.deepEqual(unitFacts(state.units), unitFacts(read(legacy, 'units')));
+    assert.deepEqual([state.turn, state.phase, state.activeTeam],
+      read(legacy, '[turn, turnPhase, phase]'));
+    assert.equal(state.rng.state, legacyRng);
+    const shots = events.filter(event => event.type === 'EnemyUnitFireResolved');
+    assert.deepEqual(shots.map(event => event.roll), legacyRolls);
+    if (round === 3) {
+      assert.deepEqual(events.map(event => event.type), ['EnemyMoved', 'EnemyMoved',
+        'EnemyPassRecorded', 'EnemyUnitFireResolved', 'PhaseChanged']);
+      assert.equal(shots[0].targetId, 'missile');
+    }
   }
 });
 
