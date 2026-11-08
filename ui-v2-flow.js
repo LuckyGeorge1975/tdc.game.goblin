@@ -45,6 +45,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let campaign = null;
     let editorDraft = null, editorCell = {x:0,y:0}, editorError = '', editorBusy = false;
     let editorConfig = null, editorReturnScenario = null;
+    let briefingDifficulty = 'medium';
     let libraryIndex = 0, libraryTab = 'values', libraryArtSide = 'own';
     let libraryKind = 'units', terrainIndex = 0;
     const focusMemory = new Map(), scrollMemory = new Map();
@@ -240,6 +241,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         GoblinUIV2.closeTarget();
         globalThis.GoblinMovement?.clear();
       }
+      if (next === 'briefing' && previous !== 'briefing') briefingDifficulty = 'medium';
       screen = next;
       renderTraining();
       const overlay = next !== 'play';
@@ -393,7 +395,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         startError = t('screen.briefing.dataUnavailable'); renderScreen(false); return;
       }
       if (missionId === 'iron-dust-v2') {
-        if (!globalThis.IronDustBrowserV2?.available || !IronDustBrowserV2.start()) {
+        if (!globalThis.IronDustBrowserV2?.available || !IronDustBrowserV2.startWithDifficulty(briefingDifficulty)) {
           startError = t('v2.reject.start'); renderScreen(false); return;
         }
       } else {
@@ -415,6 +417,22 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       editorDraft ??= GoblinEditorDraft.copyTemplate();
       editorError = '';
       show('editor');
+    }
+    function difficultyControl() {
+      const label = document.createElement('label');
+      label.textContent = t('v2.difficulty.label') + ' ';
+      const select = document.createElement('select');
+      select.id = 'v2-briefing-difficulty';
+      for (const difficulty of IronDustBrowserV2.difficulties) {
+        const option = document.createElement('option');
+        option.value = difficulty;
+        option.textContent = t('v2.difficulty.' + difficulty);
+        select.append(option);
+      }
+      select.value = briefingDifficulty;
+      select.onchange = () => { briefingDifficulty = select.value; };
+      label.append(select);
+      return label;
     }
     function updateEditor(draft, cell = editorCell) {
       try {
@@ -759,6 +777,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (legacyNumber && !campaign) header.append(paragraph(legacyNumber, 'v2-briefing-number'));
         header.append(heading(t(`mission.${missionId}.title`)),
           paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
+        if (missionId === 'iron-dust-v2' && data) header.append(difficultyControl());
         if (campaign?.index === 0) header.append(paragraph(t('v2.campaign.session')));
         if(GoblinCatalogBase.has(missionId)||globalThis.GoblinCatalogSpecialistsModel?.has(missionId)||globalThis.GoblinCatalogFullModel?.has(missionId))header.append(paragraph(t(`mission.${missionId}.budget`)));
         if(missionId==='artillery-pilot')header.append(paragraph(t('mission.artillery-pilot.budget')));

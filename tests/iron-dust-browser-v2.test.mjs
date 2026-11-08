@@ -454,6 +454,22 @@ test('Pages path starts v2, can restart, and locks a failed v2 start', async () 
     assert.equal(document.querySelector('#end-turn').disabled,true);
     assert.equal(document.querySelector('#weapon-controls').children.length,0);
     assert.equal(bridge.dispatch({type:'EndPhase',playerId:'player'}).error.code,'GAME_ENDED');
+    for (const difficulty of ['weak','strong']) {
+      assert.equal(bridge.startWithDifficulty(difficulty),true);
+      const opening = bridge.session.profile;
+      const seed = bridge.session.projection.state.rng.seed;
+      assert.equal(opening.header.enemyPolicy.difficulty,difficulty);
+      for (let i=0;i<3;i++) bridge.dispatch({type:'EndPhase',playerId:'player'});
+      assert.equal(bridge.session.projection.mode,'enemy');
+      const previousEpoch = bridge.epoch;
+      assert.equal(bridge.restart(),true);
+      assert.ok(bridge.epoch > previousEpoch);
+      assert.equal(bridge.session.profile.digest,opening.digest);
+      assert.equal(bridge.session.projection.state.rng.seed,seed);
+      assert.equal(bridge.enemyRunning,false);
+    }
+    assert.equal(bridge.start(),true);
+    assert.equal(bridge.session.profile.header.enemyPolicy,undefined);
     bridge.stop();
     assert.equal(bridge.start({...first, header:{...first.header, ruleProfileId:'BAD'}}),false);
     assert.equal(bridge.mode,'error');

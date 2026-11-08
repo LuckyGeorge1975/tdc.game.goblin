@@ -44,6 +44,10 @@ test('phase fixture instructions and Skimmer phase displays translate without vi
     fr: 'IRON DUST v2',
   };
   for (const [lang, title] of Object.entries(v2Titles)) {
+    for (const name of ['label','weak','medium','strong']) {
+      const key = 'v2.difficulty.' + name;
+      assert.notEqual(context.GoblinLanguage.t(key, {}, lang), key);
+    }
     for (const name of ['title','position','session','exitConfirm','finish','complete','completeBody']) {
       const key = 'v2.campaign.' + name;
       const copy = context.GoblinLanguage.t(key, {current:2,total:2}, lang);

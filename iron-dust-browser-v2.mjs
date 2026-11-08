@@ -7,7 +7,7 @@ function observePresentation(observer,method,...args){
 import {
   createIronDustProfile, validateIronDustProfile, projectIronDustProfile,
   queryIronDustProfile, queryIronDustCrtPreview, preflightIronDustProfile, dispatchIronDustProfile,
-  IRON_DUST_PROFILE_HEADER
+  IRON_DUST_PROFILE_HEADER, IRON_DUST_ENEMY_DIFFICULTIES
 } from './src/core/iron-dust-executable-profile.mjs';
 import {buildIronDustV2View, renderIronDustV2View, formatIronDustV2Error,
   formatIronDustV2Event,
@@ -182,14 +182,14 @@ if (typeof document !== 'undefined') {
     currentScenario = IRON_DUST_V2_SELECTOR_ID;
     document.querySelector('#scenario-select').value = IRON_DUST_V2_SELECTOR_ID;
   }
-  function start(profile) {
+  function start(profile, difficulty = 'medium') {
     if (globalThis.goblinBootProfileError) return false;
     enemyFlow.cancel();
     paused = false;
     epoch++;
     try {
       globalThis.GoblinPresentation?.stop();
-      session = createIronDustBrowserSession(profile ?? createIronDustProfile(startSeed),
+      session = createIronDustBrowserSession(profile ?? createIronDustProfile(startSeed, {difficulty}),
         startSeed);
       mode = 'ready';
       observePresentation(presentation,'sync',session);
@@ -258,7 +258,11 @@ if (typeof document !== 'undefined') {
     pause: () => {paused = true; enemyFlow.cancel(); globalThis.GoblinMovement?.clear();},
     resume: () => {paused = false; if (mode === 'ready') enemyFlow.start();},
     dispatch: dispatchAction,
-    start, restart: () => start(), stop
+    difficulties: IRON_DUST_ENEMY_DIFFICULTIES,
+    start,
+    startWithDifficulty: difficulty => start(undefined, difficulty),
+    restart: () => start(undefined, session?.profile.header.enemyPolicy?.difficulty ?? 'medium'),
+    stop
   });
   globalThis.dispatchEvent?.(new Event('goblin-core-v2-ready'));
 }
