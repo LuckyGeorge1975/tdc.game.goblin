@@ -35,6 +35,13 @@ test('Atlas carrier and cargo target each other through the same reversible load
   assert.deepEqual(reverse, forward);
   assert.equal(g.state(), before);
   assert.deepEqual(read(g, 'areaData(projected(),carrier,"movement").load'), [{x:0,y:7}]);
+  g.run('carrier.moved=true');
+  const spentCarrier = read(g, 'areaData(projected(),carrier,"movement")');
+  assert.deepEqual(spentCarrier.legal, []);
+  assert.deepEqual(spentCarrier.load, [{x:0,y:7}]);
+  assert.equal(spentCarrier.reason, '');
+  assert.equal(spentCarrier.status, 'move');
+  g.run('carrier.moved=false');
 
   for (const [actor,target] of [['carrier','cargo'],['cargo','carrier']]) {
     g.run(`view.actorId=${actor}.id;chooseHex(${target}.x,${target}.y);renderTargetCard(projected(),${actor})`);

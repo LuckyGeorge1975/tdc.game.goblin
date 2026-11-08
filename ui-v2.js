@@ -515,13 +515,22 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         else if (Number.isFinite(unit.maxHp)) section.append(statBar(unit.infantry ? 'SP' : 'HP', unit.hp, unit.maxHp, 'v2-intel-hp'));
         if (unit.strategicMissile) section.append(statGrid([[t('v2.ui.missile'), unit.missilesRemaining ?? 0]]));
         const max = key => Math.max(1, ...state.units.map(item => item[key]).filter(Number.isFinite));
-        // Goblin-class units take attack and range from the selected weapon.
-        const weapon = (unit.weapons || unit.ogreSystems?.weapons)?.[unit.selectedWeapon ?? unit.ogreSystems?.selectedWeapon];
+        const weaponKey = unit.selectedWeapon ?? unit.ogreSystems?.selectedWeapon;
+        const weapon = (unit.weapons || unit.ogreSystems?.weapons)?.[weaponKey];
+        const siegeWeapon = globalThis.GoblinSiegeWeapons?.weapons(unit)?.[unit.siegeWeapon];
+        const catalog = globalThis.GoblinSpecialistsRuntime;
+        const catalogSiege = unit.catalogFire?.ruleRef === 'siege-tank-fire-budget-v1';
+        const catalogWeapon = (unit.catalogSystems || catalogSiege) ? catalog?.selectedSpec(unit) : null;
+        const rangeWeaponName = catalogWeapon ? unit.catalogSystems ? catalog.slotLabel(unit,catalogWeapon.id) :
+          GoblinSiegeWeapons.label(catalogWeapon.id) : weapon ? t(`v2.ui.weapon.${weaponKey}`) : siegeWeapon?.label;
+        const weaponRange = (catalogWeapon ?? weapon ?? siegeWeapon)?.range;
         // A Goblin moves according to its remaining treads.
         const treadMove = treads && !unit.catalogSystems ? globalThis.GoblinSystems?.movementForTreads(treads[0]) : null;
-        const value = key => Number.isFinite(unit[key]) ? unit[key] : Number.isFinite(weapon?.[key]) ? weapon[key] : key === 'move' && Number.isFinite(treadMove) ? treadMove : null;
+        const value = key => key === 'range' && Number.isFinite(weaponRange) ? weaponRange :
+          Number.isFinite(unit[key]) ? unit[key] : Number.isFinite(weapon?.[key]) ? weapon[key] : key === 'move' && Number.isFinite(treadMove) ? treadMove : null;
         section.append(statGrid(['attack', 'defense', 'range', 'move'].map(key =>
-          [t(`v2.intel.${key}`), value(key) ?? '–', value(key) == null ? null : Math.min(1, value(key) / max(key))])));
+          [key === 'range' && rangeWeaponName ? t('v2.intel.weaponRange', {weapon:rangeWeaponName}) : t(`v2.intel.${key}`),
+            value(key) ?? '–', value(key) == null ? null : Math.min(1, value(key) / max(key))])));
         const systems = el('div', 'v2-intel-systems'); systems.id = 'v2-systems';
         if (unit.ogreSystems || unit.catalogSystems || unit.weapons) renderSystems(systems, state, unit);
         if (systems.childElementCount) section.append(systems);
@@ -860,8 +869,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         }
         const transport = data.load?.length || data.unload?.length;
         if (state.turnPhase === 'movement' && runtime.moved || state.turnPhase === 'gev' && runtime.secondMoved) {
-          data.status = transport ? 'move' : 'unavailable';
-          if (!transport) data.reason = t('ui.error.ACTION_SPENT');
+          data.status = transport ? 'move' : 'moveSpent';
           return data;
         }
         const width = core() ? Math.max(...state.cells.map(cell => cell.x)) + 1 : W;
@@ -1146,7 +1154,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           message = [message, `${t('v2.ui.sector')} ${costText}`].filter(Boolean).join(' · ');
         }
       }
-      legend.textContent = [data.plan?.label, data.plan && data.legal.length && t('v2.plan.legal'), message].filter(Boolean).join(' · ');
+      legend.textContent = [data.plan?.label, data.plan && data.legal.length && t('v2.plan.legal'), message,
+        data.load?.length && t('v2.area.loadAvailable'), data.unload?.length && t('v2.area.unloadAvailable')].filter(Boolean).join(' · ');
     }
     function coreCommands(state, actor, cell) {
       const target = targetOccupant(state, cell);

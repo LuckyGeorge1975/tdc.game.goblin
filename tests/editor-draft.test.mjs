@@ -66,7 +66,7 @@ test('editor flow keeps the validated draft across playtest and rejects an impor
   const g = await scene();
   const flow = readFileSync(new URL('../ui-v2-flow.js',import.meta.url),'utf8');
   g.run(`
-    let screen='menu',campaign=null,started=false,editorDraft=null,editorCell={x:0,y:0},editorError='',editorBusy=false;
+    let screen='menu',campaign=null,started=false,editorDraft=null,editorCell={x:0,y:0},editorError='',editorBusy=false,editorMoving=false;
     let editorConfig=null,editorReturnScenario=null;
     const show=next=>{screen=next},releasePause=()=>{},renderScreen=()=>{},heading=x=>x,paragraph=x=>x;
     const GoblinUIV2={resetView(){},startView(){}},GoblinEditorUI={render(panel,view){globalThis.editorView=view}};
@@ -76,6 +76,23 @@ test('editor flow keeps the validated draft across playtest and rejects an impor
   g.run("openEditor();renderEditor({append(){}});editorView.import('{invalid')");
   const before = read(g,'editorDraft');
   assert.equal(g.run('editorError'),'json');
+  assert.equal(g.state(),world);
+  const origin = before.units.find(unit => unit.id === 'draft-1');
+  const occupied = before.units.find(unit => unit.id === 'core');
+  g.run(`editorView.select({x:${origin.x},y:${origin.y}});editorView.setMoving(true);
+    editorView.select({x:${occupied.x},y:${occupied.y}})`);
+  assert.equal(g.run('editorError'),'collision');
+  assert.equal(g.run('editorMoving'),true);
+  assert.deepEqual(read(g,'editorDraft'),before);
+  g.run('editorView.setMoving(false)');
+  assert.equal(g.run('editorMoving'),false);
+  assert.deepEqual(read(g,'editorDraft'),before);
+  g.run('editorView.setMoving(true);editorView.select({x:0,y:3})');
+  assert.equal(g.run('editorMoving'),false);
+  assert.deepEqual(read(g,"editorDraft.units.find(unit=>unit.id==='draft-1')"),{...origin,x:0,y:3});
+  assert.deepEqual(read(g,'editorCell'),{x:0,y:3});
+  g.run(`editorView.setMoving(true);editorView.select({x:${origin.x},y:${origin.y}})`);
+  assert.deepEqual(read(g,'editorDraft'),before);
   assert.equal(g.state(),world);
   await g.run('playEditorDraft()');
   assert.equal(g.run('screen'),'play');

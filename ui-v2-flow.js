@@ -73,7 +73,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
     const campaignLessons = ['training-t01', 'training-t02'];
     let campaign = null;
-    let editorDraft = null, editorCell = {x:0,y:0}, editorError = '', editorBusy = false;
+    let editorDraft = null, editorCell = {x:0,y:0}, editorError = '', editorBusy = false, editorMoving = false;
     let editorConfig = null, editorReturnScenario = null;
     let briefingDifficulty = 'medium';
     let libraryIndex = 0, libraryTab = 'values', libraryArtSide = 'own';
@@ -256,6 +256,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     document.body.style.setProperty('--v2-overlay-alpha', String(overlayAlpha()));
     function show(next, focus = true) {
       const previous = screen;
+      if (previous === 'editor' && next !== 'editor') editorMoving = false;
       const active = document.activeElement;
       if (previous === 'levels') focusMemory.set(previous, `v2-level-${missionId}`);
       else if (surface.contains(active) && active.id) focusMemory.set(previous, active.id);
@@ -470,7 +471,23 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         editorDraft = draft;
         editorCell = cell;
         editorError = '';
+        editorMoving = false;
       } catch (error) { editorError = error.message; }
+      renderScreen(false);
+    }
+    function selectEditorCell(cell) {
+      if (editorMoving) {
+        const units = editorDraft.units.map(unit => unit.x === editorCell.x && unit.y === editorCell.y ? {...unit,...cell} : unit);
+        updateEditor({...editorDraft,units},cell);
+        return;
+      }
+      editorCell = cell;
+      editorError = '';
+      renderScreen(false);
+    }
+    function setEditorMoving(moving) {
+      editorMoving = moving;
+      editorError = '';
       renderScreen(false);
     }
     async function playEditorDraft() {
@@ -500,8 +517,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       panel.append(heading(t('v2.editor.title')), paragraph(t('mission.editor-draft.objective.short')),
         paragraph(t('v2.editor.coreMark')));
       GoblinEditorUI.render(panel, {
-        draft:editorDraft, cell:editorCell, busy:editorBusy, error:editorError,
-        select(cell) { editorCell = cell; editorError = ''; renderScreen(false); },
+        draft:editorDraft, cell:editorCell, busy:editorBusy, error:editorError, moving:editorMoving,
+        select:selectEditorCell, setMoving:setEditorMoving,
         update:updateEditor, play:playEditorDraft, back:() => show('menu'),
         import(text) {
           try { updateEditor(GoblinEditorDraft.parse(text)); }
@@ -1071,7 +1088,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (screen === 'options' || screen === 'catalog' || screen === 'legal') goBack();
         else if (screen === 'briefing') (campaign ? returnToCampaignMenu : returnToSelectedLevel)();
         else if (screen === 'campaign-complete') returnToCampaignMenu();
-        else if (screen === 'editor' && !editorBusy) show('menu');
+        else if (screen === 'editor' && !editorBusy) {
+          if (editorMoving) setEditorMoving(false);
+          else show('menu');
+        }
         else if (screen === 'catalog-detail') returnToLibrary();
         else if (screen === 'levels') show('menu');
         else if (screen === 'pause') { show('play'); releasePause(); }

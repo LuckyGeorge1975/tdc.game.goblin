@@ -45,6 +45,7 @@
     svg.setAttribute('viewBox','0 0 790 480');
     svg.setAttribute('aria-label',label('map'));
     svg.classList.add('v2-editor-map');
+    if (view.moving) svg.classList.add('v2-editor-map-moving');
     const tiles = new Map(view.draft.terrain.map(cell => [cellLabel(cell), cell.type]));
     const units = new Map(view.draft.units.map(unit => [cellLabel(unit), unit]));
     for (let y = 0; y < view.draft.height; y++) for (let x = 0; x < view.draft.width; x++) {
@@ -78,7 +79,7 @@
     return svg;
   }
   function render(panel, view) {
-    const {draft,cell,busy} = view;
+    const {draft,cell,busy,moving} = view;
     const current = draft.units.find(unit => sameCell(unit,cell));
     const types = GoblinEditorDraft.unitTypes();
     const layout = node('div'); layout.className = 'v2-editor-layout';
@@ -88,15 +89,22 @@
     const asset = select([['',label('chooseUnit')],...types.map(item => [item.assetId,unitName(item.assetId)])],current?.assetId ?? '');
     const team = select(['player','enemy'].map(id => [id,t('ui.team.' + id)]),current?.team ?? 'player');
     const x = coordinate(cell.x,draft.width), y = coordinate(cell.y,draft.height);
+    for (const input of [terrain,asset,team,x,y]) input.disabled = busy || moving;
     const error = node('p',view.error ? label('error.' + (['json','schema','unit','terrain','bounds','collision','core','player','startTerrain','unavailable'].includes(view.error) ? view.error : 'unavailable')) : '');
     error.className = 'v2-status';
     error.setAttribute('role','status');
-    fields.append(node('strong',cellLabel(cell)),field(label('terrain'),terrain),
+    fields.append(node('strong',cellLabel(cell)));
+    if (moving) {
+      const prompt = node('p',t('v2.editor.pickDestination',{unit:unitName(current.assetId)}));
+      prompt.setAttribute('role','status');
+      fields.append(prompt,button('cancelMove',() => view.setMoving(false),busy));
+    }
+    fields.append(field(label('terrain'),terrain),
       button('applyTerrain', () => {
         const tiles = draft.terrain.filter(item => !sameCell(item,cell));
         if (terrain.value !== 'open-ground') tiles.push({...cell,type:terrain.value});
         view.update({...draft,terrain:tiles});
-      },busy),
+      },busy || moving),
       field(label('unit'),asset),field(label('team'),team),field(label('column'),x),field(label('row'),y),
       button('applyUnit', () => {
         const type = types.find(item => item.assetId === asset.value);
@@ -107,20 +115,21 @@
         const unit = {id,assetId:asset.value,team:team.value,...next,...(type.squads ? {squads:current?.squads ?? 2} : {})};
         const units = current ? draft.units.map(item => item === current ? unit : item) : [...draft.units,unit];
         view.update({...draft,units},next);
-      },busy),
-      button('removeUnit', () => view.update({...draft,units:draft.units.filter(unit => unit !== current)}),busy || !current),
+      },busy || moving),
+      button('moveOnMap', () => view.setMoving(true),busy || moving || !current),
+      button('removeUnit', () => view.update({...draft,units:draft.units.filter(unit => unit !== current)}),busy || moving || !current),
       error);
     layout.append(map(view),fields);
     const json = node('textarea'); json.value = jsonText; json.rows = 4;
     json.oninput = () => { jsonText = json.value; };
     const controls = node('div'); controls.className = 'v2-screen-actions';
-    controls.append(button('import', () => view.import(json.value),busy),
+    controls.append(button('import', () => view.import(json.value),busy || moving),
       button('export', () => {
         json.value = jsonText = JSON.stringify(draft,null,2);
         json.focus();
         json.select();
       },busy),
-      button('play',view.play,busy),button('back',view.back,busy));
+      button('play',view.play,busy || moving),button('back',view.back,busy));
     panel.append(layout,field(label('json'),json),controls);
   }
   root.GoblinEditorUI = Object.freeze({render});

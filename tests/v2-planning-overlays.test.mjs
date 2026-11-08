@@ -10,6 +10,7 @@ import {read} from './artillery-product-harness.mjs';
 const ui = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
 const section = (start, end) => ui.slice(ui.indexOf(start), ui.indexOf(end, ui.indexOf(start)));
 const planning = section('    function planningWeapons(', '    function freeRatioChipCenter(');
+const intelStats = section('        const max = key =>', "        const systems = el('div', 'v2-intel-systems')");
 const mapSource = readFileSync(new URL('../game.js', import.meta.url), 'utf8')
   .match(/^function (?:hexNeighbors|dist)\([^\r\n]+/gm).join('\n');
 const label = (key, values = {}) => [key, values.name, values.range, values.budget].filter(value => value !== undefined).join(' ');
@@ -26,6 +27,10 @@ test('Core planning uses the longest ready weapon, falls back when disabled, and
   context.unitAlive = context.GoblinUnitLife.alive;
   runInNewContext(mapSource + '\n' + planning, context);
   assert.match(context.planningArea(state, actor, 'fire').label, /^v2.plan.fire v2.ui.weapon.missiles 5$/);
+  const statsContext = {state,unit:actor,t:(key,params)=>params?.weapon??key,statGrid:cells=>cells,
+    section:{append(cells){this.cells=cells}}};
+  runInNewContext('const treads = null;\n' + intelStats, statsContext);
+  assert.deepEqual(Array.from(statsContext.section.cells[2].slice(0,2)), ['v2.ui.weapon.main',3]);
   const spent = structuredClone(actor);
   spent.ogreSystems.weapons.missiles.remaining = 0;
   assert.match(context.planningArea(state, spent, 'fire').label, /^v2.plan.fire v2.ui.weapon.main 3$/);
@@ -38,6 +43,30 @@ test('Core planning uses the longest ready weapon, falls back when disabled, and
   assert.equal(move.label, 'v2.plan.movement 3');
   assert.deepEqual(context.planningArea({...state, turnPhase: 'fire'}, spent, 'movement').cells, move.cells);
   assert.equal(JSON.stringify(session), before);
+});
+
+test('System Duel intel names the selected slot while planning keeps the longest ready weapon', async () => {
+  const g = await fullScene('catalog-full-siege', 7, false, 'FULL_CATALOG_v1');
+  const before = g.state();
+  g.run(`
+    ${planning}
+    const runtime=units.find(unit=>unit.team==='player'&&unit.catalogId==='U01');
+    const unit={...runtime,...GoblinSpecialistsRuntime.projectUnit(runtime)};
+    const state={units:[unit],turn,turnPhase};
+    const treads=null,statGrid=cells=>cells;
+    const section={append(cells){this.range=cells[2]}};
+    globalThis.GoblinLanguage={t:(key,params)=>params?.class??key};
+    {
+      const t=(key,params)=>params?.weapon??key;
+      ${intelStats}
+    }
+  `);
+  assert.equal(g.run('section.range[0]'),'v2.ui.weapon.main');
+  assert.equal(g.run('section.range[1]'),3);
+  assert.equal(g.run("planningArea(state,unit,'fire').label"),'v2.plan.fire');
+  assert.ok(g.run("planningWeapons(unit,runtime,turn).some(weapon=>weapon.range===5&&weapon.ready)"));
+  assert.equal(g.state(),before);
+  assert.equal(g.rolls(),0);
 });
 
 test('Full and Legacy planning use their own weapon profile, ammo and terrain without changing world or RNG', async () => {

@@ -442,6 +442,7 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-editor-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 290px); gap: 16px; align-items: start; }
 .v2-editor-map { width: 100%; background: var(--v2-surface2); border-radius: 8px; }
 .v2-editor-hex { fill: var(--v2-surface3); stroke: var(--v2-line-strong); cursor: pointer; }
+.v2-editor-map-moving .v2-editor-hex { cursor: crosshair; }
 .v2-editor-selected { fill: var(--v2-surface); stroke: var(--v2-accent-text); stroke-width: 3px; }
 .v2-editor-map image, .v2-editor-token { pointer-events: none; }
 .v2-editor-token { fill: var(--v2-text); stroke: var(--v2-bg); paint-order: stroke; stroke-width: 4px; text-anchor: middle; dominant-baseline: central; font: bold 27px system-ui; }
