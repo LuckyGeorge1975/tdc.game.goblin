@@ -9,6 +9,7 @@ function drawTerrainArtwork(x,y){
   const type=terrainTypeAt(x,y);
   if(type==='field-position'&&typeof TerrainDisplay!=='undefined'){const c=hexCenter(x,y),marker=TerrainDisplay.svgIcon(type,c.x-14,c.y-14,28);marker.classList.add('terrain-artwork');svg.appendChild(marker);return true}
   if(type==='open-ground'&&currentScenario!=='atlas-proving-grounds'&&
+    !(currentScenario==='editor-draft'&&ScenarioRuleProfiles.isDraftSession(legacySession))&&
     !(['training-t01','training-t02','training-t03'].includes(currentScenario)&&legacySession?.scenarioId===currentScenario&&
       legacySession.ruleProfileId==='TRAINING_FIELD_TEST_v1'&&globalThis.GoblinTrainingModel?.has(currentScenario))&&
     !(['catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists'].includes(currentScenario)&&
@@ -107,7 +108,7 @@ function lineOfSight(from,to){
   if(!session?.effectiveRules||!Object.isFrozen(session)||!Object.isFrozen(session.effectiveRules))return false;
   if(session.ruleProfileId==='LEGACY_SUPERCOVER_PROBE_v1'||
      session.ruleProfileId==='FIELD_TEST_SUPERCOVER_v1'||session.ruleProfileId==='CATALOG_ARTILLERY_PILOT_v1'||session.ruleProfileId==='CATALOG_BASE_TRANSPORT_v1'||session.ruleProfileId==='CATALOG_SPECIALISTS_v1'||['CATALOG_FULL_CANDIDATE_v1','FULL_CATALOG_v1'].includes(session.ruleProfileId)){
-    if(!(globalThis.GoblinCatalogFullModel?.has(session.scenarioId,session.ruleProfileId))&&!['los-supercover-probe','los-supercover-showcase','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(session.scenarioId)||
+    if(!(globalThis.GoblinCatalogFullModel?.has(session.scenarioId,session.ruleProfileId))&&!ScenarioRuleProfiles.isDraftSession?.(session)&&!['los-supercover-probe','los-supercover-showcase','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(session.scenarioId)||
        session.scenarioVersion!==1||
        session.effectiveRules.losMode!=='strict-supercover'||typeof GoblinHexSupercover==='undefined')return false;
     return GoblinHexSupercover.intermediateHexes(from,to)

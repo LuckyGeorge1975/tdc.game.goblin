@@ -37,10 +37,19 @@ function loadScenario(id){
   if(!config)return;
   let nextSession;
   try{nextSession=ScenarioRuleProfiles.beginSession(id,config)}catch(error){addLog(error.message,true);throw error}
+  applyScenarioSession(nextSession);
+}
+function loadEditorDraft(config){
+  if(globalThis.goblinBootProfileError)throw globalThis.goblinBootProfileError;
+  const session=ScenarioRuleProfiles.beginDraftSession(config);
+  clearPhaseCommands();
+  applyScenarioSession(session);
+}
+function applyScenarioSession(nextSession){
   globalThis.IronDustBrowserV2?.stop();
   legacySession=nextSession;
   const active=nextSession.config;
-  currentScenario=id;
+  currentScenario=nextSession.scenarioId;
   terrain=new Set(active.terrain);
   terrainTypes=new Map((active.terrainTypes||[]).map(cell=>[`${cell.x},${cell.y}`,cell.type]));
   for(const [key,type] of terrainTypes)if(TerrainRules.coverBonus(type))terrain.add(key);

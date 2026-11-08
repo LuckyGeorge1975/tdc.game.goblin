@@ -1,6 +1,7 @@
 // One authoritative world adapter; the pure visibility reducer owns disclosure rules.
 (function(root){
- const active=()=>!root.IronDustBrowserV2?.active&&legacySession?.ruleProfileId===root.GoblinCatalogFullModel?.profile&&root.GoblinCatalogFullModel.has(legacySession.scenarioId);
+ const active=()=>!root.IronDustBrowserV2?.active&&legacySession?.ruleProfileId===root.GoblinCatalogFullModel?.profile&&
+  (root.GoblinCatalogFullModel.has(legacySession.scenarioId)||ScenarioRuleProfiles.isDraftSession?.(legacySession));
  const copy=v=>JSON.parse(JSON.stringify(v));
  const registry=()=>legacySession.effectiveRules.catalog.registry;
  let state=null;

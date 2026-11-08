@@ -194,9 +194,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const result = IronDustBrowserV2.query(command);
         return result.available ? {ok:true,...result} : {ok:false,reason:IronDustBrowserV2.formatError(result.error?.code)};
       }
-      if (!scenarioCatalog[currentScenario] || !ScenarioRuleProfiles.entries[currentScenario] ||
+      const draft = ScenarioRuleProfiles.isDraftSession?.(legacySession);
+      if ((!draft && (!scenarioCatalog[currentScenario] || !ScenarioRuleProfiles.entries[currentScenario])) ||
           legacySession?.scenarioId !== currentScenario ||
-          (legacySession.ruleProfileId !== ScenarioRuleProfiles.entries[currentScenario].ruleProfileId &&
+          (!draft && legacySession.ruleProfileId !== ScenarioRuleProfiles.entries[currentScenario].ruleProfileId &&
             !(globalThis.GoblinCatalogFullRuntime?.active()&&legacySession.ruleProfileId===GoblinCatalogFullModel.candidateProfile)) ||
           globalThis.IronDustBrowserV2?.active)
         return { ok: false, reason: t('ui.error.UNSUPPORTED_COMMAND') };
@@ -302,11 +303,6 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         selected = actor;
         const beforeExecution = revision();
         if(['CatalogFire','CatalogRam','CatalogLoad','CatalogDeploy','Engineer','CatalogHexFire'].includes(command.type)||globalThis.GoblinCatalogFullRuntime?.active()&&command.type==='Move'){executeSpecialistCommand(command);return revision()!==beforeExecution?{ok:true}:{ok:false,reason:t('ui.error.INVALID_COMMAND')};}
-        if (command.type === 'Embark') {
-          const carrier = units.find(unit => unit.id === command.carrierId);
-          embark(actor, carrier);
-          return revision() !== beforeExecution ? { ok: true } : { ok: false, reason: t('ui.error.INVALID_COMMAND') };
-        }
         if (command.type === 'Unload') {
           const cargo = units.find(unit => unit.id === command.cargoId);
           unloadAt(actor, cargo, command.x, command.y);

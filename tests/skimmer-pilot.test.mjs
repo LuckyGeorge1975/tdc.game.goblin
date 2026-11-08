@@ -1,3 +1,4 @@
+import {targetOptionsSource} from './helpers/target-options-source.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -138,7 +139,7 @@ test('actual async loader registers the distinct fixed mission and preserves eve
 test('overlay costs, native Guide, M1 and animation paths agree with the frozen session and Undo',()=>{
  const g=scene();queryBridge(g);attachMovement(g);
  for(const file of ['m1-unit-markers.js','unit-guide-range.js'])g.run(fs.readFileSync(new URL('../'+file,import.meta.url),'utf8'));
- const ui=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');const a=ui.indexOf('    function areaQuery('),b=ui.indexOf('    function freeRatioChipCenter(',a);g.run(ui.slice(a,b));
+ const ui=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');const a=ui.indexOf('    function areaQuery('),b=ui.indexOf('    function freeRatioChipCenter(',a);g.run("const GoblinLanguage={current:'de'};"+targetOptionsSource+ui.slice(a,b));
  const guide=JSON.parse(g.run("JSON.stringify(UnitGuideRange.profile({name:'COMBAT SKIMMER',move:'4 + 3',range:'2'},units[0]))"));assert.equal(guide.movement,4);assert.equal(guide.bonus,3);
  assert.equal(g.run("M1UnitMarkers.legacy(legacySession,units,'test',null).supported"),true);
  for(const phaseName of ['movement','gev']){

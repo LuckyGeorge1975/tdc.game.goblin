@@ -438,6 +438,18 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-library-reference :is(h3, h4, p, ul) { margin: 0; }
 .v2-library-reference ul { padding-inline-start: 22px; }
 .v2-library-reference li + li { margin-top: 6px; }
+.v2-screen-panel[data-screen="editor"] { width: min(1240px, 100%); }
+.v2-editor-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 290px); gap: 16px; align-items: start; }
+.v2-editor-map { width: 100%; background: var(--v2-surface2); border-radius: 8px; }
+.v2-editor-hex { fill: var(--v2-surface3); stroke: var(--v2-line-strong); cursor: pointer; }
+.v2-editor-selected { fill: var(--v2-surface); stroke: var(--v2-accent-text); stroke-width: 3px; }
+.v2-editor-map image, .v2-editor-token { pointer-events: none; }
+.v2-editor-token { fill: var(--v2-text); stroke: var(--v2-bg); paint-order: stroke; stroke-width: 4px; text-anchor: middle; dominant-baseline: central; font: bold 27px system-ui; }
+.v2-editor-token-player { fill: var(--v2-signal); }
+.v2-editor-token-enemy { fill: var(--v2-danger-text); }
+.v2-editor-fields, .v2-screen-panel[data-screen="editor"] label { display: grid; gap: 6px; }
+.v2-screen-panel[data-screen="editor"] :is(input,select,textarea) { min-width: 0; width: 100%; color: var(--v2-text); background: var(--v2-surface2); border: 1px solid var(--v2-line-strong); padding: 5px; }
+@media (max-width: 750px) { .v2-editor-layout { grid-template-columns: 1fr; } }
 .v2-library-terrain-tile { width: min(160px, 30vw); aspect-ratio: 1; border-radius: 10px; object-fit: cover; }
 @media (max-width: 599px) {
   .v2-units { flex-direction: row; overflow-x: auto; overflow-y: hidden; max-height: none; }

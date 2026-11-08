@@ -61,8 +61,19 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     return value;
   };
   let nextSessionId=1;
+  const draftSessions = new WeakSet();
+  function beginDraftSession(config){
+    const editor=globalThis.GoblinEditorDraft;
+    if(!editor?.isPrepared(config))reject('SCENARIO_PROFILE_MISMATCH','Editor draft was not validated');
+    const session=buildSession(editor.id,config,true);
+    draftSessions.add(session);
+    return session;
+  }
   function beginSession(id,config){
     validate(id,config);
+    return buildSession(id,config,false);
+  }
+  function buildSession(id,config,draft){
     if(!Array.isArray(config.units)||!Array.isArray(config.terrain)||
       config.terrainTypes!==undefined&&!Array.isArray(config.terrainTypes))
       reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} hat keine gültigen effektiven Regeln; Partie wurde nicht geladen.`);
@@ -73,7 +84,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         !Number.isInteger(unit.x)||unit.x<0||unit.x>=12||!Number.isInteger(unit.y)||unit.y<0||unit.y>=8||
         !Number.isInteger(unit.move)||unit.move<0||
         (unit.catalogSystems?
-          (!['catalog-siege','catalog-specialists',...fullIds].includes(id)||Object.hasOwn(unit,'hp')||Object.hasOwn(unit,'maxHp')||Object.hasOwn(unit,'infantry')||unit.alive!==true||!GoblinSystems.validateCatalogSystem(unit.catalogSystems,config.catalog.registry)):
+          ((!draft&&!['catalog-siege','catalog-specialists',...fullIds].includes(id))||Object.hasOwn(unit,'hp')||Object.hasOwn(unit,'maxHp')||Object.hasOwn(unit,'infantry')||unit.alive!==true||!GoblinSystems.validateCatalogSystem(unit.catalogSystems,config.catalog.registry)):
           (!Number.isInteger(unit.hp)||unit.hp<1||!Number.isInteger(unit.maxHp)||unit.maxHp<unit.hp||!Number.isInteger(unit.defense)||unit.defense<1||!Number.isInteger(unit.range)||unit.range<0||!Number.isInteger(unit.damage)||unit.damage<0)))
         reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} hat ungültige Einheitenwerte; Partie wurde nicht geladen.`);
       unitIds.add(unit.id);
@@ -90,11 +101,11 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         ...(id==='artillery-pilot'?{fireBudgetVersion:source.fireBudgetVersion,sourceDigest:source.sourceDigest}:{}),
         ...(id==='siege-pilot'?{fireBudgetVersion:source.fireBudgetVersion,sourceDigest:source.sourceDigest}:{}),
         ...(id==='skimmer-pilot'?{movement:source.movement,sourceDigest:source.sourceDigest}:{}),
-        ...((globalThis.GoblinCatalogBase?.has(id)||globalThis.GoblinCatalogSpecialistsModel?.has(id)||globalThis.GoblinCatalogFullModel?.has(id))?{catalog:source.catalog}:{}),
+        ...((draft||globalThis.GoblinCatalogBase?.has(id)||globalThis.GoblinCatalogSpecialistsModel?.has(id)||globalThis.GoblinCatalogFullModel?.has(id))?{catalog:source.catalog}:{}),
         ...(trainingIds.includes(id)?{training:source.training}:{}),
         unitDataProfile:source.ruleProfile??null,terrain:source.terrain,
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;
   }
-  return {schemaVersion:1,product,entries,validate,beginSession};
+  return {schemaVersion:1,product,entries,validate,beginSession,beginDraftSession,isDraftSession:session=>draftSessions.has(session)};
 })());
