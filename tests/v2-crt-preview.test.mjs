@@ -90,7 +90,10 @@ test('Legacy adapter shares legal query, effective cover, selected attack and CR
   const ui=readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
   const game=readFileSync(new URL('../game.js',import.meta.url),'utf8');
   const query=ui.slice(ui.indexOf('    function query(command) {'),ui.indexOf('    function previewFire(command) {'));
-  const preview=ui.slice(ui.indexOf('    function previewFire(command) {'),ui.indexOf('    function dispatch(command, expectedRevision) {'));
+  const previewStart=ui.indexOf('    function previewFire(command) {');
+  const dispatchStart=ui.indexOf('    function dispatch(',previewStart);
+  assert.ok(previewStart>=0&&dispatchStart>previewStart,'Expected previewFire followed by dispatch in ui-v2.js');
+  const preview=ui.slice(previewStart,dispatchStart);
   const ratio=game.slice(game.indexOf('function combatRatio('),game.indexOf('function combatOutcome(',game.indexOf('function combatRatio(')));
   const defense=game.slice(game.indexOf('function effectiveDefense(target)'),game.indexOf('function phaseCanAct(',game.indexOf('function effectiveDefense(target)')));
   const actor={id:'ogre',team:'player',hp:8,x:1,y:1,damage:4,range:6,
