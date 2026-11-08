@@ -17,7 +17,7 @@ const exact = (value, keys) => value && typeof value === 'object' &&
 const deny = code => ({available: false, error: {code}});
 const unit = (state, id) => state.units.find(item => item.id === id);
 
-export function queryIronDustEnemyMoveAction(state, command) {
+export function queryIronDustEnemyMoveAction(state, command, policy = null) {
   validateIronDustUnifiedStateProbe(state);
   const hold = command?.type === 'EnemyHold';
   if (!exact(command, hold ? ['type', 'playerId', 'actorId'] :
@@ -34,7 +34,7 @@ export function queryIronDustEnemyMoveAction(state, command) {
       state.firedActorIds.includes(actor.id)) return deny('ACTION_SPENT');
   const intent = queryIronDustEnemyIntent(state,
     {type: 'EnemyIntent', playerId: 'enemy', actorId: actor.id,
-      stage: 'move', claim: 'auto'});
+      stage: 'move', claim: 'auto'}, policy);
   if (!intent.available) return intent;
   if (hold ? intent.kind !== 'pass' || intent.reason !== 'HOLD' :
     intent.kind !== 'move') return deny('ENEMY_MOVE_INTENT_MISMATCH');
@@ -47,12 +47,12 @@ export function queryIronDustEnemyMoveAction(state, command) {
       to: intent.to, cost: intent.cost, path: intent.path})};
 }
 
-export function preflightIronDustEnemyMoveAction(state, command) {
-  return queryIronDustEnemyMoveAction(state, command);
+export function preflightIronDustEnemyMoveAction(state, command, policy = null) {
+  return queryIronDustEnemyMoveAction(state, command, policy);
 }
 
-export function dispatchIronDustEnemyMoveAction(state, command) {
-  const query = queryIronDustEnemyMoveAction(state, command);
+export function dispatchIronDustEnemyMoveAction(state, command, policy = null) {
+  const query = queryIronDustEnemyMoveAction(state, command, policy);
   if (!query.available) return {error: query.error};
   const next = clone(state), actor = unit(next, command.actorId);
   const from = {x: actor.x, y: actor.y};

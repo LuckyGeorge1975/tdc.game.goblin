@@ -5,6 +5,7 @@ import {queryIronDustEnemyMoveAction, dispatchIronDustEnemyMoveAction} from
   './iron-dust-enemy-move-action-probe.mjs';
 import {queryIronDustStandardFireAction, dispatchIronDustStandardFireAction} from
   './iron-dust-standard-fire-action-probe.mjs';
+import {validIronDustEnemyPolicy} from './iron-dust-enemy-policy.mjs';
 
 // A diagnostic scheduler, separate from Core product profiles and Replay.
 // Legacy performs a whole first pass before any actor's retry pass.
@@ -39,7 +40,8 @@ const digest = value => {
   }
   return `fnv1a64:${hash.toString(16).padStart(16, '0')}`;
 };
-const stamp = (state, cursor) => digest({state, cursor});
+const policyField = policy => policy ? {enemyPolicy: policy} : {};
+const stamp = (state, cursor, policy) => digest({state, cursor, ...policyField(policy)});
 const nextCursor = cursor => {
   if (cursor.pass === 'first') return {...cursor,
     pass: cursor.index === 1 ? 'retry' : 'first',
@@ -50,9 +52,9 @@ const nextCursor = cursor => {
   return {...cursor, pass: 'complete', index: 0};
 };
 
-export function createIronDustEnemyTurnController(state) {
+export function createIronDustEnemyTurnController(state, policy = null) {
   validateIronDustUnifiedStateProbe(state);
-  if (state.phase !== 'enemy' || state.activeTeam !== 'enemy' ||
+  if (!validIronDustEnemyPolicy(policy) || state.phase !== 'enemy' || state.activeTeam !== 'enemy' ||
       state.victory.status !== 'ongoing' || state.enemyPassed.length ||
       state.firedActorIds.length || actors.some(id => unit(state, id).moved) ||
       actors.some(id => {
@@ -67,11 +69,14 @@ export function createIronDustEnemyTurnController(state) {
       return actor.hp > 0 && !actor.disabled;
     })};
   return freeze({controllerVersion: controllerVersionFor(copy),
-    executable: false, state: copy, cursor, digest: stamp(copy, cursor)});
+    executable: false, state: copy, cursor, ...policyField(clone(policy)),
+    digest: stamp(copy, cursor, policy)});
 }
 
 export function validateIronDustEnemyTurnController(value) {
-  if (!exact(value, ['controllerVersion', 'executable', 'state', 'cursor', 'digest']) ||
+  const policy = value?.enemyPolicy ?? null;
+  if (!exact(value, ['controllerVersion', 'executable', 'state', 'cursor', 'digest',
+      ...Object.keys(policyField(policy))]) || !validIronDustEnemyPolicy(policy) ||
       value.controllerVersion !== controllerVersionFor(value.state) ||
       value.executable !== false ||
       !exact(value.cursor, ['turn', 'pass', 'index', 'eligibleActorIds']) ||
@@ -85,7 +90,7 @@ export function validateIronDustEnemyTurnController(value) {
         const actor = value.state?.units?.find(item => item.id === id);
         return actor?.hp > 0 && !actor.disabled;
       })) ||
-      value.digest !== stamp(value.state, value.cursor))
+      value.digest !== stamp(value.state, value.cursor, policy))
     throw Object.assign(new Error('ENEMY_CONTROLLER_STATE_MISMATCH'),
       {code: 'ENEMY_CONTROLLER_STATE_MISMATCH'});
   validateIronDustUnifiedStateProbe(value.state);
@@ -122,6 +127,7 @@ export function validateIronDustEnemyTurnController(value) {
 
 function nextAction(controller) {
   const {state, cursor} = controller;
+  const policy = controller.enemyPolicy ?? null;
   if (cursor.pass === 'finish') {
     const command = {type: 'EndPhase', playerId: 'enemy'};
     const query = queryIronDustStandardFireAction(state, command);
@@ -135,7 +141,7 @@ function nextAction(controller) {
     return {kind: 'skip', actorId, reason: state.firedActorIds.includes(actorId)
       ? 'FIRED' : 'PASSED'};
   const stage = cursor.pass === 'first' ? 'first-fire' : 'retry-fire';
-  const intent = queryIronDustEnemyIntent(state, intentRequest(actorId, stage));
+  const intent = queryIronDustEnemyIntent(state, intentRequest(actorId, stage), policy);
   if (!intent.available) return {error: intent.error};
   if (intent.kind === 'fire') return {kind: 'fire', actorId, command: intent.command};
   if (intent.kind === 'pass') {
@@ -145,12 +151,12 @@ function nextAction(controller) {
   }
   if (cursor.pass !== 'first' || intent.kind !== 'continue')
     return {error: {code: 'ENEMY_CONTROLLER_INTENT_MISMATCH'}};
-  const move = queryIronDustEnemyIntent(state, intentRequest(actorId, 'move'));
+  const move = queryIronDustEnemyIntent(state, intentRequest(actorId, 'move'), policy);
   if (!move.available) return {error: move.error};
   const command = move.kind === 'move'
     ? {type: 'EnemyMove', playerId: 'enemy', actorId, to: move.to}
     : {type: 'EnemyHold', playerId: 'enemy', actorId};
-  const preflight = queryIronDustEnemyMoveAction(state, command);
+  const preflight = queryIronDustEnemyMoveAction(state, command, policy);
   if (!preflight.available) return {error: preflight.error};
   return {kind: move.kind === 'move' ? 'move' : 'hold', actorId, command,
     ...(move.kind === 'move' ? {targetId: move.targetId, to: move.to,
@@ -178,9 +184,10 @@ export function dispatchIronDustEnemyTurnController(controller, request) {
   const query = queryIronDustEnemyTurnController(controller, request);
   if (!query.available) return {error: query.error};
   const {action} = query;
+  const policy = controller.enemyPolicy ?? null;
   let result;
   if (action.kind === 'move' || action.kind === 'hold')
-    result = dispatchIronDustEnemyMoveAction(controller.state, action.command);
+    result = dispatchIronDustEnemyMoveAction(controller.state, action.command, policy);
   else if (action.command)
     result = dispatchIronDustStandardFireAction(controller.state, action.command);
   else result = {state: controller.state, events: [{type: 'EnemySkipped',
@@ -194,7 +201,8 @@ export function dispatchIronDustEnemyTurnController(controller, request) {
   cursor.turn = result.state.turn;
   const state = clone(result.state);
   const next = freeze({controllerVersion: controller.controllerVersion,
-    executable: false, state, cursor, digest: stamp(state, cursor)});
+    executable: false, state, cursor, ...policyField(clone(policy)),
+    digest: stamp(state, cursor, policy)});
   validateIronDustEnemyTurnController(next);
   return {controller: next, events: result.events};
 }

@@ -13,6 +13,8 @@ import {IRON_DUST_PLAYER_MOVE_PROBE_VERSION} from './iron-dust-player-move-probe
 import {IRON_DUST_STANDARD_FIRE_ACTION_VERSION} from
   './iron-dust-standard-fire-action-probe.mjs';
 import {IRON_DUST_B3B_ACTION_VERSION} from './iron-dust-b3b-action-probe.mjs';
+import {ironDustEnemyPolicy, validIronDustEnemyPolicy} from './iron-dust-enemy-policy.mjs';
+export {IRON_DUST_ENEMY_DIFFICULTIES} from './iron-dust-enemy-policy.mjs';
 import {IRON_DUST_ZERO_TREADS_SOURCE_ACTION_ENTRY_VERSION,
   createIronDustZeroTreadsSourceActionEntry, validateIronDustSourceActionEntry,
   queryIronDustSourceActionEntry, dispatchIronDustSourceActionEntry} from
@@ -73,25 +75,30 @@ export const IRON_DUST_PROFILE_HEADER = freeze({
 const stamp = (header, sourceStartDigest, entry) => digest({
   profileVersion: IRON_DUST_PROFILE_VERSION, header, sourceStartDigest, entry
 });
-const wrap = (entry, sourceStartDigest) => {
-  const copy = clone(entry), header = clone(IRON_DUST_PROFILE_HEADER);
+const headerFor = policy => policy
+  ? {...IRON_DUST_PROFILE_HEADER, enemyPolicy: policy} : IRON_DUST_PROFILE_HEADER;
+const wrap = (entry, sourceStartDigest, policy) => {
+  const copy = clone(entry), header = clone(headerFor(policy));
   return freeze({profileVersion: IRON_DUST_PROFILE_VERSION, executable: true,
     header, sourceStartDigest, entry: copy,
     digest: stamp(header, sourceStartDigest, copy)});
 };
 
-export function createIronDustProfile(seed) {
+export function createIronDustProfile(seed, {difficulty = 'medium'} = {}) {
+  const policy = ironDustEnemyPolicy(difficulty);
   const entry = createIronDustZeroTreadsSourceActionEntry(seed);
-  return wrap(entry, digest(entry));
+  return wrap(entry, digest(entry), policy);
 }
 
 export function validateIronDustProfile(profile) {
   try {
+    const policy = profile?.header?.enemyPolicy ?? null;
     if (!exact(profile, ['profileVersion', 'executable', 'header',
       'sourceStartDigest', 'entry', 'digest']) ||
         profile.profileVersion !== IRON_DUST_PROFILE_VERSION ||
         profile.executable !== true ||
-        JSON.stringify(profile.header) !== JSON.stringify(IRON_DUST_PROFILE_HEADER) ||
+        !validIronDustEnemyPolicy(policy) ||
+        JSON.stringify(profile.header) !== JSON.stringify(headerFor(policy)) ||
         profile.digest !== stamp(profile.header, profile.sourceStartDigest,
           profile.entry)) fail();
     validateIronDustSourceActionEntry(profile.entry);
@@ -103,8 +110,8 @@ export function validateIronDustProfile(profile) {
         state.sourceDataVersion !== IRON_DUST_PROFILE_HEADER.sourceDataVersion ||
         state.targetPolicyVersion !== IRON_DUST_PROFILE_HEADER.targetPolicyVersion ||
         profile.entry.mode === 'enemy' &&
-          profile.entry.payload.controllerVersion !==
-            IRON_DUST_PROFILE_HEADER.controllerVersion ||
+          (profile.entry.payload.controllerVersion !== IRON_DUST_PROFILE_HEADER.controllerVersion ||
+            JSON.stringify(profile.entry.payload.enemyPolicy ?? null) !== JSON.stringify(policy)) ||
         profile.sourceStartDigest !== digest(start)) fail();
   } catch {fail()}
   return profile;
@@ -148,9 +155,10 @@ export function preflightIronDustProfile(profile, command) {
 export function dispatchIronDustProfile(profile, command) {
   const query = queryIronDustProfile(profile, command);
   if (!query.available) return {error: query.error};
-  const result = dispatchIronDustSourceActionEntry(profile.entry, command);
+  const policy = profile.header.enemyPolicy ?? null;
+  const result = dispatchIronDustSourceActionEntry(profile.entry, command, policy);
   if (!result.entry) return {error: result.error};
-  const next = wrap(result.entry, profile.sourceStartDigest);
+  const next = wrap(result.entry, profile.sourceStartDigest, policy);
   validateIronDustProfile(next);
   return {profile: next, events: freeze(clone(result.events))};
 }

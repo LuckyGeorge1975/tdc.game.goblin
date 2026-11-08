@@ -62,7 +62,7 @@ const stateOf = profile => profile.entry.mode === 'enemy'
   ? profile.entry.payload.state : profile.entry.payload;
 const expectedHeader = initialSnapshot => ({
   profileVersion: IRON_DUST_PROFILE_VERSION,
-  profileHeader: clone(IRON_DUST_PROFILE_HEADER),
+  profileHeader: clone(initialSnapshot.header),
   projectionVersion: IRON_DUST_PROFILE_PROJECTION_VERSION,
   eventCodecVersion: IRON_DUST_PROFILE_EVENT_CODEC_VERSION,
   controllerVersion: IRON_DUST_PROFILE_HEADER.controllerVersion,
@@ -129,7 +129,11 @@ function inspect(envelope) {
       !envelope.checkpoints.every((point, index) =>
         exact(point, checkpointKeys) && point.commandIndex === index))
     reject('IRON_DUST_REPLAY_MISMATCH');
-  const start = createIronDustProfile(envelope.initialSeed);
+  let start;
+  try {
+    start = createIronDustProfile(envelope.initialSeed,
+      {difficulty: envelope.header.profileHeader?.enemyPolicy?.difficulty});
+  } catch {reject('IRON_DUST_REPLAY_MISMATCH')}
   if (canonical(envelope.initialSnapshot) !== canonical(start) ||
       canonical(envelope.header) !== canonical(expectedHeader(start)) ||
       envelope.commandsDigest !== digest(envelope.commands) ||
@@ -142,11 +146,11 @@ function inspect(envelope) {
   return {envelope: freeze(clone(envelope)), playback: freeze(playback)};
 }
 
-export function recordIronDustProfileReplay(seed, commands) {
+export function recordIronDustProfileReplay(seed, commands, options) {
   if (!uint32(seed) || !Array.isArray(commands) ||
       !jsonValue(commands) || !commands.every(validCommand))
     reject('IRON_DUST_REPLAY_MISMATCH');
-  const start = createIronDustProfile(seed);
+  const start = createIronDustProfile(seed, options);
   const playback = simulate(start, commands);
   return inspect({replayVersion: IRON_DUST_PROFILE_REPLAY_VERSION,
     executable: false, header: expectedHeader(start), initialSeed: seed,

@@ -4,6 +4,9 @@ import {validateIronDustUnifiedStateProbe, queryIronDustFireGeometry,
   IRON_DUST_ZERO_TREADS_POLICY_VERSION} from
   './iron-dust-unified-state-probe.mjs';
 import {queryIronDustStandardFireAction} from './iron-dust-standard-fire-action-probe.mjs';
+import {IRON_DUST_LEGACY_LOS_PROBE_V1, hasIronDustLegacyLineOfSight} from
+  './iron-dust-legacy-los-probe.mjs';
+import {validIronDustEnemyPolicy} from './iron-dust-enemy-policy.mjs';
 
 // Read-only Legacy decision on the inactive seven-unit probe. No scheduler,
 // state transition, event, or random draw is exposed here.
@@ -30,8 +33,20 @@ const candidates = (state, actor, excludeEmbarked) => state.units
     (!excludeEmbarked || !unit.embarkedOn))
   .sort((a, b) => hexDistance(actor, a) - hexDistance(actor, b));
 
-function firstFire(state, actor) {
-  for (const target of candidates(state, actor, true)) {
+function threat(target) {
+  if (!target.ogreSystems) return target.damage;
+  return Math.max(0, ...Object.values(target.ogreSystems.weapons)
+    .filter(weapon => remaining(weapon) > 0).map(weapon => weapon.attack));
+}
+
+function firstFire(state, actor, policy) {
+  const targets = candidates(state, actor, true);
+  if (policy) {
+    const direction = policy.difficulty === 'strong' ? -1 : 1;
+    // Stable sort retains the Legacy distance and roster order on equal threat.
+    targets.sort((a, b) => direction * (threat(a) - threat(b)));
+  }
+  for (const target of targets) {
     const geometry = queryIronDustFireGeometry(state, actor.id, target.id, actor.range,
       {outOfRange: 'OUT_OF_RANGE', sightBlocked: 'SIGHT_BLOCKED'});
     if (!geometry.available) continue;
@@ -50,17 +65,32 @@ function firstFire(state, actor) {
 
 // Keep the historical FIFO queue, neighbor order, cheaper-cost revisit and
 // strict distance improvement. The shared Core pathfinder has different ties.
-function legacyStep(state, actor, target) {
+function preferredStep(state, actor, target, policy) {
   const occupied = new Set(state.units.filter(unit => unit.hp > 0 && unit !== actor).map(key));
   const queue = [{x: actor.x, y: actor.y, cost: 0, path: []}];
   const seen = new Map([[key(actor), 0]]);
   let best = null;
+  const targets = policy?.difficulty === 'strong' ? candidates(state, actor, true) : [];
+  const rank = (node, distance) => {
+    if (policy?.difficulty === 'weak') return [node.cost, distance];
+    if (!policy) return [distance, node.cost];
+    const firingLane = targets.some(foe => hexDistance(node, foe) <= actor.range &&
+      hasIronDustLegacyLineOfSight(IRON_DUST_LEGACY_LOS_PROBE_V1, node, foe));
+    const cover = TerrainRules.coverBonus(terrainAt(state, node));
+    return [firingLane ? 0 : 1, -cover, distance, node.cost];
+  };
+  let bestRank;
   while (queue.length) {
     const node = queue.shift();
     const distance = hexDistance(node, target), original = hexDistance(actor, target);
-    if (node.path.length && distance < original &&
-        (!best || distance < hexDistance(best, target) ||
-          distance === hexDistance(best, target) && node.cost < best.cost)) best = node;
+    if (node.path.length && distance < original) {
+      const score = rank(node, distance);
+      const difference = bestRank ? score.findIndex((value, i) => value !== bestRank[i]) : -1;
+      if (!bestRank || difference >= 0 && score[difference] < bestRank[difference]) {
+        best = node;
+        bestRank = score;
+      }
+    }
     for (const next of neighbors(node)) {
       const nextKey = key(next);
       const stepCost = TerrainRules.movementCost(terrainAt(state, next), actor);
@@ -76,8 +106,9 @@ function legacyStep(state, actor, target) {
   return best;
 }
 
-export function queryIronDustEnemyIntent(state, request) {
+export function queryIronDustEnemyIntent(state, request, policy = null) {
   validateIronDustUnifiedStateProbe(state);
+  if (!validIronDustEnemyPolicy(policy)) return deny('IRON_DUST_DIFFICULTY_INVALID');
   const resolverVersion = state.targetPolicyVersion === IRON_DUST_ZERO_TREADS_POLICY_VERSION
     ? IRON_DUST_ZERO_TREADS_ENEMY_INTENT_VERSION : IRON_DUST_ENEMY_INTENT_VERSION;
   if (!exact(request, ['type', 'playerId', 'actorId', 'stage', 'claim']) ||
@@ -102,13 +133,13 @@ export function queryIronDustEnemyIntent(state, request) {
     return deny('STALE_STAGE');
   let intent;
   if (request.stage === 'move') {
-    if (firstFire(state, actor)) return deny('FIRE_AVAILABLE');
+    if (firstFire(state, actor, policy)) return deny('FIRE_AVAILABLE');
     const target = candidates(state, actor, false)[0];
-    const step = target && legacyStep(state, actor, target);
+    const step = target && preferredStep(state, actor, target, policy);
     intent = step ? {kind: 'move', actorId: actor.id, targetId: target.id,
       to: {x: step.x, y: step.y}, cost: step.cost,
       path: step.path.map(point => ({x: point.x, y: point.y}))} : null;
-  } else intent = firstFire(state, actor);
+  } else intent = firstFire(state, actor, policy);
   if (!intent && request.stage === 'first-fire')
     intent = {kind: 'continue', actorId: actor.id, nextStage: 'move'};
   if (!intent) intent = {kind: 'pass', actorId: actor.id,

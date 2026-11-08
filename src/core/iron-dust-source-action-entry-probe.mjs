@@ -124,7 +124,7 @@ export function preflightIronDustSourceActionEntry(entry, command) {
   return queryIronDustSourceActionEntry(entry, command);
 }
 
-export function dispatchIronDustSourceActionEntry(entry, command) {
+export function dispatchIronDustSourceActionEntry(entry, command, enemyPolicy = null) {
   const query = queryIronDustSourceActionEntry(entry, command);
   if (!query.available) return {error: query.error};
   if (entry.mode === 'enemy') {
@@ -143,7 +143,7 @@ export function dispatchIronDustSourceActionEntry(entry, command) {
   if (!result.state) return {error: result.error};
   const state = result.state;
   const next = state.victory.status === 'ended' ? wrap('ended', state, entry.entryVersion)
-    : state.phase === 'enemy' ? wrap('enemy', createIronDustEnemyTurnController(state),
+    : state.phase === 'enemy' ? wrap('enemy', createIronDustEnemyTurnController(state, enemyPolicy),
       entry.entryVersion)
       : wrap('player', state, entry.entryVersion);
   validateIronDustSourceActionEntry(next);
