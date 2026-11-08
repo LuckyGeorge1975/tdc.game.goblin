@@ -92,9 +92,56 @@ test('training source/manifest mutations reject before World/RNG; Classic gets n
 });
 test('actual end-screen branch keeps normal advisory battle results separate from learning completion',async()=>{
  const source=fs.readFileSync(new URL('../ui-v2-flow.js',import.meta.url),'utf8'),start=source.indexOf('        const training=globalThis.GoblinTrainingRuntime?.view();'),end=source.indexOf("      } else if (screen === 'log')",start),body=source.slice(start,end);
- for(const learning of [false,true]){
-  const g=await trainingScene('training-t01',true);if(learning)for(const action of route('training-t01'))apply(g,action);else g.run("loadScenario('iron-dust')");
-  g.run(`{globalThis.headings=[];const state={objective:{outcome:true},scenario:currentScenario,turn:1};const panel={append(){}},heading=x=>headings.push(x),paragraph=x=>x,actions=(...x)=>x,button=(...x)=>x,confirmRestart=()=>{},goToLevels=()=>{};${body}}`);
-  assert.equal(read(g,'headings[0]'),learning?'training.complete.title':'screen.missionEnd.victory.title');
+ for(const lesson of [null,'training-t01','training-t02']){
+  const g=await trainingScene(lesson??'training-t01',true);if(lesson)for(const action of route(lesson))apply(g,action);else g.run("loadScenario('iron-dust')");
+  g.run(`{globalThis.headings=[];globalThis.buttons=[];const campaign=null,state={objective:{outcome:true},scenario:currentScenario,turn:1};const panel={append(){}},heading=x=>headings.push(x),paragraph=x=>x,actions=(...x)=>x,button=(key)=>buttons.push(key),confirmRestart=()=>{},goToLevels=()=>{};${body}}`);
+  assert.equal(read(g,'headings[0]'),lesson?'training.complete.title':'screen.missionEnd.victory.title');
+  assert.equal(read(g,"buttons.includes('training.nextLesson')"),!!lesson);
  }
+});
+
+test('tutorial campaign advances only from its confirmed lessons and isolates restart and exit',async()=>{
+ const flow=fs.readFileSync(new URL('../ui-v2-flow.js',import.meta.url),'utf8');
+ const g=await trainingScene();
+ g.run(`
+  const campaignLessons=['training-t01','training-t02'];
+  let campaign=null,screen='menu',missionId='relay-run',startError='',started=false;
+  const show=next=>{screen=next},missionData=id=>scenarioCatalog[id];
+  const GoblinUIV2={resetView(){},startView(){}},renderScreen=()=>{},releasePause=()=>{};
+  ${flow.slice(flow.indexOf('    function campaignAvailable('),flow.indexOf('    function libraryAssetId('))}
+ `);
+ g.run('openCampaign()');
+ assert.deepEqual(read(g,'[screen,missionId,campaign.index]'),['briefing','training-t01',0]);
+ await g.run('startMission()');
+ const first=progress(g).binding.sessionId;
+ assert.equal(read(g,'campaign.sessionId'),first);
+ g.run("show('end');advanceCampaign()");
+ assert.deepEqual(read(g,'[screen,campaign.index]'),['end',0]);
+ g.run('GameDialogs.confirm=async()=>true');
+ await g.run('confirmRestart()');
+ const retry=progress(g).binding.sessionId;
+ assert.notEqual(retry,first);
+ assert.equal(read(g,'campaign.sessionId'),retry);
+ for(const action of route('training-t01').slice(0,-1))apply(g,action);
+ assert.equal(progress(g).status,'ready-for-debrief');
+ g.run("show('end');advanceCampaign()");
+ assert.equal(read(g,'campaign.index'),0);
+ apply(g,route('training-t01').at(-1));
+ g.run('advanceCampaign()');
+ assert.deepEqual(read(g,'[screen,missionId,campaign.index,campaign.sessionId]'),['briefing','training-t02',1,null]);
+ await g.run('startMission()');
+ assert.notEqual(progress(g).binding.sessionId,retry);
+ g.run('GameDialogs.confirm=async()=>false');
+ await g.run("leaveMission('levels')");
+ assert.deepEqual(read(g,'[screen,campaign.index]'),['play',1]);
+ for(const action of route('training-t02'))apply(g,action);
+ g.run("show('end');advanceCampaign()");
+ assert.equal(read(g,'screen'),'campaign-complete');
+ g.run('returnToCampaignMenu()');
+ assert.deepEqual(read(g,'[screen,missionId,campaign,started]'),['menu','relay-run',null,false]);
+ g.run('openCampaign()');
+ await g.run('startMission()');
+ g.run('GameDialogs.confirm=async()=>true');
+ await g.run("leaveMission('levels')");
+ assert.deepEqual(read(g,'[screen,missionId,campaign,started]'),['levels','relay-run',null,false]);
 });

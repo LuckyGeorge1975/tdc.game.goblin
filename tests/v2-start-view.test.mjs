@@ -84,7 +84,7 @@ test('only a successful start or accepted restart requests the initial view afte
   const restart=flow.slice(flow.indexOf('    async function confirmRestart() {'),flow.indexOf('    async function goToLevels() {'));
   for(const accepted of [false,true])for(const engine of ['core','legacy']){
     const calls=[];
-    const context={...lifeGlobals,GameDialogs:{isOpen:()=>false,confirm:async()=>accepted},t:key=>key,
+    const context={...lifeGlobals,bindCampaignLesson(){},GameDialogs:{isOpen:()=>false,confirm:async()=>accepted},t:key=>key,
       currentScenario:'relay-run',loadScenario:id=>calls.push('load:'+id),
       IronDustBrowserV2:{mode:engine==='core'?'ready':'inactive',restart(){calls.push('restart')}},
       GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},
@@ -95,7 +95,7 @@ test('only a successful start or accepted restart requests the initial view afte
   }
   const start=flow.slice(flow.indexOf('    async function startMission() {'),flow.indexOf('    function libraryAssetId('));
   for(const succeeds of [false,true]){
-    const calls=[],context={GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'iron-dust-v2',
+    const calls=[],context={bindCampaignLesson(){},GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'iron-dust-v2',
       t:key=>key,renderScreen(){},IronDustBrowserV2:{available:true,start:()=>succeeds},
       document:{querySelector:()=>({})},GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},
       show:screen=>calls.push(screen),releasePause:()=>calls.push('resume')};
@@ -103,7 +103,7 @@ test('only a successful start or accepted restart requests the initial view afte
     await context.start();
     assert.deepEqual(calls,succeeds?['reset','play','resume','start-view']:[]);
   }
-  const calls=[],context={GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'relay-run',
+  const calls=[],context={bindCampaignLesson(){},GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'relay-run',
     scenarioCatalog:{'relay-run':{}},loadScenario:id=>calls.push('load:'+id),
     IronDustBrowserV2:{stop:()=>calls.push('stop-core')},document:{querySelector:()=>({})},
     GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},
