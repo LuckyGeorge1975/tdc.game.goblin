@@ -12,7 +12,64 @@ for(const [result,roll]of [['NE',0],['D',2],['X',5]])test('controlled actual CRT
  apply(g,{command:{type:'Fire',actorId:'training-t02-tank',x:5,y:3}});
  assert.equal(progress(g).stepId,'result');assert.equal(read(g,"units.find(u=>u.team==='enemy').lastOutcome"),result);
  const receipt=read(g,'GoblinTrainingRuntime.audit().at(-1).receipt');assert.equal(receipt.command.type,'Fire');assert.equal(receipt.events[0].outcome,result);assert.equal(receipt.events.length,1);
+ assert.equal(g.run('GoblinTrainingRuntime.shotEffect()'),{NE:'noEffect',D:'disabled',X:'destroyed'}[result]);
+ if(result==='D')assert.equal(g.run("units.find(u=>u.team==='enemy').hp"),3);
  apply(g,{ui:'ack',action:'continue'});advanceEnemy(g);assert.equal(progress(g).status,'ready-for-debrief');assert.equal(read(g,'gameOver'),false);
+});
+function mountTrainingPanel(g){
+ const flow=fs.readFileSync(new URL('../ui-v2-flow.js',import.meta.url),'utf8');
+ const panel=flow.slice(flow.indexOf('    const targetTrainingCopy'),flow.indexOf('    const requestedScenario'));
+ g.run(`
+  let busy=false,refreshes=0,screen='play';
+  const campaign=null,confirmRestart=()=>{},goToLevels=()=>{};
+  const GoblinLanguage={t:key=>key,translate:key=>key};
+  const GoblinUIV2={project:()=>({scenario:currentScenario,phase,turnPhase,units}),refresh:()=>refreshes++};
+  globalThis.GoblinMovement={busy:()=>busy};
+  const trainingPanel={nodes:[],replaceChildren(){this.nodes=[]},append(...nodes){this.nodes.push(...nodes)}};
+  const paragraph=x=>x,actions=(...nodes)=>Object.assign(nodes,{append(...items){nodes.push(...items)}}),
+   button=(key,onclick)=>({key:key.key,onclick});
+  {
+   const t=(key,params)=>({key,params});
+   ${panel}
+   globalThis.renderTraining=renderTraining;
+  }
+ `);
+}
+test('advisory acknowledgement refreshes the current target without bubbling into the outside-click handler',async()=>{
+ const g=await trainingScene('iron-dust',true);
+ apply(g,{ui:'ack',action:'continue'});
+ const move=read(g,"(()=>{for(let x=0;x<W;x++)for(let y=0;y<H;y++){const c={type:'Move',actorId:'gev',x,y};if(query(c).ok)return c}})()");
+ assert.equal(execute(g,move).ok,true);
+ assert.equal(progress(g).stepId,'hint');
+ g.run("setTurnPhase('fire')");
+ mountTrainingPanel(g);
+ const before=JSON.parse(g.state());
+ g.run("let stopped=false;renderTraining();trainingPanel.nodes.at(-1).find(b=>b.key==='ui.dialog.confirm').onclick({stopPropagation(){stopped=true}})");
+ assert.equal(g.run('stopped'),true);
+ assert.equal(g.run('refreshes'),1);
+ assert.deepEqual(JSON.parse(g.state()),before);
+ assert.equal(progress(g).stepId,'exit');
+});
+test('T02 shows phase guidance before the enemy turn and delays the debrief until movement settles',async()=>{
+ const g=await beforeShot();
+ mountTrainingPanel(g);
+ apply(g,{command:{type:'Fire',actorId:'training-t02-tank',x:5,y:3}});
+ g.run('renderTraining()');
+ assert.match(g.run('trainingPanel.nodes[1].params.effect.key'),/^v2\.training\.effect\./);
+ apply(g,{ui:'ack',action:'continue'});
+ g.run('renderTraining()');
+ assert.equal(g.run('trainingPanel.nodes[1].key'),'v2.training.finishFire');
+ g.run("setTurnPhase('gev');renderTraining()");
+ assert.equal(g.run('trainingPanel.nodes[1].key'),'v2.training.startEnemy');
+ g.run('busy=true');
+ advanceEnemy(g);
+ g.run('renderTraining()');
+ assert.equal(g.run('trainingPanel.nodes[1].key'),'v2.training.waitForEnemy');
+ assert.equal(g.run('trainingPanel.nodes.length'),2);
+ g.run('busy=false;renderTraining()');
+ assert.equal(g.run('trainingPanel.nodes[1].key'),'training.readyForDebrief');
+ assert.equal(g.run('trainingPanel.nodes[2].key'),'training.roundComplete');
+ assert.equal(g.run("trainingPanel.nodes.at(-1).some(b=>b.key==='training.debrief.confirm')"),true);
 });
 test('actual fire BACK reuses cached die while physical RNG stays advanced; new branch and audit remain monotone',async()=>{
  const g=await beforeShot(),before=read(g,'GoblinTrainingRuntime.rng()');apply(g,{command:{type:'Fire',actorId:'training-t02-tank',x:5,y:3}});

@@ -5,7 +5,7 @@ const GameDialogs = (() => {
   dialog.setAttribute('aria-labelledby', 'game-dialog-title');
   dialog.setAttribute('aria-describedby', 'game-dialog-message');
   dialog.innerHTML = `<small class="dialog-kind"></small><h2 id="game-dialog-title"></h2>
-    <p id="game-dialog-message"></p><label class="dialog-preference"><input type="checkbox"> NEVER ASK AGAIN</label>
+    <p id="game-dialog-message"></p><label class="dialog-preference"><input type="checkbox"> <span>NEVER ASK AGAIN</span></label>
     <div class="dialog-actions"><button type="button" class="action-button dialog-cancel">CANCEL</button>
     <button type="button" class="action-button primary dialog-accept">CONTINUE</button></div>`;
   document.body.appendChild(dialog);
@@ -23,6 +23,7 @@ const GameDialogs = (() => {
     message.textContent = active.message;
     dialog.querySelector('small').textContent = active.kind === 'warning' ? 'WARNING' : 'CONFIRM';
     preference.hidden = !active.rememberKey;
+    preference.querySelector('span').textContent = active.rememberLabel || 'NEVER ASK AGAIN';
     checkbox.checked = false;
     cancel.hidden = active.kind === 'warning';
     cancel.textContent = active.cancelLabel || 'CANCEL';

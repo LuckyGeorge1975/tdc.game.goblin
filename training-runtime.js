@@ -113,6 +113,15 @@
  function inspect(command,legal,preview){if(!active())return;const actor=units.find(u=>u.id===command.actorId),target=units.find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===command.x&&u.y===command.y);if(!actor||!Object.values(session.definition.actorTags).includes(actor.id))return;const h=descriptor();session.queries=[{queryId:'query',actorId:actor.id,targetId:target?.id??null,regionRef:null,historyRevision:h.revision,stateKey:h.stateKey,legal:!!legal.ok,losBlocked:!!target&&dist(actor,target)<=actor.range&&!lineOfSight(actor,target),previewAvailable:command.type==='Move'?!!legal.ok:!!preview,coverPresent:TerrainRules.coverBonus(terrainTypeAt(command.x,command.y))>0}];session.intent={intentId:session.binding.sessionId+':intent:'+ ++session.checkpoints,queryId:'query',actorId:actor.id,stepId:session.progress.stepId,historyRevision:h.revision,stateKey:h.stateKey};session.queryDetails={command:copy(command),legal:copy(legal),preview:copy(preview??null)};ui(command.type==='Move'&&legal.ok||preview?'preview':'selectIntent',actor.id)}
  function params(){const q=session.queryDetails,actor=units.find(u=>u.id===(q?.command.actorId??session.definition.actorTags.tank)),target=units.find(u=>u.id===session.definition.actorTags.hostile),values={'query:attack':actor?.damage,'query:defense':target?effectiveDefense(target):'', 'query:range':actor?.range,'query:cost':q?.legal.path?.reduce((n,c)=>n+movementCost(actor,c.x+','+c.y),0)??'', 'query:available':actor?movementBudget(actor):'', 'shot:result':session.lastShot?.outcome??'', 'shot:effect':session.lastShot?.outcome??'',recoveryReason:root.GoblinLanguage?.t('training.undoUnavailable')??'',skills:'',objective:'', 'control:back':'BACK','control:cancel':root.GoblinLanguage?.t('ui.cancel')??'Cancel','phase:fire':'FIRE','phase:movement':'MOVEMENT'};for(const [tag,id]of Object.entries(session.definition.actorTags))values['actor:'+tag]=units.find(u=>u.id===id)?.name??'';for(const [ref,cells]of Object.entries(session.regions))values['region:'+ref]=cells.map(c=>String.fromCharCode(65+c.x)+String(c.y+1).padStart(2,'0')).join(' / ');return values}
  function render(){root.dispatchEvent?.(new Event('goblin-training-change'))}
+ function shotEffect(){
+  if(!active()||!session.lastShot)return null;
+  const {actorId,targetId,outcome}=session.lastShot;
+  const shot=session.audit.findLast(entry=>!entry.error&&entry.receipt.events.some(event=>
+   event.type==='ShotResolved'&&event.actorId===actorId&&event.targetId===targetId&&event.outcome===outcome));
+  const target=shot?.receipt.events.find(event=>event.type==='ShotResolved')?.targetAfter;
+  if(!target)return null;
+  return outcome==='NE'?'noEffect':!target.alive?'destroyed':target.disabled?'disabled':'strengthLost';
+ }
  function rejected(command){
   if(!active())return;const actor=units.find(u=>u.id===command?.actorId);let normalized={type:'Other'};
   if(command?.type==='Move'&&actor&&Object.values(session.definition.actorTags).includes(actor.id)&&Number.isInteger(command.x)&&Number.isInteger(command.y))normalized={type:'Move',actorId:actor.id,from:{x:actor.x,y:actor.y},to:{x:command.x,y:command.y},acceptedPath:[],cost:null};
@@ -131,7 +140,7 @@
   return values;
  }
  root.GoblinTrainingRuntime=Object.freeze({
-  active,checkpoint,inspect,rejected,select:actorId=>ui('selectActor',actorId),
+  active,checkpoint,inspect,rejected,shotEffect,select:actorId=>ui('selectActor',actorId),
   cancel:()=>{if(active()&&session.intent)ui('cancelIntent',session.intent.actorId)},
   ack:(action='continue')=>ui('acknowledgeInstruction',null,action),
   status:()=>active()?session.progress.status:null,

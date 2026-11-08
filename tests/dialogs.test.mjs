@@ -25,9 +25,12 @@ test('requests queue and warnings share the dialog; idle waits for every dialog'
   dialog.querySelector('.dialog-accept').onclick();await second;await waiting;assert.equal(idle,true);
 });
 test('remember preference requires acceptance and applies only to its dialog key',async()=>{
-  const {api,dialog,storage}=setup();let answer=api.confirm({title:'Phase',rememberKey:'phase'});
+  const {api,dialog,storage}=setup();let answer=api.confirm({title:'Phase',rememberKey:'phase',rememberLabel:'Skip phase prompts'});
+  assert.equal(dialog.querySelector('label').querySelector('span').textContent,'Skip phase prompts');
   dialog.querySelector('input').checked=true;dialog.querySelector('.dialog-cancel').onclick();await answer;assert.equal(storage.has('phase'),false);
-  answer=api.confirm({title:'Phase',rememberKey:'phase'});dialog.querySelector('input').checked=true;dialog.querySelector('.dialog-accept').onclick();await answer;
+  answer=api.confirm({title:'Phase',rememberKey:'phase'});
+  assert.equal(dialog.querySelector('label').querySelector('span').textContent,'NEVER ASK AGAIN');
+  dialog.querySelector('input').checked=true;dialog.querySelector('.dialog-accept').onclick();await answer;
   assert.equal(await api.confirm({rememberKey:'phase'}),true);
   answer=api.confirm({title:'Restart'});assert.equal(api.isOpen(),true);dialog.querySelector('.dialog-cancel').onclick();await answer;
 });

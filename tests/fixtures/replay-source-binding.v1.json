@@ -28,7 +28,7 @@
     "catalog-visibility.js": "3e9c05509d88acbc0546a428c966520cb8edfb0efaf247a2fc2a5b6e72003fcd",
     "catalog-waves.js": "a481fd5c3f1601019f91b55644d73003b78b75f12bb635b00e7828767e10dc29",
     "command-history.js": "f37784b39f8a9ef8ba7c75e5599fdceedb9a21cfb954045faab21f70166a5522",
-    "game.js": "8acda3bc171590df774070efc6485c560da2f01f61574354def51d7fcfd40fc0",
+    "game.js": "f1d23b8a0dcf3904489595171d2f9bb31ff0cf8c40c4d3e577f080982ab03da8",
     "legacy-supercover.js": "9652d1ddcf52cadddbaca01a1dc63f5774ba526fa3446c0de3db9811d07327eb",
     "ogre-runtime.js": "b4fa01db483fd6398f394efc570b7e1ff44288890a3d57d0e3022520f765c896",
     "ogre-systems.js": "1de2ab821f0021f1a8204d15783d15848ea28f3f80ce0fc705f47b094141c411",
@@ -43,7 +43,7 @@
     "training-director.js": "f0b5064ab6ce484032baf8753afaf1e89c3483eac7b4fd1358ca2c3677561654",
     "training-loader.js": "eeb1050534244ae0f1a3b195ff18ac48bacef4ad74785ca87306051026b1bf97",
     "training-model.js": "a231ed676710bc1cacd0625b3e0e2bb4778b76fe9200749e9dc7608e7bc2ae99",
-    "training-runtime.js": "d77bf65846ad27d2e76965605f0fae6bc7eec9a5dc48c1e75f8fbe2c757131f2",
+    "training-runtime.js": "35d874e6f705f5305c658e02d7996de973de8ec90fe298bdfe506b48c4b362d1",
     "unit-life.js": "430b14dc7b8ffd5519b26e60f31a2e1edb516706eca5673e8339638809197e60"
   },
   "ignoredPaths": {

@@ -249,11 +249,17 @@ function enemyTurn(){const acceptedTurn=turn;recoverDisabled('enemy');phase='ene
   const ready = phaseReadyUnits();
   if (!ready.length) { action(); return; }
   const beforeTurn = turn, beforePhase = turnPhase;
-  const phaseName = turnPhase === 'movement' ? 'MOVEMENT PHASE' : turnPhase === 'fire' ? 'FIRE PHASE' : 'SKIMMER MANEUVER';
+  const next = {movement:'toFire',fire:'toGev',gev:'toEnemy'}[turnPhase];
+  const t = (key, fallback, params) => {
+    const value = globalThis.GoblinLanguage?.t(key, params);
+    return value && value !== key ? value : fallback;
+  };
   const accepted = await GameDialogs.confirm({
-    id: 'phase-end', title: 'END ' + phaseName + '?',
-    message: ready.length + (ready.length === 1 ? ' Einheit kann' : ' Einheiten können') + ' in dieser Phase noch handeln.',
-    acceptLabel: 'PHASE BEENDEN', cancelLabel: 'WEITERSPIELEN',
+    id: 'phase-end', title: t('dialog.phaseAdvance.title', 'End this phase?'),
+    message: t('dialog.phaseAdvance.pending', `${ready.length} unit(s) can still act.`, {pendingCount:ready.length}),
+    acceptLabel: t(`dialog.phaseAdvance.confirm.${next}`, 'End phase'),
+    cancelLabel: t('dialog.phaseAdvance.cancel', 'Stay in this phase'),
+    rememberLabel: t('dialog.phaseAdvance.remember', 'Do not ask again when changing phases'),
     rememberKey: 'goblin-never-ask-phase'
   });
   if (accepted && !gameOver && phase === 'player' && turn === beforeTurn && turnPhase === beforePhase) action();
