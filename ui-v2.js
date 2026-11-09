@@ -353,6 +353,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       get damageVisible() { return view.damageVisible; }, setDamageVisible(value) { setViewFlag('damageVisible',value); },
       get phaseNoticeEnabled() { return phaseNoticeEnabled; }, setPhaseNoticeEnabled,
       closeTarget: () => { if (view.target) clearContext(); },
+      trainingFirePreview,
       refresh: () => { areaCache.key = null; targetCache.key = null; render(); } });
     function setViewFlag(key,value){
       view[key]=!!value;render();
@@ -669,6 +670,14 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const lastStep = !!target && (infantry ? Number(target.hp) <= 1 : target.disabled === true);
       return band ? {ratio: preview.ratioCategory.replace('-', ':'), hit: band.filter(result => result !== 'NE').length / 6,
         destroy: band.filter(result => result === 'X' || result === 'D' && lastStep).length / 6} : null;
+    }
+    function trainingFirePreview(state) {
+      const cell = view.target;
+      if (state.scenario !== 'training-t02' || state.turnPhase !== 'fire' || !cell ||
+          view.intentRevision !== state.revision || document.body.classList.contains('v2-screen-open')) return null;
+      const actor = state.units.find(unit => unit.id === view.actorId);
+      const entry = entriesAt(state,actor,cell).find(option => option.command.type === 'Fire' && entryResult(option).ok);
+      return entry ? entryChance(entry,targetOccupant(state,cell)) : null;
     }
     function renderTargetCard(state, actor) {
       const card = at('#v2-target-card');
@@ -1434,7 +1443,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         : state.gameOver&&learningResult?learningResult:t(state.gameOver ? (state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : 'phase.enemy.label');
       phaseButton.setAttribute('aria-label', phaseButton.textContent);
       splitPhaseLabel(phaseButton);
-      phaseButton.disabled = !next || state.phase !== 'player' || state.gameOver || GameDialogs.isOpen() || view.busy;
+      phaseButton.disabled = !next || state.phase !== 'player' || state.gameOver || GameDialogs.isOpen() || view.busy ||
+        !!globalThis.GoblinTrainingRuntime?.holdingShotResult();
       at('#v2-pause').disabled = GameDialogs.isOpen() || view.busy;
       const undoButton = at('#v2-undo');
       undoButton.hidden = false;

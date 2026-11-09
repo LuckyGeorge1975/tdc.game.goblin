@@ -4,6 +4,29 @@ import{trainingScene,route,apply,snapshot,inspect,advanceEnemy}from './training-
 import{read,execute}from './artillery-product-harness.mjs';
 const progress=g=>read(g,'GoblinTrainingRuntime.view().progress');
 async function beforeShot(){const g=await trainingScene('training-t02');for(const a of route('training-t02').slice(0,5))apply(g,a);assert.equal(progress(g).stepId,'shot');return g}
+function drainTurnTimers(g){
+ const auto=g.run('maybeAutoAdvancePhase');
+ for(let i=0;i<12;i++){
+  const next=[...g.timers].find(([,fn])=>fn===auto||/originalAutoAdvance|const foes=/.test(String(fn)));
+  if(!next)return;
+  g.timers.delete(next[0]);next[1]();
+ }
+ assert.fail('Turn timers did not settle');
+}
+test('T02 does not pass the result while waiting with Auto on or off',async()=>{
+ for(const enabled of [false,true]){
+  const g=await beforeShot();
+  g.run(`document.querySelector('#auto-end-turn').checked=${enabled}`);
+  apply(g,{command:{type:'Fire',actorId:'training-t02-tank',x:5,y:3}});
+  drainTurnTimers(g);
+  assert.deepEqual(read(g,'[turn,turnPhase,GoblinTrainingRuntime.view().progress.stepId]'),[1,'fire','result'],`Auto ${enabled}`);
+  await g.run("confirmPhaseAdvance(()=>setTurnPhase('gev'))");
+  assert.equal(g.run('turnPhase'),'fire');
+  apply(g,{ui:'ack',action:'continue'});
+  if(enabled)drainTurnTimers(g);else advanceEnemy(g);
+  assert.deepEqual(read(g,'[turn,turnPhase,GoblinTrainingRuntime.status()]'),[2,'movement','ready-for-debrief']);
+ }
+});
 for(const [result,roll]of [['NE',0],['D',2],['X',5]])test('controlled actual CRT '+result+' remains a valid lesson shot; no required hit',async()=>{
  const g=await beforeShot();
  // Explicit boundary-only control: real CRT/damage resolver receives this die.
@@ -23,18 +46,41 @@ function mountTrainingPanel(g){
   let busy=false,refreshes=0,screen='play';
   const campaign=null,confirmRestart=()=>{},goToLevels=()=>{};
   const GoblinLanguage={t:key=>key,translate:key=>key};
-  const GoblinUIV2={project:()=>({scenario:currentScenario,phase,turnPhase,units}),refresh:()=>refreshes++};
+  const GoblinUIV2={project:()=>({scenario:currentScenario,phase,turnPhase,units,revision:revision()}),refresh:()=>refreshes++,
+   trainingFirePreview:state=>globalThis.trainingFirePreview?.(state)};
   globalThis.GoblinMovement={busy:()=>busy};
   const trainingPanel={nodes:[],replaceChildren(){this.nodes=[]},append(...nodes){this.nodes.push(...nodes)}};
   const paragraph=x=>x,actions=(...nodes)=>Object.assign(nodes,{append(...items){nodes.push(...items)}}),
    button=(key,onclick)=>({key:key.key,onclick});
   {
-   const t=(key,params)=>({key,params});
+   const t=(key,params)=>['v2.training.previewRatio','v2.target.hit','v2.target.destroy'].includes(key)
+     ? Object.values(params).join('') : {key,params};
    ${panel}
    globalThis.renderTraining=renderTraining;
   }
  `);
 }
+test('T02 renders the shared authoritative preview only for the current legal target',async()=>{
+ const g=await beforeShot(), source=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
+ mountTrainingPanel(g);
+ g.run(`
+  document.body={classList:{contains:()=>false}};
+  ${targetOptionsSource}
+  ${source.slice(source.indexOf('    function hitChance('),source.indexOf('    function renderTargetCard('))}
+  globalThis.trainingFirePreview=trainingFirePreview;
+  view.actorId='training-t02-tank';view.target={x:5,y:3};view.intentRevision=revision();
+  const expected=hitChance(previewFire({type:'Fire',actorId:view.actorId,x:5,y:3}),units.find(u=>u.team==='enemy'));
+  const expectedCopy=[expected.ratio,Math.round(expected.hit*100),Math.round(expected.destroy*100)].join(' · ');
+ `);
+ assert.equal(g.run("renderTraining();trainingPanel.nodes.includes(expectedCopy)"),true);
+ g.run("view.intentRevision='stale';renderTraining()");
+ assert.equal(g.run('trainingPanel.nodes.includes(expectedCopy)'),false);
+ g.run("view.intentRevision=revision();busy=true;renderTraining()");
+ assert.equal(g.run('trainingPanel.nodes.includes(expectedCopy)'),false);
+ g.run("busy=false;view.target=null;renderTraining()");
+ assert.equal(g.run('trainingPanel.nodes.includes(expectedCopy)'),false);
+ assert.equal(g.rolls(),0);
+});
 test('advisory acknowledgement refreshes the current target without bubbling into the outside-click handler',async()=>{
  const g=await trainingScene('iron-dust',true);
  apply(g,{ui:'ack',action:'continue'});

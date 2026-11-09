@@ -3,6 +3,7 @@
  const copy=x=>JSON.parse(JSON.stringify(x));
  let session=null,serial=0,depth=0,rootWork=null,deferredAuto=false,advisoryEnabled=true;
  function active(){return !!session&&session.scenarioId===currentScenario&&!root.IronDustBrowserV2?.active}
+ function holdingShotResult(){return active()&&session.scenarioId==='training-t02'&&session.progress.stepId==='result'&&session.progress.status==='running'}
  function worldUnit({moveFrom,justHit,lastOutcome,...unit}){
   if(session.definition.mode!=='advisory'||!unit.ogreSystems)return unit;
   // The weapon picker mirrors the selected weapon's stats before an action begins.
@@ -85,8 +86,9 @@
  handleHex=wrapAction(handleHex,'Move');attack=wrapAction(attack,'Fire');embark=wrapAction(embark,'Other');unloadAt=wrapAction(unloadAt,'Other');
  if(typeof executeSpecialistCommand==='function')executeSpecialistCommand=wrapAction(executeSpecialistCommand,'Other');
  setTurnPhase=wrapPhase(setTurnPhase);enemyTurn=wrapPhase(enemyTurn);
- const baseAuto=maybeAutoAdvancePhase;maybeAutoAdvancePhase=function(){if(active()){if(depth){deferredAuto=true;return}if(session.progress.holdAutoPhase){clearTimeout(autoPhaseTimer);autoPhaseTimer=null;return}}return baseAuto()};
+ const baseAuto=maybeAutoAdvancePhase;maybeAutoAdvancePhase=function(){if(active()){if(depth){deferredAuto=true;return}if(session.progress.holdAutoPhase||holdingShotResult()){clearTimeout(autoPhaseTimer);autoPhaseTimer=null;return}}return baseAuto()};
  const baseConfirm=confirmPhaseAdvance;confirmPhaseAdvance=async function(action){
+  if(holdingShotResult())return;
   if(!active()||session.definition.mode!=='learning'||session.progress.stepId!=='undo')return baseConfirm(action);
   if(GameDialogs.isOpen())return;const owner=session,previous=turnPhase,t=root.GoblinLanguage?.t;
   const accepted=await GameDialogs.confirm({id:'phase-end',title:t?.('training.undoMove',{back:'BACK'})??'BACK',message:t?.('training.undoUnavailable')??'BACK',acceptLabel:t?.('dialog.phaseAdvance.confirm.toFire')??'FIRE',cancelLabel:t?.('ui.dialog.cancel')??'Cancel'});
@@ -140,9 +142,13 @@
   return values;
  }
  root.GoblinTrainingRuntime=Object.freeze({
-  active,checkpoint,inspect,rejected,shotEffect,select:actorId=>ui('selectActor',actorId),
+  active,checkpoint,inspect,rejected,shotEffect,holdingShotResult,select:actorId=>ui('selectActor',actorId),
   cancel:()=>{if(active()&&session.intent)ui('cancelIntent',session.intent.actorId)},
-  ack:(action='continue')=>ui('acknowledgeInstruction',null,action),
+  ack(action='continue'){
+   const held=holdingShotResult();
+   ui('acknowledgeInstruction',null,action);
+   if(held&&action==='continue'&&!holdingShotResult())maybeAutoAdvancePhase();
+  },
   status:()=>active()?session.progress.status:null,
   view:()=>active()?copy({definition:session.definition,progress:session.progress,params:parameterValues(),regions:session.regions,next:legacySession.config.training?.next??null}):null,
   setAdvisory(enabled){advisoryEnabled=!!enabled;if(!enabled&&active()&&session.definition.mode==='advisory')ui('acknowledgeInstruction',null,'exit')},

@@ -46,6 +46,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const effect=t02&&p.stepId==='result'?GoblinTrainingRuntime.shotEffect():null;
       if(effect)params.effect=t(`v2.training.effect.${effect}`);
       let copy=targetTrainingCopy[key]??key;
+      if(t02&&key==='training.inspectShot')copy='v2.training.inspectShotPanel';
       if(key==='training.confirmShot'){
         copy='v2.training.confirmAttack';
         params.action=t('v2.target.attack');
@@ -56,6 +57,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         params.action=t(projection.turnPhase==='gev'?'dialog.phaseAdvance.confirm.toEnemy':'dialog.phaseAdvance.confirm.toGev');
       }
       trainingPanel.append(title,paragraph(t(copy,params)));
+      const preview=t02&&GoblinUIV2.trainingFirePreview(projection);
+      if(preview)trainingPanel.append(paragraph([
+        t('v2.training.previewRatio',{ratio:preview.ratio}),
+        t('v2.target.hit',{percent:Math.round(preview.hit*100)}),
+        t('v2.target.destroy',{percent:Math.round(preview.destroy*100)})
+      ].join(' · '),'v2-training-preview'));
       if(t02&&key==='training.readyForDebrief')trainingPanel.append(paragraph(t('training.roundComplete',{phase:t('v2.phase.movement')})));
       if (campaign?.sessionId === p.binding.sessionId) trainingPanel.append(paragraph(campaignPosition()));
       if(p.stepId==='terrain'&&v.params['query:cost']!=='')trainingPanel.append(paragraph(t('training.moveCost',{cost:v.params['query:cost'],available:v.params['query:available']})));
@@ -66,7 +73,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         // This acknowledges a hint without acting on the selected hex.
         event.stopPropagation();
         GoblinTrainingRuntime.ack();
-        if(v.definition.mode==='advisory')GoblinUIV2.refresh();
+        if(v.definition.mode==='advisory'||t02&&p.stepId==='result')GoblinUIV2.refresh();
       }));
       if(p.status==='ready-for-debrief')row.append(button(t('training.debrief.confirm'),async()=>{const binding=p.binding.sessionId,sequence=p.sequence;const accepted=await GameDialogs.confirm({id:'training-debrief',title:t('training.debrief.title'),message:t('training.readyForDebrief'),acceptLabel:t('training.debrief.confirm'),cancelLabel:t('ui.dialog.cancel')});const current=GoblinTrainingRuntime.view()?.progress;if(accepted&&current?.binding.sessionId===binding&&current.sequence===sequence){GoblinTrainingRuntime.ack('debrief');GoblinUIV2.refresh()}},'primary'));
       if(v.definition.mode==='advisory')row.append(button(t('ui.dialog.cancel'),()=>GoblinTrainingRuntime.setAdvisory(false)));
