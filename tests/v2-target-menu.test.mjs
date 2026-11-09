@@ -25,16 +25,18 @@ test('target choices and cancel issue no commands, and a Core weapon switch requ
   const target = {x: 4, y: 3};
   const view = {target, intentRevision: state.revision};
   const clearContext = () => Object.assign(view, {target: null, intentRevision: null, targetOption: null, afterWeaponSwitch: false});
-  const fire = weaponKey => ({command: {type: 'PlayerFire', weaponKey}, label: weaponKey, attack:{name:weaponKey,icon:weaponKey,shots:1}});
+  const fire = weaponKey => ({command: {type: 'PlayerFire', weaponKey}, label: weaponKey, attack:{name:weaponKey,shortName:'Hpt',icon:weaponKey,shots:1}});
+  const secondary = {command: {type: 'SelectWeapon', weaponKey: 'secondary'}, label: 'switch to secondary',
+    attack:{name:'switch to secondary',shortName:'Sek ↔',icon:'secondary',shots:4}};
   const select = {command: {type: 'SelectWeapon', weaponKey: 'missiles'}, label: 'switch to missiles',
-    attack:{name:'switch to missiles',icon:'missiles',shots:2}};
+    attack:{name:'switch to missiles',shortName:'Rak ↔',icon:'missiles',shots:2}};
   const dispatched = [];
   const query = () => ({ok: true});
   const context = {
     at: selector => selector === '#v2-target-card' ? card : selector === '#v2-action-execute' ? execute() : el('button'),
     GameDialogs: {isOpen: () => false}, document: {body: {classList: {contains: () => false}}, createTextNode: text => el('#text', '', text)},
     state, actor, view, el, core: () => true, targetOccupant: () => occupant, unitAlive: () => true, hexLabel: () => 'E-04',
-    entriesAt: () => state.revision === 1 ? [fire('main'), select] : [fire('missiles')],
+    entriesAt: () => state.revision === 1 ? [fire('main'), secondary, select] : [fire('missiles')],
     entryResult: query, query, commandIcon: () => 'fire', commandKey: entry => JSON.stringify(entry.command), entryChance: () => null,
     t: (key,params) => params?.count ?? key, svgIcon: name => name, placeNearHex() {}, clearContext, revision: () => state.revision,
     dispatch(command, revision) { dispatched.push([command.type, revision]); state.revision++; return {ok: true}; }
@@ -44,10 +46,14 @@ test('target choices and cancel issue no commands, and a Core weapon switch requ
   context.render();
   assert.equal(card['data-fire-compact'], 'true');
   const rows = nodes().find(node => node.className === 'v2-target-choices').children;
-  assert.deepEqual(rows.map(row => row.children.slice(0,2).map(child => child.innerHTML ?? child.text)), [['main',1],['missiles',2]]);
+  assert.deepEqual(rows.map(row => row.children.map(child => child.innerHTML ?? child.text)),
+    [['main','Hpt'],['secondary','Sek ↔','4'],['missiles','Rak ↔','2']]);
+  assert.equal(rows[0]['aria-label'],'main · 1');
+  assert.equal(rows[1]['aria-label'],'switch to secondary · 4');
+  assert.equal(card.children.at(-1),cancel());
   assert.equal(nodes().filter(node=>node.id==='v2-target-cancel').length,1);
   assert.equal(execute(), undefined);
-  const chooseSwitch = () => nodes().find(node => node.tag === 'button' && node.children.some(child => child.text === select.label)).onclick();
+  const chooseSwitch = () => nodes().find(node => node['aria-label']?.startsWith(select.label)).onclick();
   chooseSwitch();
   assert.equal(execute().text, 'v2.target.confirmWeapon');
   cancel().onclick();
@@ -61,6 +67,7 @@ test('target choices and cancel issue no commands, and a Core weapon switch requ
   assert.deepEqual(dispatched, [['SelectWeapon', 1]]);
   assert.equal(view.target, target);
   assert.equal(execute().text, 'v2.target.attack');
+  assert.equal(card.children.at(-1),cancel());
   assert.deepEqual(nodes().filter(node=>node.tag==='button').map(node=>node.id),['v2-action-execute','v2-target-cancel']);
   const stale = execute().onclick;
   view.target = {...target};
