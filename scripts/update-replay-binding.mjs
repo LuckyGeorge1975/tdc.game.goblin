@@ -15,12 +15,12 @@ const hash = value => createHash('sha256').update(value).digest('hex');
 const source = path => fs.readFileSync(new URL(path, root), 'utf8').replaceAll('\r\n', '\n');
 const canonical = sources => JSON.stringify(Object.keys(sources).sort().map(path => [path, sources[path]]));
 
-const GAMEPLAY = ['artillery-pilot-runtime.js', 'artillery-spotter-rules.js', 'assets/training/levels.v1.json', 'assets/training/scripts.v1.json',
+const GAMEPLAY = ['artillery-pilot-runtime.js', 'artillery-spotter-rules.js', 'assets/training/level-events-pilot.v2.json', 'assets/training/levels.v1.json', 'assets/training/scripts.v1.json',
   'assets/unit-art/levels/artillery-pilot.v1.json', 'assets/unit-art/levels/catalog-full-levels.v1.json', 'assets/unit-art/rules/artillery-pilot.v1.js',
   'assets/unit-art/rules/siege-pilot.v1.js', 'assets/unit-art/rules/skimmer-pilot.v1.js', 'assets/unit-art/rules/unit-profiles.catalog-approved.v1.json',
   'assets/unit-art/rules/unit-profiles.v1.json', 'catalog-base-loader.js', 'catalog-base-model.js', 'catalog-base-runtime.js', 'catalog-full-loader.js',
   'catalog-full-model.js', 'catalog-full-runtime.js', 'editor-draft.js', 'catalog-specialists-fire.js', 'catalog-specialists-loader.js', 'catalog-specialists-model.js',
-  'catalog-specialists-runtime.js', 'catalog-visibility.js', 'catalog-waves.js', 'command-history.js', 'game.js', 'legacy-supercover.js', 'ogre-runtime.js',
+  'catalog-specialists-runtime.js', 'catalog-visibility.js', 'catalog-waves.js', 'command-history.js', 'game.js', 'legacy-supercover.js', 'level-events.js', 'ogre-runtime.js',
   'ogre-systems.js', 'scenario-profile-manifest.js', 'scenario.js', 'siege-pilot-runtime.js', 'siege-tank-fire-budget.js', 'siegebreaker-weapons.js',
   'skimmer-budget.js', 'strategic-missile.js', 'terrain-rules.js', 'training-director.js', 'training-loader.js', 'training-model.js', 'training-runtime.js',
   'unit-life.js'];

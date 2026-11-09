@@ -39,3 +39,19 @@ test('Escape cancels and blocks gameplay keyboard propagation',async()=>{
   listeners.keydown({key:'Escape',stopImmediatePropagation(){stopped=true},preventDefault(){}});
   assert.equal(await answer,false);assert.equal(stopped,true);
 });
+test('level-event acknowledgements run in order and show a portrait placeholder only when requested',async()=>{
+  const {api,dialog,listeners}=setup();
+  const first=api.warn({id:'level-event',title:'First'});
+  const second=api.warn({id:'level-event',title:'Second',portrait:true});
+  const portrait=dialog.querySelector('.dialog-portrait');
+  assert.equal(portrait.hidden,true);
+  listeners.keydown({key:'Escape',stopImmediatePropagation(){},preventDefault(){}});
+  assert.equal(dialog.querySelector('h2').textContent,'First');
+  dialog.querySelector('.dialog-accept').onclick();
+  assert.equal(await first,true);
+  assert.equal(dialog.querySelector('h2').textContent,'Second');
+  assert.equal(portrait.hidden,false);
+  dialog.querySelector('.dialog-accept').onclick();
+  assert.equal(await second,true);
+  assert.equal(api.isOpen(),false);
+});

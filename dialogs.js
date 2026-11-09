@@ -4,7 +4,7 @@ const GameDialogs = (() => {
   dialog.className = 'game-dialog';
   dialog.setAttribute('aria-labelledby', 'game-dialog-title');
   dialog.setAttribute('aria-describedby', 'game-dialog-message');
-  dialog.innerHTML = `<small class="dialog-kind"></small><h2 id="game-dialog-title"></h2>
+  dialog.innerHTML = `<small class="dialog-kind"></small><div class="dialog-portrait" aria-hidden="true" hidden></div><h2 id="game-dialog-title"></h2>
     <p id="game-dialog-message"></p><label class="dialog-preference"><input type="checkbox"> <span>NEVER ASK AGAIN</span></label>
     <div class="dialog-actions"><button type="button" class="action-button dialog-cancel">CANCEL</button>
     <button type="button" class="action-button primary dialog-accept">CONTINUE</button></div>`;
@@ -21,7 +21,8 @@ const GameDialogs = (() => {
     previousFocus = document.activeElement;
     title.textContent = active.title;
     message.textContent = active.message;
-    dialog.querySelector('small').textContent = active.kind === 'warning' ? 'WARNING' : 'CONFIRM';
+    dialog.querySelector('small').textContent = active.heading || (active.kind === 'warning' ? 'WARNING' : 'CONFIRM');
+    dialog.querySelector('.dialog-portrait').hidden = !active.portrait;
     preference.hidden = !active.rememberKey;
     preference.querySelector('span').textContent = active.rememberLabel || 'NEVER ASK AGAIN';
     checkbox.checked = false;
@@ -50,12 +51,12 @@ const GameDialogs = (() => {
   }
   cancel.onclick = () => close(false);
   accept.onclick = () => close(true);
-  dialog.addEventListener('cancel', event => { event.preventDefault(); close(false); });
+  dialog.addEventListener('cancel', event => { event.preventDefault(); if (active?.id !== 'level-event') close(false); });
   document.addEventListener('keydown', event => {
     if (!active) return;
     // Prevent gameplay/guide shortcuts; retain native Tab and button activation.
     event.stopImmediatePropagation();
-    if (event.key === 'Escape') { event.preventDefault(); close(false); }
+    if (event.key === 'Escape') { event.preventDefault(); if (active.id !== 'level-event') close(false); }
   }, true);
   return {
     confirm: options => open({...options, kind:'confirm'}),

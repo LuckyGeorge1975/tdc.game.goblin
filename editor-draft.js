@@ -22,7 +22,10 @@
   }
   function validate(draft) {
     if (!available()) fail('unavailable');
-    if (!exact(draft,['version','width','height','objective','terrain','units']) || draft.version !== version ||
+    const eventDraft = draft?.version === root.GoblinLevelEvents?.version && draft?.version !== undefined;
+    const fields = ['version','width','height','objective','terrain','units'];
+    if (eventDraft) fields.push('hotspots','hooks');
+    if (!exact(draft,fields) || (!eventDraft && draft.version !== version) ||
         draft.width !== width || draft.height !== height || draft.objective !== objective ||
         !Array.isArray(draft.terrain) || !Array.isArray(draft.units) ||
         draft.terrain.length > width * height || draft.units.length > width * height) fail('schema');
@@ -40,7 +43,8 @@
       const rule = registry.units[entry.assetId].target;
       const fields = ['id','assetId','team','x','y'];
       if (rule.strengthRef) fields.push('squads');
-      if (!exact(entry,fields) || typeof entry.id !== 'string' || !/^(core|draft-[1-9][0-9]{0,2})$/.test(entry.id) ||
+      if (!exact(entry,fields) || typeof entry.id !== 'string' ||
+          !(eventDraft ? root.GoblinLevelEvents.validId(entry.id) : /^(core|draft-[1-9][0-9]{0,2})$/.test(entry.id)) ||
           !['player','enemy'].includes(entry.team)) fail('unit');
       if (!position(entry)) fail('bounds');
       if (ids.has(entry.id) || occupied.has(key(entry))) fail('collision');
@@ -57,6 +61,7 @@
     }
     if (!ids.has('core')) fail('core');
     if (!units.some(unit => unit.team === 'player')) fail('player');
+    if (eventDraft) root.GoblinLevelEvents.validate(draft,ids,position);
     return {units,records};
   }
   function parse(text) {
@@ -80,9 +85,10 @@
     const [levelDigest,rosterDigest,terrainDigest] = await Promise.all(
       [copy,units,terrainTypes].map(value => GoblinCatalogBase.hash(value)));
     const config = freeze({...source, title:'Editor draft', kickerKey:'v2.editor.title',
+      ...(copy.version === root.GoblinLevelEvents?.version ? {levelEvents:{hotspots:copy.hotspots,hooks:copy.hooks}} : {}),
       units,terrainTypes,terrain:terrainTypes.filter(cell => TerrainRules.coverBonus(cell.type)).map(key),
       catalog:{...source.catalog,records,levelDigest,rosterDigest,terrainDigest,
-        full:{...source.catalog.full,source:version}}});
+        full:{...source.catalog.full,source:copy.version}}});
     admitted.add(config);
     return config;
   }

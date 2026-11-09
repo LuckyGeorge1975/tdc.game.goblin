@@ -139,6 +139,7 @@
   const result=GoblinCatalogVisibility.collisionPrefix(s.visibility,{id:`full-${s.sessionId}-${seq}`,seq,actorId:actor.id,phase:turnPhase,path:q.path},facts(s.visibility.teamFire),registry());
   const capture=root.GoblinLegacyPresentation?.begin(actor,result.acceptedPrefix,'move',null);s.visibility=result.state;
   actor.moveFrom={x:actor.x,y:actor.y};const last=result.acceptedPrefix.at(-1);if(last){actor.x=last.x;actor.y=last.y}
+  root.GoblinLevelEvents?.move(actor.id,result.acceptedPrefix);
   carrierCargo(actor).forEach(u=>{u.x=actor.x;u.y=actor.y});if(turnPhase==='gev')actor.secondMoved=true;else actor.moved=true;actor.acted=true;actor.moveCount=(actor.moveCount??0)+1;
   GoblinSpecialistsRuntime.appendJournal(actor,command,{kind:'move',acceptedPrefix:result.acceptedPrefix,collided:result.collided});refresh();root.GoblinLegacyPresentation?.confirm(capture);selected=null;updateSelection();draw();maybeAutoAdvancePhase();return {ok:true};
  }

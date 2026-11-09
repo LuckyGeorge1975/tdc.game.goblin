@@ -90,7 +90,7 @@
     const team = select(['player','enemy'].map(id => [id,t('ui.team.' + id)]),current?.team ?? 'player');
     const x = coordinate(cell.x,draft.width), y = coordinate(cell.y,draft.height);
     for (const input of [terrain,asset,team,x,y]) input.disabled = busy || moving;
-    const error = node('p',view.error ? label('error.' + (['json','schema','unit','terrain','bounds','collision','core','player','startTerrain','unavailable'].includes(view.error) ? view.error : 'unavailable')) : '');
+    const error = node('p',view.error ? label('error.' + (['json','schema','unit','terrain','bounds','collision','core','player','startTerrain','events','unavailable'].includes(view.error) ? view.error : 'unavailable')) : '');
     error.className = 'v2-status';
     error.setAttribute('role','status');
     fields.append(node('strong',cellLabel(cell)));
@@ -123,7 +123,9 @@
     const json = node('textarea'); json.value = jsonText; json.rows = 4;
     json.oninput = () => { jsonText = json.value; };
     const controls = node('div'); controls.className = 'v2-screen-actions';
-    controls.append(button('import', () => view.import(json.value),busy || moving),
+    const pilot = button('pilot',view.pilot,busy || moving);
+    pilot.title = label('pilotRoute');
+    controls.append(pilot,button('import', () => view.import(json.value),busy || moving),
       button('export', () => {
         json.value = jsonText = JSON.stringify(draft,null,2);
         json.focus();

@@ -34,15 +34,24 @@ function commandStateKey(list) {
   return JSON.stringify(list.map(({moveFrom, justHit, ...unit}) => unit));
 }
 
-function reversibleCommand(action, label) {
+function reversibleCommand(action, label, actorId = () => selected?.id) {
   return function(...args) {
     if (commandDepth || phase !== 'player' || gameOver) return action(...args);
     const before = commandSnapshot(label), epoch = commandEpoch;
+    const events = globalThis.GoblinLevelEvents;
+    const work = events?.begin(legacySession, actorId(...args));
+    let completed = false;
     commandDepth++;
-    try { return action(...args); }
+    try { const result = action(...args); completed = true; return result; }
     finally {
       commandDepth--;
-      if (epoch === commandEpoch && commandStateKey(before.units) !== commandStateKey(units)) {
+      const changed = (work || epoch === commandEpoch) && commandStateKey(before.units) !== commandStateKey(units);
+      const hits = events?.finish(work, legacySession, before.units, units, completed && changed, dist, unitAlive);
+      if (hits?.length) {
+        // Commit history through the event without resetting the phase's cached dice.
+        phaseCommands.length = 0;
+        events.show(hits,legacySession);
+      } else if (epoch === commandEpoch && changed) {
         phaseCommands.push(before);
       }
       updateBackButton();
@@ -92,10 +101,10 @@ combatOutcome = function(...args) {
 };
 
 handleHex = reversibleCommand(handleHex, 'Kartenbefehl');
-attack = reversibleCommand(attack, 'Feuerbefehl');
-embark = reversibleCommand(embark, 'Verladen');
-unloadAt = reversibleCommand(unloadAt, 'Entladen');
-if(typeof executeSpecialistCommand==='function')executeSpecialistCommand=reversibleCommand(executeSpecialistCommand,'Spezialistenbefehl');
+attack = reversibleCommand(attack, 'Feuerbefehl', unit => unit?.id);
+embark = reversibleCommand(embark, 'Verladen', unit => unit?.id);
+unloadAt = reversibleCommand(unloadAt, 'Entladen', unit => unit?.id);
+if(typeof executeSpecialistCommand==='function')executeSpecialistCommand=reversibleCommand(executeSpecialistCommand,'Spezialistenbefehl', command => command?.actorId);
 
 // Give BACK a short opportunity to cancel the automatic phase change.
 const originalAutoAdvance = maybeAutoAdvancePhase;
@@ -107,7 +116,12 @@ maybeAutoAdvancePhase = function() {
   const epoch = commandEpoch;
   autoPhaseTimer = setTimeout(() => {
     autoPhaseTimer = null;
-    if (epoch === commandEpoch) originalAutoAdvance();
+    const advance = () => { if (epoch === commandEpoch) originalAutoAdvance(); };
+    if (globalThis.GoblinLevelEvents?.pending(legacySession)) GameDialogs.whenIdle().then(() => {
+      if (epoch !== commandEpoch || autoPhaseTimer !== null) return;
+      autoPhaseTimer = setTimeout(() => { autoPhaseTimer = null; advance(); }, 2000);
+    });
+    else advance();
   }, 2000);
 };
 

@@ -494,6 +494,22 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       editorError = '';
       renderScreen(false);
     }
+    async function loadEditorPilot() {
+      if (editorBusy || screen !== 'editor') return;
+      editorBusy = true;
+      renderScreen(false);
+      try {
+        const response = await fetch('assets/training/level-events-pilot.v2.json');
+        if (!response.ok) throw Error('unavailable');
+        const draft = GoblinEditorDraft.parse(await response.text());
+        if (screen === 'editor') updateEditor(draft,{x:1,y:3});
+      } catch (error) {
+        editorError = error.message;
+      } finally {
+        editorBusy = false;
+        if (screen === 'editor') renderScreen(false);
+      }
+    }
     async function playEditorDraft() {
       if (editorBusy || screen !== 'editor') return;
       const draft = editorDraft;
@@ -523,7 +539,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       GoblinEditorUI.render(panel, {
         draft:editorDraft, cell:editorCell, busy:editorBusy, error:editorError, moving:editorMoving,
         select:selectEditorCell, setMoving:setEditorMoving,
-        update:updateEditor, play:playEditorDraft, back:() => show('menu'),
+        update:updateEditor, pilot:loadEditorPilot, play:playEditorDraft, back:() => show('menu'),
         import(text) {
           try { updateEditor(GoblinEditorDraft.parse(text)); }
           catch (error) { editorError = error.message; renderScreen(false); }
@@ -1068,10 +1084,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     new MutationObserver(() => { if (screen === 'levels') renderScreen(false); })
       .observe(document.querySelector('#scenario-select'), { childList: true });
     globalThis.addEventListener('goblin-v2-render', () => {
-      if (screen === 'play' && !globalThis.GoblinMovement?.busy() && GoblinUIV2.project().gameOver) show('end');
+      if (screen === 'play' && !globalThis.GoblinMovement?.busy() &&
+          !globalThis.GoblinLevelEvents?.pending(legacySession) && GoblinUIV2.project().gameOver) show('end');
     });
     globalThis.addEventListener('goblin-movement-finished', () => {
-      if (screen === 'play' && GoblinUIV2.project().gameOver) show('end');
+      if (screen === 'play' && !globalThis.GoblinLevelEvents?.pending(legacySession) && GoblinUIV2.project().gameOver) show('end');
     });
     globalThis.addEventListener('goblin-language-change', () => renderScreen(false));
     globalThis.addEventListener('goblin-language-change',renderTraining);
