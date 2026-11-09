@@ -476,6 +476,12 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-target-card[hidden] { display: none !important; }
 .v2-target-choices { display: grid; gap: 4px; overflow: auto; max-height: min(28dvh, 220px); padding: 3px; }
 .v2-target-choices button { display: flex; gap: 6px; align-items: center; text-align: left; overflow-wrap: anywhere; }
+.v2-target-card[data-fire-compact="true"] { gap: 4px; padding: 4px; border-color: transparent; background: transparent; box-shadow: none; }
+.v2-target-card[data-fire-compact="true"] .v2-target-choices { grid-template-columns: minmax(0, 1fr); }
+.v2-target-card[data-fire-compact="true"] button { min-height: 44px; box-shadow: 0 2px 8px #0008; }
+.v2-target-card[data-fire-compact="true"] .v2-action-execute { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.v2-target-card[data-fire-compact="true"]::after { display: none; }
+.v2-weapon-budget { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
 .v2-map-hover { position: absolute; z-index: 3; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; width: max-content; max-width: min(300px, 95%); padding: 5px 8px; border: 1px solid var(--v2-line); border-radius: 8px; background: var(--v2-surface); color: var(--v2-text); font-size: 12px; pointer-events: none; }
 .v2-map-hover[hidden] { display: none; }
 .v2-area-load, .v2-area-unload { fill: none; stroke: var(--v2-signal); stroke-width: 2; stroke-dasharray: 5 3; }

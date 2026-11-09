@@ -14,7 +14,7 @@ const targetCard = ui.slice(ui.indexOf('    function renderTargetCard('), ui.ind
 test('target choices and cancel issue no commands, and a Core weapon switch requires two confirmations', async () => {
   function el(tag, className = '', text = '') {
     return {tag, className, text, children: [], append(...nodes) { this.children.push(...nodes); },
-      replaceChildren() { this.children = []; }, setAttribute() {}, focus() {}};
+      replaceChildren() { this.children = []; }, setAttribute(key,value) { this[key]=value; }, focus() {}};
   }
   const card = el('section');
   const nodes = (root = card) => [root, ...(root.children || []).flatMap(node => nodes(node))];
@@ -25,8 +25,9 @@ test('target choices and cancel issue no commands, and a Core weapon switch requ
   const target = {x: 4, y: 3};
   const view = {target, intentRevision: state.revision};
   const clearContext = () => Object.assign(view, {target: null, intentRevision: null, targetOption: null, afterWeaponSwitch: false});
-  const fire = weaponKey => ({command: {type: 'PlayerFire', weaponKey}, label: weaponKey});
-  const select = {command: {type: 'SelectWeapon', weaponKey: 'missiles'}, label: 'switch to missiles'};
+  const fire = weaponKey => ({command: {type: 'PlayerFire', weaponKey}, label: weaponKey, attack:{name:weaponKey,icon:weaponKey,shots:1}});
+  const select = {command: {type: 'SelectWeapon', weaponKey: 'missiles'}, label: 'switch to missiles',
+    attack:{name:'switch to missiles',icon:'missiles',shots:2}};
   const dispatched = [];
   const query = () => ({ok: true});
   const context = {
@@ -35,12 +36,16 @@ test('target choices and cancel issue no commands, and a Core weapon switch requ
     state, actor, view, el, core: () => true, targetOccupant: () => occupant, unitAlive: () => true, hexLabel: () => 'E-04',
     entriesAt: () => state.revision === 1 ? [fire('main'), select] : [fire('missiles')],
     entryResult: query, query, commandIcon: () => 'fire', commandKey: entry => JSON.stringify(entry.command), entryChance: () => null,
-    t: key => key, svgIcon: () => '', placeNearHex() {}, clearContext, revision: () => state.revision,
+    t: (key,params) => params?.count ?? key, svgIcon: name => name, placeNearHex() {}, clearContext, revision: () => state.revision,
     dispatch(command, revision) { dispatched.push([command.type, revision]); state.revision++; return {ok: true}; }
   };
   runInNewContext(targetCard + '\nfunction render() { renderTargetCard(state, actor); }', context);
 
   context.render();
+  assert.equal(card['data-fire-compact'], 'true');
+  const rows = nodes().find(node => node.className === 'v2-target-choices').children;
+  assert.deepEqual(rows.map(row => row.children.slice(0,2).map(child => child.innerHTML ?? child.text)), [['main',1],['missiles',2]]);
+  assert.equal(nodes().filter(node=>node.id==='v2-target-cancel').length,1);
   assert.equal(execute(), undefined);
   const chooseSwitch = () => nodes().find(node => node.tag === 'button' && node.children.some(child => child.text === select.label)).onclick();
   chooseSwitch();
@@ -55,7 +60,13 @@ test('target choices and cancel issue no commands, and a Core weapon switch requ
   await execute().onclick();
   assert.deepEqual(dispatched, [['SelectWeapon', 1]]);
   assert.equal(view.target, target);
-  assert.equal(execute().text, 'v2.action.execute');
+  assert.equal(execute().text, 'v2.target.attack');
+  assert.deepEqual(nodes().filter(node=>node.tag==='button').map(node=>node.id),['v2-action-execute','v2-target-cancel']);
+  const stale = execute().onclick;
+  view.target = {...target};
+  await stale();
+  assert.deepEqual(dispatched, [['SelectWeapon', 1]]);
+  context.render();
   await execute().onclick();
   assert.deepEqual(dispatched, [['SelectWeapon', 1], ['PlayerFire', 2]]);
   assert.equal(card.hidden, true);

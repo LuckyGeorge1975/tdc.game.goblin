@@ -46,6 +46,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const effect=t02&&p.stepId==='result'?GoblinTrainingRuntime.shotEffect():null;
       if(effect)params.effect=t(`v2.training.effect.${effect}`);
       let copy=targetTrainingCopy[key]??key;
+      if(key==='training.confirmShot'){
+        copy='v2.training.confirmAttack';
+        params.action=t('v2.target.attack');
+      }
       if(t02&&key==='training.enterPhase')copy='v2.training.enterPhase';
       if(t02&&key==='training.advanceRound'){
         copy=projection.turnPhase==='gev'?'v2.training.startEnemy':'v2.training.finishFire';

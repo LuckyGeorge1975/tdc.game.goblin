@@ -27,7 +27,7 @@
  function commands(state,actor,cell){
   if(!actor||!cell)return [];
   const target=state.units.find(u=>alive(u)&&!u.embarkedOn&&u.x===cell.x&&u.y===cell.y),result=[];
-  const add=(command,label=commandLabel(command))=>result.push({command,label,confirmSplash:command.type==='CatalogHexFire'});
+  const add=(command,label=commandLabel(command),attack)=>result.push({command,label,confirmSplash:command.type==='CatalogHexFire',...(attack&&{attack})});
   const job=(name,target,option=null,label)=>add({type:'Engineer',actorId:actor.id,job:name,target,option},label);
   if(state.turnPhase==='fire'){
    if(root.GoblinCatalogFullRuntime?.active()&&actor.catalogId==='U13'){
@@ -38,16 +38,22 @@
    const targets=target.catalogSystems?GoblinSystems.catalogTargets(target.catalogSystems,api().registry()).map(c=>
     ({kind:'component',runtimeUnitId:target.id,componentId:c.id})): [{kind:'unit',runtimeUnitId:target.id}];
    const options=isArt(actor)?[
-    {weaponId:null,mode:'direct',spotterId:null,label:t('v2.ui.artillery.direct')},
+    {weaponId:null,mode:'direct',spotterId:null,label:t('v2.ui.artillery.direct'),attack:{name:t('v2.ui.artillery.direct'),icon:'fire'}},
     ...state.units.filter(u=>alive(u)&&!u.disabled&&!u.embarkedOn&&u.team===actor.team&&u.id!==actor.id).map(u=>
-     ({weaponId:null,mode:'indirect',spotterId:u.id,label:t('v2.ui.artillery.indirectVia',{spotter:u.name})}))
-   ]:api().weapons(actor).map(w=>({weaponId:w.id,mode:'direct',spotterId:null,label:`${weaponLabel(actor,w)} · A${w.attack} R${w.range} · ${statusLabel(actor,w)}`}));
-   for(const {label,...weapon} of options)for(const aim of targets){
+     ({weaponId:null,mode:'indirect',spotterId:u.id,label:t('v2.ui.artillery.indirectVia',{spotter:u.name}),
+      attack:{name:t('v2.ui.artillery.indirectVia',{spotter:u.name}),icon:'indirect'}}))
+   ]:api().weapons(actor).map(w=>{
+    const name=weaponLabel(actor,w);
+    return {weaponId:w.id,mode:'direct',spotterId:null,label:`${name} · A${w.attack} R${w.range} · ${statusLabel(actor,w)}`,
+     attack:{name,icon:w.weaponClass??(w.id?.startsWith('ap-')?'antipersonnel':w.id?.startsWith('main-')?'main':'fire'),
+      shots:w.id==='main-both'?null:w.ready}};
+   });
+   for(const {label,attack,...weapon} of options)for(const aim of targets){
     const command={type:'CatalogFire',actorId:actor.id,target:aim,...weapon};
     if(aim.kind==='component'){
      const componentLabel=api().slotLabel(target,aim.componentId);
-     result.push({command,label:`${label} · ${componentLabel}`,weaponLabel:label,componentLabel});
-    }else add(command,label);
+     result.push({command,label:`${label} · ${componentLabel}`,weaponLabel:label,componentLabel,attack});
+    }else add(command,label,attack);
    }
    return result;
   }
