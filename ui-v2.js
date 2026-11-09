@@ -571,43 +571,57 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         render();
       };
     // Floats a card above a hex (below or beside it as fallback) inside the map. Hexes in keepClear stay
-    // visible, other units preferably too; without room the card sits centred at the top of the map.
+    // visible, other units preferably too. The panel fallback also leaves map controls accessible.
+    function targetObstacles() {
+      return ['#v2-area-controls', '#v2-map-tools', '#v2-phase-notice'].map(at);
+    }
     function placeNearHex(card, anchorCell, others, keepClear) {
       if (!anchorCell) return;
       card.style.left = '-9999px'; card.style.top = '0';
       card.style.maxHeight = ''; card.style.overflowY = '';
       const frame = at('#v2-map').getBoundingClientRect(), box = card.getBoundingClientRect();
-      const notice = at('#v2-phase-notice');
-      const reserved = notice.hidden ? null : notice.getBoundingClientRect();
+      const reserved = targetObstacles().filter(node => !node.hidden).map(node => node.getBoundingClientRect())
+        .filter(rect => rect.width > 0 && rect.height > 0);
       const screen = cell => { const point = nativeMap.createSVGPoint(); Object.assign(point, hexCenter(cell.x, cell.y)); return point.matrixTransform(nativeMap.getScreenCTM()); };
       const anchor = screen(anchorCell), row = screen({x: anchorCell.x, y: anchorCell.y + 1});
       const clear = keepClear.map(screen), units = others.map(screen);
       const inset = 8, gap = Math.max(26, Math.abs(row.y - anchor.y) * .62), w = box.width, h = box.height;
-      const hitsNotice = (x,y) => reserved && reserved.width > 0 && reserved.height > 0 &&
-        x < reserved.right + inset && x + w > reserved.left - inset &&
-        y < reserved.bottom + inset && y + h > reserved.top - inset;
+      const crossesX = (rect,x) => x < rect.right + inset && x + w > rect.left - inset;
+      const hitsControl = (x,y) => reserved.some(rect => crossesX(rect,x) &&
+        y < rect.bottom + inset && y + h > rect.top - inset);
       const centered = Math.min(Math.max(anchor.x - w / 2, frame.left + inset), frame.right - inset - w);
       const candidates = [
         {x:centered,y:anchor.y-gap-h,pointer:'down'}, {x:centered,y:anchor.y+gap,pointer:'up'},
         {x:anchor.x+gap,y:anchor.y-h/2,pointer:''}, {x:anchor.x-gap-w,y:anchor.y-h/2,pointer:''}
       ];
       const fits = blockers => candidates.find(({x,y}) => x>=frame.left+inset && y>=frame.top+inset &&
-        x+w<=frame.right-inset && y+h<=frame.bottom-inset &&
-        !hitsNotice(x,y) &&
+        x+w<=Math.min(frame.right,innerWidth)-inset && y+h<=Math.min(frame.bottom,innerHeight)-inset &&
+        x>=inset && y>=inset && !hitsControl(x,y) &&
         !blockers.some(point => point.x>=x-20 && point.x<=x+w+20 && point.y>=y-20 && point.y<=y+h+20));
       const placement = anchor.x >= frame.left && anchor.x <= frame.right && anchor.y >= frame.top && anchor.y <= frame.bottom
         ? fits([...clear, ...units]) || fits(clear) : null;
-      const left = placement ? placement.x : Math.max(inset, frame.left + (frame.width - w) / 2);
+      const clampX = x => Math.max(inset, Math.min(x, innerWidth - w - inset));
+      let left = placement ? placement.x : clampX(frame.left + (frame.width - w) / 2);
       let top = placement ? placement.y : Math.max(inset, Math.min(frame.top + inset, innerHeight - h - inset));
-      if (!placement && hitsNotice(left,top)) {
-        const above = Math.max(0, reserved.top - 2 * inset);
-        const belowTop = reserved.bottom + inset;
-        const below = Math.max(0, innerHeight - belowTop - inset);
-        const useBelow = below >= h || below >= above;
-        const room = useBelow ? below : above;
-        top = useBelow ? belowTop : Math.max(inset, reserved.top - h - inset);
-        if (room < h) {
-          card.style.maxHeight = `${room}px`;
+      if (!placement && hitsControl(left,top)) {
+        const columns = [left, inset, clampX(innerWidth), ...reserved.flatMap(rect =>
+          [clampX(rect.left - inset - w), clampX(rect.right + inset)])];
+        let best = {x:left,y:top,height:0,distance:Infinity};
+        for (const x of columns) {
+          const blockers = reserved.filter(rect => crossesX(rect,x));
+          for (const y of [top, inset, ...blockers.map(rect => rect.bottom + inset)]) {
+            if (y < inset || y >= innerHeight - inset || blockers.some(rect =>
+              y > rect.top - inset && y < rect.bottom + inset)) continue;
+            const bottom = Math.min(innerHeight - inset, ...blockers.filter(rect => rect.top - inset >= y)
+              .map(rect => rect.top - inset));
+            const height = Math.min(h, bottom - y);
+            const distance = Math.hypot(x-left,y-top);
+            if (height > best.height || height === best.height && distance < best.distance) best = {x,y,height,distance};
+          }
+        }
+        left = best.x; top = best.y;
+        if (best.height < h) {
+          card.style.maxHeight = `${best.height}px`;
           card.style.overflowY = 'auto';
         }
       }
@@ -1565,10 +1579,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         (unit.x !== view.target.x || unit.y !== view.target.y)), [actor]);
     }
     window.addEventListener('resize', syncLayout);
+    window.addEventListener('scroll', syncLayout, {passive:true});
     mapPanel.addEventListener('scroll', syncLayout, {passive:true});
     const targetLayoutObserver = new ResizeObserver(syncLayout);
     targetLayoutObserver.observe(mapPanel);
-    targetLayoutObserver.observe(phaseNotice);
+    targetObstacles().forEach(node => targetLayoutObserver.observe(node));
     document.addEventListener('click', event => {
       if (view.target && event.target.isConnected && !event.target.closest?.('dialog, .v2-map-frame, #v2-target-card, #v2-units')) {
         clearContext(); render();
