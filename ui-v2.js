@@ -575,11 +575,17 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function placeNearHex(card, anchorCell, others, keepClear) {
       if (!anchorCell) return;
       card.style.left = '-9999px'; card.style.top = '0';
+      card.style.maxHeight = ''; card.style.overflowY = '';
       const frame = at('#v2-map').getBoundingClientRect(), box = card.getBoundingClientRect();
+      const notice = at('#v2-phase-notice');
+      const reserved = notice.hidden ? null : notice.getBoundingClientRect();
       const screen = cell => { const point = nativeMap.createSVGPoint(); Object.assign(point, hexCenter(cell.x, cell.y)); return point.matrixTransform(nativeMap.getScreenCTM()); };
       const anchor = screen(anchorCell), row = screen({x: anchorCell.x, y: anchorCell.y + 1});
       const clear = keepClear.map(screen), units = others.map(screen);
       const inset = 8, gap = Math.max(26, Math.abs(row.y - anchor.y) * .62), w = box.width, h = box.height;
+      const hitsNotice = (x,y) => reserved && reserved.width > 0 && reserved.height > 0 &&
+        x < reserved.right + inset && x + w > reserved.left - inset &&
+        y < reserved.bottom + inset && y + h > reserved.top - inset;
       const centered = Math.min(Math.max(anchor.x - w / 2, frame.left + inset), frame.right - inset - w);
       const candidates = [
         {x:centered,y:anchor.y-gap-h,pointer:'down'}, {x:centered,y:anchor.y+gap,pointer:'up'},
@@ -587,11 +593,24 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       ];
       const fits = blockers => candidates.find(({x,y}) => x>=frame.left+inset && y>=frame.top+inset &&
         x+w<=frame.right-inset && y+h<=frame.bottom-inset &&
+        !hitsNotice(x,y) &&
         !blockers.some(point => point.x>=x-20 && point.x<=x+w+20 && point.y>=y-20 && point.y<=y+h+20));
       const placement = anchor.x >= frame.left && anchor.x <= frame.right && anchor.y >= frame.top && anchor.y <= frame.bottom
         ? fits([...clear, ...units]) || fits(clear) : null;
       const left = placement ? placement.x : Math.max(inset, frame.left + (frame.width - w) / 2);
-      const top = placement ? placement.y : Math.max(inset, Math.min(frame.top + inset, innerHeight - h - inset));
+      let top = placement ? placement.y : Math.max(inset, Math.min(frame.top + inset, innerHeight - h - inset));
+      if (!placement && hitsNotice(left,top)) {
+        const above = Math.max(0, reserved.top - 2 * inset);
+        const belowTop = reserved.bottom + inset;
+        const below = Math.max(0, innerHeight - belowTop - inset);
+        const useBelow = below >= h || below >= above;
+        const room = useBelow ? below : above;
+        top = useBelow ? belowTop : Math.max(inset, reserved.top - h - inset);
+        if (room < h) {
+          card.style.maxHeight = `${room}px`;
+          card.style.overflowY = 'auto';
+        }
+      }
       card.dataset.placement = placement ? 'hex' : 'panel';
       card.dataset.pointer = placement?.pointer || '';
       card.style.left = `${left}px`; card.style.top = `${top}px`;
@@ -1547,6 +1566,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     window.addEventListener('resize', syncLayout);
     mapPanel.addEventListener('scroll', syncLayout, {passive:true});
+    const targetLayoutObserver = new ResizeObserver(syncLayout);
+    targetLayoutObserver.observe(mapPanel);
+    targetLayoutObserver.observe(phaseNotice);
     document.addEventListener('click', event => {
       if (view.target && event.target.isConnected && !event.target.closest?.('dialog, .v2-map-frame, #v2-target-card, #v2-units')) {
         clearContext(); render();
