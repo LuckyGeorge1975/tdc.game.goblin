@@ -42,6 +42,7 @@ test('desktop panels use independent preferences and preserve the old intel choi
   assert.match(css,/\.v2-own\[hidden\], \.v2-target:has\(> #v2-intel:empty\) \{ display: none; \}/);
   assert.match(rule('.v2-layout .v2-intel-systems .v2-system-row'),/grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(rule('.v2-layout .v2-intel-systems .v2-system-row :is(span, strong)'),/overflow-wrap: anywhere/);
+  assert.match(rule('.v2-layout .v2-intel-stat > span'),/overflow-wrap: anywhere/);
 });
 
 test('target placement reserves the phase notice on the map and in the resized fallback',()=>{
