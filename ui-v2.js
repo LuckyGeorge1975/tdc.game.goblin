@@ -44,7 +44,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const iconButton = (id, name, extra = '') => `<button type="button" class="v2-icon-button" id="${id}"${extra}>${svgIcon(name)}</button>`;
     shell.innerHTML = `
       <header class="v2-head"><div class="v2-head-mission"><span class="v2-label" id="v2-profile"></span><h1 id="v2-mission"></h1></div><div class="v2-head-turn"><p id="v2-turn"></p></div><div class="v2-head-goal"><p id="v2-objective"></p></div>${iconButton('v2-pause', 'settings')}</header>
-      <div class="v2-layout"><aside class="v2-own"><section class="v2-card v2-units-card"><div class="v2-card-head"><span class="v2-label" id="v2-units-label"></span><span class="v2-units-ready" id="v2-units-ready"></span></div><div class="v2-units" id="v2-units"></div></section></aside><main class="v2-card v2-map-card"><span class="v2-sr" id="v2-map-label"></span><div class="v2-map-frame"><div class="v2-map" id="v2-map" tabindex="0"></div><div id="v2-map-hover" class="v2-map-hover" hidden></div><strong id="v2-phase" role="status" aria-live="polite"></strong><div id="v2-phase-notice" class="v2-phase-notice" hidden><strong></strong><button type="button"></button></div><div class="v2-map-overlay v2-map-overlay-top"><div class="v2-area-controls" role="group" id="v2-area-controls">${iconButton('v2-mode-movement', 'movement', ' data-area="movement"')}${iconButton('v2-mode-fire', 'fire', ' data-area="fire"')}${iconButton('v2-mode-los', 'los', ' data-area="los"')}<button type="button" id="v2-display-toggle" aria-expanded="false" aria-controls="v2-display-controls" hidden></button><div id="v2-display-controls" class="v2-display-controls" role="group">${iconButton('v2-area-grid', 'grid')}${iconButton('v2-area-targets', 'targets')}${iconButton('v2-area-damage', 'damage')}</div></div><p id="v2-area-legend" class="v2-area-legend" role="status"></p></div><div class="v2-map-overlay v2-map-overlay-bottom"><div class="v2-map-tools" role="group" id="v2-map-tools">${iconButton('v2-zoom-in', 'zoomIn')}${iconButton('v2-zoom-out', 'zoomOut')}${iconButton('v2-zoom-center', 'center')}${iconButton('v2-zoom-fit', 'fit')}</div></div></div></main><aside class="v2-target"><section class="v2-card v2-intel-card"><div class="v2-card-head"><div class="v2-intel-switches" role="group" id="v2-intel-switches"><button type="button" id="v2-intel-unit-toggle" data-section="unit">${svgIcon('los')}<span></span></button><button type="button" id="v2-intel-field-toggle" data-section="field">${svgIcon('los')}<span></span></button></div></div><div id="v2-intel"></div></section></aside></div>
+      <div class="v2-layout"><aside class="v2-own" id="v2-roster-panel"><section class="v2-card v2-units-card"><div class="v2-card-head"><span class="v2-label" id="v2-units-label"></span><span class="v2-units-ready" id="v2-units-ready"></span></div><div class="v2-units" id="v2-units"></div></section></aside><main class="v2-card v2-map-card"><span class="v2-sr" id="v2-map-label"></span><div class="v2-map-frame"><div class="v2-map" id="v2-map" tabindex="0"></div><div id="v2-map-hover" class="v2-map-hover" hidden></div><strong id="v2-phase" role="status" aria-live="polite"></strong><div id="v2-phase-notice" class="v2-phase-notice" hidden><strong></strong><button type="button"></button></div><div class="v2-map-overlay v2-map-overlay-top"><div class="v2-area-controls" role="group" id="v2-area-controls">${iconButton('v2-mode-movement', 'movement', ' data-area="movement"')}${iconButton('v2-mode-fire', 'fire', ' data-area="fire"')}${iconButton('v2-mode-los', 'los', ' data-area="los"')}<button type="button" id="v2-display-toggle" aria-expanded="false" aria-controls="v2-display-controls" hidden></button><div id="v2-display-controls" class="v2-display-controls" role="group">${iconButton('v2-area-grid', 'grid')}${iconButton('v2-area-targets', 'targets')}${iconButton('v2-area-damage', 'damage')}</div></div><p id="v2-area-legend" class="v2-area-legend" role="status"></p></div><div class="v2-map-overlay v2-map-overlay-bottom"><div class="v2-map-tools" role="group" id="v2-map-tools">${iconButton('v2-zoom-in', 'zoomIn')}${iconButton('v2-zoom-out', 'zoomOut')}${iconButton('v2-zoom-center', 'center')}${iconButton('v2-zoom-fit', 'fit')}</div></div></div></main><aside class="v2-target" id="v2-intel-panel"><div id="v2-intel"></div></aside></div>
       <footer class="v2-controls"><div class="v2-context"><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div>${iconButton('v2-log-open', 'log')}<button type="button" id="v2-undo"></button><button type="button" id="v2-phase-action"></button><button type="button" id="v2-next-unit"></button></footer><section class="v2-card v2-target-card" id="v2-target-card" role="group" aria-labelledby="v2-target-title" hidden></section>`;
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
@@ -354,6 +354,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       get phaseNoticeEnabled() { return phaseNoticeEnabled; }, setPhaseNoticeEnabled,
       closeTarget: () => { if (view.target) clearContext(); },
       trainingFirePreview,
+      panelVisible: key => intelSections[key],
+      setPanelVisible,
       refresh: () => { areaCache.key = null; targetCache.key = null; render(); } });
     function setViewFlag(key,value){
       view[key]=!!value;render();
@@ -434,6 +436,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     // Left column: own units with art, strength and whether they can still act this phase.
     function renderRoster(state, details) {
+      at('#v2-roster-panel').hidden = !intelSections.roster;
       const ready = new Set(state.phase === 'player' && !state.gameOver ? readyUnitIds() : []);
       const own = state.units.filter(unit => unit.team === 'player');
       at('#v2-units-ready').textContent = t('v2.ui.unitsReady', {ready: ready.size, total: own.filter(unitAlive).length});
@@ -458,12 +461,19 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         roster.append(button);
       }
     }
-    // Field intel sections (unit and field), each switchable; the choice is a local display preference.
+    // Keep the previous unit/field preferences and default the two additional panels to visible.
     const intelSectionsKey = 'goblin.v2.intelSections';
     const intelSections = (() => {
-      try { const stored = JSON.parse(localStorage.getItem(intelSectionsKey)); if (stored && typeof stored === 'object') return {unit: stored.unit !== false, field: stored.field !== false}; } catch {}
-      return {unit: true, field: true};
+      let stored;
+      try { stored = JSON.parse(localStorage.getItem(intelSectionsKey)); } catch {}
+      return Object.fromEntries(['roster','unit','field','legend'].map(key => [key,stored?.[key] !== false]));
     })();
+    function setPanelVisible(key, visible) {
+      if (!Object.hasOwn(intelSections,key)) return;
+      intelSections[key] = !!visible;
+      try { localStorage.setItem(intelSectionsKey, JSON.stringify(intelSections)); } catch {}
+      render();
+    }
     function statBar(label, value, max, className = '') {
       const row = el('div', `v2-intel-bar ${className}`.trim());
       const head = el('div', 'v2-intel-bar-head');
@@ -492,21 +502,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       return button;
     }
     function renderFieldInfo(state, actor, terrainAt) {
-      const switches = at('#v2-intel-switches');
-      switches.setAttribute('aria-label', t('v2.ui.fieldIntel'));
-      for (const button of switches.querySelectorAll('[data-section]')) {
-        const section = button.dataset.section, label = t(`v2.intel.${section}`);
-        button.lastElementChild.textContent = label;
-        button.setAttribute('aria-pressed', String(intelSections[section]));
-        button.title = t(intelSections[section] ? 'v2.intel.hide' : 'v2.intel.show', {section: label});
-        button.setAttribute('aria-label', button.title);
-      }
       const intel = at('#v2-intel'); intel.replaceChildren();
       const focus = view.target || view.infoCell;
       const occupant = focus && state.units.find(unit => unitAlive(unit) && !unit.embarkedOn && unit.x === focus.x && unit.y === focus.y);
       const unit = occupant || (unitAlive(actor) ? actor : null);
       const cell = focus || (unit && !unit.embarkedOn ? {x: unit.x, y: unit.y} : null);
-      if (!unit && !cell) { intel.append(el('p', 'v2-intel-empty', t('v2.intel.empty'))); return; }
       if (unit && intelSections.unit) {
         const section = el('section', 'v2-intel-section v2-intel-unit');
         const head = el('div', 'v2-intel-head');
@@ -565,16 +565,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         intel.append(section);
       }
     }
-    for (const button of at('#v2-intel-switches').querySelectorAll('[data-section]'))
-      button.onclick = () => {
-        intelSections[button.dataset.section] = !intelSections[button.dataset.section];
-        try { localStorage.setItem(intelSectionsKey, JSON.stringify(intelSections)); } catch {}
-        render();
-      };
     // Floats a card above a hex (below or beside it as fallback) inside the map. Hexes in keepClear stay
     // visible, other units preferably too. The panel fallback also leaves map controls accessible.
     function targetObstacles() {
-      return ['#v2-area-controls', '#v2-map-tools', '#v2-phase-notice'].map(at);
+      return ['#v2-area-controls', '#v2-map-tools', '#v2-phase-notice', '#v2-roster-panel', '#v2-intel-panel', '#v2-area-legend'].map(at);
     }
     function placeNearHex(card, anchorCell, others, keepClear) {
       if (!anchorCell) return;
@@ -1175,6 +1169,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         overlay.setAttribute('pointer-events', 'none'); nativeMap.insertBefore(overlay, nativeMap.querySelector('.unit-svg,#v2-team-markers')); }
       overlay.replaceChildren();
       const legend = at('#v2-area-legend');
+      legend.hidden = !intelSections.legend;
       if (!mode || document.body.classList.contains('v2-screen-open')) { legend.textContent = ''; return; }
       const key = JSON.stringify([core(), state.revision, state.phase, state.turnPhase,
         actor?.id, mode, GoblinLanguage.current, !!globalThis.GoblinMovement?.busy()]);
@@ -1597,10 +1592,16 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (actor) placeNearHex(card, view.target, state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && unit.id !== actor.id &&
         (unit.x !== view.target.x || unit.y !== view.target.y)), [actor]);
     }
+    function syncPanelLayout() {
+      const layout = at('.v2-layout');
+      layout.style.setProperty('--v2-toolbar-height', `${at('#v2-area-controls').offsetHeight}px`);
+      layout.style.setProperty('--v2-legend-height', `${at('#v2-area-legend').offsetHeight}px`);
+      syncLayout();
+    }
     window.addEventListener('resize', syncLayout);
     window.addEventListener('scroll', syncLayout, {passive:true});
     mapPanel.addEventListener('scroll', syncLayout, {passive:true});
-    const targetLayoutObserver = new ResizeObserver(syncLayout);
+    const targetLayoutObserver = new ResizeObserver(syncPanelLayout);
     targetLayoutObserver.observe(mapPanel);
     targetObstacles().forEach(node => targetLayoutObserver.observe(node));
     document.addEventListener('click', event => {

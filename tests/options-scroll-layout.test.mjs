@@ -17,19 +17,26 @@ test('Options alone gets separate header, content scrollport and non-sticky foot
   const end=flow.indexOf('        panel.append(header, content, footer);',start)+
     '        panel.append(header, content, footer);'.length;
   assert.ok(start>0&&end>start);
-  const panel=node(),classes=[];panel.classList.add=value=>classes.push(value);
+  const panel=node(),classes=[],changes=[];panel.classList.add=value=>classes.push(value);
   const context={panel,t:key=>key,heading:()=>node('h2'),paragraph:()=>node('p'),
     button:(text,onclick)=>({...node('button'),textContent:text,onclick}),actions:(...children)=>{const el=node();el.append(...children);return el},
     document:{createElement:node,createTextNode:text=>({text})},goBack(){},
     GoblinLanguage:{languages:['de','en','es','fr'],current:'fr'},
-    GoblinUIV2:{gridVisible:false,targetsVisible:true,damageVisible:true},
+    GoblinUIV2:{gridVisible:false,targetsVisible:true,damageVisible:true,
+      panelVisible:key=>key!=='unit',setPanelVisible:(key,visible)=>changes.push([key,visible])},
     overlayAlpha:()=>.28,applyOverlayAlpha(){}};
   vm.runInNewContext(readFileSync(new URL('../presentation-preferences.js',import.meta.url),'utf8'),context);
   vm.runInNewContext(flow.slice(start,end),context);
   assert.deepEqual(classes,['v2-options-panel']);
   assert.deepEqual(panel.children.map(el=>el.className),['v2-screen-header','v2-screen-main v2-options-main','v2-screen-footer']);
   const descendants=el=>el.children?.flatMap(child=>[child,...descendants(child)])||[];
-  assert.deepEqual(descendants(panel.children[1]).filter(el=>el.tag==='input').map(el=>el.id),['v2-grid','v2-targets','v2-damage','v2-phase-notice-option','v2-overlay-alpha']);
+  const inputs=descendants(panel.children[1]).filter(el=>el.tag==='input');
+  assert.deepEqual(inputs.map(el=>el.id),['v2-grid','v2-targets','v2-damage','v2-panel-roster','v2-panel-unit',
+    'v2-panel-field','v2-panel-legend','v2-phase-notice-option','v2-overlay-alpha']);
+  const toggles=inputs.filter(el=>el.id.startsWith('v2-panel-'));
+  assert.deepEqual(toggles.map(el=>el.checked),[true,false,true,true]);
+  for(const toggle of toggles){toggle.checked=!toggle.checked;toggle.onchange();}
+  assert.deepEqual(changes,[['roster',false],['unit',true],['field',false],['legend',false]]);
   assert.equal(descendants(panel.children[2]).find(el=>el.tag==='button').id,'v2-options-back');
   assert.match(rule('.v2-screen-panel.v2-foundation.v2-options-panel'),/grid-template-rows:\s*auto minmax\(0, 1fr\) auto/);
   assert.match(rule('.v2-screen-panel.v2-foundation.v2-options-panel'),/overflow:\s*hidden/);

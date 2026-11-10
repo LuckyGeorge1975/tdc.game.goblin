@@ -1042,6 +1042,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           input.onchange=()=>GoblinUIV2[key==='targets'?'setTargetsVisible':'setDamageVisible'](input.checked);
           row.append(input,document.createTextNode(t(`v2.display.${key}`)));displayOptions.push(row);
         }
+        for(const key of ['roster','unit','field','legend']){
+          const row=document.createElement('label');row.className='v2-setting-check';
+          const input=document.createElement('input');input.type='checkbox';input.id=`v2-panel-${key}`;
+          input.checked=GoblinUIV2.panelVisible(key);
+          input.onchange=()=>GoblinUIV2.setPanelVisible(key,input.checked);
+          row.append(input,document.createTextNode(t(`v2.panel.${key}`)));displayOptions.push(row);
+        }
         const alpha = document.createElement('label'); alpha.className = 'v2-setting-range';
         const alphaValue = document.createElement('output');
         const alphaInput = document.createElement('input'); alphaInput.type = 'range'; alphaInput.id = 'v2-overlay-alpha';

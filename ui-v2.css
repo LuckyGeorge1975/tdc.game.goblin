@@ -391,12 +391,8 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-map-overlay-bottom { left: 10px; right: 10px; bottom: 10px; justify-content: space-between; align-items: flex-end; }
 .v2-area-controls button[aria-pressed="true"] { border-color: var(--v2-accent-text); background: var(--v2-surface2); color: var(--v2-accent-text); }
 .v2-area-controls .v2-icon-button:not([aria-pressed="true"]) { border-color: transparent; background: transparent; color: var(--v2-muted); }
-.v2-area-legend:empty { display: none; }
+.v2-area-legend:empty, .v2-area-legend[hidden], .v2-own[hidden], .v2-target:has(> #v2-intel:empty) { display: none; }
 .v2-target { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow: auto; }
-.v2-intel-switches { display: flex; gap: 4px; }
-.v2-intel-switches button { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 2px 10px; border-radius: 16px; color: var(--v2-muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
-.v2-intel-switches .v2-icon { width: 14px; height: 14px; }
-.v2-intel-switches button[aria-pressed="true"] { color: var(--v2-accent-text); }
 #v2-intel { display: grid; gap: 10px; }
 .v2-intel-section { display: grid; gap: 10px; padding: 10px; border: 1px solid var(--v2-line); border-radius: 10px; background: var(--v2-surface2); }
 .v2-intel-head { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
@@ -463,6 +459,21 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 @media (max-width: 599px), (max-height: 500px) { .v2-head { gap: 8px; padding: 6px 8px; } .v2-head-turn { flex: 1; gap: 8px; } .v2-head-turn p { font-size: 12px; white-space: nowrap; } #v2-phase { padding: 4px 8px; font-size: 12px; } .v2-head-goal { order: 5; flex: 1 1 100%; text-align: left; } .v2-head-goal p { font-size: 12px; } }
 @media (max-width: 1199px) { .v2-target { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; } #v2-intel { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); align-items: start; } }
 @media (max-width: 599px), (max-height: 500px) { .v2-target { grid-template-columns: minmax(0, 1fr); } .v2-head-turn { overflow: hidden; } #v2-phase { font-size: 11px; padding: 5px; } }
+@media (min-width: 851px) and (min-height: 501px) {
+  .v2-layout { position: relative; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  .v2-map-card { grid-area: 1 / 1; }
+  .v2-map-overlay-top { bottom: 10px; justify-content: space-between; }
+  .v2-map-overlay-top > .v2-area-legend { max-width: min(56%, 560px); overflow-wrap: anywhere; pointer-events: none; }
+  .v2-layout > :is(.v2-own, .v2-target) { position: absolute; z-index: 3; grid-area: auto; overscroll-behavior: contain; overflow: auto; }
+  .v2-layout > .v2-own { top: calc(19px + var(--v2-toolbar-height, 54px)); left: 11px; width: clamp(152px, 16vw, 222px); max-height: max(0px, calc(100% - 38px - var(--v2-toolbar-height, 54px) - var(--v2-legend-height, 0px))); }
+  .v2-layout > .v2-target { top: 64px; right: 11px; width: clamp(174px, 18vw, 256px); max-height: max(0px, calc(100% - 126px)); }
+  .v2-layout .v2-units-card { padding: 6px; }
+  .v2-layout .v2-units { overflow: visible; }
+  .v2-layout #v2-intel { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .v2-layout .v2-intel-section { gap: 6px; padding: 7px; }
+  .v2-layout .v2-intel-head { grid-template-columns: 32px minmax(0, 1fr) auto; gap: 5px; }
+  .v2-layout :is(.v2-intel-art, .v2-intel-tile) { width: 32px; height: 32px; }
+}
 @media (max-width: 599px), (max-height: 500px) { .v2-controls .v2-context:has(#v2-message:empty):has(#v2-terminal[hidden]):not(:has(#v2-action-chip:not([hidden]))) { display: none; } }
 /* Active action (UR-G2): chosen in the menu, shown in the command bar; the target card confirms the order. */
 .v2-action-chip { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 2px 2px 2px 8px; border: 1px solid var(--v2-accent-text); border-radius: 10px; background: var(--v2-surface2); }

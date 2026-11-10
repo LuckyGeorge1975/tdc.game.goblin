@@ -7,7 +7,7 @@ import vm from 'node:vm';
 // Execute the active UI's real field intel renderer (shared by Core and Legacy), not the hidden legacy intel panel.
 const source=readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
 const begin="    const el = (tag, className = '', text = '') => {";
-const end="    for (const button of at('#v2-intel-switches').querySelectorAll('[data-section]'))\n      button.onclick";
+const end='    function targetObstacles(';
 const renderer=source.slice(source.indexOf(begin),source.indexOf(end));
 assert.ok(source.indexOf(begin)>=0&&renderer.includes('function renderFieldInfo(state, actor, terrainAt)'));
 const terrainAt={core:'cell=>state.cells.find(item=>item.x===cell.x&&item.y===cell.y)?.type',legacy:'cell=>terrainTypeAt(cell.x,cell.y)'};
