@@ -473,6 +473,8 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
   .v2-layout .v2-intel-section { gap: 6px; padding: 7px; }
   .v2-layout .v2-intel-head { grid-template-columns: 32px minmax(0, 1fr) auto; gap: 5px; }
   .v2-layout :is(.v2-intel-art, .v2-intel-tile) { width: 32px; height: 32px; }
+  .v2-layout .v2-intel-systems .v2-system-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .v2-layout .v2-intel-systems .v2-system-row :is(span, strong) { overflow-wrap: anywhere; }
 }
 @media (max-width: 599px), (max-height: 500px) { .v2-controls .v2-context:has(#v2-message:empty):has(#v2-terminal[hidden]):not(:has(#v2-action-chip:not([hidden]))) { display: none; } }
 /* Active action (UR-G2): chosen in the menu, shown in the command bar; the target card confirms the order. */
@@ -487,7 +489,7 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-target-card[hidden] { display: none !important; }
 .v2-target-choices { display: grid; gap: 4px; overflow: auto; max-height: min(28dvh, 220px); padding: 3px; }
 .v2-target-choices button { display: flex; gap: 6px; align-items: center; text-align: left; overflow-wrap: anywhere; }
-.v2-target-card[data-fire-compact="true"] { display: flex; align-items: center; gap: 4px; padding: 4px; border-color: transparent; background: transparent; box-shadow: none; }
+.v2-target-card[data-fire-compact="true"] { display: flex; align-items: safe center; gap: 4px; padding: 4px; border-color: transparent; background: transparent; box-shadow: none; }
 .v2-attack-options { display: grid; min-width: 0; gap: 3px; }
 .v2-attack-options .v2-target-choices { grid-template-columns: minmax(0, 1fr); gap: 3px; padding: 2px; }
 .v2-target-card[data-fire-compact="true"] button { min-height: 36px; box-shadow: 0 2px 8px #0008; }

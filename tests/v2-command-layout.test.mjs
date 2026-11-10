@@ -40,6 +40,8 @@ test('desktop panels use independent preferences and preserve the old intel choi
   assert.doesNotMatch(source,/id="v2-intel-switches"/);
   assert.match(css,/@media \(min-width: 851px\) and \(min-height: 501px\)\s*\{\s*\.v2-layout \{[^}]*grid-template-columns: minmax\(0, 1fr\)/);
   assert.match(css,/\.v2-own\[hidden\], \.v2-target:has\(> #v2-intel:empty\) \{ display: none; \}/);
+  assert.match(rule('.v2-layout .v2-intel-systems .v2-system-row'),/grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(rule('.v2-layout .v2-intel-systems .v2-system-row :is(span, strong)'),/overflow-wrap: anywhere/);
 });
 
 test('target placement reserves the phase notice on the map and in the resized fallback',()=>{
@@ -49,7 +51,8 @@ test('target placement reserves the phase notice on the map and in the resized f
   let toolbarBox=rect(0,0,0,0), toolsBox=toolbarBox;
   let anchor={x:919,y:489};
   const notice={hidden:false,getBoundingClientRect:()=>noticeBox};
-  const card={style:{},dataset:{},getBoundingClientRect:()=>rect(0,0,157,54)};
+  let cardHeight=54;
+  const card={style:{},dataset:{},getBoundingClientRect:()=>rect(0,0,157,cardHeight)};
   const nativeMap={createSVGPoint:()=>({matrixTransform(){return {x:this.x,y:this.y}}}),getScreenCTM:()=>null};
   const nodes={'#v2-map':{getBoundingClientRect:()=>frame},'#v2-phase-notice':notice,
     '#v2-area-controls':{getBoundingClientRect:()=>toolbarBox},'#v2-map-tools':{getBoundingClientRect:()=>toolsBox},
@@ -90,13 +93,27 @@ test('target placement reserves the phase notice on the map and in the resized f
   place();
   [toolbarBox,toolsBox].forEach(separate);
 
+  // The selected Legacy fire card in the 1280×660 advisory layout used to run into the footer.
+  context.innerHeight=660;
+  frame=rect(13,276.171875,1254,283.78125);
+  toolbarBox=rect(23,286,320,54);
+  toolsBox=rect(1057,506,200,44);
+  noticeBox=rect(515,327,250,120);
+  notice.hidden=false;
+  anchor={x:640,y:461};
+  cardHeight=167;
+  place();
+  assert.notEqual(card.style.visibility,'hidden');
+  assert.ok(top()>=frame.top+8 && top()+(parseFloat(card.style.maxHeight)||cardHeight)<=frame.bottom-8);
+
   context.innerWidth=200;
-  frame=rect(0,115,200,75);
+  frame=rect(0,0,200,190);
   toolbarBox=rect(0,0,0,0);
   toolsBox=toolbarBox;
   notice.hidden=false;
   noticeBox=rect(10,122,180,130);
-  anchor={x:100,y:150};
+  anchor={x:210,y:150};
+  cardHeight=54;
   context.innerHeight=290;
   place();
   assert.equal(card.dataset.placement,'panel');

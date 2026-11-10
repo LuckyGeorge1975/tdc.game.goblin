@@ -573,47 +573,52 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function placeNearHex(card, anchorCell, others, keepClear) {
       if (!anchorCell) return;
       card.style.left = '-9999px'; card.style.top = '0';
-      card.style.maxHeight = ''; card.style.overflowY = '';
-      const frame = at('#v2-map').getBoundingClientRect(), box = card.getBoundingClientRect();
+      card.style.maxHeight = ''; card.style.maxWidth = ''; card.style.overflowY = ''; card.style.visibility = '';
+      const inset = 8, frame = at('#v2-map').getBoundingClientRect();
+      const leftEdge = Math.max(0,frame.left) + inset, rightEdge = Math.min(innerWidth,frame.right) - inset;
+      const topEdge = Math.max(0,frame.top) + inset, bottomEdge = Math.min(innerHeight,frame.bottom) - inset;
+      if (rightEdge <= leftEdge || bottomEdge <= topEdge) { card.style.visibility = 'hidden'; return; }
+      if (card.getBoundingClientRect().width > rightEdge - leftEdge) card.style.maxWidth = `${rightEdge-leftEdge}px`;
+      const box = card.getBoundingClientRect();
       const reserved = targetObstacles().filter(node => !node.hidden).map(node => node.getBoundingClientRect())
         .filter(rect => rect.width > 0 && rect.height > 0);
       const screen = cell => { const point = nativeMap.createSVGPoint(); Object.assign(point, hexCenter(cell.x, cell.y)); return point.matrixTransform(nativeMap.getScreenCTM()); };
       const anchor = screen(anchorCell), row = screen({x: anchorCell.x, y: anchorCell.y + 1});
       const clear = keepClear.map(screen), units = others.map(screen);
-      const inset = 8, gap = Math.max(26, Math.abs(row.y - anchor.y) * .62), w = box.width, h = box.height;
+      const gap = Math.max(26, Math.abs(row.y - anchor.y) * .62), w = box.width, h = box.height;
       const crossesX = (rect,x) => x < rect.right + inset && x + w > rect.left - inset;
       const hitsControl = (x,y) => reserved.some(rect => crossesX(rect,x) &&
         y < rect.bottom + inset && y + h > rect.top - inset);
-      const centered = Math.min(Math.max(anchor.x - w / 2, frame.left + inset), frame.right - inset - w);
+      const clampX = x => Math.max(leftEdge, Math.min(x, rightEdge - w));
+      const centered = clampX(anchor.x - w / 2);
       const candidates = [
         {x:centered,y:anchor.y-gap-h,pointer:'down'}, {x:centered,y:anchor.y+gap,pointer:'up'},
         {x:anchor.x+gap,y:anchor.y-h/2,pointer:''}, {x:anchor.x-gap-w,y:anchor.y-h/2,pointer:''}
       ];
-      const fits = blockers => candidates.find(({x,y}) => x>=frame.left+inset && y>=frame.top+inset &&
-        x+w<=Math.min(frame.right,innerWidth)-inset && y+h<=Math.min(frame.bottom,innerHeight)-inset &&
-        x>=inset && y>=inset && !hitsControl(x,y) &&
+      const fits = blockers => candidates.find(({x,y}) => x>=leftEdge && y>=topEdge &&
+        x+w<=rightEdge && y+h<=bottomEdge && !hitsControl(x,y) &&
         !blockers.some(point => point.x>=x-20 && point.x<=x+w+20 && point.y>=y-20 && point.y<=y+h+20));
       const placement = anchor.x >= frame.left && anchor.x <= frame.right && anchor.y >= frame.top && anchor.y <= frame.bottom
         ? fits([...clear, ...units]) || fits(clear) : null;
-      const clampX = x => Math.max(inset, Math.min(x, innerWidth - w - inset));
       let left = placement ? placement.x : clampX(frame.left + (frame.width - w) / 2);
-      let top = placement ? placement.y : Math.max(inset, Math.min(frame.top + inset, innerHeight - h - inset));
-      if (!placement && hitsControl(left,top)) {
-        const columns = [left, inset, clampX(innerWidth), ...reserved.flatMap(rect =>
+      let top = placement ? placement.y : topEdge;
+      if (!placement && (top + h > bottomEdge || hitsControl(left,top))) {
+        const columns = [left, leftEdge, clampX(rightEdge), ...reserved.flatMap(rect =>
           [clampX(rect.left - inset - w), clampX(rect.right + inset)])];
         let best = {x:left,y:top,height:0,distance:Infinity};
         for (const x of columns) {
           const blockers = reserved.filter(rect => crossesX(rect,x));
-          for (const y of [top, inset, ...blockers.map(rect => rect.bottom + inset)]) {
-            if (y < inset || y >= innerHeight - inset || blockers.some(rect =>
+          for (const y of [topEdge, ...blockers.map(rect => rect.bottom + inset)]) {
+            if (y < topEdge || y >= bottomEdge || blockers.some(rect =>
               y > rect.top - inset && y < rect.bottom + inset)) continue;
-            const bottom = Math.min(innerHeight - inset, ...blockers.filter(rect => rect.top - inset >= y)
+            const bottom = Math.min(bottomEdge, ...blockers.filter(rect => rect.top - inset >= y)
               .map(rect => rect.top - inset));
             const height = Math.min(h, bottom - y);
             const distance = Math.hypot(x-left,y-top);
             if (height > best.height || height === best.height && distance < best.distance) best = {x,y,height,distance};
           }
         }
+        if (best.height <= 0) { card.style.visibility = 'hidden'; return; }
         left = best.x; top = best.y;
         if (best.height < h) {
           card.style.maxHeight = `${best.height}px`;
@@ -857,7 +862,14 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       return selected?.legal ?? [];
     }
     function focusTargetCard() {
-      (at('#v2-action-execute') || at('[data-target-components] button') || at('#v2-target-card button:not(:disabled)'))?.focus({preventScroll:true});
+      const button = at('#v2-action-execute') || at('[data-target-components] button') || at('#v2-target-card button:not(:disabled)');
+      if (!button) return;
+      button.focus({preventScroll:true});
+      const card = at('#v2-target-card');
+      if (card.style?.overflowY !== 'auto') return;
+      const bounds = card.getBoundingClientRect(), control = button.getBoundingClientRect();
+      if (control.bottom > bounds.bottom) card.scrollTop += control.bottom - bounds.bottom;
+      else if (control.top < bounds.top) card.scrollTop -= bounds.top - control.top;
     }
     async function runCommand(state, entry, target = view.target, expectedRevision = view.intentRevision) {
       const {command, confirmSplash} = entry;
