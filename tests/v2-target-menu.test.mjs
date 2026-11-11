@@ -9,7 +9,8 @@ import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import {targetOptionsSource} from './helpers/target-options-source.mjs';
 
 const ui = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
-const targetCard = ui.slice(ui.indexOf('    function renderTargetCard('), ui.indexOf('    function chooseActor('));
+const revealTargetControl = ui.slice(ui.indexOf('    function revealTargetControl('), ui.indexOf('    const COMMAND_ICONS'));
+const targetCard = revealTargetControl + ui.slice(ui.indexOf('    function renderTargetCard('), ui.indexOf('    function chooseActor('));
 
 test('target choices and cancel issue no commands, and a Core weapon switch requires two confirmations', async () => {
   function el(tag, className = '', text = '') {
@@ -142,6 +143,7 @@ test('Iron Dust Core D-04 opens the legal move confirmation after pointer hover'
     slice('    function clearContext(', '    function coreOpenCount('),
     slice('    function coreOpenCount(', '    // Own units'),
     targetOptionsSource,
+    revealTargetControl,
     slice('    function inspectTrainingTarget(', '    const areaCache'),
     slice('    function cellAt(', '    function clearMapHover('),
     'let startZoomPending; function render() { const state = project(); renderTargetCard(state, state.units.find(unit => unit.id === view.actorId)); }'

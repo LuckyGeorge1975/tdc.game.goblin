@@ -26,6 +26,41 @@ test('retarget and layout reposition use the map hex and never confirm',()=>{
   assert.doesNotMatch(sync,/dispatch|runCommand/);
 });
 
+test('repositioning a clipped target card scrolls only the card to reveal its focused action', () => {
+  const card = {
+    style: {}, scrollTop: 0,
+    contains: node => node === button,
+    getBoundingClientRect: () => ({top: 388, bottom: 449})
+  };
+  const button = {
+    getBoundingClientRect: () => ({top: 514 - card.scrollTop, bottom: 550 - card.scrollTop})
+  };
+  const view = {actorId: 'scout', target: {x: 4, y: 2}};
+  const actor = {id: 'scout'};
+  const document = {activeElement: button};
+  const context = {
+    at: selector => selector === '#v2-target-card' ? card : {hidden: true},
+    view, hoverState: {units: [actor]}, unitAlive: () => true, document,
+    placeNearHex: (targetCard, cell) => {
+      assert.equal(targetCard, card);
+      assert.equal(cell, view.target);
+      targetCard.style.overflowY = 'auto';
+    }
+  };
+  const reveal = source.slice(source.indexOf('    function revealTargetControl('), source.indexOf('    const COMMAND_ICONS'));
+  const layout = source.slice(source.indexOf('    function syncLayout()'), source.indexOf('    function syncPanelLayout()'));
+  runInNewContext(reveal + layout, context);
+  context.syncLayout();
+  assert.equal(card.scrollTop, 101);
+  assert.equal(button.getBoundingClientRect().bottom, card.getBoundingClientRect().bottom);
+  assert.equal(document.activeElement, button);
+
+  card.scrollTop = 0;
+  document.activeElement = {};
+  context.syncLayout();
+  assert.equal(card.scrollTop, 0);
+});
+
 test('desktop panels use independent preferences and preserve the old intel choices',()=>{
   const start=source.indexOf('    const intelSectionsKey'), end=source.indexOf('    function statBar(',start);
   let stored='{"unit":false,"field":true}', renders=0;

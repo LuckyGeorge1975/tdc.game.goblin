@@ -637,6 +637,12 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function placeNearHex(card, anchorCell, others, keepClear) {
       if (anchorCell) placeMapCard(card, anchorCell, others, keepClear);
     }
+    function revealTargetControl(card, button) {
+      if (!button || card.style?.overflowY !== 'auto' || !card.contains(button)) return;
+      const bounds = card.getBoundingClientRect(), control = button.getBoundingClientRect();
+      if (control.bottom > bounds.bottom) card.scrollTop += control.bottom - bounds.bottom;
+      else if (control.top < bounds.top) card.scrollTop -= bounds.top - control.top;
+    }
     const COMMAND_ICONS = {Move:'movement', Fire:'fire', PlayerFire:'fire', CatalogFire:'fire', CatalogHexFire:'fire', Ram:'ram', CatalogRam:'ram',
       Embark:'embark', CatalogLoad:'embark', Unload:'unload', CatalogDeploy:'unload', Engineer:'tool'};
     const commandIcon = command => command.type === 'SelectWeapon' ? 'fire' : COMMAND_ICONS[command.type] ?? (command.type.includes('Fire') ? 'fire' : 'action');
@@ -872,11 +878,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const button = at('#v2-action-execute') || at('[data-target-components] button') || at('#v2-target-card button:not(:disabled)');
       if (!button) return;
       button.focus({preventScroll:true});
-      const card = at('#v2-target-card');
-      if (card.style?.overflowY !== 'auto') return;
-      const bounds = card.getBoundingClientRect(), control = button.getBoundingClientRect();
-      if (control.bottom > bounds.bottom) card.scrollTop += control.bottom - bounds.bottom;
-      else if (control.top < bounds.top) card.scrollTop -= bounds.top - control.top;
+      revealTargetControl(at('#v2-target-card'), button);
     }
     async function runCommand(state, entry, target = view.target, expectedRevision = view.intentRevision) {
       const {command, confirmSplash} = entry;
@@ -1610,8 +1612,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const card = at('#v2-target-card');
       if (!view.target || card.hidden) return;
       const state = hoverState, actor = state?.units.find(unit => unit.id === view.actorId);
-      if (actor) placeNearHex(card, view.target, state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && unit.id !== actor.id &&
+      if (!actor) return;
+      placeNearHex(card, view.target, state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && unit.id !== actor.id &&
         (unit.x !== view.target.x || unit.y !== view.target.y)), [actor]);
+      revealTargetControl(card, document.activeElement);
     }
     function syncPanelLayout() {
       const layout = at('.v2-layout');
