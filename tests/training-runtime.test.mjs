@@ -49,9 +49,9 @@ function mountTrainingPanel(g){
   const GoblinUIV2={project:()=>({scenario:currentScenario,phase,turnPhase,units,revision:revision()}),refresh:()=>refreshes++,
    trainingFirePreview:state=>globalThis.trainingFirePreview?.(state)};
   globalThis.GoblinMovement={busy:()=>busy};
-  const trainingPanel={nodes:[],replaceChildren(){this.nodes=[]},append(...nodes){this.nodes.push(...nodes)}};
+  const trainingPanel={nodes:[],classList:{toggle(){}},replaceChildren(){this.nodes=[]},append(...nodes){this.nodes.push(...nodes)}};
   const paragraph=x=>x,actions=(...nodes)=>Object.assign(nodes,{append(...items){nodes.push(...items)}}),
-   button=(key,onclick)=>({key:key.key,onclick});
+   button=(key,onclick)=>({key:key.key,onclick,dataset:{}});
   {
    const t=(key,params)=>['v2.training.previewRatio','v2.target.hit','v2.target.destroy'].includes(key)
      ? Object.values(params).join('') : {key,params};

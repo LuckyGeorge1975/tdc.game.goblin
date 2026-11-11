@@ -130,3 +130,44 @@ test('target placement reserves the phase notice on the map and in the resized f
   assert.equal(card.style.maxHeight,'');
   assert.equal(card.style.overflowY,'');
 });
+
+test('map instruction and target card coexist in the short desktop viewport', () => {
+  const rect = (left, top, width, height) => ({left, top, width, height, right: left + width, bottom: top + height});
+  const fixed = box => ({getBoundingClientRect: () => box});
+  const floating = (width, height) => ({
+    style: {}, dataset: {},
+    getBoundingClientRect() {
+      return rect(parseFloat(this.style.left) || 0, parseFloat(this.style.top) || 0,
+        parseFloat(this.style.maxWidth) || width, parseFloat(this.style.maxHeight) || height);
+    }
+  });
+  const frame = rect(13, 80, 1254, 402);
+  const training = floating(480, 122);
+  const target = floating(300, 165);
+  const controls = {
+    '#v2-area-controls': fixed(rect(23, 90, 380, 54)),
+    '#v2-map-tools': fixed(rect(1040, 428, 217, 44)),
+    '#v2-phase': fixed(rect(1080, 90, 177, 30)),
+    '#v2-phase-notice': fixed(rect(500, 152, 280, 94)),
+    '#v2-roster-panel': fixed(rect(24, 153, 205, 230)),
+    '#v2-intel-panel': fixed(rect(1026, 144, 230, 270)),
+    '#v2-area-legend': fixed(rect(23, 424, 560, 48))
+  };
+  const nodes = {...controls, '#v2-map': fixed(frame), '#v2-training': training};
+  const context = {
+    at: selector => nodes[selector], innerWidth: 1280, innerHeight: 560,
+    hexCenter: (x, y) => ({x: 630 + x * 40, y: 347 + y * 40}),
+    nativeMap: {createSVGPoint: () => ({matrixTransform() { return this; }}), getScreenCTM: () => null}
+  };
+  runInNewContext(source.slice(source.indexOf('    function targetObstacles('), source.indexOf('    const COMMAND_ICONS')), context);
+  context.placeMapCard(training);
+  context.placeNearHex(target, {x: 0, y: 0}, [], []);
+  const overlaps = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+  for (const card of [training, target]) {
+    const box = card.getBoundingClientRect();
+    assert.notEqual(card.style.visibility, 'hidden');
+    assert.ok(box.left >= frame.left && box.right <= frame.right && box.top >= frame.top && box.bottom <= frame.bottom);
+    assert.ok(Object.values(controls).every(control => !overlaps(box, control.getBoundingClientRect())));
+  }
+  assert.equal(overlaps(training.getBoundingClientRect(), target.getBoundingClientRect()), false);
+});

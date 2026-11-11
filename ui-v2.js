@@ -44,7 +44,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const iconButton = (id, name, extra = '') => `<button type="button" class="v2-icon-button" id="${id}"${extra}>${svgIcon(name)}</button>`;
     shell.innerHTML = `
       <header class="v2-head"><div class="v2-head-mission"><span class="v2-label" id="v2-profile"></span><h1 id="v2-mission"></h1></div><div class="v2-head-turn"><p id="v2-turn"></p></div><div class="v2-head-goal"><p id="v2-objective"></p></div>${iconButton('v2-pause', 'settings')}</header>
-      <div class="v2-layout"><aside class="v2-own" id="v2-roster-panel"><section class="v2-card v2-units-card"><div class="v2-card-head"><span class="v2-label" id="v2-units-label"></span><span class="v2-units-ready" id="v2-units-ready"></span></div><div class="v2-units" id="v2-units"></div></section></aside><main class="v2-card v2-map-card"><span class="v2-sr" id="v2-map-label"></span><div class="v2-map-frame"><div class="v2-map" id="v2-map" tabindex="0"></div><div id="v2-map-hover" class="v2-map-hover" hidden></div><strong id="v2-phase" role="status" aria-live="polite"></strong><div id="v2-phase-notice" class="v2-phase-notice" hidden><strong></strong><button type="button"></button></div><div class="v2-map-overlay v2-map-overlay-top"><div class="v2-area-controls" role="group" id="v2-area-controls">${iconButton('v2-mode-movement', 'movement', ' data-area="movement"')}${iconButton('v2-mode-fire', 'fire', ' data-area="fire"')}${iconButton('v2-mode-los', 'los', ' data-area="los"')}<button type="button" id="v2-display-toggle" aria-expanded="false" aria-controls="v2-display-controls" hidden></button><div id="v2-display-controls" class="v2-display-controls" role="group">${iconButton('v2-area-grid', 'grid')}${iconButton('v2-area-targets', 'targets')}${iconButton('v2-area-damage', 'damage')}</div></div><p id="v2-area-legend" class="v2-area-legend" role="status"></p></div><div class="v2-map-overlay v2-map-overlay-bottom"><div class="v2-map-tools" role="group" id="v2-map-tools">${iconButton('v2-zoom-in', 'zoomIn')}${iconButton('v2-zoom-out', 'zoomOut')}${iconButton('v2-zoom-center', 'center')}${iconButton('v2-zoom-fit', 'fit')}</div></div></div></main><aside class="v2-target" id="v2-intel-panel"><div id="v2-intel"></div></aside></div>
+      <div class="v2-layout"><aside class="v2-own" id="v2-roster-panel"><section class="v2-card v2-units-card"><div class="v2-card-head"><span class="v2-label" id="v2-units-label"></span><span class="v2-units-ready" id="v2-units-ready"></span></div><div class="v2-units" id="v2-units"></div></section></aside><main class="v2-card v2-map-card"><span class="v2-sr" id="v2-map-label"></span><div class="v2-map-frame"><div class="v2-map" id="v2-map" tabindex="0"></div><section id="v2-training" class="v2-card v2-training" aria-labelledby="v2-training-title" hidden></section><div id="v2-map-hover" class="v2-map-hover" hidden></div><strong id="v2-phase" role="status" aria-live="polite"></strong><div id="v2-phase-notice" class="v2-phase-notice" hidden><strong></strong><button type="button"></button></div><div class="v2-map-overlay v2-map-overlay-top"><div class="v2-area-controls" role="group" id="v2-area-controls">${iconButton('v2-mode-movement', 'movement', ' data-area="movement"')}${iconButton('v2-mode-fire', 'fire', ' data-area="fire"')}${iconButton('v2-mode-los', 'los', ' data-area="los"')}<button type="button" id="v2-display-toggle" aria-expanded="false" aria-controls="v2-display-controls" hidden></button><div id="v2-display-controls" class="v2-display-controls" role="group">${iconButton('v2-area-grid', 'grid')}${iconButton('v2-area-targets', 'targets')}${iconButton('v2-area-damage', 'damage')}</div></div><p id="v2-area-legend" class="v2-area-legend" role="status"></p></div><div class="v2-map-overlay v2-map-overlay-bottom"><div class="v2-map-tools" role="group" id="v2-map-tools">${iconButton('v2-zoom-in', 'zoomIn')}${iconButton('v2-zoom-out', 'zoomOut')}${iconButton('v2-zoom-center', 'center')}${iconButton('v2-zoom-fit', 'fit')}</div></div></div></main><aside class="v2-target" id="v2-intel-panel"><div id="v2-intel"></div></aside></div>
       <footer class="v2-controls"><div class="v2-context"><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div>${iconButton('v2-log-open', 'log')}<button type="button" id="v2-undo"></button><button type="button" id="v2-phase-action"></button><button type="button" id="v2-next-unit"></button></footer><section class="v2-card v2-target-card" id="v2-target-card" role="group" aria-labelledby="v2-target-title" hidden></section>`;
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
@@ -565,40 +565,43 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         intel.append(section);
       }
     }
-    // Floats a card above a hex (below or beside it as fallback) inside the map. Hexes in keepClear stay
-    // visible, other units preferably too. The panel fallback also leaves map controls accessible.
+    // Anchored cards prefer space next to the hex and away from units. Unanchored cards
+    // share the fallback placement, which keeps the map controls clear.
     function targetObstacles() {
-      return ['#v2-area-controls', '#v2-map-tools', '#v2-phase-notice', '#v2-roster-panel', '#v2-intel-panel', '#v2-area-legend'].map(at);
+      return ['#v2-area-controls', '#v2-map-tools', '#v2-phase-notice', '#v2-roster-panel', '#v2-intel-panel', '#v2-area-legend', '#v2-training'].map(at);
     }
-    function placeNearHex(card, anchorCell, others, keepClear) {
-      if (!anchorCell) return;
+    function placeMapCard(card, anchorCell, others = [], keepClear = []) {
       card.style.left = '-9999px'; card.style.top = '0';
       card.style.maxHeight = ''; card.style.maxWidth = ''; card.style.overflowY = ''; card.style.visibility = '';
+      card.dataset.scrollable = 'false';
       const inset = 8, frame = at('#v2-map').getBoundingClientRect();
       const leftEdge = Math.max(0,frame.left) + inset, rightEdge = Math.min(innerWidth,frame.right) - inset;
       const topEdge = Math.max(0,frame.top) + inset, bottomEdge = Math.min(innerHeight,frame.bottom) - inset;
       if (rightEdge <= leftEdge || bottomEdge <= topEdge) { card.style.visibility = 'hidden'; return; }
       if (card.getBoundingClientRect().width > rightEdge - leftEdge) card.style.maxWidth = `${rightEdge-leftEdge}px`;
       const box = card.getBoundingClientRect();
-      const reserved = targetObstacles().filter(node => !node.hidden).map(node => node.getBoundingClientRect())
+      const obstacles = targetObstacles();
+      if (!anchorCell) obstacles.push(at('#v2-phase'));
+      const reserved = obstacles.filter(node => node && node !== card && !node.hidden).map(node => node.getBoundingClientRect())
         .filter(rect => rect.width > 0 && rect.height > 0);
       const screen = cell => { const point = nativeMap.createSVGPoint(); Object.assign(point, hexCenter(cell.x, cell.y)); return point.matrixTransform(nativeMap.getScreenCTM()); };
-      const anchor = screen(anchorCell), row = screen({x: anchorCell.x, y: anchorCell.y + 1});
+      const anchor = anchorCell && screen(anchorCell);
       const clear = keepClear.map(screen), units = others.map(screen);
-      const gap = Math.max(26, Math.abs(row.y - anchor.y) * .62), w = box.width, h = box.height;
+      const w = box.width, h = box.height;
       const crossesX = (rect,x) => x < rect.right + inset && x + w > rect.left - inset;
       const hitsControl = (x,y) => reserved.some(rect => crossesX(rect,x) &&
         y < rect.bottom + inset && y + h > rect.top - inset);
       const clampX = x => Math.max(leftEdge, Math.min(x, rightEdge - w));
-      const centered = clampX(anchor.x - w / 2);
-      const candidates = [
+      const gap = anchor ? Math.max(26, Math.abs(screen({x: anchorCell.x, y: anchorCell.y + 1}).y - anchor.y) * .62) : 0;
+      const centered = anchor && clampX(anchor.x - w / 2);
+      const candidates = anchor ? [
         {x:centered,y:anchor.y-gap-h,pointer:'down'}, {x:centered,y:anchor.y+gap,pointer:'up'},
         {x:anchor.x+gap,y:anchor.y-h/2,pointer:''}, {x:anchor.x-gap-w,y:anchor.y-h/2,pointer:''}
-      ];
+      ] : [];
       const fits = blockers => candidates.find(({x,y}) => x>=leftEdge && y>=topEdge &&
         x+w<=rightEdge && y+h<=bottomEdge && !hitsControl(x,y) &&
         !blockers.some(point => point.x>=x-20 && point.x<=x+w+20 && point.y>=y-20 && point.y<=y+h+20));
-      const placement = anchor.x >= frame.left && anchor.x <= frame.right && anchor.y >= frame.top && anchor.y <= frame.bottom
+      const placement = anchor && anchor.x >= frame.left && anchor.x <= frame.right && anchor.y >= frame.top && anchor.y <= frame.bottom
         ? fits([...clear, ...units]) || fits(clear) : null;
       let left = placement ? placement.x : clampX(frame.left + (frame.width - w) / 2);
       let top = placement ? placement.y : topEdge;
@@ -623,12 +626,16 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         if (best.height < h) {
           card.style.maxHeight = `${best.height}px`;
           card.style.overflowY = 'auto';
+          card.dataset.scrollable = 'true';
         }
       }
       card.dataset.placement = placement ? 'hex' : 'panel';
       card.dataset.pointer = placement?.pointer || '';
       card.style.left = `${left}px`; card.style.top = `${top}px`;
-      card.style.setProperty?.('--v2-pointer-x', `${Math.round(anchor.x - left)}px`);
+      if (anchor) card.style.setProperty?.('--v2-pointer-x', `${Math.round(anchor.x - left)}px`);
+    }
+    function placeNearHex(card, anchorCell, others, keepClear) {
+      if (anchorCell) placeMapCard(card, anchorCell, others, keepClear);
     }
     const COMMAND_ICONS = {Move:'movement', Fire:'fire', PlayerFire:'fire', CatalogFire:'fire', CatalogHexFire:'fire', Ram:'ram', CatalogRam:'ram',
       Embark:'embark', CatalogLoad:'embark', Unload:'unload', CatalogDeploy:'unload', Engineer:'tool'};
@@ -1598,6 +1605,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     // Unused since the event log moved behind its button; the line ends the map sizing source read by resize-observer-geometry.
     let compactDetails = null;
     function syncLayout() {
+      const training = at('#v2-training');
+      if (!training.hidden) placeMapCard(training);
       const card = at('#v2-target-card');
       if (!view.target || card.hidden) return;
       const state = hoverState, actor = state?.units.find(unit => unit.id === view.actorId);
@@ -1616,6 +1625,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const targetLayoutObserver = new ResizeObserver(syncPanelLayout);
     targetLayoutObserver.observe(mapPanel);
     targetObstacles().forEach(node => targetLayoutObserver.observe(node));
+    targetLayoutObserver.observe(at('#v2-phase'));
     document.addEventListener('click', event => {
       if (view.target && event.target.isConnected && !event.target.closest?.('dialog, .v2-map-frame, #v2-target-card, #v2-units')) {
         clearContext(); render();

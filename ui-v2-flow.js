@@ -7,19 +7,23 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     surface.className = 'v2-screen';
     shell.appendChild(surface);
     const t = (key, params) => GoblinLanguage.t(key, params);
-    const trainingPanel=document.createElement('section');trainingPanel.id='v2-training';trainingPanel.className='v2-card v2-training';trainingPanel.hidden=true;
-    shell.querySelector('.v2-head').after(trainingPanel);
+    const trainingPanel=document.querySelector('#v2-training');
     const targetTrainingCopy = {
       'training.selectActor':'v2.training.selectActor', 'training.previewMove':'v2.training.previewMove',
       'training.confirmMove':'v2.training.confirmMove', 'training.inspectShot':'v2.training.inspectShot',
       'training.cancelIntent':'v2.training.closeTarget'
     };
     function renderTraining(){
+      const activeAction=document.activeElement?.dataset?.trainingAction;
       const v=globalThis.GoblinTrainingRuntime?.view();trainingPanel.hidden=screen!=='play'||!v;
       document.querySelectorAll('.training-highlight').forEach(node=>node.classList.remove('training-highlight'));
-      if(!v)return;const p=v.progress,step=v.definition.steps.find(s=>s.id===p.stepId),params=Object.fromEntries(Object.entries(step.paramRefs).map(([key,ref])=>[key,v.params[ref]??'']));
-      if(v.definition.mode==='advisory'&&(!step.messageKey||p.status==='abandoned'))trainingPanel.hidden=true;
-      if(trainingPanel.hidden)return;
+      const p=v?.progress,step=v?.definition.steps.find(s=>s.id===p.stepId);
+      if(v?.definition.mode==='advisory'&&(!step.messageKey||p.status==='abandoned'))trainingPanel.hidden=true;
+      if(trainingPanel.hidden){
+        if(activeAction&&screen==='play')document.querySelector('#v2-map')?.focus({preventScroll:true});
+        return;
+      }
+      const params=Object.fromEntries(Object.entries(step.paramRefs).map(([key,ref])=>[key,v.params[ref]??'']));
       const projection=GoblinUIV2.project(),controls={back:'#v2-undo',phase:'#v2-phase-action',cancel:'#v2-target-cancel',confirm:'#v2-action-execute',exit:'#v2-pause'};
       const t02=projection.scenario==='training-t02';
       const waiting=t02&&((p.status==='ready-for-debrief'&&globalThis.GoblinMovement?.busy())||
@@ -40,8 +44,18 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const cells=ref.kind==='region'?v.regions[ref.ref]:projection.units.filter(u=>u.id===v.definition.actorTags[ref.ref]);
         cells?.forEach(c=>document.querySelector(`#battlefield-map .hex[data-x="${c.x}"][data-y="${c.y}"]`)?.classList.add('training-highlight'));
       }
-      trainingPanel.replaceChildren();const title=document.createElement('strong');title.textContent=t(v.definition.mode==='advisory'?'ui.nav.missions':'training.learningGoal');
-      if(waiting){trainingPanel.append(title,paragraph(t('v2.training.waitForEnemy')));return;}
+      const canAcknowledge=step.category==='explanation'||
+        (step.category==='instruction'&&step.completeWhen?.op==='uiFact'&&step.completeWhen.type==='acknowledgeInstruction');
+      trainingPanel.classList.toggle('v2-training-confirmation',!waiting&&(canAcknowledge||p.status==='ready-for-debrief'));
+      trainingPanel.replaceChildren();
+      const title=document.createElement('strong');
+      title.id='v2-training-title';
+      title.textContent=t(v.definition.mode==='advisory'?'ui.nav.missions':'training.learningGoal');
+      if(waiting){
+        trainingPanel.append(title,paragraph(t('v2.training.waitForEnemy')));
+        if(activeAction)document.querySelector('#v2-map')?.focus({preventScroll:true});
+        return;
+      }
       const key=p.status==='lesson-failed'?'training.failure.title':p.status==='lesson-complete'?'training.complete.title':p.recoveryOffered?'training.recovery':step.messageKey;
       const effect=t02&&p.stepId==='result'?GoblinTrainingRuntime.shotEffect():null;
       if(effect)params.effect=t(`v2.training.effect.${effect}`);
@@ -68,16 +82,23 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if(p.stepId==='terrain'&&v.params['query:cost']!=='')trainingPanel.append(paragraph(t('training.moveCost',{cost:v.params['query:cost'],available:v.params['query:available']})));
       if(['infantry','practice'].includes(p.stepId))trainingPanel.append(paragraph(t('v2.training.confirmMove',{region:v.params['region:practice']})));
       if(p.status==='ready-for-debrief')trainingPanel.append(paragraph(t('training.debrief.skills',{skills:t(`mission.${currentScenario}.objective.short`)})));
-      const row=actions(button(t('training.repeatInstruction'),()=>GoblinTrainingRuntime.ack('repeat')));
-      if(step.category==='instruction'&&step.completeWhen?.op==='uiFact'&&step.completeWhen.type==='acknowledgeInstruction'||step.category==='explanation')row.append(button(t('ui.dialog.confirm'),event=>{
+      const trainingButton=(key,action,className)=>{
+        const node=button(t(key),action,className);
+        node.dataset.trainingAction=key;
+        return node;
+      };
+      const row=actions(trainingButton('training.repeatInstruction',()=>GoblinTrainingRuntime.ack('repeat')));
+      if(canAcknowledge)row.append(trainingButton('ui.dialog.confirm',event=>{
         // This acknowledges a hint without acting on the selected hex.
         event.stopPropagation();
         GoblinTrainingRuntime.ack();
         if(v.definition.mode==='advisory'||t02&&p.stepId==='result')GoblinUIV2.refresh();
       }));
-      if(p.status==='ready-for-debrief')row.append(button(t('training.debrief.confirm'),async()=>{const binding=p.binding.sessionId,sequence=p.sequence;const accepted=await GameDialogs.confirm({id:'training-debrief',title:t('training.debrief.title'),message:t('training.readyForDebrief'),acceptLabel:t('training.debrief.confirm'),cancelLabel:t('ui.dialog.cancel')});const current=GoblinTrainingRuntime.view()?.progress;if(accepted&&current?.binding.sessionId===binding&&current.sequence===sequence){GoblinTrainingRuntime.ack('debrief');GoblinUIV2.refresh()}},'primary'));
-      if(v.definition.mode==='advisory')row.append(button(t('ui.dialog.cancel'),()=>GoblinTrainingRuntime.setAdvisory(false)));
-      else row.append(button(t('training.restartLesson'),confirmRestart),button(t('training.exit'),goToLevels));trainingPanel.append(row);
+      if(p.status==='ready-for-debrief')row.append(trainingButton('training.debrief.confirm',async()=>{const binding=p.binding.sessionId,sequence=p.sequence;const accepted=await GameDialogs.confirm({id:'training-debrief',title:t('training.debrief.title'),message:t('training.readyForDebrief'),acceptLabel:t('training.debrief.confirm'),cancelLabel:t('ui.dialog.cancel')});const current=GoblinTrainingRuntime.view()?.progress;if(accepted&&current?.binding.sessionId===binding&&current.sequence===sequence){GoblinTrainingRuntime.ack('debrief');GoblinUIV2.refresh()}},'primary'));
+      if(v.definition.mode==='advisory')row.append(trainingButton('ui.dialog.cancel',()=>GoblinTrainingRuntime.setAdvisory(false)));
+      else row.append(trainingButton('training.restartLesson',confirmRestart),trainingButton('training.exit',goToLevels));
+      trainingPanel.append(row);
+      if(activeAction)(row.querySelector(`[data-training-action="${activeAction}"]`)??document.querySelector('#v2-map'))?.focus({preventScroll:true});
     }
     const requestedScenario=new URLSearchParams(globalThis.location?.search||'').get('scenario');
     let missionId = globalThis.GoblinCatalogFullModel?.has(requestedScenario)&&currentScenario===requestedScenario?requestedScenario:'iron-dust', started = false, startError = '';
