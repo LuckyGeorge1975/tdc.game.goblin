@@ -446,6 +446,7 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-intel-systems .v2-system-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; font-size: 12px; }
 .v2-intel-systems .v2-system-row span { overflow-wrap: normal; hyphens: auto; }
 .v2-intel-systems .v2-system-row strong { font-weight: 600; text-align: right; }
+.v2-intel-compact-label > span[aria-hidden="true"] { overflow-wrap: normal; }
 .v2-units .v2-unit[aria-pressed="true"] .v2-unit-text small { color: var(--v2-text); }
 .v2-library-kinds { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .v2-library-reference { margin-top: 12px; }

@@ -15,7 +15,7 @@ const textOf=node=>[node.textContent,...node.children.map(textOf)].filter(Boolea
 
 async function scene(lang,runtime){
   let currentLang=lang;
-  const node=()=>({children:[],textContent:'',style:{},dataset:{},replaceChildren(){this.children=[];},setAttribute(){},
+  const node=()=>({children:[],textContent:'',style:{},dataset:{},attributes:{},replaceChildren(){this.children=[];},setAttribute(key,value){this.attributes[key]=value;},
     appendChild(child){this.children.push(child);},append(...nodes){this.children.push(...nodes);},prepend(){},
     get childElementCount(){return this.children.length;},querySelectorAll:()=>[]});
   const intel=node(),context=vm.createContext({...lifeGlobals,actor:null,console,URL,URLSearchParams,
@@ -43,6 +43,35 @@ async function scene(lang,runtime){
   context.GoblinPresentation.bind({runtime,sessionId:1},context.state);
   return {context,intel,live,wreck,setLanguage:lang=>{currentLang=lang;}};
 }
+
+test('Siegebreaker intel uses localized compact weapon names and exposes full labels beside unchanged values', async () => {
+  const {context, intel, live, setLanguage} = await scene('de', 'legacy');
+  const main = {range: 4, ready: 1, remaining: 1, count: 2, destroyed: 1};
+  const antipersonnel = {range: 1, ready: 3, remaining: 3, count: 4, destroyed: 0};
+  live.ogreSystems = {treads: 12, maxTreads: 16, selectedWeapon: 'main', weapons: {main, antipersonnel}};
+  context.state.systems = [{id: live.id, summary: {weapons: {main: 1, antipersonnel: 3}}}];
+  const all = (node, className) => [node, ...node.children.flatMap(child => all(child, className))]
+    .filter(item => item.className === className);
+  const expected = {de: ['Hpt', 'Inf'], en: ['Main', 'AP'], es: ['Ppal', 'AP'], fr: ['Princ', 'AP']};
+  for (const [language, [mainShort, apShort]] of Object.entries(expected)) {
+    setLanguage(language);
+    vm.runInContext(`{${renderer}renderFieldInfo(state, actor, ${terrainAt.legacy});}`, context);
+    const mainFull = context.t('v2.ui.weapon.main');
+    const apFull = context.t('v2.ui.weapon.antipersonnel');
+    const range = weapon => context.t('v2.intel.weaponRange', {weapon});
+    const [rangeLabel, mainLabel, apLabel] = all(intel, 'v2-intel-compact-label');
+    for (const [label, short, full] of [[rangeLabel, range(mainShort), range(mainFull)], [mainLabel, mainShort, mainFull], [apLabel, apShort, apFull]]) {
+      assert.equal(label.title, full);
+      assert.equal(label.children[0].textContent, short);
+      assert.equal(label.children[0].attributes['aria-hidden'], 'true');
+      assert.equal(label.children[1].className, 'v2-sr');
+      assert.equal(label.children[1].textContent, full);
+    }
+    assert.equal(all(intel, 'v2-intel-stat').find(cell => cell.children[0] === rangeLabel).children[1].textContent, '4');
+    assert.deepEqual(all(intel, 'v2-system-row').map(row => row.children[1].textContent),
+      [`1/2 · ${context.t('v2.ui.weaponDamage', {count: 1})}`, `3/4 · ${context.t('v2.ui.weaponDamage', {count: 0})}`]);
+  }
+});
 
 for(const runtime of ['core','legacy'])test(`active ${runtime} intel uses exact contextual names across language changes, repeats and Undo`,async()=>{
   const {context,intel,live,setLanguage}=await scene('de',runtime),before=JSON.stringify(context.state);

@@ -421,6 +421,20 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (text !== '') node.textContent = text;
       return node;
     };
+    function intelLabel(label, fullLabel) {
+      if (!fullLabel || label === fullLabel) return el('span', '', label);
+      const node = el('span', 'v2-intel-compact-label');
+      const visible = el('span', '', label);
+      visible.setAttribute('aria-hidden', 'true');
+      node.title = fullLabel;
+      node.append(visible, el('span', 'v2-sr', fullLabel));
+      return node;
+    }
+    function compactWeaponLabel(key, fullLabel) {
+      const translationKey = `v2.target.short.${key}`;
+      const shortLabel = t(translationKey);
+      return shortLabel === translationKey ? fullLabel : shortLabel;
+    }
     // Weapon and system rows of a Goblin-class unit (Legacy systems or catalog components).
     function renderSystems(host, state, unit) {
       const entry = state.systems.find(item => item.id === unit.id);
@@ -429,7 +443,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       for (const [key, count] of Object.entries(weapons)) {
         const raw = unit.ogreSystems?.weapons[key];
         const line = el('div', 'v2-system-row');
-        line.append(el('span', '', t(`v2.ui.weapon.${key}`)), el('strong', '', raw
+        const fullLabel = t(`v2.ui.weapon.${key}`);
+        line.append(intelLabel(compactWeaponLabel(key, fullLabel), fullLabel), el('strong', '', raw
           ? `${Math.max(0, Math.min(raw.remaining, raw.count - raw.destroyed))}/${raw.count} · ${t('v2.ui.weaponDamage', {count: raw.destroyed})}` : String(count)));
         host.append(line);
       }
@@ -486,9 +501,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function statGrid(cells) {
       const grid = el('div', 'v2-intel-grid');
-      for (const [label, value, share, tone] of cells) {
+      for (const [label, value, share, tone, fullLabel] of cells) {
         const cell = el('div', `v2-intel-stat${tone ? ` v2-tone-${tone}` : ''}`);
-        cell.append(el('span', '', label), el('strong', '', String(value)));
+        cell.append(intelLabel(label, fullLabel), el('strong', '', String(value)));
         if (share != null) { const track = el('div', 'v2-intel-meter'); const fill = el('i'); fill.style.width = `${Math.round(100 * share)}%`; track.append(fill); cell.append(track); }
         grid.append(cell);
       }
@@ -529,14 +544,16 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const catalogWeapon = (unit.catalogSystems || catalogSiege) ? catalog?.selectedSpec(unit) : null;
         const rangeWeaponName = catalogWeapon ? unit.catalogSystems ? catalog.slotLabel(unit,catalogWeapon.id) :
           GoblinSiegeWeapons.label(catalogWeapon.id) : weapon ? t(`v2.ui.weapon.${weaponKey}`) : siegeWeapon?.label;
+        const compactRangeWeapon = weapon && !catalogWeapon ? compactWeaponLabel(weaponKey, rangeWeaponName) : rangeWeaponName;
         const weaponRange = (catalogWeapon ?? weapon ?? siegeWeapon)?.range;
         // A Goblin moves according to its remaining treads.
         const treadMove = treads && !unit.catalogSystems ? globalThis.GoblinSystems?.movementForTreads(treads[0]) : null;
         const value = key => key === 'range' && Number.isFinite(weaponRange) ? weaponRange :
           Number.isFinite(unit[key]) ? unit[key] : Number.isFinite(weapon?.[key]) ? weapon[key] : key === 'move' && Number.isFinite(treadMove) ? treadMove : null;
         section.append(statGrid(['attack', 'defense', 'range', 'move'].map(key =>
-          [key === 'range' && rangeWeaponName ? t('v2.intel.weaponRange', {weapon:rangeWeaponName}) : t(`v2.intel.${key}`),
-            value(key) ?? '–', value(key) == null ? null : Math.min(1, value(key) / max(key))])));
+          [key === 'range' && rangeWeaponName ? t('v2.intel.weaponRange', {weapon:compactRangeWeapon}) : t(`v2.intel.${key}`),
+            value(key) ?? '–', value(key) == null ? null : Math.min(1, value(key) / max(key)), null,
+            key === 'range' && rangeWeaponName ? t('v2.intel.weaponRange', {weapon:rangeWeaponName}) : null])));
         const systems = el('div', 'v2-intel-systems'); systems.id = 'v2-systems';
         if (unit.ogreSystems || unit.catalogSystems || unit.weapons) renderSystems(systems, state, unit);
         if (systems.childElementCount) section.append(systems);
