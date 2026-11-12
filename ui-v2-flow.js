@@ -24,7 +24,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         return;
       }
       const params=Object.fromEntries(Object.entries(step.paramRefs).map(([key,ref])=>[key,v.params[ref]??'']));
-      const projection=GoblinUIV2.project(),controls={back:'#v2-undo',phase:'#v2-phase-action',cancel:'#v2-target-cancel',confirm:'#v2-action-execute',exit:'#v2-pause'};
+      const projection=GoblinUIV2.project(),controls={back:'#v2-undo',phase:'#v2-phase-action',cancel:'#v2-map',confirm:'#v2-action-execute',exit:'#v2-pause'};
       const t02=projection.scenario==='training-t02';
       const waiting=t02&&((p.status==='ready-for-debrief'&&globalThis.GoblinMovement?.busy())||
         (p.status!=='lesson-failed'&&p.stepId==='round'&&projection.phase==='enemy'));
@@ -36,7 +36,6 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           }
         }
         params.back=GoblinLanguage.translate('BACK');
-        params.cancel=t('v2.target.other');
         params.phase=t('dialog.phaseAdvance.confirm.toFire');
       }
       for(const ref of step.highlightRefs){
@@ -63,7 +62,6 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if(t02&&key==='training.inspectShot')copy='v2.training.inspectShotPanel';
       if(key==='training.confirmShot'){
         copy='v2.training.confirmAttack';
-        params.action=t('v2.target.attack');
       }
       if(t02&&key==='training.enterPhase')copy='v2.training.enterPhase';
       if(t02&&key==='training.advanceRound'){

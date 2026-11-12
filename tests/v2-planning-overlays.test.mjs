@@ -10,6 +10,7 @@ import {read} from './artillery-product-harness.mjs';
 const ui = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
 const section = (start, end) => ui.slice(ui.indexOf(start), ui.indexOf(end, ui.indexOf(start)));
 const planning = section('    function planningWeapons(', '    function freeRatioChipCenter(');
+const compactWeaponLabel = section('    function compactWeaponLabel(', '    // Weapon and system rows');
 const intelStats = section('        const max = key =>', "        const systems = el('div', 'v2-intel-systems')");
 const mapSource = readFileSync(new URL('../game.js', import.meta.url), 'utf8')
   .match(/^function (?:hexNeighbors|dist)\([^\r\n]+/gm).join('\n');
@@ -27,10 +28,11 @@ test('Core planning uses the longest ready weapon, falls back when disabled, and
   context.unitAlive = context.GoblinUnitLife.alive;
   runInNewContext(mapSource + '\n' + planning, context);
   assert.match(context.planningArea(state, actor, 'fire').label, /^v2.plan.fire v2.ui.weapon.missiles 5$/);
-  const statsContext = {state,unit:actor,t:(key,params)=>params?.weapon??key,statGrid:cells=>cells,
+  const statsContext = {state,unit:actor,t:(key,params)=>params?.weapon??(key==='v2.target.short.main'?'Hpt':key),statGrid:cells=>cells,
     section:{append(cells){this.cells=cells}}};
-  runInNewContext('const treads = null;\n' + intelStats, statsContext);
-  assert.deepEqual(Array.from(statsContext.section.cells[2].slice(0,2)), ['v2.ui.weapon.main',3]);
+  runInNewContext('const treads = null;\n' + compactWeaponLabel + intelStats, statsContext);
+  assert.deepEqual(Array.from(statsContext.section.cells[2].slice(0,2)), ['Hpt',3]);
+  assert.equal(statsContext.section.cells[2][4], 'v2.ui.weapon.main');
   const spent = structuredClone(actor);
   spent.ogreSystems.weapons.missiles.remaining = 0;
   assert.match(context.planningArea(state, spent, 'fire').label, /^v2.plan.fire v2.ui.weapon.main 3$/);

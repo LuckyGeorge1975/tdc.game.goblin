@@ -30,7 +30,7 @@
   const add=(command,label=commandLabel(command),attack)=>result.push({command,label,confirmSplash:command.type==='CatalogHexFire',...(attack&&{attack})});
   const job=(name,target,option=null,label)=>add({type:'Engineer',actorId:actor.id,job:name,target,option},label);
   if(state.turnPhase==='fire'){
-   if(root.GoblinCatalogFullRuntime?.active()&&actor.catalogId==='U13'){
+   if(root.GoblinCatalogFullRuntime?.active()&&api().rules(actor)?.missileRuleRef){
     add({type:'CatalogHexFire',actorId:actor.id,...cell},t('v2.ui.missile'));
     return result;
    }
@@ -60,7 +60,7 @@
   if(!['movement','gev'].includes(state.turnPhase))return result;
   if(!target)add({type:'Move',actorId:actor.id,...cell});
   if(state.turnPhase==='gev')return result;
-  if(target?.team!==actor.team&&target&&actor.catalogSystems&&['U01','U20'].includes(actor.catalogId))add({type:'CatalogRam',actorId:actor.id,targetId:target.id,...cell});
+  if(target&&target.team!==actor.team&&actor.catalogSystems)add({type:'CatalogRam',actorId:actor.id,targetId:target.id,...cell});
   if(target?.team===actor.team&&target.id!==actor.id){
    addLoadOptions(result,actor,target);
    addLoadOptions(result,target,actor);

@@ -7,7 +7,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const view = { actorId: null, target: null, infoCell: null, focusCell: null,
       intentRevision: null, busy: false, message: '', zoom: 1, areaMode: null, gridVisible: false,
       targetsVisible:true,damageVisible:true,
-      phaseSkip: null, targetGroup: null, targetWeapon: null, targetOption: null, afterWeaponSwitch: false };
+      phaseSkip: null, targetBranch: [], targetOption: null, afterWeaponSwitch: false };
     const shell = document.createElement('div');
     shell.className = 'v2-shell';
     // Line icons for the game shell; every icon button carries its text as aria-label and title.
@@ -275,7 +275,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const target = command.type==='CatalogFire'?units.find(unit=>unit.id===command.target.runtimeUnitId):units.find(unit => unitAlive(unit) && !unit.embarkedOn &&
         unit.x === command.x && unit.y === command.y);
       if (!actor || !target) return null;
-      const attack = legal.weapon?.attack ?? actor.damage;
+      const attack = command.type === 'Fire' && actor.strategicMissile
+        ? globalThis.StrategicMissile.STRIKE.directAttack : legal.weapon?.attack ?? actor.damage;
       const defense = command.type==='CatalogFire'?legal.defense:effectiveDefense(target);
       const ratioCategory = Number.isFinite(attack) && Number.isFinite(defense)
         ? combatRatio(attack, defense) : command.type==='CatalogFire'&&command.target.componentId==='treads'?'1-1':null;
@@ -362,7 +363,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       globalThis.dispatchEvent(new Event('goblin-view-settings-change'));
     }
 
-    function clearContext() { globalThis.GoblinTrainingRuntime?.cancel();view.targetGroup = null; view.targetWeapon = null; view.targetOption = null; view.afterWeaponSwitch = false; view.target = null; view.intentRevision = null; view.message = ''; }
+    function clearContext() { globalThis.GoblinTrainingRuntime?.cancel();view.targetBranch = []; view.targetOption = null; view.afterWeaponSwitch = false; view.target = null; view.intentRevision = null; view.message = ''; }
     const hexLabel = cell => `${String.fromCharCode(65 + cell.x)}-${String(cell.y + 1).padStart(2, '0')}`;
     function coreOpenCount(source) { return coreOpenUnits(source).length; }
     function coreOpenUnits(source) {
@@ -679,8 +680,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     function entryChance(entry, occupant) {
       if (Object.hasOwn(entry, 'chance')) return entry.chance;
-      const chance = entryResult(entry).ok ? hitChance(previewFire(entry.command), occupant) : null;
-      if (chance && entry.command.target?.kind === 'component') chance.destroy = null;
+      const chance = entryResult(entry).ok ? hitChance(previewFire(entry.command), occupant, entry.command.target?.kind === 'component') : null;
       entry.chance = chance;
       return chance;
     }
@@ -691,13 +691,18 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const command = {type: phase === 'fire' ? 'Fire' : 'Move', actorId: actor.id, ...cell};
       training.inspect(command, query(command), phase === 'fire' ? previewFire(command) : null);
     }
-    function hitChance(preview, target) {
+    function hitChance(preview, target, component = false) {
       if (!preview) return null;
       if (preview.meaning === 'tread-roll-5-6') return {ratio: '5–6', hit: 2 / 6, destroy: null};
       const band = preview.ratioCategory === '5-1' ? Array(6).fill('X') : COMBAT_RULES.crt[preview.ratioCategory];
       const infantry = target?.infantry === true || target?.engineering === true || target?.type === 'infantry' || target?.id === 'infantry';
       const lastStep = !!target && (infantry ? Number(target.hp) <= 1 : target.disabled === true);
+      if (band && component) {
+        const destroy = band.filter(result => result === 'X').length / band.length;
+        return {ratio: preview.ratioCategory.replace('-', ':'), hit: destroy, destroy};
+      }
       return band ? {ratio: preview.ratioCategory.replace('-', ':'), hit: band.filter(result => result !== 'NE').length / 6,
+        disable: target && !infantry && !target.disabled ? band.filter(result => result === 'D').length / 6 : null,
         destroy: band.filter(result => result === 'X' || result === 'D' && lastStep).length / 6} : null;
     }
     function trainingFirePreview(state) {
@@ -708,191 +713,204 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const entry = entriesAt(state,actor,cell).find(option => option.command.type === 'Fire' && entryResult(option).ok);
       return entry ? entryChance(entry,targetOccupant(state,cell)) : null;
     }
+    function targetMenuRows(entries) {
+      const groups = new Map();
+      const labels = {embark:'v2.ui.embark', unload:'v2.ui.unload', movement:'v2.ui.move'};
+      for (const entry of entries) {
+        const command = entry.command, icon = commandIcon(command);
+        const indirect = command.mode === 'indirect';
+        const key = indirect ? 'indirect' : icon === 'fire'
+          ? JSON.stringify([command.type, command.weaponKey, command.weaponId, command.mode])
+          : JSON.stringify([command.type, command.job, command.option]);
+        if (!groups.has(key)) groups.set(key, {
+          icon: indirect ? 'indirect' : entry.attack?.icon ?? icon,
+          label: indirect ? t('v2.ui.artillery.indirect') : entry.attack?.name ??
+            (icon === 'tool' ? entry.label.split(' · ')[0] : labels[icon] ? t(labels[icon]) : entry.label),
+          entries: []
+        });
+        groups.get(key).entries.push(entry);
+      }
+      const leaves = options => options.map(entry => ({
+        entry, icon: entry.attack?.icon ?? commandIcon(entry.command),
+        label: entry.componentLabel ? [entry.attack?.shortName ?? entry.attack?.name, entry.componentLabel].filter(Boolean).join(' · ')
+          : entry.attack?.shortName ?? entry.attack?.name ?? entry.label
+      }));
+      const branch = (label, icon, children, choice) => ({label, icon, children, choice});
+      const rows = [];
+      for (const group of groups.values()) {
+        const first = group.entries[0];
+        const observers = new Map();
+        for (const entry of group.entries) {
+          const id = entry.command.spotterId;
+          if (!observers.has(id)) observers.set(id, []);
+          observers.get(id).push(entry);
+        }
+        const components = !!first.componentLabel;
+        let choices = leaves(group.entries);
+        if (observers.size > 1) choices = [...observers.values()].flatMap(options => options.length === 1 ? leaves(options) :
+          [branch(options[0].attack?.name ?? options[0].weaponLabel, group.icon, leaves(options), 'v2.target.componentChoice')]);
+        const choice = observers.size > 1 ? 'v2.target.observerChoice' : components ? 'v2.target.componentChoice' : 'v2.target.detailChoice';
+        if (choices.length > 1 && groups.size > 1) {
+          rows.push(branch(group.label, group.icon, choices, choice));
+        } else rows.push(...choices);
+      }
+      return rows;
+    }
+
+    function missileWarning(state, entry, cell) {
+      const strike = globalThis.StrategicMissile.STRIKE;
+      const affected = state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn &&
+        (entry.command.type !== 'CatalogHexFire' || unit.team === 'player') && dist(unit, cell) <= strike.radius)
+        .map(unit => unit.name + ' (' + t(unit.team === 'player' ? 'ui.team.player' : 'ui.team.enemy') + ')');
+      return [t('v2.ui.missileSplash'), t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.splashAttack}),
+        affected.join(', ')].filter(Boolean).join(' · ');
+    }
+
+    function targetFireChance(entry, occupant, details) {
+      if (entry.command.type !== 'CatalogHexFire') return entryChance(entry, occupant);
+      const attack = entryResult(entry).weapon?.attack;
+      if (!occupant || !Number.isFinite(attack)) return null;
+      if (!occupant.catalogSystems) return hitChance({ratioCategory:combatRatio(attack, effectiveDefense(occupant))}, occupant);
+      const rules = GoblinSpecialistsRuntime.registry();
+      const component = GoblinSystems.catalogChooseTarget(occupant.catalogSystems, rules);
+      if (!component) return null;
+      details.push(t('v2.target.componentChoice') + ' · ' + GoblinSpecialistsRuntime.slotLabel(occupant, component.id));
+      if (component.type === 'treads') return hitChance({meaning:'tread-roll-5-6'}, occupant, true);
+      const defense = component.defense + TerrainRules.coverBonus(terrainTypeAt(occupant.x, occupant.y));
+      return hitChance({ratioCategory:combatRatio(attack, defense)}, occupant, true);
+    }
+
+    function targetRowFacts(entry, state, actor, occupant) {
+      const command = entry.command, result = entryResult(entry);
+      const details = [], metrics = [];
+      if (command.type === 'Move' && result.path) {
+        details.push(t('v2.ui.pathSteps', {count:result.path.length}));
+        const cost = core() ? result.cost : result.path.reduce((sum, step) => sum + movementCost(units.find(unit => unit.id === actor.id), step.x + ',' + step.y), 0);
+        if (Number.isFinite(cost)) {
+          details.push(GoblinLanguage.translate('MOVE COST') + ' ' + cost);
+          metrics.push(String(cost));
+        }
+      }
+      if (command.type === 'Engineer') {
+        if (result.cost) { details.push(t('v2.engineer.cost', {cost:result.cost})); metrics.push('−' + result.cost); }
+        if (result.materialGain) {
+          details.push(t('v2.engineer.gain', {gain:result.materialGain})); metrics.push('+' + result.materialGain);
+          const wreck = state.units.find(unit => unitDead(unit) && !unit.salvaged && !unit.embarkedOn &&
+            GoblinSpecialistsRuntime.wreckKey(unit) === command.target.wreckId);
+          if (wreck) details.push(wreck.name);
+        }
+      }
+      if (Number.isSafeInteger(entry.attack?.shots)) details.push(t('v2.target.shotsLeft', {count:entry.attack.shots}));
+      if (command.type !== 'SelectWeapon' && commandIcon(command) === 'fire') {
+        const chance = targetFireChance(entry, occupant, details);
+        if (chance) {
+          const percent = value => Math.round(value * 100);
+          details.push(t('v2.training.previewRatio', {ratio:chance.ratio}), t('v2.target.hit', {percent:percent(chance.hit)}));
+          metrics.push(t('v2.target.hitShort', {percent:percent(chance.hit)}));
+          if (chance.disable != null) details.push(t('v2.target.disable', {percent:percent(chance.disable)}));
+          if (chance.destroy != null) {
+            details.push(t('v2.target.destroyChance', {percent:percent(chance.destroy)}));
+            metrics.push(t('v2.target.destroyShort', {percent:percent(chance.destroy)}));
+          }
+        }
+      }
+      return {details, metrics};
+    }
+
     function renderTargetCard(state, actor) {
-      const card = at('#v2-target-card');
-      const cell = view.target;
+      const card = at('#v2-target-card'), cell = view.target;
       card.replaceChildren();
       card.hidden = !cell || !actor || view.intentRevision !== state.revision || GameDialogs.isOpen() ||
         document.body.classList.contains('v2-screen-open') || !!globalThis.GoblinMovement?.busy();
       if (card.hidden) return;
       const occupant = targetOccupant(state, cell);
       const entries = entriesAt(state, actor, cell);
-      const groups = new Map();
-      for (const entry of entries) {
-        const kind = commandIcon(entry.command);
-        if (!groups.has(kind)) groups.set(kind, []);
-        groups.get(kind).push(entry);
-      }
-      for (const [kind, options] of groups) {
-        const legal = options.filter(entry => entryResult(entry).ok);
-        if (!legal.length && !(view.afterWeaponSwitch && kind === 'fire')) groups.delete(kind);
-        else if (kind !== 'fire') groups.set(kind, legal);
-      }
-      const actionNames = {movement:'v2.ui.move', ram:'v2.ui.ram', embark:'v2.ui.embark', unload:'v2.ui.unload', fire:'v2.ui.fire', tool:'v2.target.engineer'};
-      const group = groups.has(view.targetGroup) ? view.targetGroup : groups.size === 1 ? groups.keys().next().value : null;
-      const groupOptions = groups.get(group) ?? [];
-      const fireOptions = group === 'fire' ? groupOptions.filter(entry => entryResult(entry).ok) : [];
-      const compact = group === 'fire' && groups.size === 1 && fireOptions.length > 0 &&
-        !groupOptions.some(entry => entry.confirmSplash || entry.command.target?.kind === 'component');
-      const content = compact ? el('div', 'v2-attack-options') : card;
-      card.setAttribute('data-fire-compact', String(compact));
-      const title = el('strong', compact ? 'v2-sr' : '', compact ?
-        [occupant?.name, hexLabel(cell)].filter(Boolean).join(' · ') : hexLabel(cell));
+      const legal = entries.filter(entry => entryResult(entry).ok);
+      const rows = targetMenuRows(legal);
+      if (occupant?.team === 'player' && occupant.id !== actor.id) rows.push({
+        label: t('v2.target.selectUnit', {name:occupant.name}), icon: 'action', select: occupant.id
+      });
+      const blocked = view.afterWeaponSwitch ? entries.find(entry => entry.command.type === 'PlayerFire' && !entryResult(entry).ok) : null;
+      if (!rows.length && !blocked) { card.hidden = true; return; }
+
+      const location = [occupant?.name, hexLabel(cell)].filter(Boolean).join(' · ');
+      const title = el('strong', 'v2-sr', location);
       title.id = 'v2-target-title';
       card.append(title);
-      if (!compact) {
-        const terrain = core() ? state.cells.find(item => item.x === cell.x && item.y === cell.y)?.type : terrainTypeAt(cell.x, cell.y);
-        card.append(el('p', 'v2-target-where', [occupant?.name, terrain && TerrainDisplay.label(terrain)].filter(Boolean).join(' · ')));
-      }
-      if (groups.size > 1) {
-        const actions = el('div', 'v2-target-actions');
-        for (const [kind] of groups) {
-          const button = el('button'); button.type = 'button';
-          button.append(Object.assign(el('span', 'v2-action-icon'), {innerHTML:svgIcon(kind)}), document.createTextNode(t(actionNames[kind] ?? 'v2.action.execute')));
-          button.setAttribute('aria-pressed', String(group === kind));
-          button.onclick = () => { view.targetGroup = kind; view.targetWeapon = null; view.targetOption = null; render(); focusTargetCard(); };
-          actions.append(button);
-        }
-        card.append(actions);
-      }
-      const components = group === 'fire' ? renderComponentWeapons(card, groupOptions) : null;
-      const options = compact ? fireOptions : components ?? groupOptions;
-      const legal = options.filter(entry => entryResult(entry).ok);
-      const chosen = legal.find(entry => commandKey(entry) === view.targetOption) ?? (legal.length === 1 ? legal[0] : null);
-      if (options.length > 1) {
-        const list = el('div', 'v2-target-choices');
-        if (compact) {
-          list.setAttribute('role', 'group');
-          list.setAttribute('aria-label', t('v2.target.weaponChoice'));
-        }
-        if (components) {
-          list.setAttribute('data-target-components', '');
-          list.setAttribute('role', 'group');
-          list.setAttribute('aria-label', t('v2.target.componentChoice'));
-          card.append(el('strong', '', t('v2.target.componentChoice')));
-        }
-        for (const option of options) {
-          const result = entryResult(option), chance = group === 'fire' && !components && !compact ? entryChance(option, occupant) : null;
-          const button = el('button'); button.type = 'button'; button.disabled = !result.ok;
-          if (compact) weaponRow(button, option.attack, option.label, true, attackPreview(option, occupant), true);
-          else button.append(Object.assign(el('span', 'v2-action-icon'), {innerHTML:svgIcon(group)}),
-            document.createTextNode([components ? option.componentLabel : option.label, chance && t('v2.target.hit', {percent:Math.round(chance.hit * 100)})].filter(Boolean).join(' · ')));
-          button.setAttribute('aria-pressed', String(chosen === option));
-          if (!result.ok) button.title = result.reason;
-          button.onclick = () => { view.targetOption = commandKey(option); render(); focusTargetCard(); };
-          list.append(button);
-        }
-        content.append(list);
-      }
-      if (view.afterWeaponSwitch) {
-        const shot = groupOptions.find(entry => entry.command.type === 'PlayerFire');
-        if (shot && !entryResult(shot).ok) content.append(el('p', 'v2-target-blocked', entryResult(shot).reason));
-      }
+      let page = rows;
+      for (const index of view.targetBranch ?? []) page = page[index]?.children ?? page;
+
+      const warning = legal.find(entry => entry.confirmSplash);
+      if (warning) card.append(el('p', 'v2-target-warning', missileWarning(state, warning, cell)));
+      if (blocked) card.append(el('p', 'v2-target-blocked', entryResult(blocked).reason));
       for (const entry of entries.filter(option => option.transport && !entryResult(option).ok)) {
-        const cargo = entry.command.type === 'CatalogDeploy' && units.find(unit => unit.id === entry.command.cargoId);
+        const cargo = entry.command.type === 'CatalogDeploy' && state.units.find(unit => unit.id === entry.command.cargoId);
         const reason = cargo?.embarkedThisTurn ? t('v2.reject.catalog.sameTurn') : entryResult(entry).reason;
         card.append(el('p', 'v2-target-blocked', [entry.label, reason].filter(Boolean).join(' · ')));
       }
-      const controls = el('div', 'v2-target-actions');
-      if (chosen && !compact) {
-        const result = entryResult(chosen);
-        const facts = el('div', 'v2-target-facts');
-        facts.append(el('strong', '', chosen.label));
-        if (chosen.command.type === 'Move' && result.path) {
-          facts.append(el('span', '', t('v2.ui.pathSteps', {count:result.path.length})));
-          const cost = core() ? result.cost : result.path.reduce((sum, step) => sum + movementCost(units.find(unit => unit.id === actor.id), step.x + ',' + step.y), 0);
-          if (Number.isFinite(cost)) facts.append(el('span', '', GoblinLanguage.translate('MOVE COST') + ' ' + cost));
-        }
-        if (chosen.command.type === 'Engineer') {
-          if (Number.isFinite(result.cost)) facts.append(el('span', '', t('v2.engineer.cost', {cost:result.cost})));
-          if (result.materialGain) facts.append(el('span', '', t('v2.engineer.gain', {gain:result.materialGain})));
-        }
-        const chance = group === 'fire' ? entryChance(chosen, occupant) : null;
-        if (chance) {
-          facts.append(el('span', 'v2-target-ratio', chance.ratio), el('strong', 'v2-target-chance', t('v2.target.hit', {percent:Math.round(chance.hit * 100)})));
-          if (chance.destroy !== null) facts.append(el('span', '', t('v2.target.destroy', {percent:Math.round(chance.destroy * 100)})));
-        }
-        card.append(facts);
-      }
-      if (chosen) {
-        const execute = el('button', 'v2-action-execute', t(chosen.command.type === 'SelectWeapon' ? 'v2.target.confirmWeapon' : compact ? 'v2.target.attack' : 'v2.action.execute'));
-        if (compact) {
-          const details = [chosen.label, attackPreview(chosen, occupant)].filter(Boolean).join(' · ');
-          execute.title = details;
-          execute.setAttribute('aria-description', details);
-        }
-        execute.type = 'button'; execute.id = 'v2-action-execute'; execute.disabled = view.busy;
-        const expectedRevision = state.revision;
-        execute.onclick = () => runCommand(state, chosen, cell, expectedRevision);
-        (compact ? content : controls).append(execute);
-      }
-      if (occupant?.team === 'player' && occupant.id !== actor.id) {
-        const select = el('button', '', t('v2.target.selectUnit', {name:occupant.name}));
-        select.type = 'button'; select.onclick = () => chooseActor(occupant.id); controls.append(select);
-      }
-      const back = el('button', 'v2-icon-button v2-action-cancel'); back.type = 'button'; back.id = 'v2-target-cancel';
-      back.innerHTML = svgIcon('close'); back.title = t(compact ? 'ui.dialog.cancel' : 'v2.target.other'); back.setAttribute('aria-label', back.title);
-      back.onclick = () => { clearContext(); render(); at('#v2-map').focus({preventScroll:true}); };
-      if (compact) card.append(content, back);
-      else { controls.append(back); card.append(controls); }
-      placeNearHex(card, cell, state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && unit.id !== actor.id && unit !== occupant), [actor]);
-    }
-    function attackPreview(entry, occupant) {
-      const chance = entryChance(entry, occupant);
-      if (!chance) return '';
-      return [chance.ratio, t('v2.target.hit', {percent:Math.round(chance.hit * 100)}),
-        chance.destroy !== null && t('v2.target.destroy', {percent:Math.round(chance.destroy * 100)})].filter(Boolean).join(' · ');
-    }
-    function weaponRow(button, attack, fallback, available, detail, compact = false) {
-      const name = attack?.name ?? fallback;
-      const shots = Number.isSafeInteger(attack?.shots) ? t('v2.target.shotsLeft', {count:attack.shots}) :
-        available ? t('v2.target.usable') : '';
-      button.append(Object.assign(el('span', 'v2-action-icon'), {innerHTML:svgIcon(attack?.icon ?? 'fire')}));
-      if (compact) {
-        button.append(el('span', '', attack?.shortName ?? name));
-        if (attack?.shots > 1) button.append(el('span', 'v2-weapon-budget', String(attack.shots)));
-        button.setAttribute('aria-label', [name,shots].filter(Boolean).join(' · '));
-      } else {
-        if (shots) button.append(el('span', 'v2-weapon-budget', shots));
-        button.append(el('span', '', name));
-      }
-      button.title = [fallback, shots, detail].filter(Boolean).join(' · ');
-      const description = [fallback !== name && fallback, detail].filter(Boolean).join(' · ');
-      if (description) button.setAttribute('aria-description', description);
-    }
-    function renderComponentWeapons(card, options) {
-      if (!options.length || !options.every(entry => entry.command.target?.kind === 'component')) return null;
-      const weapons = new Map();
-      for (const entry of options) {
-        const {weaponId, mode, spotterId} = entry.command;
-        const key = JSON.stringify([weaponId, mode, spotterId]);
-        if (!weapons.has(key)) weapons.set(key, {key, label:entry.weaponLabel, attack:entry.attack, legal:[]});
-        if (entryResult(entry).ok) weapons.get(key).legal.push(entry);
-      }
-      const ready = [...weapons.values()].filter(weapon => weapon.legal.length);
-      const selected = weapons.get(view.targetWeapon) ?? (ready.length === 1 ? ready[0] : null);
-      const list = el('div', 'v2-target-choices');
-      list.setAttribute('role', 'group');
-      list.setAttribute('aria-label', t('v2.target.weaponChoice'));
-      for (const weapon of [...ready, ...[...weapons.values()].filter(item => !item.legal.length)]) {
-        const status = t('v2.target.legalComponents', {count:weapon.legal.length});
-        const button = el('button');
-        weaponRow(button, weapon.attack, weapon.label, !!weapon.legal.length, status);
+      const compare = page.filter(row => row.entry && commandIcon(row.entry.command) === 'fire' && row.entry.command.type !== 'SelectWeapon').length > 1;
+      const list = el('div', compare ? 'v2-target-choices v2-target-compare' : 'v2-target-choices');
+      for (const [index, row] of page.entries()) {
+        const {entry, children, select} = row;
+        const button = el('button', 'v2-target-row');
         button.type = 'button';
-        button.disabled = !weapon.legal.length;
-        button.setAttribute('aria-pressed', String(selected === weapon));
+        button.disabled = !!view.busy;
+        const facts = entry ? targetRowFacts(entry, state, actor, occupant) : {details:[], metrics:[]};
+        const description = [
+          entry && commandIcon(entry.command) === 'fire' && entry.command.type !== 'SelectWeapon' ? t('v2.target.attack') : '',
+          entry && actor.name, entry?.label ?? row.label, location, ...facts.details,
+          entry?.confirmSplash && missileWarning(state, entry, cell),
+          children ? t('v2.target.openChoice', {choice:t(row.choice)}) :
+            entry?.command.type === 'SelectWeapon' ? t('v2.target.switchOnly') :
+            entry?.confirmSplash ? t('v2.target.splashReview') : t('v2.target.executeRow')
+        ].filter(Boolean).join(' · ');
+        button.title = description;
+        button.setAttribute('aria-label', description);
+        const name = el('span', 'v2-target-row-name');
+        name.append(Object.assign(el('span', 'v2-action-icon'), {innerHTML:svgIcon(row.icon)}), el('span', '', row.label));
+        if (entry?.attack?.shots > 1) name.append(el('span', 'v2-weapon-budget', String(entry.attack.shots)));
+        const metrics = el('span', 'v2-target-row-metrics', facts.metrics.join(' · '));
+        const cue = el('span', 'v2-target-row-cue', children || entry?.confirmSplash ? '›' : '✓');
+        cue.setAttribute('aria-hidden', 'true');
+        button.append(name, metrics, cue);
+        if (entry && index === 0) button.id = 'v2-action-execute';
+        if (entry && commandIcon(entry.command) === 'fire' && entry.command.type !== 'SelectWeapon' && !entry.confirmSplash) {
+          button.onpointerenter = button.onfocus = () => {
+            if (view.target !== cell || view.intentRevision !== state.revision) return;
+            view.targetOption = commandKey(entry);
+            renderAreaPreview(state, actor);
+          };
+        }
         button.onclick = () => {
-          view.targetWeapon = weapon.key;
-          view.targetOption = weapon.legal.length === 1 ? commandKey(weapon.legal[0]) : null;
-          render(); focusTargetCard();
+          if (children) {
+            view.targetBranch = [...(view.targetBranch ?? []), index];
+            view.targetOption = null;
+            render(); focusTargetCard();
+          } else if (select) chooseActor(select);
+          else runCommand(state, entry, cell, state.revision);
         };
         list.append(button);
       }
-      card.append(el('strong', '', t('v2.target.weaponChoice')), list);
-      return selected?.legal ?? [];
+      card.append(list);
+      placeNearHex(card, cell, state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && unit.id !== actor.id && unit !== occupant), [actor]);
+    }
+    function renderTargetBlast(overlay, state, actor) {
+      const target = view.target;
+      if (!target || view.intentRevision !== state.revision || document.body.classList.contains('v2-screen-open')) return;
+      const entry = entriesAt(state, actor, target).find(option => option.confirmSplash && entryResult(option).ok);
+      if (!entry) return;
+      const footprint = entryResult(entry).footprint ?? [target, ...hexNeighbors(target.x, target.y)
+        .filter(cell => cell.x >= 0 && cell.x < W && cell.y >= 0 && cell.y < H)];
+      for (const [index, cell] of footprint.entries()) {
+        const shape = document.createElementNS(NS, 'polygon');
+        shape.setAttribute('points', hexPoints(cell.x, cell.y));
+        shape.classList.add('v2-full-blast', index === 0 ? 'v2-full-blast-center' : 'v2-full-blast-adjacent');
+        shape.setAttribute('aria-hidden', 'true');
+        overlay.append(shape);
+      }
     }
     function focusTargetCard() {
-      const button = at('#v2-action-execute') || at('[data-target-components] button') || at('#v2-target-card button:not(:disabled)');
+      const button = at('#v2-action-execute') || at('#v2-target-card button:not(:disabled)');
       if (!button) return;
       button.focus({preventScroll:true});
       revealTargetControl(at('#v2-target-card'), button);
@@ -902,19 +920,16 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const cell = view.target;
       if (!cell || target !== cell || expectedRevision !== view.intentRevision || expectedRevision !== revision() || !query(command).ok) return;
       if (confirmSplash) {
-        const strike = globalThis.StrategicMissile.STRIKE;
-        const affected = state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && (command.type!=='CatalogHexFire'||unit.team==='player') &&
-          dist(unit, cell) <= strike.radius).map(unit => unit.name + ' (' + t(unit.team === 'player' ? 'ui.team.player' : 'ui.team.enemy') + ')');
         const accepted = await GameDialogs.confirm({id:'v2-splash-confirm',title:t('v2.ui.missile'),
-          message:[t('v2.ui.sector') + ' ' + hexLabel(cell), t('v2.ui.missileSplash'), t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.splashAttack}), affected.join(', ')].filter(Boolean).join(' · '),
+          message:[t('v2.ui.sector') + ' ' + hexLabel(cell), missileWarning(state, entry, cell)].join(' · '),
           acceptLabel:t('ui.hud.intent.confirm'),cancelLabel:t('ui.dialog.cancel')});
-        if (!accepted || view.target !== cell || expectedRevision !== revision()) { render(); return; }
+        if (!accepted || view.target !== cell || expectedRevision !== revision() || !query(command).ok) { render(); return; }
       }
       const result = dispatch(command, expectedRevision, true);
       if (result.ok) {
         clearContext();
         if (command.type === 'SelectWeapon') {
-          view.target = cell; view.targetGroup = 'fire'; view.afterWeaponSwitch = true; view.intentRevision = revision();
+          view.target = cell; view.afterWeaponSwitch = true; view.intentRevision = revision();
         }
       }
       view.message = result.ok ? '' : result.reason;
@@ -948,11 +963,14 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       startZoomPending = null;
       const state = project(), cell = {x,y};
       const unit = targetOccupant(state, cell), actor = state.units.find(item => item.id === view.actorId);
-      const available = entriesAt(state, actor, cell).some(entry => entry.transport || entryResult(entry).ok);
+      const entries = entriesAt(state, actor, cell);
+      const available = entries.some(entry => entryResult(entry).ok);
+      const blockedTransport = !available && entries.find(entry => entry.transport);
       if (!available && unit?.team === 'player') { chooseActor(unit.id); return; }
       clearContext(); view.infoCell = cell; view.focusCell = cell;
       inspectTrainingTarget(actor, cell, state.turnPhase);
       if (available) { view.target = cell; view.intentRevision = state.revision; }
+      if (blockedTransport) view.message = entryResult(blockedTransport).reason;
       render();
       if (available) focusTargetCard();
     }
@@ -1023,7 +1041,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         data.status = 'sight';
         return data;
       }
-      if (globalThis.GoblinCatalogFullRuntime?.active() && actor.catalogId === 'U13' || runtime?.strategicMissile) {
+      if (globalThis.GoblinSpecialistsRuntime?.rules?.(actor)?.missileRuleRef || runtime?.strategicMissile) {
         const type = globalThis.GoblinCatalogFullRuntime?.active() ? 'CatalogHexFire' : 'Fire';
         for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
           const result = areaQuery({type, actorId:actor.id, x, y});
@@ -1052,7 +1070,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const preview = chosen ? previewFire(chosen.command) : null;
       const weaponKey = chosen?.command.weaponKey ?? chosen?.command.weaponId ??
         (chosen?.command.type === 'FireArtillery' ? entryResult(chosen).weapon?.key : null);
-      return preview?.legal && (preview.meaning === 'crt-attack-effective-defense'||state.profile==='CATALOG_SPECIALISTS_v1'&&preview.meaning==='tread-roll-5-6') &&
+      return preview?.legal && ['crt-attack-effective-defense','tread-roll-5-6'].includes(preview.meaning) &&
         preview.profileId === state.profile && preview.stateRevision === state.revision &&
         preview.actorId === actor.id && preview.targetId === target.id &&
         preview.weaponKey === weaponKey && preview.from?.x === actor.x &&
@@ -1208,7 +1226,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       overlay.replaceChildren();
       const legend = at('#v2-area-legend');
       legend.hidden = !intelSections.legend;
-      if (!mode || document.body.classList.contains('v2-screen-open')) { legend.textContent = ''; return; }
+      if (!mode || document.body.classList.contains('v2-screen-open')) {
+        renderTargetBlast(overlay, state, actor);
+        legend.textContent = '';
+        return;
+      }
       const key = JSON.stringify([core(), state.revision, state.phase, state.turnPhase,
         actor?.id, mode, GoblinLanguage.current, !!globalThis.GoblinMovement?.busy()]);
       if (areaCache.key !== key) { areaCache.key = key; areaCache.value = areaData(state, actor, mode); }
@@ -1232,7 +1254,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (data.legal.length) overlay.append(areaEdge(data.legal, areaKind));
       if (data.plan?.cells.length) overlay.append(areaEdge(data.plan.cells, 'plan'));
       if (mode !== 'los') for (const cell of data.blocked) mark(cell, 'blocked');
-      if(globalThis.GoblinCatalogFullRuntime?.active()&&actor?.catalogId==='U13'&&mode==='fire'&&view.target){const strike=GoblinCatalogFullRuntime.hexQuery({type:'CatalogHexFire',actorId:actor.id,...view.target});if(strike.ok)for(const [i,cell] of strike.footprint.entries()){const shape=document.createElementNS(NS,'polygon');shape.setAttribute('points',hexPoints(cell.x,cell.y));shape.classList.add('v2-full-blast',i===0?'v2-full-blast-center':'v2-full-blast-adjacent');shape.setAttribute('aria-hidden','true');overlay.append(shape);}}
+      renderTargetBlast(overlay, state, actor);
       const firePreview = selectedFirePreview(state, actor, mode, data.legal);
       if (firePreview) {
         const from = hexCenter(firePreview.from.x, firePreview.from.y);
@@ -1295,7 +1317,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (target?.team !== 'enemy') return [];
       const shot = {type:'PlayerFire', ...own, targetId:target.id};
       if (!actor.weapons) return [{command:shot, label:t('v2.ui.fire')}];
-      return Object.entries(actor.weapons).map(([weaponKey, weapon]) => {
+      return Object.entries(actor.weapons).sort(([left], [right]) =>
+        Number(right === actor.selectedWeapon) - Number(left === actor.selectedWeapon)).map(([weaponKey, weapon]) => {
         const current = weaponKey === actor.selectedWeapon;
         const name = t('v2.ui.weapon.' + weaponKey);
         const shortName = t('v2.target.short.' + weaponKey);
@@ -1438,6 +1461,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       hoverState = state;
       clearMapHover();
       syncAreaPhase(state);
+      if (view.target && view.intentRevision !== state.revision) clearContext();
       const fireZoom = fireZoomEntry(state);
       const centerFireActor = fireZoom ? zoomOnFireEntry(fireZoom.target) : false;
       if (fireZoom) fireZoomPhase = fireZoom.key;
@@ -1647,11 +1671,15 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     targetLayoutObserver.observe(mapPanel);
     targetObstacles().forEach(node => targetLayoutObserver.observe(node));
     targetLayoutObserver.observe(at('#v2-phase'));
-    document.addEventListener('click', event => {
-      if (view.target && event.target.isConnected && !event.target.closest?.('dialog, .v2-map-frame, #v2-target-card, #v2-units')) {
-        clearContext(); render();
-      }
-    });
+    function dismissTargetOnOutsideClick(event) {
+      if (!view.target || at('#v2-target-card').hidden ||
+          event.target.closest?.('dialog, #v2-target-card, #v2-training button')) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      clearContext(); render();
+      at('#v2-map').focus({preventScroll:true});
+    }
+    document.addEventListener('click', dismissTargetOnOutsideClick, true);
     const pointers = new Map();
     let pinch = null, suppressTapUntil = 0;
     function cellAt(clientX, clientY) {
@@ -1789,7 +1817,6 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     });
     nativeMap.addEventListener('click', event => {
       event.preventDefault(); event.stopImmediatePropagation();
-      // The action menu is not modal: another hex simply becomes the new target.
       if (performance.now() < suppressTapUntil) return;
       const cell = cellAt(event.clientX, event.clientY);
       if (cell) chooseHex(cell.x, cell.y);

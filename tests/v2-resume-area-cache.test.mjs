@@ -21,6 +21,7 @@ const cacheSource = between(ui, '      const key = JSON.stringify([core()', '   
 const releaseSource = between(flow, '    function releasePause()', '    function enterPause()');
 const modeSource = between(ui, '    function activeAreaMode(', '    function areaQuery(');
 const hiddenSource = between(ui, "      if (!mode || document.body.classList.contains('v2-screen-open'))", '      const key = JSON.stringify([core()');
+const blastSource = between(ui, '    function renderTargetBlast(', '    function focusTargetCard(');
 const refreshSource = ui.match(/refresh: (\(\) => [\s\S]*?) \}\);/)[1];
 const querySource = between(bridge, '    query: command =>', '    previewFire:').trim().slice(7, -1);
 const resumeSource = bridge.match(/    resume: (\(\) => \{[^\n]+\}),/)[1];
@@ -65,9 +66,11 @@ function scene() {
     ${targetOptionsSource}
     ${modeSource}
     ${areaSource}
+    ${blastSource}
     function render() {
       const state=project(), actor=state.units.find(unit=>unit.id==='ogre');
       const mode=activeAreaMode(state), weaponKey=actor.selectedWeapon;
+      const overlay={append(){}};
       ${hiddenSource}
       ${cacheSource}
       const preview=selectedFirePreview(state,actor,mode,data.legal);
