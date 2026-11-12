@@ -1,0 +1,563 @@
+{
+  "version": "goblin-level-package-v3",
+  "levels": [
+    {
+      "version": "goblin-level-v3",
+      "id": "showcase-terrain-course",
+      "scenarioVersion": 1,
+      "width": 12,
+      "height": 8,
+      "ruleProfile": "FIELD_TEST_LEGACY_v1",
+      "objective": "core-and-escort",
+      "terrain": [
+        {
+          "x": 3,
+          "y": 3,
+          "type": "rubble-field"
+        },
+        {
+          "x": 4,
+          "y": 2,
+          "type": "mountain"
+        },
+        {
+          "x": 7,
+          "y": 2,
+          "type": "ridge"
+        },
+        {
+          "x": 4,
+          "y": 4,
+          "type": "forest"
+        },
+        {
+          "x": 5,
+          "y": 5,
+          "type": "marsh"
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "type": "water"
+        },
+        {
+          "x": 7,
+          "y": 0,
+          "type": "water"
+        },
+        {
+          "x": 6,
+          "y": 1,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 2,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 4,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "type": "river"
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 8,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "type": "bridge"
+        },
+        {
+          "x": 9,
+          "y": 3,
+          "type": "urban"
+        },
+        {
+          "x": 8,
+          "y": 5,
+          "type": "crater"
+        }
+      ],
+      "units": [
+        {
+          "id": "assault-tank",
+          "assetId": "assault-tank",
+          "team": "player",
+          "x": 1,
+          "y": 3
+        },
+        {
+          "id": "skimmer-scout",
+          "assetId": "skimmer-scout",
+          "team": "player",
+          "x": 2,
+          "y": 2
+        },
+        {
+          "id": "amphibious-infantry",
+          "assetId": "amphibious-infantry",
+          "team": "player",
+          "x": 1,
+          "y": 5
+        },
+        {
+          "id": "rocket-artillery",
+          "assetId": "rocket-artillery",
+          "team": "player",
+          "x": 2,
+          "y": 5
+        },
+        {
+          "id": "guard-tank",
+          "assetId": "guard-tank",
+          "team": "enemy",
+          "x": 8,
+          "y": 2
+        },
+        {
+          "id": "raider-skimmer",
+          "assetId": "raider-skimmer",
+          "team": "enemy",
+          "x": 9,
+          "y": 6
+        },
+        {
+          "id": "core",
+          "assetId": "command-core",
+          "team": "enemy",
+          "x": 10,
+          "y": 3
+        }
+      ]
+    },
+    {
+      "version": "goblin-level-v3",
+      "id": "showcase-advance",
+      "scenarioVersion": 1,
+      "width": 12,
+      "height": 8,
+      "ruleProfile": "FIELD_TEST_LEGACY_v1",
+      "objective": "core-and-escort",
+      "terrain": [
+        {
+          "x": 5,
+          "y": 2,
+          "type": "rubble-field"
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "type": "crater"
+        }
+      ],
+      "units": [
+        {
+          "id": "ogre",
+          "assetId": "goblin-siegebreaker",
+          "team": "player",
+          "x": 1,
+          "y": 3
+        },
+        {
+          "id": "skimmer-scout",
+          "assetId": "skimmer-scout",
+          "team": "player",
+          "x": 2,
+          "y": 1
+        },
+        {
+          "id": "rocket-artillery",
+          "assetId": "rocket-artillery",
+          "team": "player",
+          "x": 1,
+          "y": 5
+        },
+        {
+          "id": "infantry-squad",
+          "assetId": "infantry-squad",
+          "team": "player",
+          "x": 2,
+          "y": 5
+        },
+        {
+          "id": "assault-tank",
+          "assetId": "assault-tank",
+          "team": "player",
+          "x": 3,
+          "y": 3
+        },
+        {
+          "id": "recon-tank",
+          "assetId": "recon-tank",
+          "team": "player",
+          "x": 3,
+          "y": 1
+        },
+        {
+          "id": "guard-tank",
+          "assetId": "guard-tank",
+          "team": "enemy",
+          "x": 8,
+          "y": 2
+        },
+        {
+          "id": "raider-skimmer",
+          "assetId": "raider-skimmer",
+          "team": "enemy",
+          "x": 8,
+          "y": 5
+        },
+        {
+          "id": "core",
+          "assetId": "command-core",
+          "team": "enemy",
+          "x": 10,
+          "y": 3
+        }
+      ]
+    },
+    {
+      "version": "goblin-level-v3",
+      "id": "showcase-siege",
+      "scenarioVersion": 1,
+      "width": 12,
+      "height": 8,
+      "ruleProfile": "FIELD_TEST_LEGACY_v1",
+      "objective": "core-and-escort",
+      "terrain": [
+        {
+          "x": 4,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 7,
+          "y": 4,
+          "type": "rubble-field"
+        }
+      ],
+      "units": [
+        {
+          "id": "siege-tank",
+          "assetId": "siege-tank",
+          "team": "player",
+          "x": 2,
+          "y": 3
+        },
+        {
+          "id": "long-range-battery",
+          "assetId": "long-range-battery",
+          "team": "player",
+          "x": 4,
+          "y": 2
+        },
+        {
+          "id": "mobile-siege-gun",
+          "assetId": "mobile-siege-gun",
+          "team": "player",
+          "x": 2,
+          "y": 5
+        },
+        {
+          "id": "combat-skimmer",
+          "assetId": "combat-skimmer",
+          "team": "player",
+          "x": 3,
+          "y": 4
+        },
+        {
+          "id": "light-skimmer",
+          "assetId": "light-skimmer",
+          "team": "player",
+          "x": 1,
+          "y": 6
+        },
+        {
+          "id": "skimmer-carrier",
+          "assetId": "skimmer-carrier",
+          "team": "player",
+          "x": 3,
+          "y": 5
+        },
+        {
+          "id": "infantry-squad",
+          "assetId": "infantry-squad",
+          "team": "player",
+          "x": 3,
+          "y": 6
+        },
+        {
+          "id": "command-hub",
+          "assetId": "command-hub",
+          "team": "enemy",
+          "x": 9,
+          "y": 1
+        },
+        {
+          "id": "goblin-dreadnaught",
+          "assetId": "goblin-dreadnaught",
+          "team": "enemy",
+          "x": 8,
+          "y": 4
+        },
+        {
+          "id": "infantry-platoon",
+          "assetId": "infantry-platoon",
+          "team": "enemy",
+          "x": 9,
+          "y": 5
+        },
+        {
+          "id": "core",
+          "assetId": "command-core",
+          "team": "enemy",
+          "x": 10,
+          "y": 3
+        }
+      ]
+    },
+    {
+      "version": "goblin-level-v3",
+      "id": "showcase-specialists",
+      "scenarioVersion": 1,
+      "width": 12,
+      "height": 8,
+      "ruleProfile": "FIELD_TEST_LEGACY_v1",
+      "objective": "core-and-escort",
+      "terrain": [
+        {
+          "x": 6,
+          "y": 4,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "type": "river"
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "type": "bridge"
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 8,
+          "y": 2,
+          "type": "urban"
+        }
+      ],
+      "units": [
+        {
+          "id": "strategic-missile-carrier",
+          "assetId": "strategic-missile-carrier",
+          "team": "player",
+          "x": 1,
+          "y": 1
+        },
+        {
+          "id": "artillery-drone",
+          "assetId": "artillery-drone",
+          "team": "player",
+          "x": 1,
+          "y": 3
+        },
+        {
+          "id": "amphibious-infantry",
+          "assetId": "amphibious-infantry",
+          "team": "player",
+          "x": 2,
+          "y": 6
+        },
+        {
+          "id": "field-engineers",
+          "assetId": "field-engineers",
+          "team": "player",
+          "x": 2,
+          "y": 4
+        },
+        {
+          "id": "local-defense",
+          "assetId": "local-defense",
+          "team": "player",
+          "x": 0,
+          "y": 5
+        },
+        {
+          "id": "forge-engineer",
+          "assetId": "forge-engineer",
+          "team": "player",
+          "x": 3,
+          "y": 5
+        },
+        {
+          "id": "skimmer-carrier",
+          "assetId": "skimmer-carrier",
+          "team": "player",
+          "x": 2,
+          "y": 5
+        },
+        {
+          "id": "phantom-platform",
+          "assetId": "phantom-platform",
+          "team": "enemy",
+          "x": 9,
+          "y": 2
+        },
+        {
+          "id": "relay-node",
+          "assetId": "relay-node",
+          "team": "enemy",
+          "x": 9,
+          "y": 5
+        },
+        {
+          "id": "core",
+          "assetId": "command-core",
+          "team": "enemy",
+          "x": 10,
+          "y": 3
+        }
+      ]
+    },
+    {
+      "version": "goblin-level-v3",
+      "id": "los-supercover-showcase",
+      "scenarioVersion": 1,
+      "width": 12,
+      "height": 8,
+      "ruleProfile": "FIELD_TEST_SUPERCOVER_v1",
+      "objective": "core-and-escort",
+      "terrain": [
+        {
+          "x": 1,
+          "y": 1,
+          "type": "rubble-field"
+        },
+        {
+          "x": 5,
+          "y": 4,
+          "type": "forest"
+        },
+        {
+          "x": 7,
+          "y": 2,
+          "type": "ridge"
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "type": "road"
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "type": "road"
+        }
+      ],
+      "units": [
+        {
+          "id": "siege-tank",
+          "assetId": "siege-tank",
+          "team": "player",
+          "x": 2,
+          "y": 2
+        },
+        {
+          "id": "assault-tank",
+          "assetId": "assault-tank",
+          "team": "player",
+          "x": 1,
+          "y": 4
+        },
+        {
+          "id": "rocket-artillery",
+          "assetId": "rocket-artillery",
+          "team": "player",
+          "x": 2,
+          "y": 5
+        },
+        {
+          "id": "skimmer-scout",
+          "assetId": "skimmer-scout",
+          "team": "player",
+          "x": 3,
+          "y": 5
+        },
+        {
+          "id": "guard-tank",
+          "assetId": "guard-tank",
+          "team": "enemy",
+          "x": 2,
+          "y": 0
+        },
+        {
+          "id": "raider-skimmer",
+          "assetId": "raider-skimmer",
+          "team": "enemy",
+          "x": 8,
+          "y": 5
+        },
+        {
+          "id": "core",
+          "assetId": "command-core",
+          "team": "enemy",
+          "x": 10,
+          "y": 3
+        }
+      ]
+    }
+  ]
+}

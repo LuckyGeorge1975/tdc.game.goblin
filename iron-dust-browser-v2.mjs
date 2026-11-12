@@ -14,6 +14,7 @@ import {buildIronDustV2View, renderIronDustV2View, formatIronDustV2Error,
   resetIronDustV2View} from './iron-dust-v2-view.mjs?v=10';
 import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1}
   from './src/levels/iron-dust-core-data.v1.mjs';
+import {IRON_DUST_LEVEL_V3} from './src/levels/iron-dust.v3.mjs';
 
 // Browser commands cross the same validated profile boundary as the Core probes.
 export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';
@@ -182,14 +183,14 @@ if (typeof document !== 'undefined') {
     currentScenario = IRON_DUST_V2_SELECTOR_ID;
     document.querySelector('#scenario-select').value = IRON_DUST_V2_SELECTOR_ID;
   }
-  function start(profile, difficulty = 'medium') {
+  function start(profile, difficulty = 'medium', minimumDifficulty) {
     if (globalThis.goblinBootProfileError) return false;
     enemyFlow.cancel();
     paused = false;
     epoch++;
     try {
       globalThis.GoblinPresentation?.stop();
-      session = createIronDustBrowserSession(profile ?? createIronDustProfile(startSeed, {difficulty}),
+      session = createIronDustBrowserSession(profile ?? createIronDustProfile(startSeed, {difficulty,minimumDifficulty}),
         startSeed);
       mode = 'ready';
       observePresentation(presentation,'sync',session);
@@ -258,10 +259,11 @@ if (typeof document !== 'undefined') {
     pause: () => {paused = true; enemyFlow.cancel(); globalThis.GoblinMovement?.clear();},
     resume: () => {paused = false; if (mode === 'ready') enemyFlow.start();},
     dispatch: dispatchAction,
-    difficulties: IRON_DUST_ENEMY_DIFFICULTIES,
+    difficulties: Object.freeze(IRON_DUST_ENEMY_DIFFICULTIES.slice(
+      Math.max(0,IRON_DUST_ENEMY_DIFFICULTIES.indexOf(IRON_DUST_LEVEL_V3.minimumDifficulty)))),
     start,
-    startWithDifficulty: difficulty => start(undefined, difficulty),
-    restart: () => start(undefined, session?.profile.header.enemyPolicy?.difficulty ?? 'medium'),
+    startWithDifficulty: (difficulty, minimumDifficulty) => start(undefined, difficulty, minimumDifficulty),
+    restart: () => start(undefined, session?.profile.header.enemyPolicy?.difficulty ?? 'medium',session?.profile.header.minimumDifficulty),
     stop
   });
   globalThis.dispatchEvent?.(new Event('goblin-core-v2-ready'));

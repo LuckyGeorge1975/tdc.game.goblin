@@ -1,4 +1,8 @@
-// Versioned Legacy data snapshot. No game path imports this module yet.
+import {IRON_DUST_LEVEL_V3} from './iron-dust.v3.mjs';
+import {IRON_DUST_START_ROSTER} from '../core/iron-dust-start-roster.mjs';
+import {effectiveIronDustDifficulty} from '../core/iron-dust-enemy-policy.mjs';
+
+// Versioned historical Legacy snapshot retained by the executable profile.
 // The Siegebreaker systems are data dependencies, not a claim of Core support.
 const freeze = value => {
   if (value && typeof value === 'object') {
@@ -8,38 +12,19 @@ const freeze = value => {
   return value;
 };
 
+freeze(IRON_DUST_LEVEL_V3);
+const {minimumDifficulty: configuredMinimum, ...fixedLayout} = IRON_DUST_LEVEL_V3;
+export const IRON_DUST_HISTORICAL_LAYOUT = freeze(fixedLayout);
+
+// Preserve the historical source snapshot consumed by Core and its replay digests.
 export const IRON_DUST_LEVEL_V1 = freeze({
-  schemaVersion: 1,
-  id: 'iron-dust',
-  scenarioVersion: 1,
-  ruleProfileId: 'FIELD_TEST_LEGACY_v1',
-  objectiveVersion: 1,
-  objective: 'core',
-  width: 12,
-  height: 8,
-  defaultTerrain: 'open-ground',
-  terrain: ['3,1', '8,1', '1,4', '5,3', '9,5', '2,6', '7,6', '10,2'],
-  units: [
-    {
-      id: 'ogre', name: 'GOBLIN SIEGEBREAKER', type: 'HEAVY ASSAULT', team: 'player',
-      x: 1, y: 5, hp: 5, maxHp: 5, defense: 5, range: 2, move: 3, damage: 3, icon: 'G',
-      ogreSystems: {
-        model: 'SIEGEBREAKER', selectedWeapon: 'main', maxTreads: 45, treads: 45,
-        weapons: {
-          main: {label: 'MAIN BATTERY', count: 1, attack: 4, range: 3, defense: 4, destroyed: 0, remaining: 1, firedThisPhase: 0},
-          secondary: {label: 'SECONDARY BATTERY', count: 4, attack: 3, range: 2, defense: 3, destroyed: 0, remaining: 4, firedThisPhase: 0},
-          missiles: {label: 'MISSILES', count: 2, attack: 6, range: 5, defense: 3, expendable: true, destroyed: 0, remaining: 2, firedThisPhase: 0},
-          antipersonnel: {label: 'ANTI-PERSONNEL', count: 8, attack: 1, range: 1, defense: 1, infantryOnly: true, destroyed: 0, remaining: 8, firedThisPhase: 0}
-        }
-      }
-    },
-    {id: 'gev', name: 'SKIMMER SCOUT', type: 'HOVERCRAFT', team: 'player', x: 2, y: 6, hp: 3, maxHp: 3, defense: 3, range: 3, move: 3, damage: 1, icon: 'G'},
-    {id: 'missile', name: 'ROCKET ARTILLERY', type: 'ARTILLERY', team: 'player', x: 3, y: 6, hp: 3, maxHp: 3, defense: 3, range: 4, move: 1, damage: 2, icon: 'M'},
-    {id: 'infantry', name: 'INFANTRY PLATOON', type: 'MOBILE INFANTRY', team: 'player', x: 1, y: 6, hp: 2, maxHp: 2, defense: 2, range: 1, move: 2, damage: 1, icon: 'I', infantry: true},
-    {id: 'core', name: 'COMMAND CORE', type: 'FORTIFIED TARGET', team: 'enemy', x: 10, y: 2, hp: 5, maxHp: 5, defense: 5, range: 0, move: 0, damage: 0, icon: 'X', core: true},
-    {id: 'guard', name: 'GUARD TANK', type: 'HOSTILE ARMOR', team: 'enemy', x: 8, y: 3, hp: 3, maxHp: 3, defense: 3, range: 2, move: 1, damage: 1, icon: 'G'},
-    {id: 'raider', name: 'RAIDER SKIMMER', type: 'HOSTILE HOVER', team: 'enemy', x: 9, y: 5, hp: 2, maxHp: 2, defense: 2, range: 2, move: 2, damage: 1, icon: 'R'}
-  ]
+  schemaVersion:1,id:'iron-dust',scenarioVersion:1,ruleProfileId:'FIELD_TEST_LEGACY_v1',
+  objectiveVersion:1,objective:IRON_DUST_LEVEL_V3.objective,width:IRON_DUST_LEVEL_V3.width,height:IRON_DUST_LEVEL_V3.height,
+  defaultTerrain:'open-ground',terrain:IRON_DUST_LEVEL_V3.terrain.map(({x,y})=>x+','+y),
+  units:IRON_DUST_LEVEL_V3.units.map(({id,assetId,team,x,y})=>{
+    const {name,type,...stats}=IRON_DUST_START_ROSTER[assetId];
+    return {id,name,type,team,x,y,...stats};
+  })
 });
 
 const same = (actual, expected) => {
@@ -57,4 +42,13 @@ export function validateIronDustLevelV1(value) {
     throw new Error('UNSUPPORTED_LEVEL_PROFILE');
   if (!same(value, IRON_DUST_LEVEL_V1)) throw new Error('LEVEL_DATA_MISMATCH');
   return IRON_DUST_LEVEL_V1;
+}
+
+export function validateIronDustLevelV3(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('LEVEL_DATA_MISMATCH');
+  const {minimumDifficulty,...layout} = value;
+  if (!same(layout,IRON_DUST_HISTORICAL_LAYOUT)) throw new Error('LEVEL_DATA_MISMATCH');
+  if (Object.hasOwn(value,'minimumDifficulty') && minimumDifficulty === undefined) throw new Error('IRON_DUST_DIFFICULTY_INVALID');
+  effectiveIronDustDifficulty('medium',minimumDifficulty);
+  return freeze({...IRON_DUST_HISTORICAL_LAYOUT,...(minimumDifficulty === undefined ? {} : {minimumDifficulty})});
 }

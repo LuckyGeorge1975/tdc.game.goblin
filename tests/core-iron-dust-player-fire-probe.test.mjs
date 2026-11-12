@@ -31,7 +31,7 @@ function extract(text, name) {
 
 function legacy() {
   const text = readFileSync(new URL('../game.js', import.meta.url), 'utf8');
-  const crtStart = text.indexOf('const COMBAT_RULES='), crtEnd = text.indexOf(';const units', crtStart);
+  const crtStart = text.indexOf('const COMBAT_RULES='), crtEnd = text.indexOf('const builtInLevels', crtStart) - 1;
   const map = IRON_DUST_CORE_DATA_V1.map;
   const context = vm.createContext({...lifeGlobals,TerrainRules, turn: 1, carrierCargo: () => [],
     terrainTypeAt: (x, y) => map.terrain.find(cell => cell.x === x && cell.y === y)?.type ??

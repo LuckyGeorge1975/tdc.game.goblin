@@ -15,8 +15,13 @@ const hash = value => createHash('sha256').update(value).digest('hex');
 const source = path => fs.readFileSync(new URL(path, root), 'utf8').replaceAll('\r\n', '\n');
 const canonical = sources => JSON.stringify(Object.keys(sources).sort().map(path => [path, sources[path]]));
 
-const GAMEPLAY = ['artillery-pilot-runtime.js', 'artillery-spotter-rules.js', 'assets/training/level-events-pilot.v2.json', 'assets/training/levels.v1.json', 'assets/training/scripts.v1.json',
-  'assets/unit-art/levels/artillery-pilot.v1.json', 'assets/unit-art/levels/catalog-full-levels.v1.json', 'assets/unit-art/rules/artillery-pilot.v1.js',
+const GAMEPLAY = ['artillery-pilot-runtime.js', 'artillery-spotter-rules.js', 'atlas-level.js',
+  'assets/training/level-events-pilot.v2.json', 'assets/training/level-events-pilot.v3.json', 'assets/training/levels.v1.json',
+  'assets/training/levels.v3.json', 'assets/training/scripts.v1.json',
+  'assets/unit-art/levels/artillery-pilot.v1.json', 'assets/unit-art/levels/artillery-pilot.v3.json', 'assets/unit-art/levels/atlas-proving-grounds.v3.json',
+  'assets/unit-art/levels/catalog-full-levels.v1.json', 'assets/unit-art/levels/catalog-full-levels.v3.json',
+  'assets/unit-art/levels/showcase-levels.v3.json', 'assets/unit-art/levels/siege-pilot.v3.json', 'assets/unit-art/levels/skimmer-pilot.v3.json',
+  'assets/unit-art/rules/artillery-pilot.v1.js',
   'assets/unit-art/rules/siege-pilot.v1.js', 'assets/unit-art/rules/skimmer-pilot.v1.js', 'assets/unit-art/rules/unit-profiles.catalog-approved.v1.json',
   'assets/unit-art/rules/unit-profiles.v1.json', 'catalog-base-loader.js', 'catalog-base-model.js', 'catalog-base-runtime.js', 'catalog-full-loader.js',
   'catalog-full-model.js', 'catalog-full-runtime.js', 'editor-draft.js', 'catalog-specialists-fire.js', 'catalog-specialists-loader.js', 'catalog-specialists-model.js',

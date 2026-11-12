@@ -20,6 +20,21 @@ test('five fixed full candidates authorize 26 actual classes with Ninja systems 
  assert.equal(c.data.targetActive,false);
  assert.throws(()=>vm.runInContext("ScenarioRuleProfiles.beginSession('catalog-full-atlas',{...GoblinCatalogFullModel.configs['catalog-full-atlas'],ruleProfileId:'FULL_CATALOG_v1'})",c));
 });
+
+test('v3 full layout, waves and enemy turn limit reproduce the historical effective configurations',async()=>{
+ const c=await model();
+ const baseline=vm.runInContext('JSON.stringify(GoblinCatalogFullModel.configs)',c);
+ c.author=read('assets/unit-art/levels/catalog-full-levels.v3.json');
+ const initialize='GoblinCatalogFullModel.initialize(data,author,{profile:"CATALOG_FULL_CANDIDATE_v1"})';
+ await vm.runInContext(initialize,c);
+ assert.equal(vm.runInContext('JSON.stringify(GoblinCatalogFullModel.configs)',c),baseline);
+ c.author.levels[0].title='injected UI';
+ await assert.rejects(vm.runInContext(initialize,c),/FULL_LEVEL_CONTRACT/);
+ delete c.author.levels[0].title;
+ c.author.levels[0].units[0].attack=20;
+ await assert.rejects(vm.runInContext(initialize,c),/FULL_LEVEL_DIGEST/);
+ assert.equal(vm.runInContext('JSON.stringify(GoblinCatalogFullModel.configs)',c),baseline);
+});
 test('only U3 declares bounded waves and limit, while cargo and wave instances have distinct records',async()=>{
  const c=await model(),configs=JSON.parse(vm.runInContext('JSON.stringify(GoblinCatalogFullModel.configs)',c));
  for(const [id,cfg] of Object.entries(configs)){

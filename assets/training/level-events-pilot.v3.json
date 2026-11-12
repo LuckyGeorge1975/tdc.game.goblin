@@ -1,0 +1,121 @@
+{
+  "events": [
+    {
+      "effect": {
+        "text": {
+          "de": "Dein Sturmpanzer hat sich bewegt. Ab dieser Meldung kannst du nur spätere Befehle rückgängig machen.",
+          "en": "Your assault tank has moved. From here, you can undo only later commands.",
+          "es": "Tu tanque de asalto se ha movido. A partir de aquí solo puedes deshacer órdenes posteriores.",
+          "fr": "Votre char d’assaut s’est déplacé. Vous ne pouvez annuler que les ordres suivants."
+        },
+        "title": {
+          "de": "Erste Bewegung",
+          "en": "First move",
+          "es": "Primer movimiento",
+          "fr": "Premier déplacement"
+        },
+        "type": "dialog"
+      },
+      "id": "first-drive",
+      "when": {
+        "event": "UnitMoved",
+        "unitId": "tutorial-tank"
+      }
+    },
+    {
+      "effect": {
+        "text": {
+          "de": "Dein Sturmpanzer hat D-04 erreicht oder durchquert. Rücke zum Kommandokern vor und greife ihn in der Feuerphase an.",
+          "en": "Your assault tank reached or crossed D-04. Advance toward the command core and attack it in the fire phase.",
+          "es": "Tu tanque de asalto ha alcanzado o cruzado D-04. Avanza hacia el núcleo de mando y atácalo en la fase de fuego.",
+          "fr": "Votre char d’assaut a atteint ou traversé D-04. Avancez vers le noyau de commandement et attaquez-le en phase de tir."
+        },
+        "title": {
+          "de": "Meldung der Einsatzleitung",
+          "en": "Message from command",
+          "es": "Mensaje del mando",
+          "fr": "Message du commandement"
+        },
+        "type": "general-dialog"
+      },
+      "id": "cross-training-area",
+      "when": {
+        "all": [
+          {
+            "event": "UnitMoved",
+            "unitId": "tutorial-tank"
+          },
+          {
+            "pathCrossesHotspot": "training-area"
+          }
+        ]
+      }
+    },
+    {
+      "effect": {
+        "text": {
+          "de": "Der gegnerische Kommandokern ist ausgeschaltet.",
+          "en": "The enemy command core has been destroyed.",
+          "es": "El núcleo de mando enemigo ha sido destruido.",
+          "fr": "Le noyau de commandement ennemi a été détruit."
+        },
+        "title": {
+          "de": "Ziel zerstört",
+          "en": "Target destroyed",
+          "es": "Objetivo destruido",
+          "fr": "Cible détruite"
+        },
+        "type": "dialog"
+      },
+      "id": "target-destroyed",
+      "when": {
+        "event": "UnitDestroyed",
+        "unitId": "core"
+      }
+    }
+  ],
+  "height": 8,
+  "hotspots": [
+    {
+      "center": {
+        "x": 3,
+        "y": 3
+      },
+      "id": "training-area",
+      "radius": 0
+    }
+  ],
+  "objective": "core-and-escort",
+  "terrain": [
+    {
+      "type": "forest",
+      "x": 3,
+      "y": 2
+    }
+  ],
+  "units": [
+    {
+      "assetId": "assault-tank",
+      "id": "tutorial-tank",
+      "team": "player",
+      "x": 1,
+      "y": 3
+    },
+    {
+      "assetId": "skimmer-scout",
+      "id": "tutorial-scout",
+      "team": "player",
+      "x": 1,
+      "y": 5
+    },
+    {
+      "assetId": "command-core",
+      "id": "core",
+      "team": "enemy",
+      "x": 6,
+      "y": 3
+    }
+  ],
+  "version": "goblin-level-v3",
+  "width": 12
+}

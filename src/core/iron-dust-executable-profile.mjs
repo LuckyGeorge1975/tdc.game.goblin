@@ -1,6 +1,8 @@
 import TerrainRules from '../../terrain-rules-module.mjs';
 import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1} from
   '../levels/iron-dust-core-data.v1.mjs';
+import {IRON_DUST_LEVEL_V3} from '../levels/iron-dust.v3.mjs';
+import {validateIronDustLevelV3} from '../levels/iron-dust.v1.mjs';
 import {IRON_DUST_LEGACY_LOS_PROBE_V1} from './iron-dust-legacy-los-probe.mjs';
 import {IRON_DUST_ZERO_TREADS_STATE_VERSION,
   IRON_DUST_ZERO_TREADS_POLICY_VERSION, IRON_DUST_FIRE_GEOMETRY_VERSION,
@@ -13,7 +15,7 @@ import {IRON_DUST_PLAYER_MOVE_PROBE_VERSION} from './iron-dust-player-move-probe
 import {IRON_DUST_STANDARD_FIRE_ACTION_VERSION} from
   './iron-dust-standard-fire-action-probe.mjs';
 import {IRON_DUST_B3B_ACTION_VERSION} from './iron-dust-b3b-action-probe.mjs';
-import {ironDustEnemyPolicy, validIronDustEnemyPolicy} from './iron-dust-enemy-policy.mjs';
+import {effectiveIronDustDifficulty, ironDustEnemyPolicy, validIronDustEnemyPolicy} from './iron-dust-enemy-policy.mjs';
 export {IRON_DUST_ENEMY_DIFFICULTIES} from './iron-dust-enemy-policy.mjs';
 import {IRON_DUST_ZERO_TREADS_SOURCE_ACTION_ENTRY_VERSION,
   createIronDustZeroTreadsSourceActionEntry, validateIronDustSourceActionEntry,
@@ -75,30 +77,38 @@ export const IRON_DUST_PROFILE_HEADER = freeze({
 const stamp = (header, sourceStartDigest, entry) => digest({
   profileVersion: IRON_DUST_PROFILE_VERSION, header, sourceStartDigest, entry
 });
-const headerFor = policy => policy
-  ? {...IRON_DUST_PROFILE_HEADER, enemyPolicy: policy} : IRON_DUST_PROFILE_HEADER;
-const wrap = (entry, sourceStartDigest, policy) => {
-  const copy = clone(entry), header = clone(headerFor(policy));
+const headerFor = (policy, minimumDifficulty) => ({
+  ...IRON_DUST_PROFILE_HEADER,
+  ...(policy ? {enemyPolicy:policy} : {}),
+  ...(minimumDifficulty === undefined ? {} : {minimumDifficulty})
+});
+const wrap = (entry, sourceStartDigest, policy, minimumDifficulty) => {
+  const copy = clone(entry), header = clone(headerFor(policy, minimumDifficulty));
   return freeze({profileVersion: IRON_DUST_PROFILE_VERSION, executable: true,
     header, sourceStartDigest, entry: copy,
     digest: stamp(header, sourceStartDigest, copy)});
 };
 
-export function createIronDustProfile(seed, {difficulty = 'medium'} = {}) {
-  const policy = ironDustEnemyPolicy(difficulty);
+export function createIronDustProfile(seed, {difficulty = 'medium', minimumDifficulty, level = IRON_DUST_LEVEL_V3} = {}) {
+  const levelMinimum = validateIronDustLevelV3(level).minimumDifficulty;
+  if (levelMinimum !== undefined) minimumDifficulty = effectiveIronDustDifficulty(levelMinimum,minimumDifficulty);
+  const policy = ironDustEnemyPolicy(effectiveIronDustDifficulty(difficulty,minimumDifficulty));
   const entry = createIronDustZeroTreadsSourceActionEntry(seed);
-  return wrap(entry, digest(entry), policy);
+  return wrap(entry, digest(entry), policy, minimumDifficulty);
 }
 
 export function validateIronDustProfile(profile) {
   try {
     const policy = profile?.header?.enemyPolicy ?? null;
+    const minimumDifficulty = profile?.header?.minimumDifficulty;
+    const difficulty = policy?.difficulty ?? 'medium';
     if (!exact(profile, ['profileVersion', 'executable', 'header',
       'sourceStartDigest', 'entry', 'digest']) ||
         profile.profileVersion !== IRON_DUST_PROFILE_VERSION ||
         profile.executable !== true ||
         !validIronDustEnemyPolicy(policy) ||
-        JSON.stringify(profile.header) !== JSON.stringify(headerFor(policy)) ||
+        effectiveIronDustDifficulty(difficulty,minimumDifficulty) !== difficulty ||
+        JSON.stringify(profile.header) !== JSON.stringify(headerFor(policy,minimumDifficulty)) ||
         profile.digest !== stamp(profile.header, profile.sourceStartDigest,
           profile.entry)) fail();
     validateIronDustSourceActionEntry(profile.entry);
@@ -158,7 +168,7 @@ export function dispatchIronDustProfile(profile, command) {
   const policy = profile.header.enemyPolicy ?? null;
   const result = dispatchIronDustSourceActionEntry(profile.entry, command, policy);
   if (!result.entry) return {error: result.error};
-  const next = wrap(result.entry, profile.sourceStartDigest, policy);
+  const next = wrap(result.entry, profile.sourceStartDigest, policy, profile.header.minimumDifficulty);
   validateIronDustProfile(next);
   return {profile: next, events: freeze(clone(result.events))};
 }

@@ -127,7 +127,7 @@
     pilot.title = label('pilotRoute');
     controls.append(pilot,button('import', () => view.import(json.value),busy || moving),
       button('export', () => {
-        json.value = jsonText = JSON.stringify(draft,null,2);
+        json.value = jsonText = GoblinEditorDraft.exportJson(draft);
         json.focus();
         json.select();
       },busy),

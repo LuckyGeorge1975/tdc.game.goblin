@@ -490,6 +490,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         option.textContent = t('v2.difficulty.' + difficulty);
         select.append(option);
       }
+      if (!IronDustBrowserV2.difficulties.includes(briefingDifficulty)) briefingDifficulty = IronDustBrowserV2.difficulties[0];
       select.value = briefingDifficulty;
       select.onchange = () => { briefingDifficulty = select.value; };
       label.append(select);
@@ -525,7 +526,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       editorBusy = true;
       renderScreen(false);
       try {
-        const response = await fetch('assets/training/level-events-pilot.v2.json');
+        const response = await fetch('assets/training/level-events-pilot.v3.json');
         if (!response.ok) throw Error('unavailable');
         const draft = GoblinEditorDraft.parse(await response.text());
         if (screen === 'editor') updateEditor(draft,{x:1,y:3});

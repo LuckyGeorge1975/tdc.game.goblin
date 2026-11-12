@@ -13,14 +13,14 @@ const atlasBake=JSON.parse(readFileSync(new URL('../assets/map-bakes/atlas-provi
 const roadBakes=Object.fromEntries(['showcase-siege','los-supercover-showcase'].map(id=>
   [id,JSON.parse(readFileSync(new URL(`../assets/map-bakes/${id}-192.json`,import.meta.url),'utf8'))]));
 
-async function load(bundle=showcase,search='',registry=profiles){
+async function load(bundle=showcase,search='',registry=profiles,atlasSource=atlas){
   const options=[],errors=[],loaded=[];
   const context=vm.createContext({
     W:12,H:8,scenarioCatalog:{},GoblinSystems:{createMarkIII:()=>({test:true})},
     TerrainRules:(await import('../terrain-rules.js')).default,updateRoster:()=>{},terrain:new Set(),currentScenario:'iron-dust',
     $:()=>({appendChild:option=>options.push(option)}),renderScenarioObjective:()=>{},
     document:{createElement:()=>({dataset:{}})},
-    fetch:async url=>({ok:true,json:async()=>url.includes('unit-profiles')?registry:url.includes('showcase-levels')?bundle:url.includes('-pilot.v1.json')?JSON.parse(readFileSync(new URL('../'+url,import.meta.url),'utf8')):atlas}),
+    fetch:async url=>({ok:true,json:async()=>url.includes('unit-profiles')?registry:url.includes('showcase-levels')?bundle:url.includes('-pilot.v3.json')?JSON.parse(readFileSync(new URL('../'+url,import.meta.url),'utf8')):atlasSource}),
     console:{error:(...items)=>errors.push(items)},addLog:()=>{},
     location:{search},loadScenario:id=>loaded.push(id),URLSearchParams
   });
@@ -31,6 +31,18 @@ async function load(bundle=showcase,search='',registry=profiles){
   // These historical ATLAS assertions retain their original six-level boundary. The three pilots are validated above and checked by their own suites.
   return {context,options:options.filter(o=>!['artillery-pilot','siege-pilot','skimmer-pilot'].includes(o.value)),errors,loaded};
 }
+
+test('v3 atlas and showcase sources restore the same runtime configurations and bake inputs',async()=>{
+  const v3 = name => JSON.parse(readFileSync(new URL('../assets/unit-art/levels/'+name+'.v3.json',import.meta.url),'utf8'));
+  const old = await load(), migrated = await load(v3('showcase-levels'),'',profiles,v3('atlas-proving-grounds'));
+  assert.deepEqual(migrated.errors,[]);
+  assert.deepEqual(JSON.parse(JSON.stringify(migrated.context.scenarioCatalog)),JSON.parse(JSON.stringify(old.context.scenarioCatalog)));
+  const invalid = v3('showcase-levels');
+  invalid.levels[0].units[0].damage = 99;
+  const rejected = await load(invalid,'',profiles,v3('atlas-proving-grounds'));
+  assert.equal(rejected.context.scenarioCatalog['showcase-terrain-course'],undefined);
+  assert.match(String(rejected.errors.at(-1)?.[1]),/schema invalid/);
+});
 
 test('ATLAS and five smaller scenarios load with complete roster and terrain coverage',async()=>{
   const {context,options,errors}=await load();

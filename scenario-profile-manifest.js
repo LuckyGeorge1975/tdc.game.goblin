@@ -32,7 +32,65 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     'showcase-specialists':Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:product,unitDataProfile:atlasData}),
     'los-supercover-showcase':Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:'FIELD_TEST_SUPERCOVER_v1',unitDataProfile:atlasData,losMode:'strict-supercover'})
   });
+  // Historical stats and traits stay in profile-owned records. Factories run only during resolution.
+  const legacyUnitProfiles={
+    "goblin-siegebreaker":{"name":"GOBLIN SIEGEBREAKER","type":"HEAVY ASSAULT","hp":5,"maxHp":5,"defense":5,"range":2,"move":3,"damage":3,"icon":"G","ogreSystems":()=>GoblinSystems.createMarkIII()},
+    "skimmer-scout":{"name":"SKIMMER SCOUT","type":"HOVERCRAFT","hp":3,"maxHp":3,"defense":3,"range":3,"move":3,"damage":1,"icon":"G"},
+    "rocket-artillery":{"name":"ROCKET ARTILLERY","type":"ARTILLERY","hp":3,"maxHp":3,"defense":3,"range":4,"move":1,"damage":2,"icon":"M"},
+    "infantry-platoon":{"name":"INFANTRY PLATOON","type":"MOBILE INFANTRY","hp":2,"maxHp":2,"defense":2,"range":1,"move":2,"damage":1,"icon":"I","infantry":true},
+    "command-core":{"name":"COMMAND CORE","type":"FORTIFIED TARGET","hp":5,"maxHp":5,"defense":5,"range":0,"move":0,"damage":0,"icon":"X","core":true},
+    "guard-tank":{"name":"GUARD TANK","type":"HOSTILE ARMOR","hp":3,"maxHp":3,"defense":3,"range":2,"move":1,"damage":1,"icon":"G"},
+    "raider-skimmer":{"name":"RAIDER SKIMMER","type":"HOSTILE HOVER","hp":2,"maxHp":2,"defense":2,"range":2,"move":2,"damage":1,"icon":"R"},
+    "relay-node":{"name":"RELAY NODE","type":"FORTIFIED TARGET","hp":4,"maxHp":4,"defense":4,"range":0,"move":0,"damage":0,"icon":"X","core":true},
+    "assault-tank":{"name":"ASSAULT TANK","type":"FRONTLINE ARMOR","hp":3,"maxHp":3,"defense":3,"range":2,"move":3,"damage":4,"icon":"H"},
+    "recon-tank":{"name":"RECON TANK","type":"SCOUT ARMOR","hp":2,"maxHp":2,"defense":2,"range":2,"move":3,"damage":2,"icon":"L"},
+    "skimmer-carrier":{"name":"SKIMMER CARRIER","type":"PERSONNEL CARRIER","hp":2,"maxHp":2,"defense":2,"range":2,"move":3,"damage":1,"icon":"P","movementMode":"gev","gev":true,"transportCapacity":3},
+    "field-engineers":{"name":"FIELD ENGINEERS","type":"FIELD ENGINEERING","hp":2,"maxHp":2,"defense":2,"range":1,"move":2,"damage":2,"icon":"E","infantry":true,"engineering":true},
+    "command-hub":{"name":"COMMAND HUB","type":"FORTIFIED TARGET","hp":5,"maxHp":5,"defense":5,"range":0,"move":0,"damage":0,"icon":"X","core":true},
+    "siege-tank":{"name":"SIEGE TANK","type":"TWIN-GUN TANK DESTROYER","hp":5,"maxHp":5,"defense":5,"range":3,"move":3,"damage":6,"icon":"S"},
+    "light-skimmer":{"name":"LIGHT SKIMMER","type":"HOSTILE HOVERCRAFT","hp":1,"maxHp":1,"defense":1,"range":2,"move":3,"damage":1,"icon":"L"},
+    "strategic-missile-carrier":{"name":"STRATEGIC MISSILE CARRIER","type":"ONE-SHOT MISSILE PLATFORM","hp":2,"maxHp":2,"defense":2,"range":8,"move":1,"damage":6,"icon":"C","strategicMissile":true,"missilesRemaining":1}
+  };
+  const legacyCopy={
+    "iron-dust":{"kicker":"MISSION 07 / IRON DUST","title":"Durchbrechen. Ausschalten. Überleben.","sub":"Zerstöre den feindlichen Kommandokern, bevor Verstärkungen eintreffen."},
+    "relay-run":{"kicker":"MISSION 08 / RELAY RUN","title":"Sichern. Halten. Extrahieren.","sub":"Erreiche den östlichen Relaisknoten und schalte seine Eskorte aus."},
+    "unit-trial":{"kicker":"MISSION 09 / UNIT TRIAL","title":"Katalog testen. Linie halten.","sub":"Erprobe die neuen Einheiten gegen eine gemischte Verteidigung."}
+  };
   function reject(code,message){const error=new Error(`${code}: ${message}`);error.code=code;throw error}
+  function legacyLevel(level){
+    const fail=()=>reject('SCENARIO_PROFILE_MISMATCH','Invalid historical level data');
+    const exact=(value,keys)=>value&&typeof value==='object'&&!Array.isArray(value)&&
+      Object.keys(value).length===keys.length&&keys.every(key=>Object.hasOwn(value,key));
+    if(!exact(level,['version','id','scenarioVersion','width','height','ruleProfile','objective','terrain','units'])||
+      level.version!=='goblin-level-v3'||!Object.hasOwn(legacyCopy,level.id)||level.width!==12||level.height!==8||
+      !Array.isArray(level.terrain)||!Array.isArray(level.units))fail();
+    const rules=entries[level.id];
+    if(level.ruleProfile!==rules.ruleProfileId)
+      reject('UNSUPPORTED_RULE_PROFILE',`Unbekanntes Regelprofil ${level.ruleProfile}; Partie wurde nicht geladen.`);
+    if(level.scenarioVersion!==rules.scenarioVersion||level.objective!==rules.objective)fail();
+    const position=cell=>Number.isInteger(cell.x)&&cell.x>=0&&cell.x<level.width&&
+      Number.isInteger(cell.y)&&cell.y>=0&&cell.y<level.height;
+    const key=cell=>`${cell.x},${cell.y}`;
+    const cells=new Set(),ids=new Set(),starts=new Set();
+    for(const cell of level.terrain){
+      if(!exact(cell,['x','y','type'])||!position(cell)||cell.type!=='rubble-field'||cells.has(key(cell)))fail();
+      cells.add(key(cell));
+    }
+    const units=level.units.map(unit=>{
+      if(!exact(unit,['id','assetId','team','x','y'])||typeof unit.id!=='string'||!/^[a-z][a-z0-9-]*$/.test(unit.id)||
+        !Object.hasOwn(legacyUnitProfiles,unit.assetId)||!['player','enemy'].includes(unit.team)||
+        !position(unit)||ids.has(unit.id)||starts.has(key(unit)))fail();
+      ids.add(unit.id);starts.add(key(unit));
+      const {name,type,...record}=legacyUnitProfiles[unit.assetId];
+      if(record.ogreSystems)record.ogreSystems=record.ogreSystems();
+      const {id,team,x,y}=unit;
+      return {id,name,type,team,x,y,...record};
+    });
+    if(!units.some(unit=>unit.team==='player')||units.filter(unit=>unit.team==='enemy'&&unit.core).length!==1)fail();
+    return {...legacyCopy[level.id],scenarioVersion:rules.scenarioVersion,ruleProfileId:rules.ruleProfileId,
+      ...(rules.targetPolicyVersion?{targetPolicyVersion:rules.targetPolicyVersion}:{}),
+      objectiveVersion:1,objective:rules.objective,terrain:[...cells],units};
+  }
   function validate(id,config){
     if(trainingIds.includes(id)){if(!globalThis.GoblinTrainingModel)reject('SCENARIO_PROFILE_MISMATCH','Training contract unavailable');GoblinTrainingModel.validate(id,config);return entries[id]}
     if(fullIds.includes(id)){if(!globalThis.GoblinCatalogFullModel)reject('SCENARIO_PROFILE_MISMATCH','Full contract unavailable');GoblinCatalogFullModel.validate(id,config);}
@@ -107,5 +165,5 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;
   }
-  return {schemaVersion:1,product,entries,validate,beginSession,beginDraftSession,isDraftSession:session=>draftSessions.has(session)};
+  return {schemaVersion:1,product,entries,legacyLevel,validate,beginSession,beginDraftSession,isDraftSession:session=>draftSessions.has(session)};
 })());

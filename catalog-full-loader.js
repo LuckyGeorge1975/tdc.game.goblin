@@ -5,7 +5,7 @@
  try{
   if(params.has('catalogCandidate')&&params.get('catalogCandidate')!=='1')throw Error('FULL_ADMISSION_QUERY');
   const profile=params.get('catalogCandidate')==='1'?GoblinCatalogFullModel.candidateProfile:GoblinCatalogFullModel.publicProfile;
-  const responses=await Promise.all(['assets/unit-art/rules/unit-profiles.catalog-approved.v1.json','assets/unit-art/levels/catalog-full-levels.v1.json'].map(path=>fetch(path)));
+  const responses=await Promise.all(['assets/unit-art/rules/unit-profiles.catalog-approved.v1.json','assets/unit-art/levels/catalog-full-levels.v3.json'].map(path=>fetch(path)));
   if(responses.some(r=>!r.ok))throw Error('FULL_SOURCE_UNAVAILABLE');
   const [data,levels]=await Promise.all(responses.map(r=>r.json()));
   if(globalThis.GoblinLanguage&&await GoblinLanguage.ready!==true)throw Error('FULL_COPY_UNAVAILABLE');

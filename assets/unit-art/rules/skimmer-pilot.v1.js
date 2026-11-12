@@ -8,15 +8,19 @@
  const same=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
  let canonical;
  function create(value,registry){
-   if(!same(value,level))throw new Error('PILOT_LEVEL_MISMATCH');
+   const authorLevel={version:'goblin-level-v3',id:level.id,scenarioVersion:level.scenarioVersion,width:level.width,height:level.height,
+     ruleProfile:level.ruleProfileId,objective:level.objective,terrain:level.terrain,
+     units:level.units.map(unit=>({...unit,id:unit.id??(unit.assetId==='command-core'?'core':unit.assetId)}))};
+   if(!same(value,value?.version==='goblin-level-v3'?authorLevel:level))throw new Error('PILOT_LEVEL_MISMATCH');
+   const {terrain,units:placements}=value;
    const budget=GoblinSkimmerBudget.skimmerMovementBudget(registry,registry.targetProfile,'combat-skimmer');
    if(budget.primary!==4||budget.secondary!==3)throw new Error('INVALID_PILOT_BUDGET');
    const stats={'combat-skimmer':[2,2,2,budget.primary,2,'C','HOVERCRAFT'],'guard-tank':[3,3,2,1,1,'G','GUARD ARMOR'],'command-core':[5,5,0,0,0,'C','COMMAND CORE']};
-   const units=level.units.map(entry=>{
+   const units=placements.map(entry=>{
      const [hp,defense,range,move,damage,icon,type]=stats[entry.assetId];
      return {id:entry.assetId==='command-core'?'core':entry.assetId,visualKey:entry.assetId,name:entry.assetId.replaceAll('-',' ').toUpperCase(),type,team:entry.team,x:entry.x,y:entry.y,hp,maxHp:hp,defense,range,move,damage,icon,...(entry.assetId==='combat-skimmer'?{gev:true,movementMode:'gev'}:{}),...(entry.assetId==='command-core'?{core:true}:{})};
    });
-   canonical=freeze({title:level.title,kicker:level.kicker,sub:level.title,scenarioVersion:1,ruleProfileId:level.ruleProfileId,ruleProfile:'skimmer-pilot-data-v1',objectiveVersion:1,objective:'core',sourceDigest:digest,movement:{version:'skimmer-pilot-budget-v1',primary:budget.primary,secondary:budget.secondary},terrain:level.terrain.filter(cell=>TerrainRules.coverBonus(cell.type)>0).map(cell=>`${cell.x},${cell.y}`),terrainTypes:level.terrain,units});
+   canonical=freeze({title:level.title,kicker:level.kicker,sub:level.title,scenarioVersion:1,ruleProfileId:level.ruleProfileId,ruleProfile:'skimmer-pilot-data-v1',objectiveVersion:1,objective:'core',sourceDigest:digest,movement:{version:'skimmer-pilot-budget-v1',primary:budget.primary,secondary:budget.secondary},terrain:terrain.filter(cell=>TerrainRules.coverBonus(cell.type)>0).map(cell=>`${cell.x},${cell.y}`),terrainTypes:terrain,units});
    return canonical;
  }
  function validate(config){if(!canonical||!same(config,canonical))throw new Error('PILOT_PROFILE_MISMATCH')}

@@ -101,6 +101,18 @@ test('a session owns a frozen copy of validated effective rules',()=>{
   assert.equal(old.effectiveRules.targetPolicyVersion,undefined);
 });
 
+test('legacy declarative starts reproduce the three pre-migration configurations byte for byte',async()=>{
+  const {createHash}=await import('node:crypto');
+  const context=vm.createContext({GoblinSystems:{createMarkIII:()=>({factory:'mark-iii'})}});
+  vm.runInContext(source,context);
+  const start=gameSource.indexOf('const builtInLevels='),end=gameSource.indexOf('const scenarioCatalog=',start);
+  vm.runInContext(gameSource.slice(start,end),context);
+  const data=vm.runInContext('JSON.stringify(Object.fromEntries(builtInLevels.map(level=>[level.id,ScenarioRuleProfiles.legacyLevel(level)])))',context);
+  assert.equal(createHash('sha256').update(data).digest('hex'),'416cfe26f92015073d5c5eddece04f85163ad78f2fb9ff8f95d4dbe49510a562');
+  for(const mutation of ['level.units[0].hp=99','level.losMode="strict"','level.minimumDifficulty="weak"'])
+    assert.throws(()=>vm.runInContext(`{const level=JSON.parse(JSON.stringify(builtInLevels[0]));${mutation};ScenarioRuleProfiles.legacyLevel(level)}`,context),/SCENARIO_PROFILE_MISMATCH/);
+});
+
 test('an invalid built-in profile stops initial boot before gameplay handlers or first draw',()=>{
   const nodes=new Map(),classes=new Set(),listeners=[];
   const document={body:{classList:{add(name){classes.add(name)}}},querySelector(selector){
@@ -109,7 +121,7 @@ test('an invalid built-in profile stops initial boot before gameplay handlers or
   },querySelectorAll(){return []},addEventListener(name){listeners.push(name)}};
   const context=vm.createContext({document,GoblinSystems:{createMarkIII:()=>({})},window:{}});
   vm.runInContext(source,context);
-  const invalid=gameSource.replace("ruleProfileId:'FIELD_TEST_LEGACY_v2'","ruleProfileId:'FULL_CATALOG_v1'");
+  const invalid=gameSource.replace('"ruleProfile":"FIELD_TEST_LEGACY_v2"','"ruleProfile":"FULL_CATALOG_v1"');
   assert.doesNotThrow(()=>vm.runInContext(invalid,context));
   assert.match(document.querySelector('#mission-sub').textContent,/Partie wurde nicht geladen/);
   assert.equal(vm.runInContext('goblinBootProfileError.code',context),'UNSUPPORTED_RULE_PROFILE');

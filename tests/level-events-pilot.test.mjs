@@ -5,11 +5,11 @@ import {fullScene} from './catalog-full-harness.mjs';
 import {execute,read,enemy} from './artillery-product-harness.mjs';
 
 const source = path => readFileSync(new URL('../'+path,import.meta.url),'utf8');
-async function pilot() {
+async function pilot(version = 2) {
   const game = await fullScene('catalog-full-terrain-course',7,false,'FULL_CATALOG_v1');
   game.run(source('level-events.js'));
   game.run(source('editor-draft.js'));
-  game.context.draftText = source('assets/training/level-events-pilot.v2.json');
+  game.context.draftText = source(`assets/training/level-events-pilot.v${version}.json`);
   game.run(`
     const warnings=[], confirmations=[];
     GameDialogs.isOpen=()=>confirmations.length>0;
@@ -27,7 +27,10 @@ async function pilot() {
 test('tutorial draft validates round-trip, exact declarative schema and old v1 import',async()=>{
   const game=await pilot();
   assert.deepEqual(read(game,'GoblinEditorDraft.parse(JSON.stringify(eventDraft))'),JSON.parse(game.context.draftText));
-  assert.equal(game.run('GoblinEditorDraft.parse(JSON.stringify(GoblinEditorDraft.copyTemplate())).version'),'goblin-level-draft-v1');
+  assert.equal(game.run("GoblinEditorDraft.parse(JSON.stringify({...GoblinEditorDraft.copyTemplate(),version:'goblin-level-draft-v1'})).version"),'goblin-level-draft-v1');
+  assert.equal(game.run('GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(eventDraft)).version'),'goblin-level-v3');
+  assert.equal(game.run('GoblinEditorDraft.exportJson(GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(eventDraft)))===GoblinEditorDraft.exportJson(eventDraft)'),true);
+  assert.equal(game.run('GoblinEditorDraft.exportJson(eventDraft)'),source('assets/training/level-events-pilot.v3.json').trimEnd());
   for (const mutation of [
     "d.hooks[0].when.unitId='unknown'",
     "d.hotspots[0].radius=-1",
@@ -41,7 +44,7 @@ test('tutorial draft validates round-trip, exact declarative schema and old v1 i
 });
 
 test('the editor pilot entry loads the shipped draft through the same validated import path',async()=>{
-  const game=await pilot(), flow=source('ui-v2-flow.js');
+  const game=await pilot(3), flow=source('ui-v2-flow.js');
   const start=flow.indexOf('    function updateEditor('), end=flow.indexOf('    async function playEditorDraft(',start);
   game.run(`
     let screen='editor',editorDraft=GoblinEditorDraft.copyTemplate(),editorBusy=false,editorMoving=false,
@@ -51,7 +54,7 @@ test('the editor pilot entry loads the shipped draft through the same validated 
     ${flow.slice(start,end)}
   `);
   await game.run('loadEditorPilot()');
-  assert.equal(game.run('requested'),'assets/training/level-events-pilot.v2.json');
+  assert.equal(game.run('requested'),'assets/training/level-events-pilot.v3.json');
   assert.deepEqual(read(game,'editorDraft'),JSON.parse(game.context.draftText));
   assert.deepEqual(read(game,'editorCell'),{x:1,y:3});
   assert.equal(game.run('editorBusy'),false);
@@ -59,7 +62,7 @@ test('the editor pilot entry loads the shipped draft through the same validated 
 });
 
 test('only committed paths fire hooks, in order, and cut off Undo before the first notice',async()=>{
-  const game=await pilot();
+  const game=await pilot(3);
   const scout={type:'Move',actorId:'tutorial-scout',x:2,y:5};
   const tank={type:'Move',actorId:'tutorial-tank',x:4,y:3};
   assert.equal(execute(game,scout).ok,true);

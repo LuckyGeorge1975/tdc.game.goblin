@@ -3,6 +3,17 @@ import test from 'node:test';import assert from 'node:assert/strict';import fs f
 import{trainingScene,route,apply,snapshot,inspect,advanceEnemy}from './training-product-harness.mjs';
 import{read,execute}from './artillery-product-harness.mjs';
 const progress=g=>read(g,'GoblinTrainingRuntime.view().progress');
+test('v3 training placements resolve to the same learning profiles and reject inline stats',async()=>{
+ const g=await trainingScene();
+ const before=g.run('JSON.stringify(GoblinTrainingModel.configs)');
+ const world=g.state();
+ g.context.authorLevels=JSON.parse(fs.readFileSync(new URL('../assets/training/levels.v3.json',import.meta.url),'utf8'));
+ await g.run('GoblinTrainingModel.initialize(authorLevels,trainingScripts)');
+ assert.equal(g.run('JSON.stringify(GoblinTrainingModel.configs)'),before);
+ g.context.authorLevels.levels[0].units[0].range=20;
+ await assert.rejects(g.run('GoblinTrainingModel.initialize(authorLevels,trainingScripts)'),/TRAINING_SOURCE_VERSION/);
+ assert.equal(g.state(),world);
+});
 async function beforeShot(){const g=await trainingScene('training-t02');for(const a of route('training-t02').slice(0,5))apply(g,a);assert.equal(progress(g).stepId,'shot');return g}
 function drainTurnTimers(g){
  const auto=g.run('maybeAutoAdvancePhase');

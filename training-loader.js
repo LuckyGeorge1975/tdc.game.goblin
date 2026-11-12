@@ -3,7 +3,7 @@
  const params=new URLSearchParams(globalThis.location?.search||'');
  if(!['v2',null].includes(params.get('ui')))return;
  try{
-  const responses=await Promise.all(['assets/training/levels.v1.json','assets/training/scripts.v1.json'].map(path=>fetch(path)));
+  const responses=await Promise.all(['assets/training/levels.v3.json','assets/training/scripts.v1.json'].map(path=>fetch(path)));
   if(responses.some(r=>!r.ok))throw Error('TRAINING_SOURCE_UNAVAILABLE');
   const [levels,scripts]=await Promise.all(responses.map(r=>r.json()));
   if(globalThis.GoblinLanguage&&await GoblinLanguage.ready!==true)throw Error('TRAINING_COPY_UNAVAILABLE');

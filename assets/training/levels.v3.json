@@ -1,0 +1,208 @@
+{
+  "version": "goblin-level-package-v3",
+  "levels": [
+    {
+      "version": "goblin-level-v3",
+      "id": "training-t01",
+      "scenarioVersion": 1,
+      "width": 12,
+      "height": 8,
+      "ruleProfile": "TRAINING_FIELD_TEST_v1",
+      "objective": "learning",
+      "terrain": [],
+      "regions": {
+        "goal": [
+          {
+            "x": 3,
+            "y": 3
+          }
+        ],
+        "practice": [
+          {
+            "x": 2,
+            "y": 5
+          },
+          {
+            "x": 3,
+            "y": 5
+          }
+        ]
+      },
+      "units": [
+        {
+          "id": "training-t01-tank",
+          "assetId": "assault-tank",
+          "team": "player",
+          "x": 1,
+          "y": 3
+        },
+        {
+          "id": "training-t01-infantry",
+          "assetId": "infantry-platoon",
+          "team": "player",
+          "x": 1,
+          "y": 5
+        }
+      ]
+    },
+    {
+      "version": "goblin-level-v3",
+      "id": "training-t02",
+      "scenarioVersion": 1,
+      "width": 12,
+      "height": 8,
+      "ruleProfile": "TRAINING_FIELD_TEST_v1",
+      "objective": "learning",
+      "terrain": [],
+      "regions": {
+        "goal": [
+          {
+            "x": 3,
+            "y": 3
+          }
+        ],
+        "practice": [
+          {
+            "x": 2,
+            "y": 5
+          },
+          {
+            "x": 3,
+            "y": 5
+          }
+        ]
+      },
+      "units": [
+        {
+          "id": "training-t02-tank",
+          "assetId": "assault-tank",
+          "team": "player",
+          "x": 1,
+          "y": 3
+        },
+        {
+          "id": "training-t02-infantry",
+          "assetId": "infantry-platoon",
+          "team": "player",
+          "x": 1,
+          "y": 5
+        },
+        {
+          "id": "training-t02-hostile",
+          "assetId": "guard-tank",
+          "team": "enemy",
+          "x": 5,
+          "y": 3
+        }
+      ]
+    },
+    {
+      "version": "goblin-level-v3",
+      "id": "training-t03",
+      "scenarioVersion": 1,
+      "width": 12,
+      "height": 8,
+      "ruleProfile": "TRAINING_FIELD_TEST_v1",
+      "objective": "learning",
+      "terrain": [
+        {
+          "x": 2,
+          "y": 3,
+          "type": "rubble-field"
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "type": "forest"
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "type": "rubble-field"
+        },
+        {
+          "x": 5,
+          "y": 2,
+          "type": "rubble-field"
+        },
+        {
+          "x": 6,
+          "y": 2,
+          "type": "rubble-field"
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "type": "rubble-field"
+        },
+        {
+          "x": 6,
+          "y": 4,
+          "type": "rubble-field"
+        },
+        {
+          "x": 5,
+          "y": 4,
+          "type": "rubble-field"
+        }
+      ],
+      "regions": {
+        "goal": [
+          {
+            "x": 3,
+            "y": 3
+          }
+        ],
+        "practice": [
+          {
+            "x": 2,
+            "y": 5
+          },
+          {
+            "x": 3,
+            "y": 5
+          }
+        ],
+        "openFire": [
+          {
+            "x": 4,
+            "y": 3
+          },
+          {
+            "x": 5,
+            "y": 2
+          }
+        ],
+        "terrain": [
+          {
+            "x": 2,
+            "y": 3
+          }
+        ]
+      },
+      "units": [
+        {
+          "id": "training-t03-tank",
+          "assetId": "assault-tank",
+          "team": "player",
+          "x": 1,
+          "y": 3
+        },
+        {
+          "id": "training-t03-infantry",
+          "assetId": "infantry-platoon",
+          "team": "player",
+          "x": 1,
+          "y": 5
+        },
+        {
+          "id": "training-t03-hostile",
+          "assetId": "guard-tank",
+          "team": "enemy",
+          "x": 5,
+          "y": 3
+        }
+      ]
+    }
+  ]
+}

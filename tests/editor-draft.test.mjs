@@ -19,6 +19,8 @@ test('draft JSON round-trips and rejects malformed coordinates, IDs, terrain and
     ['d.version="wrong"','schema'], ['d.objective="core"','schema'], ['d.units[0].x=12','bounds'],
     ['d.units[0].id=d.units[1].id','collision'], ['d.units[0].x=d.units[1].x;d.units[0].y=d.units[1].y','collision'],
     ['d.units[0].assetId="__proto__"','unit'], ['d.units[0].hp=999','unit'],
+    ['d.ruleProfile="FIELD_TEST_LEGACY_v1"','schema'], ['d.minimumDifficulty="strong"','schema'],
+    ['d.losMode="legacy"','schema'], ['d.code="return 0"','schema'], ['d.title="custom UI"','schema'],
     ['d.units=d.units.filter(u=>u.id!=="core")','core'], ['d.units=d.units.filter(u=>u.team!=="player")','player'],
     ['d.terrain.push({x:0,y:0,type:"lava"})','terrain'],
     ['const u=d.units[0];d.terrain=d.terrain.filter(c=>c.x!==u.x||c.y!==u.y);d.terrain.push({x:u.x,y:u.y,type:"water"})','startTerrain']
@@ -27,6 +29,23 @@ test('draft JSON round-trips and rejects malformed coordinates, IDs, terrain and
     assert.equal(g.state(),before);
   }
   assert.throws(()=>g.run("GoblinEditorDraft.parse('{invalid')"),/json/);
+});
+
+test('editor prepares an authored level from its registered profile without a demo config',async()=>{
+  const g=await scene();
+  const source=readFileSync(new URL('../editor-draft.js',import.meta.url),'utf8');
+  g.run(`{const root=globalThis;
+    const isolated={GoblinCatalogFullModel:{editorProfile:root.GoblinCatalogFullModel.editorProfile,scope:root.GoblinCatalogFullModel.scope}};
+    ((globalThis,GoblinCatalogFullModel)=>{
+    ${source}
+    })(isolated,isolated.GoblinCatalogFullModel);
+    root.independentEditor=isolated.GoblinEditorDraft;
+  }`);
+  const config=await g.run('independentEditor.prepare(draft)');
+  assert.equal(config.ruleProfileId,'FULL_CATALOG_v1');
+  assert.equal(config.losMode,'strict-supercover');
+  assert.deepEqual(Array.from(config.catalog.full.waves.waves),[]);
+  assert.equal(Object.hasOwn(config.catalog.full,'turnLimit'),false);
 });
 
 test('a prepared draft starts real FULL play without registration, mutation of curated config or acceptance of a forged session',async()=>{

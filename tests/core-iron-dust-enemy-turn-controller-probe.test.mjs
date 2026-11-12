@@ -82,7 +82,7 @@ function legacyTurn(seed, changes = {}) {
       TerrainRules.coverBonus(map.terrain.find(cell =>
         cell.x === target.x && cell.y === target.y)?.type ?? map.defaultTerrain)});
   const crtStart = game.indexOf('const COMBAT_RULES='), crtEnd =
-    game.indexOf(';const units', crtStart);
+    game.indexOf('const builtInLevels', crtStart) - 1;
   vm.runInContext(`${game.slice(crtStart, crtEnd + 1)}\n` +
     ['hexNeighbors', 'dist', 'findEnemyStep', 'recoverDisabled', 'combatRatio',
       'applyCombatRoll', 'combatOutcome', 'enemyTurn'].map(name => extract(name)).join('\n') +

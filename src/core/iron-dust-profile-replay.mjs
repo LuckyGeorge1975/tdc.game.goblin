@@ -2,6 +2,7 @@ import {IRON_DUST_PROFILE_VERSION, IRON_DUST_PROFILE_HEADER,
   IRON_DUST_PROFILE_PROJECTION_VERSION, createIronDustProfile,
   validateIronDustProfile, queryIronDustProfile, dispatchIronDustProfile,
   projectIronDustProfile} from './iron-dust-executable-profile.mjs';
+import {IRON_DUST_HISTORICAL_LAYOUT} from '../levels/iron-dust.v1.mjs';
 
 // Internal v2 source replay. This does not extend schema-1 or expose file I/O.
 export const IRON_DUST_PROFILE_REPLAY_VERSION = 'iron-dust-profile-replay-v1';
@@ -132,7 +133,8 @@ function inspect(envelope) {
   let start;
   try {
     start = createIronDustProfile(envelope.initialSeed,
-      {difficulty: envelope.header.profileHeader?.enemyPolicy?.difficulty});
+      {level:IRON_DUST_HISTORICAL_LAYOUT,difficulty: envelope.header.profileHeader?.enemyPolicy?.difficulty,
+        minimumDifficulty:envelope.header.profileHeader?.minimumDifficulty});
   } catch {reject('IRON_DUST_REPLAY_MISMATCH')}
   if (canonical(envelope.initialSnapshot) !== canonical(start) ||
       canonical(envelope.header) !== canonical(expectedHeader(start)) ||

@@ -10,9 +10,10 @@ const plain = value => JSON.parse(JSON.stringify(value));
 function legacyIronDust() {
   const context = vm.createContext({});
   vm.runInContext(read('../ogre-systems.js'), context);
+  vm.runInContext(read('../scenario-profile-manifest.js'), context);
   const game = read('../game.js');
   vm.runInContext(game.slice(0, game.indexOf('let bootProfileError=')), context);
-  return plain(vm.runInContext("scenarioCatalog['iron-dust']", context));
+  return plain(vm.runInContext("ScenarioRuleProfiles.legacyLevel(builtInLevels[0])", context));
 }
 
 test('Iron Dust v1 data keeps the built-in roster and terrain across the new rule pair', () => {

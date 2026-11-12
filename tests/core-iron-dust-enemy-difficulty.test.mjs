@@ -7,12 +7,27 @@ import {queryIronDustEnemyIntent} from '../src/core/iron-dust-enemy-intent-probe
 import {queryIronDustStandardFireAction} from '../src/core/iron-dust-standard-fire-action-probe.mjs';
 import {recordIronDustProfileReplay, playIronDustProfileReplay}
   from '../src/core/iron-dust-profile-replay.mjs';
+import {IRON_DUST_LEVEL_V3} from '../src/levels/iron-dust.v3.mjs';
 
 const seed = 2;
 const end = {type: 'EndPhase', playerId: 'player'};
 const auto = {type: 'AutoEnemyAdvance', playerId: 'enemy'};
 const commands = [{type: 'Move', playerId: 'player', unitId: 'gev', to: {x: 0, y: 6}},
   ...Array.from({length: 4}, () => [end, end, end, auto, auto, auto, auto, auto]).flat()];
+
+test('a registered level minimum clamps difficulty and remains bound through replay', () => {
+  const level = {...IRON_DUST_LEVEL_V3, minimumDifficulty:'medium'};
+  const below = createIronDustProfile(seed, {difficulty:'weak',level});
+  assert.deepEqual(below, createIronDustProfile(seed, {difficulty:'medium',level}));
+  assert.equal(below.header.minimumDifficulty, 'medium');
+  assert.equal(below.header.enemyPolicy, undefined);
+  assert.equal(createIronDustProfile(seed, {difficulty:'strong',level}).header.enemyPolicy.difficulty, 'strong');
+  assert.throws(() => createIronDustProfile(seed, {level:{...level,minimumDifficulty:'unknown'}}), /DIFFICULTY_INVALID/);
+  assert.throws(() => createIronDustProfile(seed, {level:{...level,losMode:'strict'}}), /LEVEL_DATA_MISMATCH/);
+  const replay = recordIronDustProfileReplay(seed, commands.slice(0, 2), {difficulty:'weak',level});
+  assert.equal(replay.header.profileHeader.minimumDifficulty, 'medium');
+  assert.doesNotThrow(() => playIronDustProfileReplay(replay));
+});
 
 test('three policies run and replay one common source route with the same dice rule', () => {
   const medium = createIronDustProfile(seed);

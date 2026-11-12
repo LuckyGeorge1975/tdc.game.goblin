@@ -1,16 +1,47 @@
-// Fixed Field Test training sources; no catalog statistics or gameplay resolver.
+// Profile-bound Field Test starts and separate learning contracts.
 (function(root){
  const profile='TRAINING_FIELD_TEST_v1',ids=Object.freeze(['training-t01','training-t02','training-t03']);
  const stable=v=>v&&typeof v==='object'?(Array.isArray(v)?v.map(stable):Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])]))):v;
  const copy=v=>JSON.parse(JSON.stringify(v)),freeze=v=>{if(v&&typeof v==='object'){Object.values(v).forEach(freeze);Object.freeze(v)}return v};
  async function hash(v){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(stable(v))));return [...new Uint8Array(bytes)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+ const unitProfiles={
+  "assault-tank":{"visualKey":"assault-tank","name":"ASSAULT TANK","type":"FRONTLINE ARMOR","hp":3,"maxHp":3,"defense":3,"range":2,"move":3,"damage":4,"icon":"H","movementMode":"tracked"},
+  "infantry-platoon":{"visualKey":"infantry-platoon","name":"INFANTRY PLATOON","type":"MOBILE INFANTRY","hp":2,"maxHp":2,"defense":2,"range":1,"move":2,"damage":1,"icon":"I","infantry":true,"movementMode":"infantry"},
+  "guard-tank":{"visualKey":"guard-tank","name":"GUARD TANK","type":"HOSTILE ARMOR","hp":3,"maxHp":3,"defense":3,"range":2,"move":1,"damage":1,"icon":"G","movementMode":"tracked"}
+ };
+ const learningProfiles={
+  "training-t01":{"seed":37093377,"next":"training-t02","titleKey":"training.t01.title","goalKey":"training.t01.goal"},
+  "training-t02":{"seed":37093378,"next":"training-t03","titleKey":"training.t02.title","goalKey":"training.t02.goal"},
+  "training-t03":{"seed":37093379,"next":"iron-dust","titleKey":"training.t03.title","goalKey":"training.t03.goal"}
+ };
  let configs=null,levels=null,definitions=null;
  let advisory=null,advisorySource=null;
  const parameterRefs=['query','actor:tank','actor:infantry','actor:hostile','region:goal','region:practice','region:openFire','control:back','control:cancel','phase:fire','phase:movement','query:attack','query:defense','query:range','query:cost','query:available','shot:result','shot:effect','recoveryReason','skills','objective','budget:scout','actor:scout'];
  const controls=['back','cancel','confirm','phase','exit'];
+ function historicalShape(data){
+  if(data?.version!=='goblin-level-package-v3')return data;
+  const fail=()=>{throw Error('TRAINING_SOURCE_VERSION')};
+  const exact=(value,keys)=>value&&typeof value==='object'&&!Array.isArray(value)&&
+   Object.keys(value).length===keys.length&&keys.every(key=>Object.hasOwn(value,key));
+  if(!exact(data,['version','levels'])||!Array.isArray(data.levels))fail();
+  return {version:'training-levels-v1',
+   authority:{contractSha256:'88a2a9dde0ea9c9b4db347e09bd42d59fe2410abd8fcec0e07e1a0fcbec9b13b',
+    contentPin:'2fdce6ac1be30e8b2a360250b37724586469e71c',status:'authored candidate; actual query/route checks required before delivery'},
+   levels:data.levels.map(level=>{
+    if(!exact(level,['version','id','scenarioVersion','width','height','ruleProfile','objective','terrain','regions','units'])||
+     level.version!=='goblin-level-v3'||!Object.hasOwn(learningProfiles,level.id)||level.scenarioVersion!==1||
+     level.width!==12||level.height!==8||level.ruleProfile!==profile||level.objective!=='learning'||!Array.isArray(level.units))fail();
+    const units=level.units.map(entry=>{
+     if(!exact(entry,['id','assetId','team','x','y'])||!Object.hasOwn(unitProfiles,entry.assetId))fail();
+     const {visualKey,name,type,...rules}=unitProfiles[entry.assetId];
+     return {id:entry.id,visualKey,name,type,team:entry.team,x:entry.x,y:entry.y,...rules};
+    });
+    return {id:level.id,...learningProfiles[level.id],units,terrain:level.terrain,regions:level.regions};
+   })};
+ }
  function manifestFor(definition){return {binding:copy(definition.binding),definition:copy(definition),actorTags:copy(definition.actorTags),regionRefs:[...definition.regionRefs],copyKeys:[...new Set([...definition.steps.flatMap(s=>[s.messageKey,s.recovery?.messageKey]).filter(Boolean),...(definition.terminal?Object.entries(definition.terminal).filter(([k])=>k!=='requiredStepIds').map(([,v])=>v):[])])],parameterRefs:[...parameterRefs],controlRefs:[...controls],capabilityRefs:[]}}
  async function initialize(levelData,scriptData){
-  levelData=copy(levelData);scriptData=copy(scriptData);
+  levelData=historicalShape(copy(levelData));scriptData=copy(scriptData);
   if(await hash(levelData)!=='f68869da180df36a2d485940ca8155953d8c36f581d993a20514acf855d01d73'||await hash(scriptData)!=='5407c9e7d97a9583a002ef3aae54f528a27e21bb315a310016ff29703477e37b')throw Error('TRAINING_SOURCE_DIGEST');
   if(levelData.version!=='training-levels-v1'||scriptData.version!=='training-scripts-v1'||levelData.levels.length!==3||scriptData.definitions.length!==3)throw Error('TRAINING_SOURCE_VERSION');
   const next={};
