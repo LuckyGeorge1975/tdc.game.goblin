@@ -867,7 +867,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const facts = entry ? targetRowFacts(entry, state, actor, occupant) : {details:[], metrics:[]};
         const description = [
           entry && commandIcon(entry.command) === 'fire' && entry.command.type !== 'SelectWeapon' ? t('v2.target.attack') : '',
-          entry && actor.name, entry?.label ?? row.label, location, ...facts.details,
+          entry && actor.name, entry?.label ?? row.label, entry?.singleWeapon, location, ...facts.details,
           entry?.confirmSplash && missileWarning(state, entry, cell),
           children ? t('v2.target.openChoice', {choice:t(row.choice)}) :
             entry?.command.type === 'SelectWeapon' ? t('v2.target.switchOnly') :
@@ -1360,7 +1360,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
               label:t('v2.ui.weapon.' + weaponKey) + ' · ' + t('v2.specialists.readyCount',{count:GoblinSystems.weaponReady(weapon)}),
               attack:{name:t('v2.ui.weapon.' + weaponKey), shortName:t('v2.target.short.'+weaponKey), icon:weaponKey, shots:GoblinSystems.weaponReady(weapon)}}));
         }
-        return [{command:{type:'Fire', ...intent}, label:t(runtime?.strategicMissile ? 'v2.ui.missile' : 'v2.ui.fire'), confirmSplash:!!runtime?.strategicMissile}];
+        if (runtime?.strategicMissile) return [{command:{type:'Fire', ...intent}, label:t('v2.ui.missile'), confirmSplash:true}];
+        const weaponClass = globalThis.GoblinFireAnchors?.[runtime?.visualKey]?.klasse;
+        const singleWeapon = t(weaponClass === 'cannon' ? 'v2.target.weapon.cannon' : 'v2.plan.standardWeapon');
+        return [{command:{type:'Fire', ...intent}, label:t('v2.ui.fire'), singleWeapon}];
       }
       if (target?.team === 'enemy') return [{command:{type:'Ram', ...intent}, label:t('v2.ui.ram')}];
       if (target?.team === 'player' && target.id !== actor.id && state.turnPhase === 'movement' && dist(actor,target) === 1) {

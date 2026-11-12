@@ -7,7 +7,7 @@ import {buildIronDustV2View} from '../iron-dust-v2-view.mjs';
 import {queryIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
 import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import {targetOptionsSource} from './helpers/target-options-source.mjs';
-import {trainingScene} from './training-product-harness.mjs';
+import {apply, route, trainingScene} from './training-product-harness.mjs';
 import {read} from './artillery-product-harness.mjs';
 
 const ui = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
@@ -141,6 +141,44 @@ test('the same live fire rules yield the same menu across T02 and T03, then reac
 
 const warningSource = ui.slice(ui.indexOf('    function missileWarning('), ui.indexOf('    function targetRowFacts('));
 const runCommand = warningSource + ui.slice(ui.indexOf('    async function runCommand('), ui.indexOf('    function chooseActor('));
+
+test('T02 renders the cannon class and the same combat prognosis in all four tooltip languages', async () => {
+  const game = await trainingScene('training-t02');
+  for (const action of route('training-t02').slice(0, 5)) apply(game, action);
+  Object.assign(game.context, {
+    URL, location: {href: import.meta.url},
+    fetch: async url => ({ok:true, json:async()=>JSON.parse(readFileSync(
+      new URL('../assets/ui-copy/' + new URL(url).pathname.split('/').at(-1), import.meta.url), 'utf8'))})
+  });
+  game.context.document.readyState = 'loading';
+  for (const file of ['localization.js', 'fire-anchors.js']) game.run(readFileSync(new URL('../' + file, import.meta.url), 'utf8'));
+  await game.context.GoblinLanguage.ready;
+  const odds = ui.slice(ui.indexOf('    function hitChance('), ui.indexOf('    function trainingFirePreview('));
+  const world = game.state(), rng = game.rng();
+  for (const [language, weapon] of Object.entries({de:'Kanone', en:'Cannon', es:'Cañón', fr:'Canon'})) {
+    game.context.testLocale = language;
+    const tooltip = game.run(`{
+      const GoblinLanguage={current:testLocale};
+      const t=(key,params)=>globalThis.GoblinLanguage.t(key,params,testLocale);
+      const el=(tag,className='',text='')=>({tag,className,text,children:[],
+        append(...nodes){this.children.push(...nodes)},replaceChildren(){this.children=[]},setAttribute(key,value){this[key]=value}});
+      const card=el('section'),at=()=>card,hexLabel=()=>'F-04',svgIcon=()=>'',placeNearHex=()=>{};
+      document.body={classList:{contains:()=>false}};
+      ${targetOptionsSource}
+      ${odds}
+      ${targetCard}
+      view.target={x:5,y:3};view.intentRevision=revision();
+      renderTargetCard({units,phase,turnPhase,gameOver,revision:revision()},units.find(unit=>unit.id==='training-t02-tank'));
+      const row=card.children.flatMap(node=>node.children).find(node=>node.tag==='button');
+      [row.title,row['aria-label']];
+    }`);
+    assert.equal(tooltip[0], tooltip[1]);
+    assert.ok(tooltip[0].includes(` · ${weapon} · GUARD TANK · F-04 · `), tooltip[0]);
+    assert.deepEqual(tooltip[0].match(/1:1|\d+ %/g), ['1:1', '67 %', '50 %', '17 %']);
+  }
+  assert.equal(game.state(), world);
+  assert.deepEqual(game.rng(), rng);
+});
 
 for (const [profile, type] of [['FULL U13', 'CatalogHexFire'], ['Legacy', 'Fire']]) {
   test(`${profile} missile warns of attack 6 direct and 3 adjacent before dispatch`, async () => {

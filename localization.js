@@ -607,6 +607,7 @@
     'v2.target.switchWeapon': {de:'Waffenwechsel: {weapon}',en:'Switch weapon: {weapon}',es:'Cambiar de arma: {weapon}',fr:'Changer d’arme : {weapon}'},
     'v2.target.confirmWeapon': {de:'Waffenwechsel bestätigen',en:'Confirm weapon switch',es:'Confirmar cambio de arma',fr:'Confirmer le changement d’arme'},
     'v2.target.attack': {de:'Angreifen',en:'Attack',es:'Atacar',fr:'Attaquer'},
+    'v2.target.weapon.cannon': {de:'Kanone',en:'Cannon',es:'Cañón',fr:'Canon'},
     'v2.target.hitShort': {de:'TC {percent} %',en:'Hit {percent} %',es:'Impacto {percent} %',fr:'Touche {percent} %'},
     'v2.target.destroyShort': {de:'Zerst. {percent} %',en:'Dest. {percent} %',es:'Destr. {percent} %',fr:'Destr. {percent} %'},
     'v2.target.disable': {de:'Deaktivierungschance {percent} %',en:'Disable chance {percent} %',es:'Probabilidad de desactivación {percent} %',fr:'Chance de neutraliser {percent} %'},
