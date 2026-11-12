@@ -30,7 +30,9 @@ test('tutorial draft validates round-trip, exact declarative schema and old v1 i
   assert.equal(game.run("GoblinEditorDraft.parse(JSON.stringify({...GoblinEditorDraft.copyTemplate(),version:'goblin-level-draft-v1'})).version"),'goblin-level-draft-v1');
   assert.equal(game.run('GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(eventDraft)).version'),'goblin-level-v3');
   assert.equal(game.run('GoblinEditorDraft.exportJson(GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(eventDraft)))===GoblinEditorDraft.exportJson(eventDraft)'),true);
-  assert.equal(game.run('GoblinEditorDraft.exportJson(eventDraft)'),source('assets/training/level-events-pilot.v3.json').trimEnd());
+  const canonicalExport=game.run('GoblinEditorDraft.exportJson(eventDraft)');
+  assert.doesNotMatch(canonicalExport,/\r/);
+  assert.equal(canonicalExport,source('assets/training/level-events-pilot.v3.json').replaceAll('\r\n','\n').trimEnd());
   for (const mutation of [
     "d.hooks[0].when.unitId='unknown'",
     "d.hotspots[0].radius=-1",

@@ -2,6 +2,15 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden im jeweiligen Release-Issue nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.29] - 2026-11-12
+
+- Das Kontextmenü am Zielhex zeigt legale Befehle als vertikale Zeilen. Eindeutige Aktionen lassen sich direkt bestätigen. Bei Bedarf öffnet die Zeile die Wahl von Waffe, Bauteil, Beobachter oder Fracht. Ein Außenklick verwirft die Vorschau. Tooltips nennen Aktion, Ziel und verfügbare Prognosen. Bei Flächenraketen erscheinen Wirkungsbereich und Warnung vor der Bestätigung. Verladen lässt sich von beiden benachbarten Einheiten aus öffnen.
+- Die Desktopkarte nutzt den Platz zwischen Kopf- und Befehlsleiste. Einheitenliste, Einheiteninfo, Feldinfo und Legende sind einzeln schaltbar. Phasenmeldungen und Tutorial-Hinweise liegen auf der Karte. Reichweitenplanung und aktuell legale Aktionen sind getrennt erkennbar. Die Platzierung hält Zielaktionen auch bei niedrigem Fenster erreichbar. Kurze Waffenlabels lassen die Bestands- und Reichweitenwerte lesbar.
+- Die Trainingskampagne verbindet T01 und T02. T02 zeigt die Treffer- und Zerstörungschance der aktuellen Vorschau und wartet vor dem automatischen Phasenwechsel auf die Ergebnisbestätigung. T03 und der optionale Legacy-Iron-Dust-Hinweis bleiben verfügbar.
+- Der lokale Level-Editor erlaubt ein Probespiel im Vollkatalog-Profil. Er liest v1- und v2-Entwürfe und exportiert kanonisches v3. Versionierte Leveldaten referenzieren Einheiten- und Regelprofile. Der Event-Pilot zeigt bestehende Dialogeffekte nach bekannten Auslösern. Zuglimit, Verstärkungen, historische Startwerte und Replay-Bindungen bleiben erhalten.
+- Für Iron Dust Core v2 lässt sich die Gegnerstufe im Briefing wählen. Eine für ein Level konfigurierte Untergrenze wird zentral angewendet und im Replay gebunden. Bestehende Missionen erhalten keinen neuen Mindestwert. Überarbeitete Einheitenlisten, Kampfpräsentation und Bibliotheksnavigation ergänzen die Bedienung. Der Vollkatalog verwendet bereits berechnete Bereitschafts- und Sichtdaten weiter, solange sich der Regelzustand nicht ändert.
+- Lokaler Releasekandidat zu `goblin-shkd`. Rückfallpunkt ist `v0.1.28` auf `db399b25be17bed57d95dadb65270109ea8ed84d`. Der [Build-29-Handoff](reports/TEST_HANDOFF.md#build-0129--kontextmenü-und-deklarative-level) dokumentiert Prüfstand und offene Abnahmen.
+
 ## [0.1.28] - 2026-11-04
 
 - **Field-Test-Build nach dem User Report vom 02.11.2026** (Epic `goblin-1md1`), vom Nutzer am 04.11.2026 zur Veröffentlichung auf GitHub Pages beauftragt; Feintest und Bericht folgen auf diesem Build. Rückfallpunkt ist `v0.1.27` auf `9985e09513eb6ad5e1865f34b3d615f6d0e6aeb4`.

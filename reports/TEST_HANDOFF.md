@@ -2,6 +2,21 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## Build 0.1.29 · Kontextmenü und deklarative Level
+
+| Feld | Stand am 12.11.2026 |
+|---|---|
+| Version | `0.1.29` |
+| Build | `29` |
+| Status | Lokaler `release-candidate`. Veröffentlichung nach unabhängiger Abnahme im Issue `goblin-shkd` beauftragt. |
+| Runtimebasis | `fe1746c8d3ac63fce594ea39af2633a172c48200`, lokal abgenommene Lieferung von Kontextmenü (`goblin-wn6l`) und Leveldaten (`goblin-09qu.2`). Das Buildpaket aktualisiert Metadaten, Dokumentation und Testportabilität. |
+| Tag und Rückfall | Vorgesehenes Tag `v0.1.29`. Öffentlich geprüfter Rückfallpunkt `v0.1.28` auf `db399b25be17bed57d95dadb65270109ea8ed84d`. |
+| Inhalt | [Änderungen seit Build 28](../CHANGELOG.md#0129---2026-11-12). Neues Hex-Kontextmenü, maximierte Desktopkarte mit separaten Panels, Ingame-Lernhinweise, Editor und Level-Events, deklarative v3-Quellen, wählbare Iron-Dust-Core-Gegnerstufe und Katalog-Optimierungen. |
+| Automatische Vorbelege | Auf der Runtimebasis 809/809 mit `node scripts/run-tests.mjs --all`, einschließlich historischer Replays. Der Archivtest prüft beim Buildpaket weiterhin den kanonischen LF-Export gegen die Vorlage und berücksichtigt beim Einlesen deren Windows-Zeilenenden. |
+| Content | Bestehender Quellenpin `2fdce6ac1be30e8b2a360250b37724586469e71c`. Die Levelmigration verwendet vorhandene Einheiten-, Gelände- und Eventreferenzen. Content-/Legal-Endreview folgt für das Releasepaket. |
+| Unabhängige Prüfschwerpunkte | Öffentlicher Projektpfad im lokalen Export, sichtbare Buildanzeige, regulärer Legacy-/FULL-/Core-Einstieg, ein Feuer- oder Transportpfad im Kontextmenü, Tutorial-Vorschau und Außenabbruch, Editor-v2-Import, v3-Export und Probespiel mit Event. Bei niedrigem Desktopfenster Zielkarte und Bedienflächen prüfen. |
+| Bild und Auslieferung | Aktuelle Karte aus dem festen Build-29-Kandidaten nach der Browserprüfung aufnehmen. Das README-Bild folgt im Bild- und Dokumentnachlauf. Danach Release-SHA, Tag, Pages und öffentliche Nachprüfung im Release-Issue belegen. |
+
 ## Build 0.1.28 · Field-Test nach User Report 02.11.
 
 | Feld | Stand am 04.11.2026 |
