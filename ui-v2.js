@@ -363,7 +363,16 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       globalThis.dispatchEvent(new Event('goblin-view-settings-change'));
     }
 
-    function clearContext() { globalThis.GoblinTrainingRuntime?.cancel();view.targetBranch = []; view.targetOption = null; view.afterWeaponSwitch = false; view.target = null; view.intentRevision = null; view.message = ''; }
+    function clearContext() {
+      // A synchronous draw can retire the menu before the active dispatch publishes its training receipt.
+      if (!view.busy) globalThis.GoblinTrainingRuntime?.cancel();
+      view.targetBranch = [];
+      view.targetOption = null;
+      view.afterWeaponSwitch = false;
+      view.target = null;
+      view.intentRevision = null;
+      view.message = '';
+    }
     const hexLabel = cell => `${String.fromCharCode(65 + cell.x)}-${String(cell.y + 1).padStart(2, '0')}`;
     function coreOpenCount(source) { return coreOpenUnits(source).length; }
     function coreOpenUnits(source) {

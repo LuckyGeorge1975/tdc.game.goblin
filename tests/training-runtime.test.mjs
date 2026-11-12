@@ -176,6 +176,65 @@ test('actual V2 chooseActor/chooseHex/clearContext handlers prove the T01 previe
  g.run("GoblinTrainingRuntime.ack();chooseActor('training-t01-tank');chooseHex(3,3)");assert.equal(progress(g).stepId,'cancel');
  const before=snapshot(g).world;g.run('clearContext()');assert.equal(progress(g).stepId,'first-move');assert.deepEqual(snapshot(g).world,before);
 });
+for (const [mission, afterMove] of [['training-t01', 'undo'], ['training-t02', 'fire-phase']]) {
+ test(`${mission} confirms the target row through a synchronous draw without publishing a cancel receipt`, async () => {
+  const g = await trainingScene(mission);
+  const source = fs.readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
+  const cut = (start, end) => source.slice(source.indexOf(start), source.indexOf(end, source.indexOf(start)));
+  const renderStart = cut('    function render() {', '      const fireZoom =');
+  g.run(`
+    const GoblinLanguage={current:'de'};
+    const project=()=>({units,phase,turnPhase,gameOver,revision:revision(),scenario:currentScenario});
+    const at=selector=>document.querySelector(selector);
+    at('#v2-map').focus=()=>{};
+    document.body={classList:{contains:()=>false}};
+    const focusTargetCard=()=>{}, resumeMapSize=()=>{}, clearMapHover=()=>{};
+    let areaPhase=null, hoverState, changedDraws=0;
+    ${targetOptionsSource}
+    ${cut('    function clearContext()', '    const hexLabel')}
+    ${cut('    function inspectTrainingTarget(', '    function renderTargetCard(')}
+    ${cut('    async function runCommand(', '    const areaCache')}
+    ${cut('    function syncAreaPhase(', '    function activeAreaMode(')}
+    ${cut('    function dismissTargetOnOutsideClick(', "    document.addEventListener('click', dismissTargetOnOutsideClick")}
+    ${renderStart.replace('function render()', 'function nativeRender()')} }
+    const baseDraw=draw;
+    draw=()=>{baseDraw();if(view.busy&&view.target&&view.intentRevision!==revision())changedDraws++;nativeRender()};
+    const confirmRow=()=>{
+      const state=project(), actor=units.find(unit=>unit.id===view.actorId);
+      const entry=entriesAt(state,actor,view.target).find(option=>entryResult(option).ok);
+      return runCommand(state,entry,view.target,state.revision);
+    };
+    GoblinTrainingRuntime.ack();
+    chooseActor(currentScenario+'-tank');
+    nativeRender();
+    chooseHex(3,3);
+  `);
+  if (mission === 'training-t01') {
+   const world = g.state(), rng = g.rng();
+   g.run("dismissTargetOnOutsideClick({target:{closest:()=>null},preventDefault(){},stopImmediatePropagation(){}})");
+   assert.equal(progress(g).stepId, 'first-move');
+   assert.equal(read(g, 'GoblinTrainingRuntime.audit().at(-1).receipt.ui.type'), 'cancelIntent');
+   assert.equal(g.state(), world);
+   assert.deepEqual(g.rng(), rng);
+   g.run('chooseHex(3,3)');
+  }
+  const before = read(g, 'GoblinTrainingRuntime.audit().length');
+  await g.run('confirmRow()');
+  assert.equal(progress(g).stepId, afterMove);
+  assert.ok(g.run('changedDraws') > 0);
+  const move = read(g, `GoblinTrainingRuntime.audit().slice(${before})`);
+  assert.deepEqual(move.map(item => [item.receipt.command.type, item.receipt.events[0].type, item.error]), [['Move', 'UnitMoved', null]]);
+  if (mission === 'training-t02') {
+   g.run("setTurnPhase('fire');chooseHex(5,3)");
+   assert.equal(progress(g).stepId, 'shot');
+   assert.ok(g.run('trainingFirePreview(project()).hit > 0'));
+   await g.run('confirmRow()');
+   assert.equal(progress(g).stepId, 'result');
+   assert.equal(read(g, 'GoblinTrainingRuntime.audit().at(-1).receipt.events[0].type'), 'ShotResolved');
+  }
+  assert.ok(g.run('GoblinTrainingRuntime.audit().every(item=>item.error===null)'));
+ });
+}
 test('all friendly losses take priority over a previously ready learning debrief',async()=>{
  const g=await beforeShot();g.run("const actualApply=applyCombatRoll;applyCombatRoll=(actor,target,roll)=>actualApply(actor,target,actor.team==='enemy'?5:0)");
  apply(g,{command:{type:'Fire',actorId:'training-t02-tank',x:5,y:3}});apply(g,{ui:'ack',action:'continue'});advanceEnemy(g);assert.equal(progress(g).status,'ready-for-debrief');
