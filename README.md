@@ -4,6 +4,14 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
+**0.1.29 / Build 29 vom 12.11.2026** ist der lokal geprüfte Release-Kandidat. Das Hex-Kontextmenü zeigt verfügbare Befehle am Ziel. Die Desktop-Karte lässt sich maximieren und der Level-Editor exportiert das deklarative v3-Format. [Änderungen seit Build 28](CHANGELOG.md#0129---2026-11-12) · [Test-Handoff](reports/TEST_HANDOFF.md#build-0129--kontextmenü-und-deklarative-level)
+
+![Build 0.1.29 – FULL Atlas Proving Grounds mit sichtbaren Einheiten auf der Hexkarte](docs/images/field-test-0.1.29-full-atlas.webp)
+
+*FULL Atlas Proving Grounds in Build 0.1.29, Deutsch, Zug 1 in der Bewegungsphase. Die Aufnahme stammt aus dem geprüften Buildpaket `7885efd`. [Herkunft und Bildprüfung](reports/TEST_HANDOFF.md#readme-aufnahme-build-29)*
+
+## Frühere Desktopstände
+
 **0.1.28 / Build 28 vom 04.11.2026 ist der Field-Test-Build nach dem User Report vom 02.11.2026.** Die Spieloberfläche zeigt das aktuelle Terrainset, Missionsauswahl und Briefing kommen ohne Systemscrollleisten aus, das Spiel-Layout hat Kartenoverlays, eine Einheitenliste mit Bereitschaft und eine schaltbare Feldinfo. Neu sind Zurück/Nächste Einheit, überarbeitete Reichweiten, die Ereignisliste per Button und ein Aktionsablauf in drei Schritten: Einheit antippen öffnet das Aktionsmenü, die gewählte Aktion steht in der Befehlsleiste, ein Ziel öffnet eine Zielkarte mit Schritten bzw. Quote und Trefferchance und wird erst mit „Ausführen“ ausgeführt. Die Trainingslektionen beschreiben diesen Ablauf. Legacy-/FULL-Regeln, Missionen und Trainingswerte bleiben unverändert; der getrennte IronDust-v2-Corepfad nutzt die Legacy-Pixel-Sichtlinie und generisches Mehrwaffenfeuer. Feintest und Bericht folgen auf Pages: [Build-28-Handoff](reports/TEST_HANDOFF.md#build-0128--field-test-nach-user-report-0211). Die folgenden Absätze beschreiben den vorigen Stand 0.1.27.
 
 **0.1.27 / Build 27 ist der geprüfte Desktopstand vom 30.10.2026.** Die abgenommene Runtime ist `637c423af98cab8a13b6c7d41904516e18479a18`. Die unabhängige Gesamtregression (749/749) gehört zum ersten Paket `594cd33`; der anschließende FULL-OpenGround-Renderfix auf 637c423 ist mit gezielten Nachprüfungen beider Testerrollen abgenommen. Er ist gegenüber der früheren df1-/594-Runtime nicht bytegleich. Der letzte Nachlauf ergänzt ausschließlich die unten belegte Aufnahme und Dokumentation; abschließende Bild-/Dokumentprüfung und Legalzuordnung sowie die öffentliche Auslieferung werden separat nachgewiesen. [Zuordnung und Prüfgrenzen](reports/TEST_HANDOFF.md#finaler-bild--und-dokumentnachlauf).
@@ -14,7 +22,7 @@ Der normale V2-Einstieg bietet fünf FULL-Missionen (`catalog-full-atlas`, `cata
 
 Der unabhängige .5-Produktlauf auf df1ba35 absolvierte die drei Lektionen, normale Legacy-Hinweise und Recovery-/Navigationswege in einem durchgehend beobachteten Browserdokument mit 0 Errors/0 Rejections. Ältere ResizeObserver-Befunde bleiben historisch dokumentiert. Dies ist keine universelle Geräte-/Layoutfreigabe: Bei 1280×720 und langer französischer Recovery ist die Fit-Karte etwa 64 px hoch; Zoom/Pan bleiben verfügbar. Fingerproben und eine allgemeine Kleindesktop-/Mobilkomfortgarantie sind nicht Bestandteil dieses Belegs.
 
-![Build 0.1.27 – FULL Atlas Proving Grounds mit sichtbaren eigenen und gegnerischen Einheiten](docs/images/field-test-0.1.27-full-atlas.webp)
+[Historische FULL-Atlas-Aufnahme aus Build 0.1.27](docs/images/field-test-0.1.27-full-atlas.webp)
 
 *Echte Aufnahme aus Runtime `637c423`, Build 27, Deutsch/High, 1902×984. Normale FULL-Atlas-Ansicht mit 20 projizierten eigenen und sieben bekannten gegnerischen Einheiten, 96 Terrainbildern einschließlich 71 OpenGroundkacheln; keine Sichtfreischaltung. Verlustfreies WebP, 204.844 Bytes, decodierte RGBA-Pixel identisch zum Original-PNG. [Quelle, Hashes und Kompressionsbeleg](reports/TEST_HANDOFF.md#finaler-bild--und-dokumentnachlauf).*
 

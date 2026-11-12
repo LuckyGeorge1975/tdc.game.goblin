@@ -15,7 +15,17 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Automatische Vorbelege | Auf der Runtimebasis 809/809 mit `node scripts/run-tests.mjs --all`, einschließlich historischer Replays. Der Archivtest prüft beim Buildpaket weiterhin den kanonischen LF-Export gegen die Vorlage und berücksichtigt beim Einlesen deren Windows-Zeilenenden. |
 | Content | Bestehender Quellenpin `2fdce6ac1be30e8b2a360250b37724586469e71c`. Die Levelmigration verwendet vorhandene Einheiten-, Gelände- und Eventreferenzen. Content-/Legal-Endreview folgt für das Releasepaket. |
 | Unabhängige Prüfschwerpunkte | Öffentlicher Projektpfad im lokalen Export, sichtbare Buildanzeige, regulärer Legacy-/FULL-/Core-Einstieg, ein Feuer- oder Transportpfad im Kontextmenü, Tutorial-Vorschau und Außenabbruch, Editor-v2-Import, v3-Export und Probespiel mit Event. Bei niedrigem Desktopfenster Zielkarte und Bedienflächen prüfen. |
-| Bild und Auslieferung | Aktuelle Karte aus dem festen Build-29-Kandidaten nach der Browserprüfung aufnehmen. Das README-Bild folgt im Bild- und Dokumentnachlauf. Danach Release-SHA, Tag, Pages und öffentliche Nachprüfung im Release-Issue belegen. |
+| Bild und Auslieferung | [Geprüfte FULL-Atlas-Aufnahme aus Build 29](#readme-aufnahme-build-29). Release-SHA, Tag, Pages und öffentliche Nachprüfung im Release-Issue belegen. |
+
+### README-Aufnahme Build 29
+
+| Feld | Beleg |
+|---|---|
+| Geprüftes Buildpaket | `7885efd6ac8ffbd773b7ebd630b6f0683e6bd0e8`, Version `0.1.29`, Build 29. Unabhängige Desktop-QA mit Windows Headless Chrome. Archiv-SHA256 `7bd630276e7c201ec28742b4154ab889b029bebf19bb388dbbd89b7247419ad7`. |
+| Spielzustand | FULL Atlas Proving Grounds (`catalog-full-atlas`, `FULL_CATALOG_v1`), Deutsch, Zug 1, Bewegungsphase, 96 Kartenhexe und 25 Einheitensprites. |
+| Original und Herkunft | Projektroot `.tools/qa-shkd/build29-full-atlas-original.png`, Herkunft `.tools/qa-shkd/readme-original.json`, QA-Beleg `.tools/qa-shkd/after.md`. PNG, 1902 × 984, 1.328.751 Bytes, SHA256 `a4222aefbed2fbbbaeeb9442c25e381643dfb84bf61d312ff80fbcfe11164a72`. |
+| README-Ableitung | [field-test-0.1.29-full-atlas.webp](../docs/images/field-test-0.1.29-full-atlas.webp), WebP, 1902 × 984, 917.706 Bytes, SHA256 `33b5435c8193e05cd72e655dc9c2db8d7e9603a80a8e6e4149eb359f1de548c3`. |
+| Kompression und Prüfung | Pillow 13.0.0 / libwebp 1.6.0, `lossless=True, quality=100, method=6, exact=True`. Alle decodierten RGBA-Pixel und die Abmessungen entsprechen dem Original. |
 
 ## Build 0.1.28 · Field-Test nach User Report 02.11.
 
