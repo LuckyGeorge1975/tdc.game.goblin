@@ -20,7 +20,8 @@ test('Options alone gets separate header, content scrollport and non-sticky foot
   const panel=node(),classes=[],changes=[];panel.classList.add=value=>classes.push(value);
   const context={panel,t:key=>key,heading:()=>node('h2'),paragraph:()=>node('p'),
     button:(text,onclick)=>({...node('button'),textContent:text,onclick}),actions:(...children)=>{const el=node();el.append(...children);return el},
-    document:{createElement:node,createTextNode:text=>({text})},goBack(){},
+    document:{createElement:tag=>({...node(tag),addEventListener(){}}),createTextNode:text=>({text})},goBack(){},
+    reloadGameCache(){},optionsScrollObserver:null,ResizeObserver:class {observe(){}},
     GoblinLanguage:{languages:['de','en','es','fr'],current:'fr'},
     GoblinUIV2:{gridVisible:false,targetsVisible:true,damageVisible:true,
       panelVisible:key=>key!=='unit',setPanelVisible:(key,visible)=>changes.push([key,visible])},
@@ -67,4 +68,17 @@ test('focus clearance and original checkbox-row/Back sizes remain available',()=
   assert.match(rule('.v2-options-panel > .v2-options-main'),/scroll-padding:\s*5px/);
   assert.match(rule('.v2-setting-check'),/min-height:\s*56px/);
   assert.match(rule('.v2-foundation button'),/min-height:\s*44px/);
+});
+
+test('resetting transient game cache only reloads after confirmation', async () => {
+  const start=flow.indexOf('    async function reloadGameCache(');
+  const end=flow.indexOf('    function renderSavedLevels(',start);
+  let accepted=false, reloads=0;
+  const context={t:key=>key,GameDialogs:{isOpen:()=>false,confirm:async()=>accepted},location:{reload(){reloads++;}}};
+  vm.runInNewContext(flow.slice(start,end),context);
+  await context.reloadGameCache();
+  assert.equal(reloads,0);
+  accepted=true;
+  await context.reloadGameCache();
+  assert.equal(reloads,1);
 });

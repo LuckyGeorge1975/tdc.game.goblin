@@ -84,7 +84,7 @@ test('only a successful start or accepted restart requests the initial view afte
   const restart=flow.slice(flow.indexOf('    async function confirmRestart() {'),flow.indexOf('    async function goToLevels() {'));
   for(const accepted of [false,true])for(const engine of ['core','legacy']){
     const calls=[];
-    const context={...lifeGlobals,editorConfig:null,bindCampaignLesson(){},GameDialogs:{isOpen:()=>false,confirm:async()=>accepted},t:key=>key,
+    const context={...lifeGlobals,editorConfig:null,savedConfig:null,bindCampaignLesson(){},GameDialogs:{isOpen:()=>false,confirm:async()=>accepted},t:key=>key,
       currentScenario:'relay-run',loadScenario:id=>calls.push('load:'+id),
       IronDustBrowserV2:{mode:engine==='core'?'ready':'inactive',restart(){calls.push('restart')}},
       GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},

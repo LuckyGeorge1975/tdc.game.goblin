@@ -180,7 +180,12 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-animation-segments button { min-width: 44px; min-height: 44px; }
 .v2-animation-segments button[aria-pressed="true"] { border-color: var(--v2-accent-text); box-shadow: inset 0 0 0 1px var(--v2-accent-text); }
 .v2-screen-panel.v2-foundation.v2-options-panel { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; }
-.v2-options-panel > .v2-options-main { min-height: 0; overflow-y: auto; padding: 5px; scroll-padding: 5px; }
+.v2-options-panel > .v2-options-main { min-height: 0; overflow-y: auto; scrollbar-width: none; padding: 5px; scroll-padding: 5px; }
+.v2-options-main::-webkit-scrollbar { display: none; }
+.v2-screen-panel:is(.v2-options-panel, [data-screen="editor"]):not([hidden]) { border-radius: 10px; }
+.v2-saved-levels { display: grid; gap: 8px; }
+.v2-saved-levels article { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; border: 1px solid var(--v2-line); border-radius: 8px; }
+.v2-saved-levels strong { overflow-wrap: anywhere; }
 .v2-options-panel > .v2-screen-footer { position: static; margin-top: 0; z-index: auto; }
 .v2-screen-log { max-height: min(54dvh, 440px); overflow: auto; }
 .v2-screen-log p { border-bottom: 1px solid var(--v2-line); padding: 8px 0; }

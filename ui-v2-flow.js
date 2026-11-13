@@ -105,6 +105,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let campaign = null;
     let editorDraft = null, editorCell = {x:0,y:0}, editorError = '', editorBusy = false, editorMoving = false;
     let editorConfig = null, editorReturnScenario = null;
+    let savedConfig = null, savedTitle = '', savedTab = false, savedStarting = false, savedError = '';
+    let editorSaved = null, editorName = '', editorSavedMessage = '';
+    let optionsScrollObserver = null;
     let briefingDifficulty = 'medium';
     let libraryIndex = 0, libraryTab = 'values', libraryArtSide = 'own';
     let libraryKind = 'units', terrainIndex = 0;
@@ -288,7 +291,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const previous = screen;
       if (previous === 'editor' && next !== 'editor') editorMoving = false;
       const active = document.activeElement;
-      if (previous === 'levels') focusMemory.set(previous, `v2-level-${missionId}`);
+      if (previous === 'levels') focusMemory.set(previous, savedTab ? 'v2-level-tab-own' : `v2-level-${missionId}`);
       else if (surface.contains(active) && active.id) focusMemory.set(previous, active.id);
       const currentPanel = surface.querySelector('.v2-screen-panel');
       if (currentPanel) scrollMemory.set(previous, {
@@ -407,7 +410,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         message: t('dialog.restart.body'), acceptLabel: t('dialog.restart.confirm'), cancelLabel: t('dialog.restart.cancel')
       });
       if (!accepted) { renderScreen(false); return; }
-      if (editorConfig) loadEditorDraft(editorConfig);
+      if (editorConfig || savedConfig) loadEditorDraft(editorConfig || savedConfig);
       else if (globalThis.IronDustBrowserV2?.mode === 'ready') IronDustBrowserV2.restart();
       else loadScenario(currentScenario);
       bindCampaignLesson();
@@ -443,7 +446,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (globalThis.IronDustBrowserV2?.mode === 'ready') {
           IronDustBrowserV2.stop();
           loadScenario('iron-dust');
-        } else loadScenario(currentScenario);
+        } else loadScenario(savedConfig ? missionId : currentScenario);
+        savedConfig = null;
+        savedTitle = '';
         GoblinUIV2.resetView();
         started = false;
         releasePause();
@@ -479,6 +484,93 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       editorError = '';
       show('editor');
     }
+    function editSavedLevel(entry) {
+      try { editorDraft = GoblinEditorDraft.parse(entry.level); }
+      catch { savedError = t('v2.saved.readError'); renderScreen(false); return; }
+      editorSaved = entry;
+      editorName = entry.name;
+      editorSavedMessage = '';
+      editorCell = {x:0,y:0};
+      openEditor();
+    }
+    async function saveEditorLevel(overwrite) {
+      if (editorBusy || screen !== 'editor' || GameDialogs.isOpen()) return;
+      const previous = overwrite ? editorSaved : null;
+      if (previous && !await GameDialogs.confirm({id:'saved-level-overwrite',
+        title:t('v2.saved.overwrite'),message:t('v2.saved.overwriteBody'),
+        acceptLabel:t('v2.saved.overwrite'),cancelLabel:t('ui.dialog.cancel')})) return;
+      if (screen !== 'editor') return;
+      try {
+        editorSaved = GoblinSavedLevels.save(editorName, editorDraft, previous);
+        editorSavedMessage = t('v2.saved.success');
+        editorError = '';
+      } catch (error) {
+        editorSavedMessage = '';
+        editorError = t(error.message === 'name' ? 'v2.saved.nameError' :
+          error.message === 'conflict' ? 'v2.saved.conflict' : 'v2.saved.writeError');
+      }
+      renderScreen(false);
+    }
+    async function startSavedLevel(entry) {
+      if (savedStarting || GameDialogs.isOpen()) return;
+      savedStarting = true;
+      savedError = '';
+      const panel = surface.querySelector('.v2-screen-panel');
+      try {
+        const latest = GoblinSavedLevels.read().find(level => level.id === entry.id);
+        if (!latest || latest.level !== entry.level || latest.name !== entry.name) throw Error('conflict');
+        const config = await GoblinEditorDraft.prepare(GoblinEditorDraft.parse(latest.level));
+        if (screen !== 'levels' || !savedTab || surface.querySelector('.v2-screen-panel') !== panel) return;
+        globalThis.IronDustBrowserV2?.stop();
+        loadEditorDraft(config);
+        savedConfig = config;
+        savedTitle = latest.name;
+        started = true;
+        GoblinUIV2.resetView();
+        show('play');
+        releasePause();
+        GoblinUIV2.startView();
+      } catch {
+        if (surface.querySelector('.v2-screen-panel') === panel) savedError = t('v2.saved.readError');
+      } finally {
+        savedStarting = false;
+        if (screen === 'levels' && savedTab) renderScreen(false);
+      }
+    }
+    async function reloadGameCache() {
+      if (GameDialogs.isOpen()) return;
+      if (await GameDialogs.confirm({id:'v2-reload-cache',title:t('v2.cache.reload'),
+        message:t('v2.cache.confirm'),acceptLabel:t('v2.cache.reload'),cancelLabel:t('ui.dialog.cancel')}))
+        location.reload();
+    }
+    function renderSavedLevels(panel) {
+      const list = document.createElement('section');
+      list.className = 'v2-screen-main v2-saved-levels';
+      try {
+        const entries = GoblinSavedLevels.read();
+        if (!entries.length) list.append(paragraph(t('v2.saved.empty')));
+        for (const entry of entries) {
+          const row = document.createElement('article');
+          const title = document.createElement('strong');
+          title.textContent = entry.name;
+          const play = button(t('v2.saved.play'), () => startSavedLevel(entry));
+          const edit = button(t('v2.saved.edit'), () => editSavedLevel(entry));
+          let valid = false;
+          if (GoblinEditorDraft.available()) {
+            try { GoblinEditorDraft.parse(entry.level); valid = true; }
+            catch { row.append(paragraph(t('v2.saved.readError'))); }
+          }
+          play.disabled = edit.disabled = savedStarting || !valid;
+          row.append(title, actions(play, edit));
+          list.append(row);
+        }
+      } catch { list.append(paragraph(t('v2.saved.readError'))); }
+      if (savedError) list.append(paragraph(savedError));
+      const footer = document.createElement('footer');
+      footer.className = 'v2-screen-footer';
+      footer.append(actions(button(t('ui.nav.back'), () => show('menu'))));
+      panel.append(list, footer);
+    }
     function difficultyControl() {
       const label = document.createElement('label');
       label.textContent = t('v2.difficulty.label') + ' ';
@@ -500,6 +592,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       try {
         GoblinEditorDraft.validate(draft);
         editorDraft = draft;
+        editorSavedMessage = '';
         editorCell = cell;
         editorError = '';
         editorMoving = false;
@@ -529,7 +622,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const response = await fetch('assets/training/level-events-pilot.v3.json');
         if (!response.ok) throw Error('unavailable');
         const draft = GoblinEditorDraft.parse(await response.text());
-        if (screen === 'editor') updateEditor(draft,{x:1,y:3});
+        if (screen === 'editor') { editorSaved = null; editorSavedMessage = ''; updateEditor(draft,{x:1,y:3}); }
       } catch (error) {
         editorError = error.message;
       } finally {
@@ -563,12 +656,30 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function renderEditor(panel) {
       panel.append(heading(t('v2.editor.title')), paragraph(t('mission.editor-draft.objective.short')),
         paragraph(t('v2.editor.coreMark')));
+      const label = document.createElement('label');
+      const name = document.createElement('input');
+      name.id = 'v2-saved-level-name'; name.maxLength = 80; name.value = editorName;
+      name.oninput = () => { editorName = name.value; };
+      label.append(document.createTextNode(t('v2.saved.name')), name);
+      const save = button(t('v2.saved.saveNew'), () => saveEditorLevel(false));
+      const overwrite = button(t('v2.saved.overwrite'), () => saveEditorLevel(true));
+      save.disabled = editorBusy; overwrite.disabled = editorBusy;
+      panel.append(label, actions(save, ...(editorSaved ? [overwrite] : [])));
+      if (editorSavedMessage) {
+        const status = paragraph(editorSavedMessage);
+        status.setAttribute('role','status');
+        panel.append(status);
+      }
       GoblinEditorUI.render(panel, {
         draft:editorDraft, cell:editorCell, busy:editorBusy, error:editorError, moving:editorMoving,
         select:selectEditorCell, setMoving:setEditorMoving,
         update:updateEditor, pilot:loadEditorPilot, play:playEditorDraft, back:() => show('menu'),
         import(text) {
-          try { updateEditor(GoblinEditorDraft.parse(text)); }
+          try {
+            const draft = GoblinEditorDraft.parse(text);
+            editorSaved = null; editorSavedMessage = '';
+            updateEditor(draft);
+          }
           catch (error) { editorError = error.message; renderScreen(false); }
         }
       });
@@ -786,6 +897,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     globalThis.GoblinV2Flow = Object.freeze({ findUnit, openLibrary, hasStarted: () => started });
     function renderScreen(focus = true) {
+      optionsScrollObserver?.disconnect();
+      optionsScrollObserver = null;
       if (screen === 'play') return;
       const lastFocus = focus ? null : document.activeElement?.id;
       const lastIndex = focus ? -1 : [...surface.querySelectorAll('button:not(.v2-list-step), select, input')].indexOf(document.activeElement);
@@ -826,8 +939,16 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         renderEditor(panel);
       } else if (screen === 'levels') {
         const header = document.createElement('header'); header.className = 'v2-screen-header';
-        header.append(heading(t('ui.levels.title')));
+        const builtIn = button(t('v2.saved.builtIn'), () => { savedTab = false; renderScreen(false); });
+        const own = button(t('v2.saved.own'), () => { savedTab = true; savedError = ''; renderScreen(false); });
+        builtIn.id = 'v2-level-tab-built-in'; own.id = 'v2-level-tab-own';
+        builtIn.setAttribute('aria-pressed', String(!savedTab)); own.setAttribute('aria-pressed', String(savedTab));
+        header.append(heading(t('ui.levels.title')), actions(builtIn, own));
         panel.append(header);
+        if (savedTab) {
+          renderSavedLevels(panel);
+          return finishScreen(panel, focus, lastFocus, lastIndex);
+        }
         const layout = document.createElement('div'); layout.className = 'v2-level-layout v2-screen-main';
         const list = document.createElement('div'); list.className = 'v2-level-list';
         list.addEventListener('keydown', stepLevelSelection);
@@ -1095,12 +1216,33 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         autoSelectInput.checked = GoblinUIV2.autoSelectReady;
         autoSelectInput.onchange = () => GoblinUIV2.setAutoSelectReady(autoSelectInput.checked);
         autoSelect.append(autoSelectInput, document.createTextNode(t('v2.autoSelectReady')));
-        content.append(language, animation, grid, ...displayOptions, phaseNotice, autoSelect, alpha, paragraph(t('ui.settings.note')));
+        content.tabIndex = 0;
+        content.setAttribute('aria-label', t('v2.options.scrollArea'));
+        content.append(language, animation, grid, ...displayOptions, phaseNotice, autoSelect, alpha,
+          button(t('v2.cache.reload'), reloadGameCache), paragraph(t('ui.settings.note')));
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-options-back';
-        footer.append(actions(back));
+        const up = button('↑', () => content.scrollBy({top:-content.clientHeight * .8}));
+        const down = button('↓', () => content.scrollBy({top:content.clientHeight * .8}));
+        up.setAttribute('aria-label', t('v2.options.scrollUp'));
+        down.setAttribute('aria-label', t('v2.options.scrollDown'));
+        const updateScroll = () => {
+          const limit = content.scrollHeight - content.clientHeight;
+          up.hidden = down.hidden = limit <= 1;
+          up.disabled = content.scrollTop <= 1;
+          down.disabled = content.scrollTop >= limit - 1;
+        };
+        content.addEventListener('scroll', updateScroll);
+        footer.append(actions(back, up, down));
+        const observer = new ResizeObserver(updateScroll);
+        observer.observe(content);
+        for (const child of content.children) observer.observe(child);
+        optionsScrollObserver = observer;
         panel.append(header, content, footer);
       }
+      finishScreen(panel, focus, lastFocus, lastIndex);
+    }
+    function finishScreen(panel, focus, lastFocus, lastIndex) {
       const savedScroll = scrollMemory.get(screen);
       if (savedScroll) {
         panel.scrollTop = savedScroll.panel;
@@ -1129,6 +1271,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     new MutationObserver(() => { if (screen === 'levels') renderScreen(false); })
       .observe(document.querySelector('#scenario-select'), { childList: true });
     globalThis.addEventListener('goblin-v2-render', () => {
+      if (savedTitle && currentScenario === 'editor-draft')
+        document.querySelector('#v2-mission').textContent = savedTitle;
       if (screen === 'play' && !globalThis.GoblinMovement?.busy() &&
           !globalThis.GoblinLevelEvents?.pending(legacySession) && GoblinUIV2.project().gameOver) show('end');
     });

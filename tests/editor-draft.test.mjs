@@ -11,6 +11,56 @@ async function scene() {
   return g;
 }
 
+test('saved v3 levels reload by stable ID and restart from the admitted start snapshot', async () => {
+  const disk = new Map();
+  const open = async () => {
+    const game = await scene();
+    game.context.localStorage = {getItem:key=>disk.get(key)??null,setItem:(key,value)=>disk.set(key,value)};
+    game.run(readFileSync(new URL('../saved-levels.js',import.meta.url),'utf8'));
+    return game;
+  };
+  const first = await open();
+  const a = read(first, "GoblinSavedLevels.save('Atlas copy',draft)");
+  const b = read(first, "GoblinSavedLevels.save('Atlas copy',draft)");
+  assert.notEqual(a.id,b.id);
+  assert.equal(JSON.parse(a.level).version,'goblin-level-v3');
+  const second = await open();
+  assert.deepEqual(read(second,'GoblinSavedLevels.read()'),[a,b]);
+  const flow = readFileSync(new URL('../ui-v2-flow.js',import.meta.url),'utf8');
+  const start = flow.slice(flow.indexOf('    async function startSavedLevel('),flow.indexOf('    async function reloadGameCache('));
+  const restart = flow.slice(flow.indexOf('    async function confirmRestart('),flow.indexOf('    async function goToLevels('));
+  second.run(`
+    let screen='levels',savedTab=true,savedStarting=false,savedError='',savedConfig=null,savedTitle='',editorConfig=null,started=false;
+    let panel={};
+    const surface={querySelector:()=>panel};
+    const renderScreen=()=>{},show=value=>{screen=value},releasePause=()=>{},bindCampaignLesson=()=>{};
+    const GoblinUIV2={resetView(){},startView(){}};
+    ${start}
+    ${restart}
+  `);
+  const beforeStart = second.state();
+  const stale = second.run('startSavedLevel(GoblinSavedLevels.read()[0])');
+  second.run('panel={}');
+  await stale;
+  assert.equal(second.run('screen'),'levels');
+  assert.equal(second.state(),beforeStart);
+  await second.run('startSavedLevel(GoblinSavedLevels.read()[0])');
+  assert.equal(second.run('screen'),'play');
+  assert.equal(second.run('savedTitle'),'Atlas copy');
+  const snapshot = read(second,'savedConfig.units');
+  second.run("GoblinSavedLevels.save('Revised',draft,GoblinSavedLevels.read()[0]); units[0].x=0");
+  await second.run('confirmRestart()');
+  assert.deepEqual(read(second,'legacySession.config.units'),snapshot);
+  assert.equal(read(second,'GoblinSavedLevels.read()[0].id'),a.id);
+  assert.throws(()=>second.run(`GoblinSavedLevels.save('Stale',draft,${JSON.stringify(a)})`),/conflict/);
+  const before = [...disk];
+  second.context.localStorage.setItem = () => { throw Error('quota'); };
+  assert.throws(()=>second.run("GoblinSavedLevels.save('Quota',draft)"),/quota/);
+  assert.deepEqual([...disk],before);
+  disk.set(before[0][0],'{');
+  assert.throws(()=>second.run('GoblinSavedLevels.read()'));
+});
+
 test('draft JSON round-trips and rejects malformed coordinates, IDs, terrain and objective without a world change',async()=>{
   const g = await scene();
   const before = g.state();
@@ -84,9 +134,14 @@ test('a prepared draft starts real FULL play without registration, mutation of c
 test('editor flow keeps the validated draft across playtest and rejects an import without replacing it',async()=>{
   const g = await scene();
   const flow = readFileSync(new URL('../ui-v2-flow.js',import.meta.url),'utf8');
+  g.context.document.createTextNode = text => text;
+  const createElement = g.context.document.createElement;
+  g.context.document.createElement = () => Object.assign(createElement(), {append() {}});
   g.run(`
     let screen='menu',campaign=null,started=false,editorDraft=null,editorCell={x:0,y:0},editorError='',editorBusy=false,editorMoving=false;
     let editorConfig=null,editorReturnScenario=null;
+    let editorSaved=null,editorName='',editorSavedMessage='';
+    const button=()=>({}),actions=()=>({});
     const show=next=>{screen=next},releasePause=()=>{},renderScreen=()=>{},heading=x=>x,paragraph=x=>x;
     const GoblinUIV2={resetView(){},startView(){}},GoblinEditorUI={render(panel,view){globalThis.editorView=view}};
     ${flow.slice(flow.indexOf('    async function leaveMission('),flow.indexOf('    function libraryAssetId('))}
