@@ -1185,7 +1185,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-library-exit';
         footer.append(actions(back));
         if (libraryKind === 'rules' || libraryKind === 'tips') {
-          panel.append(header, libraryReference(libraryKind), footer);
+          panel.append(header, steppedList(libraryReference(libraryKind), 'v2-library-detail-scroll'), footer);
         } else {
           header.append(paragraph(t(libraryKind === 'terrain' ? 'v2.library.terrain.note' : 'v2.ui.catalogNote')));
           const layout = document.createElement('div'); layout.className = 'v2-library-layout v2-screen-main';
