@@ -59,7 +59,7 @@ test('library switches between four localized areas and keeps unit and terrain d
     document: {createElement: node, readyState: 'loading', addEventListener() {}},
     location: {href: import.meta.url}, URL, URLSearchParams,
     libraryKind: 'units', screen: 'play', returnScreen: '', libraryIndex: 0, terrainIndex: 0,
-    libraryTab: 'range', terrainIds: ['open-ground', 'rubble-field'], unitGuideEntries: ['first', 'second'],
+    libraryTab: 'range', libraryLiveId:null, libraryFullRegistry:()=>null, terrainIds: ['open-ground', 'rubble-field'], unitGuideEntries: ['first', 'second'],
     libraryTarget: entry => ({unit: {id: entry}}), GameDialogs: {isOpen: () => false},
     GoblinUIV2: {project: () => ({})}, matchMedia: () => ({matches: false}), renderScreen() {},
     button: (textContent, onclick) => ({...node('button'), textContent, onclick}),
@@ -94,5 +94,36 @@ test('library switches between four localized areas and keeps unit and terrain d
   context.openLibrary('unit', 'second');
   assert.equal(context.libraryKind, 'units');
   assert.equal(context.libraryIndex, 1);
-  assert.equal(context.libraryTab, 'values');
+  assert.equal(context.libraryTab, 'description');
+});
+test('FULL reference weapons use approved slots and all four locales contain the linked rules', () => {
+  const registry = JSON.parse(readFileSync(new URL('../assets/unit-art/rules/unit-profiles.catalog-approved.v1.json',import.meta.url),'utf8'));
+  const context = {started:false, GoblinCatalogFullModel:{editorProfile:{catalog:{registry}}},
+    libraryAssetId:entry=>entry.id};
+  runInNewContext(readFileSync(new URL('../ogre-systems.js',import.meta.url),'utf8'),context);
+  runInNewContext(readFileSync(new URL('../siege-tank-fire-budget.js',import.meta.url),'utf8'),context);
+  runInNewContext(readFileSync(new URL('../library-full-copy.js',import.meta.url),'utf8') +
+    slice('    function libraryFullRegistry(', '    function libraryWeaponName(') +
+    '\n globalThis.refs={rules:libraryFullRules, units:libraryFullUnitRules};',context);
+  const weapons = id => JSON.parse(JSON.stringify(context.libraryReferenceWeapons({id},registry)));
+  assert.deepEqual(weapons('goblin-siegebreaker').map(w=>[w.id,w.range]).sort(),
+    [['antipersonnel',1],['main',3],['missiles',5],['secondary',2]]);
+  assert.deepEqual(weapons('siege-tank').map(w=>w.attack),[3,6,1]);
+  assert.deepEqual(weapons('command-hub'),[]);
+  assert.equal(weapons('strategic-missile-carrier')[0].range,8);
+  assert.equal(context.libraryFullRegistry({}),registry);
+  context.started=true;
+  assert.equal(context.libraryFullRegistry({profile:'FIELD_TEST_LEGACY_v1'}),null);
+  assert.equal(context.libraryFullRegistry({profile:'FULL_CATALOG_v1'}),registry);
+  assert.equal(Object.keys(context.refs.units).length,26);
+  assert.equal(context.refs.rules.length,15);
+  for (const lang of ['de','en','es','fr']) {
+    const {messages} = JSON.parse(readFileSync(new URL(`../assets/ui-copy/library-01.${lang}.json`,import.meta.url),'utf8'));
+    for (const id of context.refs.rules)
+      assert.ok(messages[`library.rules.${id}.title`] && messages[`library.rules.${id}.body`]);
+    for (const [id,rules] of Object.entries(context.refs.units)) {
+      assert.ok(messages[`library.unit.${id}.tactics`]);
+      assert.ok(rules.every(rule=>context.refs.rules.includes(rule)));
+    }
+  }
 });

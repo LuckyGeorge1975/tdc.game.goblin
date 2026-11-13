@@ -109,7 +109,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let editorSaved = null, editorName = '', editorSavedMessage = '';
     let optionsScrollObserver = null;
     let briefingDifficulty = 'medium';
-    let libraryIndex = 0, libraryTab = 'values', libraryArtSide = 'own';
+    let libraryIndex = 0, libraryTab = 'description', libraryArtSide = 'own', libraryMapMode = 'move';
+    let libraryWeapon = null, libraryRule = null, libraryLiveId = null;
     let libraryKind = 'units', terrainIndex = 0;
     const focusMemory = new Map(), scrollMemory = new Map();
     const waiting = [];
@@ -324,7 +325,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         });
       }
     }
-    function openSection(next) { returnScreen = screen; show(next); }
+    function openSection(next) { if (next === 'catalog') libraryLiveId = null; returnScreen = screen; show(next); }
     function goBack() { show(returnScreen === 'play' && GoblinUIV2.project().gameOver ? 'end' : returnScreen); }
     function selectLevel(id) {
       missionId = id;
@@ -695,7 +696,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function openLibraryEntry(index) {
       libraryIndex = index;
-      libraryTab = 'values';
+      libraryTab = 'description';
       if (matchMedia('(max-width: 900px)').matches) show('catalog-detail');
       else renderScreen(false);
     }
@@ -715,20 +716,61 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function libraryTarget(entry, state) {
       if (!started || state.gameOver || !['play', 'pause', 'catalog', 'catalog-detail'].includes(returnScreen))
         return {reason:'screen.library.mapUnavailable.noMission'};
-      const match = state.units.find(unit => state.scenario === 'iron-dust-v2'
-        ? unit.id === entry.coreUnitId : ['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(state.scenario)||globalThis.GoblinCatalogFullRuntime?.active() ? unit.visualKey === libraryAssetId(entry) : unit.name === entry.name);
+      const asset = libraryAssetId(entry);
+      const matches = state.units.filter(unit => !unit.embarkedOn && (state.scenario === 'iron-dust-v2'
+        ? unit.id === entry.coreUnitId : (unit.catalogAssetId ?? UnitVisuals.artKey(unit)) === asset));
+      const match = matches.find(unit=>unit.id===libraryLiveId) ?? (matches.length === 1 ? matches[0] : null);
+      if (!match && matches.length > 1) return {reason:'v2.library.ambiguous'};
       if (!match) return {reason:'screen.library.mapUnavailable.notPresent'};
       if (unitDead(match)) return {unit:match,reason:'screen.library.mapUnavailable.destroyed'};
       return {unit:match};
     }
-    function libraryDetail(entry, index, state, mobile) {
-      const card=globalThis.GoblinCatalogFullRuntime?.catalogCard(entry);if(card)entry={...entry,...card};
-      const target = libraryTarget(entry, state);
-      const live = target.unit;
-      const detail = document.createElement('section'); detail.className = 'v2-library-detail';
+    function libraryFullRegistry(state) {
+      const model = globalThis.GoblinCatalogFullModel;
+      if (started && state.profile !== 'FULL_CATALOG_v1') return null;
+      return model?.editorProfile?.catalog.registry ?? null;
+    }
+    function libraryReferenceWeapons(entry, registry) {
+      const id = libraryAssetId(entry), rule = registry?.units[id]?.target;
+      const weapon = (id, spec, count = 1, icon = id) => ({id, ...spec, count, icon});
+      if (!rule) {
+        if (id === 'goblin-siegebreaker')
+          return Object.entries(GoblinSystems.WEAPONS).map(([key, spec]) => weapon(key, spec, spec.count));
+        const range = UnitGuideRange.profile(entry,null).range;
+        return range > 0 ? [weapon('fire',{attack:entry.attack,range},1,'fire')] : [];
+      }
+      if (rule.systemDefinitionRef) {
+        const system = GoblinSystems.createCatalogSystem(registry,id);
+        const slots = system.rules.definition.components.filter(item => item.kind === 'weapon');
+        return [...new Set(slots.map(slot => slot.weaponClassRef))].map(key =>
+          weapon(key,system.rules.weaponClasses[key],slots.filter(slot=>slot.weaponClassRef===key).length));
+      }
+      if (rule.fireRuleRef === 'siege-tank-fire-budget-v1') {
+        const specs = GoblinSiegeBudget.WEAPONS;
+        return [weapon('main',specs['main-1'],2), weapon('combined',specs['main-both'],null,'main'),
+          weapon('antipersonnel',specs['ap-1'],2)];
+      }
+      if (!rule.range || rule.fireRuleRef === 'no-fire-v1') return [];
+      const key = rule.missileRuleRef ? 'missiles' : rule.fireRuleRef === 'artillery-spotter-v1' ? 'indirect' : 'fire';
+      return [weapon(key,{attack:rule.strengthRef?2:rule.attack,range:rule.range},1,key)];
+    }
+    function libraryWeaponName(weapon) {
+      return t(weapon.id === 'combined' ? 'v2.library.combined' :
+        weapon.id === 'indirect' ? 'v2.library.artillery' :
+        weapon.id === 'fire' ? 'v2.ui.fire' : `v2.ui.weapon.${weapon.id}`);
+    }
+    function libraryDetail(entry, state, mobile) {
+      const registry = libraryFullRegistry(state), id = libraryAssetId(entry);
+      const rule = registry?.units[id]?.target;
+      const system = rule?.systemDefinitionRef ? GoblinSystems.createCatalogSystem(registry,id) : null;
+      const target = libraryTarget(entry,state);
+      const detail = document.createElement('section'); detail.className = 'v2-library-detail v2-library-unit-detail';
       const title = mobile ? heading(libraryName(entry)) : document.createElement('h3');
       if (!mobile) title.textContent = libraryName(entry);
-      const header = document.createElement('div'); header.className = 'v2-library-detail-head';
+      const identity = document.createElement('div'); identity.className = 'v2-library-identity';
+      identity.append(title, paragraph(GoblinLanguage.translate(entry.role)));
+      const top = document.createElement('div'); top.className = 'v2-library-unit-top';
+      const artPanel = document.createElement('div'); artPanel.className = 'v2-library-art-panel';
       const artId = libraryAssetId(entry);
       const enemyArt = `assets/unit-art/sets/02-technical-illustration/library-enemy/${artId}`;
       const art = libraryArtSide === 'enemy' ? `${enemyArt}@768.png`
@@ -742,57 +784,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           const source = document.createElement('source'); source.srcset = webp; source.type = 'image/webp';
           picture.append(source);
         }
-        const image = document.createElement('img'); image.src = art; image.alt = '';
+        const image = document.createElement('img'); image.src = art; image.alt = libraryName(entry);
+        image.onerror = () => picture.replaceWith(UnitVisuals.iconElement(entry, 'v2-library-fallback'));
         const caption = document.createElement('figcaption');
         caption.textContent = `${libraryName(entry)} · ${t(`v2.ui.preview.${libraryArtSide}`)}`;
-        picture.append(image); figure.append(picture, caption); header.append(figure);
+        picture.append(image); figure.append(picture, caption); artPanel.append(figure);
       }
-      const identity = document.createElement('div'); identity.className = 'v2-library-identity';
-      identity.append(title, paragraph(t('screen.library.category'), 'v2-library-category'),
-        paragraph(GoblinLanguage.translate(entry.role)),
-        paragraph(GoblinLanguage.translate(entry.team), 'v2-library-team'));
-      header.append(identity);
-      const values = document.createElement('dl'); values.className = 'v2-library-values';
-      const siegeSpec=live?.siegeFireBudget?GoblinSiegeWeapons.weapons(live)?.[live.siegeWeapon]:null;
-      const system = !!live && (!!live.catalogSystems || !!live.weapons || !!state.systems.find(item => item.id === live.id));
-      for (const [key, value] of [['attack',system ? t('v2.ui.byWeapon') : siegeSpec?.attack ?? live?.attack ?? entry.attack],
-        ['defense',system ? t('screen.library.value.bySystem') : live?.defense ?? entry.defense],
-        ['move',live ? `${live.move}${live.secondaryMove?` + ${live.secondaryMove}`:''}` : entry.move],
-        ['range',system ? t('v2.ui.byWeapon') : siegeSpec?.range ?? live?.range ?? entry.range]]) {
-        const field = document.createElement('div');
-        const label = document.createElement('dt'); label.textContent = t(`v2.ui.${key}`);
-        const number = document.createElement('dd'); number.textContent = libraryValue(value);
-        field.append(label, number); values.append(field);
-      }
-      const tabs = document.createElement('div'); tabs.className = 'v2-library-tabs';
-      for (const [tab, key] of [['values','screen.library.tab.valuesNote'],
-        ['range','screen.library.tab.range']]) {
-        const item = button(t(key), () => { libraryTab = tab; renderScreen(false); });
-        item.id = `v2-library-tab-${tab}`;
-        item.setAttribute('aria-pressed', String(libraryTab === tab));
-        tabs.append(item);
-      }
-      const body = document.createElement('div'); body.className = 'v2-library-detail-body';
-      if (libraryTab === 'values') {
-        const hpValue = live?.catalogSystems?`${live.catalogSystems.treads}/${live.catalogSystems.maxTreads}`:system ? t('screen.library.value.bySystem') : live
-          ? `${Math.max(0, live.hp)}/${live.maxHp}` : (entry.hp === 'SYSTEMS'||card?.system)
-            ? t('screen.library.value.bySystem') : entry.hp;
-        body.append(paragraph(`${t(live?.catalogSystems||card?.system?'v2.ui.treads':'v2.ui.armorHp')}: ${hpValue}`, 'v2-library-hp'));
-        if(live?.artilleryFire)body.append(paragraph(GoblinArtilleryWeapons.summary(live)));
-        if(live?.siegeFireBudget)body.append(paragraph(GoblinSiegeWeapons.summary(live)));
-        body.append(paragraph(live?.catalogId?GoblinCatalogRuntime.summary(live,state.units):GoblinLanguage.translate(entry.copy)));
-        if (UnitGuideRange.profile(entry,live).bonus > 0) body.append(paragraph(t('screen.library.value.skimmerManeuver')));
-      } else {
-        const pilotLive=live&&(globalThis.GoblinCatalogFullRuntime?.active()||['skimmer-pilot','siege-pilot','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(state.scenario));
-        const profile = pilotLive ? {...UnitGuideRange.profile(entry,live),bonus:live.secondaryMove??0} : UnitGuideRange.profile(entry, null);
-        for (const [mode, key] of [['move','v2.ui.move'], ['attack','v2.ui.attack']]) {
-          const figure = document.createElement('figure'); figure.className = 'v2-library-range';
-          const caption = document.createElement('figcaption'); caption.textContent = t(key);
-          figure.innerHTML = UnitGuideRange.mapSvg(profile, mode);
-          figure.prepend(caption); body.append(figure);
-        }
-        body.append(paragraph(live?.catalogId ? t('v2.catalog.schematicNote') : pilotLive ? t(`mission.${state.scenario}.budget`) : t('v2.ui.catalogNote')));
-      }
+
       const find = button(t('screen.library.showOnMap'), () => findUnit(target.unit.id));
       find.id = 'v2-library-find'; find.disabled = !!target.reason;
       const mapRow = document.createElement('div'); mapRow.className = 'v2-library-map-action';
@@ -810,7 +808,94 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         choice.setAttribute('aria-pressed', String(libraryArtSide === side));
         artSwitch.append(choice);
       }
-      detail.append(header, values, artSwitch, tabs, body, mapRow);
+
+      artPanel.append(artSwitch);
+      const weapons = libraryReferenceWeapons(entry,registry);
+      const selectionKey = `${state.profile}:${registry?.dataVersion ?? 'legacy'}:${id}`;
+      if (libraryWeapon?.key !== selectionKey || !weapons.some(weapon=>weapon.id===libraryWeapon.id))
+        libraryWeapon = {key:selectionKey,id:weapons[0]?.id};
+      const weapon = weapons.find(item=>item.id===libraryWeapon.id);
+      const profile = rule ? {movement:rule.movement[0],bonus:rule.gevPhaseEligible ? rule.movement[1] : 0} : UnitGuideRange.profile(entry,null);
+      const diagram = document.createElement('div'); diagram.className = 'v2-library-diagram';
+      const modes = document.createElement('div'); modes.className = 'v2-library-tabs';
+      for (const [mode,key] of [['move','v2.ui.move'],['attack','v2.ui.fire']]) {
+        const choice = button(t(key),()=>{libraryMapMode=mode;renderScreen(false)});
+        choice.id = `v2-library-map-${mode}`;
+        choice.setAttribute('aria-pressed',String(libraryMapMode===mode));
+        modes.append(choice);
+      }
+      const preview = document.createElement('div'); preview.className = 'v2-library-diagram-map';
+      const figure = document.createElement('figure'); figure.className = 'v2-library-range';
+      figure.innerHTML = UnitGuideRange.mapSvg({...profile,range:weapon?.range??0},libraryMapMode);
+      const caption = document.createElement('figcaption');
+      caption.textContent = libraryMapMode === 'move' ? (profile.movement ?
+        [t('v2.ui.movePoints',{cost:profile.movement}),profile.bonus ? `+ ${t('v2.ui.movePoints',{cost:profile.bonus})} ${t('screen.library.value.skimmerManeuver')}` : ''].filter(Boolean).join(' · ') :
+        t('v2.library.noMovement')) : weapon ? `${libraryWeaponName(weapon)} · ${t('v2.ui.range')} ${weapon.range}` : t('v2.library.noWeapon');
+      figure.append(caption);
+      figure.title = t('v2.library.schematic');
+      preview.append(figure);
+      if (libraryMapMode === 'attack' && weapons.length) {
+        const rail = document.createElement('div'); rail.className = 'v2-library-weapon-rail';
+        for (const option of weapons) {
+          const name = libraryWeaponName(option);
+          const choice = button('',()=>{libraryWeapon={key:selectionKey,id:option.id};renderScreen(false)});
+          choice.innerHTML = GoblinUIV2.svgIcon(option.icon);
+          choice.id = `v2-library-weapon-${option.id}`; choice.title = name;
+          choice.setAttribute('aria-label',name);
+          choice.setAttribute('aria-pressed',String(option===weapon));
+          rail.append(choice);
+        }
+        preview.append(rail);
+      }
+      diagram.append(modes,preview);
+      if (libraryMapMode === 'attack' && rule?.missileRuleRef && weapon) {
+        const strike = StrategicMissile.STRIKE;
+        diagram.append(paragraph(t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.splashAttack}),'v2-library-splash'));
+      }
+      top.append(artPanel,diagram);
+      const tabs = document.createElement('div'); tabs.className = 'v2-library-tabs';
+      for (const tab of ['description','stats','specials','strategy']) {
+        const item = button(t(`v2.library.detail.${tab}`),()=>{libraryTab=tab;renderScreen(false)});
+        item.id = `v2-library-tab-${tab}`;
+        item.setAttribute('aria-pressed',String(libraryTab===tab));
+        tabs.append(item);
+      }
+      const body = document.createElement('div'); body.className = 'v2-library-detail-body';
+      if (libraryTab === 'description') {
+        body.append(paragraph(GoblinLanguage.translate(entry.copy)),paragraph(t('v2.library.schematic')));
+      } else if (libraryTab === 'stats') {
+        const values = document.createElement('dl'); values.className = 'v2-library-values';
+        const fields = [
+          ['v2.ui.attack',weapon?.attack],['v2.ui.range',weapon?.range],
+          ['v2.ui.defense',system ? 'BY SYSTEM' : rule?.defense ?? entry.defense],
+          ['v2.ui.move',t('v2.ui.movePoints',{cost:profile.movement})],
+          [system?'v2.ui.treads':rule?.strengthRef?'v2.ui.strength':'v2.ui.armorHp',
+            system ? `${system.treads}/${system.maxTreads}` : rule?.strengthRef ? 2 : rule?.hp ?? entry.hp]
+        ];
+        for (const [key,value] of fields) {
+          const field = document.createElement('div'), label = document.createElement('dt'), number = document.createElement('dd');
+          label.textContent = t(key); number.textContent = libraryValue(value ?? '—');
+          field.append(label,number); values.append(field);
+        }
+        body.append(paragraph(t('v2.library.referenceValues')),values);
+        if (profile.bonus > 0) body.append(paragraph(t('screen.library.value.skimmerManeuver')));
+        if (weapon?.count > 1) body.append(paragraph(t('v2.library.slotCount',{count:weapon.count})));
+        if (system) body.append(paragraph(t('v2.library.systemBands',{points:rule.movement.join(' / ')})));
+        if (target.unit && !target.reason) body.append(paragraph(t('v2.library.livePosition',{hex:`${String.fromCharCode(65+target.unit.x)}-${String(target.unit.y+1).padStart(2,'0')}`})));
+      } else {
+        const strategy = libraryTab === 'strategy';
+        if (strategy) body.append(paragraph(rule ? t(`library.unit.${id}.tactics`) : t('v2.library.noStrategy')));
+        const refs = rule ? (libraryFullUnitRules[id] ?? []).filter(ref=>strategy === ['movement','fire'].includes(ref)) : [];
+        const links = refs.map(ref => button(t(`library.rules.${ref}.title`), () => {
+          libraryRule = ref; libraryKind = 'rules'; show('catalog', false);
+          const rule = document.getElementById(`v2-library-rule-${ref}`);
+          rule?.scrollIntoView({block:'nearest'});
+          rule?.querySelector('summary')?.focus({preventScroll:true});
+        }));
+        if (links.length) body.append(actions(...links));
+        if (!strategy && !refs.length) body.append(paragraph(t('v2.library.noSpecials')));
+      }
+      detail.append(identity,top,tabs,body,mapRow);
       return detail;
     }
     // Terrain entries of the library (UR-D): the former terrain card of the game screen, with its rules.
@@ -857,6 +942,18 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       title.textContent = t(`v2.library.${kind}.status`);
       section.append(title, paragraph(t(`v2.library.${kind}.intro`)));
       if (kind === 'rules') {
+        if (libraryFullRegistry(GoblinUIV2.project())) {
+          for (const id of libraryFullRules) {
+            const rule = document.createElement('details');
+            rule.id = `v2-library-rule-${id}`;
+            rule.open = libraryRule === id;
+            const summary = document.createElement('summary');
+            summary.textContent = t(`library.rules.${id}.title`);
+            rule.append(summary,paragraph(t(`library.rules.${id}.body`)));
+            section.append(rule);
+          }
+          return section;
+        }
         for (const [topic, items] of [
           ['general', ['turns', 'combat']],
           ['profiles', ['profiles', 'specials']],
@@ -883,8 +980,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (libraryKind === 'terrain') terrainIndex = Math.max(0, terrainIds.indexOf(key));
       else {
         const state = GoblinUIV2.project();
+        libraryLiveId = key;
         const index = unitGuideEntries.findIndex(entry => libraryTarget(entry, {...state, gameOver: false}).unit?.id === key);
-        if (index >= 0) { libraryIndex = index; libraryTab = 'values'; }
+        if (index >= 0) { libraryIndex = index; libraryTab = 'description'; }
       }
       show(matchMedia('(max-width: 900px)').matches ? 'catalog-detail' : 'catalog');
     }
@@ -1109,20 +1207,20 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           layout.append(list);
           if (!matchMedia('(max-width: 900px)').matches)
             layout.append(libraryKind === 'terrain' ? terrainDetail(terrainIds[terrainIndex], false)
-              : libraryDetail(unitGuideEntries[libraryIndex], libraryIndex, state, false));
+              : libraryDetail(unitGuideEntries[libraryIndex], state, false));
           panel.append(header, layout, footer);
         }
       } else if (screen === 'catalog-detail') {
         const terrain = libraryKind === 'terrain';
         const detail = terrain ? terrainDetail(terrainIds[terrainIndex], true)
-          : libraryDetail(unitGuideEntries[libraryIndex], libraryIndex, state, true);
+          : libraryDetail(unitGuideEntries[libraryIndex], state, true);
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer v2-library-footer';
         const back = button(t('screen.library.back'), returnToLibrary); back.id = 'v2-library-back';
         const count = paragraph(t('screen.library.count', {current:(terrain ? terrainIndex : libraryIndex) + 1,
           total:terrain ? terrainIds.length : unitGuideEntries.length}), 'v2-library-count');
         const next = button(t('screen.library.next'), () => {
           if (terrain) terrainIndex = (terrainIndex + 1) % terrainIds.length;
-          else { libraryIndex = (libraryIndex + 1) % unitGuideEntries.length; libraryTab = 'values'; }
+          else { libraryIndex = (libraryIndex + 1) % unitGuideEntries.length; libraryTab = 'description'; }
           renderScreen(false);
         });
         next.id = 'v2-library-next';

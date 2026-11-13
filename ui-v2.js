@@ -355,7 +355,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       get phaseNoticeSeconds() { return phaseNoticeSeconds; }, setPhaseNoticeSeconds,
       get autoSelectReady() { return view.autoSelectReady; }, setAutoSelectReady,
       closeTarget: () => { if (view.target) clearContext(); },
-      trainingFirePreview,
+      trainingFirePreview, svgIcon,
       panelVisible: key => intelSections[key],
       setPanelVisible,
       refresh: () => { areaCache.key = null; targetCache.key = null; render(); } });
