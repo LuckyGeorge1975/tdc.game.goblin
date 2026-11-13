@@ -2,6 +2,30 @@ import test from 'node:test';import assert from 'node:assert/strict';import fs f
 import {fullScene} from './catalog-full-harness.mjs';import {read} from './artillery-product-harness.mjs';
 const source=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8'),ui=process.env.DISPLAY_FIX_UI?fs.readFileSync(process.env.DISPLAY_FIX_UI,'utf8'):source('ui-v2.js'),flow=source('ui-v2-flow.js');
 const cut=(s,a,b)=>{const start=s.indexOf(a),end=s.indexOf(b,start);assert.ok(start>=0&&end>start);return s.slice(start,end)};
+test('saved FULL draft without a limit omits the counter, while a real limit is shown', async () => {
+  const g = await fullScene('catalog-full-atlas',7,false,'FULL_CATALOG_v1');
+  g.run(source('editor-draft.js'));
+  await g.run('GoblinEditorDraft.prepare(GoblinEditorDraft.copyTemplate()).then(loadEditorDraft)');
+  const body = cut(ui,'      if(state.fullStatus){','      status.title=');
+  g.run(`
+    function renderLimit(fullStatus) {
+      const state={fullStatus},status={textContent:''},t=(key,params)=>[key,params?.current,params?.limit].join('/');
+      ${body}
+      return status.textContent;
+    }
+  `);
+  assert.equal(g.run('renderLimit(GoblinCatalogFullRuntime.status())'),'');
+  assert.equal(g.run('renderLimit({turnLimit:null,enemyTurns:0})'),'');
+  assert.equal(g.run('renderLimit({turnLimit:8,enemyTurns:2})'),' · v2.full.limit.status/2/8');
+  const briefing = cut(flow,'          if(Number.isSafeInteger(full.turnLimit)','        const conditions');
+  g.run(`function briefingLimit(full){
+    const output=[],header={append(value){output.push(value)}},paragraph=x=>x,t=(key,{limit})=>[key,limit].join('/');
+    ${briefing.split('\n')[0]}
+    return output;
+  }`);
+  assert.deepEqual(read(g,'briefingLimit({})'),[]);
+  assert.deepEqual(read(g,'briefingLimit({turnLimit:8})'),['v2.full.limit.briefing/8']);
+});
 const unchanged=(g,b)=>{assert.equal(g.state(),b.state);assert.deepEqual(read(g,'GoblinCatalogFullRuntime.snapshot()'),b.full);assert.deepEqual(g.rng(),b.rng);assert.deepEqual(read(g,'({view,history:phaseCommands,rolls:phaseRolls,cursor:phaseRollCursor})'),b.viewHistory)};
 const before=g=>({state:g.state(),full:read(g,'GoblinCatalogFullRuntime.snapshot()'),rng:g.rng(),viewHistory:read(g,'({view,history:phaseCommands,rolls:phaseRolls,cursor:phaseRollCursor})')});
 function overlay(g){g.context.GoblinLanguage={current:"de",t:k=>k};g.context.__shapes=[];g.context.__legend={textContent:''};g.context.document.body={classList:{contains:()=>false}};g.context.document.createElementNS=()=>({classList:{add(){}},setAttribute(){}});g.run(`{const at=()=>__legend,nativeMap={querySelector(){return {replaceChildren(){__shapes.length=0},append(n){__shapes.push(n)}}},getBoundingClientRect(){return {width:790}},viewBox:{baseVal:{width:790}},style:{}},core=()=>false,planningArea=()=>null,areaData=()=>({legal:[],blocked:[],status:'blocked'}),areaCache={key:null,actors:new Map()},matchMedia=()=>({matches:false}),mode='fire',intelSections={legend:true},entriesAt=(state,actor,cell)=>actor?[{command:{type:'CatalogHexFire',actorId:actor.id,...cell},confirmSplash:true}]:[],entryResult=entry=>GoblinCatalogFullRuntime.hexQuery(entry.command);${cut(ui,'    function renderTargetBlast(', '    function focusTargetCard(')}globalThis.actualOverlay=function(state,actor){${cut(ui,'      let overlay =', '      const firePreview =')}}}`)}

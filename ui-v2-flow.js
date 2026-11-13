@@ -1106,7 +1106,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           const full=scenarioCatalog[missionId].catalog.full;
           for(const wave of full.waves.waves){const unit=full.waveTemplates.find(u=>u.id===wave.templateId);header.append(paragraph(t('v2.full.wave.announcement',{team:t(`ui.team.${wave.team}`),unit:t(`library.unit.${unit.catalogAssetId}.name`),turn:wave.dueOwnTurn})));header.append(paragraph(t('v2.full.wave.entries',{entries:wave.entries.map(cell=>`${String.fromCharCode(65+cell.x)}-${String(cell.y+1).padStart(2,'0')}`).join(' → ')})));}
           if(full.waves.waves.length)header.append(paragraph(t('v2.full.wave.retryRule',{maxAttempts:3})));
-          if(full.turnLimit!==null)header.append(paragraph(t('v2.full.limit.briefing',{limit:full.turnLimit})));
+          if(Number.isSafeInteger(full.turnLimit)&&full.turnLimit>0)header.append(paragraph(t('v2.full.limit.briefing',{limit:full.turnLimit})));
         }
         const conditions = document.createElement('section'); conditions.className = 'v2-briefing-conditions';
         conditions.append(document.createElement('div'), document.createElement('div'));

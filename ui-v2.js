@@ -75,7 +75,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       let status=at('#v2-objective-members');
       if(!status){status=document.createElement('p');status.id='v2-objective-members';at('#v2-objective').after(status);}
       status.textContent=members.length?t('v2.ui.objectiveMembers',{done,total:members.length}):'';
-      if(state.fullStatus){if(state.fullStatus.pendingEnemy)status.textContent+=' · '+t('v2.full.objective.pendingWaves');if(state.fullStatus.turnLimit!==null)status.textContent+=' · '+t('v2.full.limit.status',{current:state.fullStatus.enemyTurns,limit:state.fullStatus.turnLimit});}
+      if(state.fullStatus){if(state.fullStatus.pendingEnemy)status.textContent+=' · '+t('v2.full.objective.pendingWaves');if(Number.isSafeInteger(state.fullStatus.turnLimit)&&state.fullStatus.turnLimit>0)status.textContent+=' · '+t('v2.full.limit.status',{current:state.fullStatus.enemyTurns,limit:state.fullStatus.turnLimit});}
       status.title=members.map(member => `${state.units.find(unit=>unit.id===member.unitId)?.name || member.unitId}: ${t(member.state==='satisfied'?'v2.ui.destroyed':'v2.ui.objectivePending')}`).join('\n');
     }
 

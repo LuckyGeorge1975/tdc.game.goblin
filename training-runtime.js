@@ -4,6 +4,10 @@
  let session=null,serial=0,depth=0,rootWork=null,deferredAuto=false,advisoryEnabled=true;
  function active(){return !!session&&session.scenarioId===currentScenario&&!root.IronDustBrowserV2?.active}
  function holdingShotResult(){return active()&&session.scenarioId==='training-t02'&&session.progress.stepId==='result'&&session.progress.status==='running'}
+ function holdingTaughtPhase(){
+  return session.scenarioId==='training-t02'&&session.progress.status==='running'&&
+   ['fire-phase','round'].includes(session.progress.stepId);
+ }
  function worldUnit({moveFrom,justHit,lastOutcome,...unit}){
   if(session.definition.mode!=='advisory'||!unit.ogreSystems)return unit;
   // The weapon picker mirrors the selected weapon's stats before an action begins.
@@ -86,7 +90,7 @@
  handleHex=wrapAction(handleHex,'Move');attack=wrapAction(attack,'Fire');embark=wrapAction(embark,'Other');unloadAt=wrapAction(unloadAt,'Other');
  if(typeof executeSpecialistCommand==='function')executeSpecialistCommand=wrapAction(executeSpecialistCommand,'Other');
  setTurnPhase=wrapPhase(setTurnPhase);enemyTurn=wrapPhase(enemyTurn);
- const baseAuto=maybeAutoAdvancePhase;maybeAutoAdvancePhase=function(){if(active()){if(depth){deferredAuto=true;return}if(session.progress.holdAutoPhase||holdingShotResult()){clearTimeout(autoPhaseTimer);autoPhaseTimer=null;return}}return baseAuto()};
+ const baseAuto=maybeAutoAdvancePhase;maybeAutoAdvancePhase=function(){if(active()){if(depth){deferredAuto=true;return}if(session.progress.holdAutoPhase||holdingShotResult()||holdingTaughtPhase()){clearTimeout(autoPhaseTimer);autoPhaseTimer=null;return}}return baseAuto()};
  const baseConfirm=confirmPhaseAdvance;confirmPhaseAdvance=async function(action){
   if(holdingShotResult())return;
   if(!active()||session.definition.mode!=='learning'||session.progress.stepId!=='undo')return baseConfirm(action);

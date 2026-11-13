@@ -24,18 +24,40 @@ function drainTurnTimers(g){
  }
  assert.fail('Turn timers did not settle');
 }
-test('T02 does not pass the result while waiting with Auto on or off',async()=>{
+test('T02 waits for each taught phase command with Auto on or off',async()=>{
  for(const enabled of [false,true]){
-  const g=await beforeShot();
+  const g=await trainingScene('training-t02');
   g.run(`document.querySelector('#auto-end-turn').checked=${enabled}`);
+  for(const a of route('training-t02').slice(0,3))apply(g,a);
+  const infantry=read(g,`(()=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const command={type:'Move',actorId:'training-t02-infantry',x,y};
+    if(query(command).ok)return command;
+  }})()`);
+  apply(g,{command:infantry});
+  drainTurnTimers(g);
+  assert.deepEqual(read(g,'[turnPhase,GoblinTrainingRuntime.view().progress.stepId]'),['movement','fire-phase']);
+  await g.run("confirmPhaseAdvance(()=>setTurnPhase('fire'))");
+  apply(g,{ui:'inspect',command:{type:'Fire',actorId:'training-t02-tank',x:5,y:3}});
+  mountTrainingPanel(g);
   apply(g,{command:{type:'Fire',actorId:'training-t02-tank',x:5,y:3}});
   drainTurnTimers(g);
   assert.deepEqual(read(g,'[turn,turnPhase,GoblinTrainingRuntime.view().progress.stepId]'),[1,'fire','result'],`Auto ${enabled}`);
   await g.run("confirmPhaseAdvance(()=>setTurnPhase('gev'))");
   assert.equal(g.run('turnPhase'),'fire');
   apply(g,{ui:'ack',action:'continue'});
-  if(enabled)drainTurnTimers(g);else advanceEnemy(g);
+  drainTurnTimers(g);
+  assert.equal(g.run('turnPhase'),'fire');
+  g.run('renderTraining()');
+  assert.equal(g.run('trainingPanel.nodes[1].key'),'v2.training.finishFire');
+  await g.run("confirmPhaseAdvance(()=>setTurnPhase('gev'))");
+  drainTurnTimers(g);
+  assert.equal(g.run('turnPhase'),'gev');
+  g.run('renderTraining()');
+  assert.equal(g.run('trainingPanel.nodes[1].key'),'v2.training.startEnemy');
+  await g.run('confirmPhaseAdvance(startEnemyTurn)');
+  drainTurnTimers(g);
   assert.deepEqual(read(g,'[turn,turnPhase,GoblinTrainingRuntime.status()]'),[2,'movement','ready-for-debrief']);
+  assert.equal(g.run("document.querySelector('#auto-end-turn').checked"),enabled);
  }
 });
 for(const [result,roll]of [['NE',0],['D',2],['X',5]])test('controlled actual CRT '+result+' remains a valid lesson shot; no required hit',async()=>{

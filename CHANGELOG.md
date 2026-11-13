@@ -7,6 +7,7 @@ Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließli
 - Die Einheitenbibliothek kombiniert Bild, Bewegungs- und Feuerkarte und eine Waffenwahl für die Vorschau. Beschreibung, Werte, Sonderaktionen und Strategie sind separat erreichbar. Der Vollkatalog enthält 26 Strategien und 15 verlinkte Regeln in vier Sprachen.
 - Eigene Level lassen sich im Browser als validierte v3-Entwürfe speichern und aus der Missionsauswahl spielen. Neustart verwendet den validierten Startstand. Die Einstellungen bieten Scrollpfeile bei Überlauf und bestätigtes Neuladen für flüchtige Spielcaches.
 - Der modale Phasenhinweis lässt sich für 0 bis 5 Sekunden einstellen. Wiederholte Einheitenwahl und ungültige Felder heben die Auswahl auf. Die automatische Wahl handlungsfähiger Einheiten ist optional.
+- T02 wartet auch bei aktivem Auto-Phasenwechsel auf die gelehrten Phasenbefehle. Gespeicherte Level ohne Zuglimit zeigen keinen Limitzähler.
 - Die Feuerflächenanzeige verwendet Abfragen beim Einheitenwechsel wieder, meldet fehlende Ziele neutral und weist Wegkosten mit Einheit aus. Benutzte Phasen werden beim automatischen Wechsel nicht als übersprungen gemeldet. Der Raketen-Sicherheitsdialog benennt den Abbruch.
 - Der Gegnerzug bietet einen optionalen, sitzungsgebundenen Einstieg für Bewegungs- und Halteentscheidungen im Vollkatalog. Im normalen Spiel bleibt die bisherige Strategie aktiv.
 

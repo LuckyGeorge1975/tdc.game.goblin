@@ -12,6 +12,7 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Rückfallpunkt | `v0.1.29` auf `657503e921c9412ebaddabb2ab0c0a725d714936` |
 | Umfang | [Änderungen seit Build 29](../CHANGELOG.md#0130---2026-11-13), einschließlich Playtest-Korrekturen, Bibliothek, Phasenoverlay und eigener Level. |
 | Bibliothek | Vollkatalog-Texte für vier Sprachen, Katalogwerte und schematische Waffenreichweiten. Die Bibliotheksvorschau führt keine Befehle aus. Historische Profile behalten ihre Beschreibungstexte. |
+| Tutorial und Zuglimit | T02 hält die gelehrten Phasenbefehle bei Auto an und aus bis zur Eingabe. Eigene Level ohne Limit zeigen keinen Limitzähler. Positive Limitwerte erscheinen weiterhin im Briefing und Missionsstatus. |
 | Abnahme | Französische Bibliotheksansicht bei 1280 × 560 und 1280 × 660, Scrollpfeile und erreichbarer Tabinhalt. Bibliotheksbeschreibungen, Build-/Cacheadressen, Tutorialbefund `goblin-4fn2.6`, Content/Legal und Release-Prüfung im Issue `goblin-4fn2.5` belegen. |
 | README-Bild | Aktuelle Kartenaufnahme aus dem geprüften Build 30 folgt im Bildnachlauf. |
 
