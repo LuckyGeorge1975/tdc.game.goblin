@@ -179,6 +179,12 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-library-unit-detail .v2-library-tabs { flex: none; gap: 4px; }
 .v2-library-unit-detail .v2-library-tabs button { min-width: 0; padding-inline: 4px; overflow-wrap: anywhere; }
 .v2-library-unit-detail .v2-library-detail-body { flex: 1 1 auto; overflow: auto; }
+.v2-library-detail-scroll > .v2-library-detail { flex: 1 1 auto; overflow: auto; scrollbar-width: none; }
+.v2-library-detail-scroll > .v2-library-detail::-webkit-scrollbar { display: none; }
+.v2-library-detail-scroll .v2-library-detail-body { flex: 0 0 auto; min-height: 4rem; overflow: visible; }
+.v2-screen-panel[data-screen="catalog"] > .v2-library-layout { flex: 1 1 0; }
+.v2-screen-panel[data-screen="catalog"] > :is(.v2-screen-header,.v2-screen-footer) { flex: none; }
+.v2-library-layout > .v2-stepped-list > .v2-library-list { flex: 1 1 auto; }
 .v2-library-unit-detail .v2-library-map-action { flex: none; }
 .v2-library-splash { font-size: 12px; margin: 0; }
 .v2-library-reference details { padding: 6px; border: 1px solid var(--v2-line); border-radius: 6px; }

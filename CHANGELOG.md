@@ -2,6 +2,14 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden im jeweiligen Release-Issue nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.30] - 2026-11-13
+
+- Die Einheitenbibliothek kombiniert Bild, Bewegungs- und Feuerkarte und eine Waffenwahl für die Vorschau. Beschreibung, Werte, Sonderaktionen und Strategie sind separat erreichbar. Der Vollkatalog enthält 26 Strategien und 15 verlinkte Regeln in vier Sprachen.
+- Eigene Level lassen sich im Browser als validierte v3-Entwürfe speichern und aus der Missionsauswahl spielen. Neustart verwendet den validierten Startstand. Die Einstellungen bieten Scrollpfeile bei Überlauf und bestätigtes Neuladen für flüchtige Spielcaches.
+- Der modale Phasenhinweis lässt sich für 0 bis 5 Sekunden einstellen. Wiederholte Einheitenwahl und ungültige Felder heben die Auswahl auf. Die automatische Wahl handlungsfähiger Einheiten ist optional.
+- Die Feuerflächenanzeige verwendet Abfragen beim Einheitenwechsel wieder, meldet fehlende Ziele neutral und weist Wegkosten mit Einheit aus. Benutzte Phasen werden beim automatischen Wechsel nicht als übersprungen gemeldet. Der Raketen-Sicherheitsdialog benennt den Abbruch.
+- Der Gegnerzug bietet einen optionalen, sitzungsgebundenen Einstieg für Bewegungs- und Halteentscheidungen im Vollkatalog. Im normalen Spiel bleibt die bisherige Strategie aktiv.
+
 ## [0.1.29] - 2026-11-12
 
 - Das Kontextmenü am Zielhex zeigt legale Befehle als vertikale Zeilen. Eindeutige Aktionen lassen sich direkt bestätigen. Bei Bedarf öffnet die Zeile die Wahl von Waffe, Bauteil, Beobachter oder Fracht. Ein Außenklick verwirft die Vorschau. Tooltips nennen Aktion, Ziel und verfügbare Prognosen. Bei Flächenraketen erscheinen Wirkungsbereich und Warnung vor der Bestätigung. Verladen lässt sich von beiden benachbarten Einheiten aus öffnen.

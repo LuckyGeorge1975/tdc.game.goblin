@@ -50,7 +50,7 @@ function focusScene({view,legal,showCostChips,mode='movement',cardHidden=false})
   const intel={textContent:'Unit → D-05 · Mountain'};
   const card={hidden:cardHidden};
   const context = {mode,view,data:{legal},message:'Reachable',showCostChips,
-    t:key=>key==='v2.ui.sector'?'SECTOR':key,
+    t:(key,params)=>key==='v2.ui.sector'?'SECTOR':key==='v2.ui.movePoints'?params.cost+' BP':key,
     hexLabel:()=> 'D-05',
     GoblinLanguage:{translate:()=> 'MOVE COST'},
     at:key=>({'#v2-command-intel':intel,'#v2-command-card':card})[key]};
@@ -60,7 +60,7 @@ function focusScene({view,legal,showCostChips,mode='movement',cardHidden=false})
 
 test('focused legal field keeps its authoritative cost in the existing status view', () => {
   const context=focusScene({view:{infoCell:{x:3,y:4}},legal:[{x:3,y:4,cost:2}],showCostChips:true});
-  assert.equal(context.message,'Reachable · SECTOR D-05 · MOVE COST 2');
+  assert.equal(context.message,'Reachable · SECTOR D-05 · MOVE COST 2 BP');
 });
 
 test('fire and sight fill the whole cell like movement, without per-cell outline', () => {
@@ -93,10 +93,10 @@ test('the area outline keeps only sides that are not shared by two cells of the 
 test('hidden chips expose only current legal focus cost above the map and in open move intel', () => {
   const legal=[{x:3,y:4,cost:2}];
   const selected=focusScene({view:{target:{x:3,y:4}},legal,showCostChips:false});
-  assert.equal(selected.message,'Reachable · SECTOR D-05 · MOVE COST 2');
+  assert.equal(selected.message,'Reachable · SECTOR D-05 · MOVE COST 2 BP');
   assert.equal(selected.intel,'Unit → D-05 · Mountain');
   const focused=focusScene({view:{focusCell:{x:3,y:4}},legal,showCostChips:false,cardHidden:true});
-  assert.equal(focused.message,'Reachable · SECTOR D-05 · MOVE COST 2');
+  assert.equal(focused.message,'Reachable · SECTOR D-05 · MOVE COST 2 BP');
   assert.equal(focused.intel,'Unit → D-05 · Mountain');
   const stale=focusScene({view:{target:{x:7,y:7},infoCell:{x:3,y:4}},legal,showCostChips:false});
   assert.equal(stale.message,'Reachable');

@@ -94,6 +94,19 @@
     "library.unit.command-core.tactics": "El núcleo de mando permanece fijo y no dispara. Consulta el objetivo de la misión y busca una línea de tiro despejada si debes destruirlo.",
     "library.unit.relay-node.tactics": "El nodo de enlace permanece fijo y no dispara. Consulta el objetivo de la misión antes de dedicarle un ataque.",
     "library.unit.guard-tank.tactics": "Elige pronto una casilla con cobertura y visión de la ruta de avance probable. Su corto movimiento hace que cambiar de posición lleve tiempo.",
-    "library.unit.raider-skimmer.tactics": "Aprovecha las vías de agua transitables para acercarte desde otra dirección. Elige tu casilla final antes de disparar, ya que este deslizador no tiene movimiento adicional."
+    "library.unit.raider-skimmer.tactics": "Aprovecha las vías de agua transitables para acercarte desde otra dirección. Elige tu casilla final antes de disparar, ya que este deslizador no tiene movimiento adicional.",
+    "library.unit.phantom-platform.description": "Plataforma furtiva con sistemas separados. Los enemigos activos cercanos pueden detectarla con visión directa. Disparar, recibir ataques y colisionar puede delatarla.",
+    "library.unit.goblin-dreadnaught.description": "Plataforma pesada de asalto con armas y orugas que pueden atacarse por separado. La pérdida de orugas puede reducir su movimiento.",
+    "library.unit.forge-engineer.description": "Plataforma de ingeniería con herramientas y bahías de drones separadas. Las herramientas intactas permiten reparar o recuperar restos si el objetivo y el material lo permiten.",
+    "library.unit.field-engineers.description": "Los ingenieros pueden despejar terreno, construir fortificaciones o puentes y reparar vehículos adyacentes. Los trabajos disponibles dependen del objetivo y del material.",
+    "library.unit.strategic-missile-carrier.description": "Ataque de área de un solo uso sobre una casilla al alcance y en visión directa. La explosión alcanza la casilla objetivo y las vecinas, incluidas las unidades aliadas.",
+    "library.unit.artillery-drone.description": "El dron de artillería dispara directamente y cambia de posición mediante transporte. Tras desplegarlo, puede disparar a partir de su siguiente turno.",
+    "library.unit.infantry-platoon.description": "Un resultado D le cuesta un punto de vida al pelotón. Su ataque y defensa permanecen fijos mientras sobreviva.",
+    "library.unit.skimmer-carrier.description": "Deslizador de transporte con una maniobra adicional. Transporta infantería o un dron que ocupa toda la bodega.",
+    "library.unit.long-range-battery.description": "Artillería fija de largo alcance. Dispara directamente con visión propia o indirectamente con un observador aliado activo.",
+    "library.unit.mobile-siege-gun.description": "Artillería móvil con fuego directo e indirecto mediante un observador aliado activo.",
+    "library.unit.raider-skimmer.description": "El deslizador de incursión usa costes de terreno de deslizador y se mueve antes de la fase de fuego.",
+    "library.unit.guard-tank.description": "Tanque de guardia de corto alcance y movilidad limitada.",
+    "library.unit.command-core.description": "Núcleo de mando fijo y sin armas. Su importancia depende del objetivo de la misión."
   }
 }

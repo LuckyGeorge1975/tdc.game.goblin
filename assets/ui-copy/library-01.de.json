@@ -94,6 +94,19 @@
     "library.unit.command-core.tactics": "Der Kommandokern bleibt stehen und feuert nicht. Prüfe das Missionsziel und plane eine freie Schusslinie, wenn du ihn ausschalten musst.",
     "library.unit.relay-node.tactics": "Der Relaisknoten bleibt stehen und feuert nicht. Prüfe das Missionsziel, bevor du für ihn einen Angriff einplanst.",
     "library.unit.guard-tank.tactics": "Wähle früh ein gedecktes Feld mit Sicht auf den erwarteten Anmarsch. Der Wachpanzer braucht wegen seiner kurzen Bewegung Zeit für einen Stellungswechsel.",
-    "library.unit.raider-skimmer.tactics": "Nutze passierbare Wasserwege, um aus einer anderen Richtung anzugreifen. Plane dein Endfeld vor dem Schuss, da der Überfall-Skimmer keinen zusätzlichen Skimmer-Schritt hat."
+    "library.unit.raider-skimmer.tactics": "Nutze passierbare Wasserwege, um aus einer anderen Richtung anzugreifen. Plane dein Endfeld vor dem Schuss, da der Überfall-Skimmer keinen zusätzlichen Skimmer-Schritt hat.",
+    "library.unit.phantom-platform.description": "Getarnte Systemplattform. Nahe aktive Gegner können sie bei direkter Sicht aufklären. Feuer, empfangene Angriffe und Kollisionen können ihre Position verraten.",
+    "library.unit.goblin-dreadnaught.description": "Schwere Angriffsplattform mit einzeln angreifbaren Waffensystemen und Ketten. Kettenverluste können ihr Bewegungsbudget senken.",
+    "library.unit.forge-engineer.description": "Pionierplattform mit Werkzeugen und getrennten Drohnenbuchten. Intakte Werkzeuge ermöglichen unter anderem Reparaturen und Bergung, wenn das Ziel und das Material es zulassen.",
+    "library.unit.field-engineers.description": "Pioniere können Gelände räumen, Feldstellungen oder Brücken bauen und benachbarte Fahrzeuge reparieren. Die verfügbaren Arbeiten hängen vom Ziel und Material ab.",
+    "library.unit.strategic-missile-carrier.description": "Einmaliger Flächenschuss auf ein Feld in Reichweite und eigener Sicht. Die Explosion trifft das Zielfeld und seine Nachbarfelder, auch wenn dort eigene Einheiten stehen.",
+    "library.unit.artillery-drone.description": "Die Artilleriedrohne feuert direkt und wechselt ihren Standort per Transport. Nach dem Absetzen kann sie ab dem nächsten eigenen Zug feuern.",
+    "library.unit.infantry-platoon.description": "Ein D-Ergebnis kostet den Infanteriezug einen Trefferpunkt. Angriff und Verteidigung bleiben gleich, solange die Einheit überlebt.",
+    "library.unit.skimmer-carrier.description": "Transportskimmer mit zusätzlichem Manöverschritt. Er befördert Infanterie oder eine Drohne, die den gesamten Frachtraum belegt.",
+    "library.unit.long-range-battery.description": "Stationäre Fernartillerie. Sie feuert direkt bei eigener Sicht oder indirekt mit einem aktiven verbündeten Beobachter.",
+    "library.unit.mobile-siege-gun.description": "Mobile Artillerie mit direktem Feuer und indirektem Feuer über einen aktiven verbündeten Beobachter.",
+    "library.unit.raider-skimmer.description": "Der Überfall-Skimmer nutzt Skimmer-Geländekosten und bewegt sich vor der Feuerphase.",
+    "library.unit.guard-tank.description": "Sicherungspanzer mit kurzer Reichweite und kleinem Bewegungsbudget.",
+    "library.unit.command-core.description": "Stationärer, unbewaffneter Kommandokern. Seine Bedeutung ergibt sich aus dem Missionsziel."
   }
 }

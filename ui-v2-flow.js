@@ -239,9 +239,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       return figure;
     }
     // Lists scroll without system scrollbars; step buttons above and below page through the items.
-    function steppedList(list) {
+    function steppedList(list, extraClass = '') {
       // Start as overflowing so a restored scroll position is not clamped before the first measurement.
       const frame = document.createElement('div'); frame.className = 'v2-stepped-list v2-overflowing';
+      if (extraClass) frame.classList.add(extraClass);
       const step = direction => {
         const node = button('', () => list.scrollBy({
           top: direction * Math.max(list.clientHeight - 72, 48), behavior: 'smooth'
@@ -689,6 +690,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function libraryName(entry) {
       return t(`library.unit.${libraryAssetId(entry)}.name`);
     }
+    function libraryDescription(entry, fullRule) {
+      const key = `library.unit.${libraryAssetId(entry)}.description`;
+      const description = fullRule ? t(key) : key;
+      return description === key ? GoblinLanguage.translate(entry.copy) : description;
+    }
     function libraryValue(value) {
       if (value === 'BY SYSTEM') return t('screen.library.value.bySystem');
       if (value === '1 / squad') return `1 / ${t('screen.library.value.perSquad')}`;
@@ -862,7 +868,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       const body = document.createElement('div'); body.className = 'v2-library-detail-body';
       if (libraryTab === 'description') {
-        body.append(paragraph(GoblinLanguage.translate(entry.copy)),paragraph(t('v2.library.schematic')));
+        body.append(paragraph(libraryDescription(entry, rule)),paragraph(t('v2.library.schematic')));
       } else if (libraryTab === 'stats') {
         const values = document.createElement('dl'); values.className = 'v2-library-values';
         const fields = [
@@ -1204,10 +1210,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
               item.prepend(UnitVisuals.iconElement(entry, 'v2-library-map-icon'));
             list.append(item);
           });
-          layout.append(list);
-          if (!matchMedia('(max-width: 900px)').matches)
-            layout.append(libraryKind === 'terrain' ? terrainDetail(terrainIds[terrainIndex], false)
-              : libraryDetail(unitGuideEntries[libraryIndex], state, false));
+          layout.append(steppedList(list));
+          if (!matchMedia('(max-width: 900px)').matches) {
+            const detail = libraryKind === 'terrain' ? terrainDetail(terrainIds[terrainIndex], false)
+              : libraryDetail(unitGuideEntries[libraryIndex], state, false);
+            layout.append(steppedList(detail, 'v2-library-detail-scroll'));
+          }
           panel.append(header, layout, footer);
         }
       } else if (screen === 'catalog-detail') {

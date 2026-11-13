@@ -278,7 +278,7 @@ test('tutorial campaign advances only from its confirmed lessons and isolates re
  const g=await trainingScene();
  g.run(`
   const campaignLessons=['training-t01','training-t02'];
-  let campaign=null,editorConfig=null,screen='menu',missionId='relay-run',startError='',started=false;
+  let campaign=null,editorConfig=null,savedConfig=null,screen='menu',missionId='relay-run',startError='',started=false;
   const show=next=>{screen=next},missionData=id=>scenarioCatalog[id];
   const GoblinUIV2={resetView(){},startView(){}},renderScreen=()=>{},releasePause=()=>{};
   ${flow.slice(flow.indexOf('    function campaignAvailable('),flow.indexOf('    function libraryAssetId('))}

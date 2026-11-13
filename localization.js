@@ -9,10 +9,10 @@
     const response = await fetch(new URL(`content-02.${lang}.json`, catalogBase));
     if (!response.ok) throw Error(`CONTENT-02 ${lang}: HTTP ${response.status}`);
     const catalog = await response.json();
-    const briefingResponse = await fetch(new URL(`briefing-01.${lang}.json`, catalogBase));
+    const briefingResponse = await fetch(new URL(`briefing-01.${lang}.json?v=30`, catalogBase));
     if (!briefingResponse.ok) throw Error(`BRIEFING-01 ${lang}: HTTP ${briefingResponse.status}`);
     const briefing = await briefingResponse.json();
-    const libraryResponse = await fetch(new URL(`library-01.${lang}.json`, catalogBase));
+    const libraryResponse = await fetch(new URL(`library-01.${lang}.json?v=30`, catalogBase));
     if (!libraryResponse.ok) throw Error(`LIBRARY-01 ${lang}: HTTP ${libraryResponse.status}`);
     const library = await libraryResponse.json();
     contentCatalogs[lang] = { ...catalog.messages, ...briefing.messages, ...library.messages };

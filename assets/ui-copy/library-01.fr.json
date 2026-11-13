@@ -94,6 +94,19 @@
     "library.unit.command-core.tactics": "Le noyau de commandement reste fixe et ne tire pas. Consultez l’objectif de mission et cherchez un couloir de tir dégagé si vous devez le détruire.",
     "library.unit.relay-node.tactics": "Le nœud relais reste fixe et ne tire pas. Consultez l’objectif de mission avant de consacrer une attaque à cette cible.",
     "library.unit.guard-tank.tactics": "Choisissez tôt une case à couvert avec vue sur l’approche probable. Son court déplacement rend les changements de position lents.",
-    "library.unit.raider-skimmer.tactics": "Empruntez les voies d’eau praticables pour approcher d’un autre côté. Choisissez votre case finale avant de tirer, car cet aéroglisseur n’a pas de déplacement supplémentaire."
+    "library.unit.raider-skimmer.tactics": "Empruntez les voies d’eau praticables pour approcher d’un autre côté. Choisissez votre case finale avant de tirer, car cet aéroglisseur n’a pas de déplacement supplémentaire.",
+    "library.unit.phantom-platform.description": "Plateforme furtive à systèmes distincts. Les ennemis actifs proches peuvent la détecter en ligne de vue directe. Ses tirs, les attaques reçues et les collisions peuvent la révéler.",
+    "library.unit.goblin-dreadnaught.description": "Plateforme d’assaut lourde dont les armes et les chenilles peuvent être ciblées séparément. La perte de chenilles peut réduire son déplacement.",
+    "library.unit.forge-engineer.description": "Plateforme du génie dotée d’outils et de baies de drones distinctes. Les outils intacts permettent notamment de réparer ou de récupérer des épaves si la cible et les matériaux le permettent.",
+    "library.unit.field-engineers.description": "Les sapeurs peuvent dégager le terrain, construire des fortifications ou des ponts et réparer des véhicules adjacents. Les travaux disponibles dépendent de la cible et des matériaux.",
+    "library.unit.strategic-missile-carrier.description": "Tir de zone à usage unique sur un hexagone à portée et en ligne de vue directe. L’explosion touche l’hexagone ciblé et ses voisins, y compris les unités alliées.",
+    "library.unit.artillery-drone.description": "Le drone d’artillerie tire en direct et change de position par transport. Une fois déployé, il peut tirer à partir de son prochain tour.",
+    "library.unit.infantry-platoon.description": "Un résultat D coûte un point de vie au peloton. Son attaque et sa défense restent fixes tant qu’il survit.",
+    "library.unit.skimmer-carrier.description": "Aéroglisseur de transport doté d’une manœuvre supplémentaire. Il transporte de l’infanterie ou un drone qui occupe toute la soute.",
+    "library.unit.long-range-battery.description": "Artillerie fixe à longue portée. Elle tire en direct avec sa propre ligne de vue ou en indirect avec un observateur allié actif.",
+    "library.unit.mobile-siege-gun.description": "Artillerie mobile capable de tirer en direct ou en indirect avec un observateur allié actif.",
+    "library.unit.raider-skimmer.description": "L’aéroglisseur de raid applique les coûts de terrain des aéroglisseurs et se déplace avant la phase de tir.",
+    "library.unit.guard-tank.description": "Char de garde à courte portée et au déplacement limité.",
+    "library.unit.command-core.description": "Noyau de commandement fixe et désarmé. Son importance dépend de l’objectif de la mission."
   }
 }

@@ -14,6 +14,7 @@ Pionieraktionen, Material, reparierte Module mit Bereitschaft ab dem nächsten e
 
 - Daten: `assets/unit-art/rules/unit-profiles.catalog-approved.v1.json`, unveränderte geprüfte Adoption; Content-main erneut am 29.10.2026 um 18:27:37 UTC gelesen, unverändert `2fdce6ac1be30e8b2a360250b37724586469e71c`. Keine Content-Arbeitsbaumänderung und keine neuen Bildassets.
 - Additiver Core-Beitrag `ogre-systems.js`: SHA256 `1de2ab821f0021f1a8204d15783d15848ea28f3f80ce0fc705f47b094141c411`. Fire-Binding: `50aa505a33a4c4b2313ff258e7d072e22cfe21bdc58cacf8b3e3fcd5392a4ac3`. Alte reine U07/U08/U09-Helfer bleiben unverändert.
+- Nachführung für Build 30: `7474fe03bec326694dc89fe100bacb03abded920` ergänzt die reine Schussabfrage `catalogFireShot` und teilt deren validierte Slotprüfung mit der bestehenden Schussaufzeichnung. Aktuelle SHA256 mit LF-Zeilenenden: `8529a02c0cda4adbde1efd20c31275216f6914b806a157748e3a2cb316c6d887`. Der ursprüngliche Core-Hash oben bleibt der Herkunftsbeleg.
 - 65 genehmigte Copykeys plus ein Kettenhinweis in vier Sprachen exakt übernommen. Die Feldstellung benutzt einen Vektormarker. Unbelegte Plattform-Mündungspositionen verwenden den bestehenden Mittelpunktfallback.
 - Kein neuer öffentlicher Save-/Replayimport, kein öffentlicher Release, Push, Tag oder eigener Browser-/Serverbetrieb. Die neuen Missionen werden im modernen Menü angeboten; bestehende Classic-Missionen bleiben erhalten.
 

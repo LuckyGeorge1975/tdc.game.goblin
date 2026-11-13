@@ -94,6 +94,19 @@
     "library.unit.command-core.tactics": "The Command Core stays in place and does not fire. Check the mission objective and plan a clear firing lane if you need to destroy it.",
     "library.unit.relay-node.tactics": "The Relay Node stays in place and does not fire. Check the mission objective before committing an attack to it.",
     "library.unit.guard-tank.tactics": "Pick a covered hex early with sight of the likely approach. The Guard Tank’s short move makes repositioning slow.",
-    "library.unit.raider-skimmer.tactics": "Use passable waterways to approach from another direction. Pick your final hex before firing because the Raider Skimmer has no extra skimmer move."
+    "library.unit.raider-skimmer.tactics": "Use passable waterways to approach from another direction. Pick your final hex before firing because the Raider Skimmer has no extra skimmer move.",
+    "library.unit.phantom-platform.description": "Stealth platform with individual systems. Nearby active enemies can detect it with direct line of sight. Firing, incoming attacks and collisions can reveal it.",
+    "library.unit.goblin-dreadnaught.description": "Heavy assault platform with individually targetable weapons and treads. Tread losses can reduce its movement budget.",
+    "library.unit.forge-engineer.description": "Engineering platform with tools and separate drone bays. Intact tools allow work such as repairs and salvage when the target and available material permit it.",
+    "library.unit.field-engineers.description": "Field engineers can clear terrain, build fieldworks or bridges and repair adjacent vehicles. Available jobs depend on the target and material.",
+    "library.unit.strategic-missile-carrier.description": "Single-use area strike on a hex within range and direct line of sight. The blast hits the target hex and its neighbors, including friendly units.",
+    "library.unit.artillery-drone.description": "The artillery drone fires directly and changes position by transport. After deployment, it can fire from its next friendly turn.",
+    "library.unit.infantry-platoon.description": "A D result costs the infantry platoon one hit point. Attack and defense stay fixed while it survives.",
+    "library.unit.skimmer-carrier.description": "Transport skimmer with an extra maneuver. It carries infantry or one drone that occupies the entire hold.",
+    "library.unit.long-range-battery.description": "Stationary long-range artillery. It fires directly with its own line of sight or indirectly with an active friendly spotter.",
+    "library.unit.mobile-siege-gun.description": "Mobile artillery with direct fire and indirect fire using an active friendly spotter.",
+    "library.unit.raider-skimmer.description": "The raider skimmer uses skimmer terrain costs and moves before the fire phase.",
+    "library.unit.guard-tank.description": "Guard tank with short range and a small movement budget.",
+    "library.unit.command-core.description": "Stationary, unarmed command core. Its importance depends on the mission objective."
   }
 }
