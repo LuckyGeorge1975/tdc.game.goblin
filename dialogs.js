@@ -18,6 +18,7 @@ const GameDialogs = (() => {
   function showNext() {
     if (active || !queue.length) return;
     active = queue.shift();
+    document.dispatchEvent(new Event('goblin-game-dialog-opening'));
     previousFocus = document.activeElement;
     title.textContent = active.title;
     message.textContent = active.message;

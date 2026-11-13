@@ -44,7 +44,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const iconButton = (id, name, extra = '') => `<button type="button" class="v2-icon-button" id="${id}"${extra}>${svgIcon(name)}</button>`;
     shell.innerHTML = `
       <header class="v2-head"><div class="v2-head-mission"><span class="v2-label" id="v2-profile"></span><h1 id="v2-mission"></h1></div><div class="v2-head-turn"><p id="v2-turn"></p></div><div class="v2-head-goal"><p id="v2-objective"></p></div>${iconButton('v2-pause', 'settings')}</header>
-      <div class="v2-layout"><aside class="v2-own" id="v2-roster-panel"><section class="v2-card v2-units-card"><div class="v2-card-head"><span class="v2-label" id="v2-units-label"></span><span class="v2-units-ready" id="v2-units-ready"></span></div><div class="v2-units" id="v2-units"></div></section></aside><main class="v2-card v2-map-card"><span class="v2-sr" id="v2-map-label"></span><div class="v2-map-frame"><div class="v2-map" id="v2-map" tabindex="0"></div><section id="v2-training" class="v2-card v2-training" aria-labelledby="v2-training-title" hidden></section><div id="v2-map-hover" class="v2-map-hover" hidden></div><strong id="v2-phase" role="status" aria-live="polite"></strong><div id="v2-phase-notice" class="v2-phase-notice" hidden><strong></strong><button type="button"></button></div><div class="v2-map-overlay v2-map-overlay-top"><div class="v2-area-controls" role="group" id="v2-area-controls">${iconButton('v2-mode-movement', 'movement', ' data-area="movement"')}${iconButton('v2-mode-fire', 'fire', ' data-area="fire"')}${iconButton('v2-mode-los', 'los', ' data-area="los"')}<button type="button" id="v2-display-toggle" aria-expanded="false" aria-controls="v2-display-controls" hidden></button><div id="v2-display-controls" class="v2-display-controls" role="group">${iconButton('v2-area-grid', 'grid')}${iconButton('v2-area-targets', 'targets')}${iconButton('v2-area-damage', 'damage')}</div></div><p id="v2-area-legend" class="v2-area-legend" role="status"></p></div><div class="v2-map-overlay v2-map-overlay-bottom"><div class="v2-map-tools" role="group" id="v2-map-tools">${iconButton('v2-zoom-in', 'zoomIn')}${iconButton('v2-zoom-out', 'zoomOut')}${iconButton('v2-zoom-center', 'center')}${iconButton('v2-zoom-fit', 'fit')}</div></div></div></main><aside class="v2-target" id="v2-intel-panel"><div id="v2-intel"></div></aside></div>
+      <div class="v2-layout"><aside class="v2-own" id="v2-roster-panel"><section class="v2-card v2-units-card"><div class="v2-card-head"><span class="v2-label" id="v2-units-label"></span><span class="v2-units-ready" id="v2-units-ready"></span></div><div class="v2-units" id="v2-units"></div></section></aside><main class="v2-card v2-map-card"><span class="v2-sr" id="v2-map-label"></span><div class="v2-map-frame"><div class="v2-map" id="v2-map" tabindex="0"></div><section id="v2-training" class="v2-card v2-training" aria-labelledby="v2-training-title" hidden></section><div id="v2-map-hover" class="v2-map-hover" hidden></div><strong id="v2-phase" role="status" aria-live="polite"></strong><dialog id="v2-phase-notice" class="v2-phase-notice" aria-labelledby="v2-phase-notice-title" hidden><strong id="v2-phase-notice-title"></strong><label><input type="checkbox"><span></span></label></dialog><div class="v2-map-overlay v2-map-overlay-top"><div class="v2-area-controls" role="group" id="v2-area-controls">${iconButton('v2-mode-movement', 'movement', ' data-area="movement"')}${iconButton('v2-mode-fire', 'fire', ' data-area="fire"')}${iconButton('v2-mode-los', 'los', ' data-area="los"')}<button type="button" id="v2-display-toggle" aria-expanded="false" aria-controls="v2-display-controls" hidden></button><div id="v2-display-controls" class="v2-display-controls" role="group">${iconButton('v2-area-grid', 'grid')}${iconButton('v2-area-targets', 'targets')}${iconButton('v2-area-damage', 'damage')}</div></div><p id="v2-area-legend" class="v2-area-legend" role="status"></p></div><div class="v2-map-overlay v2-map-overlay-bottom"><div class="v2-map-tools" role="group" id="v2-map-tools">${iconButton('v2-zoom-in', 'zoomIn')}${iconButton('v2-zoom-out', 'zoomOut')}${iconButton('v2-zoom-center', 'center')}${iconButton('v2-zoom-fit', 'fit')}</div></div></div></main><aside class="v2-target" id="v2-intel-panel"><div id="v2-intel"></div></aside></div>
       <footer class="v2-controls"><div class="v2-context"><strong id="v2-terminal" hidden></strong><p id="v2-message" class="v2-status" role="status"></p></div>${iconButton('v2-log-open', 'log')}<button type="button" id="v2-undo"></button><button type="button" id="v2-phase-action"></button><button type="button" id="v2-next-unit"></button></footer><section class="v2-card v2-target-card" id="v2-target-card" role="group" aria-labelledby="v2-target-title" hidden></section>`;
     document.body.insertBefore(shell, nativeShell);
     shell.querySelector('#v2-map').appendChild(nativeMap);
@@ -352,7 +352,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       get gridVisible() { return view.gridVisible; }, setGridVisible(value) { setViewFlag('gridVisible',value); },
       get targetsVisible() { return view.targetsVisible; }, setTargetsVisible(value) { setViewFlag('targetsVisible',value); },
       get damageVisible() { return view.damageVisible; }, setDamageVisible(value) { setViewFlag('damageVisible',value); },
-      get phaseNoticeEnabled() { return phaseNoticeEnabled; }, setPhaseNoticeEnabled,
+      get phaseNoticeSeconds() { return phaseNoticeSeconds; }, setPhaseNoticeSeconds,
+      get autoSelectReady() { return view.autoSelectReady; }, setAutoSelectReady,
       closeTarget: () => { if (view.target) clearContext(); },
       trainingFirePreview,
       panelVisible: key => intelSections[key],
@@ -399,8 +400,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (core()) return coreOpenUnits(IronDustBrowserV2.view).map(unit => unit.id);
       return phase === 'player' && !gameOver ? phaseReadyUnits().map(unit => unit.id) : [];
     }
-    function nextReadyUnit() {
-      const ids = readyUnitIds(), order = project().units.filter(unit => unit.team === 'player').map(unit => unit.id);
+    function nextReadyUnit(state = project()) {
+      const ids = readyUnitIds(), order = state.units.filter(unit => unit.team === 'player').map(unit => unit.id);
       const current = order.indexOf(view.actorId);
       return ids.find(id => order.indexOf(id) > current) ?? ids[0] ?? null;
     }
@@ -942,15 +943,16 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           view.target = cell; view.afterWeaponSwitch = true; view.intentRevision = revision();
         }
       }
+      if (result.ok && command.type !== 'SelectWeapon' && view.autoSelectReady) selectReadyActor(project(), true);
       view.message = result.ok ? '' : result.reason;
       render();
       if (result.ok && command.type === 'SelectWeapon') focusTargetCard();
-      else if (result.ok) at('#v2-map').focus({preventScroll:true});
+      else if (result.ok && !at('#v2-phase-notice')?.open) at('#v2-map').focus({preventScroll:true});
     }
-    function chooseActor(id) {
+    function chooseActor(id, toggle = true) {
       startZoomPending = null;
       const roster = core() ? IronDustBrowserV2.view.units : globalThis.GoblinCatalogFullRuntime?.active() ? GoblinCatalogFullRuntime.roster() : units;
-      const unit = roster.find(item => item.id === id && item.team === 'player' && unitAlive(item));
+      const unit = roster.find(item => item.id === id && (!toggle || item.id !== view.actorId) && item.team === 'player' && unitAlive(item));
       view.actorId = unit?.id || null;
 
       if (unit) { view.focusCell = {x:unit.x,y:unit.y}; view.infoCell = view.focusCell; }
@@ -960,7 +962,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function focusUnit(id) {
       const unit = (core() ? project().units : globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(item => item.id === id && unitAlive(item));
       if (!unit) return;
-      if (unit.team === 'player') chooseActor(id);
+      if (unit.team === 'player') chooseActor(id, false);
       else {
         view.actorId = null; view.focusCell = { x: unit.x, y: unit.y };
         view.infoCell = { ...view.focusCell }; clearContext(); render();
@@ -973,6 +975,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       startZoomPending = null;
       const state = project(), cell = {x,y};
       const unit = targetOccupant(state, cell), actor = state.units.find(item => item.id === view.actorId);
+      if (unit && unit === actor) { chooseActor(unit.id); return; }
       const entries = entriesAt(state, actor, cell);
       const available = entries.some(entry => entryResult(entry).ok);
       const blockedTransport = !available && entries.find(entry => entry.transport);
@@ -980,6 +983,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       clearContext(); view.infoCell = cell; view.focusCell = cell;
       inspectTrainingTarget(actor, cell, state.turnPhase);
       if (available) { view.target = cell; view.intentRevision = state.revision; }
+      else view.actorId = null;
       if (blockedTransport) view.message = entryResult(blockedTransport).reason;
       render();
       if (available) focusTargetCard();
@@ -993,6 +997,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (areaPhase !== key) {
         if (areaPhase !== null) clearContext();
         areaPhase = key;
+        if (view.autoSelectReady) selectReadyActor(state);
       }
     }
     function activeAreaMode(state) {
@@ -1387,21 +1392,59 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     const targetCommands = (state, actor, cell) => actor && cell ? (core() ? coreCommands : legacyCommands)(state, actor, cell) : [];
     const phaseNotice = at('#v2-phase-notice');
     const phaseNoticePreference = 'goblin.v2.phaseNotice';
-    let phaseNoticeEnabled = true, phaseNoticeKey = null, phaseNoticeTimer = null;
-    try { phaseNoticeEnabled = localStorage.getItem(phaseNoticePreference) !== 'off'; } catch {}
+    const phaseDurationPreference = 'goblin.v2.phaseNoticeSeconds';
+    const autoSelectPreference = 'goblin.v2.autoSelectReady';
+    const phaseNoticeToggle = phaseNotice.querySelector('input');
+    let phaseNoticeSeconds = 1, phaseNoticeKey = null, phaseNoticeTimer = null;
+    view.autoSelectReady = false;
+    try {
+      const stored = localStorage.getItem(phaseDurationPreference);
+      const seconds = Number(stored);
+      if (localStorage.getItem(phaseNoticePreference) === 'off') phaseNoticeSeconds = 0;
+      else if (stored != null && Number.isInteger(seconds) && seconds >= 0 && seconds <= 5) phaseNoticeSeconds = seconds;
+      view.autoSelectReady = localStorage.getItem(autoSelectPreference) === 'on';
+    } catch {}
+    function setAutoSelectReady(enabled) {
+      view.autoSelectReady = !!enabled;
+      try { localStorage.setItem(autoSelectPreference, enabled ? 'on' : 'off'); } catch {}
+    }
+    function selectReadyActor(state, afterCommand = false) {
+      if (state.phase !== 'player' || state.gameOver || globalThis.GoblinTrainingRuntime?.active()) return;
+      if (afterCommand && view.actorId && readyUnitIds().includes(view.actorId)) return;
+      const id = nextReadyUnit(state);
+      const unit = state.units.find(item => item.id === id);
+      view.actorId = unit?.id ?? null;
+      if (unit) view.focusCell = view.infoCell = {x:unit.x,y:unit.y};
+    }
     function hidePhaseNotice() {
       clearTimeout(phaseNoticeTimer);
+      if (phaseNotice.open) phaseNotice.close();
       phaseNotice.hidden = true;
     }
-    function setPhaseNoticeEnabled(enabled) {
-      phaseNoticeEnabled = !!enabled;
-      try { localStorage.setItem(phaseNoticePreference, enabled ? 'on' : 'off'); } catch {}
-      if (!phaseNoticeEnabled) hidePhaseNotice();
+    function setPhaseNoticeSeconds(value) {
+      if (!Number.isInteger(value) || value < 0 || value > 5) return;
+      phaseNoticeSeconds = value;
+      try {
+        localStorage.setItem(phaseDurationPreference, String(value));
+        localStorage.setItem(phaseNoticePreference, value ? 'on' : 'off');
+      } catch {}
+      if (!value) hidePhaseNotice();
     }
-    phaseNotice.querySelector('button').onclick = () => {
-      setPhaseNoticeEnabled(false);
-      at('#v2-map').focus({preventScroll:true});
+    phaseNoticeToggle.onchange = () => {
+      if (phaseNoticeToggle.checked) setPhaseNoticeSeconds(0);
     };
+    phaseNotice.addEventListener('cancel', event => event.preventDefault());
+    document.addEventListener('goblin-game-dialog-opening', hidePhaseNotice);
+    function positionPhaseNotice() {
+      const box = at('#v2-map').getBoundingClientRect();
+      let top = Math.max(0, box.top), bottom = Math.min(innerHeight, box.bottom);
+      let left = Math.max(0, box.left), right = Math.min(innerWidth, box.right);
+      if (bottom - top < Math.min(160, innerHeight)) { top = 0; bottom = innerHeight; }
+      if (right - left < Math.min(220, innerWidth)) { left = 0; right = innerWidth; }
+      const xGap = Math.min(100, Math.max(0, (right - left) * .12));
+      const yGap = Math.min(100, Math.max(0, (bottom - top) * .22));
+      phaseNotice.style.inset = `${top + yGap}px ${innerWidth - right + xGap}px ${innerHeight - bottom + yGap}px ${left + xGap}px`;
+    }
     function renderPhaseNotice(state) {
       const phase = state.phase === 'enemy' ? 'enemy' : state.turnPhase;
       const label = at('#v2-phase');
@@ -1415,17 +1458,16 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (phaseNoticeKey !== key) {
         phaseNoticeKey = key;
         hidePhaseNotice();
-        if (!phaseNoticeEnabled || GameDialogs.isOpen()) return;
+        if (!phaseNoticeSeconds || GameDialogs.isOpen() || globalThis.GoblinTrainingRuntime?.active()) return;
         phaseNotice.dataset.phase = phase;
-        phaseNotice.hidden = false;
-        phaseNoticeTimer = setTimeout(() => {
-          if (!phaseNotice.contains(document.activeElement)) hidePhaseNotice();
-        }, 5000);
-      }
-      if (!phaseNotice.hidden) {
+        phaseNoticeToggle.checked = false;
         phaseNotice.querySelector('strong').textContent = t(phase === 'enemy' ? 'phase.enemy.label' : `v2.phase.${phase}`);
-        phaseNotice.querySelector('button').textContent = t('v2.phaseNotice.disable');
-      }
+        phaseNotice.querySelector('span').textContent = t('v2.phaseNotice.disable');
+        phaseNotice.hidden = false;
+        positionPhaseNotice();
+        phaseNotice.showModal();
+        phaseNoticeTimer = setTimeout(hidePhaseNotice, phaseNoticeSeconds * 1000);
+      } else if (phaseNotice.open) positionPhaseNotice();
     }
 
     function renderCore(state) {
@@ -1686,7 +1728,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     targetObstacles().forEach(node => targetLayoutObserver.observe(node));
     targetLayoutObserver.observe(at('#v2-phase'));
     function dismissTargetOnOutsideClick(event) {
-      if (!view.target || at('#v2-target-card').hidden ||
+      if (!view.target || at('#v2-phase-notice')?.open || at('#v2-target-card').hidden ||
           event.target.closest?.('dialog, #v2-target-card, #v2-training button')) return;
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -1836,6 +1878,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (cell) chooseHex(cell.x, cell.y);
     }, true);
     document.addEventListener('keydown', event => {
+      if (phaseNotice.open) { event.stopImmediatePropagation(); return; }
       startZoomPending = null;
       if(displayControls.handleKeydown(event))return;
       if (document.body.classList.contains('v2-screen-open')) {

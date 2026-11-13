@@ -4,10 +4,10 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 function setup(){
   const listeners={},storage=new Map();let dialog;
-  const document={activeElement:null,addEventListener(t,fn){listeners[t]=fn},body:{appendChild(n){dialog=n}},createElement(){return element()}};
+  const document={activeElement:null,dispatchEvent(event){listeners[event.type]?.(event)},addEventListener(t,fn){listeners[t]=fn},body:{appendChild(n){dialog=n}},createElement(){return element()}};
   function element(){const children=new Map();return {hidden:false,checked:false,isConnected:true,open:false,setAttribute(){},querySelector(s){if(!children.has(s))children.set(s,element());return children.get(s)},addEventListener(t,fn){this[t]=fn},showModal(){this.open=true},close(){this.open=false},focus(){document.activeElement=this}}}
   const trigger=element();document.activeElement=trigger;
-  const context=vm.createContext({document,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}});
+  const context=vm.createContext({document,Event,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}});
   vm.runInContext(readFileSync(new URL('../dialogs.js',import.meta.url),'utf8'),context);
   return {api:vm.runInContext('GameDialogs',context),dialog,document,trigger,listeners,storage};
 }

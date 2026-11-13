@@ -8,41 +8,88 @@ import {read} from './artillery-product-harness.mjs';
 const source = fs.readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
 const language = fs.readFileSync(new URL('../localization.js', import.meta.url), 'utf8');
 
-test('phase notice preference persists and applies to the next phase without reannouncing a render', () => {
+test('phase modal times out, migrates off preference and yields to safety dialogs', () => {
   const start = source.indexOf("    const phaseNotice = at('#v2-phase-notice');");
   const end = source.indexOf('    function renderCore(', start);
-  const button = {}, title = {}, badge = {dataset: {}}, storage = new Map();
-  const notice = {hidden: true, dataset: {}, querySelector: tag => tag === 'button' ? button : title};
-  const body = new Set();
-  let focused = false;
-  const map = {focus: () => { focused = true; }};
-  const elements = {'#v2-phase-notice': notice, '#v2-phase': badge, '#v2-map': map};
-  const context = vm.createContext({at: key => elements[key], t: key => key, GameDialogs: {isOpen: () => false},
-    localStorage: {getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value)},
-    document: {body: {classList: {contains: name => body.has(name)}}},
-    setTimeout: fn => { context.expire = fn; return 1; }, clearTimeout: () => {}});
-  vm.runInContext(`${source.slice(start, end)}\nglobalThis.renderNotice = renderPhaseNotice; globalThis.enable = setPhaseNoticeEnabled;`, context);
-  const state = {scenario: 'atlas', turn: 1, phase: 'player', turnPhase: 'movement', markers: {binding: {sessionId: 1}}};
+  const state = {scenario:'atlas', turn:1, phase:'player', turnPhase:'movement', markers:{binding:{sessionId:1}}};
+  const setup = (storage = new Map()) => {
+    const input = {}, title = {}, label = {}, badge = {dataset:{}}, events = {};
+    const notice = {hidden:true, open:false, style:{}, dataset:{},
+      querySelector: tag => ({input, strong:title, span:label})[tag],
+      addEventListener() {}, showModal() { this.open = true; }, close() { this.open = false; }};
+    const map = {getBoundingClientRect: () => ({top:50,bottom:850,left:300,right:1300})};
+    const elements = {'#v2-phase-notice':notice, '#v2-phase':badge, '#v2-map':map};
+    const context = vm.createContext({view:{}, at:key=>elements[key], t:key=>key, innerHeight:900, innerWidth:1500,
+      GameDialogs:{isOpen:()=>false},
+      localStorage:{getItem:key=>storage.get(key),setItem:(key,value)=>storage.set(key,value)},
+      document:{body:{classList:{contains:()=>false}},addEventListener:(name,fn)=>{events[name]=fn}},
+      setTimeout:(fn,ms)=>{context.expire=fn;context.delay=ms;return 1;},clearTimeout(){}});
+    vm.runInContext(source.slice(start,end) + '\nglobalThis.renderNotice=renderPhaseNotice;globalThis.setSeconds=setPhaseNoticeSeconds;',context);
+    return {context, notice, title, input, events, storage};
+  };
+  const {context, notice, title, input, events, storage} = setup();
   context.renderNotice(state);
-  assert.equal(notice.hidden, false);
-  assert.equal(title.textContent, 'v2.phase.movement');
-  button.onclick();
-  assert.equal(storage.get('goblin.v2.phaseNotice'), 'off');
-  assert.equal(focused, true);
-  assert.equal(notice.hidden, true);
-  state.turnPhase = 'fire';
+  assert.equal(notice.open,true);
+  assert.equal(title.textContent,'v2.phase.movement');
+  assert.equal(context.delay,1000);
+  assert.equal(notice.style.inset,'150px 300px 150px 400px');
+  context.expire();
   context.renderNotice(state);
-  assert.equal(notice.hidden, true);
-  assert.equal(badge.dataset.phase, 'fire');
-  context.enable(true);
+  assert.equal(notice.open,false);
+  context.setSeconds(5);
+  state.turnPhase='fire';
   context.renderNotice(state);
-  assert.equal(notice.hidden, true);
-  state.turnPhase = 'gev';
+  assert.equal(context.delay,5000);
+  events['goblin-game-dialog-opening']();
+  assert.equal(notice.open,false);
+  state.turnPhase='gev';
   context.renderNotice(state);
-  assert.equal(notice.hidden, false);
-  body.add('v2-screen-open');
-  context.renderNotice(state);
-  assert.equal(notice.hidden, true);
+  input.checked=true;
+  input.onchange();
+  assert.equal(storage.get('goblin.v2.phaseNoticeSeconds'),'0');
+  assert.equal(notice.open,false);
+  const migrated=setup(new Map([['goblin.v2.phaseNotice','off']]));
+  migrated.context.renderNotice(state);
+  assert.equal(migrated.notice.open,false);
+  migrated.context.setSeconds(2);
+  state.markers.binding.sessionId=2;
+  migrated.context.renderNotice(state);
+  assert.equal(migrated.context.delay,2000);
+});
+
+test('own unit and invalid hex deselect, and automatic selection needs a ready candidate', () => {
+  const cut = (start,end) => source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start)));
+  const units = [{id:'tank',x:1,y:3,team:'player'},{id:'scout',x:2,y:1,team:'player'}];
+  const state = {units,phase:'player',turnPhase:'movement'};
+  const view = {actorId:'tank'};
+  const context = vm.createContext({units,view,core:()=>false,unitAlive:()=>true,
+    project:()=>state,render(){},clearContext(){view.target=null;},inspectTrainingTarget(){},
+    targetOccupant:(_,cell)=>units.find(unit=>unit.x===cell.x&&unit.y===cell.y),
+    entriesAt:()=>[],nextReadyUnit:()=>context.candidate,readyUnitIds:()=>context.ready??[]});
+  vm.runInContext([
+    'let startZoomPending;',
+    cut('    function chooseActor(', '    function focusUnit('),
+    cut('    function chooseHex(', '    const areaCache'),
+    cut('    function selectReadyActor(', '    function hidePhaseNotice('),
+    'globalThis.pick=()=>selectReadyActor(project(),true);'
+  ].join('\n'),context);
+  context.chooseHex(1,3);
+  assert.equal(view.actorId,null);
+  context.chooseActor('tank');
+  context.chooseHex(9,6);
+  assert.equal(view.actorId,null);
+  context.chooseActor('tank');
+  context.candidate='scout';
+  context.ready=['tank','scout'];
+  context.pick();
+  assert.equal(view.actorId,'tank');
+  context.ready=['scout'];
+  context.pick();
+  assert.equal(view.actorId,'scout');
+  context.candidate=undefined;
+  context.ready=[];
+  context.pick();
+  assert.equal(view.actorId,null);
 });
 
 test('native SVG hover names use only the viewer roster and remove contacts once lost', async () => {

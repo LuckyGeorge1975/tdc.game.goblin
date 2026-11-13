@@ -32,7 +32,7 @@ test('Options alone gets separate header, content scrollport and non-sticky foot
   const descendants=el=>el.children?.flatMap(child=>[child,...descendants(child)])||[];
   const inputs=descendants(panel.children[1]).filter(el=>el.tag==='input');
   assert.deepEqual(inputs.map(el=>el.id),['v2-grid','v2-targets','v2-damage','v2-panel-roster','v2-panel-unit',
-    'v2-panel-field','v2-panel-legend','v2-phase-notice-option','v2-overlay-alpha']);
+    'v2-panel-field','v2-panel-legend','v2-phase-notice-option','v2-auto-select-ready','v2-overlay-alpha']);
   const toggles=inputs.filter(el=>el.id.startsWith('v2-panel-'));
   assert.deepEqual(toggles.map(el=>el.checked),[true,false,true,true]);
   for(const toggle of toggles){toggle.checked=!toggle.checked;toggle.onchange();}

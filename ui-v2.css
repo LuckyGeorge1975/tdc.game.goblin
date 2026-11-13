@@ -194,12 +194,12 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-shell button:disabled { cursor: default; border-color: var(--v2-line); color: var(--v2-muted); }
 .v2-shell button[aria-pressed="true"] { border-color: var(--v2-accent-text); background: var(--v2-surface2); }
 body.ui-v2-active .language-picker select { min-width: 88px; min-height: 44px; padding: 8px; }
-.v2-head, .v2-card { min-width: 0; border: 1px solid var(--v2-line); border-radius: 14px; background: var(--v2-surface); padding: 12px; }
+.v2-head, .v2-card { min-width: 0; border: 1px solid var(--v2-line); border-radius: 10px; background: var(--v2-surface); padding: 10px; }
 .v2-head { display: flex; align-items: center; gap: 16px; padding: 8px 12px; }
 .v2-head h1 { margin: 0; font-size: clamp(20px, 4vw, 30px); line-height: 1.2; overflow-wrap: anywhere; }
 .v2-head p, .v2-card p { margin: 5px 0; color: var(--v2-muted); overflow-wrap: anywhere; }
 .v2-label { display: block; color: var(--v2-accent-text); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.v2-layout { display: grid; grid-template-columns: minmax(230px, 260px) minmax(480px, 1fr) minmax(250px, 290px); gap: 12px; min-height: 0; }
+.v2-layout { display: grid; grid-template-columns: minmax(230px, 260px) minmax(480px, 1fr) minmax(250px, 290px); gap: 8px; min-height: 0; }
 .v2-map-card { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 0; overflow: hidden; }
 .v2-map { height: 100%; min-width: 0; min-height: 0; overflow: auto; scrollbar-width: none; background: #102226; touch-action: none; }
 .v2-map::-webkit-scrollbar { display: none; }
@@ -228,7 +228,7 @@ body.ui-v2-active #battlefield-map .hex.attack { stroke: transparent; stroke-wid
 .m1-ring-inner.m1-ring-target { stroke: var(--v2-danger); }
 .m1-status, .m1-weapon-damage { font: 700 8px system-ui,sans-serif; text-anchor: middle; fill: var(--v2-danger-text); paint-order: stroke; stroke: #0b0e12; stroke-width: 1.5; }
 .v2-own, .v2-target { display: grid; align-content: start; gap: 12px; min-height: 0; overflow: auto; }
-.v2-units { display: flex; flex-direction: column; gap: 6px; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.v2-units { display: flex; flex-direction: column; gap: 4px; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
 .v2-units .v2-unit { display: grid; flex: none; grid-template-columns: 32px minmax(0, 1fr) 20px; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; text-align: left; }
 .v2-roster-art { width: 32px; height: 32px; object-fit: contain; flex: none; }
 .v2-system-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-top: 1px solid var(--v2-line); padding: 4px 0; font-size: 13px; }
@@ -379,9 +379,11 @@ button.training-highlight{outline:2px solid var(--v2-signal);outline-offset:3px}
 .v2-head-turn { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .v2-head-turn p { margin: 0; }
 #v2-phase { position: absolute; z-index: 2; inset: 10px 10px auto auto; width: max-content; max-width: var(--v2-phase-width); box-sizing: border-box; padding: 6px 10px; border: 1px solid var(--v2-signal); border-radius: 8px; background: var(--v2-surface2); color: var(--v2-signal); font-size: 14px; letter-spacing: .06em; text-align: center; text-transform: uppercase; overflow-wrap: anywhere; pointer-events: none; }
-.v2-phase-notice { position: absolute; z-index: 3; top: clamp(72px, 18%, 150px); left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: 8px; width: max-content; max-width: calc(100% - 32px); box-sizing: border-box; padding: 12px; border: 1px solid var(--v2-signal); border-radius: 10px; background: var(--v2-surface); color: var(--v2-signal); text-align: center; pointer-events: none; }
+.v2-phase-notice { position: fixed; display: grid; grid-template-rows: 1fr auto; align-items: center; justify-items: center; box-sizing: border-box; width: auto; height: auto; max-width: none; max-height: none; margin: 0; padding: clamp(8px, 2vmin, 20px); border: 1px solid var(--v2-signal); border-radius: 10px; background: var(--v2-surface); color: var(--v2-signal); text-align: center; overflow: auto; }
 .v2-phase-notice[hidden] { display: none; }
-.v2-phase-notice button { pointer-events: auto; max-width: 100%; }
+.v2-phase-notice::backdrop { background: rgb(0 0 0 / .35); }
+.v2-phase-notice strong { font-size: clamp(22px, 5vmin, 56px); line-height: 1.1; overflow-wrap: anywhere; }
+.v2-phase-notice label { display: flex; align-items: center; gap: 6px; color: var(--v2-text); font-size: 14px; }
 :is(#v2-phase, .v2-phase-notice)[data-phase="movement"] { border-color: var(--v2-success); color: var(--v2-success); }
 :is(#v2-phase, .v2-phase-notice)[data-phase="fire"] { border-color: var(--v2-danger-text); color: var(--v2-danger-text); }
 .v2-head-goal { flex: 1; min-width: 0; text-align: right; }
