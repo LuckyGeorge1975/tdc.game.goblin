@@ -780,6 +780,8 @@
     'v2.ui.coreHp': {de:'KERN-HP',en:'CORE HP',es:'PV DEL NÚCLEO',fr:'PV DU NOYAU'},
     'v2.ui.move': {de:'BEWEGUNG',en:'MOVE',es:'MOVIMIENTO',fr:'DÉPLACEMENT'},
     'v2.ui.pathSteps': {de:'Schritte: {count}',en:'Steps: {count}',es:'Pasos: {count}',fr:'Pas : {count}'},
+    'v2.ui.movePoints': {de:'{cost} BP',en:'{cost} MP',es:'{cost} PM',fr:'{cost} PM'},
+    'v2.ui.missileCancel': {de:'Wähle „Abbrechen“, um ohne Abschuss zum Zielmenü zurückzukehren.',en:'Choose Cancel to return to the target menu without firing.',es:'Elige Cancelar para volver al menú de objetivos sin disparar.',fr:'Choisissez Annuler pour revenir au menu de ciblage sans tirer.'},
     'v2.ui.fire': {de:'FEUER',en:'FIRE',es:'FUEGO',fr:'TIR'},
     'v2.ui.skimmer': {de:'SKIMMER',en:'SKIMMER',es:'DESLIZADOR',fr:'AÉROGLISSEUR'},
     'v2.ui.success': {de:'ERFOLG',en:'SUCCESS',es:'ÉXITO',fr:'SUCCÈS'},

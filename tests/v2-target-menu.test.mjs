@@ -8,7 +8,8 @@ import {queryIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs
 import {lifeGlobals} from './helpers/unit-life-context.mjs';
 import {targetOptionsSource} from './helpers/target-options-source.mjs';
 import {apply, route, trainingScene} from './training-product-harness.mjs';
-import {read} from './artillery-product-harness.mjs';
+import {fullScene} from './catalog-full-harness.mjs';
+import {enemy, execute, read} from './artillery-product-harness.mjs';
 
 const ui = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
 const revealTargetControl = ui.slice(ui.indexOf('    function revealTargetControl('), ui.indexOf('    const COMMAND_ICONS'));
@@ -142,6 +143,51 @@ test('the same live fire rules yield the same menu across T02 and T03, then reac
 const warningSource = ui.slice(ui.indexOf('    function missileWarning('), ui.indexOf('    function targetRowFacts('));
 const runCommand = warningSource + ui.slice(ui.indexOf('    async function runCommand('), ui.indexOf('    function chooseActor('));
 
+test('Advance H03 missile retires its menu before the first K04 click', async () => {
+  const game = await fullScene('catalog-full-advance', 7, false, 'FULL_CATALOG_v1');
+  const actor = 'catalog-full-advance-1';
+  assert.equal(execute(game, {type:'Move', actorId:actor, x:4, y:2}).ok, true);
+  enemy(game);
+  assert.equal(execute(game, {type:'Move', actorId:actor, x:5, y:2}).ok, true);
+  game.run("setTurnPhase('fire')");
+  const slice = (start, end) => ui.slice(ui.indexOf(start), ui.indexOf(end));
+  game.run(`
+    const at=selector=>document.querySelector(selector);
+    at('#v2-map').focus=()=>{};
+    const project=()=>({units, phase, turnPhase, gameOver, revision:revision()});
+    const focusTargetCard=()=>{};
+    const targetOccupant=(state,cell)=>state.units.find(unit=>unitAlive(unit)&&!unit.embarkedOn&&unit.x===cell.x&&unit.y===cell.y);
+    const entriesAt=(state,actor,cell)=>GoblinSpecialistsUI.commands(state,actor,cell);
+    const entryResult=entry=>query(entry.command);
+    const inspectTrainingTarget=()=>{};
+    ${slice('    function clearContext(', '    const hexLabel')}
+    ${runCommand}
+    ${slice('    function chooseHex(', '    const areaCache')}
+    ${slice('    function dismissTargetOnOutsideClick(', "    document.addEventListener('click', dismissTargetOnOutsideClick")}
+    view.actorId='${actor}';
+    chooseHex(7,2);
+    const missile=entriesAt(project(),units.find(unit=>unit.id===view.actorId),view.target)
+      .find(entry=>entry.command.weaponId==='missiles-1'&&entryResult(entry).ok);
+    const clickOutside=()=>{
+      let consumed=false;
+      dismissTargetOnOutsideClick({target:{closest:()=>null},preventDefault(){consumed=true},stopImmediatePropagation(){}});
+      return consumed;
+    };
+  `);
+  assert.equal(read(game, 'clickOutside()'), true);
+  assert.equal(read(game, 'phaseCommands.length'), 0);
+  game.run('chooseHex(7,2)');
+  await game.run('runCommand(project(),missile)');
+  assert.equal(read(game, 'phaseCommands.length'), 1);
+  assert.equal(read(game, 'view.target'), null);
+  const rng = game.rng();
+  assert.equal(read(game, 'clickOutside()'), false);
+  game.run('chooseHex(10,3)');
+  assert.deepEqual(read(game, 'view.focusCell'), {x:10,y:3});
+  assert.equal(read(game, 'phaseCommands.length'), 1);
+  assert.deepEqual(game.rng(), rng);
+});
+
 test('T02 renders the cannon class and the same combat prognosis in all four tooltip languages', async () => {
   const game = await trainingScene('training-t02');
   for (const action of route('training-t02').slice(0, 5)) apply(game, action);
@@ -203,6 +249,7 @@ for (const [profile, type] of [['FULL U13', 'CatalogHexFire'], ['Legacy', 'Fire'
     assert.equal(warnings.length, 1);
     assert.equal(warnings[0].title, context.t('v2.ui.missile'));
     assert.match(warnings[0].message, /E-01.*Angriff 6 direkt, 3 auf Nachbarfeldern/);
+    assert.match(warnings[0].message, /„Abbrechen“.*ohne Abschuss/);
     assert.equal(view.target, target);
   });
 }
@@ -232,7 +279,7 @@ test('Iron Dust Core D-04 opens the legal move confirmation after pointer hover'
       createSVGPoint: () => ({matrixTransform() { return this; }}),
       getScreenCTM: () => ({inverse() {}})
     },
-    el: node, svgIcon: () => '', t: key => key, placeNearHex() {},
+    el: node, svgIcon: () => '', t: (key, params) => key === 'v2.ui.movePoints' ? `${params.cost} BP` : key, placeNearHex() {},
     at: selector => selector === '#v2-target-card' ? card : children().find(child => '#' + child.id === selector)
   };
   runInNewContext([
@@ -260,7 +307,7 @@ test('Iron Dust Core D-04 opens the legal move confirmation after pointer hover'
   assert.deepEqual(Object.keys(move.command.to).sort(), ['x', 'y']);
   assert.equal(card.hidden, false);
   assert.ok(children().some(child => child.id === 'v2-action-execute'));
-  assert.ok(children().some(child => child.title?.includes('MOVE COST 3')));
+  assert.ok(children().some(child => child.title?.includes('MOVE COST 3 BP')));
 });
 
 test('component fire groups weapon and spotter choices before aiming and confirming', async () => {

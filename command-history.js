@@ -1,6 +1,7 @@
 // Commands remain reversible only until the current phase is committed.
 const phaseCommands = [];
 let commandDepth = 0, autoPhaseTimer = null, commandEpoch = 0;
+let phaseHasCommittedCommand = false;
 let phaseRolls = [], phaseRollCursor = 0;
 
 function updateBackButton() {
@@ -16,6 +17,7 @@ function clearPhaseCommands() {
   autoPhaseTimer = null;
   commandEpoch++;
   phaseCommands.length = 0;
+  phaseHasCommittedCommand = false;
   phaseRolls = [];
   phaseRollCursor = 0;
   updateBackButton();
@@ -50,6 +52,7 @@ function reversibleCommand(action, label, actorId = () => selected?.id) {
       if (hits?.length) {
         // Commit history through the event without resetting the phase's cached dice.
         phaseCommands.length = 0;
+        if (epoch === commandEpoch) phaseHasCommittedCommand = true;
         events.show(hits,legacySession);
       } else if (epoch === commandEpoch && changed) {
         phaseCommands.push(before);

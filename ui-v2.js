@@ -114,7 +114,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }));
     }
     function notifyPhaseSkip(phaseName) {
-      if (!['movement', 'fire', 'gev'].includes(phaseName) || core()) return;
+      if (!['movement', 'fire', 'gev'].includes(phaseName) || core() || phaseCommands.length || phaseHasCommittedCommand) return;
       const key = `v2.phaseSkip.${phaseName}`;
       if (globalThis.GoblinCatalogFullRuntime?.active()) GoblinCatalogFullRuntime.log(key, {}, []);
       else {
@@ -796,8 +796,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         details.push(t('v2.ui.pathSteps', {count:result.path.length}));
         const cost = core() ? result.cost : result.path.reduce((sum, step) => sum + movementCost(units.find(unit => unit.id === actor.id), step.x + ',' + step.y), 0);
         if (Number.isFinite(cost)) {
-          details.push(GoblinLanguage.translate('MOVE COST') + ' ' + cost);
-          metrics.push(String(cost));
+          const points = t('v2.ui.movePoints', {cost});
+          details.push(GoblinLanguage.translate('MOVE COST') + ' ' + points);
+          metrics.push(points);
         }
       }
       if (command.type === 'Engineer') {
@@ -930,7 +931,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (!cell || target !== cell || expectedRevision !== view.intentRevision || expectedRevision !== revision() || !query(command).ok) return;
       if (confirmSplash) {
         const accepted = await GameDialogs.confirm({id:'v2-splash-confirm',title:t('v2.ui.missile'),
-          message:[t('v2.ui.sector') + ' ' + hexLabel(cell), missileWarning(state, entry, cell)].join(' · '),
+          message:[t('v2.ui.sector') + ' ' + hexLabel(cell), missileWarning(state, entry, cell), t('v2.ui.missileCancel')].join(' · '),
           acceptLabel:t('ui.hud.intent.confirm'),cancelLabel:t('ui.dialog.cancel')});
         if (!accepted || view.target !== cell || expectedRevision !== revision() || !query(command).ok) { render(); return; }
       }
@@ -1309,7 +1310,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         const focused = view.target || view.infoCell || view.focusCell;
         const cell = focused && data.legal.find(item => item.x === focused.x && item.y === focused.y);
         if (cell && Number.isFinite(cell.cost)) {
-          const costText = `${hexLabel(focused)} · ${GoblinLanguage.translate('MOVE COST')} ${cell.cost}`;
+          const costText = `${hexLabel(focused)} · ${GoblinLanguage.translate('MOVE COST')} ${t('v2.ui.movePoints', {cost:cell.cost})}`;
           message = [message, `${t('v2.ui.sector')} ${costText}`].filter(Boolean).join(' · ');
         }
       }

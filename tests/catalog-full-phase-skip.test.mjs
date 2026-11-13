@@ -1,4 +1,4 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {fullScene}from './catalog-full-harness.mjs';import {read}from './artillery-product-harness.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {fullScene}from './catalog-full-harness.mjs';import {enemy,execute,read}from './artillery-product-harness.mjs';
 const ui=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8'),body=ui.slice(ui.indexOf('    function notifyPhaseSkip('),ui.indexOf('    let idleCoreLog='));
 function attach(g){g.context.__core=false;g.context.GoblinLanguage={current:'de',t:k=>'localized:'+k};g.run(`{const core=()=>__core,t=k=>GoblinLanguage.t(k);${body}globalThis.__notify=notifyPhaseSkip;globalThis.GoblinUIV2={notifyPhaseSkip};}`)}
 const facts=g=>read(g,'({units,terrain:[...terrain],terrainTypes:[...terrainTypes],turn,phase,turnPhase,gameOver,history:phaseCommands,rolls:phaseRolls,cursor:phaseRollCursor})');
@@ -6,3 +6,27 @@ test('actual Full notify is safe for empty or stale legacy log and adds exactly 
 test('actual non-Full notify tags only a genuinely new line and never a stale or missing one',async()=>{for(const insertion of ['new','stale','empty']){const g=await fullScene();attach(g);g.context.__insertion=insertion;g.run("globalThis.GoblinCatalogFullRuntime={active:()=>false};logEl.firstElementChild={dataset:{old:true},setAttribute(){}};logEl.insertAdjacentHTML=function(){if(__insertion==='new')this.firstElementChild={dataset:{new:true},setAttribute(){}};if(__insertion==='empty')this.firstElementChild=null}");g.run("__notify('fire')");const node=read(g,'logEl.firstElementChild');assert.deepEqual(node,insertion==='new'?{dataset:{new:true,phaseSkipKey:'v2.phaseSkip.fire'}}:insertion==='stale'?{dataset:{old:true}}:null)}});
 test('Core and unsupported phase notifications return without message, world, RNG or view effects',async()=>{for(const core of [true,false]){const g=await fullScene();attach(g);g.context.__core=core;const full=read(g,'GoblinCatalogFullRuntime.snapshot()'),world=facts(g),rng=g.rng(),view=read(g,'view'),timers=g.timers.size;g.run(core?"__notify('gev')":"__notify('foreign')");assert.deepEqual(read(g,'GoblinCatalogFullRuntime.snapshot()'),full);assert.deepEqual(facts(g),world);assert.deepEqual(g.rng(),rng);assert.deepEqual(read(g,'view'),view);assert.equal(g.timers.size,timers)}});
 test('actual auto-phase caller reaches one normal phase or enemy-start after its Full notification',async()=>{for(const phaseName of ['movement','fire','gev']){const g=await fullScene();attach(g);g.context.__phaseName=phaseName;g.context.__calls=[];g.run("turnPhase=__phaseName;phaseReadyUnits=()=>[];$('#auto-end-turn').checked=true;const originalSet=setTurnPhase,originalEnemyStart=startEnemyTurn;setTurnPhase=function(next){__calls.push(next);return originalSet(next)};startEnemyTurn=function(){__calls.push('enemy');return originalEnemyStart()}");const rng=g.rng();g.run('maybeAutoAdvancePhase()');assert.deepEqual([...g.context.__calls],[phaseName==='movement'?'fire':phaseName==='fire'?'gev':'enemy']);assert.equal(read(g,'GoblinCatalogFullRuntime.snapshot().logs.filter(e=>e.key===`v2.phaseSkip.${__phaseName}`).length'),1);assert.deepEqual(g.rng(),rng);assert.equal(read(g,'turnPhase'),phaseName==='movement'?'fire':phaseName==='fire'?'gev':'enemy')}});
+
+test('Terrain Course advances after the H04 shot without reporting an unused fire phase', async () => {
+  const g = await fullScene('catalog-full-terrain-course', 7, false, 'FULL_CATALOG_v1');
+  attach(g);
+  const tank = 'catalog-full-terrain-course-1';
+  const infantry = 'catalog-full-terrain-course-3';
+  assert.equal(execute(g, {type:'Move', actorId:tank, x:3, y:3}).ok, true);
+  assert.equal(execute(g, {type:'Move', actorId:infantry, x:3, y:6}).ok, true);
+  enemy(g);
+  assert.equal(read(g, 'turn'), 2);
+  assert.equal(execute(g, {type:'Move', actorId:tank, x:5, y:3}).ok, true);
+  g.run("setTurnPhase('fire'); $('#auto-end-turn').checked=true");
+  const shot = read(g, `GoblinSpecialistsUI.commands({units,turnPhase}, units.find(u=>u.id==='${tank}'), {x:7,y:3})
+    .find(entry=>query(entry.command).ok).command`);
+  assert.equal(execute(g, shot).ok, true);
+  assert.equal(read(g, 'phaseCommands.length'), 1);
+  const rng = g.rng();
+  const advance = g.timers.get(g.run('autoPhaseTimer'));
+  assert.ok(advance);
+  advance();
+  assert.equal(read(g, 'turnPhase'), 'gev');
+  assert.equal(read(g, "GoblinCatalogFullRuntime.snapshot().logs.some(e=>e.key==='v2.phaseSkip.fire')"), false);
+  assert.deepEqual(g.rng(), rng);
+});
