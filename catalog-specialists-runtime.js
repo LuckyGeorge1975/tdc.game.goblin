@@ -184,7 +184,7 @@
   if(u.catalogFire&&u.catalogFire.state.turn<turn)u.catalogFire=GoblinCatalogSpecialistFire.reset(u.catalogFire,u.id,turn,registry());
  }}
  const oldReset=resetActionState;resetActionState=function(){oldReset();if(active())resetOwned('player')};
- const oldEnemyTurn=enemyTurn;enemyTurn=function(){if(active())resetOwned('enemy');return oldEnemyTurn()};
+ const oldEnemyTurn=enemyTurn;enemyTurn=function(...args){if(active())resetOwned('enemy');return oldEnemyTurn(...args)};
  // A stationary engineer or Forge can still work or deploy. Readiness must not commit its phase early.
  function hasMovementAction(u){
   if(!alive(u)||u.team!=='player'||u.disabled||u.embarkedOn||u.moved)return false;
