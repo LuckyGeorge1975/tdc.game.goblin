@@ -31,10 +31,18 @@ test('FULL fire areas reuse each actor only within the current rule revision', a
       units.find(unit=>unit.id==='catalog-full-atlas-1').x=5;
       setTurnPhase('fire');
     }
-    startFire();
+    setTurnPhase('fire');
   `);
   const siege = 'catalog-full-atlas-1', scout = 'catalog-full-atlas-2';
   const draw = id => read(game, `drawArea('${id}')`);
+  const unselectedTarget = draw(siege);
+  assert.equal(unselectedTarget.legal.length, 0);
+  assert.ok(unselectedTarget.blocked.some(cell => cell.reason && cell.reason !== 'v2.area.noLegalTarget'));
+  assert.equal(unselectedTarget.reason, 'v2.area.noLegalTarget');
+  assert.equal(draw(scout).reason, 'v2.area.noLegalTarget');
+  assert.deepEqual(draw(siege), unselectedTarget);
+  assert.equal(draw('catalog-full-atlas-13').legal.length, 37);
+  game.run('startFire()');
   const original = draw(siege);
   assert.ok(original.legal.length);
   draw(scout);

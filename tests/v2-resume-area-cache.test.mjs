@@ -74,7 +74,7 @@ function scene() {
       ${hiddenSource}
       ${cacheSource}
       const preview=selectedFirePreview(state,actor,mode,data.legal);
-      record({key:areaCache.key, weaponKey, legal:data.legal.length, reason:data.reason,
+      record({key:areaCache.key, weaponKey, legal:data.legal.length, reason:data.reason, blocked:data.blocked,
         crt:preview?.ratioCategory??null, revision:state.revision});
     }
     globalThis.GoblinUIV2={refresh:${refreshSource}};
@@ -102,7 +102,8 @@ test('post-resume refresh replaces paused FR rejection with legal targets and se
   assert.equal(before.crt,'2-1');
   const {pausedFrame,resumedFrame}=model.resumeFrench();
   assert.equal(pausedFrame.legal,0);
-  assert.equal(pausedFrame.reason,'V2_NOT_READY');
+  assert.equal(pausedFrame.reason,'v2.area.noLegalTarget');
+  assert.ok(pausedFrame.blocked.some(cell=>cell.reason==='V2_NOT_READY'));
   assert.equal(resumedFrame.revision,before.revision);
   assert.equal(resumedFrame.legal,2);
   assert.equal(resumedFrame.crt,'2-1');

@@ -1066,8 +1066,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       }
       data.status = mode === 'los' ? 'coreSight' :
         data.legal.length ? 'fire' : 'blocked';
-      data.reason = mode === 'fire' && !data.legal.length ?
-        (data.blocked.find(item => item.reason)?.reason || t('v2.area.noLegalTarget')) : '';
+      data.reason = mode === 'fire' && !data.legal.length ? t('v2.area.noLegalTarget') : '';
       return data;
     }
     function selectedFirePreview(state, actor, mode, legal) {
