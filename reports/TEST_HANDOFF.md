@@ -13,8 +13,18 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Umfang | [Änderungen seit Build 29](../CHANGELOG.md#0130---2026-11-13), einschließlich Playtest-Korrekturen, Bibliothek, Phasenoverlay und eigener Level. |
 | Bibliothek | Vollkatalog-Texte für vier Sprachen, Katalogwerte und schematische Waffenreichweiten. Die Bibliotheksvorschau führt keine Befehle aus. Historische Profile behalten ihre Beschreibungstexte. |
 | Tutorial und Zuglimit | T02 hält die gelehrten Phasenbefehle bei Auto an und aus bis zur Eingabe. Eigene Level ohne Limit zeigen keinen Limitzähler. Positive Limitwerte erscheinen weiterhin im Briefing und Missionsstatus. |
-| Abnahme | Französische Bibliotheksansicht bei 1280 × 560 und 1280 × 660, Scrollpfeile und erreichbarer Tabinhalt. Bibliotheksbeschreibungen, Build-/Cacheadressen, Tutorialbefund `goblin-4fn2.6`, Content/Legal und Release-Prüfung im Issue `goblin-4fn2.5` belegen. |
-| README-Bild | Aktuelle Kartenaufnahme aus dem geprüften Build 30 folgt im Bildnachlauf. |
+| Abnahme | Unabhängige Desktop-QA für Bibliothek und Beschreibungen bei 1280 × 560 und 1280 × 660, Scrollpfeile, T02 mit Auto an und aus sowie eigene Level mit und ohne Zuglimit bestanden. Belege in `.tools/qa-build-030/after.md`. Content/Legal und Release-Endprüfung im Issue `goblin-4fn2.5` belegen. |
+| README-Bild | [Geprüfte FULL-Atlas-Aufnahme aus Build 30](#readme-aufnahme-build-30). |
+
+### README-Aufnahme Build 30
+
+| Feld | Beleg |
+|---|---|
+| Quellcommit | `2d01fd43127a2bf47537fb276e1a8007707fe6d0`, Version `0.1.30`, Build 30. QA-Archiv-SHA256 `84c9131c37f61f9c94e7fdcb246c3133c1aaeedd2d36fdf391a8111058eb2136`. |
+| Aufnahme | Nativer Desktopstart von FULL Atlas Proving Grounds (`catalog-full-atlas`, `FULL_CATALOG_v1`), Englisch, Zug 1, Bewegungsphase, 18 eigene und sieben sichtbare gegnerische Einheiten. Rohbeleg `.tools/qa-build-030/readme-browser.json`. |
+| Original | `.tools/qa-build-030/readme-build-0.1.30-full-atlas.png`, PNG, 1600 × 900, 1.099.946 Bytes, SHA256 `133de5fa3a06d79cff11a2a91d5f1a39878ea86dbb209fb29bdbc134a9f8ba68`. |
+| README-Ableitung | [field-test-0.1.30-full-atlas.webp](../docs/images/field-test-0.1.30-full-atlas.webp), verlustbehaftetes WebP (VP8), 1600 × 900, 189.800 Bytes, SHA256 `c15a358120de327eb3c7276f443550133538ac316d139548dd7f0a9600fbfcb0`. |
+| Kompression und Prüfung | Pillow, RGB, Qualität 90, Methode 6, Auflösung wie im Original. Unabhängige Dekodierung und Sichtprüfung bestanden. Beim Bildnachlauf beide SHA256 und Abmessungen erneut geprüft. |
 
 ## Build 0.1.29 · Kontextmenü und deklarative Level
 

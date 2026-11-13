@@ -4,13 +4,15 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-**0.1.29 / Build 29 vom 12.11.2026** ist der lokal geprüfte Release-Kandidat. Das Hex-Kontextmenü zeigt verfügbare Befehle am Ziel. Die Desktop-Karte lässt sich maximieren und der Level-Editor exportiert das deklarative v3-Format. [Änderungen seit Build 28](CHANGELOG.md#0129---2026-11-12) · [Test-Handoff](reports/TEST_HANDOFF.md#build-0129--kontextmenü-und-deklarative-level)
+**0.1.30 / Build 30 vom 13.11.2026** ist der lokale Release-Kandidat. Die Einheitenbibliothek zeigt Bewegungs- und Feuerreichweiten sowie verlinkte Regeln. Eigene Level lassen sich im Browser speichern und aus der Missionsauswahl spielen. [Änderungen seit Build 29](CHANGELOG.md#0130---2026-11-13) · [Test-Handoff](reports/TEST_HANDOFF.md#build-0130--bibliothek-und-eigene-level)
 
-![Build 0.1.29 – FULL Atlas Proving Grounds mit sichtbaren Einheiten auf der Hexkarte](docs/images/field-test-0.1.29-full-atlas.webp)
+![Build 0.1.30 – FULL Atlas Proving Grounds mit sichtbaren Einheiten auf der Hexkarte](docs/images/field-test-0.1.30-full-atlas.webp)
 
-*FULL Atlas Proving Grounds in Build 0.1.29, Deutsch, Zug 1 in der Bewegungsphase. Die Aufnahme stammt aus dem geprüften Buildpaket `7885efd`. [Herkunft und Bildprüfung](reports/TEST_HANDOFF.md#readme-aufnahme-build-29)*
+*FULL Atlas Proving Grounds in Build 0.1.30, Englisch, Zug 1 in der Bewegungsphase. Zu sehen sind 18 eigene und sieben sichtbare gegnerische Einheiten. [Herkunft und Bildprüfung](reports/TEST_HANDOFF.md#readme-aufnahme-build-30)*
 
 ## Frühere Desktopstände
+
+**0.1.29 / Build 29 vom 12.11.2026** führte das Hex-Kontextmenü, die maximierbare Desktop-Karte und den kanonischen v3-Export im Level-Editor ein. [Historische Atlas-Aufnahme](docs/images/field-test-0.1.29-full-atlas.webp) · [Herkunft und Bildprüfung](reports/TEST_HANDOFF.md#readme-aufnahme-build-29)
 
 **0.1.28 / Build 28 vom 04.11.2026 ist der Field-Test-Build nach dem User Report vom 02.11.2026.** Die Spieloberfläche zeigt das aktuelle Terrainset, Missionsauswahl und Briefing kommen ohne Systemscrollleisten aus, das Spiel-Layout hat Kartenoverlays, eine Einheitenliste mit Bereitschaft und eine schaltbare Feldinfo. Neu sind Zurück/Nächste Einheit, überarbeitete Reichweiten, die Ereignisliste per Button und ein Aktionsablauf in drei Schritten: Einheit antippen öffnet das Aktionsmenü, die gewählte Aktion steht in der Befehlsleiste, ein Ziel öffnet eine Zielkarte mit Schritten bzw. Quote und Trefferchance und wird erst mit „Ausführen“ ausgeführt. Die Trainingslektionen beschreiben diesen Ablauf. Legacy-/FULL-Regeln, Missionen und Trainingswerte bleiben unverändert; der getrennte IronDust-v2-Corepfad nutzt die Legacy-Pixel-Sichtlinie und generisches Mehrwaffenfeuer. Feintest und Bericht folgen auf Pages: [Build-28-Handoff](reports/TEST_HANDOFF.md#build-0128--field-test-nach-user-report-0211). Die folgenden Absätze beschreiben den vorigen Stand 0.1.27.
 
