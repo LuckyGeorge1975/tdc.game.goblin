@@ -70,6 +70,78 @@ test('a scheduled choice from a previous session never opens an actor slot', asy
   assert.deepEqual(facts(g), before);
 });
 
+test('restarting inside a choice stops the old pass, retry and turn end', async () => {
+  const g = await atlas();
+  let calls = 0, restarted;
+  schedule(g, slot => {
+    calls++;
+    g.run("loadScenario('catalog-full-atlas')");
+    restarted = facts(g);
+    assert.equal(slot.execute({type:'EnemyHold',actorId:slot.actorId}).code, 'ENEMY_SLOT_CLOSED');
+  })();
+  assert.equal(calls, 1);
+  assert.deepEqual(read(g,'[phase,turnPhase,turn]'), ['player','movement',1]);
+  assert.deepEqual(facts(g), restarted);
+});
+
+test('choice exception before commit closes the slot and falls back to the automatic turn', async () => {
+  const expected = await atlas();
+  schedule(expected)();
+  const g = await atlas();
+  const reports = [], error = new Error('choice before commit');
+  g.context.console = {error:(...args) => reports.push(args)};
+  let saved;
+  schedule(g, slot => {
+    if (slot.actorId !== dreadnaught) return;
+    saved = slot;
+    throw error;
+  })();
+  assert.equal(saved.execute(hold).code, 'ENEMY_SLOT_CLOSED');
+  assert.deepEqual(reports, [['FULL enemy choice failed',dreadnaught,error]]);
+  assert.deepEqual(facts(g), facts(expected));
+});
+
+test('choice exception after movement preserves the commit and its normal fire retry', async () => {
+  const expected = await atlas();
+  schedule(expected, slot => {
+    if (slot.actorId === dreadnaught) assert.equal(slot.execute(move).ok,true);
+  })();
+  const g = await atlas();
+  const reports = [], error = new Error('choice after commit');
+  g.context.console = {error:(...args) => reports.push(args)};
+  let saved;
+  schedule(g, slot => {
+    if (slot.actorId !== dreadnaught) return;
+    saved = slot;
+    assert.equal(slot.execute(move).ok,true);
+    throw error;
+  })();
+  assert.equal(saved.execute(move).code, 'ENEMY_SLOT_CLOSED');
+  assert.deepEqual(reports, [['FULL enemy choice failed',dreadnaught,error]]);
+  assert.deepEqual(facts(g), facts(expected));
+});
+
+test('an exception from the movement commit propagates without fallback or retry', async () => {
+  const g = await atlas();
+  const error = new Error('commit failed after a world mutation');
+  g.context.commitError = error;
+  g.run(`const normalCommit=commitEnemyStep;
+    commitEnemyStep=function(actor,step){
+      normalCommit(actor,step);
+      if(actor.id==='catalog-full-atlas-20') throw commitError;
+    };`);
+  let saved, failedState;
+  const callback = schedule(g, slot => {
+    if (slot.actorId !== dreadnaught) return;
+    saved = slot;
+    assert.throws(() => slot.execute(move), error);
+    failedState = facts(g);
+  });
+  assert.throws(callback, error);
+  assert.equal(saved.execute(hold).code, 'ENEMY_SLOT_CLOSED');
+  assert.deepEqual(facts(g), failedState);
+});
+
 test('Hold consumes only the first pass and allows the normal fire retry', async () => {
   const g = await atlas();
   let slotExecuted = false;

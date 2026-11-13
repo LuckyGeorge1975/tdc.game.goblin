@@ -267,7 +267,7 @@ function enemyTurn(chooseEnemyAction) {
   function chooseEnemyStep(full, actor, choose) {
     if (typeof choose !== 'function') return false;
     const session = legacySession, actionTurn = turn;
-    let open = true, spent = false;
+    let open = true, spent = false, engineFailed = false, engineError;
     const fail = code => ({ok:false,code});
     const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
       Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value,key));
@@ -292,18 +292,31 @@ function enemyTurn(chooseEnemyAction) {
       return path?.length ? {ok:true,path} : fail('ENEMY_DESTINATION_UNREACHABLE');
     }
     function execute(command) {
-      const checked = query(command);
-      if (!checked.ok) return checked;
-      spent = true;
-      if (command.type === 'EnemyMove')
-        commitEnemyStep(actor,full.enemyStep(actor,{x:command.x,y:command.y,path:checked.path}));
-      return {ok:true};
+      try {
+        const checked = query(command);
+        if (!checked.ok) return checked;
+        spent = true;
+        if (command.type === 'EnemyMove')
+          commitEnemyStep(actor,full.enemyStep(actor,{x:command.x,y:command.y,path:checked.path}));
+        return {ok:true};
+      } catch (error) {
+        engineFailed = true;
+        engineError = error;
+        open = false;
+        throw error;
+      }
     }
+    let choiceFailed = false, choiceError;
     try {
       choose(Object.freeze({actorId:actor.id,query,execute}));
+    } catch (error) {
+      choiceFailed = true;
+      choiceError = error;
     } finally {
       open = false;
     }
+    if (engineFailed) throw engineError;
+    if (choiceFailed) console.error('FULL enemy choice failed', actor.id, choiceError);
     return spent;
   }
   const acceptedTurn = turn;
@@ -324,7 +337,10 @@ function enemyTurn(chooseEnemyAction) {
       u !== units.find(x => x.id === 'core') && (!globalThis.GoblinCatalogRuntime?.active() || !u.embarkedOn));
     for (const foe of foes) {
       if (gameOver) break;
-      if (full?.active() && chooseEnemyStep(full, foe, chooseEnemyAction)) {
+      const explicitStep = full?.active() && chooseEnemyStep(full, foe, chooseEnemyAction);
+      if (acceptedSession && (legacySession !== acceptedSession || turn !== acceptedTurn ||
+          phase !== 'enemy' || turnPhase !== 'enemy')) return;
+      if (explicitStep) {
         // An explicit first-pass move or hold still leaves the normal fire retry.
         foe.enemyFired = false;
         continue;
