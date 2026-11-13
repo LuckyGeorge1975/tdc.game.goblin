@@ -40,7 +40,7 @@ function scene() {
   const context = {...lifeGlobals,
     mode:'ready', paused:false, pauseActive:false, screen:'play', savedAuto:false, waiting:[],
     get session() { return session; }, enemyFlow:{running:false,start(){}}, queryIronDustProfile,
-    areaCache:{key:null,value:null}, GoblinLanguage:{current:'de'}, core:()=>true,
+    areaCache:{key:null,actors:new Map()}, GameDialogs:{isOpen:()=>false}, GoblinLanguage:{current:'de'}, core:()=>true,
     previewWeaponKey:actor=>actor.selectedWeapon, t:key=>key,
     view:{target:{x:8,y:3}}, legend:{textContent:''},
     document:{querySelector:()=>({checked:false}),body:{classList:{contains:()=>false}}},

@@ -182,14 +182,14 @@ test('natural fire settle replaces busy-cached blocked area with the legal autos
   game.run(`globalThis.followBusy=true;globalThis.GoblinMovement={busy:()=>followBusy};
     globalThis.core=()=>false;globalThis.t=key=>key;globalThis.GoblinLanguage={current:'de'};
     ${targetOptionsSource}
-    const areaCache={key:null,value:null};
+    const areaCache={key:null,actors:new Map()};
     ${slice('    function query(command)', '    function previewFire(command)')}
     ${slice('    function areaQuery(', '    function freeRatioChipCenter(')}
     function drawFollowArea(){
       const state={revision:'same-confirmed-shot',phase,turnPhase,gameOver,units};
       const actor=units[0],mode='fire',weaponKey=actor.ogreSystems.selectedWeapon;
       ${slice('      const key = JSON.stringify([core()', '      const hexWidth')}
-      return JSON.stringify({key,legal:areaCache.value.legal});
+      return JSON.stringify({key,legal:data.legal});
     }
     globalThis.followBefore=drawFollowArea();`);
   assert.equal(game.run('units[0].ogreSystems.selectedWeapon'),'secondary');

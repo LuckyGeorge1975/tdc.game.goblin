@@ -1,11 +1,69 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import {readFileSync} from 'node:fs';
 import {fullScene} from './catalog-full-harness.mjs';
-import {read} from './artillery-product-harness.mjs';
+import {execute, read} from './artillery-product-harness.mjs';
+import {targetOptionsSource} from './helpers/target-options-source.mjs';
 
 const atlas = () => fullScene('catalog-full-atlas', 7, false, 'FULL_CATALOG_v1');
 const readyIds = game => read(game, 'phaseReadyUnits().map(unit => unit.id)');
 const uncachedReadyIds = game => read(game, 'units.filter(unit => phaseCanAct(unit)).map(unit => unit.id)');
+
+test('FULL fire areas reuse each actor only within the current rule revision', async () => {
+  const game = await atlas();
+  const ui = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
+  const cut = (start, end) => ui.slice(ui.indexOf(start), ui.indexOf(end, ui.indexOf(start)));
+  game.run(`
+    const GoblinLanguage={current:'de'};
+    ${targetOptionsSource}
+    ${cut('    const areaCache', '    let areaPhase')}
+    ${cut('    function areaQuery(', '    function selectedFirePreview(')}
+    let queries=0;
+    const originalQuery=query;
+    query=command=>{queries++;return originalQuery(command)};
+    function drawArea(id){
+      const state={revision:revision(),phase,turnPhase,gameOver,units:GoblinCatalogFullRuntime.roster()};
+      const actor=state.units.find(unit=>unit.id===id),mode='fire';
+      ${cut('      const key = JSON.stringify([core()', '      const hexWidth')}
+      return data;
+    }
+    function startFire(){
+      units.find(unit=>unit.id==='catalog-full-atlas-1').x=5;
+      setTurnPhase('fire');
+    }
+    startFire();
+  `);
+  const siege = 'catalog-full-atlas-1', scout = 'catalog-full-atlas-2';
+  const draw = id => read(game, `drawArea('${id}')`);
+  const original = draw(siege);
+  assert.ok(original.legal.length);
+  draw(scout);
+  game.run('queries=0');
+  const before = game.state(), rng = game.rng();
+  assert.deepEqual(draw(siege), original);
+  assert.equal(game.run('queries'), 0);
+  assert.equal(game.state(), before);
+  assert.deepEqual(game.rng(), rng);
+
+  const shot = read(game, `entriesAt({revision:revision(),phase,turnPhase,gameOver,units:GoblinCatalogFullRuntime.roster()},
+    units.find(unit=>unit.id==='${siege}'), ${JSON.stringify(original.legal[0])}).find(entry=>entryResult(entry).ok).command`);
+  assert.equal(execute(game, shot).ok, true);
+  game.run('queries=0');
+  draw(siege);
+  assert.ok(game.run('queries') > 0);
+  game.run('undoPhaseCommand(); queries=0');
+  assert.deepEqual(draw(siege), original);
+  assert.ok(game.run('queries') > 0);
+
+  game.run("const hidden=units.find(unit=>unit.team==='enemy'&&!GoblinCatalogFullRuntime.known(unit.id)); GoblinCatalogFullRuntime.reveal(hidden.id,'own-fire'); queries=0");
+  draw(siege);
+  assert.ok(game.run('queries') > 0);
+  game.run("setTurnPhase('gev')");
+  assert.equal(draw(siege).status, 'phase');
+  game.run("loadScenario('catalog-full-atlas'); startFire(); queries=0");
+  assert.deepEqual(draw(siege), original);
+  assert.ok(game.run('queries') > 0);
+});
 
 test('FULL readiness reuses scans across selection and refreshes after action and movement input changes', async () => {
   const game = await atlas();

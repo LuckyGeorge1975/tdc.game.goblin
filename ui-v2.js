@@ -678,9 +678,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function entriesAt(state, actor, cell) {
       if (!actor || state.phase !== 'player' || state.gameOver || actor.disabled || !unitAlive(actor) ||
           globalThis.GoblinMovement?.busy() || GameDialogs.isOpen()) return [];
-      const key = JSON.stringify([state.revision, actor.id, state.turnPhase, GoblinLanguage.current]);
+      const key = JSON.stringify([state.revision, state.turnPhase, GoblinLanguage.current]);
       if (targetCache.key !== key) { targetCache.key = key; targetCache.cells.clear(); }
-      const position = cell.x + ',' + cell.y;
+      const position = JSON.stringify([actor.id, cell.x, cell.y]);
       if (!targetCache.cells.has(position)) targetCache.cells.set(position, targetCommands(state, actor, cell));
       return targetCache.cells.get(position);
     }
@@ -984,7 +984,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       render();
       if (available) focusTargetCard();
     }
-    const areaCache = { key: null, value: null };
+    const areaCache = { key: null, actors: new Map() };
     let areaPhase = null;
     let fireZoomPhase = null;
     let startZoomMission = null, startZoomPending = null;
@@ -1242,9 +1242,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         return;
       }
       const key = JSON.stringify([core(), state.revision, state.phase, state.turnPhase,
-        actor?.id, mode, GoblinLanguage.current, !!globalThis.GoblinMovement?.busy()]);
-      if (areaCache.key !== key) { areaCache.key = key; areaCache.value = areaData(state, actor, mode); }
-      const data = areaCache.value;
+        mode, GoblinLanguage.current, !!globalThis.GoblinMovement?.busy(), GameDialogs.isOpen()]);
+      if (areaCache.key !== key) { areaCache.key = key; areaCache.actors.clear(); }
+      const actorId = actor?.id ?? null;
+      if (!areaCache.actors.has(actorId)) areaCache.actors.set(actorId, areaData(state, actor, mode));
+      const data = areaCache.actors.get(actorId);
       const hexWidth = Math.sqrt(3) * S;
       const referenceScale = hexWidth / 112;
       const mapWidth = nativeMap.getBoundingClientRect().width || nativeMap.clientWidth ||

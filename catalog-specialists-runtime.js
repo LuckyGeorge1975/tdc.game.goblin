@@ -22,7 +22,7 @@
   if(system(u)){validateOwner(u);require(t.kind==='component'&&typeof t.componentId==='string'&&!!t.componentId,'COMPONENT_REQUIRED');const c=GoblinSystems.catalogTargets(u.catalogSystems,registry()).find(c=>c.id===t.componentId);require(c,'COMPONENT_UNAVAILABLE');return {unit:u,component:c}}
   require(t.kind==='unit','INVALID_COMPONENT_OWNER');return {unit:u,component:null};
  }
- function fireQuery(command,allowEnemy=false){
+ function fireQuery(command,allowEnemy=false,preview=false){
   require(exact(command,['type','actorId','target','weaponId','mode','spotterId'])&&command.type==='CatalogFire','INVALID_SPECIALISTS_FIRE');
   const u=units.find(u=>u.id===command.actorId);require(alive(u)&&!u.disabled&&(!u.embarkedOn||rules(u).passengerRef),'ACTOR_UNAVAILABLE');
   require((u.team==='player'||allowEnemy)&&worldPhase(u,'fire'),'WRONG_FIRE_PHASE');
@@ -30,7 +30,8 @@
   const rule=rules(u),distance=dist(u,t),los=lineOfSight(u,t);let attack,nextSystem=null,nextFire=null,effects=[];
   if(system(u)){
    validateOwner(u);require(command.mode==='direct'&&command.spotterId===null&&typeof command.weaponId==='string','INVALID_SYSTEM_FIRE');
-   const out=GoblinSystems.catalogRecordFire(u.catalogSystems,command.weaponId,registry());attack={...out.shot,key:command.weaponId};nextSystem=out.state;effects=out.effects;
+   if(preview){attack={...GoblinSystems.catalogFireShot(u.catalogSystems,command.weaponId,registry()),key:command.weaponId};}
+   else{const out=GoblinSystems.catalogRecordFire(u.catalogSystems,command.weaponId,registry());attack={...out.shot,key:command.weaponId};nextSystem=out.state;effects=out.effects;}
    require(distance>=1&&distance<=attack.range,'TARGET_OUT_OF_RANGE');require(los,'DIRECT_LOS_REQUIRED');require(!attack.infantryOnly||rules(t).infantry===true,'INFANTRY_TARGET_REQUIRED');
   }else if(u.catalogFire){
    const actor={id:record(u).assetId,team:u.team,hp:dtoHp(u),disabled:!!u.disabled};let request;
@@ -227,7 +228,7 @@
   if(command?.type==='CatalogRam')return executeRam(command);
   return executeFire(command);
  }
- function query(command){try{if(command?.type==='CatalogRam'){const q=ramQuery(command);return {ok:true,path:q.path}}if(['CatalogLoad','CatalogDeploy'].includes(command?.type)){cargoQuery(command);return {ok:true}}if(command?.type==='Engineer'){const q=engineeringQuery(command);return {ok:true,cost:q.cost,materialGain:q.materialGain,terrainChange:q.terrainChange}}const q=fireQuery(command);return {ok:true,weapon:q.weapon,componentId:q.component?.id??null,defense:q.component?.type==='treads'?null:q.component?q.component.defense+TerrainRules.coverBonus(terrainTypeAt(q.target.x,q.target.y)):effectiveDefense(q.target)}}catch(error){return {ok:false,code:error.code??error.message,reason:reason(error.code??error.message,command),...(Number.isFinite(error.cost)?{cost:error.cost}:{})}}}
+ function query(command){try{if(command?.type==='CatalogRam'){const q=ramQuery(command);return {ok:true,path:q.path}}if(['CatalogLoad','CatalogDeploy'].includes(command?.type)){cargoQuery(command);return {ok:true}}if(command?.type==='Engineer'){const q=engineeringQuery(command);return {ok:true,cost:q.cost,materialGain:q.materialGain,terrainChange:q.terrainChange}}const q=fireQuery(command,false,true);return {ok:true,weapon:q.weapon,componentId:q.component?.id??null,defense:q.component?.type==='treads'?null:q.component?q.component.defense+TerrainRules.coverBonus(terrainTypeAt(q.target.x,q.target.y)):effectiveDefense(q.target)}}catch(error){return {ok:false,code:error.code??error.message,reason:reason(error.code??error.message,command),...(Number.isFinite(error.cost)?{cost:error.cost}:{})}}}
  function validateRestoredState(){
   if(!active())return true;const ids=new Set();
   for(const u of units){const r=record(u);require(r&&!ids.has(u.id),'RESTORE_OWNER_MISMATCH');ids.add(u.id);

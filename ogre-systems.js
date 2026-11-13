@@ -144,6 +144,9 @@
   function catalogMovement(state,registry){validateCatalogSystem(state,registry);return state.rules.definition.movementBands.find(b=>state.treads>=b.minTreads&&state.treads<=b.maxTreads).movement}
   function catalogIsHelpless(state,registry){
     validateCatalogSystem(state,registry);
+    return catalogHelpless(state);
+  }
+  function catalogHelpless(state){
     return state.treads===0&&state.components.every((slot,i)=>{
       const spec=state.rules.definition.components[i];
       return spec.kind==='drone-bay'||slot.destroyed||slot.spent;
@@ -151,6 +154,9 @@
   }
   function catalogWeaponReady(state,id,registry){
     validateCatalogSystem(state,registry);const {slot,spec}=catalogSlot(state,id);
+    return catalogSlotReady(state,slot,spec);
+  }
+  function catalogSlotReady(state,slot,spec){
     if(spec.kind!=='weapon')return 0;
     return !slot.destroyed&&!slot.spent&&!slot.fired&&slot.readyFromTurn<=state.turn?1:0;
   }
@@ -202,15 +208,19 @@
     validateCatalogSystem(next,registry);
     return catalogFreeze({state:next,effects,hit:{targetId:request.targetId,result:request.result,loss,remaining,cause:catalogClone(request.cause)}});
   }
-  function catalogRecordFire(state,componentId,registry){
+  function catalogFireShot(state,componentId,registry){
     validateCatalogSystem(state,registry);
-    const {spec}=catalogSlot(state,componentId);
-    if(spec.kind!=='weapon'||!catalogWeaponReady(state,componentId,registry)||catalogIsHelpless(state,registry))catalogReject('CATALOG_WEAPON_UNAVAILABLE');
-    const weapon=state.rules.weaponClasses[spec.weaponClassRef],next=catalogClone(state),slot=catalogSlot(next,componentId).slot;
-    if(weapon.expendable)slot.spent=true;else slot.fired=true;
-    const effects=[{type:'CatalogWeaponFired',unitId:state.unitId,componentId,turn:state.turn,expendable:weapon.expendable},...catalogEffectsAfter(state,next,registry)];
+    const {slot,spec}=catalogSlot(state,componentId);
+    if(!catalogSlotReady(state,slot,spec)||catalogHelpless(state))catalogReject('CATALOG_WEAPON_UNAVAILABLE');
+    const weapon=state.rules.weaponClasses[spec.weaponClassRef];
+    return {componentId,weaponClass:spec.weaponClassRef,attack:weapon.attack,range:weapon.range,infantryOnly:weapon.infantryOnly,expendable:weapon.expendable};
+  }
+  function catalogRecordFire(state,componentId,registry){
+    const shot=catalogFireShot(state,componentId,registry),next=catalogClone(state),slot=catalogSlot(next,componentId).slot;
+    if(shot.expendable)slot.spent=true;else slot.fired=true;
+    const effects=[{type:'CatalogWeaponFired',unitId:state.unitId,componentId,turn:state.turn,expendable:shot.expendable},...catalogEffectsAfter(state,next,registry)];
     validateCatalogSystem(next,registry);
-    return catalogFreeze({state:next,effects,shot:{componentId,weaponClass:spec.weaponClassRef,attack:weapon.attack,range:weapon.range,infantryOnly:weapon.infantryOnly,expendable:weapon.expendable}});
+    return catalogFreeze({state:next,effects,shot});
   }
   function catalogResetFire(state,nextTurn,registry){
     validateCatalogSystem(state,registry);
@@ -231,5 +241,5 @@
     return catalogFreeze({version:state.version,unitId:state.unitId,model:state.model,turn:state.turn,treads:state.treads,maxTreads:state.maxTreads,movement:catalogMovement(state,registry),helpless:catalogIsHelpless(state,registry),components:counts});
   }
 
-  root.GoblinSystems=Object.freeze({WEAPONS,createMarkIII,weaponRemaining,weaponReady,recordFire,resetFireState,movementForTreads,targets,chooseTarget,chooseTargetSkippingDepletedTreads,applyHit,isHelpless,summary,CATALOG_SYSTEM_VERSION,createCatalogSystem,validateCatalogSystem,catalogMovement,catalogTargets,catalogChooseTarget,catalogApplyHit,catalogWeaponReady,catalogRecordFire,catalogResetFire,catalogIsHelpless,catalogSummary});
+  root.GoblinSystems=Object.freeze({WEAPONS,createMarkIII,weaponRemaining,weaponReady,recordFire,resetFireState,movementForTreads,targets,chooseTarget,chooseTargetSkippingDepletedTreads,applyHit,isHelpless,summary,CATALOG_SYSTEM_VERSION,createCatalogSystem,validateCatalogSystem,catalogMovement,catalogTargets,catalogChooseTarget,catalogApplyHit,catalogWeaponReady,catalogFireShot,catalogRecordFire,catalogResetFire,catalogIsHelpless,catalogSummary});
 })(globalThis);
