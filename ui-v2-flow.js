@@ -375,7 +375,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       return campaignLessons.every(id => !!missionData(id));
     }
     function campaignPosition() {
-      return t('v2.campaign.position', {current:campaign.index + 1, total:(campaign.relay ? relayMissions : campaignLessons).length});
+      return t(campaign.relay ? 'v2.relay.position' : 'v2.campaign.position',
+        {current:campaign.index + 1, total:(campaign.relay ? relayMissions : campaignLessons).length});
     }
     function relayUnlocked() {
       if (relayWon) return 2;

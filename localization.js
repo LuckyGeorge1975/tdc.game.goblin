@@ -690,6 +690,7 @@
     'v2.difficulty.medium': {de:'Mittel',en:'Medium',es:'Media',fr:'Moyenne'},
     'v2.difficulty.strong': {de:'Stark',en:'Strong',es:'Fuerte',fr:'Forte'},
     'v2.campaign.position': {de:'Tutorialkampagne · Mission {current}/{total}',en:'Tutorial campaign · Mission {current}/{total}',es:'Campaña de tutorial · Misión {current}/{total}',fr:'Campagne de tutoriel · Mission {current}/{total}'},
+    'v2.relay.position': {de:'Relaislinie · Mission {current}/{total}',en:'Relay Line · Mission {current}/{total}',es:'Línea de enlace · Misión {current}/{total}',fr:'Ligne de relais · Mission {current}/{total}'},
     'v2.campaign.session': {de:'Zwei Trainingsmissionen. Beim Verlassen oder Neuladen beginnt die Kampagne wieder bei Mission 1.',en:'Two training missions. Leaving or reloading resets the campaign to mission 1.',es:'Dos misiones de entrenamiento. Si sales o recargas, la campaña vuelve a la misión 1.',fr:'Deux missions d’entraînement. Quitter ou recharger ramène la campagne à la mission 1.'},
     'v2.campaign.exitConfirm': {de:'Tutorialkampagne verlassen? Beim nächsten Start beginnst du wieder bei Mission 1.',en:'Leave the tutorial campaign? Your next run starts at mission 1.',es:'¿Salir de la campaña de tutorial? La próxima partida empezará en la misión 1.',fr:'Quitter la campagne de tutoriel ? La prochaine partie commencera à la mission 1.'},
     'v2.campaign.finish': {de:'Tutorialkampagne abschließen',en:'Finish tutorial campaign',es:'Finalizar campaña de tutorial',fr:'Terminer la campagne de tutoriel'},

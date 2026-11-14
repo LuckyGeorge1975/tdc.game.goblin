@@ -1,12 +1,34 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import test from 'node:test';
+import {runInNewContext} from 'node:vm';
 import {fullScene} from './catalog-full-harness.mjs';
 import {execute, read} from './artillery-product-harness.mjs';
 
 const source = path => readFileSync(new URL('../' + path, import.meta.url),'utf8');
 const flow = source('ui-v2-flow.js');
 const cut = (from,to) => flow.slice(flow.indexOf(from),flow.indexOf(to,flow.indexOf(from)));
+
+test('the position label names the selected campaign in all four languages', () => {
+  const context = {URL, URLSearchParams, location:{href:import.meta.url}, document:{readyState:'loading',addEventListener(){}},
+    campaign:{index:0,relay:true}, relayMissions:['bridge','relay'], campaignLessons:['t01','t02']};
+  runInNewContext(source('localization.js'),context);
+  runInNewContext(cut('    function campaignPosition(', '    function relayUnlocked('),context);
+  for (const [lang,relay,tutorial] of [
+    ['de','Relaislinie · Mission','Tutorialkampagne · Mission'],
+    ['en','Relay Line · Mission','Tutorial campaign · Mission'],
+    ['es','Línea de enlace · Misión','Campaña de tutorial · Misión'],
+    ['fr','Ligne de relais · Mission','Campagne de tutoriel · Mission']
+  ]) {
+    context.t = (key,params) => context.GoblinLanguage.t(key,params,lang);
+    context.campaign = {index:0,relay:true};
+    assert.equal(context.campaignPosition(),relay + ' 1/2');
+    context.campaign.index = 1;
+    assert.equal(context.campaignPosition(),relay + ' 2/2');
+    context.campaign = {index:0};
+    assert.equal(context.campaignPosition(),tutorial + ' 1/2');
+  }
+});
 
 test('Relay Line admits both new maps and unlocks mission two only after a bound victory', async () => {
   const g = await fullScene('catalog-full-atlas',7,false,'FULL_CATALOG_v1');
