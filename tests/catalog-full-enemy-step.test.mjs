@@ -70,6 +70,38 @@ test('a scheduled choice from a previous session never opens an actor slot', asy
   assert.deepEqual(facts(g), before);
 });
 
+test('FULL rechecks affected enemy actors before movement and fire retry', async () => {
+  const g = await atlas();
+  g.run(`
+    const nativeEnemyFire = enemyFire;
+    const shotCalls = [];
+    const destroyed = units.find(unit => unit.id === 'catalog-full-atlas-20');
+    const disabled = units.find(unit => unit.id === 'catalog-full-atlas-21');
+    enemyFire = (actor, choose, pass) => {
+      shotCalls.push([actor.id, pass]);
+      if (actor.id === 'catalog-full-atlas-19' && pass === 'first') {
+        destroyed.disabled = false;
+        destroyed.alive = false;
+        destroyed.hp = 0;
+        disabled.disabled = true;
+        actor.disabled = true;
+        return false;
+      }
+      return nativeEnemyFire(actor, choose, pass);
+    };
+  `);
+  const slots = [];
+  const before = read(g, '[destroyed.x, destroyed.y, disabled.x, disabled.y]');
+  schedule(g, slot => { slots.push(slot.actorId); })();
+  assert.ok(slots.includes('catalog-full-atlas-19'));
+  assert.ok(!slots.includes('catalog-full-atlas-20'));
+  assert.ok(!slots.includes('catalog-full-atlas-21'));
+  assert.deepEqual(read(g, '[destroyed.x, destroyed.y, disabled.x, disabled.y]'), before);
+  assert.deepEqual(read(g, 'shotCalls.filter(([id]) => ["catalog-full-atlas-19","catalog-full-atlas-20","catalog-full-atlas-21"].includes(id))'),
+    [['catalog-full-atlas-19', 'first']]);
+  assert.deepEqual(read(g, '[phase, turnPhase, turn]'), ['player', 'movement', 2]);
+});
+
 test('restarting inside a choice stops the old pass, retry and turn end', async () => {
   const g = await atlas();
   let calls = 0, restarted;

@@ -380,10 +380,14 @@ function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
     const full = globalThis.GoblinCatalogFullRuntime;
     if (full?.active() && (phase !== 'enemy' || turn !== acceptedTurn)) return;
     if (acceptedSession && legacySession !== acceptedSession) return;
-    const foes=units.filter(u => u.team === 'enemy' && unitAlive(u) && !u.disabled &&
-      u !== units.find(x => x.id === 'core') && (!globalThis.GoblinCatalogRuntime?.active() || !u.embarkedOn));
+    const fullActive = full?.active();
+    const canAct = unit => unitAlive(unit) && !unit.disabled &&
+      (!(fullActive || globalThis.GoblinCatalogRuntime?.active()) || !unit.embarkedOn);
+    const core = units.find(unit => unit.id === 'core');
+    const foes=units.filter(unit => unit.team === 'enemy' && unit !== core && canAct(unit));
     for (const foe of foes) {
       if (gameOver) break;
+      if (fullActive && !canAct(foe)) continue;
       const explicitStep = full?.active() && chooseEnemyStep(full, foe, chooseEnemyAction);
       if (acceptedSession && (legacySession !== acceptedSession || turn !== acceptedTurn ||
           phase !== 'enemy' || turnPhase !== 'enemy')) return;
@@ -395,7 +399,7 @@ function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
       const fired = enemyFire(foe,chooseEnemyFireTarget,'first');
       if (stale()) return;
       foe.enemyFired = fired;
-      if (foe.enemyFired) continue;
+      if (foe.enemyFired || (fullActive && !canAct(foe))) continue;
       const targets = (full?.active() ? full.roster(foe.team) : units)
         .filter(u => u.team === 'player' && unitAlive(u))
         .sort((a,b) => dist(foe,a) - dist(foe,b));
@@ -408,7 +412,7 @@ function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
     }
     for (const foe of foes) {
       if (gameOver) break;
-      if (foe.enemyFired) continue;
+      if (foe.enemyFired || (fullActive && !canAct(foe))) continue;
       const fired = enemyFire(foe,chooseEnemyFireTarget,'retry');
       if (stale()) return;
       foe.enemyFired = fired;
