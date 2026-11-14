@@ -4,7 +4,7 @@ test('release metadata, fallback, notices, dated supplement and current handoff 
  const context=vm.createContext({});vm.runInContext(file('release.js'),context);const r=context.GOBLIN_RELEASE;
  assert.deepEqual(JSON.parse(JSON.stringify(r)),{version:'0.1.30',build:30,releasedAt:'2026-11-13',tag:'v0.1.30',status:'release-candidate'});
  const index=file('index.html');assert.match(index,/id="build-version" class="build">FIELD TEST 0\.1\.30</);assert.match(index,/release\.js\?v=30/);
- assert.match(file('docs/CONTENT-NOTICES.md'),/\*\*Document version:\*\* 21/);assert.match(file('reports/REPORTS.md'),/CONTENT-CLEARANCE-DESKTOP-0\.1\.27-2026-10-30\.md/);
+ assert.match(file('docs/CONTENT-NOTICES.md'),/\*\*Document version:\*\* 22/);assert.match(file('reports/REPORTS.md'),/CONTENT-CLEARANCE-DESKTOP-0\.1\.27-2026-10-30\.md/);
  for(const p of ['README.md','CHANGELOG.md','reports/TEST_HANDOFF.md','docs/CONTENT-NOTICES.md','reports/CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md'])assert.doesNotMatch(file(p),/\[(?:RELEASEVERSION|PAKETDATUM|RUNTIME-SHA|PAKET-SHA|ZUSATZ-DATEI)\]/);
  assert.match(file('reports/TEST_HANDOFF.md'),/df1ba35d935971f7cc28835ae7d8d32f3d65178a/);assert.match(file('README.md'),/historisch, aus Build 26/);
 });

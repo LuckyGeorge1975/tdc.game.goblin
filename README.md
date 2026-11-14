@@ -30,7 +30,7 @@ Der unabhängige .5-Produktlauf auf df1ba35 absolvierte die drei Lektionen, norm
 
 Die [frühere Atlas-Aufnahme](docs/images/field-test-0.1.26-atlas.webp) bleibt **historisch, aus Build 26**: französische Oberfläche, Runtime `74e594d`, 1440×900. Datei und damalige Herkunftsbelege im Build-26-Handoff bleiben erhalten.
 
-Änderungen stehen im [Changelog](CHANGELOG.md), aktuelle Abnahmebezüge und verbleibende Releasegates im [Build-27-Handoff](reports/TEST_HANDOFF.md#build-0127--erstes-lokales-releasepaket). [Notices v20](docs/CONTENT-NOTICES.md) und [datierter Herkunftszusatz](reports/CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md) beschreiben die 52 zusätzlichen Code-Wrackderivate plus zwei Metadaten; historische Quellenbelege bleiben erhalten. Normale Builds und Pages brauchen das private Content-Repository nicht.
+Änderungen stehen im [Changelog](CHANGELOG.md), aktuelle Abnahmebezüge und verbleibende Releasegates im [Build-27-Handoff](reports/TEST_HANDOFF.md#build-0127--erstes-lokales-releasepaket). Die [archivierten Notices](reports/CONTENT-NOTICES-V21.md) und der [datierte Herkunftszusatz](reports/CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md) beschreiben die 52 zusätzlichen Code-Wrackderivate und zwei Metadatendateien. Normale Builds und Pages brauchen das private Content-Repository nicht.
 
 ### Historische Field-Test-Funktionen und weiterhin verfügbare alte Profile
 
