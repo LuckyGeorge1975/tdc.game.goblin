@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 
-const source = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8').replaceAll('\r\n', '\n');
 const localization = readFileSync(new URL('../localization.js', import.meta.url), 'utf8');
 const match = source.match(/      function mark\(cell, kind\) \{[\s\S]*?\n      \}\n      const areaKind/);
 assert.ok(match, 'area mark must remain inside renderAreaPreview');

@@ -121,7 +121,7 @@ test('missing translation and icon cannot expose a raw key or remove the type la
 test('actual mission preview uses each canonical type and small icon, without a terrain legend', () => {
   const {display, context} = setup();
   const source = readFileSync(new URL('ui-v2-flow.js', root), 'utf8');
-  const match = source.match(/    function missionPreview\(data\) \{[\s\S]*?\n    \}\n    function missionStats/);
+  const match = source.match(/    function missionPreview\(data\) \{[\s\S]*?\r?\n    \}\r?\n    function missionStats/);
   assert.ok(match);
   context.TerrainDisplay = display;
   context.UnitVisuals.assetFor = () => null;

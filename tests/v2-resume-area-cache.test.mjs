@@ -18,7 +18,7 @@ function between(source, start, end) {
 }
 const areaSource = between(ui, '    function areaQuery(', '    function freeRatioChipCenter(');
 const cacheSource = between(ui, '      const key = JSON.stringify([core()', '      const hexWidth');
-const releaseSource = between(flow, '    function releasePause()', '    function enterPause()');
+const releaseSource = between(flow, '    function releasePause(', '    function enterPause()');
 const modeSource = between(ui, '    function activeAreaMode(', '    function areaQuery(');
 const hiddenSource = between(ui, "      if (!mode || document.body.classList.contains('v2-screen-open'))", '      const key = JSON.stringify([core()');
 const blastSource = between(ui, '    function renderTargetBlast(', '    function focusTargetCard(');

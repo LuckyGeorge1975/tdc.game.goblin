@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
 import {fullScene} from './catalog-full-harness.mjs';import {read} from './artillery-product-harness.mjs';
-const source=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8'),ui=process.env.DISPLAY_FIX_UI?fs.readFileSync(process.env.DISPLAY_FIX_UI,'utf8'):source('ui-v2.js'),flow=source('ui-v2-flow.js');
+const source=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8'),ui=process.env.DISPLAY_FIX_UI?fs.readFileSync(process.env.DISPLAY_FIX_UI,'utf8'):source('ui-v2.js'),flow=source('ui-v2-flow.js').replaceAll('\r\n','\n');
 const cut=(s,a,b)=>{const start=s.indexOf(a),end=s.indexOf(b,start);assert.ok(start>=0&&end>start);return s.slice(start,end)};
 test('saved FULL draft without a limit omits the counter, while a real limit is shown', async () => {
   const g = await fullScene('catalog-full-atlas',7,false,'FULL_CATALOG_v1');
