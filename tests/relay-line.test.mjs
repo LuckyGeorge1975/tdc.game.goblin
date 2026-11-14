@@ -6,8 +6,14 @@ import {fullScene} from './catalog-full-harness.mjs';
 import {execute, read} from './artillery-product-harness.mjs';
 
 const source = path => readFileSync(new URL('../' + path, import.meta.url),'utf8');
-const flow = source('ui-v2-flow.js');
-const cut = (from,to) => flow.slice(flow.indexOf(from),flow.indexOf(to,flow.indexOf(from)));
+const flow = source('ui-v2-flow.js').replaceAll('\r\n', '\n');
+function cut(from, to) {
+  const start = flow.indexOf(from);
+  assert.notEqual(start, -1, `Missing start anchor: ${from}`);
+  const end = flow.indexOf(to, start + from.length);
+  assert.notEqual(end, -1, `Missing end anchor: ${to}`);
+  return flow.slice(start, end);
+}
 
 test('the position label names the selected campaign in all four languages', () => {
   const context = {URL, URLSearchParams, location:{href:import.meta.url}, document:{readyState:'loading',addEventListener(){}},
@@ -102,6 +108,16 @@ test('Relay Line admits both maps and unlocks mission two only after a bound vic
   assert.equal(g.run("legacySession.config.terrainTypes.some(c=>c.type==='bridge')"),false);
   g.run("units.filter(u=>u.team==='enemy').forEach(u=>u.hp=0);checkVictory();show('end');advanceFieldCampaign()");
   assert.equal(g.run('screen'),'campaign-complete');
+  const completion = cut("      } else if (screen === 'campaign-complete') {", "      } else if (screen === 'end') {");
+  const headings = [];
+  runInNewContext(completion.slice(completion.indexOf('\n') + 1), {
+    campaign: read(g, 'campaign'),
+    panel: {append() {}},
+    heading: key => headings.push(key),
+    t: key => key,
+    paragraph() {}, actions() {}, button() {}, returnToCampaignMenu() {}
+  });
+  assert.deepEqual(headings, ['v2.relay.complete']);
 });
 
 test('Scorched Earth loads all twelve FULL scenarios and advances only on the bound victory', async () => {
