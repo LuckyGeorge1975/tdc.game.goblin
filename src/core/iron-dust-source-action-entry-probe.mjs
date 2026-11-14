@@ -109,14 +109,14 @@ function commandGate(entry, command) {
   return null;
 }
 
-export function queryIronDustSourceActionEntry(entry, command) {
+export function queryIronDustSourceActionEntry(entry, command, decisionTrace) {
   try {validateIronDustSourceActionEntry(entry)}
   catch {return deny('SOURCE_ENTRY_STATE_MISMATCH')}
   const gate = commandGate(entry, command);
   if (gate) return gate;
   return entry.mode === 'enemy'
     ? queryIronDustEnemyTurnController(entry.payload,
-      {type: 'AdvanceEnemyTurn', playerId: 'enemy'})
+      {type: 'AdvanceEnemyTurn', playerId: 'enemy'}, decisionTrace)
     : queryIronDustStandardFireAction(entry.payload, command);
 }
 

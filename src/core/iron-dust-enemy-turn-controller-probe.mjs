@@ -125,7 +125,7 @@ export function validateIronDustEnemyTurnController(value) {
   return value;
 }
 
-function nextAction(controller) {
+function nextAction(controller, decisionTrace) {
   const {state, cursor} = controller;
   const policy = controller.enemyPolicy ?? null;
   if (cursor.pass === 'finish') {
@@ -141,7 +141,7 @@ function nextAction(controller) {
     return {kind: 'skip', actorId, reason: state.firedActorIds.includes(actorId)
       ? 'FIRED' : 'PASSED'};
   const stage = cursor.pass === 'first' ? 'first-fire' : 'retry-fire';
-  const intent = queryIronDustEnemyIntent(state, intentRequest(actorId, stage), policy);
+  const intent = queryIronDustEnemyIntent(state, intentRequest(actorId, stage), policy, decisionTrace);
   if (!intent.available) return {error: intent.error};
   if (intent.kind === 'fire') return {kind: 'fire', actorId, command: intent.command};
   if (intent.kind === 'pass') {
@@ -151,7 +151,7 @@ function nextAction(controller) {
   }
   if (cursor.pass !== 'first' || intent.kind !== 'continue')
     return {error: {code: 'ENEMY_CONTROLLER_INTENT_MISMATCH'}};
-  const move = queryIronDustEnemyIntent(state, intentRequest(actorId, 'move'), policy);
+  const move = queryIronDustEnemyIntent(state, intentRequest(actorId, 'move'), policy, decisionTrace);
   if (!move.available) return {error: move.error};
   const command = move.kind === 'move'
     ? {type: 'EnemyMove', playerId: 'enemy', actorId, to: move.to}
@@ -163,14 +163,14 @@ function nextAction(controller) {
       cost: move.cost, path: move.path} : {reason: 'HOLD'})};
 }
 
-export function queryIronDustEnemyTurnController(controller, request) {
+export function queryIronDustEnemyTurnController(controller, request, decisionTrace) {
   try {validateIronDustEnemyTurnController(controller)}
   catch {return deny('ENEMY_CONTROLLER_STATE_MISMATCH')}
   if (!exact(request, ['type', 'playerId']) || request.type !== 'AdvanceEnemyTurn')
     return deny('ENEMY_CONTROLLER_COMMAND_INVALID');
   if (request.playerId !== 'enemy') return deny('NOT_ACTIVE_TEAM');
   if (controller.cursor.pass === 'complete') return deny('ENEMY_TURN_COMPLETE');
-  const action = nextAction(controller);
+  const action = nextAction(controller, decisionTrace);
   if (action.error) return {available: false, error: action.error};
   return {available: true, controllerVersion: controller.controllerVersion,
     cursor: clone(controller.cursor), action};

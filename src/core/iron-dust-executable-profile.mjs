@@ -25,6 +25,7 @@ import {IRON_DUST_ZERO_TREADS_SOURCE_ACTION_ENTRY_VERSION,
 // Internal executable profile boundary; no browser, level picker or replay import.
 export const IRON_DUST_PROFILE_VERSION = 'core-iron-dust-profile-v1';
 export const IRON_DUST_PROFILE_PROJECTION_VERSION = 'core-iron-dust-projection-v1';
+export const IRON_DUST_ENEMY_DECISION_TRACE_VERSION = 1;
 const clone = value => JSON.parse(JSON.stringify(value));
 const freeze = value => {
   if (value && typeof value === 'object') {
@@ -127,10 +128,10 @@ export function validateIronDustProfile(profile) {
   return profile;
 }
 
-export function queryIronDustProfile(profile, command) {
+export function queryIronDustProfile(profile, command, decisionTrace) {
   try {validateIronDustProfile(profile)}
   catch {return deny('IRON_DUST_PROFILE_MISMATCH')}
-  return queryIronDustSourceActionEntry(profile.entry, command);
+  return queryIronDustSourceActionEntry(profile.entry, command, decisionTrace);
 }
 
 // This describes only the directly selected player target. The legal query remains
