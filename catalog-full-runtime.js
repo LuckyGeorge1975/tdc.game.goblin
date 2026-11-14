@@ -68,6 +68,17 @@
   const ids = projectedIds(team);
   return units.filter(unit => ids.has(unit.id));
  }
+ function aiProjection(team){
+  if(!active()||legacySession.ruleProfileId!=='FULL_CATALOG_v1'||!['player','enemy'].includes(team))return null;
+  const visible=roster(team), ids=new Set(visible.map(u=>u.id));
+  return {side:team,phase:turnPhase,turn,terrain:{width:W,height:H,defaultTerrain:'open-ground',
+   cells:[...terrainTypes].map(([key,type])=>{const [x,y]=key.split(',').map(Number);return {x,y,type}})},
+   units:visible.map(u=>({id:u.id,relation:u.team===team?'own':'opponent',assetId:u.catalogAssetId,
+    x:u.x,y:u.y,alive:unitAlive(u),disabled:!!u.disabled,
+    embarkedOn:ids.has(u.embarkedOn)?u.embarkedOn:null,objectiveTarget:u.core===true,
+    ...(u.catalogSystems?{systems:{treads:u.catalogSystems.treads,components:u.catalogSystems.components.map(c=>
+     ({id:c.id,destroyed:c.destroyed,spent:c.spent}))}}:{hp:u.hp,maxHp:u.maxHp})}))};
+ }
  function fireView(binding){const out=copy(binding);if(out?.state)delete out.state.mainTargets;return out}
  function viewerUnit(u){const {specialistJournal,specialistSerial,...publicUnit}=u,out=copy(publicUnit);if(out.catalogFire)out.catalogFire=fireView(out.catalogFire);if(out.spotterId&&!known(out.spotterId))out.spotterId=null;return out}
  function event(type,fields={},clocks=null){const s=ensure();if(!s)return;const seq=s.visibility.sequence+1,result=GoblinCatalogVisibility.reduce(s.visibility,{type,id:`full-${s.sessionId}-${seq}`,seq,...fields},facts(clocks??s.visibility.teamFire),registry());s.visibility=result.state;return result}
@@ -128,7 +139,61 @@
   updateSelection();draw();if(!ended&&actor.team==='player')maybeAutoAdvancePhase();return {ok:true};
  }
  function hasHexAction(actor){for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(hexQuery({type:'CatalogHexFire',actorId:actor.id,x,y},actor.team==='enemy').ok)return true;return false}
- function enemyHex(actor){const targets=roster(actor.team).filter(u=>unitAlive(u)&&!u.embarkedOn&&u.team!==actor.team).sort((a,b)=>dist(actor,a)-dist(actor,b)||(a.id<b.id?-1:1));for(const t of targets){const c={type:'CatalogHexFire',actorId:actor.id,x:t.x,y:t.y};if(hexQuery(c,true).ok){executeHex(c,true);return true}}return false}
+ // The callback may only replace the target of a shot the engine would take.
+ // This opens one synchronous choice in the existing pass and weapon slot.
+ function chooseEnemyFire(actor,pass,baseline,commands,preview,apply,choose){
+  const owner=legacySession,initialRevision=commandRevision();
+  const current=()=>active()&&owner===legacySession&&phase==='enemy'&&turnPhase==='enemy'&&!gameOver;
+  const byKey=new Map(commands().map(c=>[JSON.stringify(c),c]));
+  const baselineKey=JSON.stringify(baseline);
+  const checked=[...byKey.values()].flatMap(c=>{const q=preview(c);return q.ok?[{command:c,
+   facts:{attack:q.attack,range:q.range,ratioCategory:q.ratioCategory,effectKind:q.effectKind,
+    ...(Object.hasOwn(q,'objectiveTarget')?{objectiveTarget:q.objectiveTarget,disabledTarget:q.disabledTarget}:{})},
+   baseline:JSON.stringify(c)===baselineKey}]:[]});
+  if(!checked.some(entry=>entry.baseline))throw Error('FULL_ENEMY_BASELINE_MISSING');
+  let open=true,spent=false,failed=false,engineError;
+  const reject=code=>({ok:false,code});
+  function execute(command){
+   if(!open||!current())return reject('ENEMY_FIRE_SLOT_CLOSED');
+   if(spent)return reject('ENEMY_FIRE_SLOT_SPENT');
+   if(commandRevision()!==initialRevision)return reject('ENEMY_FIRE_STATE_CHANGED');
+   const allowed=checked.find(entry=>JSON.stringify(entry.command)===JSON.stringify(command));
+   if(!allowed)return reject('ENEMY_FIRE_CHOICE_UNAVAILABLE');
+   try{
+    const q=preview(allowed.command);
+    if(!q.ok)return q;
+    spent=true;
+    return apply(allowed.command);
+   }catch(error){failed=true;engineError=error;open=false;throw error}
+  }
+  try{choose(Object.freeze({actorId:actor.id,pass,entries:()=>open&&current()&&!spent&&commandRevision()===initialRevision
+   ?copy(checked):[],execute}));}
+  catch(error){if(!failed)console.error('FULL enemy fire choice failed',actor.id,error)}
+  finally{open=false}
+  if(failed)throw engineError;
+  if(spent)return true;
+  if(!current())return null;
+  if(commandRevision()!==initialRevision)throw Error('FULL_ENEMY_FIRE_STATE_CHANGED');
+  apply(baseline);
+  return true;
+ }
+ function enemyHex(actor,choose,pass){
+  const targets=roster(actor.team).filter(u=>unitAlive(u)&&!u.embarkedOn&&u.team!==actor.team).sort((a,b)=>dist(actor,a)-dist(actor,b)||(a.id<b.id?-1:1));
+  for(const t of targets){
+   const c={type:'CatalogHexFire',actorId:actor.id,x:t.x,y:t.y};
+   if(!hexQuery(c,true).ok)continue;
+   if(typeof choose==='function')return chooseEnemyFire(actor,pass,c,()=>{
+    const cells=[];
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++)cells.push({type:'CatalogHexFire',actorId:actor.id,x,y});
+    return cells;
+   },command=>{const q=hexQuery(command,true);return q.ok?{ok:true,attack:q.weapon.attack,range:q.weapon.range,
+    ratioCategory:null,effectKind:'area'}:q},
+   command=>executeHex(command,true),choose)===true;
+   executeHex(c,true);
+   return true;
+  }
+  return false;
+ }
  function enemyStep(actor,step){if(!active()||!step)return step;const s=ensure(),seq=s.visibility.sequence+1,result=GoblinCatalogVisibility.collisionPrefix(s.visibility,{id:`full-${s.sessionId}-${seq}`,seq,actorId:actor.id,phase:'movement',path:step.path},facts(s.visibility.teamFire),registry());s.visibility=result.state;const last=result.acceptedPrefix.at(-1)??actor;return {...step,x:last.x,y:last.y,path:result.acceptedPrefix}}
  function moveQuery(command){
   if(!active()||!exact(command,['type','actorId','x','y'])||command.type!=='Move')return fail('INVALID_FULL_MOVE');
@@ -196,7 +261,7 @@
   if(config.waves.length){GoblinCatalogWaves.validate(value.waves,config);if(JSON.stringify(value.ownTurns)!==JSON.stringify(value.waves.ownTurns))throw Error('FULL_RESTORE_TURNS')}else if(value.waves!==null)throw Error('FULL_RESTORE_WAVES');
   state=copy(value);
  }
- root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,catalogCard,initialRoster,status,stealthText});
+ root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,catalogCard,initialRoster,status,stealthText});
  const oldSetPhase=setTurnPhase;setTurnPhase=function(next){if(active()&&phase==='player'){if(turnPhase==='fire'&&next!=='fire')fireBoundary('player',false);if(next==='fire'&&turnPhase!=='fire')fireBoundary('player',true)}return oldSetPhase(next)};
  const oldFinish=finish;finish=function(win){if(active()){const s=ensure();s.terminalOutcome=win;for(const team of ['player','enemy'])if(s.visibility.teamFire[team].active)fireBoundary(team,false);if(s.waves){const result=GoblinCatalogWaves.discardPending(s.waves);s.waves=result.state;s.journal.push({type:'mission-end',outcome:win,effects:copy(result.effects)})}}return oldFinish(win)};
  const oldHex=handleHex;handleHex=function(x,y){if(!active())return oldHex(x,y);focusedCell={x,y};const occupant=roster().find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);if(!occupant&&selected?.team==='player'&&['movement','gev'].includes(turnPhase))return executeSpecialistCommand({type:'Move',actorId:selected.id,x,y});if(occupant)return handleUnitClick(occupant);showFieldInfo(x,y);draw()};

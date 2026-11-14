@@ -19,7 +19,7 @@ import {effectiveIronDustDifficulty, ironDustEnemyPolicy, validIronDustEnemyPoli
 export {IRON_DUST_ENEMY_DIFFICULTIES} from './iron-dust-enemy-policy.mjs';
 import {IRON_DUST_ZERO_TREADS_SOURCE_ACTION_ENTRY_VERSION,
   createIronDustZeroTreadsSourceActionEntry, validateIronDustSourceActionEntry,
-  queryIronDustSourceActionEntry, dispatchIronDustSourceActionEntry} from
+  queryIronDustSourceActionEntry, dispatchIronDustSourceActionEntry, dispatchIronDustSourceEnemyFireChoice} from
   './iron-dust-source-action-entry-probe.mjs';
 
 // Internal executable profile boundary; no browser, level picker or replay import.
@@ -167,9 +167,21 @@ export function dispatchIronDustProfile(profile, command) {
   const query = queryIronDustProfile(profile, command);
   if (!query.available) return {error: query.error};
   const policy = profile.header.enemyPolicy ?? null;
-  const result = dispatchIronDustSourceActionEntry(profile.entry, command, policy);
+  return applyEntryResult(profile, dispatchIronDustSourceActionEntry(profile.entry, command, policy));
+}
+
+// Explicit enemy target choice is opt-in. Existing browser and replay commands
+// continue to use dispatchIronDustProfile and its versioned automatic policy.
+export function dispatchIronDustProfileEnemyFireChoice(profile, command) {
+  try {validateIronDustProfile(profile)}
+  catch {return {error: {code: 'IRON_DUST_PROFILE_MISMATCH'}}}
+  return applyEntryResult(profile, dispatchIronDustSourceEnemyFireChoice(profile.entry, command));
+}
+
+function applyEntryResult(profile, result) {
   if (!result.entry) return {error: result.error};
-  const next = wrap(result.entry, profile.sourceStartDigest, policy, profile.header.minimumDifficulty);
+  const next = wrap(result.entry, profile.sourceStartDigest, profile.header.enemyPolicy ?? null,
+    profile.header.minimumDifficulty);
   validateIronDustProfile(next);
   return {profile: next, events: freeze(clone(result.events))};
 }

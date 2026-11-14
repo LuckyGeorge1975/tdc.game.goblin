@@ -184,6 +184,27 @@ export function dispatchIronDustEnemyTurnController(controller, request) {
   const query = queryIronDustEnemyTurnController(controller, request);
   if (!query.available) return {error: query.error};
   const {action} = query;
+  return applyControllerAction(controller, action);
+}
+
+// The controller owns actor/pass eligibility. A choice can replace the target
+// of an already permitted fire attempt, including a different system component.
+export function queryIronDustEnemyFireChoice(controller, command) {
+  const request = {type: 'AdvanceEnemyTurn', playerId: 'enemy'};
+  const slot = queryIronDustEnemyTurnController(controller, request);
+  if (!slot.available) return slot;
+  if (slot.action.kind !== 'fire' || command?.attackerId !== slot.action.actorId ||
+      !['EnemyUnitAttack', 'EnemySystemAttack'].includes(command?.type))
+    return deny('ENEMY_FIRE_CHOICE_OUTSIDE_SLOT');
+  return queryIronDustStandardFireAction(controller.state, command);
+}
+
+export function dispatchIronDustEnemyFireChoice(controller, command) {
+  const check = queryIronDustEnemyFireChoice(controller, command);
+  return check.available ? applyControllerAction(controller, {kind: 'fire', command}) : check;
+}
+
+function applyControllerAction(controller, action) {
   const policy = controller.enemyPolicy ?? null;
   let result;
   if (action.kind === 'move' || action.kind === 'hold')

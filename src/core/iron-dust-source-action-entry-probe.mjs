@@ -4,7 +4,8 @@ import {createIronDustUnifiedStateProbe, createIronDustZeroTreadsUnifiedStatePro
 import {queryIronDustStandardFireAction, dispatchIronDustStandardFireAction} from
   './iron-dust-standard-fire-action-probe.mjs';
 import {createIronDustEnemyTurnController, validateIronDustEnemyTurnController,
-  queryIronDustEnemyTurnController, dispatchIronDustEnemyTurnController} from
+  queryIronDustEnemyTurnController, dispatchIronDustEnemyTurnController,
+  dispatchIronDustEnemyFireChoice} from
   './iron-dust-enemy-turn-controller-probe.mjs';
 
 // The sole source-game command boundary for this inactive technical probe.
@@ -124,6 +125,24 @@ export function preflightIronDustSourceActionEntry(entry, command) {
   return queryIronDustSourceActionEntry(entry, command);
 }
 
+function withEnemyController(entry, controller) {
+  const next = controller.cursor.pass === 'complete'
+    ? wrap(controller.state.victory.status === 'ended' ? 'ended' : 'player',
+      controller.state, entry.entryVersion)
+    : wrap('enemy', controller, entry.entryVersion);
+  return validateIronDustSourceActionEntry(next);
+}
+
+export function dispatchIronDustSourceEnemyFireChoice(entry, command) {
+  try {validateIronDustSourceActionEntry(entry)}
+  catch {return {error: {code: 'SOURCE_ENTRY_STATE_MISMATCH'}}}
+  if (entry.mode !== 'enemy') return {error: {code: 'WRONG_PHASE'}};
+  const result = dispatchIronDustEnemyFireChoice(entry.payload, command);
+  return result.controller
+    ? {entry: withEnemyController(entry, result.controller), events: result.events}
+    : {error: result.error};
+}
+
 export function dispatchIronDustSourceActionEntry(entry, command, enemyPolicy = null) {
   const query = queryIronDustSourceActionEntry(entry, command);
   if (!query.available) return {error: query.error};
@@ -131,13 +150,7 @@ export function dispatchIronDustSourceActionEntry(entry, command, enemyPolicy = 
     const result = dispatchIronDustEnemyTurnController(entry.payload,
       {type: 'AdvanceEnemyTurn', playerId: 'enemy'});
     if (!result.controller) return {error: result.error};
-    const controller = result.controller;
-    const next = controller.cursor.pass === 'complete'
-      ? wrap(controller.state.victory.status === 'ended' ? 'ended' : 'player',
-        controller.state, entry.entryVersion)
-      : wrap('enemy', controller, entry.entryVersion);
-    validateIronDustSourceActionEntry(next);
-    return {entry: next, events: result.events};
+    return {entry: withEnemyController(entry, result.controller), events: result.events};
   }
   const result = dispatchIronDustStandardFireAction(entry.payload, command);
   if (!result.state) return {error: result.error};
