@@ -112,9 +112,19 @@ test('FULL reference weapons use approved slots and all four locales contain the
   assert.deepEqual(weapons('command-hub'),[]);
   assert.equal(weapons('strategic-missile-carrier')[0].range,8);
   assert.equal(context.libraryFullRegistry({}),registry);
+  const special = (id, profile) => Array.from(context.librarySpecialRules({id},{profile}) ?? []);
+  assert.deepEqual(special('forge-engineer'), ['drones','systems','engineering']);
+  assert.deepEqual(special('goblin-dreadnaught'), ['systems','ram']);
+  assert.deepEqual(special('phantom-platform'), ['systems','stealth']);
   context.started=true;
   assert.equal(context.libraryFullRegistry({profile:'FIELD_TEST_LEGACY_v1'}),null);
   assert.equal(context.libraryFullRegistry({profile:'FULL_CATALOG_v1'}),registry);
+  context.UnitVisuals = {artKey:unit => unit.art};
+  context.legacySession = {ruleProfileId:'FIELD_TEST_LEGACY_v1',config:{units:[{id:'ogre',art:'goblin-siegebreaker'},{art:'skimmer-carrier',transportCapacity:3}]}};
+  assert.deepEqual(special('goblin-siegebreaker','FIELD_TEST_LEGACY_v1'), ['ram','systems']);
+  assert.deepEqual(special('skimmer-carrier','FIELD_TEST_LEGACY_v1'), ['legacyPassengers']);
+  context.legacySession = {ruleProfileId:'CATALOG_ARTILLERY_PILOT_v1',config:{units:[{art:'long-range-battery',artilleryFire:{}}]}};
+  assert.deepEqual(special('long-range-battery','CATALOG_ARTILLERY_PILOT_v1'), ['spotter']);
   assert.equal(Object.keys(context.refs.units).length,26);
   assert.equal(context.refs.rules.length,15);
   for (const lang of ['de','en','es','fr']) {

@@ -820,6 +820,39 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (started && state.profile !== 'FULL_CATALOG_v1') return null;
       return model?.editorProfile?.catalog.registry ?? null;
     }
+    function librarySpecialRules(entry, state) {
+      const id = libraryAssetId(entry);
+      const config = started && legacySession.ruleProfileId === state.profile ? legacySession.config : null;
+      const registry = started ? config?.catalog?.registry : libraryFullRegistry(state);
+      const record = registry?.units[id];
+      const specialist = !started || ['FULL_CATALOG_v1','CATALOG_SPECIALISTS_v1'].includes(state.profile);
+      const refs = new Set();
+      if (record?.target && (specialist || state.profile === 'CATALOG_BASE_TRANSPORT_v1')) {
+        const rule = record.target;
+        if (rule.gevPhaseEligible) refs.add('gev');
+        if (rule.strengthRef) refs.add('strength');
+        if (rule.passengerRef || rule.cargoRef === 'carrier-cargo-v1') refs.add('passengers');
+        if (rule.cargoRef === 'drone-cargo-v1' || rule.cargoRef === 'forge-drone-bays-v1') refs.add('drones');
+        if (specialist && rule.systemDefinitionRef) refs.add('systems');
+        if (specialist && ['U01','U20'].includes(record.catalogId)) refs.add('ram');
+        if (specialist && rule.engineeringRef) refs.add('engineering');
+        if (specialist && rule.fireRuleRef === 'artillery-spotter-v1') refs.add('spotter');
+        if (specialist && rule.fireRuleRef === 'siege-tank-fire-budget-v1') refs.add('siege');
+        if (specialist && rule.missileRuleRef) refs.add('missile');
+        if (specialist && rule.stealthRef) refs.add('stealth');
+        return [...refs];
+      }
+      const unit = config?.units.find(unit => UnitVisuals.artKey(unit) === id);
+      if (!unit) return null;
+      if (unit.gevPhaseEligible) refs.add('gev');
+      if (unit.id === 'ogre') refs.add('ram');
+      if (unit.ogreSystems || unit.id === 'ogre') refs.add('systems');
+      if (unit.transportCapacity || unit.infantry || unit.engineering) refs.add('legacyPassengers');
+      if (unit.artilleryFire) refs.add('spotter');
+      if (unit.siegeFireBudget) refs.add('siege');
+      if (unit.strategicMissile) refs.add('missile');
+      return [...refs];
+    }
     function libraryReferenceWeapons(entry, registry) {
       const id = libraryAssetId(entry), rule = registry?.units[id]?.target;
       const weapon = (id, spec, count = 1, icon = id) => ({id, ...spec, count, icon});
@@ -917,13 +950,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const preview = document.createElement('div'); preview.className = 'v2-library-diagram-map';
       const figure = document.createElement('figure'); figure.className = 'v2-library-range';
       figure.innerHTML = UnitGuideRange.mapSvg({...profile,range:weapon?.range??0},libraryMapMode);
-      const caption = document.createElement('figcaption');
+      const caption = document.createElement('p'); caption.className = 'v2-library-range-caption';
       caption.textContent = libraryMapMode === 'move' ? (profile.movement ?
         [t('v2.ui.movePoints',{cost:profile.movement}),profile.bonus ? `+ ${t('v2.ui.movePoints',{cost:profile.bonus})} ${t('screen.library.value.skimmerManeuver')}` : ''].filter(Boolean).join(' · ') :
         t('v2.library.noMovement')) : weapon ? `${libraryWeaponName(weapon)} · ${t('v2.ui.range')} ${weapon.range}` : t('v2.library.noWeapon');
-      figure.append(caption);
       figure.title = t('v2.library.schematic');
-      preview.append(figure);
+      preview.append(figure, modes);
       if (libraryMapMode === 'attack' && weapons.length) {
         const rail = document.createElement('div'); rail.className = 'v2-library-weapon-rail';
         for (const option of weapons) {
@@ -937,10 +969,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         }
         preview.append(rail);
       }
-      diagram.append(modes,preview);
-      if (libraryMapMode === 'attack' && rule?.missileRuleRef && weapon) {
+      diagram.append(preview,caption);
+      if (rule?.missileRuleRef && weapon) {
         const strike = StrategicMissile.STRIKE;
-        diagram.append(paragraph(t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.splashAttack}),'v2-library-splash'));
+        caption.title = t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.splashAttack});
+        if (libraryMapMode === 'attack') caption.textContent += ' · ' + caption.title;
       }
       top.append(artPanel,diagram);
       const tabs = document.createElement('div'); tabs.className = 'v2-library-tabs';
@@ -975,15 +1008,21 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       } else {
         const strategy = libraryTab === 'strategy';
         if (strategy) body.append(paragraph(rule ? t(`library.unit.${id}.tactics`) : t('v2.library.noStrategy')));
-        const refs = rule ? (libraryFullUnitRules[id] ?? []).filter(ref=>strategy === ['movement','fire'].includes(ref)) : [];
-        const links = refs.map(ref => button(t(`library.rules.${ref}.title`), () => {
+        const refs = strategy ? (rule ? (libraryFullUnitRules[id] ?? []).filter(ref=>['movement','fire'].includes(ref)) : []) :
+          librarySpecialRules(entry, state);
+        if (!strategy) {
+          body.append(paragraph(t(started ? 'v2.library.referenceValues' : 'v2.library.fullReference')));
+          if (refs === null) body.append(paragraph(t('v2.library.profileUnavailable')));
+          else for (const ref of refs) body.append(paragraph(t(`library.rules.${ref}.body`)));
+        }
+        const links = (refs ?? []).filter(ref => libraryFullRules.includes(ref)).map(ref => button(t(`library.rules.${ref}.title`), () => {
           libraryRule = ref; libraryKind = 'rules'; show('catalog', false);
           const rule = document.getElementById(`v2-library-rule-${ref}`);
           rule?.scrollIntoView({block:'nearest'});
           rule?.querySelector('summary')?.focus({preventScroll:true});
         }));
         if (links.length) body.append(actions(...links));
-        if (!strategy && !refs.length) body.append(paragraph(t('v2.library.noSpecials')));
+        if (!strategy && refs?.length === 0) body.append(paragraph(t('v2.library.noSpecials')));
       }
       detail.append(identity,top,tabs,body,mapRow);
       return detail;

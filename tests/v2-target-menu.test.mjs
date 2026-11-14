@@ -20,7 +20,7 @@ test('target choices and cancel issue no commands, and a Core weapon switch requ
     return {tag, className, text, children: [], append(...nodes) { this.children.push(...nodes); },
       replaceChildren() { this.children = []; }, setAttribute(key,value) { this[key]=value; }, focus() {}};
   }
-  const card = el('section');
+  const card = Object.assign(el('section'), {dataset:{}});
   const nodes = (root = card) => [root, ...(root.children || []).flatMap(node => nodes(node))];
   const execute = () => nodes().find(node => node.id === 'v2-action-execute');
   const rows = () => nodes().filter(node => node.className === 'v2-target-row');
@@ -208,7 +208,7 @@ test('T02 renders the cannon class and the same combat prognosis in all four too
       const t=(key,params)=>globalThis.GoblinLanguage.t(key,params,testLocale);
       const el=(tag,className='',text='')=>({tag,className,text,children:[],
         append(...nodes){this.children.push(...nodes)},replaceChildren(){this.children=[]},setAttribute(key,value){this[key]=value}});
-      const card=el('section'),at=()=>card,hexLabel=()=>'F-04',svgIcon=()=>'',placeNearHex=()=>{};
+      const card=Object.assign(el('section'),{dataset:{}}),at=()=>card,hexLabel=()=>'F-04',svgIcon=()=>'',placeNearHex=()=>{};
       document.body={classList:{contains:()=>false}};
       ${targetOptionsSource}
       ${odds}
@@ -262,7 +262,7 @@ test('Iron Dust Core D-04 opens the legal move confirmation after pointer hover'
     tag, className, text, children: [], append(...nodes) { this.children.push(...nodes); },
     replaceChildren() { this.children = []; }, setAttribute(key,value) { this[key]=value; }, focus() {}
   });
-  const card = node('section');
+  const card = Object.assign(node('section'), {dataset:{}});
   const children = (root = card) => [root, ...(root.children || []).flatMap(child => children(child))];
   const calls = [];
   const context = {
@@ -315,7 +315,11 @@ test('component fire groups weapon and spotter choices before aiming and confirm
     return {tag, className, text, children: [], append(...nodes) { this.children.push(...nodes); },
       replaceChildren() { this.children = []; }, setAttribute(key,value) { this[key]=value; }, focus() {}};
   }
-  const card = el('section');
+  const card = Object.assign(el('section'), {dataset:{}});
+  card.style = {removeProperty(){}};
+  const intel = {append(node) { node.parentElement = this; }};
+  const shell = {append(node) { node.parentElement = this; }};
+  shell.append(card);
   const nodes = (root = card) => [root, ...root.children.flatMap(node => nodes(node))];
   const execute = () => nodes().find(node => node.id === 'v2-action-execute');
   const choose = text => nodes().find(node => node.tag === 'button' && node.children[0]?.children[1]?.text === text);
@@ -323,14 +327,15 @@ test('component fire groups weapon and spotter choices before aiming and confirm
   const view = {target, intentRevision: 1};
   const state = {revision: 1, units: [actor, target]};
   const options = ['Blocked', 'Scout', 'Tank'].flatMap(spotterId =>
-    ['Main', 'Treads'].map(componentId => ({
+    ['Main', 'Treads', ...Array.from({length:12}, (_, i) => `Slot ${i + 1}`)].map(componentId => ({
       command: {type: 'CatalogFire', mode: 'indirect', spotterId, weaponId: null, target: {kind: 'component', componentId}},
       label: spotterId + ' · ' + componentId, weaponLabel: spotterId, componentLabel: componentId
     })));
   const dispatched = [], previews = [];
   const query = command => ({ok: command.spotterId !== 'Blocked'});
   const context = {
-    at: selector => selector === '#v2-target-card' ? card : selector === '#v2-map' ? el('div') : execute(),
+    at: selector => selector === '#v2-target-card' ? card : selector === '#v2-map' ? el('div') : selector === '#v2-intel-panel' ? intel : execute(),
+    shell, window:{matchMedia:query => ({matches:query.includes('501px')})},
     document: {body: {classList: {contains: () => false}}, createTextNode: text => el('#text', '', text)},
     GameDialogs: {isOpen: () => false}, state, actor, view, el, core: () => false,
     terrainTypeAt: () => null, targetOccupant: () => target, hexLabel: () => 'I-05', unitAlive: () => true,
@@ -356,9 +361,11 @@ test('component fire groups weapon and spotter choices before aiming and confirm
   assert.ok(choose('Tank'));
   assert.equal(choose('Blocked'), undefined);
   choose('Tank').onclick();
+  assert.equal(card.parentElement, intel);
+  assert.ok(choose('Slot 12'));
   assert.equal(choose('Main').children[2].text, '✓');
   assert.match(choose('Treads').title, /Tank · Treads/);
   assert.deepEqual(dispatched, []);
   await choose('Treads').onclick();
-  assert.deepEqual(dispatched, [options[5].command]);
+  assert.deepEqual(dispatched, [options.find(entry => entry.label === 'Tank · Treads').command]);
 });

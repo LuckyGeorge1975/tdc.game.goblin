@@ -20,7 +20,7 @@ test('Atlas carrier and cargo target each other through the same reversible load
     const project=projected;
     const el=(tag,className='',text='')=>({tag,className,text,children:[],
       append(...nodes){this.children.push(...nodes)},replaceChildren(){this.children=[]},setAttribute(){}});
-    const card=el('section'), at=selector=>selector==='#v2-target-card'?card:selector==='#v2-map'?{focus(){}}:null;
+    const card=Object.assign(el('section'),{dataset:{}}), at=selector=>selector==='#v2-target-card'?card:selector==='#v2-map'?{focus(){}}:null;
     const svgIcon=()=>'', placeNearHex=()=>{}, TerrainDisplay={label:type=>type,icon:()=>null};
     document.body={classList:{contains:()=>false}};
     document.createTextNode=text=>el('#text','',text);

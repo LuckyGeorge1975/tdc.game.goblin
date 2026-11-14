@@ -164,16 +164,18 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-library-range .guide-range-cell.origin { fill: var(--v2-text); stroke: var(--v2-line-strong); }
 .v2-library-unit-detail { gap: 8px; padding: 10px; border-radius: 8px; }
 .v2-library-unit-detail .v2-library-identity > :is(h2,h3,p) { margin: 0; }
-.v2-library-unit-top { display: grid; grid-template-columns: minmax(100px, 1fr) minmax(0, 2fr); gap: 10px; flex: none; }
+.v2-library-unit-top { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; flex: none; }
 .v2-library-art-panel, .v2-library-diagram { min-width: 0; display: grid; align-content: start; gap: 4px; }
 .v2-library-art-panel .v2-library-art { width: 100%; }
-.v2-library-art-panel img { display: block; width: 100%; height: clamp(76px, 16dvh, 124px); object-fit: contain; }
+.v2-library-art-panel img { display: block; width: 100%; height: clamp(110px, 23dvh, 172px); object-fit: contain; }
 .v2-library-art-panel .v2-library-art-switch { flex-wrap: nowrap; gap: 4px; }
 .v2-library-art-panel .v2-library-art-switch button { flex: 1 1 0; min-width: 0; padding-inline: 4px; overflow-wrap: anywhere; }
-.v2-library-diagram-map { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; min-width: 0; }
+.v2-library-diagram-map { position: relative; min-width: 0; height: clamp(110px, 23dvh, 172px); }
+.v2-library-diagram-map > .v2-library-tabs { position: absolute; z-index: 1; inset: 0 0 auto; }
 .v2-library-diagram .v2-library-range { width: 100%; text-align: center; margin: 0; gap: 2px; }
-.v2-library-diagram svg.guide-range-svg { height: clamp(78px, 18dvh, 145px); }
-.v2-library-weapon-rail { display: grid; grid-template-columns: repeat(2, minmax(36px,1fr)); gap: 3px; }
+.v2-library-range-caption { margin: 0; min-height: 3em; font-size: 12px; line-height: 1.2; }
+.v2-library-diagram svg.guide-range-svg { position: absolute; inset: 46px 38px 0 6px; width: calc(100% - 44px); height: calc(100% - 46px); }
+.v2-library-weapon-rail { position: absolute; inset: 46px 0 0 auto; width: 38px; display: grid; align-content: start; gap: 3px; overflow: auto; }
 .v2-library-weapon-rail button { min-width: 36px; padding: 3px; }
 .v2-library-weapon-rail button[aria-pressed="true"] { border-color: var(--v2-accent-text); background: var(--v2-surface3); }
 .v2-library-weapon-rail .v2-icon { width: 20px; height: 20px; }
@@ -551,6 +553,12 @@ body.ui-v2-active .v2-head .language-picker { display: none; }
 .v2-shell .v2-action-cancel { min-width: 40px; min-height: 40px; border-color: transparent; background: transparent; }
 .v2-target-card { position: fixed; z-index: 20; display: grid; gap: 6px; width: max-content; max-width: min(320px, calc(100vw - 16px)); padding: 8px 10px; border-color: var(--v2-accent-text); box-shadow: 0 8px 30px #000b; }
 .v2-target-card[hidden] { display: none !important; }
+.v2-layout:has(> #v2-intel-panel > .v2-target-card:not([hidden])) { grid-template-columns: minmax(0, 1fr) clamp(224px, 22vw, 310px); }
+.v2-layout > #v2-intel-panel:has(> .v2-target-card:not([hidden])) { position: static; display: flex; grid-area: 1 / 2; width: auto; max-height: none; overflow: hidden; }
+#v2-intel-panel:has(> .v2-target-card:not([hidden])) > #v2-intel { display: none; }
+#v2-intel-panel > .v2-target-card { position: static; width: auto; max-width: none; min-height: 0; grid-template-rows: auto; box-shadow: none; overflow: auto; }
+#v2-intel-panel .v2-target-choices { max-height: none; align-content: start; }
+.v2-shell .v2-target-card[data-components="true"] .v2-target-row { min-height: 44px; }
 .v2-target-choices { display: grid; gap: 4px; overflow: auto; max-height: min(28dvh, 220px); padding: 3px; }
 .v2-shell .v2-target-row {
   display: grid;

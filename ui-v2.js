@@ -830,10 +830,14 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
 
     function renderTargetCard(state, actor) {
       const card = at('#v2-target-card'), cell = view.target;
+      const intel = at('#v2-intel-panel');
       card.replaceChildren();
       card.hidden = !cell || !actor || view.intentRevision !== state.revision || GameDialogs.isOpen() ||
         document.body.classList.contains('v2-screen-open') || !!globalThis.GoblinMovement?.busy();
-      if (card.hidden) return;
+      if (card.hidden) {
+        if (intel && card.parentElement === intel) shell.append(card);
+        return;
+      }
       const occupant = targetOccupant(state, cell);
       const entries = entriesAt(state, actor, cell);
       const legal = entries.filter(entry => entryResult(entry).ok);
@@ -842,14 +846,23 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         label: t('v2.target.selectUnit', {name:occupant.name}), icon: 'action', select: occupant.id
       });
       const blocked = view.afterWeaponSwitch ? entries.find(entry => entry.command.type === 'PlayerFire' && !entryResult(entry).ok) : null;
-      if (!rows.length && !blocked) { card.hidden = true; return; }
+      if (!rows.length && !blocked) {
+        card.hidden = true;
+        if (intel && card.parentElement === intel) shell.append(card);
+        return;
+      }
 
       const location = [occupant?.name, hexLabel(cell)].filter(Boolean).join(' · ');
-      const title = el('strong', 'v2-sr', location);
+      let page = rows;
+      let componentPage = false;
+      for (const index of view.targetBranch ?? []) {
+        componentPage = page[index]?.choice === 'v2.target.componentChoice';
+        page = page[index]?.children ?? page;
+      }
+      componentPage ||= page.some(row => row.entry?.componentLabel);
+      const title = el('strong', componentPage ? '' : 'v2-sr', location);
       title.id = 'v2-target-title';
       card.append(title);
-      let page = rows;
-      for (const index of view.targetBranch ?? []) page = page[index]?.children ?? page;
 
       const warning = legal.find(entry => entry.confirmSplash);
       if (warning) card.append(el('p', 'v2-target-warning', missileWarning(state, warning, cell)));
@@ -903,6 +916,22 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         list.append(button);
       }
       card.append(list);
+      card.dataset.components = String(componentPage);
+      positionTargetCard(card, cell, state, actor, occupant);
+    }
+    function positionTargetCard(card, cell, state, actor, occupant) {
+      const intel = at('#v2-intel-panel');
+      const dock = card.dataset.components === 'true' && window.matchMedia('(min-width: 851px) and (min-height: 501px)').matches;
+      if (dock) {
+        if (card.parentElement !== intel) intel.append(card);
+        card.dataset.pointer = '';
+        card.style.removeProperty('left');
+        card.style.removeProperty('top');
+        card.style.removeProperty('max-height');
+        card.style.removeProperty('overflow-y');
+        return;
+      }
+      if (intel && card.parentElement === intel) shell.append(card);
       placeNearHex(card, cell, state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && unit.id !== actor.id && unit !== occupant), [actor]);
     }
     function renderTargetBlast(overlay, state, actor) {
@@ -1710,8 +1739,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (!view.target || card.hidden) return;
       const state = hoverState, actor = state?.units.find(unit => unit.id === view.actorId);
       if (!actor) return;
-      placeNearHex(card, view.target, state.units.filter(unit => unitAlive(unit) && !unit.embarkedOn && unit.id !== actor.id &&
-        (unit.x !== view.target.x || unit.y !== view.target.y)), [actor]);
+      positionTargetCard(card, view.target, state, actor, targetOccupant(state, view.target));
       revealTargetControl(card, document.activeElement);
     }
     function syncPanelLayout() {
