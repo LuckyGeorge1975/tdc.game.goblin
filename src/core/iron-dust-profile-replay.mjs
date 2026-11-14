@@ -1,11 +1,13 @@
 import {IRON_DUST_PROFILE_VERSION, IRON_DUST_PROFILE_HEADER,
   IRON_DUST_PROFILE_PROJECTION_VERSION, createIronDustProfile,
   validateIronDustProfile, queryIronDustProfile, dispatchIronDustProfile,
+  dispatchIronDustProfileEnemyMoveChoice,dispatchIronDustProfileEnemyFireChoice,
   projectIronDustProfile} from './iron-dust-executable-profile.mjs?v=2';
 import {IRON_DUST_HISTORICAL_LAYOUT} from '../levels/iron-dust.v1.mjs';
 
 // Internal v2 source replay. This does not extend schema-1 or expose file I/O.
 export const IRON_DUST_PROFILE_REPLAY_VERSION = 'iron-dust-profile-replay-v1';
+export const IRON_DUST_COMMIT_REPLAY_VERSION = 'iron-dust-profile-replay-v2';
 export const IRON_DUST_PROFILE_EVENT_CODEC_VERSION = 'iron-dust-source-events-v2';
 const actors = ['ogre', 'gev', 'missile', 'infantry'];
 const targets = ['core', 'guard', 'raider'];
@@ -96,21 +98,47 @@ function validCommand(command) {
     command.playerId === 'player' && actors.includes(command.unitId) &&
     targets.includes(command.targetId) && (!ogre || weapons.includes(command.weaponKey));
 }
-function simulate(initialSnapshot, commands) {
+function validCommittedCommand(command) {
+  if (validCommand(command)) return true;
+  if (command?.playerId!=='enemy') return false;
+  switch(command.type) {
+    case 'EnemyMove':
+      return exact(command,['type','playerId','actorId','to'])&&['guard','raider'].includes(command.actorId)&&
+        exact(command.to,['x','y'])&&Number.isInteger(command.to.x)&&Number.isInteger(command.to.y);
+    case 'EnemyHold':
+      return exact(command,['type','playerId','actorId'])&&['guard','raider'].includes(command.actorId);
+    case 'EnemyUnitAttack':
+      return exact(command,['type','playerId','attackerId','targetId'])&&['guard','raider'].includes(command.attackerId)&&
+        ['gev','missile','infantry'].includes(command.targetId);
+    case 'EnemySystemAttack':
+      return exact(command,['type','playerId','attackerId','targetId','targetKey'])&&['guard','raider'].includes(command.attackerId)&&
+        command.targetId==='ogre'&&[...weapons,'treads'].includes(command.targetKey);
+    default: return false;
+  }
+}
+
+function dispatchCommitted(profile,command) {
+  if(command.type==='EnemyMove'||command.type==='EnemyHold')return dispatchIronDustProfileEnemyMoveChoice(profile,command);
+  if(command.type==='EnemyUnitAttack'||command.type==='EnemySystemAttack')return dispatchIronDustProfileEnemyFireChoice(profile,command);
+  return dispatchIronDustProfile(profile,command);
+}
+
+function checkpointFor(profile,events,commandIndex) {
+  const state=stateOf(profile);
+  return {commandIndex,turn:state.turn,phase:state.phase,mode:profile.entry.mode,rngState:state.rng.state,
+    entryDigest:profile.entry.digest,stateDigest:profile.digest,eventsDigest:digest(events)};
+}
+
+function simulate(initialSnapshot, commands, committed=false) {
   let profile = initialSnapshot;
   const steps = [], checkpoints = [];
   for (const [commandIndex, command] of commands.entries()) {
-    const allowed = queryIronDustProfile(profile, command);
-    if (!allowed.available) reject('IRON_DUST_REPLAY_COMMAND_REJECTED');
-    const result = dispatchIronDustProfile(profile, command);
+    if (!committed && !queryIronDustProfile(profile, command).available) reject('IRON_DUST_REPLAY_COMMAND_REJECTED');
+    const result = committed ? dispatchCommitted(profile,command) : dispatchIronDustProfile(profile,command);
     if (!result.profile || !Array.isArray(result.events))
       reject('IRON_DUST_REPLAY_COMMAND_REJECTED');
     profile = result.profile;
-    const state = stateOf(profile);
-    const checkpoint = {commandIndex, turn: state.turn, phase: state.phase,
-      mode: profile.entry.mode, rngState: state.rng.state,
-      entryDigest: profile.entry.digest, stateDigest: profile.digest,
-      eventsDigest: digest(result.events)};
+    const checkpoint = checkpointFor(profile,result.events,commandIndex);
     checkpoints.push(checkpoint);
     steps.push({commandIndex, command: clone(command),
       events: clone(result.events), state: projectIronDustProfile(profile),
@@ -120,11 +148,12 @@ function simulate(initialSnapshot, commands) {
     steps, finalState: projectIronDustProfile(profile), checkpoints};
 }
 function inspect(envelope) {
+  const committed=envelope?.replayVersion===IRON_DUST_COMMIT_REPLAY_VERSION;
   if (!jsonValue(envelope) || !exact(envelope, envelopeKeys) ||
-      envelope.replayVersion !== IRON_DUST_PROFILE_REPLAY_VERSION ||
+      (!committed && envelope.replayVersion !== IRON_DUST_PROFILE_REPLAY_VERSION) ||
       envelope.executable !== false || !exact(envelope.header, headerKeys) ||
       !uint32(envelope.initialSeed) || !Array.isArray(envelope.commands) ||
-      !envelope.commands.every(validCommand) ||
+      !envelope.commands.every(committed?validCommittedCommand:validCommand) ||
       !Array.isArray(envelope.checkpoints) ||
       envelope.checkpoints.length !== envelope.commands.length ||
       !envelope.checkpoints.every((point, index) =>
@@ -142,10 +171,38 @@ function inspect(envelope) {
       envelope.traceDigest !== digest(envelope.checkpoints))
     reject('IRON_DUST_REPLAY_MISMATCH');
   validateIronDustProfile(start);
-  const playback = simulate(start, envelope.commands);
+  const playback = simulate(start, envelope.commands, committed);
   if (canonical(playback.checkpoints) !== canonical(envelope.checkpoints))
     reject('IRON_DUST_REPLAY_MISMATCH');
   return {envelope: freeze(clone(envelope)), playback: freeze(playback)};
+}
+
+// Owned by one host. Appending a receipt never runs the command a second time.
+export function createIronDustCommitRecorder(initialSnapshot) {
+  validateIronDustProfile(initialSnapshot);
+  const initialSeed=stateOf(initialSnapshot).rng.seed;
+  const expectedStart=createIronDustProfile(initialSeed,{
+    difficulty:initialSnapshot.header.enemyPolicy?.difficulty,
+    minimumDifficulty:initialSnapshot.header.minimumDifficulty
+  });
+  if(canonical(initialSnapshot)!==canonical(expectedStart))reject('IRON_DUST_REPLAY_MISMATCH');
+  let previous=initialSnapshot;
+  const commands=[], checkpoints=[];
+  function accept(before,{action,profile,events}) {
+    if(before!==previous||!profile||profile===before||!Array.isArray(events)||!validCommittedCommand(action))
+      reject('IRON_DUST_REPLAY_RECEIPT_INVALID');
+    const checkpoint=checkpointFor(profile,events,commands.length);
+    commands.push(clone(action));
+    checkpoints.push(checkpoint);
+    previous=profile;
+  }
+  function snapshot() {
+    return freeze({replayVersion:IRON_DUST_COMMIT_REPLAY_VERSION,executable:false,
+      header:expectedHeader(initialSnapshot),initialSeed,initialSnapshot:clone(initialSnapshot),
+      commands:clone(commands),commandsDigest:digest(commands),checkpoints:clone(checkpoints),
+      traceDigest:digest(checkpoints)});
+  }
+  return Object.freeze({accept,snapshot});
 }
 
 export function recordIronDustProfileReplay(seed, commands, options) {

@@ -1,4 +1,4 @@
-import {createRoundRecorder,visibleRoundPath} from './round-view-producer.mjs?v=3';
+import {createRoundRecorder,visibleRoundPath} from './round-view-producer.mjs?v=4';
 import {dispatchIronDustProfile,validateIronDustProfile} from './src/core/iron-dust-executable-profile.mjs?v=2';
 
 const stateOf = profile => profile.entry.mode==='enemy'?profile.entry.payload.state:profile.entry.payload;

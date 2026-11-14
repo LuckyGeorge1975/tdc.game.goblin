@@ -1,6 +1,6 @@
 import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
-import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=4';
-import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs?v=2';
+import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=5';
+import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs?v=3';
 import {createAiSessionHost} from './src/core/ai-session-host.mjs?v=2';
 import {createAiPolicyRegistry} from './src/core/ai-policy-registry.mjs';
 
@@ -39,7 +39,7 @@ export function createIronDustDecisionHost({readSession, readEpoch, select, poli
         profile:session.profile.header.ruleProfileId,feature};
     },
     commit(result) {
-      install(Object.freeze({profile:result.profile,projection:projectIronDustProfile(result.profile,result.events)}));
+      install(Object.freeze({profile:result.profile,projection:projectIronDustProfile(result.profile,result.events)}),result.action);
     }
   });
 }

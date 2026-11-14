@@ -145,8 +145,9 @@ function describe(profile, side, scope) {
 
 export function createIronDustAiAdapter(read) {
   return createAiDecisionAdapter({read,describe,apply(profile,{command,executeKind}) {
-    if (executeKind==='enemy-fire') return dispatchIronDustProfileEnemyFireChoice(profile,command);
-    if (executeKind==='enemy-move') return dispatchIronDustProfileEnemyMoveChoice(profile,command);
-    return dispatchIronDustProfile(profile,command);
+    const dispatch=executeKind==='enemy-fire'?dispatchIronDustProfileEnemyFireChoice:
+      executeKind==='enemy-move'?dispatchIronDustProfileEnemyMoveChoice:dispatchIronDustProfile;
+    const result=dispatch(profile,command);
+    return result.profile?{...result,action:structuredClone(command)}:result;
   }});
 }

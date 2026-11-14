@@ -1,25 +1,29 @@
-import {createIronDustBrowserSession, createIronDustDecisionHost} from './iron-dust-browser-v2.mjs?v=23';
-import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=4';
+import {createIronDustBrowserSession, createIronDustDecisionHost} from './iron-dust-browser-v2.mjs?v=24';
+import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=5';
+import {createIronDustCommitRecorder} from './src/core/iron-dust-profile-replay.mjs';
 
-export function createIronDustSpectatorMatch(select) {
+export function createIronDustSpectatorMatch(select,{recordReplay=false}={}) {
   let session = createIronDustBrowserSession();
   let epoch = 0;
   const recorder = createIronDustRoundRecorder(session.profile, () => session?.profile, 'spectator');
+  const replay=recordReplay===true?createIronDustCommitRecorder(session.profile):null;
   const host = createIronDustDecisionHost({
     readSession:() => session, readEpoch:() => epoch, spectator:true, select,
-    install(next) {
+    install(next,action) {
       const commit = recorder.beginCommit();
       const before = session.profile;
       session = next;
       captureIronDustRoundCommit(commit,before, {
         profile:next.profile, events:next.projection.events
       });
+      replay?.accept(before,{action,profile:next.profile,events:next.projection.events});
     }
   });
   return Object.freeze({
     advance:host.advance,
     ended:() => session?.projection.mode === 'ended',
     view:() => recorder.view(),
+    ...(replay?{replay:()=>session?replay.snapshot():null}:{}),
     board:recorder.board,
     stop() { epoch++; host.stop(); session = null; }
   });
