@@ -102,6 +102,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let missionId = globalThis.GoblinCatalogFullModel?.has(requestedScenario)&&currentScenario===requestedScenario?requestedScenario:'iron-dust', started = false, startError = '';
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
     let roundAnalysis = null;
+    let spectatorInput = null;
+    let spectatorEscapeHeld = false;
     const campaignLessons = ['training-t01', 'training-t02'];
     const fieldCampaigns = {
       relay: {file:'relay-line', ids:['relay-line-bridge', 'relay-line-relay'], unlocked:1},
@@ -127,20 +129,20 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       whenResumed: () => pauseActive ? new Promise(resolve => waiting.push(resolve)) : Promise.resolve()
     });
 
-    function releasePause() {
+    function releasePause(refreshPlay = true, resumeCore = true) {
       if (!pauseActive) return;
       pauseActive = false;
-      globalThis.IronDustBrowserV2?.resume();
+      if (resumeCore) globalThis.IronDustBrowserV2?.resume();
       document.querySelector('#auto-end-turn').checked = savedAuto;
       waiting.splice(0).forEach(resolve => resolve());
-      if (screen === 'play') {
+      if (refreshPlay && screen === 'play') {
         GoblinUIV2.refresh();
         maybeAutoAdvancePhase();
       }
     }
-    function holdPlay() {
+    function holdPlay(clearMovement = true) {
       if (GameDialogs.isOpen() || pauseActive) return false;
-      globalThis.GoblinMovement?.clear();
+      if (clearMovement) globalThis.GoblinMovement?.clear();
       savedAuto = document.querySelector('#auto-end-turn').checked;
       document.querySelector('#auto-end-turn').checked = false;
       pauseActive = true;
@@ -150,6 +152,47 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function enterPause() {
       if (holdPlay()) show('pause');
     }
+    // The caller owns the isolated match; the screen owns browser input and
+    // restoration of the underlying play session.
+    function acquireSpectatorInput(dialog, stop, focus = document.activeElement) {
+      if (spectatorInput || GameDialogs.isOpen() || dialog.open || !dialog.isConnected ||
+          !['menu', 'play', 'pause'].includes(screen)) return null;
+      const core = globalThis.IronDustBrowserV2;
+      if (screen === 'play' && (pauseActive || core?.mode !== 'ready' || core.enemyRunning ||
+          globalThis.GoblinMovement?.busy() || GoblinUIV2.project().gameOver)) return null;
+      const owner = legacySession, epoch = core?.epoch, origin = screen;
+      const ownsPause = origin === 'play' && holdPlay(false);
+      const leave = () => {
+        if (spectatorInput?.leave !== leave) return;
+        try {
+          stop();
+        } finally {
+          dialog.removeEventListener('cancel', cancel);
+          dialog.removeEventListener('close', leave);
+          if (dialog.open) dialog.close();
+          const sameSession = screen === origin && legacySession === owner && core?.epoch === epoch;
+          spectatorInput = null;
+          if (ownsPause) releasePause(false, sameSession);
+          if (sameSession) (focus?.isConnected ? focus : document.getElementById(focus?.id))?.focus({preventScroll:true});
+        }
+      };
+      function cancel(event) {
+        event.preventDefault();
+        leave();
+      }
+      spectatorInput = {dialog, leave};
+      GoblinUIV2.cancelMapPointers();
+      dialog.addEventListener('cancel', cancel);
+      dialog.addEventListener('close', leave);
+      try {
+        dialog.showModal();
+      } catch (error) {
+        leave();
+        throw error;
+      }
+      return leave;
+    }
+    globalThis.GoblinV2SpectatorInput = Object.freeze({acquire: acquireSpectatorInput});
     function button(label, action, className = '') {
       const node = document.createElement('button');
       node.type = 'button'; node.className = className;
@@ -1632,7 +1675,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     new MutationObserver(() => { if (screen === 'levels') renderScreen(false); })
       .observe(document.querySelector('#scenario-select'), { childList: true });
     function showMissionEnd() {
-      if (screen !== 'play' || globalThis.GoblinMovement?.busy() || globalThis.GoblinLevelEvents?.pending(legacySession)) return;
+      if (spectatorInput || screen !== 'play' || globalThis.GoblinMovement?.busy() || globalThis.GoblinLevelEvents?.pending(legacySession)) return;
       const state = GoblinUIV2.project();
       if (!state.gameOver) return;
       if (campaign?.field) recordFieldVictory(state);
@@ -1662,7 +1705,32 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (screen === 'levels' || screen === 'briefing') renderScreen(false);
     });
     GoblinLanguage.ready.then(() => renderScreen(false));
+    for (const type of ['pointerdown', 'click', 'contextmenu', 'wheel']) {
+      globalThis.addEventListener(type, event => {
+        if (!spectatorInput || event.composedPath().includes(spectatorInput.dialog)) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }, {capture:true, passive:false});
+    }
+    globalThis.addEventListener('keyup', event => {
+      if (event.key === 'Escape') spectatorEscapeHeld = false;
+    }, true);
     globalThis.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !event.repeat) spectatorEscapeHeld = false;
+      if (spectatorEscapeHeld && event.key === 'Escape') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
+      if (spectatorInput) {
+        event.stopImmediatePropagation();
+        if (event.key === 'Escape') {
+          spectatorEscapeHeld = true;
+          event.preventDefault();
+          spectatorInput.leave();
+        }
+        return;
+      }
       if (screen !== 'play' && event.key === 'Escape' && !GameDialogs.isOpen() && document.querySelector('#unit-guide-modal').classList.contains('hidden')) {
         if (['options','catalog','legal','changelog'].includes(screen)) goBack();
         else if (screen === 'briefing') (campaign ? returnToCampaignMenu : returnToSelectedLevel)();

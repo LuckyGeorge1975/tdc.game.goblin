@@ -354,6 +354,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       get phaseNoticeSeconds() { return phaseNoticeSeconds; }, setPhaseNoticeSeconds,
       get autoSelectReady() { return view.autoSelectReady; }, setAutoSelectReady,
       closeTarget: () => { if (view.target) clearContext(); },
+      cancelMapPointers,
       trainingFirePreview, svgIcon,
       panelVisible: key => intelSections[key],
       setPanelVisible,
@@ -1938,7 +1939,12 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     window.addEventListener('pointerup', endPointer);
     window.addEventListener('pointercancel', endPointer);
-    window.addEventListener('blur', () => { for (const pointer of pointers.values()) clearTimeout(pointer.timer); pointers.clear(); pinch = null; });
+    function cancelMapPointers() {
+      for (const pointer of pointers.values()) clearTimeout(pointer.timer);
+      pointers.clear();
+      pinch = null;
+    }
+    window.addEventListener('blur', cancelMapPointers);
     mapPanel.addEventListener('wheel', event => {
       startZoomPending = null;
       event.preventDefault();
