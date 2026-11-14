@@ -194,7 +194,7 @@
   } catch(error){if(!error.code)throw error;return {ok:false,code:error.code}}
  }
  const oldEnemy=enemyFire;enemyFire=function(u,choose,pass){
-  if(!active())return oldEnemy(u);
+  if(!active())return oldEnemy(u,choose,pass);
   const full=root.GoblinCatalogFullRuntime;
   if(full?.active()&&u.catalogId==='U13')return full.enemyHex(u,choose,pass);
   if(!alive(u)||u.disabled||u.embarkedOn&&!rules(u).passengerRef)return false;
@@ -204,8 +204,10 @@
    if(!w.ready)continue;
    const baseline=candidateCommands(u,w.id).find(legalFire);
    if(!baseline)continue;
-   if(full?.active()&&typeof choose==='function'){
-    const result=full.chooseEnemyFire(u,pass,baseline,()=>candidateCommands(u,w.id,true),c=>firePreview(c,true),c=>executeFire(c,true),choose);
+   if(typeof choose==='function'){
+    const list=()=>candidateCommands(u,w.id,true), preview=c=>firePreview(c,true), apply=c=>executeFire(c,true);
+    const result=full?.active()?full.chooseEnemyFire(u,pass,baseline,list,preview,apply,choose):
+      chooseNativeEnemyFire(u,pass,baseline,list,preview,apply,choose,legacyRuleRevision,active);
     if(result===null)return fired;
    }else executeFire(baseline,true);
    fired=true;

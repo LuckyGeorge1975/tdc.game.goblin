@@ -105,7 +105,7 @@
   if(unitDead(t))for(const u of mechanical){u.hp=0;u.embarkedOn=t.id;u.lastOutcome='X';const hit=result.passengers.find(p=>p.unit.id===u.id);if(hit){hit.outcome={...hit.outcome,directResult:hit.outcome.result,result:'X',cause:'mechanical-carrier-loss'}}}
   return result;
  };
- const oldEnemyFire=enemyFire;enemyFire=function(u){if(spec(u)&&(u.embarkedOn&&!passenger(u)||spec(u).fireRuleRef==='no-fire-v1'||drone(u)&&(u.droneReadyTurn??1)>turn))return false;return oldEnemyFire(u)};
+ const oldEnemyFire=enemyFire;enemyFire=function(u,...args){if(spec(u)&&(u.embarkedOn&&!passenger(u)||spec(u).fireRuleRef==='no-fire-v1'||drone(u)&&(u.droneReadyTurn??1)>turn))return false;return oldEnemyFire(u,...args)};
  function syncCargo(c){if(active())for(const u of carrierCargo(c)){u.x=c.x;u.y=c.y}}
  const loadWeight=(c,roster=units)=>roster.filter(u=>unitAlive(u)&&u.embarkedOn===c.id).reduce((n,u)=>n+(drone(u)?cargoDefinition(spec(u).cargoRef).cargoCost:u.hp),0);
  function summary(u,roster=units){const t=spec(u);if(!t)return null;if(root.GoblinSpecialistsRuntime?.active()&&u.catalogSystems)return root.GoblinSpecialistsRuntime.summary(u,roster);

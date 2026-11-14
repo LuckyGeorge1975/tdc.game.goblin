@@ -73,11 +73,7 @@
     maybeAutoAdvancePhase();
   };
 
-  enemyFire=function(foe){
-    if(foe.hp<=0||foe.disabled)return false;
-    const targets=units.filter(unit=>unit.team==='player'&&unit.hp>0&&!unit.embarkedOn).sort((a,b)=>dist(foe,a)-dist(foe,b));
-    const target=targets.find(unit=>dist(foe,unit)<=foe.range&&lineOfSight(foe,unit));
-    if(!target)return false;
+  function resolveEnemyFire(foe,target){
     if(target.ogreSystems){
       const outcome=GoblinOgreRuntime.resolveSystemAttack(foe,target);
       if(!outcome)return false;
@@ -94,6 +90,30 @@
     reportPassengerHits(foe,outcome,true);
     setTimeout(()=>{target.justHit=false;draw()},560);
     return true;
+  }
+  enemyFire=function(foe,choose,pass){
+    if(foe.hp<=0||foe.disabled)return false;
+    const reachable=target=>dist(foe,target)<=foe.range&&lineOfSight(foe,target);
+    const targets=units.filter(unit=>unit.team==='player'&&unit.hp>0&&!unit.embarkedOn).sort((a,b)=>dist(foe,a)-dist(foe,b));
+    const baseline=targets.find(reachable);
+    if(!baseline)return false;
+    if(typeof choose!=='function'||(baseline.ogreSystems&&!GoblinOgreRuntime.querySystemTarget(baseline)))
+      return resolveEnemyFire(foe,baseline);
+    const commandFor=target=>({type:'LegacyEnemyFire',actorId:foe.id,targetId:target.id});
+    function preview(command){
+      const target=targets.find(unit=>unit.id===command.targetId&&unit.hp>0&&!unit.embarkedOn);
+      if(!target||!reachable(target))return {ok:false,code:'ENEMY_FIRE_CHOICE_UNAVAILABLE'};
+      const system=target.ogreSystems?GoblinOgreRuntime.querySystemTarget(target):null;
+      if(target.ogreSystems&&!system)return {ok:false,code:'ENEMY_FIRE_CHOICE_UNAVAILABLE'};
+      const treads=system?.type==='treads';
+      const defense=system?system.defense+TerrainRules.coverBonus(terrainTypeAt(target.x,target.y)):effectiveDefense(target);
+      return {ok:true,attack:foe.damage,range:foe.range,ratioCategory:treads?null:combatRatio(foe.damage,defense),
+        effectKind:treads?'tread-roll-5-6':system?'component-crt':'unit-crt',
+        ...(system?{componentId:system.key}:{}),objectiveTarget:!!target.core,disabledTarget:!!target.disabled};
+    }
+    return chooseNativeEnemyFire(foe,pass,commandFor(baseline),()=>targets.map(commandFor),preview,
+      command=>({ok:resolveEnemyFire(foe,targets.find(unit=>unit.id===command.targetId))}),choose,
+      legacyRuleRevision,()=>units.includes(foe)&&foe.hp>0&&!foe.disabled)===true;
   };
 
   updateObjectiveStatus();

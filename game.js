@@ -268,6 +268,46 @@ function commitEnemyStep(foe,step){
   globalThis.GoblinLegacyPresentation?.confirm(presentation);
   addLog(`${foe.name} rückt nach ${String.fromCharCode(65+foe.x)}-${String(foe.y+1).padStart(2,'0')} vor.`,true);
 }
+// A policy can replace a shot only within the engine's current fire slot.
+function chooseNativeEnemyFire(actor,pass,baseline,commands,preview,apply,choose,revision,isActive){
+  const owner=legacySession, initialRevision=revision();
+  const current=()=>isActive()&&owner===legacySession&&phase==='enemy'&&turnPhase==='enemy'&&!gameOver;
+  const checked=new Map();
+  const baselineKey=JSON.stringify(baseline);
+  for(const command of commands()){
+    const {ok,code,...facts}=preview(command);
+    if(ok){const key=JSON.stringify(command);checked.set(key,{command,facts,baseline:key===baselineKey});}
+  }
+  if(!checked.has(baselineKey))throw Error('ENEMY_FIRE_BASELINE_MISSING');
+  let open=true, spent=false, engineFailed=false, engineError;
+  const reject=code=>({ok:false,code});
+  const available=()=>open&&current()&&!spent&&revision()===initialRevision;
+  function execute(command){
+    if(!open||!current())return reject('ENEMY_FIRE_SLOT_CLOSED');
+    if(spent)return reject('ENEMY_FIRE_SLOT_SPENT');
+    if(revision()!==initialRevision)return reject('ENEMY_FIRE_STATE_CHANGED');
+    const allowed=checked.get(JSON.stringify(command));
+    if(!allowed)return reject('ENEMY_FIRE_CHOICE_UNAVAILABLE');
+    try{
+      const result=preview(allowed.command);
+      if(!result.ok)return result;
+      spent=true;
+      return apply(allowed.command);
+    }catch(error){engineFailed=true;engineError=error;open=false;throw error;}
+  }
+  try{choose(Object.freeze({actorId:actor.id,pass,entries:()=>available()?structuredClone([...checked.values()]):[],execute}));}
+  catch(error){if(!engineFailed)console.error('Enemy fire choice failed',actor.id,error);}
+  finally{open=false;}
+  if(engineFailed)throw engineError;
+  if(spent)return true;
+  if(!current())return null;
+  if(revision()!==initialRevision)throw Error('ENEMY_FIRE_STATE_CHANGED');
+  return apply(baseline).ok;
+}
+function legacyRuleRevision(){
+  return JSON.stringify([currentScenario,legacySession?.sessionId,legacySession?.ruleProfileId,turn,phase,turnPhase,gameOver,
+    [...terrain],[...terrainTypes],units.map(({moveFrom,justHit,...unit})=>unit)]);
+}
 function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
   function chooseEnemyStep(full, actor, choose) {
     if (typeof choose !== 'function') return false;

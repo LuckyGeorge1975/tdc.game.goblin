@@ -9,14 +9,18 @@
     if(GoblinSystems.isHelpless(state))unit.hp=0;
     return unit;
   }
-  function resolveSystemAttack(attacker,target,targetKey){
+  function querySystemTarget(target,targetKey){
     const session=typeof legacySession==='undefined'?null:legacySession;
-    const state=ensureState(target),corrected=!!session&&Object.isFrozen(session)&&
+    const state=target?.ogreSystems,corrected=!!session&&Object.isFrozen(session)&&
       Object.isFrozen(session.effectiveRules)&&session.scenarioId==='iron-dust'&&
       session.scenarioVersion===2&&session.ruleProfileId==='FIELD_TEST_LEGACY_v2'&&
       session.effectiveRules.targetPolicyVersion==='skip-depleted-treads-v1';
-    const system=targetKey?GoblinSystems.targets(state).find(item=>item.key===targetKey):
+    if(!state)return null;
+    return targetKey?GoblinSystems.targets(state).find(item=>item.key===targetKey):
       corrected?GoblinSystems.chooseTargetSkippingDepletedTreads(state):GoblinSystems.chooseTarget(state);
+  }
+  function resolveSystemAttack(attacker,target,targetKey){
+    const state=ensureState(target),system=querySystemTarget(target,targetKey);
     if(!system)return null;
     const presentation=root.GoblinLegacyPresentation?.beforeResult('legacy-resolveSystemAttack',attacker,target);
     const roll=Math.floor(Math.random()*6);
@@ -71,5 +75,5 @@
   };
 
   units.forEach(syncUnit);
-  root.GoblinOgreRuntime=Object.freeze({ensureState,syncUnit,resolveSystemAttack,describeHit});
+  root.GoblinOgreRuntime=Object.freeze({ensureState,syncUnit,querySystemTarget,resolveSystemAttack,describeHit});
 })(globalThis);

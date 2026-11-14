@@ -100,8 +100,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function revision() {
       if (core()) return `core:${IronDustBrowserV2.epoch}:${IronDustBrowserV2.session.profile.digest}`;
       if(globalThis.GoblinCatalogFullRuntime?.active())return GoblinCatalogFullRuntime.commandRevision();
-      return JSON.stringify([currentScenario, legacySession?.sessionId, legacySession?.ruleProfileId, turn, phase, turnPhase, gameOver,
-        [...terrain], [...terrainTypes], units.map(({ moveFrom, justHit, ...unit }) => unit)]);
+      return legacyRuleRevision();
     }
     function legacyLogEntries() {
       if(globalThis.GoblinCatalogFullRuntime?.active())return GoblinCatalogFullRuntime.logEntries();
@@ -348,7 +347,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
     }
-    globalThis.GoblinUIV2 = Object.freeze({ project, query, previewFire, dispatch, undo, resetView, startView, focusUnit, notifyPhaseSkip,
+    globalThis.GoblinUIV2 = Object.freeze({ project, query, previewFire, dispatch, undo, resetView, startView, focusUnit, notifyPhaseSkip, legacyAiHost,
       get gridVisible() { return view.gridVisible; }, setGridVisible(value) { setViewFlag('gridVisible',value); },
       get targetsVisible() { return view.targetsVisible; }, setTargetsVisible(value) { setViewFlag('targetsVisible',value); },
       get damageVisible() { return view.damageVisible; }, setDamageVisible(value) { setViewFlag('damageVisible',value); },
@@ -1417,6 +1416,58 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           carrierCargo(runtime).map(cargo => ({command:{type:'Unload', ...intent, cargoId:cargo.id},transport:true,
           label:t(globalThis.GoblinCatalogRuntime?.drone(cargo) ? 'v2.ui.catalog.deployDrone' : 'v2.ui.unload') + ' · ' +
             (globalThis.GoblinCatalogRuntime?.record(cargo) ? GoblinCatalogRuntime.name(cargo) : cargo.name)})) : [])];
+    }
+    function legacyAiHost() {
+      const active = () => !!legacySession && !core() && !globalThis.IronDustBrowserV2?.active &&
+        !globalThis.GoblinCatalogFullRuntime?.active() && legacySession?.scenarioId === currentScenario &&
+        !ScenarioRuleProfiles.isDraftSession?.(legacySession) &&
+        ScenarioRuleProfiles.entries[currentScenario]?.ruleProfileId === legacySession?.ruleProfileId;
+      const current = () => active() && !gameOver && !view.busy && !GameDialogs.isOpen() && !globalThis.GoblinMovement?.busy();
+      const generation = () => `${commandEpoch}:${commandUndoRevision}:${W}:${H}`;
+      function projectSide(side) {
+        // These admitted profiles expose the same on-map roster to each team.
+        // The FULL visibility reducer has its own host.
+        return {profileId:legacySession.ruleProfileId,side,phase:turnPhase,turn,
+          terrain:{width:W,height:H,defaultTerrain:'open-ground',cells:[...terrainTypes].map(([key,type])=>{
+            const [x,y]=key.split(',').map(Number);return {x,y,type};
+          })},
+          units:units.filter(unit=>unitAlive(unit)&&(!unit.embarkedOn||unit.team===side)).map(unit=>({
+            id:unit.id,relation:unit.team===side?'own':'opponent',x:unit.x,y:unit.y,
+            ...(unit.catalogSystems?{treads:unit.catalogSystems.treads}:{hp:unit.hp,maxHp:unit.maxHp}),
+            disabled:!!unit.disabled,objectiveTarget:!!unit.core,embarked:!!unit.embarkedOn
+          }))};
+      }
+      function playerOptions() {
+        const state={turnPhase,units}, available=new Map();
+        for(const actor of units){
+          if(actor.team!=='player'||!unitAlive(actor)||actor.disabled)continue;
+          for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+            const cell={x,y};
+            for(const {command,confirmSplash} of legacyCommands(state,actor,cell)){
+              const key=JSON.stringify(command);
+              if(available.has(key))continue;
+              const check=query(command);
+              if(!check.ok)continue;
+              const preview=previewFire(command), target=units.find(unit=>unit.id===preview?.targetId);
+              available.set(key,{command,displayCell:cell,weaponRef:preview?.weaponKey,
+                ...(target?{targetId:target.id}:{}),facts:{
+                  ...(check.path?{path:check.path}:{}),...(Number.isFinite(check.cost)?{cost:check.cost}:{}),
+                  ...(check.weapon?{attack:check.weapon.attack,range:check.weapon.range}:{}),
+                  ...(preview?{ratioCategory:preview.meaning==='tread-roll-5-6'?null:preview.ratioCategory,
+                    effectKind:confirmSplash?'area':preview.meaning==='tread-roll-5-6'?preview.meaning:
+                      command.target?.kind==='component'?'component-crt':'unit-crt',
+                    objectiveTarget:!!target?.core,disabledTarget:!!target?.disabled}:{}),
+                  ...(command.mode?{spotterId:command.spotterId,mode:command.mode}:{}),
+                  ...(command.cargoId?{cargoId:command.cargoId}:{}),
+                  ...(command.bayId?{bayId:command.bayId}:{}),
+                  ...(command.job?{job:command.job,option:command.option}:{})}});
+            }
+          }
+        }
+        return [...available.values()];
+      }
+      return Object.freeze({revision:()=>current()?revision():null,generation,
+        side:()=>phase,project:projectSide,playerOptions,dispatch});
     }
     const targetCommands = (state, actor, cell) => actor && cell ? (core() ? coreCommands : legacyCommands)(state, actor, cell) : [];
     const phaseNotice = at('#v2-phase-notice');

@@ -1,6 +1,7 @@
 // Commands remain reversible only until the current phase is committed.
 const phaseCommands = [];
 let commandDepth = 0, autoPhaseTimer = null, commandEpoch = 0;
+let commandUndoRevision = 0;
 let phaseHasCommittedCommand = false;
 let phaseRolls = [], phaseRollCursor = 0;
 
@@ -69,6 +70,7 @@ function undoPhaseCommand() {
   autoPhaseTimer = null;
   closePhaseConfirm(false);
   const before = phaseCommands.pop();
+  commandUndoRevision++;
   globalThis.GoblinLegacyPresentation?.beforeUndo();
   units.splice(0, units.length, ...structuredClone(before.units));
   units.forEach(unit => { unit.moveFrom = null; unit.justHit = false; });
