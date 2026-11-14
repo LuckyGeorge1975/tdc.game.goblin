@@ -9,7 +9,7 @@
     const response = await fetch(new URL(`content-02.${lang}.json`, catalogBase));
     if (!response.ok) throw Error(`CONTENT-02 ${lang}: HTTP ${response.status}`);
     const catalog = await response.json();
-    const briefingResponse = await fetch(new URL(`briefing-01.${lang}.json?v=30`, catalogBase));
+    const briefingResponse = await fetch(new URL(`briefing-01.${lang}.json?v=31`, catalogBase));
     if (!briefingResponse.ok) throw Error(`BRIEFING-01 ${lang}: HTTP ${briefingResponse.status}`);
     const briefing = await briefingResponse.json();
     const libraryResponse = await fetch(new URL(`library-01.${lang}.json?v=30`, catalogBase));
@@ -536,6 +536,30 @@
     'v2.library.detail.stats': {de:"Werte",en:"Stats",es:"Datos",fr:"Valeurs"},
     'v2.library.detail.specials': {de:"Sonderaktionen",en:"Special actions",es:"Acciones especiales",fr:"Actions spéciales"},
     'v2.library.detail.strategy': {de:"Strategie",en:"Strategy",es:"Estrategia",fr:"Stratégie"},
+    'v2.scorched.title': {de:"Verbrannte Erde",en:"Scorched Earth",es:"Tierra quemada",fr:"Terre brûlée"},
+    'v2.scorched.intro': {de:"Zwölf Missionen gegen den gegnerischen Verband.",en:"Twelve missions against the enemy force.",es:"Doce misiones contra las fuerzas enemigas.",fr:"Douze missions contre les forces ennemies."},
+    'v2.scorched.position': {de:"Verbrannte Erde · Mission {current}/{total}",en:"Scorched Earth · Mission {current}/{total}",es:"Tierra quemada · Misión {current}/{total}",fr:"Terre brûlée · Mission {current}/{total}"},
+    'v2.scorched.locked': {de:"Ein Sieg schaltet die nächste Mission frei.",en:"Win to unlock the next mission.",es:"Gana para desbloquear la siguiente misión.",fr:"Remportez la victoire pour débloquer la mission suivante."},
+    'v2.scorched.next': {de:"Nächste Mission",en:"Next mission",es:"Siguiente misión",fr:"Mission suivante"},
+    'v2.scorched.finish': {de:"Kampagne abschließen",en:"Finish campaign",es:"Finalizar campaña",fr:"Terminer la campagne"},
+    'v2.scorched.complete': {de:"Verbrannte Erde abgeschlossen",en:"Scorched Earth complete",es:"Tierra quemada completada",fr:"Terre brûlée terminée"},
+    'v2.scorched.completeBody': {de:"Die letzte Stellung ist gesichert.",en:"The final position is secure.",es:"La última posición está asegurada.",fr:"La dernière position est sécurisée."},
+    'v2.scorched.storageError': {de:"Fortschritt konnte nicht dauerhaft gespeichert werden.",en:"Progress could not be saved permanently.",es:"No se pudo guardar el progreso de forma permanente.",fr:"La progression n’a pas pu être enregistrée durablement."},
+    'v2.scorched.victory': {de:"Schalte den Kommandokern und alle Gegner aus. Mindestens eine eigene Einheit muss überleben.",en:"Destroy the command core and all enemies. Keep at least one friendly unit alive.",es:"Destruye el núcleo de mando y elimina a todos los enemigos. Conserva al menos una unidad aliada.",fr:"Détruisez le noyau de commandement et tous les ennemis. Gardez au moins une unité alliée en vie."},
+    'v2.scorched.defeat': {de:"Alle eigenen Einheiten fallen.",en:"All friendly units are lost.",es:"Se pierden todas las unidades aliadas.",fr:"Toutes les unités alliées sont perdues."},
+    'v2.scorched.won': {de:"Die Stellung ist gesichert.",en:"The position is secure.",es:"La posición está asegurada.",fr:"La position est sécurisée."},
+    'mission.scorched-ash-road.title': {de:"Aschenstraße",en:"Ash Road",es:"Camino de ceniza",fr:"Route des cendres"},
+    'mission.scorched-black-ridge.title': {de:"Schwarzer Grat",en:"Black Ridge",es:"Cresta negra",fr:"Crête noire"},
+    'mission.scorched-salt-flats.title': {de:"Salzebene",en:"Salt Flats",es:"Salinas",fr:"Plaines salées"},
+    'mission.scorched-floodline.title': {de:"Flutlinie",en:"Floodline",es:"Línea de crecida",fr:"Ligne de crue"},
+    'mission.scorched-cut-the-relay.title': {de:"Relaisbruch",en:"Cut the Relay",es:"Corte del enlace",fr:"Coupure du relais"},
+    'mission.scorched-dead-ground.title': {de:"Toter Winkel",en:"Dead Ground",es:"Ángulo muerto",fr:"Angle mort"},
+    'mission.scorched-cinder-yard.title': {de:"Schlackenhof",en:"Cinder Yard",es:"Patio de escoria",fr:"Cour des scories"},
+    'mission.scorched-ignition.title': {de:"Zündung",en:"Ignition",es:"Ignición",fr:"Allumage"},
+    'mission.scorched-forge-crossing.title': {de:"Schmiedeübergang",en:"Forge Crossing",es:"Paso de la forja",fr:"Passage de la forge"},
+    'mission.scorched-steel-gate.title': {de:"Stahltor",en:"Steel Gate",es:"Puerta de acero",fr:"Porte d’acier"},
+    'mission.scorched-ghost-quarter.title': {de:"Geisterviertel",en:"Ghost Quarter",es:"Barrio fantasma",fr:"Quartier fantôme"},
+    'mission.scorched-last-ember.title': {de:"Letzte Glut",en:"Last Ember",es:"Última brasa",fr:"Dernière braise"},
     'v2.relay.title': {de:"Relaislinie",en:"Relay Line",es:"Línea de enlace",fr:"Ligne de relais"},
     'v2.relay.intro': {de:"Sichere den Übergang und schalte danach den Relaisposten aus.",en:"Secure the crossing, then take out the relay post.",es:"Asegura el paso y luego neutraliza el puesto de enlace.",fr:"Sécurisez le passage, puis neutralisez le poste relais."},
     'v2.relay.locked': {de:"Ein Sieg in Brückenweg schaltet Relaisbruch frei.",en:"Win Bridge Route to unlock Relay Break.",es:"Gana Ruta del puente para desbloquear Ruptura del enlace.",fr:"Remportez Route du pont pour débloquer Rupture du relais."},

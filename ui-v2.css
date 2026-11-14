@@ -55,6 +55,7 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-menu-intro h2 { font-size: clamp(40px, 7vw, 72px); letter-spacing: .06em; }
 .v2-menu-eyebrow { color: var(--v2-accent-text) !important; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .v2-menu-links { display: grid; gap: 10px; margin-top: 34px; }
+.v2-menu-campaigns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .v2-menu-links button { width: 100%; min-height: 58px; text-align: left; font-weight: 700; }
 .v2-level-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); gap: 18px; min-height: 0; }
 .v2-foundation .v2-level-layout { flex: none; }

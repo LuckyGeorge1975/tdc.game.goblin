@@ -11,9 +11,9 @@ const cut = (from,to) => flow.slice(flow.indexOf(from),flow.indexOf(to,flow.inde
 
 test('the position label names the selected campaign in all four languages', () => {
   const context = {URL, URLSearchParams, location:{href:import.meta.url}, document:{readyState:'loading',addEventListener(){}},
-    campaign:{index:0,relay:true}, relayMissions:['bridge','relay'], campaignLessons:['t01','t02']};
+    campaign:{index:0,field:'relay'}, fieldCampaigns:{relay:{ids:['bridge','relay']},scorched:{ids:Array(12)}}, campaignLessons:['t01','t02']};
   runInNewContext(source('localization.js'),context);
-  runInNewContext(cut('    function campaignPosition(', '    function relayUnlocked('),context);
+  runInNewContext(cut('    function campaignPosition(', '    function fieldStorageKey('),context);
   for (const [lang,relay,tutorial] of [
     ['de','Relaislinie · Mission','Tutorialkampagne · Mission'],
     ['en','Relay Line · Mission','Tutorial campaign · Mission'],
@@ -21,7 +21,7 @@ test('the position label names the selected campaign in all four languages', () 
     ['fr','Ligne de relais · Mission','Campagne de tutoriel · Mission']
   ]) {
     context.t = (key,params) => context.GoblinLanguage.t(key,params,lang);
-    context.campaign = {index:0,relay:true};
+    context.campaign = {index:0,field:'relay'};
     assert.equal(context.campaignPosition(),relay + ' 1/2');
     context.campaign.index = 1;
     assert.equal(context.campaignPosition(),relay + ' 2/2');
@@ -33,10 +33,10 @@ test('the position label names the selected campaign in all four languages', () 
 test('Relay Line victory uses its own action labels and defeat offers no advance', () => {
   const labels = [];
   const context = {URL, URLSearchParams, location:{href:import.meta.url}, document:{readyState:'loading',addEventListener(){}},
-    panel:{append(){}}, paragraph(){}, campaign:{relay:true,index:0}, campaignPosition(){},
-    advanceRelayCampaign(){}, actions(){}, button:label=>labels.push(label), relayError:''};
+    panel:{append(){}}, paragraph(){}, campaign:{field:'relay',index:0}, campaignPosition(){},
+    advanceFieldCampaign(){}, actions(){}, button:label=>labels.push(label), fieldError:'', fieldCampaigns:{relay:{ids:['bridge','relay']}}};
   runInNewContext(source('localization.js'),context);
-  const actions = cut('        if (campaign?.relay) {\n          panel.append(paragraph(campaignPosition()));', "      } else if (screen === 'log')");
+  const actions = cut('        if (campaign?.field) {\n          panel.append(paragraph(campaignPosition()));', "      } else if (screen === 'log')");
   runInNewContext('function renderActions(won) {\n' + actions.slice(0,actions.lastIndexOf('        }')) + '}',context);
   for (const [lang,next,finish] of [
     ['de','Weiter zu Relaisbruch','Relaislinie abschließen'],
@@ -55,11 +55,12 @@ test('Relay Line victory uses its own action labels and defeat offers no advance
   }
 });
 
-test('Relay Line admits both new maps and unlocks mission two only after a bound victory', async () => {
+async function campaignGame() {
   const g = await fullScene('catalog-full-atlas',7,false,'FULL_CATALOG_v1');
   const storage = new Map();
   g.context.localStorage = {getItem:key=>storage.get(key),setItem:(key,value)=>storage.set(key,value)};
-  g.context.fetch = async () => ({ok:true,json:()=>JSON.parse(source('assets/unit-art/levels/relay-line.v3.json'))});
+  g.context.fetch = async path => ({ok:true,json:()=>JSON.parse(source(path.split('?')[0]))});
+  g.run(source('level-events.js'));
   g.run(source('editor-draft.js'));
   g.run(`
     let screen='menu',missionId='catalog-full-atlas',startError='',started=false,editorConfig=null,savedConfig=null;
@@ -70,30 +71,78 @@ test('Relay Line admits both new maps and unlocks mission two only after a bound
     ${cut('    function campaignAvailable','    async function goToLevels')}
     ${cut('    async function startMission','    function openEditor')}
   `);
-  await g.run('openRelayCampaign()');
+  return {g, storage};
+}
+
+test('Relay Line admits both maps and unlocks mission two only after a bound victory', async () => {
+  const {g, storage} = await campaignGame();
+  await g.run("openFieldCampaign('relay')");
   assert.equal(g.run('screen'),'relay-campaign');
-  g.run('chooseRelayMission(1)');
+  g.run('chooseFieldMission(1)');
   assert.equal(g.run('campaign'),null);
-  g.run('chooseRelayMission(0)');
+  g.run('chooseFieldMission(0)');
   await g.run('startMission()');
   assert.equal(g.run('legacySession.ruleProfileId'),'FULL_CATALOG_v1');
   const initial = read(g,'legacySession.config.units');
   assert.equal(execute(g,{type:'Move',actorId:'relay-1',x:5,y:3}).ok,true);
-  g.run("units.filter(u=>u.team==='player').forEach(u=>u.hp=0);checkVictory();recordRelayVictory(GoblinUIV2.project());show('end');advanceRelayCampaign()");
+  g.run("units.filter(u=>u.team==='player').forEach(u=>u.hp=0);checkVictory();recordFieldVictory(GoblinUIV2.project());show('end');advanceFieldCampaign()");
   assert.equal(g.run('screen'),'end');
-  assert.equal(g.run('relayUnlocked()'),1);
+  assert.equal(g.run('fieldUnlocked(fieldCampaigns.relay)'),1);
   assert.equal(storage.size,0);
   await g.run('confirmRestart()');
   assert.deepEqual(read(g,'legacySession.config.units'),initial);
-  g.run("units.filter(u=>u.team==='enemy').forEach(u=>u.hp=0);checkVictory();recordRelayVictory(GoblinUIV2.project());show('end')");
+  g.run("units.filter(u=>u.team==='enemy').forEach(u=>u.hp=0);checkVictory();recordFieldVictory(GoblinUIV2.project());show('end')");
   assert.equal(storage.get('tdc.game.goblin.relay-line.v1'),'2');
-  g.run('relayWon=false');
-  assert.equal(g.run('relayUnlocked()'),2);
-  g.run('advanceRelayCampaign()');
+  g.run('fieldCampaigns.relay.unlocked=1');
+  assert.equal(g.run('fieldUnlocked(fieldCampaigns.relay)'),2);
+  g.run('advanceFieldCampaign()');
   assert.equal(g.run('missionId'),'relay-line-relay');
   await g.run('startMission()');
   assert.equal(g.run("units.some(u=>u.catalogAssetId==='relay-node')"),true);
   assert.equal(g.run("legacySession.config.terrainTypes.some(c=>c.type==='bridge')"),false);
-  g.run("units.filter(u=>u.team==='enemy').forEach(u=>u.hp=0);checkVictory();show('end');advanceRelayCampaign()");
+  g.run("units.filter(u=>u.team==='enemy').forEach(u=>u.hp=0);checkVictory();show('end');advanceFieldCampaign()");
   assert.equal(g.run('screen'),'campaign-complete');
+});
+
+test('Scorched Earth loads all twelve FULL scenarios and advances only on the bound victory', async () => {
+  const {g, storage} = await campaignGame();
+  const key = 'tdc.game.goblin.scorched-earth.v1';
+  const relayKey = 'tdc.game.goblin.relay-line.v1';
+  storage.set(relayKey, '2');
+  storage.set(key, '13');
+  await g.run("openFieldCampaign('scorched')");
+  assert.equal(g.run('screen'), 'relay-campaign');
+  const levels = JSON.parse(source('assets/unit-art/levels/scorched-earth.v3.json'));
+  const ids = read(g,'fieldCampaigns.scorched.ids');
+  const briefings = ['de','en','es','fr'].map(lang =>
+    JSON.parse(source(`assets/ui-copy/briefing-01.${lang}.json`)).messages);
+  for (const [index,id] of ids.entries()) {
+    const file = `${String(index + 1).padStart(2,'0')}-${id.slice('scorched-'.length)}`;
+    assert.deepEqual(JSON.parse(source(`assets/unit-art/levels/scorched-earth/${file}.v3.json`)), levels[index]);
+    for (const copy of briefings) assert.ok(copy[`mission.${id}.briefing.short`], id);
+  }
+  g.run('chooseFieldMission(1)');
+  assert.equal(g.run('campaign'), null);
+  g.run('chooseFieldMission(0)');
+  for (let index = 0; index < 12; index++) {
+    assert.equal(g.run('campaign.index'), index);
+    await g.run('startMission()');
+    assert.equal(g.run('legacySession.ruleProfileId'), 'FULL_CATALOG_v1');
+    assert.deepEqual(read(g,'legacySession.config.terrainTypes'), read(g,'fieldCampaigns.scorched.configs[campaign.index].terrainTypes'));
+    assert.deepEqual(read(g,'legacySession.config.units'), read(g,'fieldCampaigns.scorched.configs[campaign.index].units'));
+    g.run("units.filter(u=>u.team==='enemy').forEach(u=>{u.hp=0;if(u.catalogSystems)u.alive=false});checkVictory()");
+    if (index === 0) {
+      g.run('campaign.sessionId=null;recordFieldVictory(GoblinUIV2.project())');
+      assert.equal(storage.get(key), '13');
+      g.run('bindCampaignLesson()');
+    }
+    g.run("recordFieldVictory(GoblinUIV2.project());show('end');advanceFieldCampaign()");
+    assert.equal(storage.get(key), String(Math.min(index + 2, 12)));
+    assert.equal(storage.get(relayKey), '2');
+  }
+  assert.equal(g.run('screen'), 'campaign-complete');
+  g.run("fieldCampaigns.scorched.unlocked=1;show('menu')");
+  await g.run("openFieldCampaign('scorched')");
+  g.run('chooseFieldMission(11)');
+  assert.equal(g.run('missionId'), 'scorched-last-ember');
 });
