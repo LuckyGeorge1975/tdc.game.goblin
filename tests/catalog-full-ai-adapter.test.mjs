@@ -3,6 +3,7 @@ import test from 'node:test';
 import {fullScene} from './catalog-full-harness.mjs';
 import {read} from './artillery-product-harness.mjs';
 import {createFullCatalogAiAdapter, createFullCatalogAiHost} from '../src/core/full-catalog-ai-adapter.mjs';
+import {createFullCatalogSessionHost} from '../src/core/full-catalog-session-host.mjs';
 
 const full = id => fullScene(id,7,false,'FULL_CATALOG_v1');
 const snapshot = game => [game.state(),read(game,'GoblinCatalogFullRuntime.snapshot()'),game.rng()];
@@ -31,6 +32,25 @@ function closeAtlas(game) {
     shooter.x=1;shooter.y=1;targetSystem.x=2;targetSystem.y=1;opposing.x=1;opposing.y=2;
     terrain.clear();terrainTypes.clear();GoblinCatalogFullRuntime.refresh();`);
 }
+
+test('FULL spectator host uses native player and synchronous enemy commits',async()=>{
+  const game = await full('catalog-full-atlas');
+  closeAtlas(game);
+  const receipts = [];
+  const session = createFullCatalogSessionHost({host:hostFor(game),spectator:true,
+    read:()=>({session:game.run('legacySession.sessionId'),side:game.run('phase'),ended:game.run('gameOver')}),
+    readGeneration:()=>1,
+    select:batch=>batch.candidates.find(candidate=>candidate.kind==='move').key,
+    selectEnemy:batch=>batch.candidates.find(candidate=>candidate.facts.baseline)?.key,
+    onCommit:(receipt,before)=>receipts.push([receipt.action.type,before.side])
+  });
+  assert.deepEqual(await session.advancePlayer(),{ok:true});
+  schedule(game,session.chooseEnemyFire,session.chooseEnemyStep)();
+  assert.deepEqual(receipts[0],['Move','player']);
+  assert.ok(receipts.some(([type,side])=>type==='CatalogFire'&&side==='enemy'));
+  session.stop();
+  assert.equal((await session.advancePlayer()).code,'AI_HOST_UNAVAILABLE');
+});
 
 test('player projection excludes concealed Phantom and dispatch revalidates after revision change',async()=>{
   const g = await full('catalog-full-atlas');
