@@ -1,0 +1,237 @@
+{
+  "version": "goblin-level-v3",
+  "width": 12,
+  "height": 8,
+  "objective": "core-and-escort",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "terrain": [
+    {
+      "x": 5,
+      "y": 0,
+      "type": "river"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "river"
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "type": "ridge"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "rubble-field"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "river"
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "type": "ridge"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "river"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "crater"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "river"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "river"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "crater"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "bridge"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "type": "road"
+    }
+  ],
+  "units": [
+    {
+      "id": "engineers",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 4,
+      "y": 4
+    },
+    {
+      "id": "lead",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 4,
+      "y": 3
+    },
+    {
+      "id": "reserve",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 2,
+      "y": 5
+    },
+    {
+      "id": "scout",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 3,
+      "y": 1
+    },
+    {
+      "id": "battery",
+      "assetId": "rocket-artillery",
+      "team": "enemy",
+      "x": 8,
+      "y": 2
+    },
+    {
+      "id": "armor",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 7,
+      "y": 4
+    },
+    {
+      "id": "screen",
+      "assetId": "guard-tank",
+      "team": "enemy",
+      "x": 7,
+      "y": 3
+    },
+    {
+      "id": "guard",
+      "assetId": "infantry-platoon",
+      "team": "enemy",
+      "x": 7,
+      "y": 6
+    },
+    {
+      "id": "relay",
+      "assetId": "relay-node",
+      "team": "enemy",
+      "x": 8,
+      "y": 3
+    },
+    {
+      "id": "core",
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 10,
+      "y": 4
+    }
+  ],
+  "hotspots": [],
+  "events": [
+    {
+      "id": "field-orders",
+      "when": {
+        "any": [
+          {
+            "event": "UnitActed",
+            "unitId": "engineers"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "lead"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "reserve"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "scout"
+          }
+        ]
+      },
+      "effect": {
+        "type": "dialog",
+        "title": {
+          "de": "05 · Relaisbruch",
+          "en": "05 · Cut the Relay",
+          "es": "05 · Cortar el relé",
+          "fr": "05 · Couper le relais"
+        },
+        "text": {
+          "de": "Deine Feldpioniere können von ihrer Startposition vor der Bewegung auf F-05 eine Brücke bauen. Das kostet zwei Material und bindet sie für den Zug. Nutze den neuen Übergang für die Panzer und schalte den unbewaffneten Relaisknoten hinter dem Wachpanzer aus. Mit dem letzten Material kannst du etwa eine Feldstellung bauen oder ein beschädigtes Fahrzeug reparieren.",
+          "en": "Before moving your Field Engineers, build a bridge at F-05 from their starting hex. It costs two material and uses their turn. Cross with armor and knock out the unarmed Relay Node behind the Guard Tank. Use the last material to build a field position or repair a damaged vehicle.",
+          "es": "Antes de mover a los ingenieros, construye un puente en F-05 desde su posición inicial. Cuesta dos materiales y ocupa su turno. Cruza con los tanques y destruye el relé desarmado tras el tanque de guardia. Usa el material restante para una posición de campaña o para reparar un vehículo dañado.",
+          "fr": "Avant de déplacer les sapeurs, construisez un pont en F-05 depuis leur case de départ. Cela coûte deux matériaux et utilise leur tour. Faites traverser les chars et détruisez le relais sans armes derrière le char de garde. Gardez le dernier matériau pour une position de campagne ou une réparation."
+        }
+      }
+    }
+  ]
+}

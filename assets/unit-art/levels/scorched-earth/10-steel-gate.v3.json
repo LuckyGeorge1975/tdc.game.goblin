@@ -1,0 +1,195 @@
+{
+  "version": "goblin-level-v3",
+  "width": 12,
+  "height": 8,
+  "objective": "core-and-escort",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "terrain": [
+    {
+      "x": 5,
+      "y": 1,
+      "type": "ridge"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "type": "crater"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "crater"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "type": "field-position"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "rubble-field"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "road"
+    }
+  ],
+  "units": [
+    {
+      "id": "mk-three",
+      "assetId": "goblin-siegebreaker",
+      "team": "player",
+      "x": 3,
+      "y": 3
+    },
+    {
+      "id": "rocket",
+      "assetId": "rocket-artillery",
+      "team": "player",
+      "x": 2,
+      "y": 1
+    },
+    {
+      "id": "siege",
+      "assetId": "siege-tank",
+      "team": "player",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "id": "engineers",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "id": "mk-three-east",
+      "assetId": "goblin-siegebreaker",
+      "team": "enemy",
+      "x": 8,
+      "y": 3
+    },
+    {
+      "id": "siege-east",
+      "assetId": "siege-tank",
+      "team": "enemy",
+      "x": 8,
+      "y": 6
+    },
+    {
+      "id": "guard",
+      "assetId": "guard-tank",
+      "team": "enemy",
+      "x": 8,
+      "y": 2
+    },
+    {
+      "id": "light",
+      "assetId": "light-skimmer",
+      "team": "enemy",
+      "x": 8,
+      "y": 0
+    },
+    {
+      "id": "core",
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 10,
+      "y": 4
+    }
+  ],
+  "hotspots": [],
+  "events": [
+    {
+      "id": "field-orders",
+      "when": {
+        "any": [
+          {
+            "event": "UnitActed",
+            "unitId": "mk-three"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "rocket"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "siege"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "engineers"
+          }
+        ]
+      },
+      "effect": {
+        "type": "dialog",
+        "title": {
+          "de": "10 · Stahltor",
+          "en": "10 · Steel Gate",
+          "es": "10 · Puerta de acero",
+          "fr": "10 · Porte d’acier"
+        },
+        "text": {
+          "de": "Die beiden GOBLIN Siegebreaker haben einzelne Waffen und Ketten. Wähle eine eigene Waffe und eine gegnerische Komponente: Schalte Raketen für weniger Fernfeuer aus oder triff die Ketten, um den Gegner zu bremsen. Konventionelle Fahrzeuge auf freier Fahrspur können gerammt werden.",
+          "en": "The two GOBLIN Siegebreakers fight with individual weapons and treads in place of a shared HP pool. Select one of your own weapons and an enemy component. Destroy missiles to reduce incoming long-range fire or hit the treads to slow the platform. You can ram conventional vehicles on a clear approach.",
+          "es": "Los GOBLIN Siegebreaker tienen armas y orugas individuales en lugar de PV comunes. Elige un arma propia y un componente enemigo. Destruye los misiles para reducir el fuego a distancia o golpea las orugas para frenar al enemigo. Puedes embestir vehículos convencionales si la vía está libre.",
+          "fr": "Les GOBLIN Siegebreaker ont des armes et des chenilles distinctes. Sélectionnez une arme et un composant ennemi. Détruisez les missiles pour réduire le feu à longue portée ou touchez les chenilles pour ralentir la plateforme. Vous pouvez éperonner les véhicules classiques sur une voie dégagée."
+        }
+      }
+    }
+  ]
+}

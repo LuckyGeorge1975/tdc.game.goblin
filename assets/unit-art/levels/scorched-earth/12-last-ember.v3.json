@@ -1,0 +1,229 @@
+{
+  "version": "goblin-level-v3",
+  "width": 12,
+  "height": 8,
+  "objective": "core-and-escort",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "terrain": [
+    {
+      "x": 5,
+      "y": 1,
+      "type": "rubble-field"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "crater"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "crater"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "type": "field-position"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "road"
+    }
+  ],
+  "units": [
+    {
+      "id": "mk-five",
+      "assetId": "goblin-dreadnaught",
+      "team": "player",
+      "x": 3,
+      "y": 3
+    },
+    {
+      "id": "rockets",
+      "assetId": "rocket-artillery",
+      "team": "player",
+      "x": 2,
+      "y": 1
+    },
+    {
+      "id": "scout",
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 3,
+      "y": 6
+    },
+    {
+      "id": "engineers",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "id": "siege",
+      "assetId": "siege-tank",
+      "team": "player",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "id": "mk-five-east",
+      "assetId": "goblin-dreadnaught",
+      "team": "enemy",
+      "x": 8,
+      "y": 3
+    },
+    {
+      "id": "rockets-east",
+      "assetId": "rocket-artillery",
+      "team": "enemy",
+      "x": 8,
+      "y": 6
+    },
+    {
+      "id": "armor",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 8,
+      "y": 1
+    },
+    {
+      "id": "raider",
+      "assetId": "raider-skimmer",
+      "team": "enemy",
+      "x": 7,
+      "y": 6
+    },
+    {
+      "id": "rifles",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 7,
+      "y": 4,
+      "squads": 3
+    },
+    {
+      "id": "core",
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 10,
+      "y": 4
+    }
+  ],
+  "hotspots": [],
+  "events": [
+    {
+      "id": "field-orders",
+      "when": {
+        "any": [
+          {
+            "event": "UnitActed",
+            "unitId": "mk-five"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "rockets"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "scout"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "engineers"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "siege"
+          }
+        ]
+      },
+      "effect": {
+        "type": "dialog",
+        "title": {
+          "de": "12 · Letzte Glut",
+          "en": "12 · Last Ember",
+          "es": "12 · Última brasa",
+          "fr": "12 · Dernière braise"
+        },
+        "text": {
+          "de": "Der GOBLIN Dreadnaught führt zwei Hauptbatterien und sechs Raketen auf getrennten Plätzen. Setze die weitreichenden Einmalschüsse gegen die stärksten Waffen des gegnerischen Dreadnaught ein. Unterdrücke mit dem Belagerungspanzer die Eskorte. Halte die Pioniere in Reichweite für Ketten- oder Komponentenreparaturen.",
+          "en": "The GOBLIN Dreadnaught carries two main batteries and six missiles in individual slots. Use the long-range single-use missiles against the enemy Dreadnaught’s strongest weapons. Send the Siege Tank after the escort. Keep the Field Engineers close enough to repair treads or components.",
+          "es": "El GOBLIN Dreadnaught tiene dos baterías principales y seis misiles en ranuras individuales. Usa los misiles de largo alcance y un solo uso contra las armas más fuertes del Dreadnaught enemigo. Envía el tanque de asedio contra la escolta. Mantén cerca a los ingenieros para reparar orugas o componentes.",
+          "fr": "Le GOBLIN Dreadnaught dispose de deux batteries principales et de six missiles dans des emplacements distincts. Utilisez les missiles à longue portée et à usage unique contre les armes les plus fortes du Dreadnaught ennemi. Envoyez le char de siège sur l’escorte et gardez les sapeurs à portée pour les réparations."
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "version": "goblin-level-v3",
+  "width": 12,
+  "height": 8,
+  "objective": "core-and-escort",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "terrain": [
+    {
+      "x": 3,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "crater"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "crater"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "road"
+    }
+  ],
+  "units": [
+    {
+      "id": "phantom",
+      "assetId": "phantom-platform",
+      "team": "player",
+      "x": 3,
+      "y": 3
+    },
+    {
+      "id": "scout",
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 4,
+      "y": 5
+    },
+    {
+      "id": "armor",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 2,
+      "y": 2
+    },
+    {
+      "id": "missile",
+      "assetId": "strategic-missile-carrier",
+      "team": "player",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "id": "phantom-east",
+      "assetId": "phantom-platform",
+      "team": "enemy",
+      "x": 7,
+      "y": 3
+    },
+    {
+      "id": "scout-east",
+      "assetId": "skimmer-scout",
+      "team": "enemy",
+      "x": 8,
+      "y": 1
+    },
+    {
+      "id": "armor-east",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 8,
+      "y": 6
+    },
+    {
+      "id": "rocket",
+      "assetId": "rocket-artillery",
+      "team": "enemy",
+      "x": 8,
+      "y": 5
+    },
+    {
+      "id": "core",
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 10,
+      "y": 3
+    }
+  ],
+  "hotspots": [],
+  "events": [
+    {
+      "id": "field-orders",
+      "when": {
+        "any": [
+          {
+            "event": "UnitActed",
+            "unitId": "phantom"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "scout"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "armor"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "missile"
+          }
+        ]
+      },
+      "effect": {
+        "type": "dialog",
+        "title": {
+          "de": "11 · Geisterviertel",
+          "en": "11 · Ghost Quarter",
+          "es": "11 · Barrio fantasma",
+          "fr": "11 · Quartier fantôme"
+        },
+        "text": {
+          "de": "Eine gegnerische Phantom-Plattform lauert zwischen den Ruinen. Nähere dich mit einem aktiven Aufklärer bis auf zwei Felder mit freier Sicht, um Kontakt herzustellen. Mit deiner Phantom-Plattform kannst du gedeckt flankieren. Ein eigener Schuss verrät sie. Raketenflächenfeuer kann ein getarntes Ziel im Wirkungsbereich treffen.",
+          "en": "An enemy Phantom Platform is waiting among the ruins. Bring an active scout within two hexes and with a clear line of sight to make contact. Flank under cover with your own Phantom. Firing gives it away. A strategic missile can hit a cloaked target in its blast area.",
+          "es": "Una plataforma fantasma enemiga acecha entre las ruinas. Acerca un explorador activo a dos hexágonos con línea de visión para detectarla. Flanquea con tu propia plataforma a cubierto. Disparar la delata. Un misil estratégico puede alcanzar un blanco oculto dentro de su área.",
+          "fr": "Une plateforme fantôme ennemie se cache dans les ruines. Approchez un éclaireur actif à deux cases, en ligne de vue, pour établir le contact. Contournez à couvert avec votre propre plateforme. Le tir la révèle. Un missile stratégique peut toucher une cible camouflée dans son rayon."
+        }
+      }
+    }
+  ]
+}

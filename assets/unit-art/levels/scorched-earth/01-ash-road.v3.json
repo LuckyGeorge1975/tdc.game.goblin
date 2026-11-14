@@ -1,0 +1,169 @@
+{
+  "version": "goblin-level-v3",
+  "width": 12,
+  "height": 8,
+  "objective": "core-and-escort",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "terrain": [
+    {
+      "x": 4,
+      "y": 2,
+      "type": "forest"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "type": "rubble-field"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "crater"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "type": "field-position"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "type": "crater"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "rubble-field"
+    }
+  ],
+  "units": [
+    {
+      "id": "point",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "id": "squad",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 2,
+      "y": 4,
+      "squads": 3
+    },
+    {
+      "id": "reserve",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 1,
+      "y": 5
+    },
+    {
+      "id": "screen",
+      "assetId": "guard-tank",
+      "team": "enemy",
+      "x": 6,
+      "y": 3
+    },
+    {
+      "id": "counterattack",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 7,
+      "y": 5
+    },
+    {
+      "id": "rifles",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 7,
+      "y": 4,
+      "squads": 3
+    },
+    {
+      "id": "core",
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 9,
+      "y": 4
+    }
+  ],
+  "hotspots": [],
+  "events": [
+    {
+      "id": "field-orders",
+      "when": {
+        "any": [
+          {
+            "event": "UnitActed",
+            "unitId": "point"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "squad"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "reserve"
+          }
+        ]
+      },
+      "effect": {
+        "type": "dialog",
+        "title": {
+          "de": "01 · Aschenstraße",
+          "en": "01 · Ash Road",
+          "es": "01 · Camino de ceniza",
+          "fr": "01 · Route des cendres"
+        },
+        "text": {
+          "de": "Der Wachpanzer deckt die Straße, der gegnerische Sturmpanzer bedroht den Süden. Geh mit deinen Sturmpanzern auf zwei Felder Feuerreichweite heran. Die Infanterie kommt im Krater in Deckung und feuert aus einem Feld Entfernung. Jeder verlorene Stärkepunkt senkt ihren Angriff und ihre Verteidigung. Schalte Eskorte und Kommandokern aus.",
+          "en": "The Guard Tank covers the road and the enemy Assault Tank threatens the south. Advance your Assault Tanks to firing range of two hexes. Move infantry into crater cover and fire from one hex away. Each squad point lost reduces its attack and defense. Eliminate the escort and the Command Core.",
+          "es": "El tanque de guardia cubre el camino y el tanque de asalto enemigo amenaza el sur. Acerca tus tanques de asalto a dos hexágonos. Usa el cráter como cobertura para la infantería, que dispara a un hexágono. Cada punto perdido reduce su ataque y defensa. Elimina la escolta y el núcleo de mando.",
+          "fr": "Le char de garde couvre la route et le char d’assaut ennemi menace le sud. Avancez vos chars d’assaut à deux hexagones. Mettez l’infanterie à couvert dans le cratère pour tirer à un hexagone. Chaque point perdu réduit son attaque et sa défense. Éliminez l’escorte et le noyau de commandement."
+        }
+      }
+    }
+  ]
+}

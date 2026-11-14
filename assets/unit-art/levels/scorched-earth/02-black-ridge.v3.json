@@ -1,0 +1,183 @@
+{
+  "version": "goblin-level-v3",
+  "width": 12,
+  "height": 8,
+  "objective": "core-and-escort",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "terrain": [
+    {
+      "x": 8,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "type": "ridge"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "ridge"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "ridge"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "type": "crater"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "type": "rubble-field"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "crater"
+    }
+  ],
+  "units": [
+    {
+      "id": "scout",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 3,
+      "y": 1
+    },
+    {
+      "id": "rockets",
+      "assetId": "rocket-artillery",
+      "team": "player",
+      "x": 2,
+      "y": 5
+    },
+    {
+      "id": "armor",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "id": "platoon",
+      "assetId": "infantry-platoon",
+      "team": "player",
+      "x": 2,
+      "y": 2
+    },
+    {
+      "id": "counter-scout",
+      "assetId": "recon-tank",
+      "team": "enemy",
+      "x": 7,
+      "y": 1
+    },
+    {
+      "id": "counterbattery",
+      "assetId": "rocket-artillery",
+      "team": "enemy",
+      "x": 7,
+      "y": 5
+    },
+    {
+      "id": "armor-east",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 7,
+      "y": 3
+    },
+    {
+      "id": "core",
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 9,
+      "y": 5
+    }
+  ],
+  "hotspots": [],
+  "events": [
+    {
+      "id": "field-orders",
+      "when": {
+        "any": [
+          {
+            "event": "UnitActed",
+            "unitId": "scout"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "rockets"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "armor"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "platoon"
+          }
+        ]
+      },
+      "effect": {
+        "type": "dialog",
+        "title": {
+          "de": "02 · Schwarzer Rücken",
+          "en": "02 · Black Ridge",
+          "es": "02 · Cresta negra",
+          "fr": "02 · Crête noire"
+        },
+        "text": {
+          "de": "Der Aufklärungspanzer ist so schnell wie der Sturmpanzer, aber leichter bewaffnet. Umfahre mit ihm den Höhenrücken im Norden. Lass den Infanteriezug die Mitte decken: Nach einem einzelnen D-Treffer bleiben seine Angriffswerte erhalten. Die Raketenartillerie wirkt über vier Felder mit freier Sicht. Nutze die südliche Straße für das Gegenfeuer.",
+          "en": "The Recon Tank keeps pace with the Assault Tank and carries lighter weapons. Take it around the north end of the ridge. Cover the center with the Infantry Platoon, which retains its attack after a single D hit. Rocket Artillery fires four hexes with a clear line of sight. Use the southern road for counterbattery fire.",
+          "es": "El tanque de reconocimiento mantiene el ritmo del tanque de asalto con armas más ligeras. Rodea la cresta por el norte. Cubre el centro con el pelotón de infantería, que conserva su ataque tras un impacto D. La artillería de cohetes alcanza cuatro hexágonos con línea de visión. Usa el camino del sur para batirla.",
+          "fr": "Le char de reconnaissance suit le char d’assaut avec un armement plus léger. Contournez la crête par le nord. Couvrez le centre avec la section d’infanterie, dont l’attaque reste intacte après un résultat D. L’artillerie à roquettes tire à quatre hexagones en ligne de vue. Utilisez la route sud pour la contrebatterie."
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,201 @@
+{
+  "version": "goblin-level-v3",
+  "width": 12,
+  "height": 8,
+  "objective": "core-and-escort",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "terrain": [
+    {
+      "x": 5,
+      "y": 0,
+      "type": "river"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "river"
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "river"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "river"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "river"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "river"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "marsh"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "bridge"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "river"
+    }
+  ],
+  "units": [
+    {
+      "id": "armor",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "id": "carrier",
+      "assetId": "skimmer-carrier",
+      "team": "player",
+      "x": 3,
+      "y": 3
+    },
+    {
+      "id": "militia",
+      "assetId": "local-defense",
+      "team": "player",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "id": "marines",
+      "assetId": "amphibious-infantry",
+      "team": "player",
+      "x": 4,
+      "y": 1,
+      "squads": 3
+    },
+    {
+      "id": "raider",
+      "assetId": "raider-skimmer",
+      "team": "enemy",
+      "x": 7,
+      "y": 1
+    },
+    {
+      "id": "combat",
+      "assetId": "combat-skimmer",
+      "team": "enemy",
+      "x": 7,
+      "y": 4
+    },
+    {
+      "id": "armor-east",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 8,
+      "y": 6
+    },
+    {
+      "id": "militia-east",
+      "assetId": "local-defense",
+      "team": "enemy",
+      "x": 7,
+      "y": 5
+    },
+    {
+      "id": "core",
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 9,
+      "y": 4
+    }
+  ],
+  "hotspots": [],
+  "events": [
+    {
+      "id": "field-orders",
+      "when": {
+        "any": [
+          {
+            "event": "UnitActed",
+            "unitId": "armor"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "carrier"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "militia"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "marines"
+          }
+        ]
+      },
+      "effect": {
+        "type": "dialog",
+        "title": {
+          "de": "04 · Flutlinie",
+          "en": "04 · Floodline",
+          "es": "04 · Línea de crecida",
+          "fr": "04 · Ligne de crue"
+        },
+        "text": {
+          "de": "Die leichte Ortsverteidigung beginnt neben dem Skimmer-Transporter. Lade sie vor ihrer Bewegung ein, setze über und lande im nächsten Zug. An Bord kann sie auf benachbarte Ziele feuern. Die amphibische Infanterie kann selbst durch den Fluss und dort kämpfen. Der Sturmpanzer bindet die Verteidiger an der Südbrücke.",
+          "en": "Local Defense starts beside the Skimmer Carrier. Embark it before moving the infantry, cross, then land on the next turn. It can fire at adjacent targets while aboard. Amphibious Infantry can cross the river and fight in it on foot. Use the Assault Tank to pin the defenders at the southern bridge.",
+          "es": "La defensa local empieza junto al transporte. Embárcala antes de mover la infantería, cruza y desembarca en el turno siguiente. Puede disparar a objetivos adyacentes desde a bordo. La infantería anfibia cruza y combate en el agua. Usa el tanque de asalto para fijar a los defensores en el puente sur.",
+          "fr": "La défense locale commence à côté du transport. Embarquez-la avant son déplacement, traversez et débarquez au tour suivant. Elle peut tirer sur les cibles adjacentes à bord. L’infanterie amphibie traverse et combat dans l’eau. Retenez les défenseurs au pont sud avec le char d’assaut."
+        }
+      }
+    }
+  ]
+}

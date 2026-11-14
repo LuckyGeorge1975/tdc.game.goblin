@@ -1,0 +1,210 @@
+{
+  "version": "goblin-level-v3",
+  "width": 12,
+  "height": 8,
+  "objective": "core-and-escort",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "terrain": [
+    {
+      "x": 5,
+      "y": 0,
+      "type": "river"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "river"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "river"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "river"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "river"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "rubble-field"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "bridge"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "type": "road"
+    }
+  ],
+  "units": [
+    {
+      "id": "forge",
+      "assetId": "forge-engineer",
+      "team": "player",
+      "x": 4,
+      "y": 3
+    },
+    {
+      "id": "drone-north",
+      "assetId": "artillery-drone",
+      "team": "player",
+      "x": 4,
+      "y": 2
+    },
+    {
+      "id": "drone-south",
+      "assetId": "artillery-drone",
+      "team": "player",
+      "x": 4,
+      "y": 4
+    },
+    {
+      "id": "siege",
+      "assetId": "siege-tank",
+      "team": "player",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "id": "forge-east",
+      "assetId": "forge-engineer",
+      "team": "enemy",
+      "x": 8,
+      "y": 3
+    },
+    {
+      "id": "siege-east",
+      "assetId": "siege-tank",
+      "team": "enemy",
+      "x": 8,
+      "y": 7
+    },
+    {
+      "id": "armor",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 8,
+      "y": 1
+    },
+    {
+      "id": "guard",
+      "assetId": "guard-tank",
+      "team": "enemy",
+      "x": 7,
+      "y": 5
+    },
+    {
+      "id": "core",
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 10,
+      "y": 3
+    }
+  ],
+  "hotspots": [],
+  "events": [
+    {
+      "id": "field-orders",
+      "when": {
+        "any": [
+          {
+            "event": "UnitActed",
+            "unitId": "forge"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "siege"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "drone-north"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "drone-south"
+          }
+        ]
+      },
+      "effect": {
+        "type": "dialog",
+        "title": {
+          "de": "09 · Feldwerkstatt",
+          "en": "09 · Forge Crossing",
+          "es": "09 · Paso de la forja",
+          "fr": "09 · Passage de la forge"
+        },
+        "text": {
+          "de": "Der Forge-Pionier kann von E-04 den Übergang bei F-04 bauen. In späteren Zügen kannst du die beiden angrenzenden Artilleriedrohnen in seine getrennten Buchten laden und am Ostufer absetzen. Die Drohnen haben direkte Reichweite acht und feuern nach dem Absetzen ab dem nächsten eigenen Zug. Schütze intakte Werkzeuge für den Brückenbau.",
+          "en": "The Forge Engineer can bridge F-04 from E-04. On later turns, load the two neighboring Artillery Drones into its separate bays and deploy them on the east bank. The drones have direct range eight and can fire from the next friendly turn after deployment. Protect the Forge’s tools for bridge building.",
+          "es": "La forja puede tender un puente en F-04 desde E-04. En turnos posteriores, carga los dos drones artilleros adyacentes en sus bahías separadas y despliégalos al este. Los drones tienen alcance directo de ocho y disparan a partir del turno siguiente al despliegue. Protege las herramientas de la forja.",
+          "fr": "Le sapeur Forge peut poser un pont en F-04 depuis E-04. Aux tours suivants, chargez les deux drones d’artillerie adjacents dans ses baies distinctes, puis déployez-les à l’est. Ils tirent en ligne directe à huit cases dès le tour allié suivant leur déploiement. Protégez les outils du Forge."
+        }
+      }
+    }
+  ]
+}

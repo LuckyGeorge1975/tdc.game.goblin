@@ -1,0 +1,220 @@
+{
+  "version": "goblin-level-v3",
+  "width": 12,
+  "height": 8,
+  "objective": "core-and-escort",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "terrain": [
+    {
+      "x": 4,
+      "y": 1,
+      "type": "rubble-field"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "rubble-field"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "urban"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "field-position"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "crater"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "type": "field-position"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "type": "crater"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "road"
+    }
+  ],
+  "units": [
+    {
+      "id": "siege",
+      "assetId": "siege-tank",
+      "team": "player",
+      "x": 3,
+      "y": 4
+    },
+    {
+      "id": "rifles",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 3,
+      "y": 3,
+      "squads": 3
+    },
+    {
+      "id": "armor",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 3,
+      "y": 6
+    },
+    {
+      "id": "engineers",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "id": "siege-east",
+      "assetId": "siege-tank",
+      "team": "enemy",
+      "x": 8,
+      "y": 6
+    },
+    {
+      "id": "rocket",
+      "assetId": "rocket-artillery",
+      "team": "enemy",
+      "x": 8,
+      "y": 2
+    },
+    {
+      "id": "platoon",
+      "assetId": "infantry-platoon",
+      "team": "enemy",
+      "x": 6,
+      "y": 4
+    },
+    {
+      "id": "militia",
+      "assetId": "local-defense",
+      "team": "enemy",
+      "x": 6,
+      "y": 5
+    },
+    {
+      "id": "guard",
+      "assetId": "guard-tank",
+      "team": "enemy",
+      "x": 7,
+      "y": 3
+    },
+    {
+      "id": "hub",
+      "assetId": "command-hub",
+      "team": "enemy",
+      "x": 8,
+      "y": 4
+    },
+    {
+      "id": "core",
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 10,
+      "y": 4
+    }
+  ],
+  "hotspots": [],
+  "events": [
+    {
+      "id": "field-orders",
+      "when": {
+        "any": [
+          {
+            "event": "UnitActed",
+            "unitId": "siege"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "rifles"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "armor"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "engineers"
+          }
+        ]
+      },
+      "effect": {
+        "type": "dialog",
+        "title": {
+          "de": "07 · Schlackenhof",
+          "en": "07 · Cinder Yard",
+          "es": "07 · Patio de escoria",
+          "fr": "07 · Cour des scories"
+        },
+        "text": {
+          "de": "Der Belagerungspanzer kann die Hauptwaffen gegen ein hartes Ziel bündeln oder einzeln auf zwei verschiedene Ziele feuern. Seine Nahwaffen wirken nur gegen Infanterie auf einem Nachbarfeld. Nutze die beiden Infanteriestellungen im Vorfeld zum Ausprobieren. Das unbewegliche Kommandozentrum hinter der Linie ist unbewaffnet und zählt zu den zu räumenden Zielen.",
+          "en": "The Siege Tank can combine its main guns against a hard target or split them across two different targets. Its close-range weapons only hit adjacent infantry. Try them against the two forward infantry positions. The fixed Command Hub behind the line is unarmed and counts among the targets to clear.",
+          "es": "El tanque de asedio puede concentrar los cañones principales en un blanco duro o dividir el fuego entre dos blancos distintos. Sus armas de corto alcance solo atacan a infantería adyacente. Pruébalas en las dos posiciones avanzadas. El centro de mando fijo y desarmado también es un objetivo.",
+          "fr": "Le char de siège peut concentrer ses canons principaux sur une cible solide ou les répartir sur deux cibles différentes. Ses armes de proximité visent uniquement l’infanterie adjacente. Essayez-les contre les deux postes avancés. Le centre de commandement fixe et sans armes fait aussi partie des cibles."
+        }
+      }
+    }
+  ]
+}

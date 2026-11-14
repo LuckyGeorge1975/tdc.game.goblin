@@ -1,0 +1,182 @@
+{
+  "version": "goblin-level-v3",
+  "width": 12,
+  "height": 8,
+  "objective": "core-and-escort",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "terrain": [
+    {
+      "x": 8,
+      "y": 1,
+      "type": "ridge"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "type": "rubble-field"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "crater"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "crater"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "rubble-field"
+    }
+  ],
+  "units": [
+    {
+      "id": "missile",
+      "assetId": "strategic-missile-carrier",
+      "team": "player",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "id": "armor",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 3,
+      "y": 5
+    },
+    {
+      "id": "scout",
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 3,
+      "y": 1
+    },
+    {
+      "id": "rocket",
+      "assetId": "rocket-artillery",
+      "team": "player",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "id": "armor-column",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 7,
+      "y": 3
+    },
+    {
+      "id": "armor-flank",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 7,
+      "y": 2
+    },
+    {
+      "id": "screen",
+      "assetId": "guard-tank",
+      "team": "enemy",
+      "x": 8,
+      "y": 3
+    },
+    {
+      "id": "rocket-east",
+      "assetId": "rocket-artillery",
+      "team": "enemy",
+      "x": 8,
+      "y": 5
+    },
+    {
+      "id": "rifles-east",
+      "assetId": "infantry-platoon",
+      "team": "enemy",
+      "x": 9,
+      "y": 3
+    },
+    {
+      "id": "core",
+      "assetId": "command-core",
+      "team": "enemy",
+      "x": 10,
+      "y": 3
+    }
+  ],
+  "hotspots": [],
+  "events": [
+    {
+      "id": "field-orders",
+      "when": {
+        "any": [
+          {
+            "event": "UnitActed",
+            "unitId": "armor"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "scout"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "rocket"
+          },
+          {
+            "event": "UnitActed",
+            "unitId": "missile"
+          }
+        ]
+      },
+      "effect": {
+        "type": "dialog",
+        "title": {
+          "de": "08 · Zündung",
+          "en": "08 · Ignition",
+          "es": "08 · Ignición",
+          "fr": "08 · Allumage"
+        },
+        "text": {
+          "de": "Der strategische Raketenträger hat einen Schuss auf ein Hex mit freier Sicht. Ziele in der ersten Feuerphase auf H-04, solange die gegnerische Kolonne dicht steht. Der Treffer im Zentrum ist stärker als auf den Nachbarfeldern. Halte deine eigenen Einheiten aus dem Wirkungsbereich.",
+          "en": "The Strategic Missile Carrier has one shot at a hex in clear line of sight. Aim at H-04 in the first fire phase while the enemy column is clustered. The center takes a stronger hit than its neighbors. Keep your own units outside the blast area.",
+          "es": "El portamisiles estratégico tiene un disparo a un hexágono con línea de visión. Apunta a H-04 en la primera fase de fuego mientras la columna enemiga siga agrupada. El impacto central es más fuerte que el de los hexágonos vecinos. Mantén a tus tropas fuera del área.",
+          "fr": "Le lance-missiles stratégique dispose d’un tir sur une case en ligne de vue. Visez H-04 dès la première phase de tir, avant que la colonne ennemie se disperse. L’impact est plus puissant au centre que sur les cases adjacentes. Gardez vos troupes hors du rayon."
+        }
+      }
+    }
+  ]
+}
