@@ -72,14 +72,14 @@
   if(!active())return oldEmbark(u,c);const check=loadQuery(u,c);if(!check.ok){setToast(check.reason);return}
   transportLoadMode=null;transportUnloadMode=null;u.embarkedOn=c.id;u.embarkedThisTurn=true;u.x=c.x;u.y=c.y;u.moved=true;u.acted=true;
   if(drone(u)){u.fired=true;c.moved=true;c.acted=true}
-  if(root.GoblinCatalogFullRuntime?.active()){root.GoblinCatalogFullRuntime.recordAction(u,{type:'Embark'},{kind:'cargo'});root.GoblinCatalogFullRuntime.refresh()}
+  if(root.GoblinCatalogFullRuntime?.active()){root.GoblinCatalogFullRuntime.recordAction(u,{type:'Embark'},{kind:'cargo'});root.GoblinCatalogFullRuntime.recordRoundAction(u,{type:'Embark'},{kind:'cargo'});root.GoblinCatalogFullRuntime.refresh()}
   addLog(text('v2.catalog.loaded',`${u.name} → ${c.name} · Fracht ${carrierLoad(c)}/3`,{cargo:name(u),carrier:name(c),current:carrierLoad(c),capacity:c.transportCapacity}));selected=c;updateSelection();draw();maybeAutoAdvancePhase();
  };
  const oldUnload=unloadAt;unloadAt=function(c,u,x,y){
   if(!active())return oldUnload(c,u,x,y);const check=unloadQuery(c,u,x,y);if(!check.ok){setToast(check.reason);return}
   transportUnloadMode=null;u.embarkedOn=null;u.embarkedThisTurn=false;u.disembarkedThisTurn=true;u.x=x;u.y=y;u.moved=true;u.acted=true;
   if(drone(u)){u.fired=true;u.droneReadyTurn=turn+1;c.moved=true;c.acted=true}
-  if(root.GoblinCatalogFullRuntime?.active()){root.GoblinCatalogFullRuntime.recordAction(u,{type:'Unload'},{kind:'cargo'});root.GoblinCatalogFullRuntime.refresh()}
+  if(root.GoblinCatalogFullRuntime?.active()){root.GoblinCatalogFullRuntime.recordAction(u,{type:'Unload'},{kind:'cargo'});root.GoblinCatalogFullRuntime.recordRoundAction(u,{type:'Unload'},{kind:'cargo'});root.GoblinCatalogFullRuntime.refresh()}
   addLog(drone(u)?text('v2.catalog.deployed',`${u.name} aufgestellt · Feuer ab Zug ${turn+1}.`,{unit:name(u),turn:turn+1}):`${name(u)} · ${text('v2.ui.unload','Aussteigen')}`);selected=c;updateSelection();draw();maybeAutoAdvancePhase();
  };
  const oldPhase=phaseCanAct;phaseCanAct=function(u,name=turnPhase){

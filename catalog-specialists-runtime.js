@@ -75,7 +75,7 @@
   const previous=intent;intent={area:true,commandId,command:structuredClone(command),areaTarget:{runtimeUnitId:target.id,componentId}};
   try{return combatOutcome(attacker,target)}finally{intent=previous}
  }
- function appendJournal(u,command,result){u.specialistSerial=(u.specialistSerial??0)+1;(u.specialistJournal??=[]).push({id:`${legacySession.sessionId}/${u.id}/${u.specialistSerial}`,turn,team:u.team,command:structuredClone(command),result:structuredClone(result)});root.GoblinCatalogFullRuntime?.recordAction(u,command,result)}
+ function appendJournal(u,command,result){u.specialistSerial=(u.specialistSerial??0)+1;(u.specialistJournal??=[]).push({id:`${legacySession.sessionId}/${u.id}/${u.specialistSerial}`,turn,team:u.team,command:structuredClone(command),result:structuredClone(result)});root.GoblinCatalogFullRuntime?.recordAction(u,command,result);root.GoblinCatalogFullRuntime?.recordRoundAction(u,command,result)}
  const oldAttack=attack;
  attack=function(u,t){
   if(!active())return oldAttack(u,t);if(intent?.command.type!=='CatalogFire'){setToast('Waffe und konkretes Ziel wählen.');return}

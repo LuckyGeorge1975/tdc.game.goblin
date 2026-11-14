@@ -57,6 +57,7 @@ function applyScenarioSession(nextSession){
   for(const [key,type] of terrainTypes)if(TerrainRules.coverBonus(type))terrain.add(key);
   units.splice(0,units.length,...JSON.parse(JSON.stringify(active.units)).map(unit=>({...unit,moveCount:0,moveFrom:null,acted:false,disabled:false,justHit:false})));
   selected=null;focusedCell=null;transportLoadMode=null;transportUnloadMode=null;turn=1;phase='player';turnPhase='movement';gameOver=false;resetActionState();$("#end-turn").disabled=false;
+  globalThis.GoblinFullRoundSource?.start();
   $('#mission-kicker').textContent=active.kicker;
   $('#mission-title').textContent=active.title;
   renderScenarioObjective();

@@ -90,6 +90,25 @@
  function stealthText(u){if(!active()||!registry().units[u.catalogAssetId]?.target.stealthRef)return '';const t=(key,params={})=>root.GoblinLanguage?.t(key,params)??key,parts=[t('v2.full.stealth.capability'),t('v2.full.stealth.sensorRule',{range:2}),t('v2.full.stealth.movementRule'),t('v2.full.stealth.eventRule')];if(u.team==='enemy'&&unitAlive(u)&&known(u.id)){const s=ensure();parts.push(t(s.visibility.reveals.some(r=>r.runtimeUnitId===u.id&&r.viewerTeam==='player'&&r.untilFireEnd>s.visibility.teamFire.player.completed)?'v2.full.stealth.eventExpiry':'v2.full.stealth.sensorContact'))}return parts.join(' · ')}
  function logEntries(all=false){if(!active())return [];const rows=all?ensure().logs:ensure().logs.slice(-4);return rows.toReversed().map(e=>{const visible=e.subjects.every(id=>known(id)),key=visible?e.key:'v2.full.stealth.contactLost';let message=root.GoblinLanguage?.t(key,visible?e.params:{})??key;if(visible&&e.action){message+=` · ${e.subjects.map(id=>GoblinCatalogRuntime.name(units.find(u=>u.id===id))).join(' → ')}`;if(e.action.result)message+=` · ${e.action.result}${e.action.ratio?' ('+e.action.ratio+')':''}`}return {time:'',source:'COMMAND',message}})}
  function recordAction(actor,command,result){if(!active())return;const key=result.kind==='hex-fire'?'v2.full.missile.resolved':result.kind==='collision'||result.collided?'v2.full.stealth.collision':result.kind==='engineering'?`v2.engineer.${command.job}`:result.kind==='fire'?'v2.ui.fire':result.kind==='ram'?'v2.ui.ram':['CatalogLoad','Embark'].includes(command.type)?'v2.ui.embark':command.type==='Unload'?'v2.ui.unload':command.type==='CatalogDeploy'?'v2.ui.catalog.deployDrone':'v2.ui.move';log(key,{},result.kind==='fire'?[actor.id,command.target.runtimeUnitId]:[actor.id]);const row=ensure().logs.at(-1);row.action={result:result.outcome?.result??null,ratio:result.outcome?.ratio??null}}
+ function recordRoundAction(actor,command,result){
+  const source=root.GoblinFullRoundSource;
+  if(!source||!active()||legacySession.ruleProfileId!=='FULL_CATALOG_v1'||gameOver)return;
+  const visibleIds=projectedIds('player');
+  const entity=u=>({id:u.id,labelKey:`library.unit.${u.catalogAssetId}.name`,cell:{x:u.x,y:u.y}});
+  const targetId=command.target?.runtimeUnitId??result.targetId??result.cargoId;
+  const target=units.find(unit=>unit.id===targetId);
+  const kind=['move','collision'].includes(result.kind)?'move':['fire','hex-fire'].includes(result.kind)?'fire':result.kind==='ram'?'ram':'special';
+  const board={width:W,height:H,defaultTerrain:'open-ground',terrain:[...terrainTypes].map(([key,type])=>{
+   const [x,y]=key.split(',').map(Number);return {x,y,type};
+  }),units:units.filter(unit=>unitAlive(unit)&&!unit.embarkedOn).map(entity)};
+  // Accepted prefixes attest own movement. A final reveal does not attest
+  // visibility of any intermediate enemy step.
+  const path=result.acceptedPrefix??result.path;
+  const paths=path?.length&&actor.moveFrom?[{id:actor.id,cells:[actor.moveFrom,...path]}]:[];
+  const after={...board,units:units.filter(unit=>visibleIds.has(unit.id)&&!unit.embarkedOn).map(entity)};
+  source.record({side:actor.team,kind,actor:entity(actor),target:target&&entity(target),
+   result:result.outcome?.result,snapshot:{...board,paths}},after,visibleIds);
+ }
  function catalogCard(entry){
   if(!active())return null;const r=registry().units[root.UnitVisuals.artKey(entry)];if(!r)return null;const t=r.target,system=t.systemDefinitionRef?GoblinSystems.createCatalogSystem(registry(),r.assetId??root.UnitVisuals.artKey(entry)):null;
   const values=system?system.rules.definition.components.filter(c=>c.kind==='weapon').map(c=>system.rules.weaponClasses[c.weaponClassRef]):[];
@@ -261,8 +280,8 @@
   if(config.waves.length){GoblinCatalogWaves.validate(value.waves,config);if(JSON.stringify(value.ownTurns)!==JSON.stringify(value.waves.ownTurns))throw Error('FULL_RESTORE_TURNS')}else if(value.waves!==null)throw Error('FULL_RESTORE_WAVES');
   state=copy(value);
  }
- root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,catalogCard,initialRoster,status,stealthText});
+ root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,recordRoundAction,catalogCard,initialRoster,status,stealthText});
  const oldSetPhase=setTurnPhase;setTurnPhase=function(next){if(active()&&phase==='player'){if(turnPhase==='fire'&&next!=='fire')fireBoundary('player',false);if(next==='fire'&&turnPhase!=='fire')fireBoundary('player',true)}return oldSetPhase(next)};
- const oldFinish=finish;finish=function(win){if(active()){const s=ensure();s.terminalOutcome=win;for(const team of ['player','enemy'])if(s.visibility.teamFire[team].active)fireBoundary(team,false);if(s.waves){const result=GoblinCatalogWaves.discardPending(s.waves);s.waves=result.state;s.journal.push({type:'mission-end',outcome:win,effects:copy(result.effects)})}}return oldFinish(win)};
+ const oldFinish=finish;finish=function(win){const roundCommit=!gameOver&&root.GoblinFullRoundSource?.beginBoundary();if(active()){const s=ensure();s.terminalOutcome=win;for(const team of ['player','enemy'])if(s.visibility.teamFire[team].active)fireBoundary(team,false);if(s.waves){const result=GoblinCatalogWaves.discardPending(s.waves);s.waves=result.state;s.journal.push({type:'mission-end',outcome:win,effects:copy(result.effects)})}}const result=oldFinish(win);root.GoblinFullRoundSource?.complete(roundCommit,turn,'terminal-partial');return result};
  const oldHex=handleHex;handleHex=function(x,y){if(!active())return oldHex(x,y);focusedCell={x,y};const occupant=roster().find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);if(!occupant&&selected?.team==='player'&&['movement','gev'].includes(turnPhase))return executeSpecialistCommand({type:'Move',actorId:selected.id,x,y});if(occupant)return handleUnitClick(occupant);showFieldInfo(x,y);draw()};
 })(globalThis);

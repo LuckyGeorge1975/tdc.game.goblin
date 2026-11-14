@@ -264,6 +264,7 @@ function commitEnemyStep(foe,step){
   foe.y=step.y;
   foe.moveCount=(foe.moveCount||0)+1;
   globalThis.GoblinCatalogRuntime?.syncCargo(foe);
+  globalThis.GoblinCatalogFullRuntime?.recordRoundAction(foe,{}, {kind:'move',acceptedPrefix:step.path});
   globalThis.GoblinLegacyPresentation?.confirm(presentation);
   addLog(`${foe.name} rückt nach ${String.fromCharCode(65+foe.x)}-${String(foe.y+1).padStart(2,'0')} vor.`,true);
 }
@@ -373,6 +374,7 @@ function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
       foe.enemyFired = fired;
     }
     if (gameOver || full?.enemyEnd() || checkVictory()) return;
+    const roundCommit = globalThis.GoblinFullRoundSource?.beginBoundary();
     units.filter(u => u.team === 'player').forEach(u => u.acted = false);
     phase = 'player';
     turn++;
@@ -380,6 +382,7 @@ function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
     resetActionState();
     if (full?.active()) full.beginTurn('player');
     turnPhase = 'movement';
+    globalThis.GoblinFullRoundSource?.complete(roundCommit,turn-1,'complete');
     $('#turn-number').textContent = String(turn).padStart(2,'0');
     setTurnPhase('movement');
     $('#log-status').textContent = 'STANDBY';

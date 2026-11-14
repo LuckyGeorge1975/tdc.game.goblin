@@ -138,14 +138,17 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         maybeAutoAdvancePhase();
       }
     }
-    function enterPause() {
-      if (GameDialogs.isOpen() || pauseActive) return;
+    function holdPlay() {
+      if (GameDialogs.isOpen() || pauseActive) return false;
       globalThis.GoblinMovement?.clear();
       savedAuto = document.querySelector('#auto-end-turn').checked;
       document.querySelector('#auto-end-turn').checked = false;
       pauseActive = true;
       if (globalThis.IronDustBrowserV2?.mode === 'ready') IronDustBrowserV2.pause();
-      show('pause');
+      return true;
+    }
+    function enterPause() {
+      if (holdPlay()) show('pause');
     }
     function button(label, action, className = '') {
       const node = document.createElement('button');
@@ -344,11 +347,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function goBack() { show(returnScreen === 'play' && GoblinUIV2.project().gameOver ? 'end' : returnScreen); }
     async function openRoundAnalysis(round) {
       const host = globalThis.IronDustBrowserV2;
-      const origin = screen, epoch = host?.epoch;
+      const origin = screen, epoch = host?.epoch, owner = legacySession;
       const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs');
-      if (screen !== origin || host?.epoch !== epoch) return;
-      const resume = origin === 'log' && returnScreen === 'play' && !pauseActive && !GoblinUIV2.project().gameOver;
-      if (resume) host.pause();
+      if (screen !== origin || host?.epoch !== epoch || legacySession !== owner) return;
+      const resume = origin === 'log' && returnScreen === 'play' && !GoblinUIV2.project().gameOver && holdPlay();
       roundAnalysis = {round, origin, renderRoundAnalysis, selected:0, resume, epoch};
       show('round-analysis');
     }
@@ -356,7 +358,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const {origin,resume,epoch} = roundAnalysis;
       roundAnalysis = null;
       show(origin);
-      if (resume && globalThis.IronDustBrowserV2?.epoch === epoch) IronDustBrowserV2.resume();
+      if (resume && globalThis.IronDustBrowserV2?.epoch === epoch) releasePause();
     }
     function selectLevel(id) {
       missionId = id;
@@ -1397,7 +1399,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           });
         if (!entries.childElementCount) entries.append(paragraph(t('v2.log.empty'), 'v2-screen-log-empty'));
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-log-back';
-        const rounds = state.scenario === 'iron-dust-v2' ? globalThis.IronDustBrowserV2?.roundView() : null;
+        const rounds = state.scenario === 'iron-dust-v2' ? globalThis.IronDustBrowserV2?.roundView() :
+          globalThis.GoblinFullRoundSource?.view();
         const roundActions = [];
         if (rounds?.latestComplete)
           roundActions.push(button(t('v2.round.latest'), () => openRoundAnalysis(rounds.latestComplete)));

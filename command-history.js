@@ -29,6 +29,7 @@ function commandSnapshot(label) {
     log: logEl.innerHTML, rollCursor: phaseRollCursor };
   if(globalThis.GoblinCatalogFullRuntime?.active())snapshot.catalogFull=GoblinCatalogFullRuntime.snapshot();
   globalThis.GoblinLegacyPresentation?.checkpoint(snapshot);
+  globalThis.GoblinFullRoundSource?.checkpoint(snapshot);
   return snapshot;
 }
 
@@ -82,6 +83,7 @@ function undoPhaseCommand() {
   phaseRollCursor = before.rollCursor;
   logEl.innerHTML = before.log;
   globalThis.GoblinLegacyPresentation?.afterUndo(before);
+  globalThis.GoblinFullRoundSource?.rewind(before);
   updateSelection();
   if (focusedCell) showFieldInfo(focusedCell.x, focusedCell.y);
   if (selected) showUnitInfo(selected);
