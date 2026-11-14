@@ -1,7 +1,7 @@
 import {IRON_DUST_PROFILE_VERSION, IRON_DUST_PROFILE_HEADER,
   IRON_DUST_PROFILE_PROJECTION_VERSION, createIronDustProfile,
   validateIronDustProfile, queryIronDustProfile, dispatchIronDustProfile,
-  projectIronDustProfile} from './iron-dust-executable-profile.mjs';
+  projectIronDustProfile} from './iron-dust-executable-profile.mjs?v=2';
 import {IRON_DUST_HISTORICAL_LAYOUT} from '../levels/iron-dust.v1.mjs';
 
 // Internal v2 source replay. This does not extend schema-1 or expose file I/O.

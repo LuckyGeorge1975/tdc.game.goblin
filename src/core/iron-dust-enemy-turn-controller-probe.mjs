@@ -1,8 +1,10 @@
 import {validateIronDustUnifiedStateProbe, IRON_DUST_ZERO_TREADS_POLICY_VERSION}
   from './iron-dust-unified-state-probe.mjs';
-import {queryIronDustEnemyIntent} from './iron-dust-enemy-intent-probe.mjs';
-import {queryIronDustEnemyMoveAction, dispatchIronDustEnemyMoveAction} from
-  './iron-dust-enemy-move-action-probe.mjs';
+import {queryIronDustEnemyIntent} from './iron-dust-enemy-intent-probe.mjs?v=2';
+import {queryIronDustEnemyMoveAction, dispatchIronDustEnemyMoveAction,
+  queryIronDustEnemyExplicitMoveAction, dispatchIronDustEnemyExplicitMoveAction,
+  listIronDustEnemyExplicitMoves} from
+  './iron-dust-enemy-move-action-probe.mjs?v=2';
 import {queryIronDustStandardFireAction, dispatchIronDustStandardFireAction} from
   './iron-dust-standard-fire-action-probe.mjs';
 import {validIronDustEnemyPolicy} from './iron-dust-enemy-policy.mjs';
@@ -204,6 +206,42 @@ export function dispatchIronDustEnemyFireChoice(controller, command) {
   return check.available ? applyControllerAction(controller, {kind: 'fire', command}) : check;
 }
 
+function enemyMovementSlot(controller) {
+  const slot=queryIronDustEnemyTurnController(controller,{type:'AdvanceEnemyTurn',playerId:'enemy'});
+  if (!slot.available) return slot;
+  if (slot.cursor.pass!=='first' || !['move','hold'].includes(slot.action.kind))
+    return deny('ENEMY_MOVE_CHOICE_OUTSIDE_SLOT');
+  return slot;
+}
+
+export function listIronDustEnemyMoveChoices(controller) {
+  const slot=enemyMovementSlot(controller);
+  if (!slot.available) return [];
+  const {actorId}=slot.action, common={playerId:'enemy',actorId};
+  const choices=listIronDustEnemyExplicitMoves(controller.state,actorId,slot.action).map(move=>({
+    command:{type:'EnemyMove',...common,to:move.to},cost:move.cost,path:move.path,
+    baseline:slot.action.kind==='move'&&move.to.x===slot.action.to.x&&move.to.y===slot.action.to.y
+  }));
+  choices.push({command:{type:'EnemyHold',...common},baseline:slot.action.kind==='hold'});
+  return choices.sort((a,b)=>Number(b.baseline)-Number(a.baseline));
+}
+
+function withEnemyMovementSlot(controller, command, resolve) {
+  const slot=enemyMovementSlot(controller);
+  if (!slot.available) return slot;
+  if (command?.actorId!==slot.action.actorId) return deny('ENEMY_MOVE_CHOICE_OUTSIDE_SLOT');
+  return resolve(controller.state,command,controller.enemyPolicy??null);
+}
+
+export function queryIronDustEnemyMoveChoice(controller, command) {
+  return withEnemyMovementSlot(controller,command,queryIronDustEnemyExplicitMoveAction);
+}
+
+export function dispatchIronDustEnemyMoveChoice(controller, command) {
+  const result=withEnemyMovementSlot(controller,command,dispatchIronDustEnemyExplicitMoveAction);
+  return applyControllerResult(controller,result);
+}
+
 function applyControllerAction(controller, action) {
   const policy = controller.enemyPolicy ?? null;
   let result;
@@ -213,6 +251,11 @@ function applyControllerAction(controller, action) {
     result = dispatchIronDustStandardFireAction(controller.state, action.command);
   else result = {state: controller.state, events: [{type: 'EnemySkipped',
     actorId: action.actorId, reason: action.reason, turn: controller.state.turn}]};
+  return applyControllerResult(controller,result);
+}
+
+function applyControllerResult(controller, result) {
+  const policy = controller.enemyPolicy ?? null;
   if (!result.state) return {error: result.error};
   const cursor = nextCursor(controller.cursor);
   if (result.state.victory.status !== 'ongoing') {

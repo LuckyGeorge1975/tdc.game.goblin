@@ -1,6 +1,6 @@
 import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
-import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=3';
-import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs';
+import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=4';
+import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs?v=2';
 import {createAiSessionHost} from './src/core/ai-session-host.mjs';
 
 function observePresentation(observer,method,...args){
@@ -11,7 +11,7 @@ import {
   createIronDustProfile, validateIronDustProfile, projectIronDustProfile,
   queryIronDustProfile, queryIronDustCrtPreview, preflightIronDustProfile, dispatchIronDustProfile,
   IRON_DUST_PROFILE_HEADER, IRON_DUST_ENEMY_DIFFICULTIES
-} from './src/core/iron-dust-executable-profile.mjs';
+} from './src/core/iron-dust-executable-profile.mjs?v=2';
 import {buildIronDustV2View, renderIronDustV2View, formatIronDustV2Error,
   formatIronDustV2Event,
   resetIronDustV2View} from './iron-dust-v2-view.mjs?v=10';

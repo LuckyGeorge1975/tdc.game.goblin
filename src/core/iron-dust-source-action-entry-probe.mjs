@@ -5,8 +5,8 @@ import {queryIronDustStandardFireAction, dispatchIronDustStandardFireAction} fro
   './iron-dust-standard-fire-action-probe.mjs';
 import {createIronDustEnemyTurnController, validateIronDustEnemyTurnController,
   queryIronDustEnemyTurnController, dispatchIronDustEnemyTurnController,
-  dispatchIronDustEnemyFireChoice} from
-  './iron-dust-enemy-turn-controller-probe.mjs';
+  dispatchIronDustEnemyFireChoice, dispatchIronDustEnemyMoveChoice} from
+  './iron-dust-enemy-turn-controller-probe.mjs?v=2';
 
 // The sole source-game command boundary for this inactive technical probe.
 // Older action modules remain independently importable diagnostic fixtures.
@@ -141,6 +141,15 @@ export function dispatchIronDustSourceEnemyFireChoice(entry, command) {
   return result.controller
     ? {entry: withEnemyController(entry, result.controller), events: result.events}
     : {error: result.error};
+}
+
+export function dispatchIronDustSourceEnemyMoveChoice(entry, command) {
+  try {validateIronDustSourceActionEntry(entry)}
+  catch {return {error:{code:'SOURCE_ENTRY_STATE_MISMATCH'}}}
+  if (entry.mode!=='enemy') return {error:{code:'WRONG_PHASE'}};
+  const result=dispatchIronDustEnemyMoveChoice(entry.payload,command);
+  return result.controller ? {entry:withEnemyController(entry,result.controller),events:result.events} :
+    {error:result.error};
 }
 
 export function dispatchIronDustSourceActionEntry(entry, command, enemyPolicy = null) {

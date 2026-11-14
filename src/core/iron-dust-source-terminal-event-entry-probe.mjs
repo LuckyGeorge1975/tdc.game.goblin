@@ -1,6 +1,6 @@
 import {createIronDustSourceActionEntry, validateIronDustSourceActionEntry,
   queryIronDustSourceActionEntry, dispatchIronDustSourceActionEntry} from
-  './iron-dust-source-action-entry-probe.mjs';
+  './iron-dust-source-action-entry-probe.mjs?v=2';
 
 // Opt-in terminal event layer. The unchanged v1 entry owns the only rule state.
 export const IRON_DUST_SOURCE_TERMINAL_ENTRY_VERSION =

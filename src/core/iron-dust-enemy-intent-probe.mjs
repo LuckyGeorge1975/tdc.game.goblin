@@ -84,12 +84,30 @@ function firstFire(state, actor, policy, trace) {
   return null;
 }
 
-// Keep the historical FIFO queue, neighbor order, cheaper-cost revisit and
-// strict distance improvement. The shared Core pathfinder has different ties.
-function preferredStep(state, actor, target, policy, trace) {
+// Keep the historical FIFO queue, neighbor order and cheaper-cost revisit.
+// The shared Core pathfinder has different ties.
+export function* ironDustEnemyMovementNodes(state, actor) {
   const occupied = new Set(state.units.filter(unit => unit.hp > 0 && unit !== actor).map(key));
   const queue = [{x: actor.x, y: actor.y, cost: 0, path: []}];
   const seen = new Map([[key(actor), 0]]);
+  while (queue.length) {
+    const node = queue.shift();
+    yield node;
+    for (const next of neighbors(node)) {
+      const nextKey = key(next);
+      const stepCost = TerrainRules.movementCost(terrainAt(state, next), actor);
+      const cost = node.cost + stepCost;
+      if (next.x < 0 || next.x >= state.map.width || next.y < 0 ||
+          next.y >= state.map.height || occupied.has(nextKey) || cost > actor.move) continue;
+      if (!seen.has(nextKey) || cost < seen.get(nextKey)) {
+        seen.set(nextKey, cost);
+        queue.push({x: next.x, y: next.y, cost, path: [...node.path, next]});
+      }
+    }
+  }
+}
+
+function preferredStep(state, actor, target, policy, trace) {
   let best = null;
   const targets = policy?.difficulty === 'strong' ? candidates(state, actor, true) : [];
   const rank = (node, distance) => {
@@ -105,8 +123,7 @@ function preferredStep(state, actor, target, policy, trace) {
   const original = hexDistance(actor, target);
   if (trace) trace.criteria = policy?.difficulty === 'weak' ? ['movement-cost', 'distance'] :
     policy ? ['no-firing-lane', 'negative-cover', 'distance', 'movement-cost'] : ['distance', 'movement-cost'];
-  while (queue.length) {
-    const node = queue.shift();
+  for (const node of ironDustEnemyMovementNodes(state, actor)) {
     const distance = hexDistance(node, target);
     const candidate = trace && node.path.length ? {to: {x: node.x, y: node.y},
       path: node.path, targetId: target.id, cost: node.cost, distance} : null;
@@ -122,17 +139,6 @@ function preferredStep(state, actor, target, policy, trace) {
       }
     } else if (candidate) {
       Object.assign(candidate, {status: 'rejected', reason: 'no-distance-improvement'});
-    }
-    for (const next of neighbors(node)) {
-      const nextKey = key(next);
-      const stepCost = TerrainRules.movementCost(terrainAt(state, next), actor);
-      const cost = node.cost + stepCost;
-      if (next.x < 0 || next.x >= state.map.width || next.y < 0 ||
-          next.y >= state.map.height || occupied.has(nextKey) || cost > actor.move) continue;
-      if (!seen.has(nextKey) || cost < seen.get(nextKey)) {
-        seen.set(nextKey, cost);
-        queue.push({x: next.x, y: next.y, cost, path: [...node.path, next]});
-      }
     }
   }
   if (bestCandidate) {

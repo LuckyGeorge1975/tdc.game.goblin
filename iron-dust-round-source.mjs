@@ -1,5 +1,5 @@
 import {createRoundRecorder,visibleRoundPath} from './round-view-producer.mjs?v=3';
-import {dispatchIronDustProfile,validateIronDustProfile} from './src/core/iron-dust-executable-profile.mjs';
+import {dispatchIronDustProfile,validateIronDustProfile} from './src/core/iron-dust-executable-profile.mjs?v=2';
 
 const stateOf = profile => profile.entry.mode==='enemy'?profile.entry.payload.state:profile.entry.payload;
 const kind = Object.freeze({UnitMoved:'move',EnemyMoved:'move',RamResolved:'ram',PlayerFireResolved:'fire',

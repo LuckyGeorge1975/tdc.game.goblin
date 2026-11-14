@@ -1,7 +1,7 @@
 import {createAiDecisionAdapter} from './ai-decision-adapter.mjs';
-import {dispatchIronDustProfile, dispatchIronDustProfileEnemyFireChoice, queryIronDustCrtPreview,
-  queryIronDustProfile, validateIronDustProfile} from './iron-dust-executable-profile.mjs';
-import {queryIronDustEnemyFireChoice} from './iron-dust-enemy-turn-controller-probe.mjs';
+import {dispatchIronDustProfile, dispatchIronDustProfileEnemyFireChoice, dispatchIronDustProfileEnemyMoveChoice, queryIronDustCrtPreview,
+  queryIronDustProfile, validateIronDustProfile} from './iron-dust-executable-profile.mjs?v=2';
+import {listIronDustEnemyMoveChoices,queryIronDustEnemyFireChoice} from './iron-dust-enemy-turn-controller-probe.mjs?v=2';
 import {ironDustCrtRatio} from './iron-dust-crt-ratio.mjs';
 
 export const IRON_DUST_TARGET_FEATURE_VERSION = 'iron-dust-target-bpn-v1';
@@ -92,10 +92,15 @@ function playerOptions(profile, state, scope) {
 
 function enemyOptions(profile, state) {
   const {action} = queryIronDustProfile(profile, automaticEnemy);
+  if (action.kind==='move'||action.kind==='hold') {
+    return listIronDustEnemyMoveChoices(profile.entry.payload).map(({command,path,cost,baseline})=>
+      option(baseline?automaticEnemy:command,command.type==='EnemyMove'?'move':'hold',command.actorId,
+        command.to?cellTarget(command.to):null,null,
+        {...(path?{path,cost}:{}),...(baseline?{baseline:true,automatic:true}:{})},
+        baseline?'native':'enemy-move'));
+  }
   if (action.kind !== 'fire') {
-    const target = action.kind === 'move' ? cellTarget(action.to) : null;
-    return [option(automaticEnemy, action.kind, action.actorId ?? null, target, null,
-      {automatic: true, ...(action.kind === 'move' ? {cost: action.cost} : {})})];
+    return [option(automaticEnemy,action.kind,action.actorId??null,null,null,{automatic:true})];
   }
   const options = [];
   for (const target of state.units.filter(unit => unit.team === 'player')) {
@@ -139,7 +144,9 @@ function describe(profile, side, scope) {
 }
 
 export function createIronDustAiAdapter(read) {
-  return createAiDecisionAdapter({read, describe, apply: (profile, {command, executeKind}) =>
-    executeKind === 'enemy-fire' ? dispatchIronDustProfileEnemyFireChoice(profile, command) :
-      dispatchIronDustProfile(profile, command)});
+  return createAiDecisionAdapter({read,describe,apply(profile,{command,executeKind}) {
+    if (executeKind==='enemy-fire') return dispatchIronDustProfileEnemyFireChoice(profile,command);
+    if (executeKind==='enemy-move') return dispatchIronDustProfileEnemyMoveChoice(profile,command);
+    return dispatchIronDustProfile(profile,command);
+  }});
 }
