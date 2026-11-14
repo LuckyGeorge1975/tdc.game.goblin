@@ -32,7 +32,8 @@ export function renderRoundAnalysis(panel, round, {t, previewMap, back, selected
   const rows = round.rows.map((decision, index) => {
     const item = element('li');
     const text = [decision.actor && t(decision.actor.labelKey), t(decision.descriptionKey),
-      decision.target && t(decision.target.labelKey), decision.resultKey && t(decision.resultKey)].filter(Boolean);
+      decision.target && t(decision.target.labelKey), decision.targetCell && hexLabel(decision.targetCell),
+      decision.resultKey && t(decision.resultKey)].filter(Boolean);
     const choice = button(`${index + 1}. ${text.join(' · ')}`, () => show(index));
     item.append(choice);
     list.append(item);
@@ -54,12 +55,19 @@ export function renderRoundAnalysis(panel, round, {t, previewMap, back, selected
     } else detail.append(element('p', '', t('v2.round.noMap')));
     const reason = element('div', 'v2-round-explanation');
     reason.append(element('p', '', t(decision.explanationKey ?? 'v2.round.noReason')));
+    if (decision.hits?.length) {
+      const hits = element('ul');
+      for (const hit of decision.hits)
+        hits.append(element('li','', [t(hit.target.labelKey),t(hit.resultKey)].join(' · ')));
+      reason.append(hits);
+    }
     if (decision.options?.length) {
       const alternatives = element('details');
       alternatives.append(element('summary', '', t('v2.round.alternatives')));
       const options = element('ul');
       for (const option of decision.options) {
         const label = [t(option.descriptionKey), option.target && t(option.target.labelKey),
+          option.targetCell && hexLabel(option.targetCell), option.component,
           option.selected && t('v2.round.selected'), Number.isFinite(option.score) && new Intl.NumberFormat(undefined,{maximumFractionDigits:4}).format(option.score)];
         options.append(element('li', '', label.filter(Boolean).join(' · ')));
       }
@@ -98,8 +106,11 @@ function addMapFocus(svg, decision) {
     const [cx,cy] = point(decision.actor.cell);
     for (const r of [11,15]) append('circle', 'v2-round-actor', {cx,cy,r});
   }
-  if (decision.target?.cell) {
-    const [x,y] = point(decision.target.cell);
+  const targetCell = decision.targetCell ?? decision.target?.cell;
+  if (targetCell) {
+    const [x,y] = point(targetCell);
     append('path', 'v2-round-target', {d:`M${x-15} ${y}h30 M${x} ${y-15}v30`});
   }
 }
+
+const hexLabel = ({x,y}) => `${String.fromCharCode(65+x)}-${String(y+1).padStart(2,'0')}`;

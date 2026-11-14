@@ -1,5 +1,5 @@
-import {createIronDustBrowserSession, createIronDustDecisionHost} from './iron-dust-browser-v2.mjs?v=20';
-import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=2';
+import {createIronDustBrowserSession, createIronDustDecisionHost} from './iron-dust-browser-v2.mjs?v=21';
+import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=3';
 
 export function createIronDustSpectatorMatch(select) {
   let session = createIronDustBrowserSession();

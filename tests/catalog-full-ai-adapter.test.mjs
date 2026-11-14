@@ -4,6 +4,7 @@ import {fullScene} from './catalog-full-harness.mjs';
 import {read} from './artillery-product-harness.mjs';
 import {createFullCatalogAiAdapter, createFullCatalogAiHost} from '../src/core/full-catalog-ai-adapter.mjs';
 import {createFullCatalogSessionHost} from '../src/core/full-catalog-session-host.mjs';
+import {createFullRoundSource} from '../full-round-source.mjs';
 
 const full = id => fullScene(id,7,false,'FULL_CATALOG_v1');
 const snapshot = game => [game.state(),read(game,'GoblinCatalogFullRuntime.snapshot()'),game.rng()];
@@ -80,6 +81,9 @@ test('player projection excludes concealed Phantom and dispatch revalidates afte
 
 test('Atlas selects an alternative component in the same enemy weapon slot',async()=>{
   const g=await full('catalog-full-atlas');closeAtlas(g);
+  const source=createFullRoundSource(()=>g.run('({session:legacySession,round:turn,side:phase,phase:turnPhase,ended:gameOver})'));
+  g.context.GoblinFullRoundSource=source;
+  source.start();
   const adapter=createFullCatalogAiAdapter(hostFor(g),()=>1);
   let proof, oldExecute, oldRequest;
   schedule(g,adapter.chooseEnemyFire((batch,execute)=>{
@@ -105,6 +109,10 @@ test('Atlas selects an alternative component in the same enemy weapon slot',asyn
   assert.ok(proof);
   assert.equal(oldExecute(oldRequest).code,'AI_STALE_DECISION');
   assert.equal(g.run('phase'),'player');
+  assert.ok(source.view().latestComplete.rows.every(row=>!row.options));
+  g.run('finish(false)');
+  assert.ok(source.view().latestComplete.rows.some(row=>row.options?.length>1&&
+    row.options.some(option=>option.selected&&option.component==='treads')));
 });
 
 test('FULL baseline selection matches the existing turn and stale session cannot fire',async()=>{

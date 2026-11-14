@@ -1,4 +1,4 @@
-import {createRoundRecorder} from './round-view-producer.mjs?v=2';
+import {createRoundRecorder} from './round-view-producer.mjs?v=3';
 
 export function createFullRoundSource(read) {
   let owner, recorder;
@@ -21,6 +21,7 @@ export function createFullRoundSource(read) {
     const capture = commit.captureFullRoundEvent(event,{after,disclosure:{
       actor:actor ? 'after' : null,target:target ? 'after' : null,
       boardVisible:actor || target,resultVisible:target,
+      targetCellVisible:actor && event.side === 'player',
       visibleSteps:ownPath ? event.snapshot.paths[0]?.cells.map(() => true) : undefined
     }});
     commit.accept({roundNumber:read().round,events:[capture]});

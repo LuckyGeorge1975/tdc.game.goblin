@@ -4,6 +4,29 @@ import {fullScene} from './catalog-full-harness.mjs';
 import {execute} from './artillery-product-harness.mjs';
 import {createFullRoundSource} from '../full-round-source.mjs';
 
+test('native U13 terminal shot retains the selected hex and concrete hit',async()=>{
+  const g=await fullScene('catalog-full-atlas',7,false,'FULL_CATALOG_v1');
+  const source=createFullRoundSource(()=>g.run('({session:legacySession,round:turn,side:phase,phase:turnPhase,ended:gameOver})'));
+  g.context.GoblinFullRoundSource=source;
+  source.start();
+  const actor=g.run(`(()=>{
+    const missile=units.find(u=>u.catalogId==='U13');
+    missile.x=0; missile.y=0;
+    for (const u of units.filter(u=>u.team==='enemy')) {
+      if (u.core) {u.x=2;u.y=0;u.hp=1;}
+      else {u.hp=0;if(u.catalogSystems)u.alive=false;}
+    }
+    terrain.clear();terrainTypes.clear();
+    setTurnPhase('fire');
+    return missile.id;
+  })()`);
+  g.context.rollQueue=[.99];
+  assert.ok(execute(g,{type:'CatalogHexFire',actorId:actor,x:2,y:0}).ok);
+  const shot=source.view().terminalPartial.rows.find(row=>row.kind==='fire');
+  assert.deepEqual(shot.targetCell,{x:2,y:0});
+  assert.ok(shot.hits.some(hit=>hit.target.labelKey==='library.unit.command-core.name'&&hit.resultKey==='X'));
+});
+
 test('native FULL commits publish a completed round and rewind discarded actions',async()=>{
   const g = await fullScene('catalog-full-atlas',7,false,'FULL_CATALOG_v1');
   const source = createFullRoundSource(() => g.run('GoblinCatalogFullRuntime.active() && ({session:legacySession,round:turn,side:phase,phase:turnPhase,ended:gameOver})'));

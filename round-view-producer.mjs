@@ -23,6 +23,8 @@ function encodeRound(round, perspective) {
       ...(fact.cell ? {cell:point(fact.cell)} : {})});
     if (row.actor) result.actor=entity(row.actor);
     if (row.target) result.target=entity(row.target);
+    if (row.targetCell) result.targetCell=point(row.targetCell);
+    if (row.hits?.length) result.hits=row.hits.map(hit=>({target:entity(hit.target),resultKey:RESULTS[hit.result]}));
     if (Object.hasOwn(RESULTS,row.result)) result.resultKey=RESULTS[row.result];
     if (row.snapshot) {
       const {width,height,defaultTerrain,terrain,units,paths} = row.snapshot;
@@ -33,8 +35,11 @@ function encodeRound(round, perspective) {
       result.options=row.options.map((option,i)=>({optionKey:`option-${i+1}`,
         descriptionKey:KINDS[option.kind],selected:option.selected===true,
         ...(option.target?{target:entity(option.target)}:{}),
+        ...(option.targetCell?{targetCell:point(option.targetCell)}:{}),
+        ...(option.component?{component:option.component}:{}),
         ...(Number.isFinite(option.score)?{score:option.score}:{})}));
     }
+    if (perspective !== 'player' && row.explanationKey) result.explanationKey=row.explanationKey;
     return result;
   });
   return freeze({schemaVersion:1,roundNumber:round.number,perspective,completion:round.completion,rows});
@@ -46,6 +51,10 @@ function copyRow(row) {
   const subject = fact => fact && {id:fact.id,labelKey:fact.labelKey,...(fact.cell?{cell:point(fact.cell)}:{})};
   const copy={kind:row.kind,side:row.side,actor:subject(row.actor),target:subject(row.target),
     result:typeof row.result==='string'?row.result:null};
+  if (row.targetCell) copy.targetCell=point(row.targetCell);
+  if (row.hits) copy.hits=row.hits.filter(hit=>Object.hasOwn(RESULTS,hit.result))
+    .map(hit=>({target:subject(hit.target),result:hit.result}));
+  if (row.explanationKey) copy.explanationKey=row.explanationKey;
   if (row.snapshot) {
     const {width,height,defaultTerrain,terrain,units,paths} = row.snapshot;
     const ids=new Set(units.map(unit=>unit.id));
@@ -55,6 +64,8 @@ function copyRow(row) {
   }
   if (row.options) copy.options=row.options.filter(option=>Object.hasOwn(KINDS,option.kind))
     .map(option=>({kind:option.kind,target:subject(option.target),selected:option.selected===true,
+      ...(option.targetCell?{targetCell:point(option.targetCell)}:{}),
+      ...(option.component?{component:option.component}:{}),
       ...(Number.isFinite(option.score)?{score:option.score}:{})}));
   return copy;
 }
@@ -68,6 +79,8 @@ function captureRoundEvent(event, publicEvidence = null) {
   const named = !event.actor || actor?.id===event.actor.id;
   const visible={side:event.side,kind:named?event.kind:'observed-effect',
     actor:named&&event.actor?actor:null,target:target?.id===event.target?.id?target:null,result};
+  if (publicEvidence.targetCell) visible.targetCell=publicEvidence.targetCell;
+  if (publicEvidence.hits) visible.hits=publicEvidence.hits;
   if (snapshot) visible.snapshot={...snapshot,paths:paths??[]};
   // This slice publishes no player alternatives. A visible target alone does
   // not prove that ranking, count or even the option's existence are public.
@@ -83,14 +96,16 @@ function captureFullRoundEvent(event, {before,after,disclosure}) {
   const disclosed=(id,timing)=>timing==='before'?lookup(id,before):timing==='after'?lookup(id,after):null;
   const actor=event.actor?disclosed(event.actor.id,disclosure.actor):null;
   const target=event.target?disclosed(event.target.id,disclosure.target):null;
-  if (!actor && !target && disclosure.observableEffect!==true) return captureRoundEvent(event);
+  const hits=event.hits?.filter(hit=>lookup(hit.target.id,after));
+  if (!actor && !target && !hits?.length && disclosure.observableEffect!==true) return captureRoundEvent(event);
   const snapshot=disclosure.boardVisible===true?after:null;
   const ownsMarker=snapshot?.units.some(unit=>unit.id===actor?.id);
   const path=event.snapshot?.paths.find(segment=>segment.id===actor?.id)?.cells;
   const steps=path && Array.isArray(disclosure.visibleSteps)&&disclosure.visibleSteps.length===path.length
     ? visibleRoundPath(path,index=>disclosure.visibleSteps[index]===true):[];
   const paths=ownsMarker ? steps.map(cells=>({id:actor.id,cells})):[];
-  return captureRoundEvent(event,{observable:true,actor,target,snapshot,paths,
+  return captureRoundEvent(event,{observable:true,actor,target,snapshot,paths,hits,
+    targetCell:disclosure.targetCellVisible===true?event.targetCell:null,
     result:disclosure.resultVisible===true?event.result:null});
 }
 

@@ -348,7 +348,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     async function openRoundAnalysis(round) {
       const host = globalThis.IronDustBrowserV2;
       const origin = screen, epoch = host?.epoch, owner = legacySession;
-      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs');
+      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=2');
       if (screen !== origin || host?.epoch !== epoch || legacySession !== owner) return;
       const resume = origin === 'log' && returnScreen === 'play' && !GoblinUIV2.project().gameOver && holdPlay();
       roundAnalysis = {round, origin, renderRoundAnalysis, selected:0, resume, epoch};

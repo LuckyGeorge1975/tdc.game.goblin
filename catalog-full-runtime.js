@@ -5,6 +5,7 @@
  const copy=v=>JSON.parse(JSON.stringify(v));
  const registry=()=>legacySession.effectiveRules.catalog.registry;
  let state=null;
+ let roundFireChoice=null;
  let commandKey=null,commandSerial=0;
  function revision(){return JSON.stringify([legacySession.sessionId,turn,phase,turnPhase,units.map(u=>[u.id,u.x,u.y,unitAlive(u),!!u.disabled,u.embarkedOn??null]),[...terrainTypes]])}
  function ruleStateKey(s) {
@@ -98,6 +99,17 @@
   const targetId=command.target?.runtimeUnitId??result.targetId??result.cargoId;
   const target=units.find(unit=>unit.id===targetId);
   const kind=['move','collision'].includes(result.kind)?'move':['fire','hex-fire'].includes(result.kind)?'fire':result.kind==='ram'?'ram':'special';
+  const fireTarget=c=>units.find(unit=>unit.id===c.target?.runtimeUnitId);
+  const fireCell=c=>c.type==='CatalogHexFire'?{x:c.x,y:c.y}:null;
+  const options=roundFireChoice?.checked.map(entry=>{
+   const unit=fireTarget(entry.command);
+   return {kind:'fire',target:unit&&entity(unit),targetCell:fireCell(entry.command),
+    component:entry.command.target?.componentId,selected:entry===roundFireChoice.selected};
+  });
+  const hits=result.outcomes?.flatMap(hit=>{
+   const unit=units.find(item=>item.id===hit.unitId);
+   return unit?[{target:entity(unit),result:hit.outcome.result}]:[];
+  });
   const board={width:W,height:H,defaultTerrain:'open-ground',terrain:[...terrainTypes].map(([key,type])=>{
    const [x,y]=key.split(',').map(Number);return {x,y,type};
   }),units:units.filter(unit=>unitAlive(unit)&&!unit.embarkedOn).map(entity)};
@@ -107,7 +119,8 @@
   const paths=path?.length&&actor.moveFrom?[{id:actor.id,cells:[actor.moveFrom,...path]}]:[];
   const after={...board,units:units.filter(unit=>visibleIds.has(unit.id)&&!unit.embarkedOn).map(entity)};
   source.record({side:actor.team,kind,actor:entity(actor),target:target&&entity(target),
-   result:result.outcome?.result,snapshot:{...board,paths}},after,visibleIds);
+   result:result.outcome?.result,targetCell:fireCell(command),hits,options,
+   explanationKey:roundFireChoice?.reason,snapshot:{...board,paths}},after,visibleIds);
  }
  function catalogCard(entry){
   if(!active())return null;const r=registry().units[root.UnitVisuals.artKey(entry)];if(!r)return null;const t=r.target,system=t.systemDefinitionRef?GoblinSystems.createCatalogSystem(registry(),r.assetId??root.UnitVisuals.artKey(entry)):null;
@@ -171,6 +184,11 @@
    baseline:JSON.stringify(c)===baselineKey}]:[]});
   if(!checked.some(entry=>entry.baseline))throw Error('FULL_ENEMY_BASELINE_MISSING');
   let open=true,spent=false,failed=false,engineError;
+  function applyChoice(entry,reason) {
+   const previous=roundFireChoice;
+   roundFireChoice={checked,selected:entry,reason};
+   try{return apply(entry.command)}finally{roundFireChoice=previous}
+  }
   const reject=code=>({ok:false,code});
   function execute(command){
    if(!open||!current())return reject('ENEMY_FIRE_SLOT_CLOSED');
@@ -182,7 +200,7 @@
     const q=preview(allowed.command);
     if(!q.ok)return q;
     spent=true;
-    return apply(allowed.command);
+    return applyChoice(allowed);
    }catch(error){failed=true;engineError=error;open=false;throw error}
   }
   try{choose(Object.freeze({actorId:actor.id,pass,entries:()=>open&&current()&&!spent&&commandRevision()===initialRevision
@@ -193,7 +211,7 @@
   if(spent)return true;
   if(!current())return null;
   if(commandRevision()!==initialRevision)throw Error('FULL_ENEMY_FIRE_STATE_CHANGED');
-  apply(baseline);
+  applyChoice(checked.find(entry=>entry.baseline),'v2.round.baselineFire');
   return true;
  }
  function enemyHex(actor,choose,pass){

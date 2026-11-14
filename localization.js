@@ -535,6 +535,7 @@
     'v2.round.noDecisions': {de:"Für diese Runde liegt keine sichtbare Entscheidung vor.",en:"No visible decisions are available for this round.",es:"No hay decisiones visibles para esta ronda.",fr:"Aucune décision visible pour ce tour."},
     'v2.round.noMap': {de:"Zu dieser Entscheidung liegt keine historische Kartenansicht vor.",en:"No historical map is available for this decision.",es:"No hay mapa histórico para esta decisión.",fr:"Aucune carte historique pour cette décision."},
     'v2.round.noReason': {de:"Keine Begründung verfügbar.",en:"No explanation available.",es:"No hay una explicación disponible.",fr:"Aucune explication disponible."},
+    'v2.round.baselineFire': {de:"Der Feuercontroller hat seinen Standardbefehl ausgeführt.",en:"The fire controller used its default command.",es:"El controlador de fuego ejecutó su orden predeterminada.",fr:"Le contrôleur de tir a exécuté sa commande par défaut."},
     'v2.round.alternatives': {de:"Alternativen",en:"Alternatives",es:"Alternativas",fr:"Alternatives"},
     'v2.round.selected': {de:"Gewählt",en:"Selected",es:"Elegida",fr:"Choisie"},
     'v2.round.mapLegend': {de:"Doppelkreis: Akteur · Kreuz: Ziel · Punktlinie: sichtbarer Weg",en:"Double circle: actor · Cross: target · Dotted line: visible path",es:"Círculo doble: actor · Cruz: objetivo · Puntos: ruta visible",fr:"Double cercle : acteur · Croix : cible · Pointillés : trajet visible"},
