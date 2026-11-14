@@ -42,10 +42,10 @@ function loadScenario(id){
 function loadEditorDraft(config){
   if(globalThis.goblinBootProfileError)throw globalThis.goblinBootProfileError;
   const session=ScenarioRuleProfiles.beginDraftSession(config);
-  clearPhaseCommands();
   applyScenarioSession(session);
 }
 function applyScenarioSession(nextSession){
+  clearPhaseCommands();
   globalThis.IronDustBrowserV2?.stop();
   legacySession=nextSession;
   const active=nextSession.config;

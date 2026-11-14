@@ -1419,7 +1419,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
             (globalThis.GoblinCatalogRuntime?.record(cargo) ? GoblinCatalogRuntime.name(cargo) : cargo.name)})) : [])];
     }
     function legacyAiHost() {
-      const active = () => !!legacySession && !core() && !globalThis.IronDustBrowserV2?.active &&
+      const active = () => ScenarioRuleProfiles.aiAllowed(legacySession?.config) && !core() && !globalThis.IronDustBrowserV2?.active &&
         !globalThis.GoblinCatalogFullRuntime?.active() && legacySession?.scenarioId === currentScenario &&
         !ScenarioRuleProfiles.isDraftSession?.(legacySession) &&
         ScenarioRuleProfiles.entries[currentScenario]?.ruleProfileId === legacySession?.ruleProfileId;

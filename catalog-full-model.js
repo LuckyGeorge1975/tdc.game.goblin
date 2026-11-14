@@ -21,7 +21,8 @@
   const version='catalog-full-levels-v1';
   return {version,levels:data.levels.map(level=>{
    if(!fields(level,['version','id','scenarioVersion','width','height','objective','terrain','units'],
-    ['ruleProfile','goals','events','waveTemplates'])||level.version!=='goblin-level-v3'||level.scenarioVersion!==1||
+    ['ruleProfile','goals','events','waveTemplates','aiAllowed'])||level.version!=='goblin-level-v3'||level.scenarioVersion!==1||
+    Object.hasOwn(level,'aiAllowed')&&typeof level.aiAllowed!=='boolean'||
     !Object.hasOwn(historicalLevels,level.id)||Object.hasOwn(level,'ruleProfile')&&level.ruleProfile!==requestedProfile||
     Object.hasOwn(level,'events')!==Object.hasOwn(level,'waveTemplates')||
     Object.hasOwn(level,'events')&&(!Array.isArray(level.events)||!Array.isArray(level.waveTemplates)))fail();
@@ -41,7 +42,10 @@
   if(!admission||Object.keys(admission).length!==1||!Object.hasOwn(admission,'profile')||![candidateProfile,publicProfile].includes(admission.profile))throw Error('FULL_ADMISSION_REQUIRED');
   const requestedProfile=admission.profile;
   if(profile!==null&&profile!==requestedProfile)throw Error('FULL_ADMISSION_CONTEXT');
+  const authored=levelData?.version==='goblin-level-package-v3'?levelData:null;
   levelData=historicalShape(levelData,requestedProfile);
+  // Admission metadata does not alter the historical battlefield digest.
+  const permissions=new Map(authored?.levels.filter(level=>Object.hasOwn(level,'aiAllowed')).map(level=>[level.id,level.aiAllowed]));
   await GoblinCatalogBase.initialize(data);data=GoblinCatalogBase.registry;
   if(levelData?.version!=='catalog-full-levels-v1'||levelData.levels?.length!==5)throw Error('FULL_LEVEL_CONTRACT');
   if(await GoblinCatalogBase.hash(levelData)!=='ff1e209a956dff2cf2ac9c45932e670fec643b0c5451574daf85bb863c5d9c79')throw Error('FULL_LEVEL_DIGEST');
@@ -65,7 +69,8 @@
     mechanicsDigest:catalogProfile.mechanicsDigest,levelDigest:await GoblinCatalogBase.hash(level),rosterDigest:await GoblinCatalogBase.hash(units),
     terrainDigest:await GoblinCatalogBase.hash(level.terrain),scope,records,cargo:catalogProfile.cargo,registry:data,
     full:{version:level.version,source:level.source,waves:level.waves,waveTemplates,turnLimit:level.turnLimit}};
-   next[level.id]=freeze({title:level.title,kicker:'G.O.B.L.I.N.',kickerKey:'screen.library.category',sub:'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',scenarioVersion:1,ruleProfileId:requestedProfile,ruleProfile:data.dataVersion,objectiveVersion:1,objective:level.objective,losMode:'strict-supercover',catalog,terrain:level.terrain.filter(c=>TerrainRules.coverBonus(c.type)).map(c=>`${c.x},${c.y}`),terrainTypes:level.terrain,units});
+   next[level.id]=freeze({title:level.title,kicker:'G.O.B.L.I.N.',kickerKey:'screen.library.category',sub:'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',scenarioVersion:1,ruleProfileId:requestedProfile,ruleProfile:data.dataVersion,objectiveVersion:1,objective:level.objective,losMode:'strict-supercover',catalog,terrain:level.terrain.filter(c=>TerrainRules.coverBonus(c.type)).map(c=>`${c.x},${c.y}`),terrainTypes:level.terrain,units,
+    ...(permissions.has(level.id)?{aiAllowed:permissions.get(level.id)}:{})});
   }
   if(profile!==null&&profile!==requestedProfile)throw Error('FULL_ADMISSION_CONTEXT');
   configs=freeze(next);profile=requestedProfile;

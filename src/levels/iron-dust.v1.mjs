@@ -13,7 +13,7 @@ const freeze = value => {
 };
 
 freeze(IRON_DUST_LEVEL_V3);
-const {minimumDifficulty: configuredMinimum, ...fixedLayout} = IRON_DUST_LEVEL_V3;
+const {minimumDifficulty: configuredMinimum, aiAllowed: configuredAi, ...fixedLayout} = IRON_DUST_LEVEL_V3;
 export const IRON_DUST_HISTORICAL_LAYOUT = freeze(fixedLayout);
 
 // Preserve the historical source snapshot consumed by Core and its replay digests.
@@ -46,9 +46,11 @@ export function validateIronDustLevelV1(value) {
 
 export function validateIronDustLevelV3(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('LEVEL_DATA_MISMATCH');
-  const {minimumDifficulty,...layout} = value;
+  const {minimumDifficulty,aiAllowed,...layout} = value;
   if (!same(layout,IRON_DUST_HISTORICAL_LAYOUT)) throw new Error('LEVEL_DATA_MISMATCH');
   if (Object.hasOwn(value,'minimumDifficulty') && minimumDifficulty === undefined) throw new Error('IRON_DUST_DIFFICULTY_INVALID');
+  if (Object.hasOwn(value,'aiAllowed') && typeof aiAllowed!=='boolean') throw new Error('SCENARIO_AI_PERMISSION_INVALID');
   effectiveIronDustDifficulty('medium',minimumDifficulty);
-  return freeze({...IRON_DUST_HISTORICAL_LAYOUT,...(minimumDifficulty === undefined ? {} : {minimumDifficulty})});
+  return freeze({...IRON_DUST_HISTORICAL_LAYOUT,...(minimumDifficulty === undefined ? {} : {minimumDifficulty}),
+    ...(aiAllowed === undefined ? {} : {aiAllowed})});
 }

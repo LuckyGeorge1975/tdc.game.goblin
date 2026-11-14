@@ -9,6 +9,7 @@
       "height": 8,
       "ruleProfile": "TRAINING_FIELD_TEST_v1",
       "objective": "learning",
+      "aiAllowed": false,
       "terrain": [],
       "regions": {
         "goal": [
@@ -53,6 +54,7 @@
       "height": 8,
       "ruleProfile": "TRAINING_FIELD_TEST_v1",
       "objective": "learning",
+      "aiAllowed": false,
       "terrain": [],
       "regions": {
         "goal": [
@@ -104,6 +106,7 @@
       "height": 8,
       "ruleProfile": "TRAINING_FIELD_TEST_v1",
       "objective": "learning",
+      "aiAllowed": false,
       "terrain": [
         {
           "x": 2,

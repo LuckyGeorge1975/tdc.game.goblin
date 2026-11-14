@@ -136,9 +136,11 @@ function commitPhaseBefore(action) {
   return function(...args) { clearPhaseCommands(); return action(...args); };
 }
 setTurnPhase = commitPhaseBefore(setTurnPhase);
-enemyTurn = commitPhaseBefore(enemyTurn);
-loadScenario = commitPhaseBefore(loadScenario);
-reset = commitPhaseBefore(reset);
+const runEnemyTurn = commitPhaseBefore(enemyTurn);
+enemyTurn = function(chooseEnemyAction,chooseEnemyFireTarget) {
+  ScenarioRuleProfiles.checkEnemyControllers(legacySession,chooseEnemyAction,chooseEnemyFireTarget);
+  return runEnemyTurn(chooseEnemyAction,chooseEnemyFireTarget);
+};
 finish = commitPhaseBefore(finish);
 
 const backButton = document.createElement('button');

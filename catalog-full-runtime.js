@@ -70,7 +70,8 @@
   return units.filter(unit => ids.has(unit.id));
  }
  function aiProjection(team){
-  if(!active()||legacySession.ruleProfileId!=='FULL_CATALOG_v1'||!['player','enemy'].includes(team))return null;
+  if(!active()||legacySession.ruleProfileId!=='FULL_CATALOG_v1'||!ScenarioRuleProfiles.aiAllowed(legacySession.config)||
+     !['player','enemy'].includes(team))return null;
   const visible=roster(team), ids=new Set(visible.map(u=>u.id));
   return {side:team,phase:turnPhase,turn,terrain:{width:W,height:H,defaultTerrain:'open-ground',
    cells:[...terrainTypes].map(([key,type])=>{const [x,y]=key.split(',').map(Number);return {x,y,type}})},

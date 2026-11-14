@@ -61,7 +61,9 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     const fail=()=>reject('SCENARIO_PROFILE_MISMATCH','Invalid historical level data');
     const exact=(value,keys)=>value&&typeof value==='object'&&!Array.isArray(value)&&
       Object.keys(value).length===keys.length&&keys.every(key=>Object.hasOwn(value,key));
-    if(!exact(level,['version','id','scenarioVersion','width','height','ruleProfile','objective','terrain','units'])||
+    const fields=['version','id','scenarioVersion','width','height','ruleProfile','objective','terrain','units'];
+    if(level&&Object.hasOwn(level,'aiAllowed'))fields.push('aiAllowed');
+    if(!exact(level,fields)||
       level.version!=='goblin-level-v3'||!Object.hasOwn(legacyCopy,level.id)||level.width!==12||level.height!==8||
       !Array.isArray(level.terrain)||!Array.isArray(level.units))fail();
     const rules=entries[level.id];
@@ -89,9 +91,26 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     if(!units.some(unit=>unit.team==='player')||units.filter(unit=>unit.team==='enemy'&&unit.core).length!==1)fail();
     return {...legacyCopy[level.id],scenarioVersion:rules.scenarioVersion,ruleProfileId:rules.ruleProfileId,
       ...(rules.targetPolicyVersion?{targetPolicyVersion:rules.targetPolicyVersion}:{}),
+      ...(Object.hasOwn(level,'aiAllowed')?{aiAllowed:aiAllowed(level)}:{}),
       objectiveVersion:1,objective:rules.objective,terrain:[...cells],units};
   }
+  function aiAllowed(config){
+    const learning=config?.ruleProfileId==='TRAINING_FIELD_TEST_v1'||config?.ruleProfile==='TRAINING_FIELD_TEST_v1';
+    if(config&&Object.hasOwn(config,'aiAllowed')){
+      if(typeof config.aiAllowed!=='boolean'||learning&&config.aiAllowed)
+        reject('SCENARIO_AI_PERMISSION_INVALID','Invalid aiAllowed');
+      return config.aiAllowed;
+    }
+    return !!config&&!learning;
+  }
+  function requireAi(session){
+    if(!aiAllowed(session?.config))reject('AI_LEVEL_FORBIDDEN','AI control is disabled for this level');
+  }
+  function checkEnemyControllers(session,move,fire){
+    if(typeof move==='function'||typeof fire==='function')requireAi(session);
+  }
   function validate(id,config){
+    aiAllowed(config);
     if(trainingIds.includes(id)){if(!globalThis.GoblinTrainingModel)reject('SCENARIO_PROFILE_MISMATCH','Training contract unavailable');GoblinTrainingModel.validate(id,config);return entries[id]}
     if(fullIds.includes(id)){if(!globalThis.GoblinCatalogFullModel)reject('SCENARIO_PROFILE_MISMATCH','Full contract unavailable');GoblinCatalogFullModel.validate(id,config);}
     if(['catalog-siege','catalog-specialists'].includes(id)){if(!globalThis.GoblinCatalogSpecialistsModel)reject('SCENARIO_PROFILE_MISMATCH','Specialists contract unavailable');GoblinCatalogSpecialistsModel.validate(id,config);}
@@ -132,6 +151,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     return buildSession(id,config,false);
   }
   function buildSession(id,config,draft){
+    aiAllowed(config);
     const width=draft?config.width??12:12, height=draft?config.height??8:8;
     if(!Array.isArray(config.units)||!Array.isArray(config.terrain)||
       config.terrainTypes!==undefined&&!Array.isArray(config.terrainTypes))
@@ -166,5 +186,6 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;
   }
-  return {schemaVersion:1,product,entries,legacyLevel,validate,beginSession,beginDraftSession,isDraftSession:session=>draftSessions.has(session)};
+  return {schemaVersion:1,product,entries,legacyLevel,validate,beginSession,beginDraftSession,aiAllowed,checkEnemyControllers,
+    isDraftSession:session=>draftSessions.has(session)};
 })());

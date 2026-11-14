@@ -19,6 +19,7 @@ import {buildIronDustV2View, renderIronDustV2View, formatIronDustV2Error,
 import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1}
   from './src/levels/iron-dust-core-data.v1.mjs';
 import {IRON_DUST_LEVEL_V3} from './src/levels/iron-dust.v3.mjs';
+import {validateIronDustLevelV3} from './src/levels/iron-dust.v1.mjs';
 
 // Browser commands cross the same validated profile boundary as the Core probes.
 export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';
@@ -28,12 +29,14 @@ export const IRON_DUST_V2_START_SEED = 8;
 const browserPolicies = createAiPolicyRegistry([]);
 
 export function createIronDustDecisionHost({readSession, readEpoch, select, policy, feature, install, spectator}) {
+  if(readSession()?.aiAllowed===false)
+    throw Object.assign(Error('AI control is disabled for this level'),{code:'AI_LEVEL_FORBIDDEN'});
   const adapter = createIronDustAiAdapter(() => ({state:readSession()?.profile,generation:readEpoch()}));
   return createAiSessionHost({
     adapter, select, policy, spectator,
     read() {
       const session = readSession();
-      if (!session) return null;
+      if (!session || session.aiAllowed===false) return null;
       return {session:readEpoch(),side:session.projection.state.activeTeam,ended:session.projection.mode === 'ended',
         engine:session.profile.profileVersion,
         profile:session.profile.header.ruleProfileId,feature};
@@ -50,8 +53,11 @@ export function ironDustV2StartSeed(hostname, search) {
 }
 
 export function createIronDustBrowserSession(
-  profile = createIronDustProfile(IRON_DUST_V2_START_SEED),
-  expectedSeed = IRON_DUST_V2_START_SEED) {
+  profile,
+  expectedSeed = IRON_DUST_V2_START_SEED,
+  level = IRON_DUST_LEVEL_V3) {
+  const admitted=validateIronDustLevelV3(level);
+  profile??=createIronDustProfile(expectedSeed,{level:admitted});
   validateIronDustProfile(profile);
   const projection = projectIronDustProfile(profile);
   if (profile.header.ruleProfileId !== IRON_DUST_PROFILE_HEADER.ruleProfileId ||
@@ -61,7 +67,7 @@ export function createIronDustBrowserSession(
     throw Object.assign(new Error('IRON_DUST_V2_START_INVALID'),
       {code: 'IRON_DUST_V2_START_INVALID'});
   }
-  return Object.freeze({profile, projection});
+  return Object.freeze({profile, projection,...(admitted.aiAllowed===false?{aiAllowed:false}:{})});
 }
 
 export function dispatchIronDustBrowserAction(session, command, observer = null) {
@@ -76,7 +82,7 @@ export function dispatchIronDustBrowserAction(session, command, observer = null)
   const presentation = observePresentation(observer,'begin',session,command,query);
   const result = dispatchIronDustProfile(session.profile, command);
   if (!result.profile) return {error:result.error};
-  const nextSession=Object.freeze({profile:result.profile,
+  const nextSession=Object.freeze({...session,profile:result.profile,
     projection:projectIronDustProfile(result.profile, result.events)});
   observePresentation(observer,'confirm',presentation,nextSession);
   return {session:nextSession};
