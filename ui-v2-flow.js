@@ -101,6 +101,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     const requestedScenario=new URLSearchParams(globalThis.location?.search||'').get('scenario');
     let missionId = globalThis.GoblinCatalogFullModel?.has(requestedScenario)&&currentScenario===requestedScenario?requestedScenario:'iron-dust', started = false, startError = '';
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
+    let roundAnalysis = null;
     const campaignLessons = ['training-t01', 'training-t02'];
     const fieldCampaigns = {
       relay: {file:'relay-line', ids:['relay-line-bridge', 'relay-line-relay'], unlocked:1},
@@ -341,6 +342,22 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function openSection(next) { if (next === 'catalog') libraryLiveId = null; returnScreen = screen; show(next); }
     function goBack() { show(returnScreen === 'play' && GoblinUIV2.project().gameOver ? 'end' : returnScreen); }
+    async function openRoundAnalysis(round) {
+      const host = globalThis.IronDustBrowserV2;
+      const origin = screen, epoch = host?.epoch;
+      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs');
+      if (screen !== origin || host?.epoch !== epoch) return;
+      const resume = origin === 'log' && returnScreen === 'play' && !pauseActive && !GoblinUIV2.project().gameOver;
+      if (resume) host.pause();
+      roundAnalysis = {round, origin, renderRoundAnalysis, selected:0, resume, epoch};
+      show('round-analysis');
+    }
+    function closeRoundAnalysis() {
+      const {origin,resume,epoch} = roundAnalysis;
+      roundAnalysis = null;
+      show(origin);
+      if (resume && globalThis.IronDustBrowserV2?.epoch === epoch) IronDustBrowserV2.resume();
+    }
     function selectLevel(id) {
       missionId = id;
       startError = '';
@@ -1364,6 +1381,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           if (fieldError) panel.append(paragraph(fieldError, 'v2-status'));
         }
         }
+      } else if (screen === 'round-analysis') {
+        const analysis = roundAnalysis;
+        analysis.renderRoundAnalysis(panel,analysis.round,{
+          t, previewMap:missionPreview, back:closeRoundAnalysis, selected:analysis.selected,
+          onSelect:index => { analysis.selected = index; }
+        });
       } else if (screen === 'log') {
         panel.append(heading(t(state.gameOver ? 'screen.missionEnd.action.log' : 'ui.details.log')));
         const entries = document.createElement('div'); entries.className = 'v2-screen-log';
@@ -1380,7 +1403,14 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           });
         if (!entries.childElementCount) entries.append(paragraph(t('v2.log.empty'), 'v2-screen-log-empty'));
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-log-back';
-        panel.append(entries, actions(back));
+        const rounds = state.scenario === 'iron-dust-v2' ? globalThis.IronDustBrowserV2?.roundView() : null;
+        const roundActions = [];
+        if (rounds?.latestComplete)
+          roundActions.push(button(t('v2.round.latest'), () => openRoundAnalysis(rounds.latestComplete)));
+        if (rounds?.terminalPartial)
+          roundActions.push(button(t('v2.round.partial', {round:rounds.terminalPartial.roundNumber}),
+            () => openRoundAnalysis(rounds.terminalPartial)));
+        panel.append(entries, actions(back,...roundActions));
       } else if (screen === 'catalog') {
         const header = document.createElement('header'); header.className = 'v2-screen-header';
         header.append(heading(t('v2.library.title')), libraryKindSwitch());
@@ -1633,6 +1663,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         else if (screen === 'levels') show('menu');
         else if (screen === 'pause') { show('play'); releasePause(); }
         else if (screen === 'log') goBack();
+        else if (screen === 'round-analysis') closeRoundAnalysis();
         event.preventDefault(); event.stopImmediatePropagation();
       }
     }, true);

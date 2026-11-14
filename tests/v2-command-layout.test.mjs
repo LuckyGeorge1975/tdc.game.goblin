@@ -6,7 +6,7 @@ import {runInNewContext} from 'node:vm';
 const source=readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
 const css=readFileSync(new URL('../ui-v2.css',import.meta.url),'utf8');
 const rule=selector=>{
-  const start=css.indexOf(`${selector} {`);
+  const start=css.search(new RegExp('^ *' + selector.replace(/[.*+?^$${}()|[\]\\]/g,'\\$&') + ' \\{','m'));
   assert.ok(start>=0,selector);
   return css.slice(start,css.indexOf('}',start)+1);
 };
@@ -22,13 +22,13 @@ test('one non-modal target card has bounded scrollable alternatives',()=>{
 test('retarget and layout reposition use the map hex and never confirm',()=>{
   assert.match(source,/if \(cell\) chooseHex\(cell\.x, cell\.y\);/);
   const sync=source.slice(source.indexOf('    function syncLayout()'),source.indexOf("    window.addEventListener('resize', syncLayout)"));
-  assert.match(sync,/placeNearHex\(card, view\.target/);
+  assert.match(sync,/positionTargetCard\(card, view\.target/);
   assert.doesNotMatch(sync,/dispatch|runCommand/);
 });
 
 test('repositioning a clipped target card scrolls only the card to reveal its focused action', () => {
   const card = {
-    style: {}, scrollTop: 0,
+    dataset: {}, style: {}, scrollTop: 0,
     contains: node => node === button,
     getBoundingClientRect: () => ({top: 388, bottom: 449})
   };
@@ -40,7 +40,7 @@ test('repositioning a clipped target card scrolls only the card to reveal its fo
   const document = {activeElement: button};
   const context = {
     at: selector => selector === '#v2-target-card' ? card : {hidden: true},
-    view, hoverState: {units: [actor]}, unitAlive: () => true, document,
+    view, hoverState: {units: [actor]}, unitAlive: () => true, document, targetOccupant:()=>null,
     placeNearHex: (targetCard, cell) => {
       assert.equal(targetCard, card);
       assert.equal(cell, view.target);
@@ -49,7 +49,8 @@ test('repositioning a clipped target card scrolls only the card to reveal its fo
   };
   const reveal = source.slice(source.indexOf('    function revealTargetControl('), source.indexOf('    const COMMAND_ICONS'));
   const layout = source.slice(source.indexOf('    function syncLayout()'), source.indexOf('    function syncPanelLayout()'));
-  runInNewContext(reveal + layout, context);
+  const position = source.slice(source.indexOf('    function positionTargetCard('),source.indexOf('    function renderTargetBlast('));
+  runInNewContext(reveal + position + layout, context);
   context.syncLayout();
   assert.equal(card.scrollTop, 101);
   assert.equal(button.getBoundingClientRect().bottom, card.getBoundingClientRect().bottom);

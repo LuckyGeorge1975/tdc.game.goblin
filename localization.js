@@ -528,6 +528,7 @@
     'v2.library.schematic': {de:"Schema auf freiem Gelände. Gelände, Belegung, Sicht und Phase beeinflussen die verfügbaren Aktionen.",en:"Diagram on open terrain. Terrain, occupancy, sight and phase affect available actions.",es:"Esquema en terreno abierto. El terreno, la ocupación, la visión y la fase afectan a las acciones disponibles.",fr:"Schéma en terrain dégagé. Le terrain, l’occupation, la visibilité et la phase influent sur les actions disponibles."},
     'v2.library.referenceValues': {de:"Katalogwerte",en:"Catalog values",es:"Valores de catálogo",fr:"Valeurs du catalogue"},
     'v2.round.title': {de:"Runde {round}",en:"Round {round}",es:"Ronda {round}",fr:"Tour {round}"},
+    'v2.round.latest': {de:"Letzte abgeschlossene Runde",en:"Last completed round",es:"Última ronda completada",fr:"Dernier tour terminé"},
     'v2.round.partial': {de:"Runde {round} · bis zum Missionsende",en:"Round {round} · through mission end",es:"Ronda {round} · hasta el final de la misión",fr:"Tour {round} · jusqu’à la fin de la mission"},
     'v2.round.player': {de:"Spielersicht",en:"Player view",es:"Vista del jugador",fr:"Vue du joueur"},
     'v2.round.full': {de:"Vollansicht",en:"Full view",es:"Vista completa",fr:"Vue complète"},

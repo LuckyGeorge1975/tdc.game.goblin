@@ -1,4 +1,7 @@
 import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
+import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs';
+import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs';
+import {createAiSessionHost} from './src/core/ai-session-host.mjs';
 
 function observePresentation(observer,method,...args){
   try{return observer?.[method]?.(...args);}catch{return null;}
@@ -19,6 +22,22 @@ import {IRON_DUST_LEVEL_V3} from './src/levels/iron-dust.v3.mjs';
 // Browser commands cross the same validated profile boundary as the Core probes.
 export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';
 export const IRON_DUST_V2_START_SEED = 8;
+// A future spectator owner supplies the approved policies, then schedules
+// advance() at the end of each committed engine action.
+export function createIronDustDecisionHost({readSession, readEpoch, select, install, spectator}) {
+  const adapter = createIronDustAiAdapter(() => ({state:readSession()?.profile,generation:readEpoch()}));
+  return createAiSessionHost({
+    adapter, select, spectator,
+    read() {
+      const session = readSession();
+      if (!session) return null;
+      return {session:readEpoch(),side:session.projection.state.activeTeam,ended:session.projection.mode === 'ended'};
+    },
+    commit(result) {
+      install(Object.freeze({profile:result.profile,projection:projectIronDustProfile(result.profile,result.events)}));
+    }
+  });
+}
 export function ironDustV2StartSeed(hostname, search) {
   return ['localhost', '127.0.0.1'].includes(hostname) &&
     new URLSearchParams(search).get('iron-dust-v2-seed') === '2'
@@ -105,6 +124,7 @@ if (typeof document !== 'undefined') {
   let eventHistory = [];
   let epoch = 0;
   let paused = false;
+  let rounds = null;
   const presentation = globalThis.GoblinPresentation
     ? createCorePresentationObserver(globalThis.GoblinPresentation,()=>epoch) : null;
   const endButton = document.querySelector('#end-turn');
@@ -129,9 +149,13 @@ if (typeof document !== 'undefined') {
   function commitAction(command) {
     if (mode !== 'ready' || !session) return {error:{code:'V2_NOT_READY'}};
     const cursor = session.projection.cursor;
+    const before = session.profile;
     const result = dispatchIronDustBrowserAction(session, command, presentation);
     if (result.session) {
       session = result.session;
+      rounds.accept(captureIronDustRoundCommit(before,{
+        profile:session.profile,events:session.projection.events
+      }));
       eventHistory.push(...session.projection.events.map(event => ({...event,
         cursorPass:command.type === 'AutoEnemyAdvance' ? cursor?.pass : null,
         cursorIndex:command.type === 'AutoEnemyAdvance' ? cursor?.index : null})));
@@ -192,6 +216,7 @@ if (typeof document !== 'undefined') {
       globalThis.GoblinPresentation?.stop();
       session = createIronDustBrowserSession(profile ?? createIronDustProfile(startSeed, {difficulty,minimumDifficulty}),
         startSeed);
+      rounds = createIronDustRoundRecorder(session.profile, () => session?.profile);
       mode = 'ready';
       observePresentation(presentation,'sync',session);
       showGate('');
@@ -207,6 +232,7 @@ if (typeof document !== 'undefined') {
       renderCurrent();
     } catch {
       session = null;
+      rounds = null;
       mode = 'error';
       showGate(globalThis.GoblinLanguage?.t('v2.reject.start') ??
         'IRON DUST v2 could not start.');
@@ -219,6 +245,7 @@ if (typeof document !== 'undefined') {
     epoch++;
     globalThis.GoblinPresentation?.stop('core');
     session = null;
+    rounds = null;
     mode = 'inactive';
     actionError = null;
     eventHistory = [];
@@ -245,6 +272,7 @@ if (typeof document !== 'undefined') {
     get view() { return mode === 'ready' && session ? buildIronDustV2View(session.projection,
       session.profile.header.ruleProfileId, eventHistory) : null; },
     get enemyRunning() {return enemyFlow.running;},
+    roundView: () => rounds?.view() ?? null,
     query: command => mode === 'ready' && session && !paused && !enemyFlow.running &&
       command?.type !== 'AutoEnemyAdvance' ? queryIronDustProfile(session.profile, command)
       : {available:false, error:{code:'V2_NOT_READY'}},
