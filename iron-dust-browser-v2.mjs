@@ -1,6 +1,6 @@
 import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
-import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=5';
-import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs?v=4';
+import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=6';
+import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs?v=5';
 import {createAiSessionHost} from './src/core/ai-session-host.mjs?v=2';
 import {createAiPolicyRegistry} from './src/core/ai-policy-registry.mjs';
 
@@ -12,14 +12,14 @@ import {
   createIronDustProfile, validateIronDustProfile, projectIronDustProfile,
   queryIronDustProfile, queryIronDustCrtPreview, preflightIronDustProfile, dispatchIronDustProfile,
   IRON_DUST_PROFILE_HEADER, IRON_DUST_ENEMY_DIFFICULTIES
-} from './src/core/iron-dust-executable-profile.mjs?v=2';
+} from './src/core/iron-dust-executable-profile.mjs?v=3';
 import {buildIronDustV2View, renderIronDustV2View, formatIronDustV2Error,
   formatIronDustV2Event,
   resetIronDustV2View} from './iron-dust-v2-view.mjs?v=10';
 import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1}
   from './src/levels/iron-dust-core-data.v1.mjs';
 import {IRON_DUST_LEVEL_V3} from './src/levels/iron-dust.v3.mjs';
-import {validateIronDustLevelV3} from './src/levels/iron-dust.v1.mjs';
+import {validateIronDustLevelV3} from './src/levels/iron-dust.v1.mjs?v=2';
 
 // Browser commands cross the same validated profile boundary as the Core probes.
 export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';

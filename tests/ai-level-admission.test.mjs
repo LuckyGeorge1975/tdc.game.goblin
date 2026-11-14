@@ -7,10 +7,21 @@ import {apply,route,snapshot,trainingScene} from './training-product-harness.mjs
 import {createIronDustSpectatorMatch} from '../spectator-session.mjs';
 import {createIronDustBrowserSession,createIronDustDecisionHost,dispatchIronDustBrowserAction} from '../iron-dust-browser-v2.mjs';
 import {IRON_DUST_LEVEL_V3} from '../src/levels/iron-dust.v3.mjs';
+import {validateIronDustLevelV3} from '../src/levels/iron-dust.v1.mjs';
 import {recordIronDustProfileReplay,playIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
 
 const source=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
 const ui=source('ui-v2.js');
+test('Core admission ignores inherited permission and validates own values', () => {
+  for (const inherited of [false, 'false']) {
+    const level = Object.assign(Object.create({aiAllowed:inherited}), IRON_DUST_LEVEL_V3);
+    assert.deepEqual(validateIronDustLevelV3(level), validateIronDustLevelV3(IRON_DUST_LEVEL_V3));
+  }
+  for (const aiAllowed of [true, false])
+    assert.equal(validateIronDustLevelV3({...IRON_DUST_LEVEL_V3,aiAllowed}).aiAllowed, aiAllowed);
+  for (const aiAllowed of [undefined, null, 'false'])
+    assert.throws(() => validateIronDustLevelV3({...IRON_DUST_LEVEL_V3,aiAllowed}), /SCENARIO_AI_PERMISSION_INVALID/);
+});
 function installHost(game){
   game.run(ui.split('\n').find(line=>line.startsWith('    const targetOccupant ='))+'\n'+
     ui.slice(ui.indexOf('    function legacyCommands('),ui.indexOf('    const targetCommands =')));

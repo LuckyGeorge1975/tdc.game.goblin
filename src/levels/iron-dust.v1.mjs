@@ -46,11 +46,14 @@ export function validateIronDustLevelV1(value) {
 
 export function validateIronDustLevelV3(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('LEVEL_DATA_MISMATCH');
-  const {minimumDifficulty,aiAllowed,...layout} = value;
+  const {minimumDifficulty,...layout} = value;
+  delete layout.aiAllowed;
   if (!same(layout,IRON_DUST_HISTORICAL_LAYOUT)) throw new Error('LEVEL_DATA_MISMATCH');
   if (Object.hasOwn(value,'minimumDifficulty') && minimumDifficulty === undefined) throw new Error('IRON_DUST_DIFFICULTY_INVALID');
-  if (Object.hasOwn(value,'aiAllowed') && typeof aiAllowed!=='boolean') throw new Error('SCENARIO_AI_PERMISSION_INVALID');
+  const hasAiAllowed = Object.hasOwn(value,'aiAllowed');
+  const aiAllowed = hasAiAllowed ? value.aiAllowed : undefined;
+  if (hasAiAllowed && typeof aiAllowed !== 'boolean') throw new Error('SCENARIO_AI_PERMISSION_INVALID');
   effectiveIronDustDifficulty('medium',minimumDifficulty);
   return freeze({...IRON_DUST_HISTORICAL_LAYOUT,...(minimumDifficulty === undefined ? {} : {minimumDifficulty}),
-    ...(aiAllowed === undefined ? {} : {aiAllowed})});
+    ...(hasAiAllowed ? {aiAllowed} : {})});
 }

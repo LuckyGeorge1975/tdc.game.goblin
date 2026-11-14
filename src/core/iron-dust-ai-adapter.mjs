@@ -1,6 +1,6 @@
 import {createAiDecisionAdapter} from './ai-decision-adapter.mjs';
 import {dispatchIronDustProfile, dispatchIronDustProfileEnemyFireChoice, dispatchIronDustProfileEnemyMoveChoice, queryIronDustCrtPreview,
-  queryIronDustProfile, validateIronDustProfile} from './iron-dust-executable-profile.mjs?v=2';
+  queryIronDustProfile, validateIronDustProfile} from './iron-dust-executable-profile.mjs?v=3';
 import {listIronDustEnemyMoveChoices,queryIronDustEnemyFireChoice} from './iron-dust-enemy-turn-controller-probe.mjs?v=2';
 import {ironDustCrtRatio} from './iron-dust-crt-ratio.mjs';
 

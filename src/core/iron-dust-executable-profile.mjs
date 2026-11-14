@@ -2,7 +2,7 @@ import TerrainRules from '../../terrain-rules-module.mjs';
 import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1} from
   '../levels/iron-dust-core-data.v1.mjs';
 import {IRON_DUST_LEVEL_V3} from '../levels/iron-dust.v3.mjs';
-import {validateIronDustLevelV3} from '../levels/iron-dust.v1.mjs';
+import {validateIronDustLevelV3} from '../levels/iron-dust.v1.mjs?v=2';
 import {IRON_DUST_LEGACY_LOS_PROBE_V1} from './iron-dust-legacy-los-probe.mjs';
 import {IRON_DUST_ZERO_TREADS_STATE_VERSION,
   IRON_DUST_ZERO_TREADS_POLICY_VERSION, IRON_DUST_FIRE_GEOMETRY_VERSION,
