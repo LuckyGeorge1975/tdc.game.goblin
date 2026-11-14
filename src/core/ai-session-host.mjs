@@ -1,6 +1,6 @@
 // The owning engine supplies the current side and installs any committed state
 // synchronously. The policy receives only its own adapter's decision DTO.
-export function createAiSessionHost({adapter, read, select, commit, spectator = false}) {
+export function createAiSessionHost({adapter, read, select, policy, commit, spectator = false}) {
   let generation = 0;
   let stopped = false;
   let paused = false;
@@ -20,15 +20,26 @@ export function createAiSessionHost({adapter, read, select, commit, spectator = 
       return reject('AI_HOST_WRONG_SIDE');
     const decision = adapter.open(before.side);
     if (!decision.ok) return decision;
+    if (decision.side !== before.side) {
+      adapter.invalidate();
+      return reject('AI_HOST_WRONG_SIDE');
+    }
     if (!decision.candidates.length) return reject('AI_HOST_NO_CANDIDATES');
     const request = {generation};
     pending = request;
     try {
-      const key = await select(decision);
+      let key;
+      try {
+        key = await (policy ? policy.select(before,decision) : select(decision));
+      } catch {
+        return reject('AI_HOST_SELECTION_FAILED');
+      }
       const current = read();
       if (request.generation !== generation || current?.session !== before.session ||
-          current?.side !== before.side || current?.ended)
+          current?.side !== before.side || current?.ended || current?.engine !== before.engine ||
+          current?.profile !== before.profile || current?.feature !== before.feature)
         return reject('AI_HOST_STALE');
+      if (!decision.candidates.some(candidate=>candidate.key === key)) return reject('AI_UNKNOWN_CANDIDATE');
       const result = adapter.execute({schemaVersion:decision.schemaVersion,
         decisionId:decision.decisionId,revision:decision.revision,key});
       if (result.ok) commit(result, before);

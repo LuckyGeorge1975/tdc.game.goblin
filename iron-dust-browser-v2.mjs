@@ -1,7 +1,8 @@
 import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
 import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=4';
 import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs?v=2';
-import {createAiSessionHost} from './src/core/ai-session-host.mjs';
+import {createAiSessionHost} from './src/core/ai-session-host.mjs?v=2';
+import {createAiPolicyRegistry} from './src/core/ai-policy-registry.mjs';
 
 function observePresentation(observer,method,...args){
   try{return observer?.[method]?.(...args);}catch{return null;}
@@ -24,14 +25,18 @@ export const IRON_DUST_V2_SELECTOR_ID = 'iron-dust-v2';
 export const IRON_DUST_V2_START_SEED = 8;
 // A future spectator owner supplies the approved policies, then schedules
 // advance() at the end of each committed engine action.
-export function createIronDustDecisionHost({readSession, readEpoch, select, install, spectator}) {
+const browserPolicies = createAiPolicyRegistry([]);
+
+export function createIronDustDecisionHost({readSession, readEpoch, select, policy, feature, install, spectator}) {
   const adapter = createIronDustAiAdapter(() => ({state:readSession()?.profile,generation:readEpoch()}));
   return createAiSessionHost({
-    adapter, select, spectator,
+    adapter, select, policy, spectator,
     read() {
       const session = readSession();
       if (!session) return null;
-      return {session:readEpoch(),side:session.projection.state.activeTeam,ended:session.projection.mode === 'ended'};
+      return {session:readEpoch(),side:session.projection.state.activeTeam,ended:session.projection.mode === 'ended',
+        engine:session.profile.profileVersion,
+        profile:session.profile.header.ruleProfileId,feature};
     },
     commit(result) {
       install(Object.freeze({profile:result.profile,projection:projectIronDustProfile(result.profile,result.events)}));
@@ -274,6 +279,7 @@ if (typeof document !== 'undefined') {
       session.profile.header.ruleProfileId, eventHistory) : null; },
     get enemyRunning() {return enemyFlow.running;},
     roundView: () => rounds?.view() ?? null,
+    policyChoices: scopes => browserPolicies.choices(scopes),
     query: command => mode === 'ready' && session && !paused && !enemyFlow.running &&
       command?.type !== 'AutoEnemyAdvance' ? queryIronDustProfile(session.profile, command)
       : {available:false, error:{code:'V2_NOT_READY'}},
