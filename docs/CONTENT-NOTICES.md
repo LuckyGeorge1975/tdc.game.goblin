@@ -1,8 +1,8 @@
 # Content & Asset Notices
 
-**Document version:** 20
+**Document version:** 21
 
-G.O.B.L.I.N. is an independent original prototype by Tactical Design Cell. It is not affiliated with, endorsed by, or presented as an official adaptation of any third-party game or product line.
+G.O.B.L.I.N. is an independent original prototype by Think Design Code. It is not affiliated with, endorsed by, or presented as an official adaptation of any third-party game or product line.
 
 Build 0.1.17 uses code-generated SVG and CSS artwork plus six original, locally hosted unit-art styles created for this project. Five styles serve smaller Content-08 WebP Unit Guide views with PNG fallback; the sixth uses larger SVG symbols. The active style can be changed in the game. Locally available system fonts are used; no third-party image, audio, or webfont package is required by that content layer.
 
