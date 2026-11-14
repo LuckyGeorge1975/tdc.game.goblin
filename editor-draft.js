@@ -10,8 +10,9 @@
   const available = () => !!profile();
   const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
     Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
-  const position = cell => Number.isInteger(cell.x) && cell.x >= 0 && cell.x < width &&
-    Number.isInteger(cell.y) && cell.y >= 0 && cell.y < height;
+  const size = Object.freeze({minWidth:6,maxWidth:18,minHeight:5,maxHeight:12});
+  const validSize = ({width,height}) => Number.isInteger(width) && width >= size.minWidth && width <= size.maxWidth &&
+    Number.isInteger(height) && height >= size.minHeight && height <= size.maxHeight;
   const key = cell => cell.x + ',' + cell.y;
   const fail = code => { throw new Error(code); };
   function copyTemplate() {
@@ -47,9 +48,11 @@
       if (Object.hasOwn(draft,key)) fields.push(key);
     if (!exact(draft,fields) || (!oldEvents && !current && draft.version !== historicalVersion) ||
         (current && Object.hasOwn(draft,'ruleProfile') && draft.ruleProfile !== profile().ruleProfileId) ||
-        draft.width !== width || draft.height !== height || draft.objective !== objective ||
+        !(current ? validSize(draft) : draft.width === width && draft.height === height) || draft.objective !== objective ||
         !Array.isArray(draft.terrain) || !Array.isArray(draft.units) ||
-        draft.terrain.length > width * height || draft.units.length > width * height) fail('schema');
+        draft.terrain.length > draft.width * draft.height || draft.units.length > draft.width * draft.height) fail('schema');
+    const position = cell => Number.isInteger(cell.x) && cell.x >= 0 && cell.x < draft.width &&
+      Number.isInteger(cell.y) && cell.y >= 0 && cell.y < draft.height;
     const validId = id => typeof id === 'string' && /^[a-z][a-z0-9-]{0,47}$/.test(id);
     if (Object.hasOwn(draft,'id') !== Object.hasOwn(draft,'scenarioVersion') ||
         Object.hasOwn(draft,'id') && (!validId(draft.id) || draft.scenarioVersion !== 1)) fail('schema');
@@ -80,6 +83,7 @@
       waves = {...waves,waves:draft.events};
       try { GoblinCatalogWaves.create(waves); } catch { fail('waves'); }
       if (!Array.isArray(draft.waveTemplates) || draft.waveTemplates.length !== waves.waves.length) fail('waves');
+      if (waves.waves.some(wave => wave.entries.some(cell => !position(cell)))) fail('bounds');
     }
     const templates = draft.waveTemplates ?? [];
     for (const [index,entry] of [...draft.units,...templates].entries()) {
@@ -197,7 +201,8 @@
     const source = profile(), terrainTypes = copy.terrain;
     const [levelDigest,rosterDigest,terrainDigest] = await Promise.all(
       [copy,units,terrainTypes].map(value => GoblinCatalogBase.hash(value)));
-    const config = freeze({...source, title:'Editor draft', kicker:'G.O.B.L.I.N.', kickerKey:'v2.editor.title',
+    const config = freeze({...source, ...(copy.width !== width || copy.height !== height ? {width:copy.width,height:copy.height} : {}),
+      title:'Editor draft', kicker:'G.O.B.L.I.N.', kickerKey:'v2.editor.title',
       sub:'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
       ...(copy.briefing ? {briefing:copy.briefing} : {}),
       ...(events ? {levelEvents:events} : {}),
@@ -210,5 +215,5 @@
   }
   const unitTypes = () => Object.entries(profile().catalog.registry.units).map(([assetId, record]) =>
     ({assetId, squads:!!record.target.strengthRef}));
-  root.GoblinEditorDraft = Object.freeze({id,version,available,copyTemplate,validate,parse,importLevels,exportJson,prepare,unitTypes,isPrepared:config => admitted.has(config)});
+  root.GoblinEditorDraft = Object.freeze({id,version,size,available,copyTemplate,validate,parse,importLevels,exportJson,prepare,unitTypes,isPrepared:config => admitted.has(config)});
 })(globalThis);

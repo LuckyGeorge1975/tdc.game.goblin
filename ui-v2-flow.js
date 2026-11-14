@@ -168,7 +168,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function missionData(id) {
       for (const field of Object.values(fieldCampaigns)) {
         const config = field.configs?.[field.ids.indexOf(id)];
-        if (config) return {width:12,height:8,defaultTerrain:'open-ground',terrain:config.terrainTypes,
+        if (config) return {width:config.width??12,height:config.height??8,defaultTerrain:'open-ground',terrain:config.terrainTypes,
           units:GoblinCatalogFullRuntime.initialRoster(config)};
       }
       if (id === 'iron-dust-v2') {
@@ -201,7 +201,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (!data) return paragraph(t('screen.briefing.dataUnavailable'), 'v2-status');
       const figure = document.createElement('figure'); figure.className = 'v2-mission-map';
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('viewBox', '0 0 460 254');
+      svg.setAttribute('viewBox', `0 0 ${460+(data.width-12)*36} ${254+(data.height-8)*30}`);
       svg.setAttribute('role', 'img');
       svg.setAttribute('aria-label', t('v2.ui.previewMap'));
       const terrain = new Map(data.terrain.map(cell => [`${cell.x},${cell.y}`, cell.type]));

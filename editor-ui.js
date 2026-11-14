@@ -185,7 +185,7 @@
   }
   function map(view) {
     const svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox','0 0 790 480');
+    svg.setAttribute('viewBox',boardViewBox(view.draft.width,view.draft.height));
     svg.setAttribute('aria-label',label('map'));
     svg.classList.add('v2-editor-map');
     if (view.moving) svg.classList.add('v2-editor-map-moving');
@@ -228,6 +228,15 @@
     const types = GoblinEditorDraft.unitTypes();
     const layout = node('div'); layout.className = 'v2-editor-layout';
     const fields = node('div'); fields.className = 'v2-editor-fields';
+    const limits = GoblinEditorDraft.size;
+    const width = coordinate(draft.width-1,limits.maxWidth), height = coordinate(draft.height-1,limits.maxHeight);
+    width.min = String(limits.minWidth); height.min = String(limits.minHeight);
+    width.disabled = height.disabled = busy || moving;
+    fields.append(field(label('boardWidth'),width),field(label('boardHeight'),height),
+      button('applySize',() => {
+        const next = {...draft,width:width.valueAsNumber,height:height.valueAsNumber};
+        view.update(next,{x:Math.min(cell.x,next.width-1),y:Math.min(cell.y,next.height-1)});
+      },busy || moving));
     const terrain = select(Object.keys(TerrainRules.rules).map(id => [id,TerrainDisplay.label(id)]),
       draft.terrain.find(item => sameCell(item,cell))?.type ?? 'open-ground');
     const asset = select([['',label('chooseUnit')],...types.map(item => [item.assetId,unitName(item.assetId)])],current?.assetId ?? '');
@@ -254,7 +263,8 @@
       button('applyUnit', () => {
         const type = types.find(item => item.assetId === asset.value);
         if (!type) { error.textContent = label('error.unit'); return; }
-        const freeId = Array.from({length:96},(_,i)=>'draft-' + (i+1)).find(id => !draft.units.some(unit => unit.id === id));
+        const freeId = Array.from({length:draft.units.length+(draft.waveTemplates?.length??0)+1},(_,i)=>'draft-' + (i+1)).find(id =>
+          !draft.units.some(unit => unit.id === id) && !draft.waveTemplates?.some(unit => unit.id === id));
         const id = asset.value === 'command-core' ? 'core' : current && current.id !== 'core' ? current.id : freeId;
         const next = {x:x.valueAsNumber-1,y:y.valueAsNumber-1};
         const unit = {id,assetId:asset.value,team:team.value,...next,...(type.squads ? {squads:current?.squads ?? 2} : {}),

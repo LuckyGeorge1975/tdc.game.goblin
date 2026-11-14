@@ -12,6 +12,31 @@ async function scene() {
   return g;
 }
 
+test('6×5 and 18×12 drafts save, reload and bind native board dimensions',async()=>{
+  const g=await scene();
+  const store=new Map();
+  g.context.localStorage={getItem:key=>store.get(key)??null,setItem:(key,value)=>store.set(key,value)};
+  g.run(readFileSync(new URL('../saved-levels.js',import.meta.url),'utf8'));
+  for (const [width,height] of [[6,5],[18,12]]) {
+    g.context.size={width,height};
+    g.run(`globalThis.variableDraft={...draft,...size,
+      terrain:[{x:size.width-1,y:size.height-1,type:'crater'}],
+      units:[{id:'scout',assetId:'combat-skimmer',team:'player',x:0,y:0},
+        {id:'core',assetId:'command-core',team:'enemy',x:size.width-1,y:size.height-1}]};
+      GoblinSavedLevels.save('Variable',variableDraft);`);
+    await g.run('GoblinEditorDraft.prepare(GoblinEditorDraft.parse(GoblinSavedLevels.read().at(-1).level)).then(loadEditorDraft)');
+    assert.deepEqual(read(g,'[W,H]'),[width,height]);
+    assert.equal(g.run('GoblinCatalogFullRuntime.aiProjection("player").terrain.width'),width);
+    assert.notEqual(g.run('boardViewBox()'),'0 0 790 480');
+    assert.equal(execute(g,{type:'Move',actorId:'scout',x:1,y:0}).ok,true);
+    assert.equal(execute(g,{type:'Move',actorId:'scout',x:width,y:0}).ok,false);
+    assert.throws(()=>g.run('GoblinEditorDraft.validate({...variableDraft,width:size.width-1})'),/bounds|schema/);
+    g.run("loadScenario('catalog-full-terrain-course')");
+    assert.deepEqual(read(g,'[W,H]'),[12,8]);
+    assert.equal(g.run('boardViewBox()'),'0 0 790 480');
+  }
+});
+
 test('production FULL v3 missions round-trip with starting cargo, waves and objectives', async () => {
   const g = await scene();
   const file = name => readFileSync(new URL('../assets/unit-art/levels/' + name,import.meta.url),'utf8');

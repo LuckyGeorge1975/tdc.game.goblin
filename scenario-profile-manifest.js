@@ -132,6 +132,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     return buildSession(id,config,false);
   }
   function buildSession(id,config,draft){
+    const width=draft?config.width??12:12, height=draft?config.height??8:8;
     if(!Array.isArray(config.units)||!Array.isArray(config.terrain)||
       config.terrainTypes!==undefined&&!Array.isArray(config.terrainTypes))
       reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} hat keine gültigen effektiven Regeln; Partie wurde nicht geladen.`);
@@ -139,7 +140,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     for(const unit of config.units){
       if(!unit||typeof unit.id!=='string'||!unit.id||unitIds.has(unit.id)||
         !['player','enemy'].includes(unit.team)||
-        !Number.isInteger(unit.x)||unit.x<0||unit.x>=12||!Number.isInteger(unit.y)||unit.y<0||unit.y>=8||
+        !Number.isInteger(unit.x)||unit.x<0||unit.x>=width||!Number.isInteger(unit.y)||unit.y<0||unit.y>=height||
         !Number.isInteger(unit.move)||unit.move<0||
         (unit.catalogSystems?
           ((!draft&&!['catalog-siege','catalog-specialists',...fullIds].includes(id))||Object.hasOwn(unit,'hp')||Object.hasOwn(unit,'maxHp')||Object.hasOwn(unit,'infantry')||unit.alive!==true||!GoblinSystems.validateCatalogSystem(unit.catalogSystems,config.catalog.registry)):

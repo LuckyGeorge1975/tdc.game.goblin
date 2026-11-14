@@ -49,6 +49,8 @@ function applyScenarioSession(nextSession){
   globalThis.IronDustBrowserV2?.stop();
   legacySession=nextSession;
   const active=nextSession.config;
+  W=active.width??12;
+  H=active.height??8;
   currentScenario=nextSession.scenarioId;
   terrain=new Set(active.terrain);
   terrainTypes=new Map((active.terrainTypes||[]).map(cell=>[`${cell.x},${cell.y}`,cell.type]));

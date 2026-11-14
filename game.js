@@ -1,5 +1,9 @@
 const NS='http://www.w3.org/2000/svg';
-const W=12,H=8,S=34,DX=Math.sqrt(3)*S, DY=1.5*S;
+let W=12,H=8;
+const S=34,DX=Math.sqrt(3)*S, DY=1.5*S;
+function boardViewBox(width=W,height=H) {
+  return `0 0 ${Math.ceil(790+(width-12)*DX)} ${480+(height-8)*DY}`;
+}
 let terrain=new Set();
 let terrainTypes = new Map();
 function unitAlive(unit){return globalThis.GoblinUnitLife?GoblinUnitLife.alive(unit):unit?.hp>0}
@@ -153,7 +157,7 @@ function addLog(text,enemy=false){if(globalThis.GoblinCatalogFullRuntime?.active
 function drawGrid(){if(!gridVisible)return;for(let y=0;y<H;y++)for(let x=0;x<W;x++){const grid=document.createElementNS(NS,'polygon');grid.setAttribute('points',hexPoints(x,y));grid.classList.add('grid-hex');svg.appendChild(grid)}}function drawFocusMarker(){if(!focusedCell)return;const marker=document.createElementNS(NS,'polygon');marker.setAttribute('points',hexPoints(focusedCell.x,focusedCell.y));marker.classList.add('focus-marker');svg.appendChild(marker)}function draw(){
   globalThis.GoblinLegacyPresentation?.sync();
   const visibleUnits=globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units;
-  svg.setAttribute('viewBox','0 0 790 480'); svg.innerHTML=''; const passiveSelection=selected&&unitAlive(selected)&&!phaseCanAct(selected);
+  svg.setAttribute('viewBox',boardViewBox()); svg.innerHTML=''; const passiveSelection=selected&&unitAlive(selected)&&!phaseCanAct(selected);
   const bakeData=typeof MapBake==='undefined'?null:MapBake.snapshot(currentScenario,legacySession?.config,legacySession,
     scenarioCatalog[currentScenario]?.bakeLevel,W,H,S,58,48,terrainTypeAt);
   const bakeUrl=typeof MapBake==='undefined'?null:MapBake.select(bakeData,draw),baked=!!bakeUrl;
