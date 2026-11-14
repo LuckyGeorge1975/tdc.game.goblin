@@ -1,5 +1,5 @@
 import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
-import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs';
+import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=2';
 import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs';
 import {createAiSessionHost} from './src/core/ai-session-host.mjs';
 
@@ -150,12 +150,13 @@ if (typeof document !== 'undefined') {
     if (mode !== 'ready' || !session) return {error:{code:'V2_NOT_READY'}};
     const cursor = session.projection.cursor;
     const before = session.profile;
+    const roundCommit = session.projection.mode === 'ended' ? null : rounds.beginCommit();
     const result = dispatchIronDustBrowserAction(session, command, presentation);
     if (result.session) {
       session = result.session;
-      rounds.accept(captureIronDustRoundCommit(before,{
+      captureIronDustRoundCommit(roundCommit,before,{
         profile:session.profile,events:session.projection.events
-      }));
+      });
       eventHistory.push(...session.projection.events.map(event => ({...event,
         cursorPass:command.type === 'AutoEnemyAdvance' ? cursor?.pass : null,
         cursorIndex:command.type === 'AutoEnemyAdvance' ? cursor?.index : null})));

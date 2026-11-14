@@ -1,4 +1,4 @@
-import {captureRoundEvent,createRoundRecorder,visibleRoundPath} from './round-view-producer.mjs';
+import {createRoundRecorder,visibleRoundPath} from './round-view-producer.mjs?v=2';
 import {dispatchIronDustProfile,validateIronDustProfile} from './src/core/iron-dust-executable-profile.mjs';
 
 const stateOf = profile => profile.entry.mode==='enemy'?profile.entry.payload.state:profile.entry.payload;
@@ -8,7 +8,7 @@ const kind = Object.freeze({UnitMoved:'move',EnemyMoved:'move',RamResolved:'ram'
 const label = Object.freeze(Object.fromEntries(['ogre','gev','missile','infantry','core','guard','raider']
   .map(id=>[id,`v2.unit.${id}`])));
 
-function observations(before, after, events, options) {
+function observations(before, after, events, captureRoundEvent, options) {
   const facts = new Map(after.units.map(unit=>[unit.id,{id:unit.id,labelKey:label[unit.id]??'v2.unit.unknown',
     cell:{x:unit.x,y:unit.y}}]));
   const units=after.units.filter(unit=>unit.hp>0&&!unit.embarkedOn).map(unit=>facts.get(unit.id));
@@ -52,20 +52,22 @@ export function createIronDustRoundHost(initialProfile,{mode='player',execute=di
   let profile=initialProfile;
   const recorder=createIronDustRoundRecorder(initialProfile,()=>profile,mode);
   function dispatch(command) {
+    if (profile.entry.mode==='ended') return execute(profile,command);
+    const commit=recorder.beginCommit();
     const before=profile, result=execute(before,command);
     if (!result.profile) return result;
     profile=result.profile;
-    recorder.accept(captureIronDustRoundCommit(before,result));
+    captureIronDustRoundCommit(commit,before,result);
     return result;
   }
   return Object.freeze({dispatch,view:recorder.view,get profile(){return profile}});
 }
 
-export function captureIronDustRoundCommit(before,{profile,events}, privateOptions) {
+export function captureIronDustRoundCommit(commit,before,{profile,events}, privateOptions) {
   const previous=stateOf(before), next=stateOf(profile);
   const finished=profile.entry.mode==='ended';
   const complete=previous.activeTeam==='enemy' && events.some(event=>event.type==='PhaseChanged'&&
     event.from==='enemy'&&event.side==='player'&&event.to==='movement'&&event.turn===next.turn);
-  return {roundNumber:previous.turn,events:observations(previous,next,events,privateOptions),
-    ...(finished?{boundary:'terminal-partial'}:complete?{boundary:'complete'}:{})};
+  commit.accept({roundNumber:previous.turn,events:observations(previous,next,events,commit.captureRoundEvent,privateOptions),
+    ...(finished?{boundary:'terminal-partial'}:complete?{boundary:'complete'}:{})});
 }

@@ -9,13 +9,6 @@ const freeze = value => {
   return value;
 };
 const point = ({x,y}) => ({x,y});
-const capturedEvents=new WeakSet();
-
-function sealed(full, publicRow) {
-  const record=freeze({full,public:publicRow});
-  capturedEvents.add(record);
-  return record;
-}
 
 function encodeRound(round, perspective) {
   const tokens = new Map();
@@ -68,9 +61,9 @@ function copyRow(row) {
 
 // Trusted event capture only. publicEvidence is obtained independently from
 // engine visibility and the actual public event, never from a policy or UI.
-export function captureRoundEvent(event, publicEvidence = null) {
+function captureRoundEvent(event, publicEvidence = null) {
   const full=copyRow(event);
-  if (!publicEvidence?.observable) return sealed(full,null);
+  if (!publicEvidence?.observable) return {full,public:null};
   const {actor, target, result, snapshot, paths} = publicEvidence;
   const named = !event.actor || actor?.id===event.actor.id;
   const visible={side:event.side,kind:named?event.kind:'observed-effect',
@@ -78,13 +71,13 @@ export function captureRoundEvent(event, publicEvidence = null) {
   if (snapshot) visible.snapshot={...snapshot,paths:paths??[]};
   // This slice publishes no player alternatives. A visible target alone does
   // not prove that ranking, count or even the option's existence are public.
-  return sealed(full,copyRow(visible));
+  return {full,public:copyRow(visible)};
 }
 
 // FULL commit boundaries can attest a hit or a newly revealed subject. They
 // cannot attest all intermediate coordinates. A path needs explicit per-step
 // evidence from the commit source, including visibility of the mover there.
-export function captureFullRoundEvent(event, {before,after,disclosure}) {
+function captureFullRoundEvent(event, {before,after,disclosure}) {
   if (!disclosure) return captureRoundEvent(event);
   const lookup=(id, frame)=>frame?.units.find(unit=>unit.id===id);
   const disclosed=(id,timing)=>timing==='before'?lookup(id,before):timing==='after'?lookup(id,after):null;
@@ -120,8 +113,8 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority}
   let round = initialRound, terminal=false, playerView=null;
   const completed=[];
   let base={parent:null}, head=base;
+  let generation=0;
   const checkpoints=new WeakMap();
-  const acceptedEvents=new WeakSet();
 
   function live() {
     const authority=readAuthority();
@@ -137,7 +130,11 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority}
   function rewind(key) {
     const authority=live(), saved=checkpoints.get(key);
     if (!authority || authority.ended || terminal || saved?.round!==round || authority.round!==round) return false;
-    for (let node=head;node;node=node.parent) if (node===saved.head) {head=node;return true}
+    for (let node=head;node;node=node.parent) if (node===saved.head) {
+      head=node;
+      generation++;
+      return true;
+    }
     return false;
   }
   function rows() {
@@ -146,18 +143,42 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority}
     const ordered=all.reverse();
     return {public:ordered.flatMap(node=>node.public),full:ordered.flatMap(node=>node.full)};
   }
+  // The host opens this before applying the native action. A receipt and its
+  // opaque event handles are valid only at this exact parent and undo generation.
+  function beginCommit() {
+    const authority=live();
+    if (!authority || terminal || authority.ended || authority.round!==round)
+      throw Error('ROUND_RECEIPT_STALE');
+    const parent=head, openedGeneration=generation, openedRound=round;
+    const captures=new WeakMap();
+    function bind(row) {
+      const event=Object.freeze({});
+      captures.set(event,row);
+      return event;
+    }
+    return Object.freeze({
+      captureRoundEvent:(...args)=>bind(captureRoundEvent(...args)),
+      captureFullRoundEvent:(...args)=>bind(captureFullRoundEvent(...args)),
+      accept(receipt) {
+        if (head!==parent || generation!==openedGeneration || round!==openedRound)
+          throw Error('ROUND_RECEIPT_STALE');
+        const {events}=receipt;
+        if (!Array.isArray(events)) throw Error('ROUND_RECEIPT_STALE');
+        if (new Set(events).size!==events.length || events.some(event=>!captures.has(event)))
+          throw Error('ROUND_EVENT_INVALID');
+        accept({...receipt,events:events.map(event=>captures.get(event))});
+      }
+    });
+  }
   function accept({roundNumber, events, boundary}) {
     const authority=live();
-    if (!authority || terminal || roundNumber!==round || !Array.isArray(events))
+    if (!authority || terminal || roundNumber!==round)
       throw Error('ROUND_RECEIPT_STALE');
-    if (new Set(events).size!==events.length || events.some(event=>!capturedEvents.has(event)||acceptedEvents.has(event)))
-      throw Error('ROUND_EVENT_INVALID');
     if (boundary==='complete' && (authority.ended || authority.round!==round+1 ||
         authority.side!=='player' || authority.phase!=='movement')) throw Error('ROUND_BOUNDARY_INVALID');
     if (boundary==='terminal-partial' && (!authority.ended || authority.round!==round)) throw Error('ROUND_BOUNDARY_INVALID');
     if (boundary===undefined && (authority.ended || authority.round!==round)) throw Error('ROUND_BOUNDARY_MISSING');
     if (boundary!==undefined && !['complete','terminal-partial'].includes(boundary)) throw Error('ROUND_BOUNDARY_INVALID');
-    events.forEach(event=>acceptedEvents.add(event));
     head={parent:head,public:events.flatMap(event=>event.public?[event.public]:[]),full:events.map(event=>event.full)};
     if (!boundary) return;
     const captured=rows();
@@ -187,5 +208,5 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority}
     const current=encodeRound({number:round,completion:'complete',rows:rows().full},'spectator');
     return freeze({schemaVersion:1,roundNumber:round,rows:current.rows});
   }
-  return Object.freeze({accept,checkpoint,rewind,view,spectatorCurrent});
+  return Object.freeze({beginCommit,checkpoint,rewind,view,spectatorCurrent});
 }

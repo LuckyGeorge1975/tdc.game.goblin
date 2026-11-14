@@ -1,5 +1,5 @@
-import {createIronDustBrowserSession, createIronDustDecisionHost} from './iron-dust-browser-v2.mjs';
-import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs';
+import {createIronDustBrowserSession, createIronDustDecisionHost} from './iron-dust-browser-v2.mjs?v=20';
+import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=2';
 
 export function createIronDustSpectatorMatch(select) {
   let session = createIronDustBrowserSession();
@@ -8,11 +8,12 @@ export function createIronDustSpectatorMatch(select) {
   const host = createIronDustDecisionHost({
     readSession:() => session, readEpoch:() => epoch, spectator:true, select,
     install(next) {
+      const commit = recorder.beginCommit();
       const before = session.profile;
       session = next;
-      recorder.accept(captureIronDustRoundCommit(before, {
+      captureIronDustRoundCommit(commit,before, {
         profile:next.profile, events:next.projection.events
-      }));
+      });
     }
   });
   return Object.freeze({
