@@ -266,6 +266,7 @@ if (typeof document !== 'undefined') {
     document.querySelector('#quick-start-open').disabled = false;
     document.querySelector('#unit-guide-open').disabled = false;
   }
+  const queryReady = () => mode === 'ready' && !!session && !paused && !enemyFlow.running;
   globalThis.IronDustBrowserV2 = Object.freeze({
     selectorId: IRON_DUST_V2_SELECTOR_ID,
     available: !!option && !globalThis.goblinBootProfileError,
@@ -280,7 +281,8 @@ if (typeof document !== 'undefined') {
     get enemyRunning() {return enemyFlow.running;},
     roundView: () => rounds?.view() ?? null,
     policyChoices: scopes => browserPolicies.choices(scopes),
-    query: command => mode === 'ready' && session && !paused && !enemyFlow.running &&
+    get queryReady() { return queryReady(); },
+    query: command => queryReady() &&
       command?.type !== 'AutoEnemyAdvance' ? queryIronDustProfile(session.profile, command)
       : {available:false, error:{code:'V2_NOT_READY'}},
     previewFire: command => {

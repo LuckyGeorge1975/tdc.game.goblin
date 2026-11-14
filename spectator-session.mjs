@@ -1,4 +1,4 @@
-import {createIronDustBrowserSession, createIronDustDecisionHost} from './iron-dust-browser-v2.mjs?v=24';
+import {createIronDustBrowserSession, createIronDustDecisionHost} from './iron-dust-browser-v2.mjs?v=25';
 import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=5';
 import {createIronDustCommitRecorder} from './src/core/iron-dust-profile-replay.mjs';
 

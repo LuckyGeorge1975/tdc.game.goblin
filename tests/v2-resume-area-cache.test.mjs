@@ -24,6 +24,7 @@ const hiddenSource = between(ui, "      if (!mode || document.body.classList.con
 const blastSource = between(ui, '    function renderTargetBlast(', '    function focusTargetCard(');
 const refreshSource = ui.match(/refresh: (\(\) => [\s\S]*?) \}\);/)[1];
 const querySource = between(bridge, '    query: command =>', '    previewFire:').trim().slice(7, -1);
+const queryReadySource = bridge.match(/  const queryReady = .*;/)[0];
 const resumeSource = bridge.match(/    resume: (\(\) => \{[^\n]+\}),/)[1];
 
 function scene() {
@@ -58,6 +59,7 @@ function scene() {
     record(value) { records.push(value); },
   };
   runInNewContext(`
+    ${queryReadySource}
     globalThis.IronDustBrowserV2 = {
       query: ${querySource}, formatError: code=>code,
       resume: ${resumeSource}

@@ -376,10 +376,15 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     const hexLabel = cell => `${String.fromCharCode(65 + cell.x)}-${String(cell.y + 1).padStart(2, '0')}`;
     function coreOpenCount(source) { return coreOpenUnits(source).length; }
+    let coreReadiness;
     function coreOpenUnits(source) {
-      if (source.mode !== 'player') return [];
+      const host = IronDustBrowserV2;
+      if (source.mode !== 'player' || !host.queryReady) return [];
+      const {session, epoch} = host;
+      if (coreReadiness?.host === host && coreReadiness.session === session &&
+          coreReadiness.epoch === epoch) return coreReadiness.units;
       const enemies = source.units.filter(unit => unit.team === 'enemy' && unitAlive(unit));
-      return source.units.filter(unit => unit.team === 'player' && unitAlive(unit) && !unit.disabled)
+      const units = source.units.filter(unit => unit.team === 'player' && unitAlive(unit) && !unit.disabled)
         .filter(unit => {
           if (source.phase === 'movement' || source.phase === 'gev') {
             if (source.phase === 'gev' && unit.id !== 'gev') return false;
@@ -394,6 +399,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           return unit.weapons && Object.entries(unit.weapons).some(([key,weapon]) => key !== unit.selectedWeapon && weapon.ready > 0 &&
             IronDustBrowserV2.query({type:'SelectWeapon',playerId:'player',unitId:unit.id,weaponKey:key}).available);
         });
+      coreReadiness = {host, session, epoch, units};
+      return units;
     }
     // Own units that can still act in the current phase, in roster order.
     function readyUnitIds() {
