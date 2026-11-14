@@ -1,0 +1,219 @@
+[
+  {
+    "version": "goblin-level-v3",
+    "width": 12,
+    "height": 8,
+    "objective": "core-and-escort",
+    "ruleProfile": "FULL_CATALOG_v1",
+    "terrain": [
+      {
+        "x": 5,
+        "y": 0,
+        "type": "river"
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "type": "river"
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "type": "river"
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "type": "bridge"
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "type": "river"
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "type": "river"
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "type": "river"
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "type": "river"
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "type": "road"
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "type": "road"
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "type": "forest"
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "type": "urban"
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "type": "ridge"
+      }
+    ],
+    "units": [
+      {
+        "id": "relay-1",
+        "assetId": "assault-tank",
+        "team": "player",
+        "x": 3,
+        "y": 3
+      },
+      {
+        "id": "relay-2",
+        "assetId": "skimmer-scout",
+        "team": "player",
+        "x": 3,
+        "y": 5
+      },
+      {
+        "id": "relay-3",
+        "assetId": "infantry-squad",
+        "team": "player",
+        "x": 2,
+        "y": 2,
+        "squads": 3
+      },
+      {
+        "id": "relay-4",
+        "assetId": "guard-tank",
+        "team": "enemy",
+        "x": 7,
+        "y": 3
+      },
+      {
+        "id": "core",
+        "assetId": "command-core",
+        "team": "enemy",
+        "x": 9,
+        "y": 3
+      }
+    ]
+  },
+  {
+    "version": "goblin-level-v3",
+    "width": 12,
+    "height": 8,
+    "objective": "core-and-escort",
+    "ruleProfile": "FULL_CATALOG_v1",
+    "terrain": [
+      {
+        "x": 4,
+        "y": 2,
+        "type": "road"
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "type": "road"
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "type": "road"
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "type": "forest"
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "type": "forest"
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "type": "rubble-field"
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "type": "urban"
+      },
+      {
+        "x": 9,
+        "y": 4,
+        "type": "urban"
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "type": "ridge"
+      }
+    ],
+    "units": [
+      {
+        "id": "relay-1",
+        "assetId": "goblin-siegebreaker",
+        "team": "player",
+        "x": 3,
+        "y": 4
+      },
+      {
+        "id": "relay-2",
+        "assetId": "recon-tank",
+        "team": "player",
+        "x": 3,
+        "y": 2
+      },
+      {
+        "id": "relay-3",
+        "assetId": "assault-tank",
+        "team": "player",
+        "x": 2,
+        "y": 5
+      },
+      {
+        "id": "relay-4",
+        "assetId": "guard-tank",
+        "team": "enemy",
+        "x": 7,
+        "y": 2
+      },
+      {
+        "id": "relay-5",
+        "assetId": "raider-skimmer",
+        "team": "enemy",
+        "x": 8,
+        "y": 5
+      },
+      {
+        "id": "relay-6",
+        "assetId": "relay-node",
+        "team": "enemy",
+        "x": 8,
+        "y": 3
+      },
+      {
+        "id": "core",
+        "assetId": "command-core",
+        "team": "enemy",
+        "x": 9,
+        "y": 4
+      }
+    ]
+  }
+]

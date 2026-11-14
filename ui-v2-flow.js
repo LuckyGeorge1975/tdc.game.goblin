@@ -102,6 +102,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let missionId = globalThis.GoblinCatalogFullModel?.has(requestedScenario)&&currentScenario===requestedScenario?requestedScenario:'iron-dust', started = false, startError = '';
     let screen = 'menu', returnScreen = 'menu', pauseActive = false, savedAuto = false, playScrollY = 0;
     const campaignLessons = ['training-t01', 'training-t02'];
+    const relayMissions = ['relay-line-bridge', 'relay-line-relay'];
+    const relayProgressKey = 'tdc.game.goblin.relay-line.v1';
+    let relayConfigs = null, relayLoading = false, relayError = '', relayWon = false;
     let campaign = null;
     let editorDraft = null, editorCell = {x:0,y:0}, editorError = '', editorBusy = false, editorMoving = false;
     let editorConfig = null, editorReturnScenario = null;
@@ -157,6 +160,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       row.append(...nodes); return row;
     }
     function missionData(id) {
+      const relayConfig = relayConfigs?.[relayMissions.indexOf(id)];
+      if (relayConfig) return {width:12,height:8,defaultTerrain:'open-ground',terrain:relayConfig.terrainTypes,
+        units:GoblinCatalogFullRuntime.initialRoster(relayConfig)};
       if (id === 'iron-dust-v2') {
         const source = globalThis.IronDustBrowserV2?.previewData;
         if (!globalThis.IronDustBrowserV2?.available ||
@@ -369,7 +375,57 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       return campaignLessons.every(id => !!missionData(id));
     }
     function campaignPosition() {
-      return t('v2.campaign.position', {current:campaign.index + 1, total:campaignLessons.length});
+      return t('v2.campaign.position', {current:campaign.index + 1, total:(campaign.relay ? relayMissions : campaignLessons).length});
+    }
+    function relayUnlocked() {
+      if (relayWon) return 2;
+      try { return localStorage.getItem(relayProgressKey) === '2' ? 2 : 1; }
+      catch { return 1; }
+    }
+    async function openRelayCampaign() {
+      if (screen !== 'menu' || relayLoading || !GoblinEditorDraft.available()) return;
+      relayLoading = true;
+      relayError = '';
+      renderScreen(false);
+      try {
+        if (!relayConfigs) {
+          const response = await fetch('assets/unit-art/levels/relay-line.v3.json?v=1');
+          if (!response.ok) throw Error('relay levels');
+          const levels = await response.json();
+          if (!Array.isArray(levels) || levels.length !== relayMissions.length) throw Error('relay levels');
+          relayConfigs = await Promise.all(levels.map(level => GoblinEditorDraft.prepare(GoblinEditorDraft.parse(JSON.stringify(level)))));
+        }
+        if (screen === 'menu') show('relay-campaign');
+      } catch {
+        relayError = t('screen.briefing.dataUnavailable');
+      } finally {
+        relayLoading = false;
+        if (screen === 'menu') renderScreen(false);
+      }
+    }
+    function chooseRelayMission(index) {
+      if (screen !== 'relay-campaign' || !relayConfigs?.[index] || index >= relayUnlocked()) return;
+      campaign = {relay:true,index,sessionId:null,previousMission:missionId};
+      missionId = relayMissions[index];
+      startError = '';
+      show('briefing');
+    }
+    function recordRelayVictory(state) {
+      if (!campaign?.relay || campaign.index !== 0 || campaign.sessionId !== legacySession.sessionId ||
+          !state.gameOver || state.objective.outcome !== true) return;
+      relayWon = true;
+      try { localStorage.setItem(relayProgressKey, '2'); }
+      catch { relayError = t('v2.relay.storageError'); }
+    }
+    function advanceRelayCampaign() {
+      if (!campaign?.relay || screen !== 'end' || campaign.sessionId !== legacySession.sessionId) return;
+      const state = GoblinUIV2.project();
+      if (!state.gameOver || state.objective.outcome !== true) return;
+      if (campaign.index === 1) { show('campaign-complete'); return; }
+      campaign.index = 1;
+      campaign.sessionId = null;
+      missionId = relayMissions[1];
+      show('briefing');
     }
     function openCampaign() {
       if (screen !== 'menu' || !campaignAvailable()) return;
@@ -379,7 +435,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       show('briefing');
     }
     function bindCampaignLesson() {
-      if (campaign) campaign.sessionId = globalThis.GoblinTrainingRuntime?.view()?.progress.binding.sessionId ?? null;
+      if (campaign) campaign.sessionId = campaign.relay ? legacySession.sessionId :
+        globalThis.GoblinTrainingRuntime?.view()?.progress.binding.sessionId ?? null;
     }
     function advanceCampaign() {
       const progress = globalThis.GoblinTrainingRuntime?.view()?.progress;
@@ -401,9 +458,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       startError = '';
     }
     function returnToCampaignMenu() {
+      const relayBriefing = campaign?.relay && screen === 'briefing';
       clearCampaign();
       started = false;
-      show('menu');
+      show(relayBriefing ? 'relay-campaign' : 'menu');
     }
     async function confirmRestart() {
       if (GameDialogs.isOpen()) return;
@@ -412,7 +470,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         message: t('dialog.restart.body'), acceptLabel: t('dialog.restart.confirm'), cancelLabel: t('dialog.restart.cancel')
       });
       if (!accepted) { renderScreen(false); return; }
-      if (editorConfig || savedConfig) loadEditorDraft(editorConfig || savedConfig);
+      if (campaign?.relay) loadEditorDraft(relayConfigs[campaign.index]);
+      else if (editorConfig || savedConfig) loadEditorDraft(editorConfig || savedConfig);
       else if (globalThis.IronDustBrowserV2?.mode === 'ready') IronDustBrowserV2.restart();
       else loadScenario(currentScenario);
       bindCampaignLesson();
@@ -430,7 +489,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const menu = next === 'menu';
         const accepted = await GameDialogs.confirm({
           id: 'v2-flow-leave', title: t(menu ? 'v2.dialog.mainMenu.title' : 'dialog.changeMission.title'),
-          message: t(editorConfig ? 'v2.editor.returnConfirm' : campaign ? 'v2.campaign.exitConfirm' : training?'training.exitConfirm':menu ? 'v2.dialog.mainMenu.body' : 'ui.dialog.leaveMission.body'),
+          message: t(editorConfig ? 'v2.editor.returnConfirm' : campaign && !campaign.relay ? 'v2.campaign.exitConfirm' : training?'training.exitConfirm':menu ? 'v2.dialog.mainMenu.body' : 'ui.dialog.leaveMission.body'),
           acceptLabel: t(editorConfig ? 'v2.editor.return' : menu ? 'v2.dialog.mainMenu.confirm' : 'dialog.changeMission.confirm'), cancelLabel: t('dialog.changeMission.cancel')
         });
         if (!accepted) { renderScreen(false); return; }
@@ -448,7 +507,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (globalThis.IronDustBrowserV2?.mode === 'ready') {
           IronDustBrowserV2.stop();
           loadScenario('iron-dust');
-        } else loadScenario(savedConfig ? missionId : currentScenario);
+        } else loadScenario(savedConfig || currentScenario === 'editor-draft' ? (scenarioCatalog[missionId] ? missionId : 'iron-dust') : currentScenario);
         savedConfig = null;
         savedTitle = '';
         GoblinUIV2.resetView();
@@ -462,7 +521,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (!missionData(missionId)) {
         startError = t('screen.briefing.dataUnavailable'); renderScreen(false); return;
       }
-      if (missionId === 'iron-dust-v2') {
+      if (campaign?.relay) loadEditorDraft(relayConfigs[campaign.index]);
+      else if (missionId === 'iron-dust-v2') {
         if (!globalThis.IronDustBrowserV2?.available || !IronDustBrowserV2.startWithDifficulty(briefingDifficulty)) {
           startError = t('v2.reject.start'); renderScreen(false); return;
         }
@@ -471,7 +531,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         globalThis.IronDustBrowserV2?.stop();
         loadScenario(missionId);
       }
-      document.querySelector('#scenario-select').value = missionId;
+      if (!campaign?.relay) document.querySelector('#scenario-select').value = missionId;
       bindCampaignLesson();
       started = true;
       startError = '';
@@ -1015,7 +1075,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       });
       const panel = document.createElement('div'); panel.className = 'v2-screen-panel';
       panel.dataset.screen = screen;
-      if (['menu', 'levels', 'options', 'briefing', 'catalog', 'catalog-detail', 'campaign-complete', 'editor'].includes(screen))
+      if (['menu', 'levels', 'options', 'briefing', 'catalog', 'catalog-detail', 'campaign-complete', 'relay-campaign', 'editor'].includes(screen))
         panel.classList.add('v2-foundation');
       surface.replaceChildren(panel);
       surface.setAttribute('aria-labelledby', 'v2-screen-heading');
@@ -1035,7 +1095,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const units = button(t('v2.library.title'), () => openSection('catalog')); units.id = 'v2-menu-units';
         const settings = button(t('ui.nav.settings'), () => openSection('options')); settings.id = 'v2-menu-settings';
         const legal = button(t('v2.ui.legalNotices'), () => openSection('legal')); legal.id = 'v2-menu-legal';
-        menu.append(choose, tutorial, editor, units, settings, legal);
+        const relay = button(t('v2.relay.title'), openRelayCampaign);
+        relay.id = 'v2-menu-relay';
+        relay.disabled = relayLoading || !globalThis.GoblinEditorDraft?.available();
+        menu.append(choose, tutorial, relay, editor, units, settings, legal);
+        if (relayError) menu.append(paragraph(relayError, 'v2-status'));
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         footer.append(paragraph(document.querySelector('#build-version').textContent, 'v2-screen-meta'));
         panel.append(intro, menu, footer);
@@ -1087,6 +1151,17 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         select.setAttribute('aria-label', `${t('ui.levels.select')}: ${t(`mission.${missionId}.title`)}`);
         footer.append(actions(back, select));
         panel.append(layout, footer);
+      } else if (screen === 'relay-campaign') {
+        panel.append(heading(t('v2.relay.title')), paragraph(t('v2.relay.intro')));
+        const unlocked = relayUnlocked();
+        relayMissions.forEach((id, index) => {
+          const choice = button(t(`mission.${id}.title`), () => chooseRelayMission(index));
+          choice.id = `v2-relay-mission-${index + 1}`;
+          choice.disabled = index >= unlocked;
+          panel.append(choice);
+        });
+        if (unlocked === 1) panel.append(paragraph(t('v2.relay.locked')));
+        panel.append(actions(button(t('ui.nav.back'), returnToCampaignMenu)));
       } else if (screen === 'briefing') {
         const data = missionData(missionId);
         const header = document.createElement('header'); header.className = 'v2-screen-header';
@@ -1097,7 +1172,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         header.append(heading(t(`mission.${missionId}.title`)),
           paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
         if (missionId === 'iron-dust-v2' && data) header.append(difficultyControl());
-        if (campaign?.index === 0) header.append(paragraph(t('v2.campaign.session')));
+        if (campaign?.index === 0 && !campaign.relay) header.append(paragraph(t('v2.campaign.session')));
         if(GoblinCatalogBase.has(missionId)||globalThis.GoblinCatalogSpecialistsModel?.has(missionId)||globalThis.GoblinCatalogFullModel?.has(missionId))header.append(paragraph(t(`mission.${missionId}.budget`)));
         if(missionId==='artillery-pilot')header.append(paragraph(t('mission.artillery-pilot.budget')));
         if(missionId==='siege-pilot')header.append(paragraph(t('mission.siege-pilot.budget')));
@@ -1124,7 +1199,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const main = document.createElement('div'); main.className = 'v2-screen-main v2-briefing-main';
         main.append(conditions, preview);
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
-        const back = button(t(campaign ? 'v2.ui.mainMenu' : 'screen.briefing.backToLevels'),
+        const back = button(t(campaign?.relay ? 'ui.nav.back' : campaign ? 'v2.ui.mainMenu' : 'screen.briefing.backToLevels'),
           campaign ? returnToCampaignMenu : returnToSelectedLevel); back.id = 'v2-briefing-back';
         const start = button(t('screen.briefing.startMission'), startMission, 'primary'); start.id = 'v2-briefing-start';
         start.disabled = !data;
@@ -1140,7 +1215,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             button(t('ui.nav.settings'), () => openSection('options')),
             ...(editorConfig ? [] : [button(t('v2.ui.mainMenu'), () => leaveMission('menu'))])));
       } else if (screen === 'campaign-complete') {
-        panel.append(heading(t('v2.campaign.complete')), paragraph(t('v2.campaign.completeBody')),
+        panel.append(heading(t(campaign?.relay ? 'v2.relay.complete' : 'v2.campaign.complete')),
+          paragraph(t(campaign?.relay ? 'v2.relay.completeBody' : 'v2.campaign.completeBody')),
           actions(button(t('v2.ui.mainMenu'), returnToCampaignMenu, 'primary')));
       } else if (screen === 'end') {
         const training=globalThis.GoblinTrainingRuntime?.view();
@@ -1155,11 +1231,16 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         }else{
         const won = state.objective.outcome === true;
         panel.append(heading(t(won ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title')),
-          paragraph(t(won && state.scenario === 'iron-dust-v2' ? 'v2.win' : won ? `mission.${state.scenario}.end.victory` : globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.playerAlive?'v2.full.limit.defeat':'screen.missionEnd.defeat.allUnits')),
+          paragraph(t(won && state.scenario === 'iron-dust-v2' ? 'v2.win' : won ? `mission.${campaign?.relay ? missionId : state.scenario}.end.victory` : globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.playerAlive?'v2.full.limit.defeat':'screen.missionEnd.defeat.allUnits')),
           paragraph(t('ui.hud.turn', { turn: state.turn })),
           actions(button(t('screen.missionEnd.action.retry'), confirmRestart, 'primary'),
             button(t(editorConfig ? 'v2.editor.return' : 'screen.missionEnd.action.chooseMission'), goToLevels),
             button(t('screen.missionEnd.action.log'), () => openSection('log'))));
+        if (campaign?.relay) {
+          panel.append(paragraph(campaignPosition()));
+          if (won) panel.append(actions(button(t(campaign.index === 0 ? 'v2.relay.next' : 'v2.campaign.finish'), advanceRelayCampaign, 'primary')));
+          if (relayError) panel.append(paragraph(relayError, 'v2-status'));
+        }
         }
       } else if (screen === 'log') {
         panel.append(heading(t(state.gameOver ? 'screen.missionEnd.action.log' : 'ui.details.log')));
@@ -1376,15 +1457,23 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     });
     new MutationObserver(() => { if (screen === 'levels') renderScreen(false); })
       .observe(document.querySelector('#scenario-select'), { childList: true });
+    function showMissionEnd() {
+      if (screen !== 'play' || globalThis.GoblinMovement?.busy() || globalThis.GoblinLevelEvents?.pending(legacySession)) return;
+      const state = GoblinUIV2.project();
+      if (!state.gameOver) return;
+      if (campaign?.relay) recordRelayVictory(state);
+      show('end');
+    }
     globalThis.addEventListener('goblin-v2-render', () => {
       if (savedTitle && currentScenario === 'editor-draft')
         document.querySelector('#v2-mission').textContent = savedTitle;
-      if (screen === 'play' && !globalThis.GoblinMovement?.busy() &&
-          !globalThis.GoblinLevelEvents?.pending(legacySession) && GoblinUIV2.project().gameOver) show('end');
+      if (campaign?.relay && currentScenario === 'editor-draft') {
+        document.querySelector('#v2-mission').textContent = t(`mission.${missionId}.title`);
+        document.querySelector('#v2-objective').textContent = t(`mission.${missionId}.objective.short`);
+      }
+      showMissionEnd();
     });
-    globalThis.addEventListener('goblin-movement-finished', () => {
-      if (screen === 'play' && !globalThis.GoblinLevelEvents?.pending(legacySession) && GoblinUIV2.project().gameOver) show('end');
-    });
+    globalThis.addEventListener('goblin-movement-finished', showMissionEnd);
     globalThis.addEventListener('goblin-language-change', () => renderScreen(false));
     globalThis.addEventListener('goblin-language-change',renderTraining);
     globalThis.addEventListener('goblin-training-change',renderTraining);
@@ -1403,7 +1492,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (screen !== 'play' && event.key === 'Escape' && !GameDialogs.isOpen() && document.querySelector('#unit-guide-modal').classList.contains('hidden')) {
         if (screen === 'options' || screen === 'catalog' || screen === 'legal') goBack();
         else if (screen === 'briefing') (campaign ? returnToCampaignMenu : returnToSelectedLevel)();
-        else if (screen === 'campaign-complete') returnToCampaignMenu();
+        else if (screen === 'campaign-complete' || screen === 'relay-campaign') returnToCampaignMenu();
         else if (screen === 'editor' && !editorBusy) {
           if (editorMoving) setEditorMoving(false);
           else show('menu');

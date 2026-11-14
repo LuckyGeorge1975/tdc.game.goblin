@@ -84,7 +84,7 @@ test('only a successful start or accepted restart requests the initial view afte
   const restart=flow.slice(flow.indexOf('    async function confirmRestart() {'),flow.indexOf('    async function goToLevels() {'));
   for(const accepted of [false,true])for(const engine of ['core','legacy']){
     const calls=[];
-    const context={...lifeGlobals,editorConfig:null,savedConfig:null,bindCampaignLesson(){},GameDialogs:{isOpen:()=>false,confirm:async()=>accepted},t:key=>key,
+    const context={...lifeGlobals,editorConfig:null,savedConfig:null,campaign:null,bindCampaignLesson(){},GameDialogs:{isOpen:()=>false,confirm:async()=>accepted},t:key=>key,
       currentScenario:'relay-run',loadScenario:id=>calls.push('load:'+id),
       IronDustBrowserV2:{mode:engine==='core'?'ready':'inactive',restart(){calls.push('restart')}},
       GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},
@@ -95,7 +95,7 @@ test('only a successful start or accepted restart requests the initial view afte
   }
   const start=flow.slice(flow.indexOf('    async function startMission() {'),flow.indexOf('    function libraryAssetId('));
   for(const succeeds of [false,true]){
-    const calls=[],context={briefingDifficulty:'strong',bindCampaignLesson(){},GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'iron-dust-v2',
+    const calls=[],context={campaign:null,briefingDifficulty:'strong',bindCampaignLesson(){},GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'iron-dust-v2',
       t:key=>key,renderScreen(){},IronDustBrowserV2:{available:true,startWithDifficulty:difficulty=>{assert.equal(difficulty,'strong');return succeeds}},
       document:{querySelector:()=>({})},GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},
       show:screen=>calls.push(screen),releasePause:()=>calls.push('resume')};
@@ -103,7 +103,7 @@ test('only a successful start or accepted restart requests the initial view afte
     await context.start();
     assert.deepEqual(calls,succeeds?['reset','play','resume','start-view']:[]);
   }
-  const calls=[],context={bindCampaignLesson(){},GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'relay-run',
+  const calls=[],context={campaign:null,bindCampaignLesson(){},GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'relay-run',
     scenarioCatalog:{'relay-run':{}},loadScenario:id=>calls.push('load:'+id),
     IronDustBrowserV2:{stop:()=>calls.push('stop-core')},document:{querySelector:()=>({})},
     GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},
@@ -115,7 +115,7 @@ test('only a successful start or accepted restart requests the initial view afte
 test('Iron Dust difficulty control starts at Medium, updates the choice and is scoped to its briefing',()=>{
   const start=flow.indexOf('    function difficultyControl(');
   const end=flow.indexOf('    function updateEditor(',start);
-  const context={briefingDifficulty:'medium',t:key=>key,IronDustBrowserV2:{difficulties:['weak','medium','strong']},
+  const context={campaign:null,briefingDifficulty:'medium',t:key=>key,IronDustBrowserV2:{difficulties:['weak','medium','strong']},
     document:{createElement:tag=>({tag,children:[],append(node){this.children.push(node)}})}};
   runInNewContext(flow.slice(start,end),context);
   const [select]=context.difficultyControl().children;

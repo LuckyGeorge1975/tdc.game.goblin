@@ -30,7 +30,7 @@ test('saved v3 levels reload by stable ID and restart from the admitted start sn
   const start = flow.slice(flow.indexOf('    async function startSavedLevel('),flow.indexOf('    async function reloadGameCache('));
   const restart = flow.slice(flow.indexOf('    async function confirmRestart('),flow.indexOf('    async function goToLevels('));
   second.run(`
-    let screen='levels',savedTab=true,savedStarting=false,savedError='',savedConfig=null,savedTitle='',editorConfig=null,started=false;
+    let screen='levels',savedTab=true,savedStarting=false,savedError='',savedConfig=null,savedTitle='',editorConfig=null,started=false,campaign=null;
     let panel={};
     const surface={querySelector:()=>panel};
     const renderScreen=()=>{},show=value=>{screen=value},releasePause=()=>{},bindCampaignLesson=()=>{};
