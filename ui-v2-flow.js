@@ -1241,7 +1241,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             button(t('screen.missionEnd.action.log'), () => openSection('log'))));
         if (campaign?.relay) {
           panel.append(paragraph(campaignPosition()));
-          if (won) panel.append(actions(button(t(campaign.index === 0 ? 'v2.relay.next' : 'v2.campaign.finish'), advanceRelayCampaign, 'primary')));
+          if (won) panel.append(actions(button(t(campaign.index === 0 ? 'v2.relay.next' : 'v2.relay.finish'), advanceRelayCampaign, 'primary')));
           if (relayError) panel.append(paragraph(relayError, 'v2-status'));
         }
         }

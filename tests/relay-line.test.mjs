@@ -30,6 +30,31 @@ test('the position label names the selected campaign in all four languages', () 
   }
 });
 
+test('Relay Line victory uses its own action labels and defeat offers no advance', () => {
+  const labels = [];
+  const context = {URL, URLSearchParams, location:{href:import.meta.url}, document:{readyState:'loading',addEventListener(){}},
+    panel:{append(){}}, paragraph(){}, campaign:{relay:true,index:0}, campaignPosition(){},
+    advanceRelayCampaign(){}, actions(){}, button:label=>labels.push(label), relayError:''};
+  runInNewContext(source('localization.js'),context);
+  const actions = cut('        if (campaign?.relay) {\n          panel.append(paragraph(campaignPosition()));', "      } else if (screen === 'log')");
+  runInNewContext('function renderActions(won) {\n' + actions.slice(0,actions.lastIndexOf('        }')) + '}',context);
+  for (const [lang,next,finish] of [
+    ['de','Weiter zu Relaisbruch','Relaislinie abschließen'],
+    ['en','Continue to Relay Break','Finish Relay Line'],
+    ['es','Continuar a Ruptura del enlace','Finalizar Línea de enlace'],
+    ['fr','Continuer vers Rupture du relais','Terminer Ligne de relais']
+  ]) {
+    labels.length = 0;
+    context.t = key => context.GoblinLanguage.t(key,{},lang);
+    context.campaign.index = 0;
+    context.renderActions(true);
+    context.campaign.index = 1;
+    context.renderActions(true);
+    context.renderActions(false);
+    assert.deepEqual(labels,[next,finish]);
+  }
+});
+
 test('Relay Line admits both new maps and unlocks mission two only after a bound victory', async () => {
   const g = await fullScene('catalog-full-atlas',7,false,'FULL_CATALOG_v1');
   const storage = new Map();
