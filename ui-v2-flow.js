@@ -867,32 +867,35 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const config = started && legacySession.ruleProfileId === state.profile ? legacySession.config : null;
       const registry = started ? config?.catalog?.registry : libraryFullRegistry(state);
       const record = registry?.units[id];
-      const specialist = !started || ['FULL_CATALOG_v1','CATALOG_SPECIALISTS_v1'].includes(state.profile);
+      const full = !started || state.profile === 'FULL_CATALOG_v1';
+      const specialist = full || state.profile === 'CATALOG_SPECIALISTS_v1';
       const refs = new Set();
       if (record?.target && (specialist || state.profile === 'CATALOG_BASE_TRANSPORT_v1')) {
         const rule = record.target;
         if (rule.gevPhaseEligible) refs.add('gev');
+        else if (rule.mode === 'gev' && rule.movement[0] > 0) refs.add('raider');
         if (rule.strengthRef) refs.add('strength');
+        if (rule.damageModel === 'infantry-fixed-crt-v1') refs.add('infantryFixed');
         if (rule.passengerRef || rule.cargoRef === 'carrier-cargo-v1') refs.add('passengers');
-        if (rule.cargoRef === 'drone-cargo-v1' || rule.cargoRef === 'forge-drone-bays-v1') refs.add('drones');
+        if (['carrier-cargo-v1','drone-cargo-v1','forge-drone-bays-v1'].includes(rule.cargoRef)) refs.add('drones');
         if (specialist && rule.systemDefinitionRef) refs.add('systems');
         if (specialist && ['U01','U20'].includes(record.catalogId)) refs.add('ram');
         if (specialist && rule.engineeringRef) refs.add('engineering');
         if (specialist && rule.fireRuleRef === 'artillery-spotter-v1') refs.add('spotter');
         if (specialist && rule.fireRuleRef === 'siege-tank-fire-budget-v1') refs.add('siege');
-        if (specialist && rule.missileRuleRef) refs.add('missile');
-        if (specialist && rule.stealthRef) refs.add('stealth');
+        if (full && rule.missileRuleRef) refs.add('missile');
+        if (full && rule.stealthRef) refs.add('stealth');
         return [...refs];
       }
       const unit = config?.units.find(unit => UnitVisuals.artKey(unit) === id);
       if (!unit) return null;
-      if (unit.gevPhaseEligible) refs.add('gev');
-      if (unit.id === 'ogre') refs.add('ram');
+      if (unit.gevPhaseEligible || (unit.gev || unit.movementMode === 'gev') && config.movement?.secondary > 0) refs.add('gev');
+      if (unit.id === 'ogre') refs.add('legacyRam');
       if (unit.ogreSystems || unit.id === 'ogre') refs.add('systems');
       if (unit.transportCapacity || unit.infantry || unit.engineering) refs.add('legacyPassengers');
       if (unit.artilleryFire) refs.add('spotter');
       if (unit.siegeFireBudget) refs.add('siege');
-      if (unit.strategicMissile) refs.add('missile');
+      if (unit.strategicMissile) refs.add('legacyMissile');
       return [...refs];
     }
     function libraryReferenceWeapons(entry, registry) {
@@ -1057,12 +1060,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           if (refs === null) body.append(paragraph(t('v2.library.profileUnavailable')));
           else for (const ref of refs) body.append(paragraph(t(`library.rules.${ref}.body`)));
         }
-        const links = (refs ?? []).filter(ref => libraryFullRules.includes(ref)).map(ref => button(t(`library.rules.${ref}.title`), () => {
+        const links = libraryFullRegistry(state) ? (refs ?? []).filter(ref => libraryFullRules.includes(ref)).map(ref => button(t(`library.rules.${ref}.title`), () => {
           libraryRule = ref; libraryKind = 'rules'; show('catalog', false);
           const rule = document.getElementById(`v2-library-rule-${ref}`);
           rule?.scrollIntoView({block:'nearest'});
           rule?.querySelector('summary')?.focus({preventScroll:true});
-        }));
+        })) : [];
         if (links.length) body.append(actions(...links));
         if (!strategy && refs?.length === 0) body.append(paragraph(t('v2.library.noSpecials')));
       }

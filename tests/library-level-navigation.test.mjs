@@ -121,10 +121,20 @@ test('FULL reference weapons use approved slots and all four locales contain the
   assert.equal(context.libraryFullRegistry({profile:'FULL_CATALOG_v1'}),registry);
   context.UnitVisuals = {artKey:unit => unit.art};
   context.legacySession = {ruleProfileId:'FIELD_TEST_LEGACY_v1',config:{units:[{id:'ogre',art:'goblin-siegebreaker'},{art:'skimmer-carrier',transportCapacity:3}]}};
-  assert.deepEqual(special('goblin-siegebreaker','FIELD_TEST_LEGACY_v1'), ['ram','systems']);
+  assert.deepEqual(special('goblin-siegebreaker','FIELD_TEST_LEGACY_v1'), ['legacyRam','systems']);
   assert.deepEqual(special('skimmer-carrier','FIELD_TEST_LEGACY_v1'), ['legacyPassengers']);
   context.legacySession = {ruleProfileId:'CATALOG_ARTILLERY_PILOT_v1',config:{units:[{art:'long-range-battery',artilleryFire:{}}]}};
   assert.deepEqual(special('long-range-battery','CATALOG_ARTILLERY_PILOT_v1'), ['spotter']);
+  context.legacySession = {ruleProfileId:'CATALOG_SKIMMER_PILOT_v1',config:{movement:{secondary:3},units:[{art:'combat-skimmer',gev:true}]}};
+  assert.deepEqual(special('combat-skimmer','CATALOG_SKIMMER_PILOT_v1'), ['gev']);
+  context.legacySession = {ruleProfileId:'FULL_CATALOG_v1',config:{catalog:{registry}}};
+  assert.deepEqual(special('raider-skimmer','FULL_CATALOG_v1'), ['raider']);
+  assert.deepEqual(special('skimmer-carrier','FULL_CATALOG_v1'), ['gev','passengers','drones']);
+  for (const id of ['field-engineers','local-defense','infantry-platoon'])
+    assert.ok(special(id,'FULL_CATALOG_v1').includes('infantryFixed'));
+  context.legacySession = {ruleProfileId:'CATALOG_SPECIALISTS_v1',config:{catalog:{registry}}};
+  assert.deepEqual(special('phantom-platform','CATALOG_SPECIALISTS_v1'), ['systems']);
+  assert.deepEqual(special('strategic-missile-carrier','CATALOG_SPECIALISTS_v1'), []);
   assert.equal(Object.keys(context.refs.units).length,26);
   assert.equal(context.refs.rules.length,15);
   for (const lang of ['de','en','es','fr']) {
