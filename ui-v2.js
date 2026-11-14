@@ -1809,7 +1809,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     targetLayoutObserver.observe(at('#v2-phase'));
     function dismissTargetOnOutsideClick(event) {
       if (!view.target || at('#v2-phase-notice')?.open || at('#v2-target-card').hidden ||
-          event.target.closest?.('dialog, #v2-target-card, #v2-training button')) return;
+          event.target.closest?.('dialog, #v2-target-card, #v2-training button, #v2-pause')) return;
       event.preventDefault();
       event.stopImmediatePropagation();
       clearContext(); render();

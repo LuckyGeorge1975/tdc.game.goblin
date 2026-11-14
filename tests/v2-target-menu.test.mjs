@@ -63,6 +63,16 @@ test('target choices and cancel issue no commands, and a Core weapon switch requ
   const outside = ui.slice(ui.indexOf('    function dismissTargetOnOutsideClick('),
     ui.indexOf("    document.addEventListener('click', dismissTargetOnOutsideClick"));
   runInNewContext(outside, context);
+  const pause = {id: 'v2-pause'};
+  for (const element of [pause, {parentElement: pause}]) {
+    context.dismissTargetOnOutsideClick({
+      target: {closest: selector => selector.split(', ').includes('#v2-pause') &&
+        (element.id === 'v2-pause' ? element : element.parentElement)},
+      preventDefault() { assert.fail('Pause click must reach the button'); },
+      stopImmediatePropagation() { assert.fail('Pause click must propagate'); }
+    });
+    assert.equal(view.target, target);
+  }
   let prevented = false, stopped = false;
   context.dismissTargetOnOutsideClick({
     target: {closest: () => null},
