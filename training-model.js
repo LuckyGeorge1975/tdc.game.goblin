@@ -28,7 +28,12 @@
    authority:{contractSha256:'88a2a9dde0ea9c9b4db347e09bd42d59fe2410abd8fcec0e07e1a0fcbec9b13b',
     contentPin:'2fdce6ac1be30e8b2a360250b37724586469e71c',status:'authored candidate; actual query/route checks required before delivery'},
    levels:data.levels.map(level=>{
-    if(!exact(level,['version','id','scenarioVersion','width','height','ruleProfile','objective','terrain','regions','units'])||
+    const fields=['version','id','scenarioVersion','width','height','ruleProfile','objective','terrain','regions','units'];
+    if(level&&Object.hasOwn(level,'aiAllowed')){
+     if(level.aiAllowed!==false)fail();
+     fields.push('aiAllowed');
+    }
+    if(!exact(level,fields)||
      level.version!=='goblin-level-v3'||!Object.hasOwn(learningProfiles,level.id)||level.scenarioVersion!==1||
      level.width!==12||level.height!==8||level.ruleProfile!==profile||level.objective!=='learning'||!Array.isArray(level.units))fail();
     const units=level.units.map(entry=>{
@@ -41,7 +46,7 @@
  }
  function manifestFor(definition){return {binding:copy(definition.binding),definition:copy(definition),actorTags:copy(definition.actorTags),regionRefs:[...definition.regionRefs],copyKeys:[...new Set([...definition.steps.flatMap(s=>[s.messageKey,s.recovery?.messageKey]).filter(Boolean),...(definition.terminal?Object.entries(definition.terminal).filter(([k])=>k!=='requiredStepIds').map(([,v])=>v):[])])],parameterRefs:[...parameterRefs],controlRefs:[...controls],capabilityRefs:[]}}
  async function initialize(levelData,scriptData){
-  levelData=historicalShape(copy(levelData));scriptData=copy(scriptData);
+  levelData=copy(historicalShape(levelData));scriptData=copy(scriptData);
   if(await hash(levelData)!=='f68869da180df36a2d485940ca8155953d8c36f581d993a20514acf855d01d73'||await hash(scriptData)!=='5407c9e7d97a9583a002ef3aae54f528a27e21bb315a310016ff29703477e37b')throw Error('TRAINING_SOURCE_DIGEST');
   if(levelData.version!=='training-levels-v1'||scriptData.version!=='training-scripts-v1'||levelData.levels.length!==3||scriptData.definitions.length!==3)throw Error('TRAINING_SOURCE_VERSION');
   const next={};

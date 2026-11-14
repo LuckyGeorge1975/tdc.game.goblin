@@ -2,8 +2,8 @@ import {IRON_DUST_PROFILE_VERSION, IRON_DUST_PROFILE_HEADER,
   IRON_DUST_PROFILE_PROJECTION_VERSION, createIronDustProfile,
   validateIronDustProfile, queryIronDustProfile, dispatchIronDustProfile,
   dispatchIronDustProfileEnemyMoveChoice,dispatchIronDustProfileEnemyFireChoice,
-  projectIronDustProfile} from './iron-dust-executable-profile.mjs?v=2';
-import {IRON_DUST_HISTORICAL_LAYOUT} from '../levels/iron-dust.v1.mjs';
+  projectIronDustProfile} from './iron-dust-executable-profile.mjs?v=3';
+import {IRON_DUST_HISTORICAL_LAYOUT} from '../levels/iron-dust.v1.mjs?v=2';
 
 // Internal v2 source replay. This does not extend schema-1 or expose file I/O.
 export const IRON_DUST_PROFILE_REPLAY_VERSION = 'iron-dust-profile-replay-v1';

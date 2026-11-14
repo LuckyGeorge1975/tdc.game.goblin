@@ -113,21 +113,19 @@ test('artillery pilot direct and spotter candidates use existing weapon selectio
   assert.equal(result.action.mode,'indirect');
 });
 
-test('native candidate dispatch reaches T01 BACK and T02 result holds without teaching receipts from policy',async()=>{
+test('T01 and T02 allow native human actions with their learning holds and deny AI batches',async()=>{
   const t01=await trainingScene(), a=adapterFor(t01);
   const actions=route('training-t01');
   for(const step of actions.slice(0,4))apply(t01,step);
-  const batch=a.open('player');
-  const move=batch.candidates.find(c=>c.actorId==='training-t01-tank'&&c.target?.x===3&&c.target?.y===3);
-  assert.equal(a.execute(request(batch,move)).ok,true);
+  assert.equal(a.open('player').ok,false);
+  apply(t01,actions[4]);
   t01.run("document.querySelector('#auto-end-turn').checked=true;maybeAutoAdvancePhase()");
   assert.deepEqual(read(t01,"[turnPhase,GoblinTrainingRuntime.view().progress.stepId,phaseCommands.length]"),['movement','undo',1]);
 
   const t02=await trainingScene('training-t02'), b=adapterFor(t02);
   for(const step of route('training-t02').slice(0,5))apply(t02,step);
-  const battle=b.open('player');
-  const shot=battle.candidates.find(c=>c.kind==='fire'&&c.actorId==='training-t02-tank');
-  assert.equal(b.execute(request(battle,shot)).ok,true);
+  assert.equal(b.open('player').ok,false);
+  apply(t02,route('training-t02')[5]);
   t02.run("document.querySelector('#auto-end-turn').checked=true;maybeAutoAdvancePhase()");
   await t02.run("confirmPhaseAdvance(()=>setTurnPhase('gev'))");
   assert.deepEqual(read(t02,"[turn,turnPhase,GoblinTrainingRuntime.view().progress.stepId]"),[1,'fire','result']);
@@ -137,13 +135,11 @@ test('T03 blocked-sight instruction is a native lesson step that legal gameplay 
   const g=await trainingScene('training-t03'), adapter=adapterFor(g);
   const actions=route('training-t03');
   for(const step of actions.slice(0,3))apply(g,step);
-  const batch=adapter.open('player');
-  const move=batch.candidates.find(c=>c.actorId==='training-t03-tank'&&c.target?.x===3&&c.target?.y===3);
-  assert.equal(adapter.execute(request(batch,move)).ok,true);
+  apply(g,actions[3]);
   const blocked=actions[4].command;
   assert.equal(g.run(`query(${JSON.stringify(blocked)}).ok`),false);
   assert.equal(g.run("GoblinTrainingRuntime.view().progress.stepId"),'blocked');
-  assert.ok(adapter.open('player').candidates.every(c=>c.kind!=='fire'));
+  assert.equal(adapter.open('player').ok,false);
   apply(g,actions[4]);
   assert.equal(g.run("GoblinTrainingRuntime.view().progress.stepId"),'blocked-read');
 });

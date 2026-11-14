@@ -18,7 +18,8 @@
   function copyTemplate() {
     const source = template();
     if (!available() || !source) fail('unavailable');
-    return {version, width, height, objective, terrain:source.terrainTypes.map(({x,y,type}) => ({x,y,type})),
+    return {version, width, height, objective, ...(Object.hasOwn(source,'aiAllowed')?{aiAllowed:source.aiAllowed}:{}),
+      terrain:source.terrainTypes.map(({x,y,type}) => ({x,y,type})),
       units:source.units.map((unit,index) => ({
         id:unit.core ? 'core' : 'draft-' + (index + 1), assetId:unit.catalogAssetId, team:unit.team, x:unit.x, y:unit.y,
         ...(unit.squads ? {squads:unit.squads} : {})
@@ -44,11 +45,12 @@
     const current = draft?.version === version;
     const fields = ['version','width','height','objective','terrain','units'];
     if (oldEvents) fields.push('hotspots','hooks');
-    if (current) for (const key of ['id','scenarioVersion','ruleProfile','hotspots','events','goals','waveTemplates','briefing'])
+    if (current) for (const key of ['id','scenarioVersion','ruleProfile','hotspots','events','goals','waveTemplates','briefing','aiAllowed'])
       if (Object.hasOwn(draft,key)) fields.push(key);
     if (!exact(draft,fields) || (!oldEvents && !current && draft.version !== historicalVersion) ||
         (current && Object.hasOwn(draft,'ruleProfile') && draft.ruleProfile !== profile().ruleProfileId) ||
         !(current ? validSize(draft) : draft.width === width && draft.height === height) || draft.objective !== objective ||
+        Object.hasOwn(draft,'aiAllowed') && typeof draft.aiAllowed !== 'boolean' ||
         !Array.isArray(draft.terrain) || !Array.isArray(draft.units) ||
         draft.terrain.length > draft.width * draft.height || draft.units.length > draft.width * draft.height) fail('schema');
     const position = cell => Number.isInteger(cell.x) && cell.x >= 0 && cell.x < draft.width &&
@@ -202,6 +204,7 @@
     const [levelDigest,rosterDigest,terrainDigest] = await Promise.all(
       [copy,units,terrainTypes].map(value => GoblinCatalogBase.hash(value)));
     const config = freeze({...source, ...(copy.width !== width || copy.height !== height ? {width:copy.width,height:copy.height} : {}),
+      ...(Object.hasOwn(copy,'aiAllowed') ? {aiAllowed:copy.aiAllowed} : {}),
       title:'Editor draft', kicker:'G.O.B.L.I.N.', kickerKey:'v2.editor.title',
       sub:'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
       ...(copy.briefing ? {briefing:copy.briefing} : {}),
