@@ -122,12 +122,13 @@ export function visibleRoundPath(cells, canSee) {
 }
 
 // Each recorder is bound once by the trusted host. Only view() belongs in UI.
-export function createRoundRecorder({session, mode, initialRound, readAuthority}) {
+export function createRoundRecorder({session, mode, initialRound, readAuthority, spectatorBoard}) {
   if (!session || !['player','spectator'].includes(mode) || !Number.isSafeInteger(initialRound) || initialRound<1)
     throw Error('ROUND_SESSION_INVALID');
   let round = initialRound, terminal=false, playerView=null;
+  const readBoard=mode==='spectator' && spectatorBoard ? ()=>freeze(structuredClone(spectatorBoard())) : null;
   const completed=[];
-  let base={parent:null}, head=base;
+  let base={parent:null,board:readBoard?.()}, head=base;
   let generation=0;
   const checkpoints=new WeakMap();
 
@@ -194,7 +195,7 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority}
     if (boundary==='terminal-partial' && (!authority.ended || authority.round!==round)) throw Error('ROUND_BOUNDARY_INVALID');
     if (boundary===undefined && (authority.ended || authority.round!==round)) throw Error('ROUND_BOUNDARY_MISSING');
     if (boundary!==undefined && !['complete','terminal-partial'].includes(boundary)) throw Error('ROUND_BOUNDARY_INVALID');
-    head={parent:head,public:events.flatMap(event=>event.public?[event.public]:[]),full:events.map(event=>event.full)};
+    head={parent:head,board:readBoard?.(),public:events.flatMap(event=>event.public?[event.public]:[]),full:events.map(event=>event.full)};
     if (!boundary) return;
     const captured=rows();
     completed.push({number:round,completion:boundary,rows:captured.full});
@@ -202,7 +203,7 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority}
       playerView=encodeRound({number:round,completion:boundary,rows:captured.public},'player');
       round++;
     } else terminal=true;
-    base={parent:null};head=base;
+    base={parent:null,board:head.board};head=base;
   }
   function view() {
     const authority=live();
@@ -223,5 +224,6 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority}
     const current=encodeRound({number:round,completion:'complete',rows:rows().full},'spectator');
     return freeze({schemaVersion:1,roundNumber:round,rows:current.rows});
   }
-  return Object.freeze({beginCommit,checkpoint,rewind,view,spectatorCurrent});
+  return Object.freeze({beginCommit,checkpoint,rewind,view,spectatorCurrent,
+    ...(readBoard?{board:()=>live()?head.board:null}:{})});
 }

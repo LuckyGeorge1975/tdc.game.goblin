@@ -8,12 +8,18 @@ const kind = Object.freeze({UnitMoved:'move',EnemyMoved:'move',RamResolved:'ram'
 const label = Object.freeze(Object.fromEntries(['ogre','gev','missile','infantry','core','guard','raider']
   .map(id=>[id,`v2.unit.${id}`])));
 
+function boardOf(state) {
+  const {width,height,terrain,defaultTerrain}=state.map;
+  const units=state.units.filter(unit=>unit.hp>0&&!unit.embarkedOn).map(unit=>({
+    id:unit.id,labelKey:label[unit.id]??'v2.unit.unknown',cell:{x:unit.x,y:unit.y}
+  }));
+  return {width,height,terrain,defaultTerrain,units};
+}
+
 function observations(before, after, events, captureRoundEvent, options) {
   const facts = new Map(after.units.map(unit=>[unit.id,{id:unit.id,labelKey:label[unit.id]??'v2.unit.unknown',
     cell:{x:unit.x,y:unit.y}}]));
-  const units=after.units.filter(unit=>unit.hp>0&&!unit.embarkedOn).map(unit=>facts.get(unit.id));
-  const {width,height,terrain,defaultTerrain}=after.map;
-  const board={width,height,terrain,defaultTerrain,units};
+  const board=boardOf(after);
   const rows=events.flatMap(event=>{
     if (!Object.hasOwn(kind,event.type)) return [];
     const actorId=event.actorId??event.attackerId??event.unitId??null;
@@ -40,7 +46,16 @@ export function createIronDustRoundRecorder(initialProfile, readProfile, mode='p
   const profile=validateIronDustProfile(initialProfile);
   if(profile.entry.mode!=='player'||stateOf(profile).phase!=='movement') throw Error('ROUND_START_INVALID');
   const session={};
-  return createRoundRecorder({session,mode,initialRound:stateOf(profile).turn,readAuthority:()=>{
+  // The live spectator board carries display facts and never the profile or policy DTO.
+  const spectatorBoard=()=>{
+    const current=readProfile();
+    if (!current) return null;
+    const state=stateOf(current);
+    const {width,height,terrain,defaultTerrain,units}=boardOf(state);
+    return {width,height,terrain,defaultTerrain,units,roundNumber:state.turn,
+      side:state.activeTeam,phase:state.phase,ended:current.entry.mode==='ended'};
+  };
+  return createRoundRecorder({session,mode,initialRound:stateOf(profile).turn,spectatorBoard,readAuthority:()=>{
     const current=readProfile();
     if (!current) return null;
     const state=stateOf(current);

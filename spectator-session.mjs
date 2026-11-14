@@ -20,6 +20,7 @@ export function createIronDustSpectatorMatch(select) {
     advance:host.advance,
     ended:() => session?.projection.mode === 'ended',
     view:() => recorder.view(),
+    board:recorder.board,
     stop() { epoch++; host.stop(); session = null; }
   });
 }
@@ -69,6 +70,7 @@ export function createSpectatorSession(match, {
   return Object.freeze({
     get status() { return status; },
     view: () => status === 'closed' ? null : match.view(),
+    board: () => status === 'closed' ? null : match.board?.() ?? null,
     resume() {
       if (status !== 'paused') return false;
       update('running');
