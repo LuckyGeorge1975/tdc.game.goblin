@@ -654,6 +654,7 @@
     'v2.options.scrollUp': {de:"Einstellungen nach oben scrollen",en:"Scroll settings up",es:"Desplazar ajustes hacia arriba",fr:"Faire défiler les réglages vers le haut"},
     'v2.options.scrollDown': {de:"Einstellungen nach unten scrollen",en:"Scroll settings down",es:"Desplazar ajustes hacia abajo",fr:"Faire défiler les réglages vers le bas"},
     'v2.options.scrollArea': {de:"Spieleinstellungen",en:"Game settings",es:"Ajustes del juego",fr:"Paramètres du jeu"},
+    'v2.options.supportProject': {de:"Projekt freiwillig unterstützen",en:"Support the project (optional)",es:"Apoyar el proyecto (opcional)",fr:"Soutenir le projet (facultatif)"},
     'v2.autoSelectReady': {de:'Nächste einsatzbereite Einheit automatisch wählen',en:'Automatically select the next ready unit',es:'Seleccionar automáticamente la siguiente unidad disponible',fr:'Sélectionner automatiquement la prochaine unité disponible'},
     'v2.phaseNotice.disable': {de:'Phasenhinweise ausschalten',en:'Turn off phase notices',es:'Desactivar avisos de fase',fr:'Désactiver les rappels de phase'},
     'v2.overlayHint.movement': {de:'Bewegungsplanung ein- oder ausblenden',en:'Show or hide movement planning',es:'Mostrar u ocultar la planificación de movimiento',fr:'Afficher ou masquer la planification du déplacement'},

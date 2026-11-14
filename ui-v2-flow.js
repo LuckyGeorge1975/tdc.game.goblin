@@ -1586,6 +1586,15 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         };
         content.addEventListener('scroll', updateScroll);
         footer.append(actions(back, up, down));
+        if (globalThis.GOBLIN_SUPPORT_URL) {
+          footer.classList.add('v2-options-footer-with-support');
+          const support = document.createElement('a');
+          support.className = 'v2-project-support';
+          support.href = globalThis.GOBLIN_SUPPORT_URL;
+          support.referrerPolicy = 'no-referrer';
+          support.textContent = t('v2.options.supportProject');
+          footer.append(support);
+        }
         const observer = new ResizeObserver(updateScroll);
         observer.observe(content);
         for (const child of content.children) observer.observe(child);

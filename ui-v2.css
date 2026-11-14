@@ -226,6 +226,9 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-saved-levels article { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; border: 1px solid var(--v2-line); border-radius: 8px; }
 .v2-saved-levels strong { overflow-wrap: anywhere; }
 .v2-options-panel > .v2-screen-footer { position: static; margin-top: 0; z-index: auto; }
+.v2-options-panel > .v2-options-footer-with-support { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.v2-options-footer-with-support > .v2-screen-actions { flex: 1 1 320px; min-width: 0; }
+.v2-project-support { max-width: 100%; margin-inline-start: auto; color: var(--v2-accent-text); font-size: .875rem; text-align: end; }
 .v2-screen-log { max-height: min(54dvh, 440px); overflow: auto; }
 .v2-screen-log p { border-bottom: 1px solid var(--v2-line); padding: 8px 0; }
 .v2-screen-panel.v2-round-analysis { width: min(1180px, 100%); height: min(820px, calc(100dvh - 24px)); }
