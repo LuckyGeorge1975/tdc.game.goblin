@@ -1,6 +1,6 @@
 import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
 import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=5';
-import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs?v=3';
+import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs?v=4';
 import {createAiSessionHost} from './src/core/ai-session-host.mjs?v=2';
 import {createAiPolicyRegistry} from './src/core/ai-policy-registry.mjs';
 

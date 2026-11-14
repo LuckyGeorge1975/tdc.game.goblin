@@ -18,8 +18,17 @@ const stateOf = profile => profile.entry.mode === 'enemy' ? profile.entry.payloa
 // Iron Dust v2's current rules expose the roster and terrain to both teams.
 // This explicit DTO excludes engine state, seed, replay, journals and cursors.
 function project(state, side) {
+  const core=state.units.find(unit=>unit.id==='core');
+  const playerSurvives=state.units.some(unit=>unit.team==='player'&&unit.hp>0);
   return {
     turn: state.turn, side, phase: state.phase,
+    objectives:side==='player'?[
+      {kind:'destroy-core',target:unitTarget(core.id),satisfied:core.hp===0},
+      {kind:'survive',satisfied:playerSurvives}
+    ]:[
+      {kind:'destroy-player-force',satisfied:!playerSurvives},
+      {kind:'protect-core',target:unitTarget(core.id),satisfied:core.hp>0}
+    ],
     terrain: {width: state.map.width, height: state.map.height, defaultTerrain: state.map.defaultTerrain,
       cells: state.map.terrain.map(({x, y, type}) => ({x, y, type}))},
     units: state.units.map(({id, team, x, y, hp, maxHp, disabled, embarkedOn, ogreSystems}) => ({
