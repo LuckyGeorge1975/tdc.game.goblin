@@ -9,7 +9,7 @@
     const response = await fetch(new URL(`content-02.${lang}.json`, catalogBase));
     if (!response.ok) throw Error(`CONTENT-02 ${lang}: HTTP ${response.status}`);
     const catalog = await response.json();
-    const briefingResponse = await fetch(new URL(`briefing-01.${lang}.json?v=31`, catalogBase));
+    const briefingResponse = await fetch(new URL(`briefing-01.${lang}.json?v=32`, catalogBase));
     if (!briefingResponse.ok) throw Error(`BRIEFING-01 ${lang}: HTTP ${briefingResponse.status}`);
     const briefing = await briefingResponse.json();
     const libraryResponse = await fetch(new URL(`library-01.${lang}.json?v=30`, catalogBase));
@@ -576,17 +576,16 @@
     'v2.library.detail.specials': {de:"Sonderaktionen",en:"Special actions",es:"Acciones especiales",fr:"Actions spéciales"},
     'v2.library.detail.strategy': {de:"Strategie",en:"Strategy",es:"Estrategia",fr:"Stratégie"},
     'v2.scorched.title': {de:"Verbrannte Erde",en:"Scorched Earth",es:"Tierra quemada",fr:"Terre brûlée"},
-    'v2.scorched.intro': {de:"Zwölf Missionen gegen den gegnerischen Verband.",en:"Twelve missions against the enemy force.",es:"Doce misiones contra las fuerzas enemigas.",fr:"Douze missions contre les forces ennemies."},
+    'v2.scorched.intro': {de:"Nach dem Dritten Weltkrieg sind Staaten zerfallen. Kleine Fraktionen kämpfen um die Reste. Du führst die United Eurasian Task Force gegen Banditen, die alte Militärbestände an sich gebracht haben. Sichere ihren Korridor, bevor die Banditen dort eine neue Armee aufstellen.",en:"After the Third World War, nations have fractured. Small factions fight over what remains. You command the United Eurasian Task Force against bandits who have seized old military stockpiles. Secure their corridor before the bandits raise a new army there.",es:"Tras la Tercera Guerra Mundial, los Estados se han fragmentado. Pequeñas facciones luchan por lo que queda. Diriges la United Eurasian Task Force contra bandidos que se han apoderado de antiguos arsenales. Asegura su corredor antes de que los bandidos formen allí un nuevo ejército.",fr:"Après la Troisième Guerre mondiale, les États se sont fragmentés. De petites factions se disputent ce qui reste. Vous commandez la United Eurasian Task Force face à des bandits qui ont saisi d’anciens arsenaux. Sécurisez leur couloir avant que les bandits y lèvent une nouvelle armée."},
     'v2.scorched.position': {de:"Verbrannte Erde · Mission {current}/{total}",en:"Scorched Earth · Mission {current}/{total}",es:"Tierra quemada · Misión {current}/{total}",fr:"Terre brûlée · Mission {current}/{total}"},
     'v2.scorched.locked': {de:"Ein Sieg schaltet die nächste Mission frei.",en:"Win to unlock the next mission.",es:"Gana para desbloquear la siguiente misión.",fr:"Remportez la victoire pour débloquer la mission suivante."},
     'v2.scorched.next': {de:"Nächste Mission",en:"Next mission",es:"Siguiente misión",fr:"Mission suivante"},
     'v2.scorched.finish': {de:"Kampagne abschließen",en:"Finish campaign",es:"Finalizar campaña",fr:"Terminer la campagne"},
     'v2.scorched.complete': {de:"Verbrannte Erde abgeschlossen",en:"Scorched Earth complete",es:"Tierra quemada completada",fr:"Terre brûlée terminée"},
-    'v2.scorched.completeBody': {de:"Die letzte Stellung ist gesichert.",en:"The final position is secure.",es:"La última posición está asegurada.",fr:"La dernière position est sécurisée."},
+    'v2.scorched.completeBody': {de:"Der Korridor ist gesichert, die Führungsstruktur der Banditen zerschlagen. Die alten Waffenlager sind keine Grundlage für ihren nächsten Feldzug mehr. Die United Eurasian Task Force kann die Region halten.",en:"The corridor is secure and the bandits’ command network is broken. The old arsenals can no longer support their next campaign. The United Eurasian Task Force can hold the region.",es:"El corredor está asegurado y la red de mando de los bandidos, desmantelada. Los viejos arsenales ya no pueden sostener su próxima campaña. La United Eurasian Task Force puede mantener la región.",fr:"Le couloir est sécurisé et le réseau de commandement des bandits est brisé. Les anciens arsenaux ne peuvent plus soutenir leur prochaine campagne. La United Eurasian Task Force peut tenir la région."},
     'v2.scorched.storageError': {de:"Fortschritt konnte nicht dauerhaft gespeichert werden.",en:"Progress could not be saved permanently.",es:"No se pudo guardar el progreso de forma permanente.",fr:"La progression n’a pas pu être enregistrée durablement."},
     'v2.scorched.victory': {de:"Schalte den Kommandokern und alle Gegner aus. Mindestens eine eigene Einheit muss überleben.",en:"Destroy the command core and all enemies. Keep at least one friendly unit alive.",es:"Destruye el núcleo de mando y elimina a todos los enemigos. Conserva al menos una unidad aliada.",fr:"Détruisez le noyau de commandement et tous les ennemis. Gardez au moins une unité alliée en vie."},
     'v2.scorched.defeat': {de:"Alle eigenen Einheiten fallen.",en:"All friendly units are lost.",es:"Se pierden todas las unidades aliadas.",fr:"Toutes les unités alliées sont perdues."},
-    'v2.scorched.won': {de:"Die Stellung ist gesichert.",en:"The position is secure.",es:"La posición está asegurada.",fr:"La position est sécurisée."},
     'mission.scorched-ash-road.title': {de:"Aschenstraße",en:"Ash Road",es:"Camino de ceniza",fr:"Route des cendres"},
     'mission.scorched-black-ridge.title': {de:"Schwarzer Grat",en:"Black Ridge",es:"Cresta negra",fr:"Crête noire"},
     'mission.scorched-salt-flats.title': {de:"Salzebene",en:"Salt Flats",es:"Salinas",fr:"Plaines salées"},

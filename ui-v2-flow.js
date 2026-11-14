@@ -1286,8 +1286,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const legacyNumber = missionId !== 'iron-dust-v2' &&
           scenarioCatalog[missionId]?.kicker?.match(/^(MISSION \d+|SHOWCASE \d+)/)?.[1];
         if (legacyNumber && !campaign) header.append(paragraph(legacyNumber, 'v2-briefing-number'));
-        header.append(heading(t(`mission.${missionId}.title`)),
-          paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
+        header.append(heading(t(`mission.${missionId}.title`)));
+        if (campaign?.field === 'scorched')
+          header.append(paragraph(t(`mission.${missionId}.story.briefing`), 'v2-briefing-intro'));
+        header.append(paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
         if (missionId === 'iron-dust-v2' && data) header.append(difficultyControl());
         if (campaign?.index === 0 && !campaign.field) header.append(paragraph(t('v2.campaign.session')));
         if(GoblinCatalogBase.has(missionId)||globalThis.GoblinCatalogSpecialistsModel?.has(missionId)||globalThis.GoblinCatalogFullModel?.has(missionId))header.append(paragraph(t(`mission.${missionId}.budget`)));
@@ -1348,7 +1350,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         }else{
         const won = state.objective.outcome === true;
         panel.append(heading(t(won ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title')),
-          paragraph(t(won && state.scenario === 'iron-dust-v2' ? 'v2.win' : won && campaign?.field === 'scorched' ? 'v2.scorched.won' : won ? `mission.${campaign?.field ? missionId : state.scenario}.end.victory` : globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.playerAlive?'v2.full.limit.defeat':'screen.missionEnd.defeat.allUnits')),
+          paragraph(t(won && state.scenario === 'iron-dust-v2' ? 'v2.win' : won ? `mission.${campaign?.field ? missionId : state.scenario}.end.victory` : globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.playerAlive?'v2.full.limit.defeat':'screen.missionEnd.defeat.allUnits')),
           paragraph(t('ui.hud.turn', { turn: state.turn })),
           actions(button(t('screen.missionEnd.action.retry'), confirmRestart, 'primary'),
             button(t(editorConfig ? 'v2.editor.return' : 'screen.missionEnd.action.chooseMission'), goToLevels),
