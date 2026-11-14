@@ -228,6 +228,25 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-options-panel > .v2-screen-footer { position: static; margin-top: 0; z-index: auto; }
 .v2-screen-log { max-height: min(54dvh, 440px); overflow: auto; }
 .v2-screen-log p { border-bottom: 1px solid var(--v2-line); padding: 8px 0; }
+.v2-screen-panel.v2-round-analysis { width: min(1180px, 100%); height: min(820px, calc(100dvh - 24px)); }
+.v2-round-analysis > h2, .v2-round-analysis > p { margin: 0 0 6px; }
+.v2-round-layout { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 16px; min-height: 0; flex: 1 1 auto; }
+.v2-round-decisions, .v2-round-detail { overflow: auto; overscroll-behavior: contain; min-width: 0; }
+.v2-round-decisions { list-style: none; margin: 0; padding: 3px; }
+.v2-round-decisions li + li { margin-top: 6px; }
+.v2-round-decisions button { width: 100%; min-height: 44px; text-align: left; overflow-wrap: anywhere; }
+.v2-round-decisions button[aria-pressed="true"] { border-color: var(--v2-accent-text); }
+.v2-round-detail .v2-mission-map { margin: 0; }
+.v2-round-detail .v2-mission-map svg { max-height: min(43dvh, 370px); }
+.v2-round-explanation p { margin: 8px 0; }
+.v2-round-path, .v2-round-direction, .v2-round-actor, .v2-round-target { fill: none; stroke-width: 2.2; }
+.v2-round-path, .v2-round-direction, .v2-round-actor { stroke: var(--v2-accent-text); }
+.v2-round-path { stroke-dasharray: 3 4; }
+.v2-round-unit { fill: var(--v2-text); stroke: var(--v2-surface); }
+.v2-round-target { stroke: var(--v2-danger-text); }
+@media (max-width: 660px) {
+  .v2-round-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(80px, 1fr) minmax(0, 2fr); gap: 8px; }
+}
 .v2-log-entry { display: flex; align-items: baseline; gap: 10px; }
 .v2-log-time { flex: none; color: var(--v2-muted); font-variant-numeric: tabular-nums; }
 .v2-log-message { min-width: 0; overflow-wrap: anywhere; }
