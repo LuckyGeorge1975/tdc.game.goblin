@@ -145,44 +145,5 @@
     }
   ],
   "hotspots": [],
-  "events": [
-    {
-      "id": "field-orders",
-      "when": {
-        "any": [
-          {
-            "event": "UnitActed",
-            "unitId": "armor"
-          },
-          {
-            "event": "UnitActed",
-            "unitId": "scout"
-          },
-          {
-            "event": "UnitActed",
-            "unitId": "rocket"
-          },
-          {
-            "event": "UnitActed",
-            "unitId": "missile"
-          }
-        ]
-      },
-      "effect": {
-        "type": "dialog",
-        "title": {
-          "de": "08 · Zündung",
-          "en": "08 · Ignition",
-          "es": "08 · Ignición",
-          "fr": "08 · Allumage"
-        },
-        "text": {
-          "de": "Der strategische Raketenträger hat einen Schuss auf ein Hex mit freier Sicht. Ziele in der ersten Feuerphase auf H-04, solange die gegnerische Kolonne dicht steht. Der Treffer im Zentrum ist stärker als auf den Nachbarfeldern. Halte deine eigenen Einheiten aus dem Wirkungsbereich.",
-          "en": "The Strategic Missile Carrier has one shot at a hex in clear line of sight. Aim at H-04 in the first fire phase while the enemy column is clustered. The center takes a stronger hit than its neighbors. Keep your own units outside the blast area.",
-          "es": "El portamisiles estratégico tiene un disparo a un hexágono con línea de visión. Apunta a H-04 en la primera fase de fuego mientras la columna enemiga siga agrupada. El impacto central es más fuerte que el de los hexágonos vecinos. Mantén a tus tropas fuera del área.",
-          "fr": "Le lance-missiles stratégique dispose d’un tir sur une case en ligne de vue. Visez H-04 dès la première phase de tir, avant que la colonne ennemie se disperse. L’impact est plus puissant au centre que sur les cases adjacentes. Gardez vos troupes hors du rayon."
-        }
-      }
-    }
-  ]
+  "events": []
 }
