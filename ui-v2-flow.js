@@ -1099,10 +1099,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const relay = button(t('v2.relay.title'), openRelayCampaign);
         relay.id = 'v2-menu-relay';
         relay.disabled = relayLoading || !globalThis.GoblinEditorDraft?.available();
-        menu.append(choose, tutorial, relay, editor, units, settings, legal);
+        const changelog = button(t('v2.ui.changelog'), () => openSection('changelog'));
+        changelog.id = 'v2-menu-changelog';
+        menu.append(choose, tutorial, relay, editor, units, settings);
         if (relayError) menu.append(paragraph(relayError, 'v2-status'));
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
-        footer.append(paragraph(document.querySelector('#build-version').textContent, 'v2-screen-meta'));
+        footer.append(actions(changelog, legal), paragraph(document.querySelector('#build-version').textContent, 'v2-screen-meta'));
         panel.append(intro, menu, footer);
       } else if (screen === 'editor') {
         renderEditor(panel);
@@ -1318,15 +1320,25 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         footer.append(actions(back, count, next), ...(mapAction ? [mapAction] : []));
         panel.append(detail, footer);
       } else if (screen === 'legal') {
-        panel.append(heading(t('v2.ui.legalNotices')),
-          paragraph(t('v2.ui.legalEnglish'), 'v2-screen-meta'));
+        const notice = paragraph('G.O.B.L.I.N. is an independent game prototype by Think Design Code, available as a noncommercial public preview. It is not affiliated with or endorsed by any third-party game or product line and is not an official adaptation. The project uses code-generated artwork and AI-assisted design. Unit Guide illustrations, including enemy variants, were generated with ChatGPT.');
+        notice.lang = 'en';
+        const provenance = document.createElement('a');
+        provenance.href = new URL('docs/CONTENT-NOTICES.md', document.baseURI).href;
+        provenance.textContent = 'Content & Asset Notices';
+        provenance.lang = 'en';
+        panel.append(heading(t('v2.ui.legalNotices')), paragraph(t('v2.ui.legalEnglish'), 'v2-screen-meta'),
+          notice, provenance, actions(button(t('ui.nav.back'), goBack)));
+      } else if (screen === 'changelog') {
+        panel.append(heading(t('v2.ui.changelog')), paragraph(t('v2.ui.changelogGerman'), 'v2-screen-meta'));
         const notice = document.createElement('pre'); notice.className = 'v2-legal-text';
-        notice.lang = 'en'; notice.textContent = t('v2.ui.legalLoading');
+        notice.lang = 'de';
+        notice.tabIndex = 0;
+        notice.textContent = t('v2.ui.changelogLoading');
         panel.append(notice, actions(button(t('ui.nav.back'), goBack)));
-        fetch(new URL('docs/CONTENT-NOTICES.md', document.baseURI))
+        fetch(new URL('CHANGELOG.md', document.baseURI), {cache:'no-cache'})
           .then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.text(); })
           .then(copy => { if (notice.isConnected) notice.textContent = copy; })
-          .catch(() => { if (notice.isConnected) notice.textContent = t('v2.ui.legalUnavailable'); });
+          .catch(() => { if (notice.isConnected) notice.textContent = t('v2.ui.changelogUnavailable'); });
       } else if (screen === 'options') {
         panel.classList.add('v2-options-panel');
         const header = document.createElement('header'); header.className = 'v2-screen-header';
@@ -1491,7 +1503,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     GoblinLanguage.ready.then(() => renderScreen(false));
     globalThis.addEventListener('keydown', event => {
       if (screen !== 'play' && event.key === 'Escape' && !GameDialogs.isOpen() && document.querySelector('#unit-guide-modal').classList.contains('hidden')) {
-        if (screen === 'options' || screen === 'catalog' || screen === 'legal') goBack();
+        if (['options','catalog','legal','changelog'].includes(screen)) goBack();
         else if (screen === 'briefing') (campaign ? returnToCampaignMenu : returnToSelectedLevel)();
         else if (screen === 'campaign-complete' || screen === 'relay-campaign') returnToCampaignMenu();
         else if (screen === 'editor' && !editorBusy) {
