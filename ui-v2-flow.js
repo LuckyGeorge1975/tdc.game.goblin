@@ -1381,12 +1381,6 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           if (fieldError) panel.append(paragraph(fieldError, 'v2-status'));
         }
         }
-      } else if (screen === 'round-analysis') {
-        const analysis = roundAnalysis;
-        analysis.renderRoundAnalysis(panel,analysis.round,{
-          t, previewMap:missionPreview, back:closeRoundAnalysis, selected:analysis.selected,
-          onSelect:index => { analysis.selected = index; }
-        });
       } else if (screen === 'log') {
         panel.append(heading(t(state.gameOver ? 'screen.missionEnd.action.log' : 'ui.details.log')));
         const entries = document.createElement('div'); entries.className = 'v2-screen-log';
@@ -1411,6 +1405,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           roundActions.push(button(t('v2.round.partial', {round:rounds.terminalPartial.roundNumber}),
             () => openRoundAnalysis(rounds.terminalPartial)));
         panel.append(entries, actions(back,...roundActions));
+      } else if (screen === 'round-analysis') {
+        const analysis = roundAnalysis;
+        analysis.renderRoundAnalysis(panel,analysis.round,{
+          t, previewMap:missionPreview, back:closeRoundAnalysis, selected:analysis.selected,
+          onSelect:index => { analysis.selected = index; }
+        });
       } else if (screen === 'catalog') {
         const header = document.createElement('header'); header.className = 'v2-screen-header';
         header.append(heading(t('v2.library.title')), libraryKindSwitch());
