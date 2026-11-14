@@ -4,6 +4,12 @@
   "height": 8,
   "objective": "core-and-escort",
   "ruleProfile": "FULL_CATALOG_v1",
+  "briefing": {
+    "de": "Der Belagerungspanzer kann die Hauptwaffen gegen ein hartes Ziel bündeln oder einzeln auf zwei verschiedene Ziele feuern. Seine Nahwaffen wirken nur gegen Infanterie auf einem Nachbarfeld. Nutze die beiden Infanteriestellungen im Vorfeld zum Ausprobieren. Das unbewegliche Kommandozentrum hinter der Linie ist unbewaffnet und zählt zu den zu räumenden Zielen.",
+    "en": "The Siege Tank can combine its main guns against a hard target or split them across two different targets. Its close-range weapons only hit adjacent infantry. Try them against the two forward infantry positions. The fixed Command Hub behind the line is unarmed and counts among the targets to clear.",
+    "es": "El tanque de asedio puede concentrar los cañones principales en un blanco duro o dividir el fuego entre dos blancos distintos. Sus armas de corto alcance solo atacan a infantería adyacente. Pruébalas en las dos posiciones avanzadas. El centro de mando fijo y desarmado también es un objetivo.",
+    "fr": "Le char de siège peut concentrer ses canons principaux sur une cible solide ou les répartir sur deux cibles différentes. Ses armes de proximité visent uniquement l’infanterie adjacente. Essayez-les contre les deux postes avancés. Le centre de commandement fixe et sans armes fait aussi partie des cibles."
+  },
   "terrain": [
     {
       "x": 4,

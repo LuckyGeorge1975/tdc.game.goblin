@@ -4,6 +4,12 @@
   "height": 8,
   "objective": "core-and-escort",
   "ruleProfile": "FULL_CATALOG_v1",
+  "briefing": {
+    "de": "Der Wald versperrt der Fernbatterie die Sicht nach Osten. Führe den Skimmer-Scout nördlich daran vorbei und wähle ihn in der Feuerphase als Beobachter für indirektes Feuer. Die Fernbatterie ist stationär und reicht acht Felder weit. Das mobile Belagerungsgeschütz kann auf der Südstraße ein Feld je Zug vorrücken und feuert bis zu sechs Felder weit.",
+    "en": "The woods block the Long-Range Battery’s view to the east. Move the Skimmer Scout around the north side and select it as spotter for indirect fire. The battery is fixed and reaches eight hexes. The Mobile Siege Gun can advance one hex per turn along the southern road and fire up to six hexes.",
+    "es": "El bosque corta la visión al este de la batería de largo alcance. Lleva al explorador por el norte y elígelo como observador para fuego indirecto. La batería es fija y alcanza ocho hexágonos. El cañón de asedio móvil avanza un hexágono por turno por el camino sur y dispara hasta seis.",
+    "fr": "La forêt masque l’est à la batterie longue portée. Faites passer l’éclaireur au nord et désignez-le comme observateur pour le tir indirect. La batterie fixe porte à huit hexagones. Le canon de siège mobile avance d’un hexagone par tour sur la route sud et tire jusqu’à six."
+  },
   "terrain": [
     {
       "x": 7,

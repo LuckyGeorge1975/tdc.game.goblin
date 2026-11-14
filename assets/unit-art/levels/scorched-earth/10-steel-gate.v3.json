@@ -4,6 +4,12 @@
   "height": 8,
   "objective": "core-and-escort",
   "ruleProfile": "FULL_CATALOG_v1",
+  "briefing": {
+    "de": "Die beiden GOBLIN Siegebreaker haben einzelne Waffen und Ketten. Wähle eine eigene Waffe und eine gegnerische Komponente: Schalte Raketen für weniger Fernfeuer aus oder triff die Ketten, um den Gegner zu bremsen. Konventionelle Fahrzeuge auf freier Fahrspur können gerammt werden.",
+    "en": "The two GOBLIN Siegebreakers fight with individual weapons and treads in place of a shared HP pool. Select one of your own weapons and an enemy component. Destroy missiles to reduce incoming long-range fire or hit the treads to slow the platform. You can ram conventional vehicles on a clear approach.",
+    "es": "Los GOBLIN Siegebreaker tienen armas y orugas individuales en lugar de PV comunes. Elige un arma propia y un componente enemigo. Destruye los misiles para reducir el fuego a distancia o golpea las orugas para frenar al enemigo. Puedes embestir vehículos convencionales si la vía está libre.",
+    "fr": "Les GOBLIN Siegebreaker ont des armes et des chenilles distinctes. Sélectionnez une arme et un composant ennemi. Détruisez les missiles pour réduire le feu à longue portée ou touchez les chenilles pour ralentir la plateforme. Vous pouvez éperonner les véhicules classiques sur une voie dégagée."
+  },
   "terrain": [
     {
       "x": 5,

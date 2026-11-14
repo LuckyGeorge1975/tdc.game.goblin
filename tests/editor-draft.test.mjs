@@ -6,10 +6,45 @@ import {read,execute} from './artillery-product-harness.mjs';
 
 async function scene() {
   const g = await fullScene('catalog-full-terrain-course',7,false,'FULL_CATALOG_v1');
+  g.run(readFileSync(new URL('../level-events.js',import.meta.url),'utf8'));
   g.run(readFileSync(new URL('../editor-draft.js',import.meta.url),'utf8'));
   g.run('globalThis.draft=GoblinEditorDraft.copyTemplate()');
   return g;
 }
+
+test('production FULL v3 missions round-trip with starting cargo, waves and objectives', async () => {
+  const g = await scene();
+  const file = name => readFileSync(new URL('../assets/unit-art/levels/' + name,import.meta.url),'utf8');
+  g.context.packageText = file('catalog-full-levels.v3.json');
+  const expected = JSON.parse(g.context.packageText).levels;
+  g.run('globalThis.levels=GoblinEditorDraft.importLevels(packageText)');
+  assert.deepEqual(read(g,'levels.map(level=>GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(level)))'),expected);
+  await g.run('GoblinEditorDraft.prepare(levels[0]).then(loadEditorDraft)');
+  assert.equal(g.run('units.filter(u=>u.embarkedOn).length'),2);
+  await g.run('GoblinEditorDraft.prepare(levels[4]).then(loadEditorDraft)');
+  assert.equal(g.run('GoblinCatalogFullRuntime.pendingEnemy()'),1);
+  assert.equal(g.run('GoblinCatalogFullRuntime.status().turnLimit'),expected[4].goals[0].turns);
+  g.context.pilotText = file('artillery-pilot.v3.json');
+  assert.throws(()=>g.run('GoblinEditorDraft.importLevels(pilotText)'),/schema/);
+});
+
+test('solo hotspots, briefing and large localized event data survive canonical reimport', async () => {
+  const g = await scene();
+  g.run(`
+    draft.hotspots=[{id:'rally',center:{x:4,y:4},radius:1}];
+    draft.goals=[{type:'enemy-turn-limit',turns:1}];
+    draft.briefing={de:'Briefing DE',en:'Briefing EN',es:'Briefing ES',fr:'Briefing FR'};
+  `);
+  assert.equal(read(g,'GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(draft)).hotspots[0].id'),'rally');
+  g.run(`
+    const msg=n=>Object.fromEntries(['de','en','es','fr'].map(lang=>[lang,'x'.repeat(n)]));
+    draft.events=Array.from({length:24},(_,i)=>({id:'event-'+i,when:{all:[
+      {event:'UnitMoved',unitId:'draft-1'},{pathCrossesHotspot:'rally'}]},
+      effect:{type:'dialog',title:msg(45),text:msg(540)}}));
+  `);
+  assert.deepEqual(read(g,'GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(draft))'),read(g,'draft'));
+  assert.throws(()=>g.run('GoblinEditorDraft.validate({...draft,hotspots:[]})'),/references/);
+});
 
 test('saved v3 levels reload by stable ID and restart from the admitted start snapshot', async () => {
   const disk = new Map();
@@ -140,7 +175,7 @@ test('editor flow keeps the validated draft across playtest and rejects an impor
   g.run(`
     let screen='menu',campaign=null,started=false,editorDraft=null,editorCell={x:0,y:0},editorError='',editorBusy=false,editorMoving=false;
     let editorConfig=null,editorReturnScenario=null;
-    let editorSaved=null,editorName='',editorSavedMessage='';
+    let editorSaved=null,editorName='',editorSavedMessage='',editorMissionOpen=false,editorImportLevels=null;
     const button=()=>({}),actions=()=>({});
     const show=next=>{screen=next},releasePause=()=>{},renderScreen=()=>{},heading=x=>x,paragraph=x=>x;
     const GoblinUIV2={resetView(){},startView(){}},GoblinEditorUI={render(panel,view){globalThis.editorView=view}};
@@ -168,6 +203,12 @@ test('editor flow keeps the validated draft across playtest and rejects an impor
   g.run(`editorView.setMoving(true);editorView.select({x:${origin.x},y:${origin.y}})`);
   assert.deepEqual(read(g,'editorDraft'),before);
   assert.equal(g.state(),world);
+  g.run("editorView.update({...editorDraft,briefing:'Check cover before moving'}); GameDialogs.confirm=async options=>{globalThis.notice=options;return false}");
+  await g.run('playEditorDraft()');
+  assert.equal(g.run('screen'),'editor');
+  assert.equal(g.state(),world);
+  assert.equal(g.run('notice.message'),'Check cover before moving');
+  g.run('GameDialogs.confirm=async()=>true');
   await g.run('playEditorDraft()');
   assert.equal(g.run('screen'),'play');
   assert.equal(execute(g,{type:'Move',actorId:'draft-1',x:0,y:3}).ok,true);
@@ -178,5 +219,5 @@ test('editor flow keeps the validated draft across playtest and rejects an impor
   await g.run("leaveMission('levels')");
   assert.equal(g.run('screen'),'editor');
   assert.equal(g.run('currentScenario'),'catalog-full-terrain-course');
-  assert.deepEqual(read(g,'editorDraft'),before);
+  assert.deepEqual(read(g,'editorDraft'),{...before,briefing:'Check cover before moving'});
 });

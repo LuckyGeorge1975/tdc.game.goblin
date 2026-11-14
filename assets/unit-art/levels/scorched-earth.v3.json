@@ -5,6 +5,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Der Wachpanzer deckt die Straße, der gegnerische Sturmpanzer bedroht den Süden. Geh mit deinen Sturmpanzern auf zwei Felder Feuerreichweite heran. Die Infanterie kommt im Krater in Deckung und feuert aus einem Feld Entfernung. Jeder verlorene Stärkepunkt senkt ihren Angriff und ihre Verteidigung. Schalte Eskorte und Kommandokern aus.",
+      "en": "The Guard Tank covers the road and the enemy Assault Tank threatens the south. Advance your Assault Tanks to firing range of two hexes. Move infantry into crater cover and fire from one hex away. Each squad point lost reduces its attack and defense. Eliminate the escort and the Command Core.",
+      "es": "El tanque de guardia cubre el camino y el tanque de asalto enemigo amenaza el sur. Acerca tus tanques de asalto a dos hexágonos. Usa el cráter como cobertura para la infantería, que dispara a un hexágono. Cada punto perdido reduce su ataque y defensa. Elimina la escolta y el núcleo de mando.",
+      "fr": "Le char de garde couvre la route et le char d’assaut ennemi menace le sud. Avancez vos chars d’assaut à deux hexagones. Mettez l’infanterie à couvert dans le cratère pour tirer à un hexagone. Chaque point perdu réduit son attaque et sa défense. Éliminez l’escorte et le noyau de commandement."
+    },
     "terrain": [
       {
         "x": 4,
@@ -174,6 +180,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Der Aufklärungspanzer ist so schnell wie der Sturmpanzer, aber leichter bewaffnet. Umfahre mit ihm den Höhenrücken im Norden. Lass den Infanteriezug die Mitte decken: Nach einem einzelnen D-Treffer bleiben seine Angriffswerte erhalten. Die Raketenartillerie wirkt über vier Felder mit freier Sicht. Nutze die südliche Straße für das Gegenfeuer.",
+      "en": "The Recon Tank keeps pace with the Assault Tank and carries lighter weapons. Take it around the north end of the ridge. Cover the center with the Infantry Platoon, which retains its attack after a single D hit. Rocket Artillery fires four hexes with a clear line of sight. Use the southern road for counterbattery fire.",
+      "es": "El tanque de reconocimiento mantiene el ritmo del tanque de asalto con armas más ligeras. Rodea la cresta por el norte. Cubre el centro con el pelotón de infantería, que conserva su ataque tras un impacto D. La artillería de cohetes alcanza cuatro hexágonos con línea de visión. Usa el camino del sur para batirla.",
+      "fr": "Le char de reconnaissance suit le char d’assaut avec un armement plus léger. Contournez la crête par le nord. Couvrez le centre avec la section d’infanterie, dont l’attaque reste intacte après un résultat D. L’artillerie à roquettes tire à quatre hexagones en ligne de vue. Utilisez la route sud pour la contrebatterie."
+    },
     "terrain": [
       {
         "x": 8,
@@ -357,6 +369,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Schick die Skimmer über Wasser und Sumpf. Der Scout feuert auf drei Felder und hat zwei Felder Manöver nach der Feuerphase. Kampf- und Leichtskimmer können danach bis zu drei Felder zurückweichen. Der leichtere ist besonders verwundbar. Beobachte den schnellen gegnerischen Raider am Nordufer; dein Panzer hat die Brücke.",
+      "en": "Send your skimmers over water and marsh. The Scout fires at three hexes and has two hexes of maneuver after the fire phase. Combat and Light Skimmers can pull back up to three hexes afterward. The Light Skimmer is especially vulnerable. Watch the fast enemy Raider on the north bank and send your tank across the bridge.",
+      "es": "Envía los deslizadores por agua y pantano. El explorador dispara a tres hexágonos y puede moverse dos tras la fase de fuego. Los deslizadores de combate y ligero pueden retroceder hasta tres. El ligero es especialmente vulnerable. Vigila al Raider de la orilla norte. Tu tanque dispone del puente.",
+      "fr": "Envoyez les aéroglisseurs sur l’eau et les marais. L’éclaireur tire à trois hexagones et manœuvre de deux après la phase de tir. Les modèles de combat et léger peuvent ensuite reculer de trois hexagones. Le léger est fragile. Surveillez le Raider ennemi au nord et faites passer votre char par le pont."
+    },
     "terrain": [
       {
         "x": 4,
@@ -542,6 +560,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Die leichte Ortsverteidigung beginnt neben dem Skimmer-Transporter. Lade sie vor ihrer Bewegung ein, setze über und lande im nächsten Zug. An Bord kann sie auf benachbarte Ziele feuern. Die amphibische Infanterie kann selbst durch den Fluss und dort kämpfen. Der Sturmpanzer bindet die Verteidiger an der Südbrücke.",
+      "en": "Local Defense starts beside the Skimmer Carrier. Embark it before moving the infantry, cross, then land on the next turn. It can fire at adjacent targets while aboard. Amphibious Infantry can cross the river and fight in it on foot. Use the Assault Tank to pin the defenders at the southern bridge.",
+      "es": "La defensa local empieza junto al transporte. Embárcala antes de mover la infantería, cruza y desembarca en el turno siguiente. Puede disparar a objetivos adyacentes desde a bordo. La infantería anfibia cruza y combate en el agua. Usa el tanque de asalto para fijar a los defensores en el puente sur.",
+      "fr": "La défense locale commence à côté du transport. Embarquez-la avant son déplacement, traversez et débarquez au tour suivant. Elle peut tirer sur les cibles adjacentes à bord. L’infanterie amphibie traverse et combat dans l’eau. Retenez les défenseurs au pont sud avec le char d’assaut."
+    },
     "terrain": [
       {
         "x": 5,
@@ -743,6 +767,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Deine Feldpioniere können von ihrer Startposition vor der Bewegung auf F-05 eine Brücke bauen. Das kostet zwei Material und bindet sie für den Zug. Nutze den neuen Übergang für die Panzer und schalte den unbewaffneten Relaisknoten hinter dem Wachpanzer aus. Mit dem letzten Material kannst du etwa eine Feldstellung bauen oder ein beschädigtes Fahrzeug reparieren.",
+      "en": "Before moving your Field Engineers, build a bridge at F-05 from their starting hex. It costs two material and uses their turn. Cross with armor and knock out the unarmed Relay Node behind the Guard Tank. Use the last material to build a field position or repair a damaged vehicle.",
+      "es": "Antes de mover a los ingenieros, construye un puente en F-05 desde su posición inicial. Cuesta dos materiales y ocupa su turno. Cruza con los tanques y destruye el relé desarmado tras el tanque de guardia. Usa el material restante para una posición de campaña o para reparar un vehículo dañado.",
+      "fr": "Avant de déplacer les sapeurs, construisez un pont en F-05 depuis leur case de départ. Cela coûte deux matériaux et utilise leur tour. Faites traverser les chars et détruisez le relais sans armes derrière le char de garde. Gardez le dernier matériau pour une position de campagne ou une réparation."
+    },
     "terrain": [
       {
         "x": 5,
@@ -980,6 +1010,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Der Wald versperrt der Fernbatterie die Sicht nach Osten. Führe den Skimmer-Scout nördlich daran vorbei und wähle ihn in der Feuerphase als Beobachter für indirektes Feuer. Die Fernbatterie ist stationär und reicht acht Felder weit. Das mobile Belagerungsgeschütz kann auf der Südstraße ein Feld je Zug vorrücken und feuert bis zu sechs Felder weit.",
+      "en": "The woods block the Long-Range Battery’s view to the east. Move the Skimmer Scout around the north side and select it as spotter for indirect fire. The battery is fixed and reaches eight hexes. The Mobile Siege Gun can advance one hex per turn along the southern road and fire up to six hexes.",
+      "es": "El bosque corta la visión al este de la batería de largo alcance. Lleva al explorador por el norte y elígelo como observador para fuego indirecto. La batería es fija y alcanza ocho hexágonos. El cañón de asedio móvil avanza un hexágono por turno por el camino sur y dispara hasta seis.",
+      "fr": "La forêt masque l’est à la batterie longue portée. Faites passer l’éclaireur au nord et désignez-le comme observateur pour le tir indirect. La batterie fixe porte à huit hexagones. Le canon de siège mobile avance d’un hexagone par tour sur la route sud et tire jusqu’à six."
+    },
     "terrain": [
       {
         "x": 7,
@@ -1173,6 +1209,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Der Belagerungspanzer kann die Hauptwaffen gegen ein hartes Ziel bündeln oder einzeln auf zwei verschiedene Ziele feuern. Seine Nahwaffen wirken nur gegen Infanterie auf einem Nachbarfeld. Nutze die beiden Infanteriestellungen im Vorfeld zum Ausprobieren. Das unbewegliche Kommandozentrum hinter der Linie ist unbewaffnet und zählt zu den zu räumenden Zielen.",
+      "en": "The Siege Tank can combine its main guns against a hard target or split them across two different targets. Its close-range weapons only hit adjacent infantry. Try them against the two forward infantry positions. The fixed Command Hub behind the line is unarmed and counts among the targets to clear.",
+      "es": "El tanque de asedio puede concentrar los cañones principales en un blanco duro o dividir el fuego entre dos blancos distintos. Sus armas de corto alcance solo atacan a infantería adyacente. Pruébalas en las dos posiciones avanzadas. El centro de mando fijo y desarmado también es un objetivo.",
+      "fr": "Le char de siège peut concentrer ses canons principaux sur une cible solide ou les répartir sur deux cibles différentes. Ses armes de proximité visent uniquement l’infanterie adjacente. Essayez-les contre les deux postes avancés. Le centre de commandement fixe et sans armes fait aussi partie des cibles."
+    },
     "terrain": [
       {
         "x": 4,
@@ -1393,6 +1435,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Der strategische Raketenträger hat einen Schuss auf ein Hex mit freier Sicht. Ziele in der ersten Feuerphase auf H-04, solange die gegnerische Kolonne dicht steht. Der Treffer im Zentrum ist stärker als auf den Nachbarfeldern. Halte deine eigenen Einheiten aus dem Wirkungsbereich.",
+      "en": "The Strategic Missile Carrier has one shot at a hex in clear line of sight. Aim at H-04 in the first fire phase while the enemy column is clustered. The center takes a stronger hit than its neighbors. Keep your own units outside the blast area.",
+      "es": "El portamisiles estratégico tiene un disparo a un hexágono con línea de visión. Apunta a H-04 en la primera fase de fuego mientras la columna enemiga siga agrupada. El impacto central es más fuerte que el de los hexágonos vecinos. Mantén a tus tropas fuera del área.",
+      "fr": "Le lance-missiles stratégique dispose d’un tir sur une case en ligne de vue. Visez H-04 dès la première phase de tir, avant que la colonne ennemie se disperse. L’impact est plus puissant au centre que sur les cases adjacentes. Gardez vos troupes hors du rayon."
+    },
     "terrain": [
       {
         "x": 8,
@@ -1575,6 +1623,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Der Forge-Pionier kann von E-04 den Übergang bei F-04 bauen. In späteren Zügen kannst du die beiden angrenzenden Artilleriedrohnen in seine getrennten Buchten laden und am Ostufer absetzen. Die Drohnen haben direkte Reichweite acht und feuern nach dem Absetzen ab dem nächsten eigenen Zug. Schütze intakte Werkzeuge für den Brückenbau.",
+      "en": "The Forge Engineer can bridge F-04 from E-04. On later turns, load the two neighboring Artillery Drones into its separate bays and deploy them on the east bank. The drones have direct range eight and can fire from the next friendly turn after deployment. Protect the Forge’s tools for bridge building.",
+      "es": "La forja puede tender un puente en F-04 desde E-04. En turnos posteriores, carga los dos drones artilleros adyacentes en sus bahías separadas y despliégalos al este. Los drones tienen alcance directo de ocho y disparan a partir del turno siguiente al despliegue. Protege las herramientas de la forja.",
+      "fr": "Le sapeur Forge peut poser un pont en F-04 depuis E-04. Aux tours suivants, chargez les deux drones d’artillerie adjacents dans ses baies distinctes, puis déployez-les à l’est. Ils tirent en ligne directe à huit cases dès le tour allié suivant leur déploiement. Protégez les outils du Forge."
+    },
     "terrain": [
       {
         "x": 5,
@@ -1785,6 +1839,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Die beiden GOBLIN Siegebreaker haben einzelne Waffen und Ketten. Wähle eine eigene Waffe und eine gegnerische Komponente: Schalte Raketen für weniger Fernfeuer aus oder triff die Ketten, um den Gegner zu bremsen. Konventionelle Fahrzeuge auf freier Fahrspur können gerammt werden.",
+      "en": "The two GOBLIN Siegebreakers fight with individual weapons and treads in place of a shared HP pool. Select one of your own weapons and an enemy component. Destroy missiles to reduce incoming long-range fire or hit the treads to slow the platform. You can ram conventional vehicles on a clear approach.",
+      "es": "Los GOBLIN Siegebreaker tienen armas y orugas individuales en lugar de PV comunes. Elige un arma propia y un componente enemigo. Destruye los misiles para reducir el fuego a distancia o golpea las orugas para frenar al enemigo. Puedes embestir vehículos convencionales si la vía está libre.",
+      "fr": "Les GOBLIN Siegebreaker ont des armes et des chenilles distinctes. Sélectionnez une arme et un composant ennemi. Détruisez les missiles pour réduire le feu à longue portée ou touchez les chenilles pour ralentir la plateforme. Vous pouvez éperonner les véhicules classiques sur une voie dégagée."
+    },
     "terrain": [
       {
         "x": 5,
@@ -1980,6 +2040,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Eine gegnerische Phantom-Plattform lauert zwischen den Ruinen. Nähere dich mit einem aktiven Aufklärer bis auf zwei Felder mit freier Sicht, um Kontakt herzustellen. Mit deiner Phantom-Plattform kannst du gedeckt flankieren. Ein eigener Schuss verrät sie. Raketenflächenfeuer kann ein getarntes Ziel im Wirkungsbereich treffen.",
+      "en": "An enemy Phantom Platform is waiting among the ruins. Bring an active scout within two hexes and with a clear line of sight to make contact. Flank under cover with your own Phantom. Firing gives it away. A strategic missile can hit a cloaked target in its blast area.",
+      "es": "Una plataforma fantasma enemiga acecha entre las ruinas. Acerca un explorador activo a dos hexágonos con línea de visión para detectarla. Flanquea con tu propia plataforma a cubierto. Disparar la delata. Un misil estratégico puede alcanzar un blanco oculto dentro de su área.",
+      "fr": "Une plateforme fantôme ennemie se cache dans les ruines. Approchez un éclaireur actif à deux cases, en ligne de vue, pour établir le contact. Contournez à couvert avec votre propre plateforme. Le tir la révèle. Un missile stratégique peut toucher une cible camouflée dans son rayon."
+    },
     "terrain": [
       {
         "x": 3,
@@ -2170,6 +2236,12 @@
     "height": 8,
     "objective": "core-and-escort",
     "ruleProfile": "FULL_CATALOG_v1",
+    "briefing": {
+      "de": "Der GOBLIN Dreadnaught führt zwei Hauptbatterien und sechs Raketen auf getrennten Plätzen. Setze die weitreichenden Einmalschüsse gegen die stärksten Waffen des gegnerischen Dreadnaught ein. Unterdrücke mit dem Belagerungspanzer die Eskorte. Halte die Pioniere in Reichweite für Ketten- oder Komponentenreparaturen.",
+      "en": "The GOBLIN Dreadnaught carries two main batteries and six missiles in individual slots. Use the long-range single-use missiles against the enemy Dreadnaught’s strongest weapons. Send the Siege Tank after the escort. Keep the Field Engineers close enough to repair treads or components.",
+      "es": "El GOBLIN Dreadnaught tiene dos baterías principales y seis misiles en ranuras individuales. Usa los misiles de largo alcance y un solo uso contra las armas más fuertes del Dreadnaught enemigo. Envía el tanque de asedio contra la escolta. Mantén cerca a los ingenieros para reparar orugas o componentes.",
+      "fr": "Le GOBLIN Dreadnaught dispose de deux batteries principales et de six missiles dans des emplacements distincts. Utilisez les missiles à longue portée et à usage unique contre les armes les plus fortes du Dreadnaught ennemi. Envoyez le char de siège sur l’escorte et gardez les sapeurs à portée pour les réparations."
+    },
     "terrain": [
       {
         "x": 5,

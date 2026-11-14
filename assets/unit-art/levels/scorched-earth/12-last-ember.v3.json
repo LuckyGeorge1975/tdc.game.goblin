@@ -4,6 +4,12 @@
   "height": 8,
   "objective": "core-and-escort",
   "ruleProfile": "FULL_CATALOG_v1",
+  "briefing": {
+    "de": "Der GOBLIN Dreadnaught führt zwei Hauptbatterien und sechs Raketen auf getrennten Plätzen. Setze die weitreichenden Einmalschüsse gegen die stärksten Waffen des gegnerischen Dreadnaught ein. Unterdrücke mit dem Belagerungspanzer die Eskorte. Halte die Pioniere in Reichweite für Ketten- oder Komponentenreparaturen.",
+    "en": "The GOBLIN Dreadnaught carries two main batteries and six missiles in individual slots. Use the long-range single-use missiles against the enemy Dreadnaught’s strongest weapons. Send the Siege Tank after the escort. Keep the Field Engineers close enough to repair treads or components.",
+    "es": "El GOBLIN Dreadnaught tiene dos baterías principales y seis misiles en ranuras individuales. Usa los misiles de largo alcance y un solo uso contra las armas más fuertes del Dreadnaught enemigo. Envía el tanque de asedio contra la escolta. Mantén cerca a los ingenieros para reparar orugas o componentes.",
+    "fr": "Le GOBLIN Dreadnaught dispose de deux batteries principales et de six missiles dans des emplacements distincts. Utilisez les missiles à longue portée et à usage unique contre les armes les plus fortes du Dreadnaught ennemi. Envoyez le char de siège sur l’escorte et gardez les sapeurs à portée pour les réparations."
+  },
   "terrain": [
     {
       "x": 5,

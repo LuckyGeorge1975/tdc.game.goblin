@@ -114,6 +114,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let editorConfig = null, editorReturnScenario = null;
     let savedConfig = null, savedTitle = '', savedTab = false, savedStarting = false, savedError = '';
     let editorSaved = null, editorName = '', editorSavedMessage = '';
+    let editorMissionOpen = false, editorImportLevels = null;
     let optionsScrollObserver = null;
     let briefingDifficulty = 'medium';
     let libraryIndex = 0, libraryTab = 'description', libraryArtSide = 'own', libraryMapMode = 'move';
@@ -404,7 +405,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       renderScreen(false);
       try {
         if (!field.configs) {
-          const response = await fetch(`assets/unit-art/levels/${field.file}.v3.json?v=1`);
+          const response = await fetch(`assets/unit-art/levels/${field.file}.v3.json?v=${key === 'scorched' ? 2 : 1}`);
           if (!response.ok) throw Error('campaign levels');
           const levels = await response.json();
           if (!Array.isArray(levels) || levels.length !== field.ids.length) throw Error('campaign levels');
@@ -571,9 +572,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       show('editor');
     }
     function editSavedLevel(entry) {
-      try { editorDraft = GoblinEditorDraft.parse(entry.level); }
+      try { editorDraft = GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(GoblinEditorDraft.parse(entry.level))); }
       catch { savedError = t('v2.saved.readError'); renderScreen(false); return; }
       editorSaved = entry;
+      editorImportLevels = null;
       editorName = entry.name;
       editorSavedMessage = '';
       editorCell = {x:0,y:0};
@@ -591,9 +593,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         editorSavedMessage = t('v2.saved.success');
         editorError = '';
       } catch (error) {
-        editorSavedMessage = '';
-        editorError = t(error.message === 'name' ? 'v2.saved.nameError' :
+        editorSavedMessage = t(error.message === 'name' ? 'v2.saved.nameError' :
           error.message === 'conflict' ? 'v2.saved.conflict' : 'v2.saved.writeError');
+        editorError = '';
       }
       renderScreen(false);
     }
@@ -606,6 +608,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const latest = GoblinSavedLevels.read().find(level => level.id === entry.id);
         if (!latest || latest.level !== entry.level || latest.name !== entry.name) throw Error('conflict');
         const config = await GoblinEditorDraft.prepare(GoblinEditorDraft.parse(latest.level));
+        if (screen !== 'levels' || !savedTab || surface.querySelector('.v2-screen-panel') !== panel) return;
+        if (config.briefing && !await acknowledgeLevelBriefing(config)) return;
         if (screen !== 'levels' || !savedTab || surface.querySelector('.v2-screen-panel') !== panel) return;
         globalThis.IronDustBrowserV2?.stop();
         loadEditorDraft(config);
@@ -676,7 +680,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function updateEditor(draft, cell = editorCell) {
       try {
-        GoblinEditorDraft.validate(draft);
+        GoblinEditorDraft.exportJson(draft);
         editorDraft = draft;
         editorSavedMessage = '';
         editorCell = cell;
@@ -708,7 +712,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const response = await fetch('assets/training/level-events-pilot.v3.json');
         if (!response.ok) throw Error('unavailable');
         const draft = GoblinEditorDraft.parse(await response.text());
-        if (screen === 'editor') { editorSaved = null; editorSavedMessage = ''; updateEditor(draft,{x:1,y:3}); }
+        if (screen === 'editor') {
+          editorSaved = null; editorSavedMessage = ''; editorImportLevels = null;
+          updateEditor(draft,{x:1,y:3});
+        }
       } catch (error) {
         editorError = error.message;
       } finally {
@@ -723,6 +730,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       renderScreen(false);
       try {
         const config = await GoblinEditorDraft.prepare(draft);
+        if (screen !== 'editor' || editorDraft !== draft) return;
+        if (config.briefing && !await acknowledgeLevelBriefing(config)) return;
         if (screen !== 'editor' || editorDraft !== draft) return;
         editorReturnScenario = currentScenario;
         loadEditorDraft(config);
@@ -739,6 +748,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (screen === 'editor') renderScreen(false);
       }
     }
+    function acknowledgeLevelBriefing(config) {
+      const copy = config.briefing;
+      return GameDialogs.confirm({id:'editor-level-briefing',title:t('v2.editor.briefing'),
+        message:typeof copy === 'string' ? copy : copy[GoblinLanguage.current] ?? copy.en,
+        acceptLabel:t('screen.briefing.startMission'),cancelLabel:t('ui.dialog.cancel')});
+    }
     function renderEditor(panel) {
       panel.append(heading(t('v2.editor.title')), paragraph(t('mission.editor-draft.objective.short')),
         paragraph(t('v2.editor.coreMark')));
@@ -751,6 +766,24 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const overwrite = button(t('v2.saved.overwrite'), () => saveEditorLevel(true));
       save.disabled = editorBusy; overwrite.disabled = editorBusy;
       panel.append(label, actions(save, ...(editorSaved ? [overwrite] : [])));
+      if (editorImportLevels) {
+        const choices = document.createElement('select');
+        choices.disabled = editorBusy;
+        for (const level of editorImportLevels) {
+          const option = document.createElement('option'); option.textContent = level.id;
+          choices.append(option);
+        }
+        const choose = button(t('v2.editor.openPackageLevel'), () => {
+          const draft = editorImportLevels[choices.selectedIndex];
+          if (!draft) return;
+          editorImportLevels = null;
+          editorSaved = null;
+          updateEditor(draft,{x:0,y:0});
+        });
+        choose.disabled = editorBusy;
+        choices.setAttribute('aria-label',t('v2.editor.openPackageLevel'));
+        panel.append(choices,choose);
+      }
       if (editorSavedMessage) {
         const status = paragraph(editorSavedMessage);
         status.setAttribute('role','status');
@@ -758,11 +791,20 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       GoblinEditorUI.render(panel, {
         draft:editorDraft, cell:editorCell, busy:editorBusy, error:editorError, moving:editorMoving,
+        missionOpen:editorMissionOpen, setMissionOpen:open => { editorMissionOpen = open; },
         select:selectEditorCell, setMoving:setEditorMoving,
         update:updateEditor, pilot:loadEditorPilot, play:playEditorDraft, back:() => show('menu'),
         import(text) {
           try {
-            const draft = GoblinEditorDraft.parse(text);
+            const levels = GoblinEditorDraft.importLevels(text);
+            if (levels.length > 1) {
+              editorImportLevels = levels;
+              editorError = '';
+              renderScreen(false);
+              return;
+            }
+            const draft = GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(levels[0]));
+            editorImportLevels = null;
             editorSaved = null; editorSavedMessage = '';
             updateEditor(draft);
           }

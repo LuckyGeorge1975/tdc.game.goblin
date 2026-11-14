@@ -4,6 +4,12 @@
   "height": 8,
   "objective": "core-and-escort",
   "ruleProfile": "FULL_CATALOG_v1",
+  "briefing": {
+    "de": "Deine Feldpioniere können von ihrer Startposition vor der Bewegung auf F-05 eine Brücke bauen. Das kostet zwei Material und bindet sie für den Zug. Nutze den neuen Übergang für die Panzer und schalte den unbewaffneten Relaisknoten hinter dem Wachpanzer aus. Mit dem letzten Material kannst du etwa eine Feldstellung bauen oder ein beschädigtes Fahrzeug reparieren.",
+    "en": "Before moving your Field Engineers, build a bridge at F-05 from their starting hex. It costs two material and uses their turn. Cross with armor and knock out the unarmed Relay Node behind the Guard Tank. Use the last material to build a field position or repair a damaged vehicle.",
+    "es": "Antes de mover a los ingenieros, construye un puente en F-05 desde su posición inicial. Cuesta dos materiales y ocupa su turno. Cruza con los tanques y destruye el relé desarmado tras el tanque de guardia. Usa el material restante para una posición de campaña o para reparar un vehículo dañado.",
+    "fr": "Avant de déplacer les sapeurs, construisez un pont en F-05 depuis leur case de départ. Cela coûte deux matériaux et utilise leur tour. Faites traverser les chars et détruisez le relais sans armes derrière le char de garde. Gardez le dernier matériau pour une position de campagne ou une réparation."
+  },
   "terrain": [
     {
       "x": 5,

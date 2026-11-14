@@ -4,6 +4,12 @@
   "height": 8,
   "objective": "core-and-escort",
   "ruleProfile": "FULL_CATALOG_v1",
+  "briefing": {
+    "de": "Eine gegnerische Phantom-Plattform lauert zwischen den Ruinen. Nähere dich mit einem aktiven Aufklärer bis auf zwei Felder mit freier Sicht, um Kontakt herzustellen. Mit deiner Phantom-Plattform kannst du gedeckt flankieren. Ein eigener Schuss verrät sie. Raketenflächenfeuer kann ein getarntes Ziel im Wirkungsbereich treffen.",
+    "en": "An enemy Phantom Platform is waiting among the ruins. Bring an active scout within two hexes and with a clear line of sight to make contact. Flank under cover with your own Phantom. Firing gives it away. A strategic missile can hit a cloaked target in its blast area.",
+    "es": "Una plataforma fantasma enemiga acecha entre las ruinas. Acerca un explorador activo a dos hexágonos con línea de visión para detectarla. Flanquea con tu propia plataforma a cubierto. Disparar la delata. Un misil estratégico puede alcanzar un blanco oculto dentro de su área.",
+    "fr": "Une plateforme fantôme ennemie se cache dans les ruines. Approchez un éclaireur actif à deux cases, en ligne de vue, pour établir le contact. Contournez à couvert avec votre propre plateforme. Le tir la révèle. Un missile stratégique peut toucher une cible camouflée dans son rayon."
+  },
   "terrain": [
     {
       "x": 3,

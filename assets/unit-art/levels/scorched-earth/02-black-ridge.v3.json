@@ -4,6 +4,12 @@
   "height": 8,
   "objective": "core-and-escort",
   "ruleProfile": "FULL_CATALOG_v1",
+  "briefing": {
+    "de": "Der Aufklärungspanzer ist so schnell wie der Sturmpanzer, aber leichter bewaffnet. Umfahre mit ihm den Höhenrücken im Norden. Lass den Infanteriezug die Mitte decken: Nach einem einzelnen D-Treffer bleiben seine Angriffswerte erhalten. Die Raketenartillerie wirkt über vier Felder mit freier Sicht. Nutze die südliche Straße für das Gegenfeuer.",
+    "en": "The Recon Tank keeps pace with the Assault Tank and carries lighter weapons. Take it around the north end of the ridge. Cover the center with the Infantry Platoon, which retains its attack after a single D hit. Rocket Artillery fires four hexes with a clear line of sight. Use the southern road for counterbattery fire.",
+    "es": "El tanque de reconocimiento mantiene el ritmo del tanque de asalto con armas más ligeras. Rodea la cresta por el norte. Cubre el centro con el pelotón de infantería, que conserva su ataque tras un impacto D. La artillería de cohetes alcanza cuatro hexágonos con línea de visión. Usa el camino del sur para batirla.",
+    "fr": "Le char de reconnaissance suit le char d’assaut avec un armement plus léger. Contournez la crête par le nord. Couvrez le centre avec la section d’infanterie, dont l’attaque reste intacte après un résultat D. L’artillerie à roquettes tire à quatre hexagones en ligne de vue. Utilisez la route sud pour la contrebatterie."
+  },
   "terrain": [
     {
       "x": 8,

@@ -4,6 +4,12 @@
   "height": 8,
   "objective": "core-and-escort",
   "ruleProfile": "FULL_CATALOG_v1",
+  "briefing": {
+    "de": "Der Forge-Pionier kann von E-04 den Übergang bei F-04 bauen. In späteren Zügen kannst du die beiden angrenzenden Artilleriedrohnen in seine getrennten Buchten laden und am Ostufer absetzen. Die Drohnen haben direkte Reichweite acht und feuern nach dem Absetzen ab dem nächsten eigenen Zug. Schütze intakte Werkzeuge für den Brückenbau.",
+    "en": "The Forge Engineer can bridge F-04 from E-04. On later turns, load the two neighboring Artillery Drones into its separate bays and deploy them on the east bank. The drones have direct range eight and can fire from the next friendly turn after deployment. Protect the Forge’s tools for bridge building.",
+    "es": "La forja puede tender un puente en F-04 desde E-04. En turnos posteriores, carga los dos drones artilleros adyacentes en sus bahías separadas y despliégalos al este. Los drones tienen alcance directo de ocho y disparan a partir del turno siguiente al despliegue. Protege las herramientas de la forja.",
+    "fr": "Le sapeur Forge peut poser un pont en F-04 depuis E-04. Aux tours suivants, chargez les deux drones d’artillerie adjacents dans ses baies distinctes, puis déployez-les à l’est. Ils tirent en ligne directe à huit cases dès le tour allié suivant leur déploiement. Protégez les outils du Forge."
+  },
   "terrain": [
     {
       "x": 5,

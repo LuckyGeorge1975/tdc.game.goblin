@@ -4,6 +4,12 @@
   "height": 8,
   "objective": "core-and-escort",
   "ruleProfile": "FULL_CATALOG_v1",
+  "briefing": {
+    "de": "Schick die Skimmer über Wasser und Sumpf. Der Scout feuert auf drei Felder und hat zwei Felder Manöver nach der Feuerphase. Kampf- und Leichtskimmer können danach bis zu drei Felder zurückweichen. Der leichtere ist besonders verwundbar. Beobachte den schnellen gegnerischen Raider am Nordufer; dein Panzer hat die Brücke.",
+    "en": "Send your skimmers over water and marsh. The Scout fires at three hexes and has two hexes of maneuver after the fire phase. Combat and Light Skimmers can pull back up to three hexes afterward. The Light Skimmer is especially vulnerable. Watch the fast enemy Raider on the north bank and send your tank across the bridge.",
+    "es": "Envía los deslizadores por agua y pantano. El explorador dispara a tres hexágonos y puede moverse dos tras la fase de fuego. Los deslizadores de combate y ligero pueden retroceder hasta tres. El ligero es especialmente vulnerable. Vigila al Raider de la orilla norte. Tu tanque dispone del puente.",
+    "fr": "Envoyez les aéroglisseurs sur l’eau et les marais. L’éclaireur tire à trois hexagones et manœuvre de deux après la phase de tir. Les modèles de combat et léger peuvent ensuite reculer de trois hexagones. Le léger est fragile. Surveillez le Raider ennemi au nord et faites passer votre char par le pont."
+  },
   "terrain": [
     {
       "x": 4,
