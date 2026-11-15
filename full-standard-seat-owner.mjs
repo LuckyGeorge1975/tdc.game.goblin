@@ -40,10 +40,12 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
 
   globalThis.GoblinFullSeatOwner = Object.freeze({
     offers:config => standardFullSeatOffers(config, GoblinLanguage.t('v2.full.standardDefender')),
-    bind(session, selection, ui, port) {
-      if (!allowsStandardDefender(session.config) || selection.player !== null ||
-          ![null, standardDefender].includes(selection.enemy)) throw Error('FULL_CONTROLLER_NOT_OFFERED');
-      const select = selection.enemy === standardDefender ? {enemy:selectStandardFullDefender} : {};
+    bind(session, selection, ui, port, policyIds = {}) {
+      const standard = selection.enemy === standardDefender;
+      if ((selection.player !== null && selection.player !== policyIds.player) ||
+          (selection.enemy !== null && selection.enemy !== policyIds.enemy && !standard) ||
+          (standard && !allowsStandardDefender(session.config))) throw Error('FULL_CONTROLLER_NOT_OFFERED');
+      const select = standard ? {enemy:selectStandardFullDefender} : {};
       return createOwnedFullCatalogSessionHost({port,player,select,onCommit:ui.refresh});
     },
     playerCommands: () => player.playerOptions().map(entry=>entry.command),
