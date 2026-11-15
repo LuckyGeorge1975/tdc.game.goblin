@@ -22,6 +22,7 @@
 
   const baseShowUnitInfo=showUnitInfo;
   showUnitInfo=function(unit){
+    if(fullOwnsPresentation())return;
     baseShowUnitInfo(unit);
     if(isCarrier(unit))$('#unit-intel-facts').innerHTML+=`<div><span>MISSILE</span><b>${unit.missilesRemaining}/1</b></div><div><span>BLAST</span><b>6 DIRECT · 3 ADJACENT</b></div><div><span>FRIENDLY FIRE</span><b>POSSIBLE</b></div>`;
   };

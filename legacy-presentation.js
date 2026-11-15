@@ -16,7 +16,7 @@
       turn,phase:turnPhase,activeTeam:phase,gameOver};
   }
   function sync(){
-    if(!legacySession||root.IronDustBrowserV2?.active)return false;
+    if(!legacySession||root.IronDustBrowserV2?.active||fullOwnsPresentation())return false;
     const state=snapshot();
     root.GoblinPresentation.bind({runtime:'legacy',scenarioId:legacySession.scenarioId,
       scenarioVersion:legacySession.scenarioVersion,ruleProfileId:legacySession.ruleProfileId,
@@ -92,6 +92,7 @@
   for(const name of ['attack','enemyFire']){
     const base=name==='attack'?attack:enemyFire;
     const wrapped=function(...args){
+      if(fullOwnsPresentation())return base(...args);
       if(name==='enemyFire'&&root.GoblinSpecialistsRuntime?.active())return base(...args);
       if(attackCapture)return base(...args);
       attackCapture={results:[],effects:[],before:snapshot()};

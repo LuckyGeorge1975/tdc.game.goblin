@@ -7,6 +7,7 @@
  let state=null;
  let roundFireChoice=null;
  let controller=null;
+ let presentationPending=false;
  let commandKey=null,commandSerial=0;
  function revision(){return JSON.stringify([legacySession.sessionId,turn,phase,turnPhase,units.map(u=>[u.id,u.x,u.y,unitAlive(u),!!u.disabled,u.embarkedOn??null]),[...terrainTypes]])}
  function ruleStateKey(s) {
@@ -78,15 +79,21 @@
   return sideProjection(team);
  }
  function sideProjection(team){
-  const visible=roster(team), ids=new Set(visible.map(u=>u.id));
-  return {side:team,phase:turnPhase,turn,terrain:{width:W,height:H,defaultTerrain:'open-ground',
-   cells:[...terrainTypes].map(([key,type])=>{const [x,y]=key.split(',').map(Number);return {x,y,type}})},
+  return {side:team,phase:turnPhase,turn,terrain:boardTerrain(),
    ...(controllerPort() || Object.hasOwn(ensure(),'deadlineRemoved') ? {objectives:publicObjectives(team)} : {}),
-   units:visible.map(u=>({id:u.id,relation:u.team===team?'own':'opponent',assetId:u.catalogAssetId,
+   units:boardUnits(roster(team),team)};
+ }
+ function boardTerrain(){
+  return {width:W,height:H,defaultTerrain:'open-ground',
+   cells:[...terrainTypes].map(([key,type])=>{const [x,y]=key.split(',').map(Number);return {x,y,type}})};
+ }
+ function boardUnits(visible,team){
+  const ids=new Set(visible.map(u=>u.id));
+  return visible.map(u=>({id:u.id,...(team===null?{team:u.team}:{relation:u.team===team?'own':'opponent'}),assetId:u.catalogAssetId,
     x:u.x,y:u.y,alive:unitAlive(u),disabled:!!u.disabled,
     embarkedOn:ids.has(u.embarkedOn)?u.embarkedOn:null,objectiveTarget:u.core===true,
     ...(u.catalogSystems?{systems:{treads:u.catalogSystems.treads,components:u.catalogSystems.components.map(c=>
-     ({id:c.id,destroyed:c.destroyed,spent:c.spent}))}}:{hp:u.hp,maxHp:u.maxHp})}))};
+     ({id:c.id,destroyed:c.destroyed,spent:c.spent}))}}:{hp:u.hp,maxHp:u.maxHp})}));
  }
  const coreAlive = () => units.some(unit => unit.id === 'core' && unitAlive(unit));
  function publicObjectives(team){
@@ -126,6 +133,18 @@
   return controller?.owns(legacySession) ? controller : null;
  }
  function controllerPort(){return controlOwner()?.port??null;}
+ function ownsPresentation(){return presentationPending||!!controlOwner();}
+ function stageControlledPresentation(){
+  presentationPending=true;
+  clearFullNativePresentation();
+  root.GoblinMovement?.clear();
+  root.GoblinPresentation?.stop();
+ }
+ function startControlledPresentation(){
+  const owner=controlOwner();
+  presentationPending=false;
+  owner?.startPresentation();
+ }
  function prepareControllers(session,selection,ui){
   if(session.ruleProfileId!=='FULL_CATALOG_v1' || !exact(selection,['player','enemy']) ||
       !['player','enemy'].every(side=>['ai','human'].includes(selection[side])))throw Error('FULL_CONTROLLERS_INVALID');
@@ -134,7 +153,6 @@
   return ()=>{
    if(legacySession!==session||!active()||controlOwner())throw Error('FULL_CONTROLLER_OWNER');
    controller=createControllerPort(session,roles,ui);
-   controller.enterSide();
    return controller.port;
   };
  }
@@ -208,10 +226,30 @@
  }
  function createControllerPort(session,roles,ui){
   const reject=code=>({ok:false,code});
+  const allowsSpectator=roles.player==='ai'&&roles.enemy==='ai';
+  let ready=false,latestSpectator=null;
   let generation=0,sequence=0,paused=false,stopped=false,committing=false,advancingPhase=false;
   let seat,pending,cursor,nativeSlot,offer,permit;
   const owns=current=>current===session;
-  const attached=()=>owns(legacySession)&&active()&&!stopped;
+  const attached=()=>ready&&!presentationPending&&owns(legacySession)&&active()&&!stopped;
+  const spectator=Object.freeze({read:()=>allowsSpectator&&attached()?latestSpectator:null});
+  function publishSpectator(){
+   if(!allowsSpectator||!attached())return;
+   const freeze=value=>{
+    if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}
+    return value;
+   };
+   latestSpectator=freeze({view:{side:'spectator',sessionId:session.sessionId,revision:sequence,
+    turn,phase:turnPhase,activeSide:gameOver?null:phase,ended:gameOver,outcome:terminalOutcome(),
+    terrain:boardTerrain(),units:boardUnits(units,null),objectives:{
+     player:publicObjectives('player'),enemy:publicObjectives('enemy')}},
+    log:formatLogEntries(ensure().logs,()=>true)});
+  }
+  function startPresentation(){
+   ready=true;
+   publishSpectator();
+   enterSide();
+  }
   const authorised=mode=>attached()&&!paused&&!gameOver&&roles[phase]===mode&&(mode==='ai'||seat===phase);
   function invalidate(){
    generation++;pending=null;seat=null;offer=null;permit=null;
@@ -235,6 +273,7 @@
     humanReady:authorised('human')}) : null;
   }
   function project(mode){
+   if(mode==='spectator')return spectator.read();
    if(!authorised(mode))return null;
    return {view:sideProjection(phase),...(mode==='human'?{log:logEntries(true,phase,true)}:{})};
   }
@@ -284,6 +323,7 @@
      if(!result.ok)return result;
      accepted=true;sequence++;permit=null;offer=null;
      nextEnemy(result.kind);
+     publishSpectator();
      return {ok:true};
     }finally{
      const hits=events?.finish(observed,legacySession,before,units,accepted,dist,unitAlive);
@@ -298,20 +338,22 @@
      advancingPhase=true;
      advanceNativePlayerPhase();
      sequence++;
+     publishSpectator();
      return {ok:true};
     }
     const actor=units.find(unit=>unit.id===command?.actorId);
     if(!actor||actor.team!=='player'||!playerDispatch)return reject('FULL_CONTROL_ACTOR');
     const result=playerDispatch(command,token.revision);
-    if(result.ok){sequence++;permit=null;}
+    if(result.ok){sequence++;permit=null;publishSpectator();}
     return result;
    }finally{advancingPhase=false;committing=false;}
   }
   const port=Object.freeze({state,project,ticket,open,commit,
+   spectator:()=>allowsSpectator&&attached()?spectator:null,
    pause(){if(attached()){paused=true;invalidate();}},
    resume(){if(attached()&&paused){paused=false;enterSide();}},
-   leave(){stopped=true;invalidate();cursor=null;nativeSlot=null;}});
-  return {owns,port,enterSide,startEnemy,advancingPhase:()=>advancingPhase};
+   leave(){stopped=true;invalidate();cursor=null;nativeSlot=null;latestSpectator=null;}});
+  return {owns,port,startPresentation,enterSide,startEnemy,advancingPhase:()=>advancingPhase};
  }
  function fireView(binding){const out=copy(binding);if(out?.state)delete out.state.mainTargets;return out}
  function viewerUnit(u){const {specialistJournal,specialistSerial,...publicUnit}=u,out=copy(publicUnit);if(out.catalogFire)out.catalogFire=fireView(out.catalogFire);if(out.spotterId&&!known(out.spotterId))out.spotterId=null;return out}
@@ -329,6 +371,9 @@
   const logs=ensure().logs;
   const scoped=onlyKnown?logs.filter(visible):logs;
   const rows=all?scoped:scoped.slice(-4);
+  return formatLogEntries(rows,visible);
+ }
+ function formatLogEntries(rows,visible){
   return rows.toReversed().map(entry=>{
    const disclosed=visible(entry),key=disclosed?entry.key:'v2.full.stealth.contactLost';
    let message=root.GoblinLanguage?.t(key,disclosed?entry.params:{})??key;
@@ -560,7 +605,8 @@
   state=copy(value);
  }
  root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,recordRoundAction,catalogCard,initialRoster,status,stealthText,deadlineRemoved,
-  enemyHexShot,prepareControllers,controllerPort,startControlledEnemyTurn,enterControlledSide,allowsPlayerPhaseAdvance});
+  enemyHexShot,prepareControllers,controllerPort,startControlledEnemyTurn,enterControlledSide,allowsPlayerPhaseAdvance,
+  ownsPresentation,stageControlledPresentation,startControlledPresentation});
  const oldCheckVictory=checkVictory;
  checkVictory=function(){
   // Native combat reaches this boundary after applying damage and before finishing the mission.

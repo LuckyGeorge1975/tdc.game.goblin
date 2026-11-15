@@ -39,10 +39,11 @@
   }
 
   const baseShowUnitInfo=showUnitInfo;
-  showUnitInfo=function(unit){baseShowUnitInfo(unit);renderStatusIntel(unit)};
+  showUnitInfo=function(unit){if(fullOwnsPresentation())return;baseShowUnitInfo(unit);renderStatusIntel(unit)};
 
   const baseUpdateRoster=updateRoster;
   updateRoster=function(){
+    if(fullOwnsPresentation())return;
     baseUpdateRoster();
     const roster=$('#unit-roster'),cards=roster&&roster.children?[...roster.children]:[];
     const players=units.filter(unit=>unit.team==='player');

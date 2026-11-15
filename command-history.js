@@ -27,7 +27,7 @@ function clearPhaseCommands() {
 function commandSnapshot(label) {
   const snapshot = { label, units: structuredClone(units), terrain: [...terrain], terrainTypes: [...terrainTypes],
     selectedId: selected?.id, focus: focusedCell && {...focusedCell},
-    log: logEl.innerHTML, rollCursor: phaseRollCursor };
+    log: fullOwnsPresentation()?'':logEl.innerHTML, rollCursor: phaseRollCursor };
   if(globalThis.GoblinCatalogFullRuntime?.active())snapshot.catalogFull=GoblinCatalogFullRuntime.snapshot();
   globalThis.GoblinLegacyPresentation?.checkpoint(snapshot);
   globalThis.GoblinFullRoundSource?.checkpoint(snapshot);
@@ -86,7 +86,7 @@ function undoPhaseCommand() {
   transportLoadMode = null;
   transportUnloadMode = null;
   phaseRollCursor = before.rollCursor;
-  logEl.innerHTML = before.log;
+  if(!fullOwnsPresentation())logEl.innerHTML = before.log;
   globalThis.GoblinLegacyPresentation?.afterUndo(before);
   globalThis.GoblinFullRoundSource?.rewind(before);
   updateSelection();

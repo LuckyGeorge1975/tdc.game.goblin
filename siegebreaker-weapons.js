@@ -19,6 +19,7 @@
     state.selectedWeapon=key;unit.damage=weapon.attack;unit.range=weapon.range;updateSelection();showUnitInfo(unit);draw();return true;
   }
   function renderControls(){
+    if(fullOwnsPresentation())return;
     const panel=$('#weapon-controls');if(!panel)return;
     const unit=selected,state=stateFor(unit);
     if(!state||turnPhase!=='fire'||phase!=='player'||unitDead(unit)){panel.classList.add('hidden');panel.innerHTML='';return}
@@ -35,7 +36,7 @@
   const baseUpdateSelection=updateSelection;
   updateSelection=function(){if(selected&&stateFor(selected))selectDefaultWeapon(selected);baseUpdateSelection();renderControls()};
   const baseShowUnitInfo=showUnitInfo;
-  showUnitInfo=function(unit){baseShowUnitInfo(unit);const state=stateFor(unit);if(!state)return;const weapon=selectDefaultWeapon(unit),facts=$('#unit-intel-facts');if(weapon)facts.innerHTML+=`<div><span>SELECTED WEAPON</span><b>${weapon.label}</b></div><div><span>ATTACK / RANGE</span><b>${weapon.attack} / ${weapon.range}</b></div>`};
+  showUnitInfo=function(unit){if(fullOwnsPresentation())return;baseShowUnitInfo(unit);const state=stateFor(unit);if(!state)return;const weapon=selectDefaultWeapon(unit),facts=$('#unit-intel-facts');if(weapon)facts.innerHTML+=`<div><span>SELECTED WEAPON</span><b>${weapon.label}</b></div><div><span>ATTACK / RANGE</span><b>${weapon.attack} / ${weapon.range}</b></div>`};
   const baseAttack=attack;
   attack=function(attacker,target){
     const state=stateFor(attacker);if(!state)return baseAttack(attacker,target);

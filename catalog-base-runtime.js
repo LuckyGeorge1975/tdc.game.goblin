@@ -123,6 +123,6 @@
   const labels={move:['v2.ui.move','Bewegen'],fire:['v2.ui.fire','Feuern'],'gev-second-move':['v2.ui.move','GEV-Manöver'],embark:['v2.ui.embark','Einsteigen'],disembark:['v2.ui.unload','Aussteigen'],'load-infantry':['v2.ui.embark','Einladen'],'unload-infantry':['v2.ui.unload','Ausladen'],'load-drone':['v2.ui.embark','Einladen'],'deploy-drone':['v2.ui.catalog.deployDrone','Drohne aufstellen'],'passenger-fire':['v2.ui.fire','Bordfeuer'],'be-transported':['v2.ui.embark','Transportieren']};
   return [...new Set(t.capabilities.filter(k=>labels[k]).map(k=>text(...labels[k])))];
  }
- const oldInfo=showUnitInfo;showUnitInfo=function(u){oldInfo(u);if(spec(u)){const p=document.createElement('p');p.textContent=summary(u);$('#unit-intel-facts').appendChild(p)}};
+ const oldInfo=showUnitInfo;showUnitInfo=function(u){if(fullOwnsPresentation())return;oldInfo(u);if(spec(u)){const p=document.createElement('p');p.textContent=summary(u);$('#unit-intel-facts').appendChild(p)}};
  root.GoblinCatalogRuntime=Object.freeze({active,record,spec,drone,carrier,passenger,name,actions,loadWeight,query,loadQuery,unloadQuery,fireQuery,syncCargo,summary});
 })(globalThis);

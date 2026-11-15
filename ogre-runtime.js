@@ -50,7 +50,7 @@
   }
 
   const baseShowUnitInfo=showUnitInfo;
-  showUnitInfo=function(unit){baseShowUnitInfo(unit);renderIntel(unit)};
+  showUnitInfo=function(unit){if(fullOwnsPresentation())return;baseShowUnitInfo(unit);renderIntel(unit)};
 
   const baseDraw=draw;
   draw=function(){units.forEach(syncUnit);return baseDraw()};

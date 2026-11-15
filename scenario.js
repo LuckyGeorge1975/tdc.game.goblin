@@ -46,9 +46,13 @@ function loadEditorDraft(config, control){
 }
 function applyScenarioSession(nextSession, control){
   const activate=control && globalThis.GoblinCatalogFullRuntime.prepareControllers(nextSession,control.roles,control.ui);
+  const full=globalThis.GoblinCatalogFullRuntime;
+  const transition=activate||full?.ownsPresentation();
+  if(transition)full.stageControlledPresentation();
   clearPhaseCommands();
   globalThis.IronDustBrowserV2?.stop();
   legacySession=nextSession;
+  const controllerPort=activate?.();
   const active=nextSession.config;
   W=active.width??12;
   H=active.height??8;
@@ -58,7 +62,7 @@ function applyScenarioSession(nextSession, control){
   for(const [key,type] of terrainTypes)if(TerrainRules.coverBonus(type))terrain.add(key);
   units.splice(0,units.length,...JSON.parse(JSON.stringify(active.units)).map(unit=>({...unit,moveCount:0,moveFrom:null,acted:false,disabled:false,justHit:false})));
   selected=null;focusedCell=null;transportLoadMode=null;transportUnloadMode=null;turn=1;phase='player';turnPhase='movement';gameOver=false;resetActionState();$("#end-turn").disabled=false;
-  const controllerPort=activate?.();
+  if(transition)full.startControlledPresentation();
   globalThis.GoblinFullRoundSource?.start();
   $('#mission-kicker').textContent=active.kicker;
   $('#mission-title').textContent=active.title;

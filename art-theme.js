@@ -30,6 +30,7 @@
 
   const baseUpdateRoster=updateRoster;
   updateRoster=function(){
+    if(fullOwnsPresentation())return;
     baseUpdateRoster();
     const players=units.filter(unit=>unit.team==='player');
     document.querySelectorAll('#unit-roster .unit-card').forEach((card,index)=>{
@@ -39,6 +40,7 @@
 
   const baseShowCarrierCargo=showCarrierCargo;
   showCarrierCargo=function(){
+    if(fullOwnsPresentation())return;
     baseShowCarrierCargo();
     if(!selected?.transportCapacity)return;
     const cargo=carrierCargo(selected);
@@ -49,6 +51,7 @@
 
   const baseUpdateSelection=updateSelection;
   updateSelection=function(){
+    if(fullOwnsPresentation())return;
     baseUpdateSelection();
     if(selected?.hp>0)replaceWithArt(document.querySelector('#selection-readout .selection-icon'),selected);
   };
