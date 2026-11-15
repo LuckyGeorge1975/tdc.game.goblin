@@ -158,10 +158,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function chooseFullSeats(config) {
       const owner = globalThis.GoblinFullSeatOwner;
       if (fullSetupDialog) return Promise.resolve(false);
-      if (!owner || config?.ruleProfileId !== 'FULL_CATALOG_v1' ||
-          !ScenarioRuleProfiles.aiAllowed(config)) return null;
-      const offers = owner.offers(config);
-      if (!offers) return null;
+      if (!owner || config?.ruleProfileId !== 'FULL_CATALOG_v1') return null;
+      const legacyOffers = owner.offers(config);
+      const qualification = globalThis.GoblinCatalogFullRuntime?.controllerOffers?.(config);
+      if (!legacyOffers && !qualification) return null;
+      const legacyStartAllowed = qualification?.legacyStartAllowed ?? true;
       const dialog = document.createElement('dialog');
       dialog.className = 'game-dialog';
       const form = document.createElement('form');
@@ -173,16 +174,30 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const label = document.createElement('label');
         label.textContent = t('v2.full.seat.' + side) + ' ';
         const select = document.createElement('select');
-        const choices = new Set();
-        for (const {id, label:copy} of [{id:'',label:t('v2.full.human')}, ...offers[side]]) {
+        const rated = qualification?.[side];
+        const choices = new Map([['', {label:t('v2.full.human')}]]);
+        if (legacyStartAllowed) {
+          for (const offer of legacyOffers?.[side] ?? []) choices.set(offer.id, offer);
+        }
+        for (const {id, difficulty} of rated?.choices ?? []) {
+          choices.set(id, {label:t('v2.difficulty.' + difficulty), policyId:id});
+        }
+        for (const [id, {label:copy}] of choices) {
           const option = document.createElement('option');
           option.value = id;
           option.textContent = copy;
           select.append(option);
-          choices.add(id);
         }
         label.append(select);
         form.append(label);
+        if (choices.size === 1 && rated?.reason) {
+          const reason = rated.reason === 'FULL_AI_MINIMUM_UNAVAILABLE' ?
+            t('v2.full.minimumUnavailable').replace('{minimum}', t('v2.difficulty.' + qualification.minimumDifficulty)) :
+            t(rated.reason === 'AI_LEVEL_FORBIDDEN' ? 'v2.full.aiForbidden' : 'v2.full.aiUnavailable');
+          const note = paragraph(reason, 'v2-screen-meta');
+          select.setAttribute('aria-describedby', note.id = 'v2-full-seat-reason-' + side);
+          form.append(note);
+        }
         return {side, select, choices};
       });
       const submit = document.createElement('button');
@@ -195,18 +210,23 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const cancel = document.createElement('button');
       cancel.value = 'cancel';
       cancel.textContent = t('ui.dialog.cancel');
-      form.append(actions(standard, submit, cancel));
+      form.append(legacyStartAllowed ? actions(standard, submit, cancel) : actions(submit, cancel));
       dialog.append(form);
       document.body.append(dialog);
       return new Promise(resolve => {
         dialog.addEventListener('close', () => {
           fullSetupDialog = null;
           dialog.remove();
-          if (dialog.returnValue === 'standard') return resolve(null);
+          if (dialog.returnValue === 'standard' && legacyStartAllowed) return resolve(null);
           if (dialog.returnValue !== 'configured' ||
               selectors.some(({select, choices}) => !choices.has(select.value))) return resolve(false);
-          resolve({owner, selection:Object.freeze(Object.fromEntries(
-            selectors.map(({side, select}) => [side, select.value || null])))});
+          const selection = Object.freeze(Object.fromEntries(
+            selectors.map(({side, select}) => [side, select.value || null])));
+          const policyIds = Object.freeze(Object.fromEntries(selectors.flatMap(({side, select, choices}) => {
+            const id = choices.get(select.value).policyId;
+            return id ? [[side, id]] : [];
+          })));
+          resolve({owner, selection, policyIds});
         }, {once:true});
         dialog.showModal();
         fullSetupDialog = dialog;
@@ -241,7 +261,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       };
       const roles = Object.fromEntries(Object.entries(setup.selection).map(([side, id]) =>
         [side, id === null ? 'human' : 'ai']));
-      binding.port = start({roles, ui});
+      binding.port = start({roles, policyIds:setup.policyIds, ui});
       binding.session = legacySession;
       if (!binding.port) throw new Error('FULL_CONTROLLER_OWNER');
       const host = setup.owner.bind(binding.session, setup.selection, ui, binding.port);
