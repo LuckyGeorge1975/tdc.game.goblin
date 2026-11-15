@@ -228,6 +228,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           binding.generation = seat.generation;
           fullHandoff = {session, takeSeat, taking:false};
           GoblinUIV2.cancelMapPointers();
+          if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) GoblinUIV2.refresh();
           show('full-handoff');
           return true;
         }
@@ -1365,6 +1366,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         accept.focus({preventScroll:true});
         return;
       }
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return;
       const state = GoblinUIV2.project();
       if (screen === 'menu') {
         const intro = document.createElement('div'); intro.className = 'v2-menu-intro';
@@ -1791,6 +1793,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     new MutationObserver(() => { if (screen === 'levels') renderScreen(false); })
       .observe(document.querySelector('#scenario-select'), { childList: true });
     function showMissionEnd() {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return;
       if (spectatorInput || screen !== 'play' || globalThis.GoblinMovement?.busy() || globalThis.GoblinLevelEvents?.pending(legacySession)) return;
       const state = GoblinUIV2.project();
       if (!state.gameOver) return;

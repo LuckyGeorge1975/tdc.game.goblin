@@ -83,3 +83,24 @@ test('handoff reveals play only after a single successful authorized takeover', 
   context.takeFullSeat();
   assert.equal(screens.at(-1), 'play');
 });
+
+test('owned presentation reads only the assigned channel, including after revocation', () => {
+  const ui = readFileSync(new URL('../ui-v2.js', import.meta.url), 'utf8');
+  const context = {
+    GoblinMovement:{projectedState(){ assert.fail('legacy presentation must not be read'); }},
+    GoblinCatalogFullRuntime:{ownsPresentation:()=>true,controllerPort:()=>context.port}
+  };
+  runInNewContext(ui.slice(ui.indexOf('    function fullSeatPresentation('),
+    ui.indexOf('    function query(')), context);
+  assert.equal(context.project(), null);
+  const view = {side:'enemy'};
+  context.port = {project(mode) {
+    assert.equal(mode, 'human');
+    return {view,log:[]};
+  }};
+  assert.equal(context.project(), view);
+  context.port = {spectator:()=>({read:()=>null}),project() {
+    assert.fail('closed spectator channel must not fall back to human projection');
+  }};
+  assert.equal(context.project(), null);
+});

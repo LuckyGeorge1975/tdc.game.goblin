@@ -127,7 +127,15 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       view.phaseSkipTimer = setTimeout(() => { view.phaseSkip = null; render(); }, 9000);
     }
     let idleCoreLog=[],idleLegacyLogEntries=[];
+    function fullSeatPresentation() {
+      if (!globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return null;
+      const port = globalThis.GoblinCatalogFullRuntime.controllerPort();
+      if (!port) return null;
+      const spectator = port.spectator?.();
+      return spectator ? spectator.read() : port.project('human');
+    }
     function project() {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return fullSeatPresentation()?.view ?? null;
       const displayed=globalThis.GoblinMovement?.projectedState();
       if (core()) {
         let source = IronDustBrowserV2.view;
@@ -191,6 +199,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       };
     }
     function query(command) {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
       if(globalThis.GoblinMovement?.busy())return {ok:false,reason:''};
       if (core()) {
         if (GameDialogs.isOpen() || document.body.classList.contains('v2-screen-open'))
@@ -266,6 +275,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         : { ok: false, reason: t('ui.error.TARGET_NOT_ATTACKABLE') };
     }
     function previewFire(command) {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return null;
       if (core()) return query(command).ok ? IronDustBrowserV2.previewFire(command) : null;
       if (!['Fire','FireArtillery','CatalogFire'].includes(command?.type)) return null;
       const legal = query(command);
@@ -286,6 +296,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         legal: true, ratioCategory, ...(command.type==='CatalogFire'&&command.target.componentId==='treads'?{attack,meaning:'tread-roll-5-6'}:{meaning:'crt-attack-effective-defense'})});
     }
     function dispatch(command, expectedRevision, confirmedTarget = false) {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
       if(globalThis.GoblinMovement?.busy()){globalThis.GoblinMovement.skip();return {ok:false,reason:''};}
       startZoomPending = null;
       if (core()) {
@@ -329,6 +340,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       } finally { view.busy = false; render(); }
     }
     function undo() {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
       if (core()) return {ok:false,reason:t('v2.undo')};
       if (view.busy || !phaseCommands.length || phase !== 'player' || gameOver) return { ok: false, reason: t('ui.error.ACTION_SPENT') };
       clearContext();
@@ -347,7 +359,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
     }
-    globalThis.GoblinUIV2 = Object.freeze({ project, query, previewFire, dispatch, undo, resetView, startView, focusUnit, notifyPhaseSkip, legacyAiHost,
+    globalThis.GoblinUIV2 = Object.freeze({ project, fullSeatPresentation, query, previewFire, dispatch, undo, resetView, startView, focusUnit, notifyPhaseSkip, legacyAiHost,
       get gridVisible() { return view.gridVisible; }, setGridVisible(value) { setViewFlag('gridVisible',value); },
       get targetsVisible() { return view.targetsVisible; }, setTargetsVisible(value) { setViewFlag('targetsVisible',value); },
       get damageVisible() { return view.damageVisible; }, setDamageVisible(value) { setViewFlag('damageVisible',value); },
@@ -996,6 +1008,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (unit) globalThis.GoblinTrainingRuntime?.select(unit.id);
     }
     function focusUnit(id) {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return;
       const unit = (core() ? project().units : globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(item => item.id === id && unitAlive(item));
       if (!unit) return;
       if (unit.team === 'player') chooseActor(id, false);
@@ -1008,6 +1021,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       centerOnHex(hex);
     }
     function chooseHex(x, y) {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return;
       startZoomPending = null;
       const state = project(), cell = {x,y};
       const unit = targetOccupant(state, cell), actor = state.units.find(item => item.id === view.actorId);
@@ -1600,6 +1614,30 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     }
     let hoverState = null, hoverCell = null;
     function render() {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) {
+        if (!view.fullPresentationCleared) {
+          view.fullPresentationCleared = true;
+          hoverState = null;
+          clearMapHover();
+          idleCoreLog = [];
+          idleLegacyLogEntries = [];
+          clearContext();
+          view.actorId = view.focusCell = view.infoCell = null;
+          hidePhaseNotice();
+          for (const selector of ['.v2-head', '.v2-layout', '.v2-controls', '#v2-target-card'])
+            at(selector).inert = true;
+          for (const selector of ['#v2-units', '#v2-intel', '#v2-target-card', '#v2-phase',
+            '#v2-message', '#v2-terminal', '#v2-area-legend', '#v2-units-ready'])
+            at(selector).replaceChildren();
+          at('#v2-target-card').hidden = true;
+        }
+        return;
+      }
+      if (view.fullPresentationCleared) {
+        view.fullPresentationCleared = false;
+        for (const selector of ['.v2-head', '.v2-layout', '.v2-controls', '#v2-target-card'])
+          at(selector).inert = false;
+      }
       resumeMapSize();
       const state = project();
       hoverState = state;
@@ -1677,6 +1715,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     at('#v2-next-unit').onclick = () => { const id = nextReadyUnit(); if (id) focusUnit(id); };
     at('#v2-undo').onclick = () => { const result = undo(); if (!result.ok) { view.message = result.reason; render(); } };
     at('#v2-phase-action').onclick = () => {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return;
       view.phaseSkip = null; clearTimeout(view.phaseSkipTimer);
       if (core()) {
         const command={type:'EndPhase',playerId:'player'};
@@ -1708,6 +1747,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (actor) centerOnHex(nativeMap.querySelector(`.hex[data-x="${actor.x}"][data-y="${actor.y}"]`));
     }
     function startView() {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return;
       const state = project(), binding = state.markers?.binding;
       if (!binding) return;
       const key = JSON.stringify([binding.scenarioId, binding.profileId, binding.sessionId, binding.epoch]);
@@ -1970,6 +2010,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (cell) chooseHex(cell.x, cell.y);
     }, true);
     document.addEventListener('keydown', event => {
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return;
       if (phaseNotice.open) { event.stopImmediatePropagation(); return; }
       startZoomPending = null;
       if(displayControls.handleKeydown(event))return;
