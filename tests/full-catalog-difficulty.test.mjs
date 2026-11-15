@@ -110,6 +110,35 @@ test('admission binds the actual qualified policy per side before start, preserv
   assert.ok(start(game,'(control=>loadEditorDraft(forbidden,control))',human).state());
 });
 
+test('an AI-disabled saved FULL level composes Player commands from the live human port',async()=>{
+  const game=await boot();
+  setupEditor(game);
+  const stored=new Map();
+  game.context.localStorage={getItem:key=>stored.get(key)??null,setItem:(key,value)=>stored.set(key,value)};
+  game.run(text('saved-levels.js'));
+  game.context.draft={...imported(),aiAllowed:false,minimumDifficulty:'medium'};
+  await game.run(`GoblinSavedLevels.save('Human only',draft);
+    GoblinEditorDraft.prepare(GoblinEditorDraft.parse(GoblinSavedLevels.read()[0].level))
+      .then(value=>globalThis.admitted=value)`);
+  let takeSeat;
+  const startDraft='(control=>loadEditorDraft(admitted,control))';
+  const port=start(game,startDraft,human,{}, {handoff(_seat,take){takeSeat=take}});
+  const player=playerHost(game);
+  assert.equal(player.project('player'),null);
+  assert.equal(port.project('ai'),null);
+  assert.deepEqual(player.humanPlayerOptions(port),[]);
+  assert.equal(takeSeat(),true);
+  assert.equal(port.project('human').view.side,'player');
+  const move=player.humanPlayerOptions(port).find(entry=>entry.command.type==='Move');
+  assert.ok(move);
+  assert.equal(port.commit('human',port.open('human').permit,move.command,player.dispatch).ok,true);
+  assert.equal(player.project('player'),null);
+  port.pause();
+  assert.deepEqual(player.humanPlayerOptions(port),[]);
+  start(game,startDraft,human);
+  assert.deepEqual(player.humanPlayerOptions(port),[]);
+});
+
 test('Medium can commit a legal conventional transport through the same native player port',async()=>{
   const game=await boot();
   setupEditor(game);

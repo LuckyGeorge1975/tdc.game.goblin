@@ -119,8 +119,8 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
     for (let y=0;y<view.terrain.height;y++) for(let x=0;x<view.terrain.width;x++) result.push({x,y});
     return result;
   }
-  function playerOptions(tactics=false) {
-    const safetyView = full.aiProjection('player');
+  function composePlayerOptions(safetyView,tactics) {
+    if (!safetyView) return [];
     const roster = full.roster('player');
     const view = {turnPhase:safetyView.phase,units:roster};
     const allCells = cells(safetyView);
@@ -145,6 +145,11 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
     }
     return available;
   }
+  function humanPlayerOptions(port) {
+    if (port !== full.controllerPort()) return [];
+    const view = port?.project('human')?.view;
+    return view?.side === 'player' ? composePlayerOptions(view,false) : [];
+  }
   function enemyStepOptions(slot) {
     const hold = {type:'EnemyHold',actorId:slot.actorId};
     const options = slot.query(hold).ok ? [{command:hold,facts:{}}] : [];
@@ -156,5 +161,7 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
     return options;
   }
   return Object.freeze({revision:()=>active()?full.commandRevision():null,phase:currentPhase,
-    project:full.aiProjection,dispatch:player.dispatch,playerOptions,enemyStepOptions});
+    project:full.aiProjection,dispatch:player.dispatch,
+    playerOptions:(tactics=false)=>composePlayerOptions(full.aiProjection('player'),tactics),
+    humanPlayerOptions,enemyStepOptions});
 }

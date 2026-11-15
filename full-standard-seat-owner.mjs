@@ -1,4 +1,4 @@
-import {createFullCatalogAiHost} from './src/core/full-catalog-ai-adapter.mjs?v=2';
+import {createFullCatalogAiHost} from './src/core/full-catalog-ai-adapter.mjs?v=3';
 import {createOwnedFullCatalogSessionHost} from './src/core/full-catalog-session-host.mjs?v=2';
 import {selectWeakFullCatalog, selectMediumFullCatalog} from './src/core/full-catalog-difficulty.mjs';
 
@@ -51,7 +51,7 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
       const select=fullSeatFallback(session,selection,port);
       return createOwnedFullCatalogSessionHost({port,player,select,onCommit:ui.refresh});
     },
-    playerCommands: () => player.playerOptions().map(entry=>entry.command),
+    playerCommands: port => player.humanPlayerOptions(port).map(entry=>entry.command),
     dispatchPlayer: player.dispatch
   });
 }
