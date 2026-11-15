@@ -7,6 +7,7 @@ import {createFullCatalogAiHost} from '../src/core/full-catalog-ai-adapter.mjs';
 import {createOwnedFullCatalogSessionHost} from '../src/core/full-catalog-session-host.mjs';
 import {selectWeakFullCatalog,selectMediumFullCatalog} from '../src/core/full-catalog-difficulty.mjs';
 import {fullSeatFallback} from '../full-standard-seat-owner.mjs';
+import {hexDistance} from '../src/core/hex.mjs';
 
 const atlas='catalog-full-atlas';
 const text=name=>readFileSync(new URL(`../${name}`,import.meta.url),'utf8');
@@ -29,6 +30,69 @@ function start(game,expression,roles,policyIds={},ui={}) {
   game.context.controls={roles,policyIds,ui};
   return game.run(`${expression}(controls)`);
 }
+
+test('Medium only replaces a voluntary movement pass with the best legal approach to an open visible objective',()=>{
+  const actor={id:'attacker',relation:'own',alive:true,hp:3,maxHp:3,x:0,y:0};
+  const guard={id:'guard',relation:'opponent',alive:true,hp:3,maxHp:3,x:3,y:0};
+  const end={key:'end',kind:'end-phase',facts:{}};
+  const move=(key,x,y)=>({key,kind:'move',actorId:actor.id,target:{kind:'cell',x,y},facts:{}});
+  const first=move('first',1,0), tied=move('tied',1,1), away=move('normal',0,1);
+  const batch={side:'player',phase:'movement',slot:'movement',
+    view:{units:[actor,guard],objectives:[{kind:'destroy-core',satisfied:true},{kind:'destroy-escort'}],
+      tactics:{cover:[],unitFacts:{guard:{range:2}},crt:{}}},candidates:[end,first,tied]};
+  assert.equal(selectMediumFullCatalog(batch),first.key);
+  assert.equal(selectMediumFullCatalog({...batch,candidates:[end,tied,first]}),tied.key);
+  assert.equal(selectMediumFullCatalog({...batch,phase:'fire',slot:'fire'}),end.key);
+  assert.equal(selectMediumFullCatalog({...batch,view:{...batch.view,objectives:[{kind:'destroy-escort',satisfied:true}]}}),end.key);
+  assert.equal(selectMediumFullCatalog({...batch,view:{...batch.view,units:[actor]},candidates:[end,first]}),end.key);
+  assert.equal(selectMediumFullCatalog({...batch,candidates:[end,away]}),end.key);
+  const covered={...batch,view:{...batch.view,tactics:{...batch.view.tactics,cover:[away.target]}},candidates:[end,first,away]};
+  assert.equal(selectMediumFullCatalog(covered),away.key);
+  const shot={key:'shot',kind:'fire',actorId:actor.id,target:{kind:'unit',unitId:guard.id},
+    facts:{attack:6,ratioCategory:'5-1',effectKind:'unit-crt'}};
+  assert.equal(selectMediumFullCatalog({...batch,side:'enemy',slot:'first',phase:'enemy',
+    view:{...batch.view,objectives:[{kind:'destroy-player-force',satisfied:false}]},candidates:[{...end,kind:'hold'},first,shot]}),shot.key);
+});
+
+test('saved FULL seed 5 progresses through the former fixed point to native mission end',async t=>{
+  const game=await fullScene(atlas,5,false,'FULL_CATALOG_v1');
+  setupEditor(game);
+  game.run(text('saved-levels.js'));
+  const storage=new Map();
+  game.context.localStorage={getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)};
+  game.context.seedDraft=imported();
+  await game.run(`GoblinSavedLevels.save('Seed 5',seedDraft);
+    GoblinEditorDraft.prepare(GoblinEditorDraft.parse(GoblinSavedLevels.read()[0].level)).then(value=>globalThis.admitted=value)`);
+  let movesAfterCore=0, plans=0, commits=0, removalTurn;
+  for(const side of ['player','enemy'])register(game,side,'medium',batch=>{
+    assert.equal(plans++,commits);
+    const key=selectMediumFullCatalog(batch);
+    const candidate=batch.candidates.find(c=>c.key===key);
+    assert.ok(candidate);
+    const guard=batch.view.units.find(u=>u.id==='guard');
+    const core=batch.view.units.find(u=>u.id==='core');
+    if(side==='player'&&core?.alive===false&&guard?.alive&&candidate.kind==='move'){
+      const actor=batch.view.units.find(u=>u.id===candidate.actorId);
+      if(hexDistance(candidate.target,guard)<hexDistance(actor,guard))movesAfterCore++;
+    }
+    return key;
+  });
+  const port=start(game,'(control=>loadEditorDraft(admitted,control))',{player:'ai',enemy:'ai'},
+    {player:'player-medium',enemy:'enemy-medium'});
+  const host=createOwnedFullCatalogSessionHost({port,player:playerHost(game),onCommit:()=>commits++});
+  const full=game.context.GoblinCatalogFullRuntime;
+  for(let index=0;index<120&&!port.state().ended;index++){
+    assert.ok((await host.advance()).ok);
+    if(full.deadlineRemoved())removalTurn??=game.run('turn');
+  }
+  assert.equal(removalTurn,2);
+  assert.ok(movesAfterCore>0);
+  assert.ok(port.state().ended);
+  assert.equal(port.state().outcome,true);
+  assert.equal(game.run('turn'),3);
+  assert.equal(plans,commits);
+  t.diagnostic(JSON.stringify({seed:5,removalTurn,movesAfterCore,commits,turn:game.run('turn'),outcome:port.state().outcome,rng:game.rng()}));
+});
 
 test('authored FULL minimum round-trips through import, export and save, without changing battlefield identity',async()=>{
   const game=await boot();

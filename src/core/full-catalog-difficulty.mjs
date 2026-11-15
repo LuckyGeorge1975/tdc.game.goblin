@@ -25,6 +25,33 @@ function finish(candidates) {
     candidates.find(({facts})=>facts.baseline) ?? candidates[0];
 }
 
+function openMovementTargets(batch,opponents) {
+  const goals=batch.view.objectives??[];
+  const open=kind=>goals.find(goal=>goal.kind===kind&&goal.satisfied!==true);
+  if (batch.side==='enemy') return open('destroy-player-force')?opponents:[];
+  const core=open('destroy-core')?.target;
+  if (core?.kind==='unit') {
+    const target=opponents.find(unit=>unit.id===core.unitId);
+    if (target) return [target];
+  }
+  return open('destroy-escort')?opponents.filter(unit=>!unit.objectiveTarget):[];
+}
+
+function approachOpenGoal(batch,opponents,units,abandonCore,moveScore) {
+  const targets=openMovementTargets(batch,opponents);
+  if (!targets.length) return;
+  let bestMove, highest=-Infinity;
+  for (const candidate of batch.candidates) {
+    if (candidate.kind!=='move'||candidate.target?.kind!=='cell') continue;
+    const actor=units.get(candidate.actorId);
+    if (!actor||actor.relation!=='own'||!available(actor)||actor.disabled||abandonCore(actor,candidate.target)) continue;
+    if (distanceTo(candidate.target,targets)>=distanceTo(actor,targets)) continue;
+    const value=moveScore(actor,candidate.target);
+    if (value>highest) { bestMove=candidate; highest=value; }
+  }
+  return bestMove;
+}
+
 export function selectWeakFullCatalog(batch) {
   const {units,opponents}=board(batch);
   const {candidates}=batch;
@@ -110,13 +137,16 @@ export function selectMediumFullCatalog(batch) {
   }
   if (bestAttack) return bestAttack.key;
 
+  function moveScore(actor,target) {
+    const progress=opponents.length?distanceTo(actor,opponents)-distanceTo(target,opponents):0;
+    const objective=!defending&&core?(hexDistance(actor,core)-hexDistance(target,core))/2:0;
+    return progress+objective+safety(target)-safety(actor);
+  }
   const position=best(candidates, ({kind,actorId,target,facts})=>{
     const actor=units.get(actorId);
     if (kind==='move') {
       if (abandonCore(actor,target)) return 0;
-      const progress=opponents.length?distanceTo(actor,opponents)-distanceTo(target,opponents):0;
-      const objective=!defending&&core?(hexDistance(actor,core)-hexDistance(target,core))/2:0;
-      return progress+objective+safety(target)-safety(actor);
+      return moveScore(actor,target);
     }
     if (!['load','deploy','unload'].includes(kind)||!opponents.length) return 0;
     const cargo=kind==='load'?actor:units.get(facts.cargoId);
@@ -126,5 +156,10 @@ export function selectMediumFullCatalog(batch) {
     const progress=distanceTo(cargo,goal)-distanceTo(destination,goal);
     return progress>0?progress+(kind==='load'?0:1)+safety(destination)-safety(cargo):0;
   });
-  return (position??finish(candidates))?.key;
+  if (position) return position.key;
+  const fallback=finish(candidates);
+  const voluntaryMovePass=batch.side==='enemy'?batch.slot==='first'&&fallback?.kind==='hold':
+    (batch.phase==='movement'||batch.phase==='gev')&&fallback?.kind==='end-phase';
+  const approach=voluntaryMovePass&&approachOpenGoal(batch,opponents,units,abandonCore,moveScore);
+  return (approach||fallback)?.key;
 }

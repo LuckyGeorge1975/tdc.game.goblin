@@ -1,6 +1,6 @@
 import {createFullCatalogAiHost} from './src/core/full-catalog-ai-adapter.mjs?v=3';
 import {createOwnedFullCatalogSessionHost} from './src/core/full-catalog-session-host.mjs?v=2';
-import {selectWeakFullCatalog, selectMediumFullCatalog} from './src/core/full-catalog-difficulty.mjs';
+import {selectWeakFullCatalog, selectMediumFullCatalog} from './src/core/full-catalog-difficulty.mjs?v=2';
 
 const standardDefender = 'full-native-standard-defender';
 
