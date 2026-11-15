@@ -1,4 +1,4 @@
-import {createFullCatalogAiAdapter,createOwnedFullCatalogAiAdapter} from './full-catalog-ai-adapter.mjs';
+import {createFullCatalogAiAdapter,createOwnedFullCatalogAiAdapter,sameFullCatalogActionSlot} from './full-catalog-ai-adapter.mjs';
 import {createAiSessionHost} from './ai-session-host.mjs?v=2';
 
 export function createFullCatalogSessionHost({host, read, readGeneration, select, selectEnemy, policy, onCommit, spectator = false}) {
@@ -39,20 +39,40 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
     return {...state,session:state.sessionId,engine:state.generation};
   };
   const ai=createAiSessionHost({adapter,read,spectator:true,
-    select:batch=>select[batch.side](batch),commit:onCommit});
+    select:async batch=>{
+      const attempt=attempted;
+      const key=await select[batch.side](batch);
+      attempt.intent=adapter.remember(batch,key);
+      return key;
+    },commit:onCommit});
+  function continueChoice(attempt,state){
+    if(!attempt.intent)return null;
+    const result=adapter.resume(attempt.intent);
+    if(!result)return null;
+    attempt.intent=null;
+    if(result.ok)onCommit(result,state);
+    return result.ok?{ok:true}:result;
+  }
   async function advance(){
     if(pending)return {ok:false,code:'AI_HOST_UNAVAILABLE'};
     const state=read();
     if(!state||typeof select[state.side]!=='function')return {ok:false,code:'AI_HOST_WRONG_SIDE'};
     const ticket=port.ticket('ai');
-    if(!ticket||ticket.generation===attempted?.generation&&ticket.slot===attempted.slot)
-      return {ok:false,code:'AI_FULL_NO_NEW_ACTION'};
-    attempted=ticket;
+    if(!ticket)return {ok:false,code:'AI_FULL_NO_NEW_ACTION'};
+    if(sameFullCatalogActionSlot(ticket,attempted?.ticket))
+      return continueChoice(attempted,state)??{ok:false,code:'AI_FULL_NO_NEW_ACTION'};
+    const attempt=attempted={ticket,intent:null};
     pending=true;
-    try{return await ai.advance();}
+    try{
+      const result=await ai.advance();
+      if(result.ok){attempt.intent=null;return result;}
+      if(result.code==='AI_HOST_STALE')return continueChoice(attempt,read())??result;
+      attempt.intent=null;
+      return result;
+    }
     finally{pending=false;}
   }
   return Object.freeze({advance,
     pause(){port.pause();ai.pause();},resume(){port.resume();ai.resume();},
-    leave(){port.leave();ai.stop();}});
+    leave(){port.leave();ai.stop();attempted=null;}});
 }

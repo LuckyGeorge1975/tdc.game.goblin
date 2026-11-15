@@ -63,19 +63,49 @@ export function createFullCatalogAiAdapter(host, readGeneration) {
       entries:()=>host.enemyStepOptions(nativeSlot)},select)});
 }
 
+export function sameFullCatalogActionSlot(left,right) {
+  return !!left && !!right && left.sessionId===right.sessionId && left.side===right.side && left.slot===right.slot;
+}
+
 export function createOwnedFullCatalogAiAdapter(port,player) {
-  return createAiDecisionAdapter({
+  const captured=new WeakMap();
+  let prepared;
+  function commit(token,command){
+    const result=port.commit('ai',token,command,player.dispatch);
+    return result.ok?{ok:true,action:command}:{ok:false,code:result.code??'AI_FULL_COMMAND_REJECTED'};
+  }
+  const adapter=createAiDecisionAdapter({
     read:()=>({state:port.ticket('ai')}),
     describe:(token,side,scope)=>{
       const opened=port.open('ai'), projection=port.project('ai');
       if(scope!==undefined||!opened||!projection||opened.permit!==token||token.side!==side)
         return {ok:false,code:'AI_FULL_SCOPE_UNAVAILABLE'};
       const listed=side==='enemy'?opened.entries:[...player.playerOptions(),{command:{type:'EndPhase'},facts:{}}];
+      prepared={token,commands:listed.map(({command})=>command)};
       return {ok:true,phase:token.phase,slot:opened.pass,view:projection.view,options:describeOptions(listed,side)};
     },
     apply:(token,{command})=>{
-      const result=port.commit('ai',token,command,player.dispatch);
-      return result.ok?{action:command}:{error:{code:result.code??'AI_FULL_COMMAND_REJECTED'}};
+      const result=commit(token,command);
+      return result.ok?{action:result.action}:{error:{code:result.code}};
+    }
+  });
+  return Object.freeze({...adapter,
+    open(side,scope){
+      const batch=adapter.open(side,scope);
+      if(batch.ok)captured.set(batch,prepared);
+      return batch;
+    },
+    remember(batch,key){
+      const batchNative=captured.get(batch);
+      const index=batch.candidates.findIndex(candidate=>candidate.key===key);
+      return batchNative&&index>=0 ? {token:batchNative.token,command:batchNative.commands[index]} : null;
+    },
+    resume({token:original,command}){
+      const fresh=port.ticket('ai');
+      if(!sameFullCatalogActionSlot(original,fresh)||fresh.generation===original.generation||
+          fresh.revision!==original.revision||fresh.phase!==original.phase||fresh.actorId!==original.actorId)return null;
+      // Only the recorded command is reused. The old permission never reaches commit.
+      return commit(fresh,command);
     }
   });
 }

@@ -229,7 +229,7 @@
   const allowsSpectator=roles.player==='ai'&&roles.enemy==='ai';
   let ready=false,latestSpectator=null;
   let generation=0,sequence=0,paused=false,stopped=false,committing=false,advancingPhase=false;
-  let seat,pending,cursor,nativeSlot,offer,permit;
+  let seat,pending,cursor,nativeSlot,offer,offerRevision,permit;
   const owns=current=>current===session;
   const attached=()=>ready&&!presentationPending&&owns(legacySession)&&active()&&!stopped;
   const spectator=Object.freeze({read:()=>allowsSpectator&&attached()?latestSpectator:null});
@@ -252,7 +252,7 @@
   }
   const authorised=mode=>attached()&&!paused&&!gameOver&&roles[phase]===mode&&(mode==='ai'||seat===phase);
   function invalidate(){
-   generation++;pending=null;seat=null;offer=null;permit=null;
+   generation++;pending=null;seat=null;permit=null;
   }
   function enterSide(){
    invalidate();
@@ -281,7 +281,7 @@
    if(!authorised(mode)||committing||phase==='enemy'&&!nativeSlot)return null;
    const revision=commandRevision();
    if(permit?.revision!==revision){
-    offer=null;
+    if(offerRevision!==revision)offer=null;
     permit=Object.freeze({sessionId:session.sessionId,generation,revision,side:phase,
      phase:turnPhase,slot:sequence,actorId:nativeSlot?.actor.id??null});
    }
@@ -290,7 +290,10 @@
   function open(mode){
    const token=ticket(mode);
    if(!token)return null;
-   if(phase==='enemy')offer??=enemyOffer(nativeSlot);
+   if(phase==='enemy'&&!offer){
+    offer=enemyOffer(nativeSlot);
+    offerRevision=token.revision;
+   }
    return {permit:token,pass:phase==='enemy'?nativeSlot.pass:turnPhase,entries:offer?copy(offer.entries):null};
   }
   function valid(token,mode){
@@ -352,7 +355,7 @@
    spectator:()=>allowsSpectator&&attached()?spectator:null,
    pause(){if(attached()){paused=true;invalidate();}},
    resume(){if(attached()&&paused){paused=false;enterSide();}},
-   leave(){stopped=true;invalidate();cursor=null;nativeSlot=null;latestSpectator=null;}});
+   leave(){stopped=true;invalidate();cursor=null;nativeSlot=null;offer=null;latestSpectator=null;}});
   return {owns,port,startPresentation,enterSide,startEnemy,advancingPhase:()=>advancingPhase};
  }
  function fireView(binding){const out=copy(binding);if(out?.state)delete out.state.mainTargets;return out}
