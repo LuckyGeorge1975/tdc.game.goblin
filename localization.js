@@ -774,6 +774,7 @@
     'v2.full.seat.enemy': {de:'Verteidigung',en:'Defenders',es:'Defensores',fr:'Défenseurs'},
     'v2.full.human': {de:'Mensch',en:'Human',es:'Persona',fr:'Humain'},
     'v2.full.standard': {de:'Standardpartie',en:'Standard match',es:'Partida estándar',fr:'Partie standard'},
+    'v2.full.standardDefender': {de:'Standardverteidiger',en:'Standard defender',es:'Defensor estándar',fr:'Défenseur standard'},
     'v2.full.handoff': {de:'Seitenwechsel',en:'Change of side',es:'Cambio de bando',fr:'Changement de camp'},
     'v2.full.takeSeat': {de:'Übernehmen',en:'Take over',es:'Tomar el control',fr:'Prendre le contrôle'},
     'v2.difficulty.weak': {de:'Schwach',en:'Weak',es:'Débil',fr:'Faible'},

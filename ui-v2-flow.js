@@ -190,11 +190,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       submit.textContent = t('screen.briefing.startMission');
       const standard = document.createElement('button');
       standard.value = 'standard';
+      standard.autofocus = true;
       standard.textContent = t('v2.full.standard');
       const cancel = document.createElement('button');
       cancel.value = 'cancel';
       cancel.textContent = t('ui.dialog.cancel');
-      form.append(actions(submit, standard, cancel));
+      form.append(actions(standard, submit, cancel));
       dialog.append(form);
       document.body.append(dialog);
       return new Promise(resolve => {
