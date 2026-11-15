@@ -159,7 +159,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const owner = globalThis.GoblinFullSeatOwner;
       if (fullSetupDialog) return Promise.resolve(false);
       if (!owner || config?.ruleProfileId !== 'FULL_CATALOG_v1') return null;
-      const legacyOffers = owner.offers(config);
+      const legacyOffers = ScenarioRuleProfiles.aiAllowed(config) ? owner.offers(config) : null;
       const qualification = globalThis.GoblinCatalogFullRuntime?.controllerOffers?.(config);
       if (!legacyOffers && !qualification) return null;
       const legacyStartAllowed = qualification?.legacyStartAllowed ?? true;
