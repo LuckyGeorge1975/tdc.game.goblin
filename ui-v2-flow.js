@@ -217,12 +217,15 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (!setup || legacySession.ruleProfileId !== 'FULL_CATALOG_v1' || setup.owner !== globalThis.GoblinFullSeatOwner ||
           !ScenarioRuleProfiles.aiAllowed(legacySession.config)) return;
       const session = legacySession;
-      fullSeatBinding = {...setup, session};
+      const binding = {...setup, session, generation:-1};
+      fullSeatBinding = binding;
       setup.owner.bind(session, setup.selection, {
         handoff(seat, takeSeat) {
-          if (legacySession !== session || fullSeatBinding?.session !== session || fullHandoff ||
+          if (legacySession !== session || fullSeatBinding !== binding || fullHandoff ||
               seat?.sessionId !== session.sessionId || !['player', 'enemy'].includes(seat.side) ||
+              !Number.isSafeInteger(seat.generation) || seat.generation <= binding.generation ||
               typeof takeSeat !== 'function') return false;
+          binding.generation = seat.generation;
           fullHandoff = {session, takeSeat, taking:false};
           GoblinUIV2.cancelMapPointers();
           show('full-handoff');
