@@ -1551,7 +1551,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const phase = state.phase === 'enemy' ? 'enemy' : state.turnPhase;
       const label = at('#v2-phase');
       label.dataset.phase = state.gameOver ? '' : phase;
-      if (state.gameOver || document.body.classList.contains('v2-screen-open')) {
+      if (state.gameOver || document.body.classList.contains('v2-screen-open') ||
+          (core() && IronDustBrowserV2.trainedActive)) {
         hidePhaseNotice();
         return;
       }
@@ -1597,7 +1598,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       splitPhaseLabel(phaseButton);
       phaseButton.disabled = state.phase !== 'player' || !IronDustBrowserV2.query({type:'EndPhase',playerId:'player'}).available ||
         GameDialogs.isOpen() || view.busy;
-      at('#v2-pause').disabled = GameDialogs.isOpen() || view.busy;
+      at('#v2-pause').disabled = GameDialogs.isOpen() || (view.busy && !IronDustBrowserV2.trainedActive);
       const coreUndo = at('#v2-undo');
       coreUndo.hidden = false; coreUndo.disabled = true;
       backLabel(coreUndo, 0);

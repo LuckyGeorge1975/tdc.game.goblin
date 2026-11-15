@@ -123,6 +123,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let editorMissionOpen = false, editorImportLevels = null;
     let optionsScrollObserver = null;
     let briefingDifficulty = 'medium';
+    let briefingAttacker = 'human';
     let libraryIndex = 0, libraryTab = 'description', libraryArtSide = 'own', libraryMapMode = 'move';
     let libraryWeapon = null, libraryRule = null, libraryLiveId = null;
     let libraryKind = 'units', terrainIndex = 0;
@@ -629,7 +630,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         GoblinUIV2.closeTarget();
         globalThis.GoblinMovement?.clear();
       }
-      if (next === 'briefing' && previous !== 'briefing') briefingDifficulty = 'medium';
+      if (next === 'briefing' && previous !== 'briefing') {
+        briefingDifficulty = 'medium';
+        briefingAttacker = 'human';
+      }
       screen = next;
       renderTraining();
       const overlay = next !== 'play';
@@ -890,7 +894,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           config !== (campaign?.field ? fieldCampaigns[campaign.field].configs[campaign.index] : scenarioCatalog[missionId]))) return;
       if (campaign?.field) globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadEditorDraft(config,control)) : loadEditorDraft(config);
       else if (missionId === 'iron-dust-v2') {
-        if (!globalThis.IronDustBrowserV2?.available || !IronDustBrowserV2.startWithDifficulty(briefingDifficulty)) {
+        if (!globalThis.IronDustBrowserV2?.available ||
+            !IronDustBrowserV2.startWithDifficulty(briefingDifficulty, undefined, briefingAttacker)) {
           startError = t('v2.reject.start'); renderScreen(false); return;
         }
       } else {
@@ -1008,9 +1013,27 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       footer.append(actions(button(t('ui.nav.back'), () => show('menu'))));
       panel.append(list, footer);
     }
+    function ironDustAttackerControl() {
+      const label = document.createElement('label');
+      label.textContent = t('v2.full.seat.player') + ' ';
+      const select = document.createElement('select');
+      select.id = 'v2-briefing-attacker';
+      const available = IronDustBrowserV2.trainedAvailable;
+      for (const attacker of available ? ['human','trained'] : ['human']) {
+        const option = document.createElement('option');
+        option.value = attacker;
+        option.textContent = t('v2.full.' + attacker);
+        select.append(option);
+      }
+      select.value = available ? briefingAttacker : 'human';
+      select.disabled = !available;
+      select.onchange = () => { briefingAttacker = select.value; };
+      label.append(select);
+      return label;
+    }
     function difficultyControl() {
       const label = document.createElement('label');
-      label.textContent = t('v2.difficulty.label') + ' ';
+      label.textContent = t('v2.full.seat.enemy') + ' ';
       const select = document.createElement('select');
       select.id = 'v2-briefing-difficulty';
       for (const difficulty of IronDustBrowserV2.difficulties) {
@@ -1660,7 +1683,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (campaign?.field === 'scorched')
           header.append(paragraph(t(`mission.${missionId}.story.briefing`), 'v2-briefing-intro'));
         header.append(paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
-        if (missionId === 'iron-dust-v2' && data) header.append(difficultyControl());
+        if (missionId === 'iron-dust-v2' && data) {
+          header.append(ironDustAttackerControl(), difficultyControl());
+        }
         if (campaign?.index === 0 && !campaign.field) header.append(paragraph(t('v2.campaign.session')));
         if(GoblinCatalogBase.has(missionId)||globalThis.GoblinCatalogSpecialistsModel?.has(missionId)||globalThis.GoblinCatalogFullModel?.has(missionId))header.append(paragraph(t(`mission.${missionId}.budget`)));
         if(missionId==='artillery-pilot')header.append(paragraph(t('mission.artillery-pilot.budget')));
@@ -2006,6 +2031,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const requested=new URLSearchParams(globalThis.location?.search||'').get('scenario');
       if(!started&&!campaign&&GoblinCatalogFullModel.has(requested)&&missionData(requested))missionId=requested;
       if (['menu','levels','briefing'].includes(screen)) renderScreen(false);
+    });
+    globalThis.addEventListener('goblin-iron-dust-trained-ready', () => {
+      if (screen === 'briefing' && missionId === 'iron-dust-v2') renderScreen(false);
     });
     globalThis.addEventListener('goblin-core-v2-ready', () => {
       if (screen === 'levels' || screen === 'briefing') renderScreen(false);
