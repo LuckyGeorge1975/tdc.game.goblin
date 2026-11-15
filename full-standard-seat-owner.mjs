@@ -1,6 +1,7 @@
 import {createFullCatalogAiHost} from './src/core/full-catalog-ai-adapter.mjs?v=3';
 import {createOwnedFullCatalogSessionHost} from './src/core/full-catalog-session-host.mjs?v=2';
 import {selectWeakFullCatalog, selectMediumFullCatalog} from './src/core/full-catalog-difficulty.mjs?v=2';
+import {prepareFullAttack2a, FULL_ATTACK_2A_ENGINE, FULL_ATTACK_2A_ID} from './src/core/full-attack-2a.mjs?v=1';
 
 const standardDefender = 'full-native-standard-defender';
 
@@ -54,4 +55,13 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
     playerCommands: port => player.humanPlayerOptions(port).map(entry=>entry.command),
     dispatchPlayer: player.dispatch
   });
+
+  void (async () => {
+    const response = await fetch(new URL('./assets/ai/full-attack-2a.json?v=1',import.meta.url));
+    if (!response.ok) throw Error('AI_POLICY_MODEL_UNAVAILABLE');
+    const {base64} = await response.json();
+    const modelBytes = Uint8Array.from(atob(base64),character=>character.charCodeAt(0));
+    const select = await prepareFullAttack2a({engine:FULL_ATTACK_2A_ENGINE,modelBytes});
+    full.registerQualifiedController({side:'player',id:FULL_ATTACK_2A_ID,difficulty:null,select});
+  })().catch(error => console.warn('Trained FULL attacker unavailable:',error.message));
 }

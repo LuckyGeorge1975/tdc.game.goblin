@@ -180,7 +180,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           for (const offer of legacyOffers?.[side] ?? []) choices.set(offer.id, offer);
         }
         for (const {id, difficulty} of rated?.choices ?? []) {
-          choices.set(id, {label:t('v2.difficulty.' + difficulty), policyId:id});
+          const labelKey = difficulty === null ? 'v2.full.trained' : 'v2.difficulty.' + difficulty;
+          choices.set(id, {label:t(labelKey), policyId:id});
         }
         for (const [id, {label:copy}] of choices) {
           const option = document.createElement('option');

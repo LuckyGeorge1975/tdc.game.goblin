@@ -8,6 +8,7 @@ import {createOwnedFullCatalogSessionHost} from '../src/core/full-catalog-sessio
 import {selectWeakFullCatalog,selectMediumFullCatalog} from '../src/core/full-catalog-difficulty.mjs';
 import {fullSeatFallback} from '../full-standard-seat-owner.mjs';
 import {hexDistance} from '../src/core/hex.mjs';
+import {prepareFullAttack2a,FULL_ATTACK_2A_ENGINE,FULL_ATTACK_2A_ID} from '../src/core/full-attack-2a.mjs';
 
 const atlas='catalog-full-atlas';
 const text=name=>readFileSync(new URL(`../${name}`,import.meta.url),'utf8');
@@ -52,6 +53,50 @@ test('Medium only replaces a voluntary movement pass with the best legal approac
     facts:{attack:6,ratioCategory:'5-1',effectKind:'unit-crt'}};
   assert.equal(selectMediumFullCatalog({...batch,side:'enemy',slot:'first',phase:'enemy',
     view:{...batch.view,objectives:[{kind:'destroy-player-force',satisfied:false}]},candidates:[{...end,kind:'hold'},first,shot]}),shot.key);
+});
+
+test('the pinned trained attacker is unranked, session-bound and legal only without a minimum',async()=>{
+  const game=await boot();
+  setupEditor(game);
+  game.context.draft=imported();
+  await game.run(`Promise.all([draft,{...draft,minimumDifficulty:'weak'},{...draft,aiAllowed:false}]
+    .map(GoblinEditorDraft.prepare)).then(levels=>globalThis.trainedLevels=levels)`);
+  const full=game.context.GoblinCatalogFullRuntime;
+  const modelBytes=Buffer.from(JSON.parse(text('assets/ai/full-attack-2a.json')).base64,'base64');
+  const damaged=Uint8Array.from(modelBytes);
+  damaged[0]^=1;
+  await assert.rejects(prepareFullAttack2a({engine:FULL_ATTACK_2A_ENGINE,modelBytes:damaged}),/AI_POLICY_HASH_MISMATCH/);
+  assert.equal(game.run('GoblinCatalogFullRuntime.controllerOffers(trainedLevels[0]).player.choices.length'),0);
+  const select=await prepareFullAttack2a({engine:FULL_ATTACK_2A_ENGINE,modelBytes});
+  assert.throws(()=>full.registerQualifiedController({side:'enemy',id:FULL_ATTACK_2A_ID,difficulty:null,select}),
+    {code:'FULL_AI_QUALIFICATION_INVALID'});
+  assert.throws(()=>full.registerQualifiedController({side:'player',id:FULL_ATTACK_2A_ID,difficulty:'medium',select}),
+    {code:'FULL_AI_QUALIFICATION_INVALID'});
+  full.registerQualifiedController({side:'player',id:FULL_ATTACK_2A_ID,difficulty:null,select});
+  const offers=game.run('trainedLevels.map(level=>GoblinCatalogFullRuntime.controllerOffers(level))');
+  assert.deepEqual(JSON.parse(JSON.stringify(offers[0].player.choices)),[{id:FULL_ATTACK_2A_ID,difficulty:null}]);
+  assert.equal(offers[0].enemy.choices.length,0);
+  assert.equal(offers[1].player.choices.length,0);
+  assert.equal(offers[2].player.choices.length,0);
+  const roles={player:'ai',enemy:'human'}, ids={player:FULL_ATTACK_2A_ID};
+  const startDraft=index=>`(control=>loadEditorDraft(trainedLevels[${index}],control))`;
+  assert.throws(()=>start(game,startDraft(1),roles,ids),{code:'FULL_AI_BELOW_MINIMUM'});
+  assert.throws(()=>start(game,startDraft(2),roles,ids),{code:'AI_LEVEL_FORBIDDEN'});
+  const port=start(game,startDraft(0),roles,ids);
+  assert.equal(port.state().policyId,FULL_ATTACK_2A_ID);
+  assert.equal(Object.hasOwn(port.state(),'difficulty'),false);
+  assert.equal(port.project('ai').view.tactics,undefined);
+  const oldSelector=port.qualifiedSelector();
+  const host=createOwnedFullCatalogSessionHost({port,player:playerHost(game)});
+  for(let step=0;port.state().side==='player'&&!port.state().ended&&step<100;step++)
+    assert.equal((await host.advance()).ok,true);
+  assert.equal(port.state().side,'enemy');
+  assert.equal(port.qualifiedSelector(),null);
+  assert.equal((await host.advance()).code,'AI_HOST_WRONG_SIDE');
+  const next=start(game,startDraft(0),roles,ids);
+  assert.equal(next.state().policyId,FULL_ATTACK_2A_ID);
+  assert.equal(port.state(),null);
+  assert.throws(()=>oldSelector({}),/AI_POLICY_SCOPE_MISMATCH/);
 });
 
 test('saved FULL seed 5 progresses through the former fixed point to native mission end',async t=>{

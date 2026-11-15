@@ -185,12 +185,15 @@
  }
  const nativePlayerGateway=Object.freeze({query:nativePlayerQuery,dispatch:nativePlayerDispatch});
  function registerQualifiedController({side,id,difficulty,select}){
+  const validDifficulty=id==='full-attack-2a'?side==='player'&&difficulty===null:
+   ScenarioRuleProfiles.fullDifficulties.includes(difficulty);
   if(!controllerSides.includes(side)||typeof id!=='string'||!id||
-      !ScenarioRuleProfiles.fullDifficulties.includes(difficulty)||typeof select!=='function'||
+      !validDifficulty||typeof select!=='function'||
       qualifiedControllers[side].has(id))throw admissionError('FULL_AI_QUALIFICATION_INVALID');
   qualifiedControllers[side].set(id,Object.freeze({id,difficulty,select}));
  }
  function meetsMinimum(difficulty,minimum){
+  if(minimum===null)return true;
   const order=ScenarioRuleProfiles.fullDifficulties;
   return order.indexOf(difficulty)>=order.indexOf(minimum);
  }
@@ -357,12 +360,13 @@
     phase:turnPhase,controller:roles[phase]??null,ended:gameOver,outcome:terminalOutcome(),paused,pending,
     slot:phase==='enemy'?nativeSlot?.pass??null:turnPhase,
     humanReady:authorised('human'),
-    ...(policies[phase]?{difficulty:policies[phase].difficulty,policyId:policies[phase].id}:{})}) : null;
+    ...(policies[phase]?{policyId:policies[phase].id,
+      ...(policies[phase].difficulty!==null?{difficulty:policies[phase].difficulty}:{})}:{})}) : null;
   }
   function project(mode){
    if(mode==='spectator')return spectator.read();
    if(!authorised(mode))return null;
-   return {view:mode==='ai'&&policies[phase]?tacticalProjection(phase):sideProjection(phase),
+   return {view:mode==='ai'&&policies[phase]?.difficulty!=null?tacticalProjection(phase):sideProjection(phase),
     ...(mode==='human'?{log:logEntries(true,phase,true)}:{})};
   }
   function ticket(mode){
@@ -441,7 +445,11 @@
   }
   const port=Object.freeze({state,project,ticket,open,commit,
    controlBinding:()=>attached()?binding:null,
-   qualifiedSelector:()=>authorised('ai')?policies[phase]?.select??null:null,
+   qualifiedSelector(){
+    const policy=authorised('ai')?policies[phase]:null;
+    if(!policy)return null;
+    return policy.difficulty===null?batch=>policy.select(batch,port):policy.select;
+   },
    spectator:()=>allowsSpectator&&attached()?spectator:null,
    pause(){if(attached()){paused=true;invalidate();}},
    resume(){if(attached()&&paused){paused=false;enterSide();}},
