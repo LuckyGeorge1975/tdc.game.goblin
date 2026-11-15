@@ -106,6 +106,13 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   function requireAi(session){
     if(!aiAllowed(session?.config))reject('AI_LEVEL_FORBIDDEN','AI control is disabled for this level');
   }
+  const fullDifficulties=Object.freeze(['weak','medium','strong']);
+  function fullMinimumDifficulty(config){
+    if(!Object.hasOwn(config??{},'minimumDifficulty'))return null;
+    const value=config.minimumDifficulty;
+    if(!fullDifficulties.includes(value))reject('FULL_AI_MINIMUM_INVALID','Invalid FULL minimumDifficulty');
+    return value;
+  }
   function checkEnemyControllers(session,move,fire){
     if(typeof move==='function'||typeof fire==='function')requireAi(session);
   }
@@ -187,5 +194,6 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     return session;
   }
   return {schemaVersion:1,product,entries,legacyLevel,validate,beginSession,beginDraftSession,aiAllowed,requireAi,checkEnemyControllers,
+    fullDifficulties,fullMinimumDifficulty,
     isDraftSession:session=>draftSessions.has(session)};
 })());

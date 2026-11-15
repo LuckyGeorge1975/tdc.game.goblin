@@ -19,6 +19,7 @@
     const source = template();
     if (!available() || !source) fail('unavailable');
     return {version, width, height, objective, ...(Object.hasOwn(source,'aiAllowed')?{aiAllowed:source.aiAllowed}:{}),
+      ...(Object.hasOwn(source,'minimumDifficulty')?{minimumDifficulty:source.minimumDifficulty}:{}),
       terrain:source.terrainTypes.map(({x,y,type}) => ({x,y,type})),
       units:source.units.map((unit,index) => ({
         id:unit.core ? 'core' : 'draft-' + (index + 1), assetId:unit.catalogAssetId, team:unit.team, x:unit.x, y:unit.y,
@@ -57,7 +58,7 @@
     const current = draft?.version === version;
     const fields = ['version','width','height','objective','terrain','units'];
     if (oldEvents) fields.push('hotspots','hooks');
-    if (current) for (const key of ['id','scenarioVersion','ruleProfile','hotspots','events','goals','waveTemplates','briefing','aiAllowed'])
+    if (current) for (const key of ['id','scenarioVersion','ruleProfile','hotspots','events','goals','waveTemplates','briefing','aiAllowed','minimumDifficulty'])
       if (Object.hasOwn(draft,key)) fields.push(key);
     if (!exact(draft,fields) || (!oldEvents && !current && draft.version !== historicalVersion) ||
         (current && Object.hasOwn(draft,'ruleProfile') && draft.ruleProfile !== profile().ruleProfileId) ||
@@ -65,6 +66,7 @@
         Object.hasOwn(draft,'aiAllowed') && typeof draft.aiAllowed !== 'boolean' ||
         !Array.isArray(draft.terrain) || !Array.isArray(draft.units) ||
         draft.terrain.length > draft.width * draft.height || draft.units.length > draft.width * draft.height) fail('schema');
+    if (current) ScenarioRuleProfiles.fullMinimumDifficulty(draft);
     const position = cell => Number.isInteger(cell.x) && cell.x >= 0 && cell.x < draft.width &&
       Number.isInteger(cell.y) && cell.y >= 0 && cell.y < draft.height;
     const validId = id => typeof id === 'string' && /^[a-z][a-z0-9-]{0,47}$/.test(id);
@@ -214,10 +216,12 @@
     const copy = structuredClone(draft);
     const {units,records,events,waves,waveTemplates,turnLimit} = validate(copy);
     const source = profile(), terrainTypes = copy.terrain;
+    const {minimumDifficulty,...battlefield} = copy;
     const [levelDigest,rosterDigest,terrainDigest] = await Promise.all(
-      [copy,units,terrainTypes].map(value => GoblinCatalogBase.hash(value)));
+      [battlefield,units,terrainTypes].map(value => GoblinCatalogBase.hash(value)));
     const config = freeze({...source, ...(copy.width !== width || copy.height !== height ? {width:copy.width,height:copy.height} : {}),
       ...(Object.hasOwn(copy,'aiAllowed') ? {aiAllowed:copy.aiAllowed} : {}),
+      ...(minimumDifficulty!==undefined?{minimumDifficulty}:{}),
       title:'Editor draft', kicker:'G.O.B.L.I.N.', kickerKey:'v2.editor.title',
       sub:'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
       ...(copy.briefing ? {briefing:copy.briefing} : {}),

@@ -41,7 +41,7 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
   const ai=createAiSessionHost({adapter,read,spectator:true,
     select:async batch=>{
       const attempt=attempted;
-      const key=await select[batch.side](batch);
+      const key=await attempt.select(batch);
       attempt.intent=adapter.remember(batch,key);
       return key;
     },commit:onCommit});
@@ -56,12 +56,13 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
   async function advance(){
     if(pending)return {ok:false,code:'AI_HOST_UNAVAILABLE'};
     const state=read();
-    if(!state||typeof select[state.side]!=='function')return {ok:false,code:'AI_HOST_WRONG_SIDE'};
+    const choose=state?.policyId?port.qualifiedSelector():select?.[state?.side];
+    if(!state||typeof choose!=='function')return {ok:false,code:'AI_HOST_WRONG_SIDE'};
     const ticket=port.ticket('ai');
     if(!ticket)return {ok:false,code:'AI_FULL_NO_NEW_ACTION'};
     if(sameFullCatalogActionSlot(ticket,attempted?.ticket))
       return continueChoice(attempted,state)??{ok:false,code:'AI_FULL_NO_NEW_ACTION'};
-    const attempt=attempted={ticket,intent:null};
+    const attempt=attempted={ticket,intent:null,select:choose};
     pending=true;
     try{
       const result=await ai.advance();

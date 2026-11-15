@@ -45,7 +45,9 @@ function loadEditorDraft(config, control){
   return applyScenarioSession(session,control);
 }
 function applyScenarioSession(nextSession, control){
-  const activate=control && globalThis.GoblinCatalogFullRuntime.prepareControllers(nextSession,control.roles,control.ui);
+  if(!control&&nextSession.ruleProfileId==='FULL_CATALOG_v1'&&ScenarioRuleProfiles.fullMinimumDifficulty(nextSession.config)!==null)
+    throw Object.assign(Error('FULL_AI_MINIMUM_REQUIRES_SELECTION'),{code:'FULL_AI_MINIMUM_REQUIRES_SELECTION'});
+  const activate=control && globalThis.GoblinCatalogFullRuntime.prepareControllers(nextSession,control.roles,control.ui,control.policyIds);
   const full=globalThis.GoblinCatalogFullRuntime;
   const transition=activate||full?.ownsPresentation();
   if(transition)full.stageControlledPresentation();

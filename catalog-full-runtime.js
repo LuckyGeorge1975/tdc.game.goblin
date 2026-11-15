@@ -8,6 +8,9 @@
  let roundFireChoice=null;
  let controller=null;
  let presentationPending=false;
+ const controllerSides=['player','enemy'];
+ const qualifiedControllers={player:new Map(),enemy:new Map()};
+ const admissionError=code=>Object.assign(Error(code),{code});
  let commandKey=null,commandSerial=0;
  function revision(){return JSON.stringify([legacySession.sessionId,turn,phase,turnPhase,units.map(u=>[u.id,u.x,u.y,unitAlive(u),!!u.disabled,u.embarkedOn??null]),[...terrainTypes]])}
  function ruleStateKey(s) {
@@ -87,6 +90,20 @@
   return {width:W,height:H,defaultTerrain:'open-ground',
    cells:[...terrainTypes].map(([key,type])=>{const [x,y]=key.split(',').map(Number);return {x,y,type}})};
  }
+ function tacticalProjection(team){
+  const view=sideProjection(team);
+  const cover=view.terrain.cells.filter(cell=>TerrainRules.coverBonus(cell.type)>0);
+  const unitFacts=Object.fromEntries(roster(team).filter(unitAlive).map(u=>{
+   const system=u.catalogSystems;
+   const range=system?Math.max(0,...system.rules.definition.components.flatMap((spec,i)=>{
+    const slot=system.components[i];
+    return spec.kind==='weapon'&&!slot.destroyed&&!slot.spent?[system.rules.weaponClasses[spec.weaponClassRef].range]:[];
+   })):u.catalogId==='U13'?(u.ammunition===1?8:0):u.range??0;
+   return [u.id,{range,infantry:u.infantry===true||u.engineering===true||u.id==='infantry',
+    ...(system?{maxTreads:system.maxTreads}:{})}];
+  }));
+  return {...view,tactics:{cover,unitFacts,crt:copy(COMBAT_RULES.crt)}};
+ }
  function boardUnits(visible,team){
   const ids=new Set(visible.map(u=>u.id));
   return visible.map(u=>({id:u.id,...(team===null?{team:u.team}:{relation:u.team===team?'own':'opponent'}),assetId:u.catalogAssetId,
@@ -145,14 +162,81 @@
   presentationPending=false;
   owner?.startPresentation();
  }
- function prepareControllers(session,selection,ui){
+ function nativePlayerQuery(command){
+  if(command.type==='Move')return moveQuery(command);
+  if(command.type==='CatalogHexFire')return hexQuery(command);
+  if(command.type==='Embark'||command.type==='Unload')return GoblinCatalogRuntime.query(command);
+  return GoblinSpecialistsRuntime.query(command);
+ }
+ function nativePlayerDispatch(command,revision){
+  if(phase!=='player'||gameOver||!controlOwner()?.committing()||commandRevision()!==revision)
+   return {ok:false,code:'FULL_CONTROL_STALE'};
+  if(root.GoblinMovement?.busy())return {ok:false,code:'PRESENTATION_BUSY'};
+  try{
+   if(command.type==='Embark'||command.type==='Unload'){
+    const check=nativePlayerQuery(command);
+    if(!check.ok)return check;
+    const actor=units.find(u=>u.id===command.actorId);
+    if(command.type==='Embark')embark(actor,units.find(u=>u.id===command.carrierId));
+    else unloadAt(actor,units.find(u=>u.id===command.cargoId),command.x,command.y);
+   }else executeSpecialistCommand(command);
+   return {ok:commandRevision()!==revision};
+  }catch(error){return {ok:false,code:error.code??error.message}}
+ }
+ const nativePlayerGateway=Object.freeze({query:nativePlayerQuery,dispatch:nativePlayerDispatch});
+ function registerQualifiedController({side,id,difficulty,select}){
+  if(!controllerSides.includes(side)||typeof id!=='string'||!id||
+      !ScenarioRuleProfiles.fullDifficulties.includes(difficulty)||typeof select!=='function'||
+      qualifiedControllers[side].has(id))throw admissionError('FULL_AI_QUALIFICATION_INVALID');
+  qualifiedControllers[side].set(id,Object.freeze({id,difficulty,select}));
+ }
+ function meetsMinimum(difficulty,minimum){
+  const order=ScenarioRuleProfiles.fullDifficulties;
+  return order.indexOf(difficulty)>=order.indexOf(minimum);
+ }
+ function controllerOffers(config){
+  if(config?.ruleProfileId!=='FULL_CATALOG_v1')return null;
+  const minimumDifficulty=ScenarioRuleProfiles.fullMinimumDifficulty(config);
+  const allowed=ScenarioRuleProfiles.aiAllowed(config);
+  const result={minimumDifficulty,legacyStartAllowed:minimumDifficulty===null};
+  for(const side of controllerSides){
+   const choices=allowed?[...qualifiedControllers[side].values()]
+    .filter(policy=>meetsMinimum(policy.difficulty,minimumDifficulty))
+    .map(({id,difficulty})=>Object.freeze({id,difficulty})):[];
+   const reason=choices.length?null:!allowed?'AI_LEVEL_FORBIDDEN':
+    minimumDifficulty?'FULL_AI_MINIMUM_UNAVAILABLE':'FULL_AI_NOT_QUALIFIED';
+   result[side]=Object.freeze({choices:Object.freeze(choices),reason});
+  }
+  return Object.freeze(result);
+ }
+ function bindQualifiedControllers(session,roles,policyIds){
+  if(!policyIds||typeof policyIds!=='object'||Array.isArray(policyIds)||
+      Object.keys(policyIds).some(side=>!controllerSides.includes(side)))throw admissionError('FULL_CONTROLLERS_INVALID');
+  const minimum=ScenarioRuleProfiles.fullMinimumDifficulty(session.config);
+  const bound={};
+  for(const side of controllerSides){
+   const id=Object.hasOwn(policyIds,side)?policyIds[side]:undefined;
+   if(roles[side]==='human'){
+    if(id!==undefined)throw admissionError('FULL_AI_FOR_HUMAN');
+    continue;
+   }
+   if(id===undefined&&minimum===null)continue;
+   const policy=qualifiedControllers[side].get(id);
+   if(!policy)throw admissionError(minimum===null?'FULL_AI_NOT_QUALIFIED':'FULL_AI_MINIMUM_UNAVAILABLE');
+   if(!meetsMinimum(policy.difficulty,minimum))throw admissionError('FULL_AI_BELOW_MINIMUM');
+   bound[side]=policy;
+  }
+  return Object.freeze(bound);
+ }
+ function prepareControllers(session,selection,ui,policyIds={}){
   if(session.ruleProfileId!=='FULL_CATALOG_v1' || !exact(selection,['player','enemy']) ||
-      !['player','enemy'].every(side=>['ai','human'].includes(selection[side])))throw Error('FULL_CONTROLLERS_INVALID');
+      !controllerSides.every(side=>['ai','human'].includes(selection[side])))throw admissionError('FULL_CONTROLLERS_INVALID');
   if(Object.values(selection).includes('ai'))ScenarioRuleProfiles.requireAi(session);
   const roles=Object.freeze({...selection});
+  const policies=bindQualifiedControllers(session,roles,policyIds);
   return ()=>{
    if(legacySession!==session||!active()||controlOwner())throw Error('FULL_CONTROLLER_OWNER');
-   controller=createControllerPort(session,roles,ui);
+   controller=createControllerPort(session,roles,ui,policies);
    return controller.port;
   };
  }
@@ -192,8 +276,8 @@
   }
   finishEnemyTurn(root.GoblinCatalogFullRuntime);
  }
- function enemyOffer({actor,step,shot}){
-  const fire=shot && fireChoices(shot);
+ function enemyOffer({actor,step,shot},tactics){
+  const fire=shot && fireChoices(shot,tactics);
   const entries=fire ? [...fire.checked] : [];
   const full=root.GoblinCatalogFullRuntime;
   const queryStep=step && fullEnemyStepQuery(full,actor);
@@ -224,7 +308,9 @@
   }
   return {entries,execute};
  }
- function createControllerPort(session,roles,ui){
+ function createControllerPort(session,roles,ui,policies){
+  const binding=Object.freeze({roles,policyIds:Object.freeze(Object.fromEntries(
+   Object.entries(policies).map(([side,policy])=>[side,policy.id])))});
   const reject=code=>({ok:false,code});
   const allowsSpectator=roles.player==='ai'&&roles.enemy==='ai';
   let ready=false,latestSpectator=null;
@@ -270,12 +356,14 @@
     profileId:session.ruleProfileId,levelDigest:session.effectiveRules.catalog.levelDigest,
     phase:turnPhase,controller:roles[phase]??null,ended:gameOver,outcome:terminalOutcome(),paused,pending,
     slot:phase==='enemy'?nativeSlot?.pass??null:turnPhase,
-    humanReady:authorised('human')}) : null;
+    humanReady:authorised('human'),
+    ...(policies[phase]?{difficulty:policies[phase].difficulty,policyId:policies[phase].id}:{})}) : null;
   }
   function project(mode){
    if(mode==='spectator')return spectator.read();
    if(!authorised(mode))return null;
-   return {view:sideProjection(phase),...(mode==='human'?{log:logEntries(true,phase,true)}:{})};
+   return {view:mode==='ai'&&policies[phase]?tacticalProjection(phase):sideProjection(phase),
+    ...(mode==='human'?{log:logEntries(true,phase,true)}:{})};
   }
   function ticket(mode){
    if(!authorised(mode)||committing||phase==='enemy'&&!nativeSlot)return null;
@@ -291,7 +379,7 @@
    const token=ticket(mode);
    if(!token)return null;
    if(phase==='enemy'&&!offer){
-    offer=enemyOffer(nativeSlot);
+    offer=enemyOffer(nativeSlot,!!policies[phase]);
     offerRevision=token.revision;
    }
    return {permit:token,pass:phase==='enemy'?nativeSlot.pass:turnPhase,entries:offer?copy(offer.entries):null};
@@ -352,11 +440,13 @@
    }finally{advancingPhase=false;committing=false;}
   }
   const port=Object.freeze({state,project,ticket,open,commit,
+   controlBinding:()=>attached()?binding:null,
+   qualifiedSelector:()=>authorised('ai')?policies[phase]?.select??null:null,
    spectator:()=>allowsSpectator&&attached()?spectator:null,
    pause(){if(attached()){paused=true;invalidate();}},
    resume(){if(attached()&&paused){paused=false;enterSide();}},
    leave(){stopped=true;invalidate();cursor=null;nativeSlot=null;offer=null;latestSpectator=null;}});
-  return {owns,port,startPresentation,enterSide,startEnemy,advancingPhase:()=>advancingPhase};
+  return {owns,port,startPresentation,enterSide,startEnemy,committing:()=>committing,advancingPhase:()=>advancingPhase};
  }
  function fireView(binding){const out=copy(binding);if(out?.state)delete out.state.mainTargets;return out}
  function viewerUnit(u){const {specialistJournal,specialistSerial,...publicUnit}=u,out=copy(publicUnit);if(out.catalogFire)out.catalogFire=fireView(out.catalogFire);if(out.spotterId&&!known(out.spotterId))out.spotterId=null;return out}
@@ -445,6 +535,15 @@
   const footprint=[{x,y},...hexNeighbors(x,y).filter(c=>c.x>=0&&c.y>=0&&c.x<W&&c.y<H).sort((a,b)=>a.y-b.y||a.x-b.x)];
   return {ok:true,actor,footprint,friendlies:units.filter(u=>unitAlive(u)&&!u.embarkedOn&&u.team===actor.team&&footprint.some(c=>c.x===u.x&&c.y===u.y)).map(u=>({id:u.id,name:u.name})),weapon:{attack:6,range:8}};
  }
+ function hexTacticalFacts(q){
+  const visible=roster(q.actor.team).filter(u=>unitAlive(u)&&!u.embarkedOn);
+  const hits=q.footprint.flatMap((cell,i)=>visible.filter(u=>u.x===cell.x&&u.y===cell.y).map(u=>{
+   const attack=i===0?6:3;
+   const component=u.catalogSystems?GoblinSystems.catalogChooseTarget(u.catalogSystems,GoblinSpecialistsRuntime.registry()):null;
+   return {unitId:u.id,attack,...GoblinSpecialistsRuntime.fireEffect(u,attack,component)};
+  }));
+  return {expendable:true,hits};
+ }
  function executeHex(command,allowEnemy=false){
   const q=hexQuery(command,allowEnemy);if(!q.ok)return q;
   const actor=q.actor,commandId=`${legacySession.sessionId}/${actor.id}/${(actor.specialistSerial??0)+1}`;
@@ -468,11 +567,12 @@
   updateSelection();draw();if(!ended&&actor.team==='player')maybeAutoAdvancePhase();return {ok:true};
  }
  function hasHexAction(actor){for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(hexQuery({type:'CatalogHexFire',actorId:actor.id,x,y},actor.team==='enemy').ok)return true;return false}
- function fireChoices({baseline,commands,preview,apply}){
+ function fireChoices({baseline,commands,preview,apply},tactics=false){
   const byKey=new Map(commands().map(c=>[JSON.stringify(c),c]));
   const baselineKey=JSON.stringify(baseline);
-  const checked=[...byKey.values()].flatMap(c=>{const q=preview(c);return q.ok?[{command:c,
+  const checked=[...byKey.values()].flatMap(c=>{const q=preview(c,tactics);return q.ok?[{command:c,
    facts:{attack:q.attack,range:q.range,ratioCategory:q.ratioCategory,effectKind:q.effectKind,
+    ...(tactics?{expendable:q.expendable,...(q.hits?{hits:q.hits}:{})}:{}),
     ...(Object.hasOwn(q,'objectiveTarget')?{objectiveTarget:q.objectiveTarget,disabledTarget:q.disabledTarget}:{})},
    baseline:JSON.stringify(c)===baselineKey}]:[]});
   if(!checked.some(entry=>entry.baseline))throw Error('FULL_ENEMY_BASELINE_MISSING');
@@ -523,8 +623,8 @@
     const cells=[];
     for(let y=0;y<H;y++)for(let x=0;x<W;x++)cells.push({type:'CatalogHexFire',actorId:actor.id,x,y});
     return cells;
-   },preview:command=>{const q=hexQuery(command,true);return q.ok?{ok:true,attack:q.weapon.attack,range:q.weapon.range,
-    ratioCategory:null,effectKind:'area'}:q},
+   },preview:(command,tactics)=>{const q=hexQuery(command,true);return q.ok?{ok:true,attack:q.weapon.attack,range:q.weapon.range,
+    ratioCategory:null,effectKind:'area',...(tactics?hexTacticalFacts(q):{})}:q},
    apply:command=>executeHex(command,true)};
   }
  }
@@ -609,7 +709,8 @@
  }
  root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,recordRoundAction,catalogCard,initialRoster,status,stealthText,deadlineRemoved,
   enemyHexShot,prepareControllers,controllerPort,startControlledEnemyTurn,enterControlledSide,allowsPlayerPhaseAdvance,
-  ownsPresentation,stageControlledPresentation,startControlledPresentation});
+  ownsPresentation,stageControlledPresentation,startControlledPresentation,controllerOffers,registerQualifiedController,
+  hexTacticalFacts,nativePlayerGateway});
  const oldCheckVictory=checkVictory;
  checkVictory=function(){
   // Native combat reaches this boundary after applying damage and before finishing the mission.

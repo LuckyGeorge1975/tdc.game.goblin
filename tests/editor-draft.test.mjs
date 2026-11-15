@@ -129,7 +129,7 @@ test('draft JSON round-trips and rejects malformed coordinates, IDs, terrain and
     ['d.version="wrong"','schema'], ['d.objective="core"','schema'], ['d.units[0].x=12','bounds'],
     ['d.units[0].id=d.units[1].id','collision'], ['d.units[0].x=d.units[1].x;d.units[0].y=d.units[1].y','collision'],
     ['d.units[0].assetId="__proto__"','unit'], ['d.units[0].hp=999','unit'],
-    ['d.ruleProfile="FIELD_TEST_LEGACY_v1"','schema'], ['d.minimumDifficulty="strong"','schema'],
+    ['d.ruleProfile="FIELD_TEST_LEGACY_v1"','schema'], ['d.minimumDifficulty="Strong"','FULL minimumDifficulty'],
     ['d.losMode="legacy"','schema'], ['d.code="return 0"','schema'], ['d.title="custom UI"','schema'],
     ['d.units=d.units.filter(u=>u.id!=="core")','core'], ['d.units=d.units.filter(u=>u.team!=="player")','player'],
     ['d.terrain.push({x:0,y:0,type:"lava"})','terrain'],

@@ -182,15 +182,18 @@
  const legalFire=c=>{try{return fireQuery(c,true).ok}catch{return false}};
  const hasFireAction=u=>root.GoblinCatalogFullRuntime?.active()&&u.catalogId==='U13'?root.GoblinCatalogFullRuntime.hasHexAction(u):weapons(u).some(w=>w.ready&&candidateCommands(u,w.id).some(legalFire));
  function executeFire(command,allowEnemy=false){const legal=fireQuery(command,allowEnemy);intent={command:structuredClone(command),weaponClass:legal.weapon.weaponClass??(legal.actor.catalogFire?.ruleRef==='siege-tank-fire-budget-v1'?(GoblinSiegeBudget.WEAPONS[command.weaponId].infantryOnly?'antipersonnel':'main'):null),commandId:`${legacySession.sessionId}/${command.actorId}/${(legal.actor.specialistSerial??0)+1}`};try{attack(legal.actor,legal.target)}finally{intent=null}return {ok:true}}
- function firePreview(command,allowEnemy=false){
+ function fireEffect(target,attack,component){
+  const treads=component?.type==='treads';
+  const defense=component?component.defense+TerrainRules.coverBonus(terrainTypeAt(target.x,target.y)):effectiveDefense(target);
+  return {ratioCategory:treads?null:combatRatio(attack,defense),
+   effectKind:treads?'tread-roll-5-6':component?'component-crt':'unit-crt'};
+ }
+ function firePreview(command,allowEnemy=false,tactics=false){
   try {
    const q=fireQuery(command,allowEnemy,true);
-   const treads=q.component?.type==='treads';
-   const defense=q.component?q.component.defense+TerrainRules.coverBonus(terrainTypeAt(q.target.x,q.target.y)):effectiveDefense(q.target);
-   return {ok:true,attack:q.weapon.attack,range:q.weapon.range,
-    ratioCategory:treads?null:combatRatio(q.weapon.attack,defense),
-    effectKind:treads?'tread-roll-5-6':q.component?'component-crt':'unit-crt',
-    objectiveTarget:q.target.core===true,disabledTarget:!!q.target.disabled};
+   return {ok:true,attack:q.weapon.attack,range:q.weapon.range,...fireEffect(q.target,q.weapon.attack,q.component),
+    objectiveTarget:q.target.core===true,disabledTarget:!!q.target.disabled,
+    ...(tactics?{expendable:q.weapon.expendable===true}:{})};
   } catch(error){if(!error.code)throw error;return {ok:false,code:error.code}}
  }
  function* enemyShots(u){
@@ -207,7 +210,7 @@
    const baseline=candidateCommands(u,w.id).find(legalFire);
    if(!baseline)continue;
    yield {baseline,commands:()=>candidateCommands(u,w.id,true),
-    preview:c=>firePreview(c,true),apply:c=>executeFire(c,true)};
+    preview:(c,tactics)=>firePreview(c,true,tactics),apply:c=>executeFire(c,true)};
   }
  }
  const oldEnemy=enemyFire;enemyFire=function(u,choose,pass){
@@ -318,6 +321,6 @@
  function actions(u){return [...(movementBudget(u)>0?[text('v2.ui.move')]:[]),...(weapons(u).length?[text('v2.ui.fire')]:[]),...(rules(u).engineeringRef?['clear','position','bridge','repair-disabled','repair-hp','repair-treads','repair-component','salvage'].map(k=>text('v2.engineer.'+k)):[]),...(forge(u)?[text('v2.ui.embark'),text('v2.ui.catalog.deployDrone')]:[])]}
  const oldInfo=showUnitInfo;showUnitInfo=function(u){if(fullOwnsPresentation())return;if(active()&&system(u)){$('#unit-intel-title').textContent=GoblinCatalogRuntime.name(u);$('#unit-intel-facts').textContent=summary(u);return}oldInfo(u)};
  function fireMetadata(){return intent?{command:intent.command,weaponClass:intent.weaponClass??null,weaponKey:intent.command.weaponId,mode:intent.command.mode,spotterId:intent.command.spotterId,targetComponentId:intent.command.target?.componentId??null}:null}
- root.GoblinSpecialistsRuntime=Object.freeze({active,registry,record,rules,system,sync,areaOutcome,query,fireQuery,firePreview,resolveTarget,applyEffects,execute,engineeringQuery,wreckKey,forge,bayCargo,cargoQuery,ramQuery,weapons,candidateCommands,hasFireAction,resetOwned,validateRestoredState,slotLabel,selectedSpec,summary,projectUnit,actions,appendJournal,fireMetadata,enemyShots});
+ root.GoblinSpecialistsRuntime=Object.freeze({active,registry,record,rules,system,sync,areaOutcome,query,fireQuery,firePreview,fireEffect,resolveTarget,applyEffects,execute,engineeringQuery,wreckKey,forge,bayCargo,cargoQuery,ramQuery,weapons,candidateCommands,hasFireAction,resetOwned,validateRestoredState,slotLabel,selectedSpec,summary,projectUnit,actions,appendJournal,fireMetadata,enemyShots});
 })(globalThis);
 function executeSpecialistCommand(command){return GoblinSpecialistsRuntime.execute(command)}

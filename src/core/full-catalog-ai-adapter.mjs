@@ -80,7 +80,7 @@ export function createOwnedFullCatalogAiAdapter(port,player) {
       const opened=port.open('ai'), projection=port.project('ai');
       if(scope!==undefined||!opened||!projection||opened.permit!==token||token.side!==side)
         return {ok:false,code:'AI_FULL_SCOPE_UNAVAILABLE'};
-      const listed=side==='enemy'?opened.entries:[...player.playerOptions(),{command:{type:'EndPhase'},facts:{}}];
+      const listed=side==='enemy'?opened.entries:[...player.playerOptions(!!projection.view.tactics),{command:{type:'EndPhase'},facts:{}}];
       prepared={token,commands:listed.map(({command})=>command)};
       return {ok:true,phase:token.phase,slot:opened.pass,view:projection.view,options:describeOptions(listed,side)};
     },
@@ -119,7 +119,7 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
     for (let y=0;y<view.terrain.height;y++) for(let x=0;x<view.terrain.width;x++) result.push({x,y});
     return result;
   }
-  function playerOptions() {
+  function playerOptions(tactics=false) {
     const safetyView = full.aiProjection('player');
     const roster = full.roster('player');
     const view = {turnPhase:safetyView.phase,units:roster};
@@ -132,13 +132,15 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
         seen.add(key);
         const check = player.query(command);
         if (!check.ok) continue;
-        const preview = command.type==='CatalogFire' ? specialists.firePreview(command) : null;
+        const preview = command.type==='CatalogFire' ? specialists.firePreview(command,false,tactics) : null;
         available.push({command,displayCell:cell,facts:{
           ...(Number.isFinite(check.cost)?{cost:check.cost}:{}),
           ...(check.weapon?{attack:check.weapon.attack,range:check.weapon.range}:{}),
           ...(preview?.ok?{ratioCategory:preview.ratioCategory,effectKind:preview.effectKind,
-            objectiveTarget:preview.objectiveTarget,disabledTarget:preview.disabledTarget}:{}),
-          ...(command.type==='CatalogHexFire'?{ratioCategory:null,effectKind:'area'}:{})}});
+            objectiveTarget:preview.objectiveTarget,disabledTarget:preview.disabledTarget,
+            ...(tactics?{expendable:preview.expendable}:{})}:{}),
+          ...(command.type==='CatalogHexFire'?{ratioCategory:null,effectKind:'area',
+            ...(tactics?full.hexTacticalFacts(check):{})}:{})}});
       }
     }
     return available;
