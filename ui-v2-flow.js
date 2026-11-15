@@ -269,6 +269,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (fullSeatBinding !== binding || binding.session !== legacySession) return;
         binding.lifecycle = createFullPhaseLifecycle({port:binding.port, host, changed:ui.refresh});
         binding.lifecycle.sync();
+        ui.refresh();
       });
       GoblinUIV2.refresh();
     }
@@ -288,10 +289,84 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function showStartedMission() {
       if (screen !== 'full-handoff') show(fullSeatBinding?.port ? 'full-seat' : 'play');
     }
-    function renderFullSeat(panel) {
+    function fullSeatMap(view) {
+      return missionPreview({
+        width:view.terrain.width, height:view.terrain.height,
+        terrain:view.terrain.cells, defaultTerrain:view.terrain.defaultTerrain,
+        units:view.units.filter(unit=>unit.alive && !unit.embarkedOn).map(unit=>({
+          ...unit, catalogAssetId:unit.assetId, core:unit.objectiveTarget,
+          team:unit.team ?? (unit.relation === 'own' ? view.side : view.side === 'player' ? 'enemy' : 'player')
+        }))
+      });
+    }
+    function renderFullSpectator(panel, binding, snapshot, focus = false) {
+      if (binding.spectatorScreen?.panel !== panel) {
+        const title = heading('');
+        const pause = button('', () => {
+          const lifecycle = binding.lifecycle;
+          if (lifecycle?.paused) lifecycle.resume();
+          else lifecycle?.pause();
+        });
+        const restart = button('', confirmRestart);
+        const leave = button('', () => leaveMission('menu'));
+        const latest = button('', () => openRoundAnalysis(binding.spectatorScreen.rounds.latestComplete));
+        const partial = button('', () => openRoundAnalysis(binding.spectatorScreen.rounds.terminalPartial));
+        const controls = actions(pause, restart, leave);
+        controls.classList.add('v2-full-spectator-controls');
+        const turnLabel = paragraph('');
+        const outcome = paragraph('', 'v2-full-spectator-outcome');
+        outcome.setAttribute('role', 'status');
+        const map = document.createElement('div');
+        const log = document.createElement('div');
+        log.className = 'v2-screen-log';
+        log.tabIndex = 0;
+        panel.classList.add('v2-full-spectator');
+        panel.append(title, controls, turnLabel, outcome, actions(latest, partial), map, log);
+        binding.spectatorScreen = {panel,title,pause,restart,leave,latest,partial,turnLabel,outcome,map,log};
+      }
+      const nodes = binding.spectatorScreen;
+      const {view,log} = snapshot;
+      const update = (node, copy) => { if (node.textContent !== copy) node.textContent = copy; };
+      update(nodes.title, t('v2.full.seats'));
+      update(nodes.pause, t(binding.lifecycle?.paused ? 'ui.nav.resume' : 'ui.nav.pause'));
+      update(nodes.restart, t('ui.nav.restart'));
+      update(nodes.leave, t('v2.ui.mainMenu'));
+      nodes.pause.disabled = !binding.lifecycle || view.ended;
+      update(nodes.turnLabel, t('ui.hud.turn', {turn:view.turn}));
+      update(nodes.outcome, view.ended && typeof view.outcome === 'boolean'
+        ? t(view.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '');
+      nodes.outcome.hidden = !nodes.outcome.textContent;
+
+      const rounds = nodes.rounds = globalThis.GoblinFullRoundSource?.view();
+      nodes.latest.hidden = !rounds?.latestComplete;
+      nodes.partial.hidden = !view.ended || !rounds?.terminalPartial;
+      nodes.latest.parentElement.hidden = nodes.latest.hidden && nodes.partial.hidden;
+      update(nodes.latest, t('v2.round.latest'));
+      if (!nodes.partial.hidden)
+        update(nodes.partial, t('v2.round.partial', {round:rounds.terminalPartial.roundNumber}));
+
+      if (nodes.snapshot !== snapshot) {
+        nodes.snapshot = snapshot;
+        nodes.map.replaceChildren(fullSeatMap(view));
+        const messages = log.map(line=>line.message);
+        if (!nodes.messages || messages.length !== nodes.messages.length ||
+            messages.some((message,index)=>message !== nodes.messages[index])) {
+          const scroll = nodes.log.scrollTop;
+          nodes.log.replaceChildren(...messages.map(message=>paragraph(message)));
+          nodes.log.scrollTop = scroll;
+          nodes.messages = messages;
+        }
+      }
+      if (focus) nodes.title.focus({preventScroll:true});
+    }
+    function renderFullSeat(panel, focus) {
       const binding = fullSeatBinding;
       const port = binding?.port;
       const snapshot = GoblinUIV2.fullSeatPresentation();
+      if (port && binding.session === legacySession && snapshot?.view.side === 'spectator') {
+        renderFullSpectator(panel, binding, snapshot, focus);
+        return;
+      }
       panel.append(heading(t('v2.full.seats')));
       if (!port || binding.session !== legacySession) return;
       const lifecycle = binding.lifecycle;
@@ -304,14 +379,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       if (!snapshot) { panel.append(actions(...controls)); return; }
       const {view, log} = snapshot;
-      panel.append(paragraph(t('ui.hud.turn', {turn:view.turn})), missionPreview({
-        width:view.terrain.width, height:view.terrain.height,
-        terrain:view.terrain.cells, defaultTerrain:view.terrain.defaultTerrain,
-        units:view.units.filter(unit=>unit.alive && !unit.embarkedOn).map(unit=>({
-          ...unit, catalogAssetId:unit.assetId, core:unit.objectiveTarget,
-          team:unit.team ?? (unit.relation === 'own' ? view.side : view.side === 'player' ? 'enemy' : 'player')
-        }))
-      }));
+      panel.append(paragraph(t('ui.hud.turn', {turn:view.turn})), fullSeatMap(view));
       const entries = document.createElement('div');
       entries.className = 'v2-screen-log';
       entries.append(...log.map(line=>paragraph(line.message)));
@@ -582,19 +650,26 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     function openSection(next) { if (next === 'catalog') libraryLiveId = null; returnScreen = screen; show(next); }
     function goBack() { show(returnScreen === 'play' && GoblinUIV2.project().gameOver ? 'end' : returnScreen); }
     async function openRoundAnalysis(round) {
+      if (!round) return;
       const host = globalThis.IronDustBrowserV2;
       const origin = screen, epoch = host?.epoch, owner = legacySession;
+      const binding = origin === 'full-seat' ? fullSeatBinding : null;
       const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=2');
       if (screen !== origin || host?.epoch !== epoch || legacySession !== owner) return;
+      if (binding && (binding !== fullSeatBinding || !binding.port.spectator()?.read())) return;
+      const lifecycle = binding?.lifecycle;
+      const resumeSpectator = lifecycle && !lifecycle.paused && !binding.port.state()?.ended;
+      if (resumeSpectator) lifecycle.pause();
       const resume = origin === 'log' && returnScreen === 'play' && !GoblinUIV2.project().gameOver && holdPlay();
-      roundAnalysis = {round, origin, renderRoundAnalysis, selected:0, resume, epoch};
+      roundAnalysis = {round, origin, renderRoundAnalysis, selected:0, resume, epoch, binding, resumeSpectator};
       show('round-analysis');
     }
     function closeRoundAnalysis() {
-      const {origin,resume,epoch} = roundAnalysis;
+      const {origin,resume,epoch,binding,resumeSpectator} = roundAnalysis;
       roundAnalysis = null;
       show(origin);
       if (resume && globalThis.IronDustBrowserV2?.epoch === epoch) releasePause();
+      if (resumeSpectator && binding === fullSeatBinding) binding.lifecycle.resume();
     }
     function selectLevel(id) {
       missionId = id;
@@ -1449,6 +1524,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const lastFocus = focus ? null : document.activeElement?.id;
       const lastIndex = focus ? -1 : [...surface.querySelectorAll('button:not(.v2-list-step), select, input')].indexOf(document.activeElement);
       const currentPanel = surface.querySelector('.v2-screen-panel');
+      if (screen === 'full-seat' && currentPanel && fullSeatBinding?.spectatorScreen?.panel === currentPanel) {
+        const snapshot = fullSeatBinding.port.spectator()?.read();
+        if (snapshot) {
+          renderFullSpectator(currentPanel, fullSeatBinding, snapshot, focus);
+          return;
+        }
+      }
       if (!focus && currentPanel?.dataset.screen === screen) scrollMemory.set(screen, {
         panel: currentPanel.scrollTop,
         options: currentPanel.querySelector('.v2-options-main')?.scrollTop || 0,
@@ -1468,8 +1550,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         accept.focus({preventScroll:true});
         return;
       }
-      if (screen === 'full-seat') { renderFullSeat(panel); return; }
-      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return;
+      if (screen === 'full-seat') { renderFullSeat(panel, focus); return; }
+      if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.() &&
+          !(screen === 'round-analysis' && roundAnalysis?.binding === fullSeatBinding)) return;
       const state = GoblinUIV2.project();
       if (screen === 'menu') {
         const intro = document.createElement('div'); intro.className = 'v2-menu-intro';

@@ -231,6 +231,10 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-project-support { max-width: 100%; margin-inline-start: auto; color: var(--v2-accent-text); font-size: .875rem; text-align: end; }
 .v2-screen-log { max-height: min(54dvh, 440px); overflow: auto; }
 .v2-screen-log p { border-bottom: 1px solid var(--v2-line); padding: 8px 0; }
+.v2-full-spectator-controls { position: sticky; top: 0; z-index: 1; margin: 0; padding-block: 4px; background: var(--v2-surface); }
+.v2-full-spectator .v2-mission-map svg { max-height: min(46dvh, 430px); }
+.v2-full-spectator .v2-screen-log { max-height: min(25dvh, 240px); overflow-anchor: none; }
+.v2-full-spectator p.v2-full-spectator-outcome { color: var(--v2-text); font-weight: 700; }
 .v2-screen-panel.v2-round-analysis { width: min(1180px, 100%); height: min(820px, calc(100dvh - 24px)); }
 .v2-round-analysis > h2, .v2-round-analysis > p { margin: 0 0 6px; }
 .v2-round-layout { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 16px; min-height: 0; flex: 1 1 auto; }
