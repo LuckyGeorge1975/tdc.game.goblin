@@ -84,7 +84,7 @@
   }
  }}
  function wrapPhase(fn){return function(...args){if(!active()||depth)return fn.apply(this,args);const before=descriptor(),id=session.binding.sessionId+':root:'+ ++session.roots;depth++;let result;try{result=fn.apply(this,args)}finally{depth--}if(before.stateKey!==worldKey())publish('phase',true,{type:'EndPhase'},[{type:'PhaseEntered',rootCommandId:id,...phaseFact()}],null,null,before,id);return result}}
- const baseLoad=loadScenario;loadScenario=function(id){if(!scenarioCatalog[id])return baseLoad(id);const previous=session;session=null;try{const result=baseLoad(id);begin(id);return result}catch(error){session=previous;throw error}};
+ const baseLoad=loadScenario;loadScenario=function(id,control){if(!scenarioCatalog[id])return baseLoad(id,control);const previous=session;session=null;try{const result=baseLoad(id,control);begin(id);return result}catch(error){session=previous;throw error}};
  const baseSnapshot=commandSnapshot;commandSnapshot=function(...args){const s=baseSnapshot(...args);checkpoint(s);return s};
  const baseUndo=undoPhaseCommand;undoPhaseCommand=function(){if(!active()||!phaseCommands.length||phase!=='player'||gameOver)return baseUndo();const snapshot=phaseCommands.at(-1),before=descriptor();const result=baseUndo();restore(snapshot,before);return result};
  handleHex=wrapAction(handleHex,'Move');attack=wrapAction(attack,'Fire');embark=wrapAction(embark,'Other');unloadAt=wrapAction(unloadAt,'Other');

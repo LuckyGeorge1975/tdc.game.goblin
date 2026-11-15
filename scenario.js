@@ -31,20 +31,21 @@ function renderScenarioObjective(){
 }
 globalThis.GoblinLanguage?.ready.then(renderScenarioObjective);
 globalThis.addEventListener?.('goblin-language-change',renderScenarioObjective);
-function loadScenario(id){
+function loadScenario(id, control){
   if(globalThis.goblinBootProfileError)throw globalThis.goblinBootProfileError;
   const config=scenarioCatalog[id];
   if(!config)return;
   let nextSession;
   try{nextSession=ScenarioRuleProfiles.beginSession(id,config)}catch(error){addLog(error.message,true);throw error}
-  applyScenarioSession(nextSession);
+  return applyScenarioSession(nextSession,control);
 }
-function loadEditorDraft(config){
+function loadEditorDraft(config, control){
   if(globalThis.goblinBootProfileError)throw globalThis.goblinBootProfileError;
   const session=ScenarioRuleProfiles.beginDraftSession(config);
-  applyScenarioSession(session);
+  return applyScenarioSession(session,control);
 }
-function applyScenarioSession(nextSession){
+function applyScenarioSession(nextSession, control){
+  const activate=control && globalThis.GoblinCatalogFullRuntime.prepareControllers(nextSession,control.roles,control.ui);
   clearPhaseCommands();
   globalThis.IronDustBrowserV2?.stop();
   legacySession=nextSession;
@@ -57,6 +58,7 @@ function applyScenarioSession(nextSession){
   for(const [key,type] of terrainTypes)if(TerrainRules.coverBonus(type))terrain.add(key);
   units.splice(0,units.length,...JSON.parse(JSON.stringify(active.units)).map(unit=>({...unit,moveCount:0,moveFrom:null,acted:false,disabled:false,justHit:false})));
   selected=null;focusedCell=null;transportLoadMode=null;transportUnloadMode=null;turn=1;phase='player';turnPhase='movement';gameOver=false;resetActionState();$("#end-turn").disabled=false;
+  const controllerPort=activate?.();
   globalThis.GoblinFullRoundSource?.start();
   $('#mission-kicker').textContent=active.kicker;
   $('#mission-title').textContent=active.title;
@@ -69,6 +71,7 @@ function applyScenarioSession(nextSession){
   globalThis.GoblinLegacyPresentation?.sync();
   updateSelection();
   setViewMode('movement');
+  return controllerPort;
 }
 
 function hasScenarioProgress(){return !!globalThis.IronDustBrowserV2?.active||turn>1||units.some(unit=>unit.moveCount>0||unit.moved||unit.fired||unit.secondMoved||unit.embarkedOn||unit.hp<unit.maxHp)}

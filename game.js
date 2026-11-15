@@ -254,7 +254,7 @@ function showCarrierCargo(){const panel=document.querySelector('#carrier-cargo')
 function canEmbark(a,b){const carrier=a?.transportCapacity?a:b,cargo=a?.transportCapacity?b:a,capacity=carrier?.transportCapacity??(carrier?.id==='gev-pc'?3:0);if(!carrier||!cargo||carrier.team!=='player'||cargo.team!=='player'||carrier===cargo)return false;return turnPhase==='movement'&&unitAlive(carrier)&&unitAlive(cargo)&&!carrier.disabled&&!cargo.disabled&&(cargo.infantry===true||cargo.engineering===true)&&!cargo.embarkedOn&&!cargo.moved&&!cargo.disembarkedThisTurn&&dist(carrier,cargo)<=1&&carrierLoad(carrier)+Math.max(1,cargo.hp)<=capacity}
 function embark(cargo,carrier){if(!canEmbark(cargo,carrier)){setToast('VERLADEN NICHT MÖGLICH');return}transportLoadMode=null;transportUnloadMode=null;cargo.embarkedOn=carrier.id;cargo.embarkedThisTurn=true;cargo.x=carrier.x;cargo.y=carrier.y;cargo.moved=true;cargo.acted=true;addLog(`${cargo.name} steigt in ${carrier.name} ein.`);setToast('EINHEIT EINGESCHIFFT');selected=carrier;updateSelection();draw();maybeAutoAdvancePhase()}
 function unloadAt(carrier,cargo,x,y){if(!canUnloadTo(carrier,cargo,x,y)){setToast('ZIELFELD NICHT VERFUEGBAR');return}transportUnloadMode=null;cargo.embarkedOn=null;cargo.x=x;cargo.y=y;cargo.moved=true;cargo.acted=true;carrier.moved=true;carrier.acted=true;addLog(cargo.name+' verlässt '+carrier.name+'.');setToast('EINHEIT AUSGESCHIFFT');selected=carrier;updateSelection();draw();maybeAutoAdvancePhase()}function showUnitInfo(unit){if(globalThis.GoblinCatalogFullRuntime?.active()&&!GoblinCatalogFullRuntime.known(unit?.id))return;const covered=terrain.has(`${unit.x},${unit.y}`),label=`${String.fromCharCode(65+unit.x)}-${String(unit.y+1).padStart(2,'0')}`;$('#unit-intel-kicker').textContent=unit.team==='player'?'UNIT INTEL':'HOSTILE INTEL';$('#unit-intel-title').textContent=unit.name;$('#unit-intel-copy').textContent=`${unit.type} · ${unit.team==='player'?'FRIENDLY':'HOSTILE'} · SECTOR ${label}`;$('#unit-intel-facts').innerHTML=`<div><span>HP</span><b>${Math.max(0,unit.hp)}/${unit.maxHp}</b></div><div><span>DEFENSE</span><b>${unit.defense??unit.maxHp}</b></div><div><span>MOVE / RANGE</span><b>${unit.move} / ${unit.range}</b></div><div><span>STATUS</span><b>${unit.embarkedOn?'EMBARKED':unit.disabled?'DISABLED':covered?'COVERED':'OPEN'}</b></div>`}function selectPlayerUnit(unit){transportLoadMode=null;transportUnloadMode=null;focusedCell={x:unit.x,y:unit.y};showUnitInfo(unit);showFieldInfo(unit.x,unit.y);if(unit.disabled){setToast(`${unit.name} IST DEAKTIVIERT`);return}if(selected===unit){clearSelection();return}selected=unit;setToast(phaseCanAct(unit)?`${unit.name} AUSGEWÄHLT`:`${unit.name} AUSGEWÄHLT · BEREITS GEHANDELT`);updateSelection();draw()}function selectEnemyUnit(unit){focusedCell={x:unit.x,y:unit.y};selected=unit;setToast(`${unit.name} AUSGEWÄHLT`);showUnitInfo(unit);showFieldInfo(unit.x,unit.y);updateSelection();draw()}function handleUnitClick(unit){if(globalThis.GoblinCatalogFullRuntime?.active()&&!GoblinCatalogFullRuntime.known(unit?.id))return;focusedCell={x:unit.x,y:unit.y};draw();showUnitInfo(unit);showFieldInfo(unit.x,unit.y);if(gameOver||phase!=='player')return;if(transportLoadMode===selected&&unit.team==='player'&&canEmbark(unit,selected)){embark(unit,selected);return}if(selected&&unit.team==='player'&&!selected.transportCapacity&&unit.transportCapacity&&canEmbark(selected,unit)){embark(selected,unit);return}if(unit.team==='player'){selectPlayerUnit(unit);return}const canAttack=selected&&selected.team==='player'&&turnPhase==='fire'&&dist(selected,unit)<=attackRange(selected)&&lineOfSight(selected,unit)&&weaponTargetAllowed(selected,unit);if(canAttack){attack(selected,unit);return}if(selected&&selected.team==='player'){clearSelection(turnPhase!=='fire'?'FEUERPHASE NOCH NICHT AKTIV':'ZIEL NICHT ERREICHBAR');return}selectEnemyUnit(unit)}function handleHex(x,y){focusedCell={x,y};draw();showFieldInfo(x,y);if(gameOver||phase!=='player')return;if(transportUnloadMode&&canUnloadTo(transportUnloadMode.carrier,transportUnloadMode.cargo,x,y)){unloadAt(transportUnloadMode.carrier,transportUnloadMode.cargo,x,y);return}if(!units.some(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y)){clearUnitInfo()}const unit=units.find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);if(unit){showUnitInfo(unit);if(transportLoadMode===selected&&unit.team==='player'&&canEmbark(unit,selected)){embark(unit,selected);return}if(selected&&unit.team==='player'&&!selected.transportCapacity&&unit.transportCapacity&&canEmbark(selected,unit)){embark(selected,unit);return}if(unit.team==='player'){selectPlayerUnit(unit);return}}if(!selected){if(unit?.team==='enemy'){selectEnemyUnit(unit);return}setToast('WÄHLE ZUERST EINE EINHEIT');return}if(selected.disabled){clearSelection('EINHEIT IST DEAKTIVIERT');return}if(unit?.team==='enemy'){if(turnPhase==='movement'&&selected.team==='player'&&selected.id==='ogre'&&!selected.moved&&!unit.core){const allowance=selected.move;const acceptedPath=findMovementPath(selected,{x,y},allowance);if(acceptedPath){const actor=selected;const presentation=globalThis.GoblinLegacyPresentation?.begin(actor,acceptedPath,unit?'ram':'move',unit);actor.moveFrom={x:actor.x,y:actor.y};actor.x=x;actor.y=y;actor.moved=true;actor.acted=true;unit.hp=0;unit.justHit=true;addLog(`${actor.name} rammt ${unit.name}. Ziel zerstört.`);setToast('RAMMSTOSS: ZIEL ZERSTÖRT');selected=null;updateSelection();draw();setTimeout(()=>{unit.justHit=false;draw()},560);const ended=checkVictory();globalThis.GoblinLegacyPresentation?.confirm(presentation);if(ended)return;return}clearSelection('RAMMEN NICHT MÖGLICH');return}const inRange=selected.team==='player'&&dist(selected,unit)<=attackRange(selected),visible=lineOfSight(selected,unit);if(turnPhase==='fire'&&inRange&&visible&&weaponTargetAllowed(selected,unit)){attack(selected,unit);return}if(selected.team==='player'){clearSelection(turnPhase!=='fire'?'FEUERPHASE NOCH NICHT AKTIV':'ZIEL NICHT ERREICHBAR');return}selectEnemyUnit(unit);return}if((turnPhase==='movement'||turnPhase==='gev')&&selected.team==='player'&&!unit){const second=turnPhase==='gev';if(!canMoveUnit(selected,second)){clearSelection('EINHEIT HAT BEREITS GEHANDELT');return}const allowance=movementBudget(selected,second);const acceptedPath=findMovementPath(selected,{x,y},allowance);if(acceptedPath){const actor=selected;const presentation=globalThis.GoblinLegacyPresentation?.begin(actor,acceptedPath,unit?'ram':'move',unit);actor.moveFrom={x:actor.x,y:actor.y};actor.x=x;actor.y=y;carrierCargo(actor).forEach(c=>{c.x=x;c.y=y});actor.moveCount=(actor.moveCount||0)+1;if(second)actor.secondMoved=true;else actor.moved=true;actor.acted=true;globalThis.GoblinLegacyPresentation?.confirm(presentation);addLog(`${actor.name} bewegt sich nach ${String.fromCharCode(65+x)}-${String(y+1).padStart(2,'0')}.`);setToast('BEFEHL AUSGEFÜHRT');selected=null;updateSelection();draw();maybeAutoAdvancePhase()}else clearSelection()}else if(selected.team==='player')clearSelection('IN DIESER PHASE NICHT MÖGLICH')}function startEnemyTurn(chooseEnemyAction,chooseEnemyFireTarget){
-  if(gameOver||phase!=='player')return;
+  if(gameOver||phase!=='player'||globalThis.GoblinCatalogFullRuntime?.allowsPlayerPhaseAdvance?.()===false)return;
   ScenarioRuleProfiles.checkEnemyControllers(legacySession,chooseEnemyAction,chooseEnemyFireTarget);
   selected=null;updateSelection();draw();enemyTurn(chooseEnemyAction,chooseEnemyFireTarget);
 }
@@ -312,33 +312,69 @@ function legacyRuleRevision(){
   return JSON.stringify([currentScenario,legacySession?.sessionId,legacySession?.ruleProfileId,turn,phase,turnPhase,gameOver,
     [...terrain],[...terrainTypes],units.map(({moveFrom,justHit,...unit})=>unit)]);
 }
+function fullEnemyStepQuery(full,actor) {
+  const fail = code => ({ok:false,code});
+  const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
+    Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value,key));
+  return function query(command) {
+    const move = command?.type === 'EnemyMove';
+    if (!exact(command, move ? ['type','actorId','x','y'] : ['type','actorId']) ||
+        (!move && command.type !== 'EnemyHold')) return fail('INVALID_ENEMY_STEP');
+    if (command.actorId !== actor.id || actor.team !== 'enemy' || !units.includes(actor) ||
+        !unitAlive(actor) || actor.disabled || actor.embarkedOn || actor.core)
+      return fail('ENEMY_ACTOR_UNAVAILABLE');
+    if (!move) return {ok:true};
+    const {x,y} = command;
+    if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x >= W || y >= H ||
+        (x === actor.x && y === actor.y)) return fail('INVALID_ENEMY_DESTINATION');
+    const knownRoster = full.roster('enemy');
+    if (knownRoster.some(u => unitAlive(u) && !u.embarkedOn && u.x === x && u.y === y))
+      return fail('ENEMY_DESTINATION_OCCUPIED');
+    const path = findMovementPath(actor,{x,y},actor.move,actor,knownRoster);
+    return path?.length ? {ok:true,path} : fail('ENEMY_DESTINATION_UNREACHABLE');
+  }
+}
+function defaultEnemyStep(full,foe) {
+  const target = (full?.active() ? full.roster(foe.team) : units)
+    .filter(u => u.team === 'player' && unitAlive(u)).sort((a,b) => dist(foe,a) - dist(foe,b))[0];
+  return target ? {target,step:findEnemyStep(foe,target)} : null;
+}
+function applyDefaultEnemyStep(full,foe) {
+  const planned = defaultEnemyStep(full,foe);
+  if (!planned) return;
+  const step = full?.active() ? full.enemyStep(foe,planned.step) : planned.step;
+  if (step) commitEnemyStep(foe,step);
+  else addLog(foe.name + ' hält Position.',true);
+}
+function finishEnemyTurn(full) {
+  if (gameOver || full?.enemyEnd() || checkVictory()) return;
+  const roundCommit = globalThis.GoblinFullRoundSource?.beginBoundary();
+  units.filter(u => u.team === 'player').forEach(u => u.acted = false);
+  phase = 'player';
+  turn++;
+  recoverDisabled('player');
+  resetActionState();
+  if (full?.active()) full.beginTurn('player');
+  turnPhase = 'movement';
+  full?.enterControlledSide?.();
+  globalThis.GoblinFullRoundSource?.complete(roundCommit,turn-1,'complete');
+  $('#turn-number').textContent = String(turn).padStart(2,'0');
+  setTurnPhase('movement');
+  $('#log-status').textContent = 'STANDBY';
+  setToast('WÄHLE EINE EINHEIT');
+  draw();
+}
 function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
   function chooseEnemyStep(full, actor, choose) {
     if (typeof choose !== 'function') return false;
     const session = legacySession, actionTurn = turn;
     let open = true, spent = false, engineFailed = false, engineError;
-    const fail = code => ({ok:false,code});
-    const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
-      Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value,key));
+    const queryStep = fullEnemyStepQuery(full,actor);
     function query(command) {
-      const move = command?.type === 'EnemyMove';
-      if (!exact(command, move ? ['type','actorId','x','y'] : ['type','actorId']) ||
-          (!move && command.type !== 'EnemyHold')) return fail('INVALID_ENEMY_STEP');
       if (!open || !full.active() || legacySession !== session || turn !== actionTurn ||
-          phase !== 'enemy' || turnPhase !== 'enemy' || gameOver) return fail('ENEMY_SLOT_CLOSED');
-      if (command.actorId !== actor.id || actor.team !== 'enemy' || !units.includes(actor) ||
-          !unitAlive(actor) || actor.disabled || actor.embarkedOn || actor.core)
-        return fail('ENEMY_ACTOR_UNAVAILABLE');
-      if (spent) return fail('ENEMY_STEP_SPENT');
-      if (!move) return {ok:true};
-      const {x,y} = command;
-      if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x >= W || y >= H ||
-          (x === actor.x && y === actor.y)) return fail('INVALID_ENEMY_DESTINATION');
-      const knownRoster = full.roster('enemy');
-      if (knownRoster.some(u => unitAlive(u) && !u.embarkedOn && u.x === x && u.y === y))
-        return fail('ENEMY_DESTINATION_OCCUPIED');
-      const path = findMovementPath(actor,{x,y},actor.move,actor,knownRoster);
-      return path?.length ? {ok:true,path} : fail('ENEMY_DESTINATION_UNREACHABLE');
+          phase !== 'enemy' || turnPhase !== 'enemy' || gameOver) return {ok:false,code:'ENEMY_SLOT_CLOSED'};
+      if (spent) return {ok:false,code:'ENEMY_STEP_SPENT'};
+      return queryStep(command);
     }
     function execute(command) {
       try {
@@ -380,6 +416,7 @@ function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
   showPhaseTransition('HOSTILE PHASE');
   $('#log-status').textContent = 'PROCESSING';
   setToast('FEINDZUG WIRD AUSGEFÜHRT');
+  if (globalThis.GoblinCatalogFullRuntime?.startControlledEnemyTurn?.()) return;
   scheduleGameTask(() => {
     const full = globalThis.GoblinCatalogFullRuntime;
     if (full?.active() && (phase !== 'enemy' || turn !== acceptedTurn)) return;
@@ -404,15 +441,7 @@ function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
       if (stale()) return;
       foe.enemyFired = fired;
       if (foe.enemyFired || (fullActive && !canAct(foe))) continue;
-      const targets = (full?.active() ? full.roster(foe.team) : units)
-        .filter(u => u.team === 'player' && unitAlive(u))
-        .sort((a,b) => dist(foe,a) - dist(foe,b));
-      const target = targets[0];
-      if (!target) continue;
-      const planned = findEnemyStep(foe,target);
-      const step = full?.active() ? full.enemyStep(foe,planned) : planned;
-      if (step) commitEnemyStep(foe,step);
-      else addLog(foe.name + ' hält Position.',true);
+      applyDefaultEnemyStep(full,foe);
     }
     for (const foe of foes) {
       if (gameOver) break;
@@ -421,21 +450,7 @@ function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
       if (stale()) return;
       foe.enemyFired = fired;
     }
-    if (gameOver || full?.enemyEnd() || checkVictory()) return;
-    const roundCommit = globalThis.GoblinFullRoundSource?.beginBoundary();
-    units.filter(u => u.team === 'player').forEach(u => u.acted = false);
-    phase = 'player';
-    turn++;
-    recoverDisabled('player');
-    resetActionState();
-    if (full?.active()) full.beginTurn('player');
-    turnPhase = 'movement';
-    globalThis.GoblinFullRoundSource?.complete(roundCommit,turn-1,'complete');
-    $('#turn-number').textContent = String(turn).padStart(2,'0');
-    setTurnPhase('movement');
-    $('#log-status').textContent = 'STANDBY';
-    setToast('WÄHLE EINE EINHEIT');
-    draw();
+    finishEnemyTurn(full);
   },650);
 }
 async function confirmPhaseAdvance(action) {
@@ -497,5 +512,12 @@ function enemyFire(foe){if(unitDead(foe)||foe.disabled)return false;const target
 function updateRoster(){const el=$('#unit-roster');el.innerHTML='';units.filter(u=>u.team==='player').forEach(u=>{const card=document.createElement('div'),covered=!u.embarkedOn&&terrain.has(`${u.x},${u.y}`),carrier=u.embarkedOn?units.find(item=>item.id===u.embarkedOn):null,actionStatus=phaseCanAct(u)?(covered?'COVERED · '+u.type:u.type):phaseDoneLabel(u);const status=unitDead(u)?'DESTROYED':u.embarkedOn?'EMBARKED · '+(carrier?.name||'TRANSPORT'):u.disabled?'DISABLED':u.transportCapacity?'CARGO '+carrierLoad(u)+'/'+u.transportCapacity+' · '+actionStatus:actionStatus;card.className=`unit-card ${u.id==='ogre'?'ogre':''} ${u===selected?'active':''} ${!phaseCanAct(u)&&unitAlive(u)?'acted':''} ${unitDead(u)?'destroyed':''} ${covered&&unitAlive(u)?'covered':''}`;card.innerHTML=`<div class="unit-token">${unitDead(u)?'×':u.icon}</div><div><span class="unit-name">${u.name}</span><span class="unit-type">${status}</span></div><div class="hp-bar">${Array.from({length:u.maxHp},(_,i)=>`<i class="${i>=u.hp?'off':''}"></i>`).join('')}</div>`;card.onclick=()=>{if(unitAlive(u))selectPlayerUnit(u)};el.appendChild(card)});$('#force-count').textContent=String(units.filter(u=>u.team==='player'&&unitAlive(u)).length).padStart(2,'0');const active=units.filter(u=>u.team==='player'&&unitAlive(u)&&!u.disabled),counts={movement:active.filter(u=>phaseCanAct(u,'movement')).length,fire:active.filter(u=>phaseCanAct(u,'fire')).length,gev:active.filter(u=>phaseCanAct(u,'gev')).length};[['movement','MOVE'],['fire','FIRE'],['gev','SKIMMER']].forEach(([key,label])=>{const node=$(`#${key}-ready`);if(node){const eligible=key==='movement'?active.filter(u=>!u.embarkedOn).length:key==='gev'?active.filter(u=>!u.embarkedOn&&isGevUnit(u)).length:active.length;node.textContent=`${label} ${counts[key]}/${eligible}`;node.classList.toggle('active',turnPhase===key)}});const profile=victoryProfile(legacySession.effectiveRules),objective=objectiveSnapshot(profile,units);$('#objective-text').textContent=profile.requiresAllEnemies?`HOSTILES ${objective.remaining}/${objective.total}`:objective.remaining===0?'CORE OFFLINE':`CORE ${objective.remaining===1?'DISABLED':'OPERATIONAL'} · DAMAGE ${objective.total-objective.remaining}/${objective.total}`;$('#objective-progress').style.width=`${objective.progress}%`}
 function phaseReadyForEnemy(){const active=units.filter(u=>u.team==='player'&&unitAlive(u)&&!u.disabled),gevs=active.filter(isGevUnit);return active.every(u=>u.fired)&&gevs.every(u=>u.secondMoved)}function finish(win){gameOver=true;phase='over';turnPhase='over';const result=win?'MISSION COMPLETE':'MISSION FAILED';$('#phase-title').textContent=result;$('#log-status').textContent=win?'SUCCESS':'CRITICAL';$('#end-turn').disabled=true;addLog(`${result} — COMBAT LOG AVAILABLE`);setToast(`${result} · KAMPFBERICHT VERFÜGBAR`);updateSelection();draw()}function reset(){loadScenario(currentScenario)}
 if(!bootProfileError){
-$('#end-turn').onclick=()=>{if(!gameOver&&phase==='player'){const proceed=()=>{if(turnPhase==='movement'){setTurnPhase('fire');return}if(turnPhase==='fire'){setTurnPhase('gev');return}startEnemyTurn()};confirmPhaseAdvance(proceed)}};$('#grid-toggle').onclick=()=>setGridVisible(!gridVisible);$('#reset-game').onclick=reset;document.querySelectorAll('.view-option:not(#grid-toggle)').forEach(button=>button.onclick=()=>setViewMode(button.dataset.view));document.addEventListener('keydown',e=>{if(e.key==='Escape'){selected=null;transportLoadMode=null;transportUnloadMode=null;updateSelection();draw()}if(e.key.toLowerCase()==='f'&&turnPhase==='fire'&&selected){const target=(globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(u=>u.team==='enemy'&&unitAlive(u)&&dist(selected,u)<=attackRange(selected)&&lineOfSight(selected,u)&&weaponTargetAllowed(selected,u));if(target)attack(selected,target)}});addLog('Mission online. Awaiting command.');updatePhaseControls();draw();
+function advanceNativePlayerPhase() {
+  if (globalThis.GoblinCatalogFullRuntime?.allowsPlayerPhaseAdvance?.()===false) return;
+  if (turnPhase==='movement') setTurnPhase('fire');
+  else if (turnPhase==='fire') setTurnPhase('gev');
+  else if (turnPhase==='gev') startEnemyTurn();
+}
+$('#end-turn').onclick=()=>{if(!gameOver&&phase==='player'&&!globalThis.GoblinCatalogFullRuntime?.controllerPort?.())
+  confirmPhaseAdvance(advanceNativePlayerPhase)};$('#grid-toggle').onclick=()=>setGridVisible(!gridVisible);$('#reset-game').onclick=reset;document.querySelectorAll('.view-option:not(#grid-toggle)').forEach(button=>button.onclick=()=>setViewMode(button.dataset.view));document.addEventListener('keydown',e=>{if(e.key==='Escape'){selected=null;transportLoadMode=null;transportUnloadMode=null;updateSelection();draw()}if(e.key.toLowerCase()==='f'&&turnPhase==='fire'&&selected){const target=(globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(u=>u.team==='enemy'&&unitAlive(u)&&dist(selected,u)<=attackRange(selected)&&lineOfSight(selected,u)&&weaponTargetAllowed(selected,u));if(target)attack(selected,target)}});addLog('Mission online. Awaiting command.');updatePhaseControls();draw();
 }

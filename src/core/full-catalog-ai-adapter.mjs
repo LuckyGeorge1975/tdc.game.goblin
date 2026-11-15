@@ -15,7 +15,18 @@ function targetFor(command) {
 
 const kindFor = Object.freeze({Move:'move',EnemyMove:'move',EnemyHold:'hold',CatalogFire:'fire',
   CatalogHexFire:'hex-fire',CatalogRam:'ram',Embark:'load',CatalogLoad:'load',Unload:'unload',
-  CatalogDeploy:'deploy',Engineer:'engineering'});
+  CatalogDeploy:'deploy',Engineer:'engineering',EndPhase:'end-phase'});
+
+function describeOptions(listed,side) {
+  return listed.map(({command,facts,baseline,displayCell})=>({command,executeKind:side,
+    candidate:{kind:kindFor[command.type],actorId:command.actorId??null,
+      target:targetFor({...command,displayCell}),weaponRef:command.weaponId??null,
+      facts:{...facts,...(baseline?{baseline:true}:{}),
+        ...(command.mode?{mode:command.mode,spotterId:command.spotterId}:{}),
+        ...(command.cargoId?{cargoId:command.cargoId}:{}),
+        ...(command.bayId?{bayId:command.bayId}:{}),
+        ...(command.job?{job:command.job,option:command.option}:{})}}}));
+}
 
 export function createFullCatalogAiAdapter(host, readGeneration) {
   let slot = null;
@@ -29,14 +40,7 @@ export function createFullCatalogAiAdapter(host, readGeneration) {
       const listed = side === 'player' ? host.playerOptions() : slot?.entries();
       if (!listed) return {ok:false, code:'AI_FULL_SLOT_UNAVAILABLE'};
       return {ok:true, phase:view.phase, slot:side === 'player' ? view.phase : slot.pass,
-        view, options:listed.map(({command, facts, baseline, displayCell}) => ({command, executeKind:side,
-          candidate:{kind:kindFor[command.type],actorId:command.actorId,
-            target:targetFor({...command,displayCell}),weaponRef:command.weaponId ?? null,
-            facts:{...facts,...(baseline ? {baseline:true} : {}),
-              ...(command.mode ? {mode:command.mode,spotterId:command.spotterId} : {}),
-              ...(command.cargoId ? {cargoId:command.cargoId} : {}),
-              ...(command.bayId ? {bayId:command.bayId} : {}),
-              ...(command.job ? {job:command.job, option:command.option} : {})}}}))};
+        view, options:describeOptions(listed,side)};
     },
     apply: (revision, {command,executeKind}) => {
       const result = executeKind === 'player' ? host.dispatch(command,revision) : slot.execute(command);
@@ -57,6 +61,23 @@ export function createFullCatalogAiAdapter(host, readGeneration) {
     chooseEnemyFire:select=>nativeSlot=>inEnemySlot(nativeSlot,select),
     chooseEnemyStep:select=>nativeSlot=>inEnemySlot({pass:'first-movement',execute:nativeSlot.execute,
       entries:()=>host.enemyStepOptions(nativeSlot)},select)});
+}
+
+export function createOwnedFullCatalogAiAdapter(port,player) {
+  return createAiDecisionAdapter({
+    read:()=>({state:port.ticket('ai')}),
+    describe:(token,side,scope)=>{
+      const opened=port.open('ai'), projection=port.project('ai');
+      if(scope!==undefined||!opened||!projection||opened.permit!==token||token.side!==side)
+        return {ok:false,code:'AI_FULL_SCOPE_UNAVAILABLE'};
+      const listed=side==='enemy'?opened.entries:[...player.playerOptions(),{command:{type:'EndPhase'},facts:{}}];
+      return {ok:true,phase:token.phase,slot:opened.pass,view:projection.view,options:describeOptions(listed,side)};
+    },
+    apply:(token,{command})=>{
+      const result=port.commit('ai',token,command,player.dispatch);
+      return result.ok?{action:command}:{error:{code:result.code??'AI_FULL_COMMAND_REJECTED'}};
+    }
+  });
 }
 
 // Inject the existing player command composer and revision-bound UI gateway.

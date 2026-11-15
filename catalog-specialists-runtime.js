@@ -193,23 +193,33 @@
     objectiveTarget:q.target.core===true,disabledTarget:!!q.target.disabled};
   } catch(error){if(!error.code)throw error;return {ok:false,code:error.code}}
  }
- const oldEnemy=enemyFire;enemyFire=function(u,choose,pass){
-  if(!active())return oldEnemy(u,choose,pass);
+ function* enemyShots(u){
   const full=root.GoblinCatalogFullRuntime;
-  if(full?.active()&&u.catalogId==='U13')return full.enemyHex(u,choose,pass);
-  if(!alive(u)||u.disabled||u.embarkedOn&&!rules(u).passengerRef)return false;
-  let fired=false;
+  if(full?.active()&&u.catalogId==='U13'){
+   const shot=full.enemyHexShot(u);
+   if(shot)yield shot;
+   return;
+  }
+  if(!alive(u)||u.disabled||u.embarkedOn&&!rules(u).passengerRef)return;
   for(const w of weapons(u)){
    if(!unitAlive(u)||gameOver)break;
    if(!w.ready)continue;
    const baseline=candidateCommands(u,w.id).find(legalFire);
    if(!baseline)continue;
+   yield {baseline,commands:()=>candidateCommands(u,w.id,true),
+    preview:c=>firePreview(c,true),apply:c=>executeFire(c,true)};
+  }
+ }
+ const oldEnemy=enemyFire;enemyFire=function(u,choose,pass){
+  if(!active())return oldEnemy(u,choose,pass);
+  const full=root.GoblinCatalogFullRuntime;
+  let fired=false;
+  for(const {baseline,commands,preview,apply} of enemyShots(u)){
    if(typeof choose==='function'){
-    const list=()=>candidateCommands(u,w.id,true), preview=c=>firePreview(c,true), apply=c=>executeFire(c,true);
-    const result=full?.active()?full.chooseEnemyFire(u,pass,baseline,list,preview,apply,choose):
-      chooseNativeEnemyFire(u,pass,baseline,list,preview,apply,choose,legacyRuleRevision,active);
+    const result=full?.active()?full.chooseEnemyFire(u,pass,baseline,commands,preview,apply,choose):
+      chooseNativeEnemyFire(u,pass,baseline,commands,preview,apply,choose,legacyRuleRevision,active);
     if(result===null)return fired;
-   }else executeFire(baseline,true);
+   }else apply(baseline);
    fired=true;
   }
   return fired;
@@ -308,6 +318,6 @@
  function actions(u){return [...(movementBudget(u)>0?[text('v2.ui.move')]:[]),...(weapons(u).length?[text('v2.ui.fire')]:[]),...(rules(u).engineeringRef?['clear','position','bridge','repair-disabled','repair-hp','repair-treads','repair-component','salvage'].map(k=>text('v2.engineer.'+k)):[]),...(forge(u)?[text('v2.ui.embark'),text('v2.ui.catalog.deployDrone')]:[])]}
  const oldInfo=showUnitInfo;showUnitInfo=function(u){if(active()&&system(u)){$('#unit-intel-title').textContent=GoblinCatalogRuntime.name(u);$('#unit-intel-facts').textContent=summary(u);return}oldInfo(u)};
  function fireMetadata(){return intent?{command:intent.command,weaponClass:intent.weaponClass??null,weaponKey:intent.command.weaponId,mode:intent.command.mode,spotterId:intent.command.spotterId,targetComponentId:intent.command.target?.componentId??null}:null}
- root.GoblinSpecialistsRuntime=Object.freeze({active,registry,record,rules,system,sync,areaOutcome,query,fireQuery,firePreview,resolveTarget,applyEffects,execute,engineeringQuery,wreckKey,forge,bayCargo,cargoQuery,ramQuery,weapons,candidateCommands,hasFireAction,resetOwned,validateRestoredState,slotLabel,selectedSpec,summary,projectUnit,actions,appendJournal,fireMetadata});
+ root.GoblinSpecialistsRuntime=Object.freeze({active,registry,record,rules,system,sync,areaOutcome,query,fireQuery,firePreview,resolveTarget,applyEffects,execute,engineeringQuery,wreckKey,forge,bayCargo,cargoQuery,ramQuery,weapons,candidateCommands,hasFireAction,resetOwned,validateRestoredState,slotLabel,selectedSpec,summary,projectUnit,actions,appendJournal,fireMetadata,enemyShots});
 })(globalThis);
 function executeSpecialistCommand(command){return GoblinSpecialistsRuntime.execute(command)}

@@ -186,6 +186,6 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;
   }
-  return {schemaVersion:1,product,entries,legacyLevel,validate,beginSession,beginDraftSession,aiAllowed,checkEnemyControllers,
+  return {schemaVersion:1,product,entries,legacyLevel,validate,beginSession,beginDraftSession,aiAllowed,requireAi,checkEnemyControllers,
     isDraftSession:session=>draftSessions.has(session)};
 })());
