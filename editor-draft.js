@@ -30,14 +30,26 @@
     if (!Object.hasOwn(draft,'events') && !Object.hasOwn(draft,'hotspots')) return null;
     const events = Object.hasOwn(draft,'waveTemplates') ? [] : Object.hasOwn(draft,'events') ? draft.events : [];
     if (!root.GoblinLevelEvents || !Array.isArray(events) || events.length > 24) fail('events');
-    const hooks = events.map(event => {
-      if (!exact(event,['id','when','effect']) || !exact(event.effect,['type','title','text']) ||
+    const hooks = [];
+    const ids = new Set();
+    let deadlineEvent = null;
+    for (const event of events) {
+      if (!exact(event,['id','when','effect']) || !root.GoblinLevelEvents.validId(event.id) || ids.has(event.id))
+        fail('events');
+      ids.add(event.id);
+      if (exact(event.effect,['type']) && event.effect.type === 'remove-enemy-turn-limit') {
+        if (deadlineEvent || !exact(event.when,['event','unitId']) ||
+            event.when.event !== 'UnitDestroyed' || event.when.unitId !== 'core') fail('events');
+        deadlineEvent = event.id;
+        continue;
+      }
+      if (!exact(event.effect,['type','title','text']) ||
           !['dialog','general-dialog'].includes(event.effect.type)) fail('events');
       const {type,title,text} = event.effect;
-      return {id:event.id,when:event.when,show:type==='dialog' ? {style:'standard',title,text} :
-        {style:'general',title,text,portrait:null}};
-    });
-    return {hotspots:Object.hasOwn(draft,'hotspots') ? draft.hotspots : [],hooks};
+      hooks.push({id:event.id,when:event.when,show:type==='dialog' ? {style:'standard',title,text} :
+        {style:'general',title,text,portrait:null}});
+    }
+    return {hotspots:Object.hasOwn(draft,'hotspots') ? draft.hotspots : [],hooks,deadlineEvent};
   }
   function validate(draft) {
     if (!available()) fail('unavailable');
@@ -133,6 +145,7 @@
     if (!units.some(unit => unit.team === 'player')) fail('player');
     const events = eventData(draft);
     if (events) {
+      if (events.deadlineEvent && turnLimit === null) fail('goals');
       try { root.GoblinLevelEvents.validate(events,new Set(units.map(unit => unit.id)),position); }
       catch (error) {
         if (!oldEvents) {
@@ -156,7 +169,7 @@
     const sort = value => Array.isArray(value) ? value.map(sort) : value && typeof value === 'object'
       ? Object.fromEntries(Object.keys(value).sort().map(key => [key,sort(value[key])])) : value;
     const canonical = sort({...draft,version,
-      ...(events ? {hotspots:events.hotspots,events:events.hooks.map(({id,when,show}) =>
+      ...(events ? {hotspots:events.hotspots,events:events.deadlineEvent ? draft.events : events.hooks.map(({id,when,show}) =>
         ({id,when,effect:{type:show.style==='general'?'general-dialog':'dialog',title:show.title,text:show.text}}))} : {})
     });
     delete canonical.hooks;
@@ -208,11 +221,12 @@
       title:'Editor draft', kicker:'G.O.B.L.I.N.', kickerKey:'v2.editor.title',
       sub:'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
       ...(copy.briefing ? {briefing:copy.briefing} : {}),
-      ...(events ? {levelEvents:events} : {}),
+      ...(events ? {levelEvents:{hotspots:events.hotspots,hooks:events.hooks}} : {}),
       units,terrainTypes,terrain:terrainTypes.filter(cell => TerrainRules.coverBonus(cell.type)).map(key),
       catalog:{...source.catalog,records,levelDigest,rosterDigest,terrainDigest,
         full:{version:'catalog-full-levels-v1',source:copy.version,waves,waveTemplates,
-          ...(turnLimit !== null ? {turnLimit} : {})}}});
+          ...(turnLimit !== null ? {turnLimit} : {}),
+          ...(events?.deadlineEvent ? {deadlineEvent:events.deadlineEvent} : {})}}});
     admitted.add(config);
     return config;
   }

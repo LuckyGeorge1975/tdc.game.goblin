@@ -1,0 +1,25 @@
+{
+  "version": "goblin-level-v3",
+  "id": "core-deadline-probe",
+  "scenarioVersion": 1,
+  "ruleProfile": "FULL_CATALOG_v1",
+  "objective": "core-and-escort",
+  "width": 12,
+  "height": 8,
+  "terrain": [],
+  "units": [
+    {"id": "lead-tank", "assetId": "assault-tank", "team": "player", "x": 1, "y": 3},
+    {"id": "first-tank", "assetId": "assault-tank", "team": "player", "x": 2, "y": 5},
+    {"id": "second-tank", "assetId": "assault-tank", "team": "player", "x": 2, "y": 6},
+    {"id": "core", "assetId": "command-core", "team": "enemy", "x": 6, "y": 3},
+    {"id": "guard", "assetId": "guard-tank", "team": "enemy", "x": 4, "y": 6}
+  ],
+  "goals": [{"type": "enemy-turn-limit", "turns": 2}],
+  "events": [
+    {
+      "id": "remove-deadline",
+      "when": {"event": "UnitDestroyed", "unitId": "core"},
+      "effect": {"type": "remove-enemy-turn-limit"}
+    }
+  ]
+}

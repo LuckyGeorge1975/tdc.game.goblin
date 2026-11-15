@@ -51,15 +51,18 @@ function reversibleCommand(action, label, actorId = () => selected?.id) {
       commandDepth--;
       const changed = (work || epoch === commandEpoch) && commandStateKey(before.units) !== commandStateKey(units);
       const hits = events?.finish(work, legacySession, before.units, units, completed && changed, dist, unitAlive);
-      if (hits?.length) {
+      const deadlineRemoved = before.catalogFull?.deadlineRemoved === false &&
+        globalThis.GoblinCatalogFullRuntime.deadlineRemoved();
+      if (hits?.length || deadlineRemoved) {
         // Commit history through the event without resetting the phase's cached dice.
         phaseCommands.length = 0;
         if (epoch === commandEpoch) phaseHasCommittedCommand = true;
-        events.show(hits,legacySession);
+        if (hits?.length) events.show(hits,legacySession);
       } else if (epoch === commandEpoch && changed) {
         phaseCommands.push(before);
       }
       updateBackButton();
+      if (deadlineRemoved && !gameOver) globalThis.GoblinUIV2?.refresh?.();
     }
   };
 }

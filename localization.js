@@ -544,6 +544,8 @@
     'v2.editor.boardHeight': {de:"Kartenzeilen",en:"Map rows",es:"Filas del mapa",fr:"Lignes de la carte"},
     'v2.editor.applySize': {de:"Kartengröße übernehmen",en:"Apply map size",es:"Aplicar tamaño del mapa",fr:"Appliquer la taille de la carte"},
     'v2.editor.turnLimit': {de:"Limit gegnerischer Züge",en:"Enemy turn limit",es:"Límite de turnos enemigos",fr:"Limite de tours ennemis"},
+    'v2.editor.removeEnemyTurnLimit': {de:"Kern zerstört → Zuglimit aufheben",en:"Core destroyed → remove the turn limit",es:"Núcleo destruido → eliminar el límite de turnos",fr:"Noyau détruit → lever la limite de tours"},
+    'v2.full.limit.removed': {de:"Kommandokern zerstört. Das Zuglimit ist aufgehoben.",en:"Command core destroyed. The turn limit has been lifted.",es:"Núcleo de mando destruido. Se ha levantado el límite de turnos.",fr:"Noyau de commandement détruit. La limite de tours est levée."},
     'v2.editor.briefing': {de:"Einsatzbesprechung",en:"Mission briefing",es:"Informe de misión",fr:"Briefing de mission"},
     'v2.editor.localized': {de:"Text in vier Sprachen",en:"Text in four languages",es:"Texto en cuatro idiomas",fr:"Texte en quatre langues"},
     'v2.editor.applyMission': {de:"Missionsdaten übernehmen",en:"Apply mission data",es:"Aplicar datos de misión",fr:"Appliquer les données de mission"},

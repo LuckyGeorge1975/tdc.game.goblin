@@ -153,6 +153,11 @@
     const eventList = node('section'); eventList.append(node('h3',label('events')));
     function editEvent(source, index) {
       const box = node('fieldset');
+      if (source.effect.type === 'remove-enemy-turn-limit') {
+        box.append(node('p',label('removeEnemyTurnLimit')),
+          button('removeEvent',() => view.update({...draft,events:events.filter((_,i) => i !== index)})));
+        return box;
+      }
       const id = node('input'); id.value = source.id; id.maxLength = 48;
       const type = select(['dialog','general-dialog'].map(id => [id,label(id)]),source.effect.type);
       let when = source.when, {title,text} = source.effect;

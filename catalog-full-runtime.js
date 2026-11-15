@@ -10,7 +10,8 @@
  function revision(){return JSON.stringify([legacySession.sessionId,turn,phase,turnPhase,units.map(u=>[u.id,u.x,u.y,unitAlive(u),!!u.disabled,u.embarkedOn??null]),[...terrainTypes]])}
  function ruleStateKey(s) {
   return JSON.stringify([legacySession.sessionId, turn, phase, turnPhase, gameOver, [...terrain], [...terrainTypes],
-   units.map(({moveFrom, justHit, specialistJournal, ...unit}) => unit), s.visibility, s.waves, s.ownTurns, s.terminalOutcome]);
+   units.map(({moveFrom, justHit, specialistJournal, ...unit}) => unit), s.visibility, s.waves, s.ownTurns, s.terminalOutcome,
+   ...(Object.hasOwn(s,'deadlineRemoved') ? [s.deadlineRemoved] : [])]);
  }
  function commandRevision(){const key=ruleStateKey(ensure());if(key!==commandKey){commandKey=key;commandSerial++}return `full:${legacySession.sessionId}:${commandSerial}`}
 
@@ -36,8 +37,9 @@
   if(state?.sessionId!==legacySession.sessionId){
    const teamFire={player:{completed:0,active:false},enemy:{completed:0,active:false}};
    const bindings=units.filter(u=>u.catalogId==='U21').map(u=>({runtimeUnitId:u.id,assetId:u.catalogAssetId,team:u.team,stealthRef:'phantom-stealth-v1'})).sort((a,b)=>a.runtimeUnitId<b.runtimeUnitId?-1:1);
-   const config=legacySession.effectiveRules.catalog.full.waves;
-   state={version:'catalog-full-runtime-v1',sessionId:legacySession.sessionId,visibility:GoblinCatalogVisibility.create(registry(),bindings,facts(teamFire)),waves:config.waves.length?GoblinCatalogWaves.create(config):null,ownTurns:{player:0,enemy:0},terminalOutcome:null,journal:[],logs:[]};
+   const full=legacySession.effectiveRules.catalog.full,config=full.waves;
+   state={version:'catalog-full-runtime-v1',sessionId:legacySession.sessionId,visibility:GoblinCatalogVisibility.create(registry(),bindings,facts(teamFire)),waves:config.waves.length?GoblinCatalogWaves.create(config):null,ownTurns:{player:0,enemy:0},terminalOutcome:null,journal:[],logs:[],
+    ...(full.deadlineEvent ? {deadlineRemoved:false} : {})};
    beginTurn('player');
   }
   return state;
@@ -75,11 +77,46 @@
   const visible=roster(team), ids=new Set(visible.map(u=>u.id));
   return {side:team,phase:turnPhase,turn,terrain:{width:W,height:H,defaultTerrain:'open-ground',
    cells:[...terrainTypes].map(([key,type])=>{const [x,y]=key.split(',').map(Number);return {x,y,type}})},
+   ...(Object.hasOwn(ensure(),'deadlineRemoved') ? {objectives:publicObjectives(team)} : {}),
    units:visible.map(u=>({id:u.id,relation:u.team===team?'own':'opponent',assetId:u.catalogAssetId,
     x:u.x,y:u.y,alive:unitAlive(u),disabled:!!u.disabled,
     embarkedOn:ids.has(u.embarkedOn)?u.embarkedOn:null,objectiveTarget:u.core===true,
     ...(u.catalogSystems?{systems:{treads:u.catalogSystems.treads,components:u.catalogSystems.components.map(c=>
      ({id:c.id,destroyed:c.destroyed,spent:c.spent}))}}:{hp:u.hp,maxHp:u.maxHp})}))};
+ }
+ const coreAlive = () => units.some(unit => unit.id === 'core' && unitAlive(unit));
+ function publicObjectives(team){
+  const s=ensure();
+  const target={kind:'unit',unitId:'core'};
+  const playerAlive=units.some(unit=>unit.team==='player'&&unitAlive(unit));
+  const goals=team==='player' ? [
+   {kind:'destroy-core',target,satisfied:!coreAlive()},
+   {kind:'destroy-escort'},
+   {kind:'survive',satisfied:playerAlive}
+  ] : [
+   {kind:'protect-core',target,satisfied:coreAlive()},
+   {kind:'protect-escort'},
+   {kind:'destroy-player-force',satisfied:!playerAlive}
+  ];
+  if(!s.deadlineRemoved)goals.push({kind:'enemy-turn-limit',turns:turnLimit(s),
+   completedEnemyTurns:s.visibility.teamFire.enemy.completed});
+  return goals;
+ }
+ function turnLimit(s){
+  return s.deadlineRemoved ? null : legacySession.effectiveRules.catalog.full.turnLimit;
+ }
+ function applyDeadlineEvent(){
+  const id=legacySession?.effectiveRules.catalog?.full?.deadlineEvent;
+  if(!id || !active())return;
+  const s=ensure();
+  if(s.deadlineRemoved || coreAlive())return;
+  s.deadlineRemoved=true;
+  s.journal.push({type:'deadline-removed',id});
+  // Both sides know the core and the mission deadline in this draft.
+  log('v2.full.limit.removed');
+ }
+ function deadlineRemoved(){
+  return active() && ensure().deadlineRemoved === true;
  }
  function fireView(binding){const out=copy(binding);if(out?.state)delete out.state.mainTargets;return out}
  function viewerUnit(u){const {specialistJournal,specialistSerial,...publicUnit}=u,out=copy(publicUnit);if(out.catalogFire)out.catalogFire=fireView(out.catalogFire);if(out.spotterId&&!known(out.spotterId))out.spotterId=null;return out}
@@ -88,7 +125,7 @@
  function reveal(subjectId,reason,result=null){if(active())event('reveal',{subjectId,reason,result})}
  function refresh(){if(!active())return;event('refresh');if(selected&&!known(selected.id))selected=null}
  function log(key,params={},subjects=[]){if(active())ensure().logs.push({key,params:copy(params),subjects:[...subjects]})}
- function status(){if(!active())return null;const s=ensure();return {pendingEnemy:pendingEnemy(),enemyTurns:s.visibility.teamFire.enemy.completed,turnLimit:legacySession.effectiveRules.catalog.full.turnLimit}}
+ function status(){if(!active())return null;const s=ensure();return {pendingEnemy:pendingEnemy(),enemyTurns:s.visibility.teamFire.enemy.completed,turnLimit:turnLimit(s)}}
  function stealthText(u){if(!active()||!registry().units[u.catalogAssetId]?.target.stealthRef)return '';const t=(key,params={})=>root.GoblinLanguage?.t(key,params)??key,parts=[t('v2.full.stealth.capability'),t('v2.full.stealth.sensorRule',{range:2}),t('v2.full.stealth.movementRule'),t('v2.full.stealth.eventRule')];if(u.team==='enemy'&&unitAlive(u)&&known(u.id)){const s=ensure();parts.push(t(s.visibility.reveals.some(r=>r.runtimeUnitId===u.id&&r.viewerTeam==='player'&&r.untilFireEnd>s.visibility.teamFire.player.completed)?'v2.full.stealth.eventExpiry':'v2.full.stealth.sensorContact'))}return parts.join(' · ')}
  function logEntries(all=false){if(!active())return [];const rows=all?ensure().logs:ensure().logs.slice(-4);return rows.toReversed().map(e=>{const visible=e.subjects.every(id=>known(id)),key=visible?e.key:'v2.full.stealth.contactLost';let message=root.GoblinLanguage?.t(key,visible?e.params:{})??key;if(visible&&e.action){message+=` · ${e.subjects.map(id=>GoblinCatalogRuntime.name(units.find(u=>u.id===id))).join(' → ')}`;if(e.action.result)message+=` · ${e.action.result}${e.action.ratio?' ('+e.action.ratio+')':''}`}return {time:'',source:'COMMAND',message}})}
  function recordAction(actor,command,result){if(!active())return;const key=result.kind==='hex-fire'?'v2.full.missile.resolved':result.kind==='collision'||result.collided?'v2.full.stealth.collision':result.kind==='engineering'?`v2.engineer.${command.job}`:result.kind==='fire'?'v2.ui.fire':result.kind==='ram'?'v2.ui.ram':['CatalogLoad','Embark'].includes(command.type)?'v2.ui.embark':command.type==='Unload'?'v2.ui.unload':command.type==='CatalogDeploy'?'v2.ui.catalog.deployDrone':'v2.ui.move';log(key,{},result.kind==='fire'?[actor.id,command.target.runtimeUnitId]:[actor.id]);const row=ensure().logs.at(-1);row.action={result:result.outcome?.result??null,ratio:result.outcome?.ratio??null}}
@@ -282,7 +319,7 @@
  function pendingEnemy(){return active()&&ensure().waves?GoblinCatalogWaves.pendingEnemy(ensure().waves):0}
  function terminalOutcome(){return active()?ensure().terminalOutcome:null}
  function enemyBegin(){if(!active())return;fireBoundary('player',false);beginTurn('enemy');fireBoundary('enemy',true)}
- function enemyEnd(){if(!active())return false;fireBoundary('enemy',false);if(checkVictory())return true;if(legacySession.effectiveRules.catalog.full.turnLimit!==null&&ensure().ownTurns.enemy>=legacySession.effectiveRules.catalog.full.turnLimit){finish(false);return true}return false}
+ function enemyEnd(){if(!active())return false;fireBoundary('enemy',false);if(checkVictory())return true;const s=ensure(),limit=turnLimit(s);if(limit!==null&&s.ownTurns.enemy>=limit){finish(false);return true}return false}
  function validateRoster(ids){
   const config=legacySession.config,initial=config.units.map(u=>u.id),templates=config.catalog.full.waveTemplates.map(u=>u.id);
   if(initial.some(id=>!ids.has(id))||[...ids].some(id=>!initial.includes(id)&&!templates.includes(id)))throw Error('FULL_RESTORE_ROSTER');
@@ -292,14 +329,24 @@
  }
  function restore(value){
   if(!active()){if(value!==null)throw Error('FULL_RESTORE_PROFILE');return}
-  if(!exact(value,['version','sessionId','visibility','waves','ownTurns','terminalOutcome','journal','logs'])||value.version!=='catalog-full-runtime-v1'||value.sessionId!==legacySession.sessionId)throw Error('FULL_RESTORE_SESSION');
+  const full=legacySession.effectiveRules.catalog.full;
+  const fields=['version','sessionId','visibility','waves','ownTurns','terminalOutcome','journal','logs'];
+  if(full.deadlineEvent)fields.push('deadlineRemoved');
+  if(!exact(value,fields)||value.version!=='catalog-full-runtime-v1'||value.sessionId!==legacySession.sessionId)throw Error('FULL_RESTORE_SESSION');
   if(!exact(value.ownTurns,['player','enemy'])||!['player','enemy'].every(team=>Number.isInteger(value.ownTurns[team])&&value.ownTurns[team]>=0)||![null,true,false].includes(value.terminalOutcome)||!Array.isArray(value.journal)||!Array.isArray(value.logs))throw Error('FULL_RESTORE_STATE');
   GoblinCatalogVisibility.validate(value.visibility,facts(value.visibility.teamFire),registry());
-  const config=legacySession.effectiveRules.catalog.full.waves;
+  if(full.deadlineEvent && value.deadlineRemoved !== !coreAlive())throw Error('FULL_RESTORE_DEADLINE');
+  const config=full.waves;
   if(config.waves.length){GoblinCatalogWaves.validate(value.waves,config);if(JSON.stringify(value.ownTurns)!==JSON.stringify(value.waves.ownTurns))throw Error('FULL_RESTORE_TURNS')}else if(value.waves!==null)throw Error('FULL_RESTORE_WAVES');
   state=copy(value);
  }
- root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,recordRoundAction,catalogCard,initialRoster,status,stealthText});
+ root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,recordRoundAction,catalogCard,initialRoster,status,stealthText,deadlineRemoved});
+ const oldCheckVictory=checkVictory;
+ checkVictory=function(){
+  // Native combat reaches this boundary after applying damage and before finishing the mission.
+  applyDeadlineEvent();
+  return oldCheckVictory();
+ };
  const oldSetPhase=setTurnPhase;setTurnPhase=function(next){if(active()&&phase==='player'){if(turnPhase==='fire'&&next!=='fire')fireBoundary('player',false);if(next==='fire'&&turnPhase!=='fire')fireBoundary('player',true)}return oldSetPhase(next)};
  const oldFinish=finish;finish=function(win){const roundCommit=!gameOver&&root.GoblinFullRoundSource?.beginBoundary();if(active()){const s=ensure();s.terminalOutcome=win;for(const team of ['player','enemy'])if(s.visibility.teamFire[team].active)fireBoundary(team,false);if(s.waves){const result=GoblinCatalogWaves.discardPending(s.waves);s.waves=result.state;s.journal.push({type:'mission-end',outcome:win,effects:copy(result.effects)})}}const result=oldFinish(win);root.GoblinFullRoundSource?.complete(roundCommit,turn,'terminal-partial');return result};
  const oldHex=handleHex;handleHex=function(x,y){if(!active())return oldHex(x,y);focusedCell={x,y};const occupant=roster().find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);if(!occupant&&selected?.team==='player'&&['movement','gev'].includes(turnPhase))return executeSpecialistCommand({type:'Move',actorId:selected.id,x,y});if(occupant)return handleUnitClick(occupant);showFieldInfo(x,y);draw()};
