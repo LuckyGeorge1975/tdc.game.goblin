@@ -20,7 +20,7 @@ function scene() {
     heading:()=>element('h2'), actions:(...nodes)=>nodes,
     t:key=>key, ScenarioRuleProfiles:{aiAllowed:config=>config.aiAllowed !== false},
     fullSeatBinding:null, fullHandoff:null, fullSetupDialog:null, legacySession:null,
-    GoblinUIV2:{cancelMapPointers() {}}, show:screen=>screens.push(screen)
+    GoblinUIV2:{cancelMapPointers() {},refresh() {}}, show:screen=>screens.push(screen)
   };
   runInNewContext(functions, context);
   return {context, dialogs, screens};
@@ -56,7 +56,8 @@ test('handoff reveals play only after a single successful authorized takeover', 
   const owner = {bind(session, selection, hooks) { ui = hooks; }};
   context.GoblinFullSeatOwner = owner;
   context.legacySession = {sessionId:1,ruleProfileId:'FULL_CATALOG_v1',config:{}};
-  context.bindFullSeats({owner, selection:{player:null,enemy:null}});
+  const start = () => ({leave() {}});
+  context.bindFullSeats({owner, selection:{player:null,enemy:null}}, start);
   const seat = {sessionId:1,generation:2,side:'enemy'};
   assert.equal(ui.handoff({...seat,sessionId:2},()=>true), false);
   for (const generation of [undefined, -1, 1.5, '2', Infinity, Number.MAX_SAFE_INTEGER + 1])
@@ -69,7 +70,7 @@ test('handoff reveals play only after a single successful authorized takeover', 
   context.takeFullSeat();
   context.takeFullSeat();
   assert.equal(calls, 1);
-  assert.deepEqual(screens, ['full-handoff','play']);
+  assert.deepEqual(screens, ['full-handoff','full-seat']);
   assert.equal(ui.handoff(seat,()=>true), false);
   assert.equal(ui.handoff({...seat,generation:1},()=>true), false);
   assert.equal(ui.handoff({...seat,generation:3},()=>false), true);
@@ -77,11 +78,11 @@ test('handoff reveals play only after a single successful authorized takeover', 
   assert.equal(screens.at(-1), 'full-handoff');
   const previousUi = ui;
   context.legacySession = {...context.legacySession,sessionId:2};
-  context.bindFullSeats({owner, selection:{player:null,enemy:null}});
+  context.bindFullSeats({owner, selection:{player:null,enemy:null}}, start);
   assert.equal(previousUi.handoff({...seat,generation:4},()=>true), false);
   assert.equal(ui.handoff({...seat,sessionId:2,generation:1},()=>true), true);
   context.takeFullSeat();
-  assert.equal(screens.at(-1), 'play');
+  assert.equal(screens.at(-1), 'full-seat');
 });
 
 test('owned presentation reads only the assigned channel, including after revocation', () => {

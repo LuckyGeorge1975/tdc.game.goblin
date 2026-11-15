@@ -211,16 +211,21 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         fullSetupDialog = dialog;
       });
     }
-    function bindFullSeats(setup) {
+    function bindFullSeats(setup, start) {
+      fullSeatBinding?.port?.leave();
       fullHandoff = null;
       fullSeatBinding = null;
-      if (!setup || legacySession.ruleProfileId !== 'FULL_CATALOG_v1' || setup.owner !== globalThis.GoblinFullSeatOwner ||
-          !ScenarioRuleProfiles.aiAllowed(legacySession.config)) return;
-      const session = legacySession;
-      const binding = {...setup, session, generation:-1};
+      if (!setup) return start();
+      if (setup.owner !== globalThis.GoblinFullSeatOwner) throw new Error('FULL_CONTROLLER_OWNER');
+      const binding = {...setup, session:null, generation:-1, port:null};
       fullSeatBinding = binding;
-      setup.owner.bind(session, setup.selection, {
+      const ui = {
+        refresh() {
+          if (fullSeatBinding === binding && binding.session === legacySession && screen === 'full-seat')
+            renderScreen(false);
+        },
         handoff(seat, takeSeat) {
+          const session = binding.session ?? legacySession;
           if (legacySession !== session || fullSeatBinding !== binding || fullHandoff ||
               seat?.sessionId !== session.sessionId || !['player', 'enemy'].includes(seat.side) ||
               !Number.isSafeInteger(seat.generation) || seat.generation <= binding.generation ||
@@ -232,7 +237,14 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           show('full-handoff');
           return true;
         }
-      });
+      };
+      const roles = Object.fromEntries(Object.entries(setup.selection).map(([side, id]) =>
+        [side, id === null ? 'human' : 'ai']));
+      binding.port = start({roles, ui});
+      binding.session = legacySession;
+      if (!binding.port) throw new Error('FULL_CONTROLLER_OWNER');
+      setup.owner.bind(binding.session, setup.selection, ui, binding.port);
+      GoblinUIV2.refresh();
     }
     function takeFullSeat() {
       const handoff = fullHandoff;
@@ -241,7 +253,55 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (handoff.takeSeat() !== true) return;
       if (handoff !== fullHandoff || handoff.session !== legacySession) return;
       fullHandoff = null;
-      show('play');
+      show('full-seat');
+    }
+    function showStartedMission() {
+      if (screen !== 'full-handoff') show(fullSeatBinding?.port ? 'full-seat' : 'play');
+    }
+    function renderFullSeat(panel) {
+      const binding = fullSeatBinding;
+      const port = binding?.port;
+      const snapshot = GoblinUIV2.fullSeatPresentation();
+      panel.append(heading(t('v2.full.seats')));
+      if (!port || !snapshot || binding.session !== legacySession) return;
+      const {view, log} = snapshot;
+      panel.append(paragraph(t('ui.hud.turn', {turn:view.turn})), missionPreview({
+        width:view.terrain.width, height:view.terrain.height,
+        terrain:view.terrain.cells, defaultTerrain:view.terrain.defaultTerrain,
+        units:view.units.filter(unit=>unit.alive && !unit.embarkedOn).map(unit=>({
+          ...unit, catalogAssetId:unit.assetId, core:unit.objectiveTarget,
+          team:unit.team ?? (unit.relation === 'own' ? view.side : view.side === 'player' ? 'enemy' : 'player')
+        }))
+      }));
+      const entries = document.createElement('div');
+      entries.className = 'v2-screen-log';
+      entries.append(...log.map(line=>paragraph(line.message)));
+      panel.append(entries);
+      const opened = view.side === 'spectator' ? null : port.open('human');
+      if (opened) {
+        const commands = opened.entries?.map(entry=>entry.command) ??
+          binding.owner.playerCommands?.(port) ?? [];
+        const list = document.createElement('select');
+        list.setAttribute('aria-label', t('v2.full.seats'));
+        const available = opened.entries ? commands : [...commands, {type:'EndPhase'}];
+        for (const [index, command] of available.entries()) {
+          const option = document.createElement('option');
+          option.value = String(index);
+          option.textContent = [command.type, command.actorId,
+            command.target?.runtimeUnitId, Number.isInteger(command.x) && (String.fromCharCode(65 + command.x) + '-' + String(command.y + 1).padStart(2,'0'))].filter(Boolean).join(' · ');
+          list.append(option);
+        }
+        const act = button(t('ui.dialog.confirm'), async () => {
+          const command = available[Number(list.value)];
+          if (!command) return;
+          const apply = () => port.commit('human', opened.permit, command, binding.owner.dispatchPlayer);
+          if (command.type === 'EndPhase') await confirmPhaseAdvance(apply);
+          else apply();
+          if (screen === 'full-seat' && fullSeatBinding === binding) renderScreen(false);
+        });
+        panel.append(list, actions(act));
+      }
+      panel.append(actions(button(t('ui.nav.restart'), confirmRestart), button(t('v2.ui.mainMenu'), () => leaveMission('menu'))));
     }
     // The caller owns the isolated match; the screen owns browser input and
     // restoration of the underlying play session.
@@ -650,14 +710,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       });
       if (!accepted) { renderScreen(false); return; }
       const setup = globalThis.GoblinFullSeatOwner && fullSeatBinding?.session === legacySession ? fullSeatBinding : null;
-      if (campaign?.field) loadEditorDraft(fieldCampaigns[campaign.field].configs[campaign.index]);
-      else if (editorConfig || savedConfig) loadEditorDraft(editorConfig || savedConfig);
+      if (campaign?.field) globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadEditorDraft(fieldCampaigns[campaign.field].configs[campaign.index],control)) : loadEditorDraft(fieldCampaigns[campaign.field].configs[campaign.index]);
+      else if (editorConfig || savedConfig) globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadEditorDraft(editorConfig || savedConfig,control)) : loadEditorDraft(editorConfig || savedConfig);
       else if (globalThis.IronDustBrowserV2?.mode === 'ready') IronDustBrowserV2.restart();
-      else loadScenario(currentScenario);
+      else globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadScenario(currentScenario,control)) : loadScenario(currentScenario);
       bindCampaignLesson();
       GoblinUIV2.resetView();
-      if (globalThis.GoblinFullSeatOwner) bindFullSeats(setup);
-      if (screen !== 'full-handoff') show('play');
+      globalThis.GoblinFullSeatOwner ? showStartedMission() : show('play');
       releasePause();
       if (screen === 'play') GoblinUIV2.startView();
     }
@@ -666,7 +725,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     async function leaveMission(next) {
       if (GameDialogs.isOpen()) return;
       const training=globalThis.GoblinTrainingRuntime?.view()?.definition.mode==='learning';
-      if (screen === 'pause' || screen === 'end' || screen === 'play') {
+      if (['pause', 'end', 'play', 'full-seat', 'full-handoff'].includes(screen)) {
         const menu = next === 'menu';
         const accepted = await GameDialogs.confirm({
           id: 'v2-flow-leave', title: t(menu ? 'v2.dialog.mainMenu.title' : 'dialog.changeMission.title'),
@@ -674,6 +733,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           acceptLabel: t(editorConfig ? 'v2.editor.return' : menu ? 'v2.dialog.mainMenu.confirm' : 'dialog.changeMission.confirm'), cancelLabel: t('dialog.changeMission.cancel')
         });
         if (!accepted) { renderScreen(false); return; }
+        if (globalThis.GoblinFullSeatOwner) {
+          fullSeatBinding?.port?.leave();
+          fullSeatBinding = fullHandoff = null;
+        }
         if (editorConfig) {
           editorConfig = null;
           loadScenario(editorReturnScenario);
@@ -708,7 +771,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const setup = selection && await selection;
       if (selection && (setup === false || screen !== 'briefing' || missionId !== selectedMission ||
           config !== (campaign?.field ? fieldCampaigns[campaign.field].configs[campaign.index] : scenarioCatalog[missionId]))) return;
-      if (campaign?.field) loadEditorDraft(config);
+      if (campaign?.field) globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadEditorDraft(config,control)) : loadEditorDraft(config);
       else if (missionId === 'iron-dust-v2') {
         if (!globalThis.IronDustBrowserV2?.available || !IronDustBrowserV2.startWithDifficulty(briefingDifficulty)) {
           startError = t('v2.reject.start'); renderScreen(false); return;
@@ -716,15 +779,14 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       } else {
         if (!scenarioCatalog[missionId]) return;
         globalThis.IronDustBrowserV2?.stop();
-        loadScenario(missionId);
+        globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadScenario(missionId,control)) : loadScenario(missionId);
       }
       if (!campaign?.field) document.querySelector('#scenario-select').value = missionId;
       bindCampaignLesson();
       started = true;
       startError = '';
       GoblinUIV2.resetView();
-      if (globalThis.GoblinFullSeatOwner) bindFullSeats(setup);
-      if (screen !== 'full-handoff') show('play');
+      globalThis.GoblinFullSeatOwner ? showStartedMission() : show('play');
       releasePause();
       if (screen === 'play') GoblinUIV2.startView();
     }
@@ -780,13 +842,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             surface.querySelector('.v2-screen-panel') !== panel ||
             !GoblinSavedLevels.read().some(level => level.id === latest.id && level.level === latest.level && level.name === latest.name))) return;
         globalThis.IronDustBrowserV2?.stop();
-        loadEditorDraft(config);
+        globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadEditorDraft(config,control)) : loadEditorDraft(config);
         savedConfig = config;
         savedTitle = latest.name;
         started = true;
         GoblinUIV2.resetView();
-        if (globalThis.GoblinFullSeatOwner) bindFullSeats(setup);
-        if (screen !== 'full-handoff') show('play');
+        globalThis.GoblinFullSeatOwner ? showStartedMission() : show('play');
         releasePause();
         if (screen === 'play') GoblinUIV2.startView();
       } catch {
@@ -906,13 +967,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const setup = selection && await selection;
         if (selection && (setup === false || screen !== 'editor' || editorDraft !== draft)) return;
         editorReturnScenario = currentScenario;
-        loadEditorDraft(config);
+        globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadEditorDraft(config,control)) : loadEditorDraft(config);
         editorConfig = config;
         started = true;
         editorError = '';
         GoblinUIV2.resetView();
-        if (globalThis.GoblinFullSeatOwner) bindFullSeats(setup);
-        if (screen !== 'full-handoff') show('play');
+        globalThis.GoblinFullSeatOwner ? showStartedMission() : show('play');
         if (screen === 'play') GoblinUIV2.startView();
       } catch (error) {
         editorError = error.message;
@@ -1362,10 +1422,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       surface.setAttribute('aria-labelledby', 'v2-screen-heading');
       if (screen === 'full-handoff') {
         const accept = button(t('v2.full.takeSeat'), takeFullSeat, 'primary');
-        panel.append(heading(t('v2.full.handoff')), actions(accept));
+        panel.append(heading(t('v2.full.handoff')), actions(accept,
+          button(t('v2.ui.mainMenu'), () => leaveMission('menu'))));
         accept.focus({preventScroll:true});
         return;
       }
+      if (screen === 'full-seat') { renderFullSeat(panel); return; }
       if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return;
       const state = GoblinUIV2.project();
       if (screen === 'menu') {
@@ -1826,7 +1888,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     GoblinLanguage.ready.then(() => renderScreen(false));
     for (const type of ['pointerdown', 'click', 'contextmenu', 'wheel']) {
       globalThis.addEventListener(type, event => {
-        const boundary = spectatorInput?.dialog ?? fullSetupDialog ?? (screen === 'full-handoff' ? surface : null);
+        const boundary = spectatorInput?.dialog ?? fullSetupDialog ??
+          (['full-handoff', 'full-seat'].includes(screen) && !GameDialogs.isOpen() ? surface : null);
         if (!boundary || event.composedPath().includes(boundary)) return;
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -1836,7 +1899,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (event.key === 'Escape') spectatorEscapeHeld = false;
     }, true);
     globalThis.addEventListener('keydown', event => {
-      if (fullSetupDialog || screen === 'full-handoff') {
+      if (fullSetupDialog || ['full-handoff', 'full-seat'].includes(screen) && !GameDialogs.isOpen()) {
         event.stopImmediatePropagation();
         if (screen === 'full-handoff' && event.key === 'Escape') event.preventDefault();
         return;
