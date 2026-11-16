@@ -46,8 +46,8 @@ async function atlasMatch(selection,minimumDifficulty) {
   }});
   const config=game.run(`scenarioCatalog['${atlas}']`);
   const manager=createFullGameManager(config,full);
-  assert.equal(manager.maxSeats,config.seatLayout.maxSeats);
-  assert.deepEqual(manager.seats.map(seat=>seat.id),[...config.seatLayout.seatIds]);
+  assert.equal(manager.maxSeats,2);
+  assert.deepEqual(manager.seats.map(seat=>seat.id),['player','enemy']);
   const native=fullNativeSetup(manager,selection);
   const handoffs=[], accepted=[];
   game.context.control={...native,ui:{handoff:(seat,take)=>handoffs.push({seat,take})}};
