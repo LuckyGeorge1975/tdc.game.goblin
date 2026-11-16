@@ -2,6 +2,31 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## Build 0.1.31 · KI und Rundenanalyse
+
+| Feld | Stand am 16.11.2026 |
+|---|---|
+| Version | `0.1.31` |
+| Build | `31` |
+| Status | Isolierter Release-Kandidat in `goblin-ke2k.6`. Das vorgesehene Tag `v0.1.31` wurde bei der Vorbereitung auf Verfügbarkeit geprüft. |
+| Rückfallpunkt | Öffentlich bereitgestellter Build 30, `v0.1.30` auf `3a008e4c493a6892938910280a55137cd5170734`. Tag und letzter erfolgreicher Pages-Lauf stimmen überein. |
+| Runtimebasis | `9da160904aa9742b31d46d5b86ea50a7d10ba1d8` mit unabhängig geprüfter Variante B. Paketkorrektur aus `c00abf18cbcbeb6fe92805fb27edfb9f7907a7ac`. |
+| Umfang | [Änderungen seit Build 30](../CHANGELOG.md#0131---2026-11-16). Prüfschwerpunkte sind reguläre KI-Auswahl, Zuschauersteuerung, letzte vollständige Runde und terminaler Teil, ereigniszeitliche Spielersicht, Szenarien, eigene Level und Komponentenzielwahl. |
+| Rundenanalyse | Die autorisierte Zuschauer- und Nach-Missionsansicht zeigt Gründe, Basisziel, angenommene Wahl und die dafür berechneten Werte. FULL-Fristvorrang enthält nur Zielbasiswerte. Iron Dust verwendet eine geordnete Zielbasis ohne numerischen Basiswert. Replays halten angenommene Befehle und ihre Checkpoints. |
+| Pages und itch.io | Pages verwendet den bestehenden Workflow. Der manuelle itch.io-Workflow erzeugt standardmäßig ein Paket und seinen Hash. Upload setzt den vorhandenen Publish-Pfad, den geprüften Pages-Commit, das dazugehörige Tag, das `itch-io`-Environment und den dort hinterlegten Butler-Schlüssel voraus. |
+| Abnahme | Bestehende Belege für die Runtimebasis und Paketkorrektur stehen in `goblin-ke2k.1.3` und `goblin-ke2k.6`. Auf dem endgültigen Kandidaten folgen beide unabhängigen Testerrollen und Content/Legal. Der öffentliche Smoke folgt auf die Veröffentlichung. |
+| README-Bild | [FULL-Atlas-Aufnahme aus Build 31](#readme-aufnahme-build-31). |
+
+### README-Aufnahme Build 31
+
+| Feld | Beleg |
+|---|---|
+| Quellbaum | Git-Baum `3dfd50fb085552e4a01328d6e07f9085a42aff81` mit den Runtime-Dateien des Build-31-Kandidaten vor dem Bild- und Dokumentnachlauf. |
+| Aufnahme | Regulärer Desktopstart von FULL Atlas Proving Grounds, Englisch, Zug 1 in der Bewegungsphase. 25 gerenderte Einheitenbilder. Ursprungsbeleg `.tools/ke2k-release-031/readme-capture.json`. |
+| Original | `.tools/ke2k-release-031/readme-capture.png`, PNG, 1600 × 900, 1.065.824 Bytes, SHA256 `a63b6785d749688859efc9d50cd3f73faa3a194851d8d01de77e6caaff4c2349`. |
+| README-Ableitung | [field-test-0.1.31-full-atlas.webp](../docs/images/field-test-0.1.31-full-atlas.webp), WebP, 1600 × 900, 183.122 Bytes, SHA256 `8cd1fbbf943deb1ecf6ebaf49079403188aba15fa86098db08e144c2332c65c3`. |
+| Kompression | Pillow, RGB, Qualität 90, Methode 6. Die Kartenaufnahme wurde visuell geprüft und die WebP-Ableitung dekodiert. |
+
 ## Build 0.1.30 · Bibliothek und eigene Level
 
 | Feld | Stand am 13.11.2026 |

@@ -2,6 +2,14 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden im jeweiligen Release-Issue nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.31] - 2026-11-16
+
+- Im Vollkatalog lässt sich die Steuerung je Seite im Briefing wählen. Berechtigte Missionen bieten den trainierten Angreifer. In Iron Dust V2 stehen Mensch und Trainiert für den Angriff und Schwach, Mittel und Stark für die Verteidigung zur Wahl.
+- KI gegen KI lässt sich als Zuschauer verfolgen und pausieren. Die Rundenanalyse zeigt die letzte vollständige Runde und den abgeschlossenen Teil der Endrunde. In der freigegebenen Sicht zeigt sie aufgezeichnete Auswahlgründe, Basisziel, ausgeführte Wahl und die dafür vorliegenden Wertungen.
+- Scorched Earth und Relay Line bieten Kampagnenmissionen mit eigenen Briefings. Der Editor unterstützt deklarative Vollkatalog-Missionen und öffnet importierte oder gespeicherte Level über das passende Briefing. Die KI-Auswahl berücksichtigt die im Level festgelegten Grenzen und Mindeststufen.
+- Bei der Zielwahl im Vollkatalog bleiben Bauteile im Zielbereich erreichbar. Die Einheitenbibliothek zeigt Sonderaktionen passend zum jeweiligen Regelprofil.
+- Das Hauptmenü bietet einen eigenen Changelog-Eintrag und einen kompakten Rechtshinweis mit Verweis auf die Herkunft der Inhalte.
+
 ## [0.1.30] - 2026-11-13
 
 - Die Einheitenbibliothek kombiniert Bild, Bewegungs- und Feuerkarte und eine Waffenwahl für die Vorschau. Beschreibung, Werte, Sonderaktionen und Strategie sind separat erreichbar. Der Vollkatalog enthält 26 Strategien und 15 verlinkte Regeln in vier Sprachen.

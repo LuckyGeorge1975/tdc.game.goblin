@@ -9,7 +9,7 @@ Alle Berichte werden unverändert im Repository aufbewahrt und über diese Über
 | [Spieletestbericht 2026-09-26](PLAYTEST-REPORT-2026-09-26.md) | `1` | `0.1.4` | Ausgewertet; verständlichere Treffer-, Deaktivierungs- und Core-Anzeige umgesetzt | `0.1.6` |
 | [Legal Review 2026-09-26](LEGAL-REVIEW.md) | `1` | Repository vor `0.1.5` | Offen; technischer Zugriff war blockiert, daher keine inhaltliche Freigabe | noch offen |
 | [Content Clearance 2026-09-26](CONTENT-CLEARANCE.md) | `1` | Content-Branch auf Basis `0.1.5` | Development Review abgeschlossen; formale Legal-Freigabe ausstehend | `0.1.7` |
-| [Content & Asset Notices](../docs/CONTENT-NOTICES.md) | `22` | Öffentliche Kurzfassung nach Legal-Prüfung | Projektzuordnung, Grafikherkunft und taktische Symbole | Vorschau |
+| [Content & Asset Notices](../docs/CONTENT-NOTICES.md) | `24` | Öffentliche Kurzfassung nach Legal-Prüfung | Projektzuordnung, Grafikherkunft, taktische Symbole und KI-Modellherkunft | Vorschau |
 | [Content & Asset Notices, archivierte Langfassung](CONTENT-NOTICES-V21.md) | `21` | Historische Fassung | Herkunftsbelege und Releasehistorie | Archiv |
 | [Content-Clearance-Nachtrag Terrain-Preview 2026-09-30](CONTENT-CLEARANCE-TERRAIN-PREVIEW-2026-09-30.md) | `2` | Lokaler GitHub-Pages-Previewkandidat Build 0.1.13 mit vier Terrain-Stilen | Herkunft und bedingte Legal-Risikoeinschätzung dokumentiert; keine verbindliche Rechts- oder Produktfreigabe | offen |
 | [Spieletestbericht Build 0.1.7](PLAYTEST-REPORT-0.1.7-2026-09-26.md) | `1` | `0.1.7` | Bestanden; Nomenklatur, Unit Guide, Systemschriften und Herkunftshinweise bestätigt | `0.1.8` |

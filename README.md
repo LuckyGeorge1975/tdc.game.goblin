@@ -4,13 +4,15 @@ G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence
 
 ## Aktueller Stand
 
-**0.1.30 / Build 30 vom 13.11.2026** ist der lokale Release-Kandidat. Die Einheitenbibliothek zeigt Bewegungs- und Feuerreichweiten sowie verlinkte Regeln. Eigene Level lassen sich im Browser speichern und aus der Missionsauswahl spielen. [Änderungen seit Build 29](CHANGELOG.md#0130---2026-11-13) · [Test-Handoff](reports/TEST_HANDOFF.md#build-0130--bibliothek-und-eigene-level)
+**0.1.31 / Build 31 vom 16.11.2026** ist der lokale Release-Kandidat. Im Vollkatalog und in Iron Dust V2 stehen trainierte Angreifer zur Wahl. Im Zuschauermodus lassen sich KI-Partien pausieren und abgeschlossene Runden mit den aufgezeichneten Entscheidungen ansehen. [Änderungen seit Build 30](CHANGELOG.md#0131---2026-11-16) · [Test-Handoff](reports/TEST_HANDOFF.md#build-0131--ki-und-rundenanalyse)
 
-![Build 0.1.30 – FULL Atlas Proving Grounds mit sichtbaren Einheiten auf der Hexkarte](docs/images/field-test-0.1.30-full-atlas.webp)
+![Build 0.1.31 – FULL Atlas Proving Grounds mit sichtbaren Einheiten auf der Hexkarte](docs/images/field-test-0.1.31-full-atlas.webp)
 
-*FULL Atlas Proving Grounds in Build 0.1.30, Englisch, Zug 1 in der Bewegungsphase. Zu sehen sind 18 eigene und sieben sichtbare gegnerische Einheiten. [Herkunft und Bildprüfung](reports/TEST_HANDOFF.md#readme-aufnahme-build-30)*
+*FULL Atlas Proving Grounds in Build 0.1.31, Englisch, Zug 1 in der Bewegungsphase. [Herkunft und Bildprüfung](reports/TEST_HANDOFF.md#readme-aufnahme-build-31)*
 
 ## Frühere Desktopstände
+
+**0.1.30 / Build 30 vom 13.11.2026** ergänzte die Bibliotheksvorschau für Bewegungs- und Feuerreichweiten sowie das Speichern eigener Level im Browser. [Historische Atlas-Aufnahme](docs/images/field-test-0.1.30-full-atlas.webp) · [Build-30-Handoff](reports/TEST_HANDOFF.md#build-0130--bibliothek-und-eigene-level)
 
 **0.1.29 / Build 29 vom 12.11.2026** führte das Hex-Kontextmenü, die maximierbare Desktop-Karte und den kanonischen v3-Export im Level-Editor ein. [Historische Atlas-Aufnahme](docs/images/field-test-0.1.29-full-atlas.webp) · [Herkunft und Bildprüfung](reports/TEST_HANDOFF.md#readme-aufnahme-build-29)
 
