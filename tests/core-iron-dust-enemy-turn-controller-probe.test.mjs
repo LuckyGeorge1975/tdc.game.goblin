@@ -85,7 +85,8 @@ function legacyTurn(seed, changes = {}) {
     game.indexOf('const builtInLevels', crtStart) - 1;
   vm.runInContext(`${game.slice(crtStart, crtEnd + 1)}\n` +
     ['hexNeighbors', 'dist', 'findEnemyStep', 'commitEnemyStep', 'recoverDisabled', 'combatRatio',
-      'applyCombatRoll', 'combatOutcome', 'enemyTurn'].map(name => extract(name)).join('\n') +
+      'applyCombatRoll', 'combatOutcome', 'defaultEnemyStep', 'applyDefaultEnemyStep',
+      'finishEnemyTurn', 'enemyTurn'].map(name => extract(name)).join('\n') +
     '\n' + extract('enemyFire', true), context);
   vm.runInContext('enemyTurn()', context);
   return {units, rng, turn: context.turn};

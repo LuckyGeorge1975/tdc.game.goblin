@@ -20,7 +20,7 @@ test('phase modal times out, migrates off preference and yields to safety dialog
     const map = {getBoundingClientRect: () => ({top:50,bottom:850,left:300,right:1300})};
     const elements = {'#v2-phase-notice':notice, '#v2-phase':badge, '#v2-map':map};
     const context = vm.createContext({view:{}, at:key=>elements[key], t:key=>key, innerHeight:900, innerWidth:1500,
-      GameDialogs:{isOpen:()=>false},
+      GameDialogs:{isOpen:()=>false}, core:()=>false,
       localStorage:{getItem:key=>storage.get(key),setItem:(key,value)=>storage.set(key,value)},
       document:{body:{classList:{contains:()=>false}},addEventListener:(name,fn)=>{events[name]=fn}},
       setTimeout:(fn,ms)=>{context.expire=fn;context.delay=ms;return 1;},clearTimeout(){}});

@@ -47,7 +47,8 @@ function legacyNoActionCycle() {
     scheduleGameTask(callback) {scheduled = callback}
   });
   const game = readFileSync(new URL('../game.js', import.meta.url), 'utf8');
-  const code = ['recoverDisabled', 'setTurnPhase', 'enemyTurn']
+  const code = ['recoverDisabled', 'setTurnPhase', 'defaultEnemyStep', 'applyDefaultEnemyStep',
+    'finishEnemyTurn', 'enemyTurn']
     .map(name => extractFunction(game, name)).join('\n') + '\n' +
     extractFunction(game, 'resetActionState', true);
   vm.runInContext(code, context);

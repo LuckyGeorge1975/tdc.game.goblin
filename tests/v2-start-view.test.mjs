@@ -88,17 +88,17 @@ test('only a successful start or accepted restart requests the initial view afte
       currentScenario:'relay-run',loadScenario:id=>calls.push('load:'+id),
       IronDustBrowserV2:{mode:engine==='core'?'ready':'inactive',restart(){calls.push('restart')}},
       GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},
-      show:screen=>calls.push(screen),releasePause:()=>calls.push('resume'),renderScreen(){}};
+      screen:'pause',show(screen){context.screen=screen;calls.push(screen)},releasePause:()=>calls.push('resume'),renderScreen(){}};
     runInNewContext(restart+'\nglobalThis.restart=confirmRestart;',context);
     await context.restart();
     assert.deepEqual(calls,accepted?[engine==='core'?'restart':'load:relay-run','reset','play','resume','start-view']:[]);
   }
   const start=flow.slice(flow.indexOf('    async function startMission() {'),flow.indexOf('    function libraryAssetId('));
   for(const succeeds of [false,true]){
-    const calls=[],context={campaign:null,briefingDifficulty:'strong',bindCampaignLesson(){},GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'iron-dust-v2',
-      t:key=>key,renderScreen(){},IronDustBrowserV2:{available:true,startWithDifficulty:difficulty=>{assert.equal(difficulty,'strong');return succeeds}},
+    const calls=[],context={campaign:null,briefingDifficulty:'strong',briefingAttacker:'human',bindCampaignLesson(){},GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'iron-dust-v2',scenarioCatalog:{},
+      t:key=>key,renderScreen(){},IronDustBrowserV2:{available:true,startWithDifficulty:(difficulty,minimum,attacker)=>{assert.deepEqual([difficulty,minimum,attacker],['strong',undefined,'human']);return succeeds}},
       document:{querySelector:()=>({})},GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},
-      show:screen=>calls.push(screen),releasePause:()=>calls.push('resume')};
+      screen:'briefing',show(screen){context.screen=screen;calls.push(screen)},releasePause:()=>calls.push('resume')};
     runInNewContext(start+'\nglobalThis.start=startMission;',context);
     await context.start();
     assert.deepEqual(calls,succeeds?['reset','play','resume','start-view']:[]);
@@ -107,7 +107,7 @@ test('only a successful start or accepted restart requests the initial view afte
     scenarioCatalog:{'relay-run':{}},loadScenario:id=>calls.push('load:'+id),
     IronDustBrowserV2:{stop:()=>calls.push('stop-core')},document:{querySelector:()=>({})},
     GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},
-    show:screen=>calls.push(screen),releasePause:()=>calls.push('resume')};
+    screen:'briefing',show(screen){context.screen=screen;calls.push(screen)},releasePause:()=>calls.push('resume')};
   runInNewContext(start+'\nglobalThis.start=startMission;',context);await context.start();
   assert.deepEqual(calls,['stop-core','load:relay-run','reset','play','resume','start-view']);
 });
@@ -124,6 +124,6 @@ test('Iron Dust difficulty control starts at Medium, updates the choice and is s
   select.value='weak';
   select.onchange();
   assert.equal(context.difficultyControl().children[0].value,'weak');
-  assert.match(flow,/if \(next === 'briefing' && previous !== 'briefing'\) briefingDifficulty = 'medium'/);
-  assert.match(flow,/if \(missionId === 'iron-dust-v2' && data\) header\.append\(difficultyControl\(\)\)/);
+  assert.match(flow,/if \(next === 'briefing' && previous !== 'briefing'\) \{\s*briefingDifficulty = 'medium'/);
+  assert.match(flow,/if \(missionId === 'iron-dust-v2' && data\) \{\s*header\.append\(ironDustAttackerControl\(\), difficultyControl\(\)\)/);
 });
