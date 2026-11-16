@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import test from 'node:test';
 import {runInNewContext} from 'node:vm';
+import {createGameManager} from '../src/core/game-manager.mjs';
+import {fullNativeSetup} from '../full-standard-seat-owner.mjs';
 
 const flow = readFileSync(new URL('../ui-v2-flow.js', import.meta.url), 'utf8');
 const functions = flow.slice(flow.indexOf('    function chooseFullSeats('),
@@ -18,7 +20,7 @@ function scene() {
   const context = {
     document:{createElement:element,body:{append:node=>dialogs.push(node)}},
     heading:()=>element('h2'), actions:(...nodes)=>nodes,
-    t:key=>key, ScenarioRuleProfiles:{aiAllowed:config=>config.aiAllowed !== false},
+    t:key=>key, paragraph:()=>element('p'),
     fullSeatBinding:null, fullHandoff:null, fullSetupDialog:null, legacySession:null,
     GoblinUIV2:{cancelMapPointers() {},refresh() {}}, show:screen=>screens.push(screen)
   };
@@ -29,15 +31,26 @@ function scene() {
 test('FULL start distinguishes standard play from explicit seats and limits offers by side', async () => {
   const {context, dialogs} = scene();
   const config = {ruleProfileId:'FULL_CATALOG_v1'};
-  context.GoblinFullSeatOwner = {offers:()=>({player:[{id:'test',label:'Test'}],enemy:[]})};
-  assert.equal(context.chooseFullSeats({...config,aiAllowed:false}), null);
+  context.GoblinFullSeatOwner = {
+    configure:config=>createGameManager({maxSeats:2,seatIds:['player','enemy'],aiAllowed:config.aiAllowed},{
+      player:{human:true,ai:[{id:'test',difficulty:'weak'}]},enemy:{human:true,ai:[]}
+    }),
+    offers:()=>null
+  };
+  const disabled=context.chooseFullSeats({...config,aiAllowed:false});
+  const disabledDialog=dialogs.shift();
+  assert.deepEqual(disabledDialog.children[0].children
+    .filter(node=>node.tag==='label').map(node=>node.children[0].children.map(option=>option.value)),[[''],['']]);
+  disabledDialog.returnValue='configured';
+  disabledDialog.close();
+  assert.deepEqual({...((await disabled).selection)},{player:null,enemy:null});
   const standard = context.chooseFullSeats(config);
   dialogs[0].returnValue = 'standard';
   dialogs[0].close();
   assert.equal(await standard, null);
   const configured = context.chooseFullSeats(config);
   const dialog = dialogs[1];
-  const [, player, enemy] = dialog.children[0].children;
+  const [player,enemy] = dialog.children[0].children.filter(node=>node.tag==='label');
   assert.deepEqual(player.children[0].children.map(option=>option.value), ['', 'test']);
   assert.deepEqual(enemy.children[0].children.map(option=>option.value), ['']);
   dialog.returnValue = 'configured';
@@ -53,10 +66,18 @@ test('FULL start distinguishes standard play from explicit seats and limits offe
 test('handoff reveals play only after a single successful authorized takeover', () => {
   const {context, screens} = scene();
   let ui;
-  const owner = {bind(session, selection, hooks) { ui = hooks; }};
+  const game=createGameManager({maxSeats:2,seatIds:['player','enemy']},{
+    player:{human:true,ai:[]},enemy:{human:true,ai:[]}
+  });
+  const owner = {nativeSetup:(_,selection)=>fullNativeSetup(game,selection),
+    bind(session, selection, hooks) { ui = hooks; }};
   context.GoblinFullSeatOwner = owner;
   context.legacySession = {sessionId:1,ruleProfileId:'FULL_CATALOG_v1',config:{}};
-  const start = () => ({leave() {}});
+  const start = control => {
+    assert.deepEqual(control.roles,{player:'human',enemy:'human'});
+    assert.deepEqual(control.policyIds,{});
+    return {leave() {}};
+  };
   context.bindFullSeats({owner, selection:{player:null,enemy:null}}, start);
   const seat = {sessionId:1,generation:2,side:'enemy'};
   assert.equal(ui.handoff({...seat,sessionId:2},()=>true), false);

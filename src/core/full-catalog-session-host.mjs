@@ -1,5 +1,6 @@
 import {createFullCatalogAiAdapter,createOwnedFullCatalogAiAdapter,sameFullCatalogActionSlot} from './full-catalog-ai-adapter.mjs?v=4';
 import {createAiSessionHost} from './ai-session-host.mjs?v=3';
+import {createPlayerController} from './game-manager.mjs?v=1';
 
 export function createFullCatalogSessionHost({host, read, readGeneration, select, selectEnemy, policy, onCommit, spectator = false}) {
   const adapter = createFullCatalogAiAdapter(host, readGeneration);
@@ -39,7 +40,7 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
     return {...state,session:state.sessionId,engine:state.generation};
   };
   const ai=createAiSessionHost({adapter,read,spectator:true,
-    select:(batch,report)=>attempted.select(batch,report),
+    select:(batch,report)=>attempted.controller.nextCommand(batch,report),
     remember(batch,key,evidence){if(attempted)attempted.intent=adapter.remember(batch,key,evidence);},commit:onCommit});
   function continueChoice(attempt,state){
     if(!attempt.intent)return null;
@@ -58,7 +59,7 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
     if(!ticket)return {ok:false,code:'AI_FULL_NO_NEW_ACTION'};
     if(sameFullCatalogActionSlot(ticket,attempted?.ticket))
       return continueChoice(attempted,state)??{ok:false,code:'AI_FULL_NO_NEW_ACTION'};
-    const attempt=attempted={ticket,intent:null,select:choose};
+    const attempt=attempted={ticket,intent:null,controller:createPlayerController(ticket.side,choose)};
     pending=true;
     try{
       const result=await ai.advance();

@@ -7,6 +7,7 @@ import {createIronDustProfile, dispatchIronDustProfile, projectIronDustProfile,
 import {choosePlayerAction} from '../src/core/iron-dust-objective-policy.mjs?v=1';
 import {IRON_DUST_TRAINED_SCOPE, prepareIronDustTrainedPolicy} from '../src/core/iron-dust-trained-policy.mjs?v=1';
 import {hexDistance} from '../src/core/hex.mjs';
+import {createPlayerController} from '../src/core/game-manager.mjs';
 
 const {base64} = JSON.parse(readFileSync(new URL('../assets/ai/iron-dust-target-bpn.json', import.meta.url)));
 const bytes = Buffer.from(base64, 'base64');
@@ -37,14 +38,20 @@ test('the qualified holdout changes only the target at the first divergent nativ
       assert.equal(batch.ok,true);
       assert.throws(() => policy.select({...IRON_DUST_TRAINED_SCOPE,profile:'FULL_CATALOG_v1'}, {...batch,baseline}),
         /AI_POLICY_SCOPE_MISMATCH/);
-      const key = policy.select(IRON_DUST_TRAINED_SCOPE,{...batch,baseline});
+      const controller=createPlayerController('player',(decision,report)=>
+        policy.select(IRON_DUST_TRAINED_SCOPE,{...decision,baseline},report));
+      assert.equal(controller.nextCommand({...batch,side:'enemy'}),undefined);
+      const key=controller.nextCommand(batch);
       const {actorId,weaponRef,target} = batch.candidates.find(candidate=>candidate.key===key);
       assert.equal(actorId,baseline.unitId);
       assert.equal(weaponRef,baseline.weaponKey??null);
       assert.equal(target.unitId,step===21?'raider':baseline.targetId);
       if (step === 21) {
         assert.deepEqual([baseline.unitId,baseline.weaponKey,baseline.targetId],['ogre','missiles','guard']);
-        const trained = dispatchIronDustProfile(profile,{...baseline,targetId:target.unitId});
+        const trained=adapter.execute({schemaVersion:batch.schemaVersion,
+          decisionId:batch.decisionId,revision:batch.revision,key});
+        assert.equal(trained.ok,true);
+        assert.deepEqual(trained.action,{...baseline,targetId:target.unitId});
         assert.ok(trained.events.some(event=>event.type==='PlayerFireResolved'));
         assert.equal(projectIronDustProfile(trained.profile).state.rng.state,
           projectIronDustProfile(ordinary.profile).state.rng.state);

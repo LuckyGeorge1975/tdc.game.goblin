@@ -124,6 +124,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let optionsScrollObserver = null;
     let briefingDifficulty = 'medium';
     let briefingAttacker = 'human';
+    const ironDustSeatScreens = ['iron-dust-handoff','iron-dust-defense'];
+    let syncingIronDustSeat = false;
     let libraryIndex = 0, libraryTab = 'description', libraryArtSide = 'own', libraryMapMode = 'move';
     let libraryWeapon = null, libraryRule = null, libraryLiveId = null;
     let libraryKind = 'units', terrainIndex = 0;
@@ -160,10 +162,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const owner = globalThis.GoblinFullSeatOwner;
       if (fullSetupDialog) return Promise.resolve(false);
       if (!owner || config?.ruleProfileId !== 'FULL_CATALOG_v1') return null;
-      const legacyOffers = ScenarioRuleProfiles.aiAllowed(config) ? owner.offers(config) : null;
-      const qualification = globalThis.GoblinCatalogFullRuntime?.controllerOffers?.(config);
-      if (!legacyOffers && !qualification) return null;
-      const legacyStartAllowed = qualification?.legacyStartAllowed ?? true;
+      const game = owner.configure(config);
+      if (!game) return null;
+      const legacyStartAllowed = game.minimumDifficulty === null;
+      const legacyOffers = owner.offers(config);
       const dialog = document.createElement('dialog');
       dialog.className = 'game-dialog';
       const form = document.createElement('form');
@@ -171,18 +173,15 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const title = heading(t('v2.full.seats'));
       dialog.setAttribute('aria-labelledby', title.id = 'v2-full-seat-heading');
       form.append(title);
-      const selectors = ['player', 'enemy'].map(side => {
+      const selectors = game.seats.map(({id:side,ai,aiUnavailable}) => {
         const label = document.createElement('label');
         label.textContent = t('v2.full.seat.' + side) + ' ';
         const select = document.createElement('select');
-        const rated = qualification?.[side];
         const choices = new Map([['', {label:t('v2.full.human')}]]);
-        if (legacyStartAllowed) {
-          for (const offer of legacyOffers?.[side] ?? []) choices.set(offer.id, offer);
-        }
-        for (const {id, difficulty} of rated?.choices ?? []) {
+        for (const {id,difficulty} of ai) {
+          const legacy = legacyOffers?.[side]?.find(offer=>offer.id===id);
           const labelKey = difficulty === null ? 'v2.full.trained' : 'v2.difficulty.' + difficulty;
-          choices.set(id, {label:t(labelKey), policyId:id});
+          choices.set(id, {label:legacy?.label ?? t(labelKey)});
         }
         for (const [id, {label:copy}] of choices) {
           const option = document.createElement('option');
@@ -192,10 +191,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         }
         label.append(select);
         form.append(label);
-        if (choices.size === 1 && rated?.reason) {
-          const reason = rated.reason === 'FULL_AI_MINIMUM_UNAVAILABLE' ?
-            t('v2.full.minimumUnavailable').replace('{minimum}', t('v2.difficulty.' + qualification.minimumDifficulty)) :
-            t(rated.reason === 'AI_LEVEL_FORBIDDEN' ? 'v2.full.aiForbidden' : 'v2.full.aiUnavailable');
+        if (aiUnavailable) {
+          const reason = aiUnavailable === 'AI_MINIMUM_UNAVAILABLE' ?
+            t('v2.full.minimumUnavailable').replace('{minimum}', t('v2.difficulty.' + game.minimumDifficulty)) :
+            t(aiUnavailable === 'AI_LEVEL_FORBIDDEN' ? 'v2.full.aiForbidden' : 'v2.full.aiUnavailable');
           const note = paragraph(reason, 'v2-screen-meta');
           select.setAttribute('aria-describedby', note.id = 'v2-full-seat-reason-' + side);
           form.append(note);
@@ -224,22 +223,19 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
               selectors.some(({select, choices}) => !choices.has(select.value))) return resolve(false);
           const selection = Object.freeze(Object.fromEntries(
             selectors.map(({side, select}) => [side, select.value || null])));
-          const policyIds = Object.freeze(Object.fromEntries(selectors.flatMap(({side, select, choices}) => {
-            const id = choices.get(select.value).policyId;
-            return id ? [[side, id]] : [];
-          })));
-          resolve({owner, selection, policyIds});
+          resolve({owner,config,selection});
         }, {once:true});
         dialog.showModal();
         fullSetupDialog = dialog;
       });
     }
     function bindFullSeats(setup, start) {
+      if (setup && setup.owner !== globalThis.GoblinFullSeatOwner) throw new Error('FULL_CONTROLLER_OWNER');
+      const native = setup && setup.owner.nativeSetup(setup.config,setup.selection);
       closeFullSeatBinding();
       fullHandoff = null;
       fullSeatBinding = null;
       if (!setup) return start();
-      if (setup.owner !== globalThis.GoblinFullSeatOwner) throw new Error('FULL_CONTROLLER_OWNER');
       const binding = {...setup, session:null, generation:-1, port:null};
       fullSeatBinding = binding;
       const ui = {
@@ -261,9 +257,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           return true;
         }
       };
-      const roles = Object.fromEntries(Object.entries(setup.selection).map(([side, id]) =>
-        [side, id === null ? 'human' : 'ai']));
-      binding.port = start({roles, policyIds:setup.policyIds, ui});
+      binding.port = start({...native,ui});
       binding.session = legacySession;
       if (!binding.port) throw new Error('FULL_CONTROLLER_OWNER');
       const host = setup.owner.bind(binding.session, setup.selection, ui, binding.port);
@@ -403,7 +397,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const act = button(t('ui.dialog.confirm'), async () => {
           const command = available[Number(list.value)];
           if (!command) return;
-          const apply = () => port.commit('human', opened.permit, command, binding.owner.dispatchPlayer);
+          const apply = () => binding.owner.commitHuman(port,opened.permit,view,command);
           if (command.type === 'EndPhase') await confirmPhaseAdvance(apply);
           else apply();
           if (fullSeatBinding !== binding) return;
@@ -846,7 +840,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     async function leaveMission(next) {
       if (GameDialogs.isOpen()) return;
       const training=globalThis.GoblinTrainingRuntime?.view()?.definition.mode==='learning';
-      if (['pause', 'end', 'play', 'full-seat', 'full-handoff'].includes(screen)) {
+      if (['pause', 'end', 'play', 'full-seat', 'full-handoff', ...ironDustSeatScreens].includes(screen)) {
         const menu = next === 'menu';
         const accepted = await GameDialogs.confirm({
           id: 'v2-flow-leave', title: t(menu ? 'v2.dialog.mainMenu.title' : 'dialog.changeMission.title'),
@@ -895,7 +889,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (campaign?.field) globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadEditorDraft(config,control)) : loadEditorDraft(config);
       else if (missionId === 'iron-dust-v2') {
         if (!globalThis.IronDustBrowserV2?.available ||
-            !IronDustBrowserV2.startWithDifficulty(briefingDifficulty, undefined, briefingAttacker)) {
+            !IronDustBrowserV2.startSeats({player:briefingAttacker==='human'?null:briefingAttacker,
+              enemy:briefingDifficulty==='human'?null:briefingDifficulty})) {
           startError = t('v2.reject.start'); renderScreen(false); return;
         }
       } else {
@@ -1018,7 +1013,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       label.textContent = t('v2.full.seat.player') + ' ';
       const select = document.createElement('select');
       select.id = 'v2-briefing-attacker';
-      const available = IronDustBrowserV2.trainedAvailable;
+      const available = IronDustBrowserV2.seatManager().seats[0].ai.some(option=>option.id==='trained');
       for (const attacker of available ? ['human','trained'] : ['human']) {
         const option = document.createElement('option');
         option.value = attacker;
@@ -1036,17 +1031,72 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       label.textContent = t('v2.full.seat.enemy') + ' ';
       const select = document.createElement('select');
       select.id = 'v2-briefing-difficulty';
-      for (const difficulty of IronDustBrowserV2.difficulties) {
+      const difficulties=IronDustBrowserV2.seatManager().seats[1].ai.map(option=>option.id);
+      const choices=['human',...difficulties];
+      for (const difficulty of choices) {
         const option = document.createElement('option');
         option.value = difficulty;
-        option.textContent = t('v2.difficulty.' + difficulty);
+        option.textContent = t(difficulty==='human'?'v2.full.human':'v2.difficulty.' + difficulty);
         select.append(option);
       }
-      if (!IronDustBrowserV2.difficulties.includes(briefingDifficulty)) briefingDifficulty = IronDustBrowserV2.difficulties[0];
+      if (!choices.includes(briefingDifficulty)) briefingDifficulty = difficulties[0]??'human';
       select.value = briefingDifficulty;
       select.onchange = () => { briefingDifficulty = select.value; };
       label.append(select);
       return label;
+    }
+    function syncIronDustSeat() {
+      const host=globalThis.IronDustBrowserV2;
+      if (syncingIronDustSeat || host?.mode!=='ready' ||
+          !['play',...ironDustSeatScreens].includes(screen) || GameDialogs.isOpen()) return;
+      const next=host.pendingSeat?'iron-dust-handoff':host.defenseOffer()?'iron-dust-defense':'play';
+      syncingIronDustSeat=true;
+      try {
+        if (screen!==next) show(next);
+        else if (next==='iron-dust-defense') renderScreen(false);
+      } finally {syncingIronDustSeat=false;}
+    }
+    function renderIronDustSeat(panel) {
+      const host=IronDustBrowserV2;
+      const leave=button(t('v2.ui.mainMenu'),()=>leaveMission('menu'));
+      const restart=button(t('ui.nav.restart'),confirmRestart);
+      if (screen==='iron-dust-handoff') {
+        const handoff=host.handoff;
+        const take=button(t('v2.full.takeSeat'),()=>host.takeSeat(handoff),'primary');
+        take.id='v2-iron-dust-take-seat';
+        panel.append(heading(t('v2.full.handoff')),paragraph(t('v2.full.seat.'+handoff?.side)),
+          actions(take,restart,leave));
+        take.focus({preventScroll:true});
+        return;
+      }
+      const offer=host.defenseOffer();
+      panel.append(heading(t('v2.full.seat.enemy')));
+      if (!offer) {panel.append(actions(restart,leave));return;}
+      const {width,height,cells,defaultTerrain}=offer.view.terrain;
+      const units=offer.view.units.filter(unit=>unit.hp>0&&!unit.embarkedOn).map(unit=>({...unit,
+        team:unit.relation==='own'?'enemy':'player',core:unit.objectiveTarget}));
+      panel.append(missionPreview({width,height,terrain:cells,defaultTerrain,units}));
+      const label=document.createElement('label');
+      label.textContent=t('v2.full.seat.enemy');
+      const select=document.createElement('select');
+      select.id='v2-iron-dust-defense-command';
+      for (const candidate of offer.candidates) {
+        const option=document.createElement('option');
+        option.value=candidate.key;
+        const actor=t('v2.unit.'+candidate.actorId);
+        const target=candidate.target;
+        if (candidate.kind==='hold') option.textContent=t('v2.event.EnemyHeld',{actor});
+        else if (candidate.kind==='move') {
+          const cell=String.fromCharCode(65+target.x)+'-'+String(target.y+1).padStart(2,'0');
+          option.textContent=[actor,t('v2.ui.move'),cell].join(' · ');
+        } else option.textContent=[actor,t('v2.ui.fire'),t('v2.unit.'+target.unitId),target.componentId]
+          .filter(Boolean).join(' · ');
+        select.append(option);
+      }
+      label.append(select);
+      const commit=button(t('ui.dialog.confirm'),()=>host.chooseDefense(offer.ticket,select.value),'primary');
+      commit.id='v2-iron-dust-defense-commit';
+      panel.append(label,actions(commit,restart,leave));
     }
     function updateEditor(draft, cell = editorCell) {
       try {
@@ -1575,6 +1625,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         return;
       }
       if (screen === 'full-seat') { renderFullSeat(panel, focus); return; }
+      if (ironDustSeatScreens.includes(screen)) {renderIronDustSeat(panel);return;}
       if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.() &&
           !(screen === 'round-analysis' && roundAnalysis?.binding === fullSeatBinding)) return;
       const state = GoblinUIV2.project();
@@ -2022,6 +2073,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       showMissionEnd();
     });
     globalThis.addEventListener('goblin-movement-finished', showMissionEnd);
+    globalThis.addEventListener('goblin-core-v2-render',syncIronDustSeat);
     globalThis.addEventListener('goblin-language-change', () => renderScreen(false));
     globalThis.addEventListener('goblin-language-change',renderTraining);
     globalThis.addEventListener('goblin-training-change',renderTraining);
@@ -2042,7 +2094,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     for (const type of ['pointerdown', 'click', 'contextmenu', 'wheel']) {
       globalThis.addEventListener(type, event => {
         const boundary = spectatorInput?.dialog ?? fullSetupDialog ??
-          (['full-handoff', 'full-seat'].includes(screen) && !GameDialogs.isOpen() ? surface : null);
+          (['full-handoff', 'full-seat', ...ironDustSeatScreens].includes(screen) && !GameDialogs.isOpen() ? surface : null);
         if (!boundary || event.composedPath().includes(boundary)) return;
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -2052,7 +2104,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (event.key === 'Escape') spectatorEscapeHeld = false;
     }, true);
     globalThis.addEventListener('keydown', event => {
-      if (fullSetupDialog || ['full-handoff', 'full-seat'].includes(screen) && !GameDialogs.isOpen()) {
+      if (fullSetupDialog || ['full-handoff', 'full-seat', ...ironDustSeatScreens].includes(screen) && !GameDialogs.isOpen()) {
         event.stopImmediatePropagation();
         if (screen === 'full-handoff' && event.key === 'Escape') event.preventDefault();
         return;

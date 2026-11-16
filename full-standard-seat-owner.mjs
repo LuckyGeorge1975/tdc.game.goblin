@@ -1,9 +1,33 @@
 import {createFullCatalogAiHost} from './src/core/full-catalog-ai-adapter.mjs?v=4';
-import {createOwnedFullCatalogSessionHost} from './src/core/full-catalog-session-host.mjs?v=3';
+import {createOwnedFullCatalogSessionHost} from './src/core/full-catalog-session-host.mjs?v=4';
+import {createGameManager,createPlayerController} from './src/core/game-manager.mjs?v=1';
 import {selectWeakFullCatalog, selectMediumFullCatalog} from './src/core/full-catalog-difficulty.mjs?v=3';
 import {prepareFullAttack2a, FULL_ATTACK_2A_ENGINE, FULL_ATTACK_2A_ID} from './src/core/full-attack-2a.mjs?v=2';
 
 const standardDefender = 'full-native-standard-defender';
+
+export function createFullGameManager(config,full) {
+  const capabilities=full.controllerCapabilities(config);
+  if (!capabilities) return null;
+  const {level,seats}=capabilities;
+  return createGameManager(level,{...seats,enemy:{...seats.enemy,
+    ai:[{id:standardDefender,difficulty:null},...seats.enemy.ai]}});
+}
+
+export function fullNativeSetup(manager,selection) {
+  const assignments=manager.assign(selection);
+  return Object.freeze({
+    roles:Object.freeze(Object.fromEntries(assignments.map(({seatId,controller})=>[seatId,controller]))),
+    policyIds:Object.freeze(Object.fromEntries(assignments.flatMap(({seatId,policyId})=>
+      policyId && policyId!==standardDefender?[[seatId,policyId]]:[])))
+  });
+}
+
+export function commitFullHumanCommand(port,permit,view,command,dispatchPlayer) {
+  const player=createPlayerController(permit.side,()=>command);
+  const selected=player.nextCommand({side:permit.side,view});
+  return selected ? port.commit('human',permit,selected,dispatchPlayer) : {ok:false,code:'FULL_CONTROL_STALE'};
+}
 
 function allowsStandardDefender(config) {
   return config?.ruleProfileId === 'FULL_CATALOG_v1' && config.aiAllowed !== false &&
@@ -50,6 +74,9 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
 
   globalThis.GoblinFullSeatOwner = Object.freeze({
     offers:config => standardFullSeatOffers(config, GoblinLanguage.t('v2.full.standardDefender')),
+    configure:config=>createFullGameManager(config,full),
+    nativeSetup:(config,selection)=>fullNativeSetup(createFullGameManager(config,full),selection),
+    commitHuman:(port,permit,view,command)=>commitFullHumanCommand(port,permit,view,command,player.dispatch),
     bind(session, selection, ui, port) {
       const select=fullSeatFallback(session,selection,port);
       return createOwnedFullCatalogSessionHost({port,player,select,onCommit:ui.refresh});

@@ -1552,7 +1552,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const label = at('#v2-phase');
       label.dataset.phase = state.gameOver ? '' : phase;
       if (state.gameOver || document.body.classList.contains('v2-screen-open') ||
-          (core() && IronDustBrowserV2.trainedActive)) {
+          (core() && (IronDustBrowserV2.trainedActive || IronDustBrowserV2.pendingSeat ||
+            IronDustBrowserV2.humanDefenseActive))) {
         hidePhaseNotice();
         return;
       }

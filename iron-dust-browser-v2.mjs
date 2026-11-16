@@ -1,4 +1,6 @@
 import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
+import {createGameManager,createPlayerController} from './src/core/game-manager.mjs?v=1';
+import {createIronDustHumanDefensePort} from './src/core/iron-dust-human-defense-port.mjs?v=1';
 import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=7';
 import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs?v=5';
 import {createAiSessionHost} from './src/core/ai-session-host.mjs?v=3';
@@ -158,12 +160,80 @@ if (typeof document !== 'undefined') {
   let rounds = null;
   let trainedPolicy = null;
   let trained = null;
+  let manualDefense = null;
+  let replay = null;
   const presentation = globalThis.GoblinPresentation
     ? createCorePresentationObserver(globalThis.GoblinPresentation,()=>epoch) : null;
   const endButton = document.querySelector('#end-turn');
   const legacyEndClick = endButton.onclick;
-  const enemyFlow = createIronDustEnemyFlow({getSession:() => mode === 'ready' ? session : null,
+  const enemyFlow = createIronDustEnemyFlow({getSession:() => mode === 'ready' && !defensePort.suppressesAutomaticDefense ? session : null,
     advance:() => commitAction({type:'AutoEnemyAdvance', playerId:'enemy'})});
+  const defensePort = createIronDustHumanDefensePort({
+    read:()=>({session,epoch,defenderIsHuman:!!manualDefense,
+      defenderSeat:paused?null:manualDefense?.permit}),
+    install(before,result) {
+      const next=Object.freeze({...before,profile:result.profile,
+        projection:projectIronDustProfile(result.profile,result.events)});
+      installObserved(next,result.action);
+    }
+  });
+
+  function seatManager() {
+    return createGameManager({maxSeats:2,seatIds:['player','enemy'],aiAllowed:IRON_DUST_LEVEL_V3.aiAllowed!==false,
+      minimumDifficulty:IRON_DUST_LEVEL_V3.minimumDifficulty??null},{
+      player:{human:true,ai:trainedPolicy?[{id:'trained',difficulty:null}]:[]},
+      enemy:{human:true,ai:IRON_DUST_ENEMY_DIFFICULTIES.map(id=>({id,difficulty:id}))}
+    });
+  }
+  function startSeats(selection) {
+    let plan;
+    try {plan=seatManager().assign(selection);}
+    catch {return false;}
+    const [attacker,defender]=plan;
+    return start(undefined,defender.difficulty??'medium',IRON_DUST_LEVEL_V3.minimumDifficulty,
+      attacker.policyId??'human',defender.controller==='human');
+  }
+  function switchHumanSeat(side) {
+    if (!manualDefense) return;
+    defensePort.invalidate();
+    manualDefense.permit=null;
+    manualDefense.pending=side?Object.freeze({side}):null;
+  }
+  function settleDefense() {
+    const permit=manualDefense?.permit;
+    while (permit && manualDefense?.permit===permit && defensePort.suppressesAutomaticDefense) {
+      const offer=defensePort.open(permit);
+      if (offer.kind!=='mechanical' || !defensePort.advanceMechanical(permit,offer.ticket).ok) return;
+    }
+  }
+  function takeSeat(handoff) {
+    if (paused || !handoff || manualDefense?.pending!==handoff) return false;
+    manualDefense.pending=null;
+    if (handoff.side==='enemy') {
+      manualDefense.permit=Object.freeze({});
+      settleDefense();
+    }
+    renderCurrent();
+    return true;
+  }
+  function defenseOffer() {
+    if (!manualDefense?.permit) return null;
+    const offer=defensePort.open(manualDefense.permit);
+    return offer.kind==='choice'?offer:null;
+  }
+  function chooseDefense(ticket,key) {
+    const offer=defenseOffer();
+    if (!offer || ticket!==offer.ticket) return {ok:false,code:'IRON_DUST_DEFENDER_STALE'};
+    const controller=createPlayerController('enemy',decision=>decision.candidates.find(item=>item.key===key)?.key);
+    const choice=controller.nextCommand(offer);
+    const result=defensePort.commit(manualDefense.permit,ticket,choice);
+    if (result.ok) {
+      settleDefense();
+      if (trained) scheduleTrained(trained);
+      renderCurrent();
+    }
+    return result;
+  }
   void (async () => {
     const response=await fetch(new URL('./assets/ai/iron-dust-target-bpn.json?v=1',import.meta.url));
     if (!response.ok) throw Error('AI_POLICY_MODEL_UNAVAILABLE');
@@ -180,10 +250,10 @@ if (typeof document !== 'undefined') {
   }
   function scheduleTrained(owner, delay = session?.projection.mode==='enemy'?140:0) {
     if (owner!==trained || paused || owner.pending || owner.timer!==null || owner.failed ||
-        mode!=='ready' || session.projection.mode==='ended') return;
+        mode!=='ready' || session.projection.mode==='ended' || defensePort.suppressesAutomaticDefense) return;
     owner.timer=setTimeout(() => {
       owner.timer=null;
-      if (owner!==trained || paused) return;
+      if (owner!==trained || paused || defensePort.suppressesAutomaticDefense) return;
       if (globalThis.GoblinMovement?.busy()) { scheduleTrained(owner,16); return; }
       void advanceTrained(owner);
     },delay);
@@ -224,8 +294,7 @@ if (typeof document !== 'undefined') {
     }
   }
   function enableTrained() {
-    const owner=trained={timer:null,pending:false,failed:false,shot:null,
-      replay:createIronDustCommitRecorder(session.profile)};
+    const owner=trained={timer:null,pending:false,failed:false,shot:null};
     const scope=IRON_DUST_TRAINED_SCOPE;
     owner.fire=createIronDustDecisionHost({
       // Pause keeps this atomic fire decision valid. Leaving or restarting replaces its owner.
@@ -236,12 +305,7 @@ if (typeof document !== 'undefined') {
       fireTarget:{engine:scope.engine,scope:()=>owner.shot&&
         {actorId:owner.shot.unitId,weaponRef:owner.shot.weaponKey??null}},
       install(next,command,evidence) {
-        const before=session;
-        const roundCommit=rounds.beginCommit();
-        const ticket=observePresentation(presentation,'begin',before,command,{action:{command}});
-        observePresentation(presentation,'confirm',ticket,next);
-        takeAccepted(next,command,before,roundCommit,evidence);
-        actionError=null;
+        installObserved(next,command,evidence);
         renderCurrent();
       }
     });
@@ -277,16 +341,29 @@ if (typeof document !== 'undefined') {
     session=next;
     const {profile}=next, {events}=next.projection;
     captureIronDustRoundCommit(roundCommit,before.profile,{profile,events,action:command,evidence});
-    trained?.replay.accept(before.profile,{action:command,profile,events});
+    replay?.accept(before.profile,{action:command,profile,events});
+    if (manualDefense && before.projection.mode!==next.projection.mode)
+      switchHumanSeat(next.projection.mode==='enemy'?'enemy':
+        next.projection.mode==='player'&&!trained?'player':null);
     const cursor=before.projection.cursor;
     eventHistory.push(...events.map(event=>({...event,
       cursorPass:command.type==='AutoEnemyAdvance'?cursor?.pass:null,
       cursorIndex:command.type==='AutoEnemyAdvance'?cursor?.index:null})));
     eventHistory=eventHistory.slice(-120);
   }
+  function installObserved(next,command,evidence) {
+    const before=session;
+    const roundCommit=rounds.beginCommit();
+    const ticket=observePresentation(presentation,'begin',before,command,{action:{command}});
+    observePresentation(presentation,'confirm',ticket,next);
+    takeAccepted(next,command,before,roundCommit,evidence);
+    actionError=null;
+  }
   function dispatchAction(command) {
     if (trained) return {error:{code:'V2_TRAINED_ATTACK'}};
     if (paused) return {error:{code:'V2_PAUSED'}};
+    if (manualDefense?.pending || defensePort.suppressesAutomaticDefense)
+      return {error:{code:'V2_SEAT_NOT_AUTHORIZED'}};
     if (command?.type === 'AutoEnemyAdvance' || enemyFlow.running) {
       actionError = command?.type === 'AutoEnemyAdvance' ?
         'ENEMY_TURN_AUTOMATED' : 'ENEMY_TURN_RUNNING';
@@ -294,7 +371,7 @@ if (typeof document !== 'undefined') {
       return {error:{code:actionError}};
     }
     const result = commitAction(command);
-    if (result.session?.projection.mode === 'enemy') enemyFlow.start();
+    if (result.session?.projection.mode === 'enemy' && !defensePort.suppressesAutomaticDefense) enemyFlow.start();
     return result;
   }
   const legacyDraw = draw;
@@ -327,10 +404,13 @@ if (typeof document !== 'undefined') {
     currentScenario = IRON_DUST_V2_SELECTOR_ID;
     document.querySelector('#scenario-select').value = IRON_DUST_V2_SELECTOR_ID;
   }
-  function start(profile, difficulty = 'medium', minimumDifficulty, attacker = 'human') {
+  function start(profile, difficulty = 'medium', minimumDifficulty, attacker = 'human', defenderHuman = false) {
     if (globalThis.goblinBootProfileError || !['human','trained'].includes(attacker) ||
         attacker==='trained'&&(!trainedPolicy||IRON_DUST_LEVEL_V3.aiAllowed===false||profile!==undefined)) return false;
     cancelTrained();
+    manualDefense=null;
+    replay=null;
+    defensePort.invalidate();
     enemyFlow.cancel();
     paused = false;
     epoch++;
@@ -339,7 +419,9 @@ if (typeof document !== 'undefined') {
       session = createIronDustBrowserSession(profile ?? createIronDustProfile(startSeed, {difficulty,minimumDifficulty}),
         startSeed);
       rounds = createIronDustRoundRecorder(session.profile, () => session?.profile,
-        attacker==='trained'?'spectator':'player');
+        attacker==='trained'&&!defenderHuman?'spectator':'player');
+      if (defenderHuman) manualDefense={permit:null,pending:null};
+      if (defenderHuman || attacker==='trained') replay=createIronDustCommitRecorder(session.profile);
       mode = 'ready';
       observePresentation(presentation,'sync',session);
       showGate('');
@@ -356,6 +438,8 @@ if (typeof document !== 'undefined') {
       renderCurrent();
     } catch {
       cancelTrained();
+      manualDefense=null;
+      replay=null;
       session = null;
       rounds = null;
       mode = 'error';
@@ -366,6 +450,9 @@ if (typeof document !== 'undefined') {
   }
   function stop() {
     cancelTrained();
+    manualDefense=null;
+    replay=null;
+    defensePort.invalidate();
     enemyFlow.cancel();
     paused = false;
     epoch++;
@@ -386,7 +473,8 @@ if (typeof document !== 'undefined') {
     document.querySelector('#quick-start-open').disabled = false;
     document.querySelector('#unit-guide-open').disabled = false;
   }
-  const queryReady = () => mode === 'ready' && !!session && !trained && !paused && !enemyFlow.running;
+  const queryReady = () => mode === 'ready' && !!session && !trained && !paused && !enemyFlow.running &&
+    !manualDefense?.pending && !defensePort.suppressesAutomaticDefense;
   globalThis.IronDustBrowserV2 = Object.freeze({
     selectorId: IRON_DUST_V2_SELECTOR_ID,
     available: !!option && !globalThis.goblinBootProfileError,
@@ -402,7 +490,11 @@ if (typeof document !== 'undefined') {
     get trainedAvailable() {return !!trainedPolicy && IRON_DUST_LEVEL_V3.aiAllowed!==false;},
     get trainedActive() {return !!trained;},
     roundView: () => rounds?.view() ?? null,
-    replaySnapshot: () => trained?.replay.snapshot() ?? null,
+    replaySnapshot: () => replay?.snapshot() ?? null,
+    seatManager,startSeats,takeSeat,defenseOffer,chooseDefense,
+    get handoff() {return manualDefense?.pending??null;},
+    get pendingSeat() {return manualDefense?.pending?.side??null;},
+    get humanDefenseActive() {return defensePort.suppressesAutomaticDefense;},
     policyChoices: scopes => browserPolicies.choices(scopes),
     get queryReady() { return queryReady(); },
     query: command => queryReady() &&
@@ -418,6 +510,7 @@ if (typeof document !== 'undefined') {
     formatEvent: formatIronDustV2Event,
     pause: () => {
       paused=true;
+      if (defensePort.suppressesAutomaticDefense) switchHumanSeat('enemy');
       enemyFlow.cancel();
       if (trained) {clearTimeout(trained.timer);trained.timer=null;}
       globalThis.GoblinMovement?.clear();
@@ -425,15 +518,15 @@ if (typeof document !== 'undefined') {
     resume: () => {
       paused=false;
       if (trained) scheduleTrained(trained);
-      else if (mode==='ready') enemyFlow.start();
+      else if (mode==='ready' && !defensePort.suppressesAutomaticDefense) enemyFlow.start();
     },
     dispatch: dispatchAction,
     difficulties: Object.freeze(IRON_DUST_ENEMY_DIFFICULTIES.slice(
       Math.max(0,IRON_DUST_ENEMY_DIFFICULTIES.indexOf(IRON_DUST_LEVEL_V3.minimumDifficulty)))),
-    start,
+    start: (profile,difficulty,minimumDifficulty,attacker)=>start(profile,difficulty,minimumDifficulty,attacker),
     startWithDifficulty: (difficulty, minimumDifficulty, attacker) => start(undefined,difficulty,minimumDifficulty,attacker),
     restart: () => start(undefined,session?.profile.header.enemyPolicy?.difficulty??'medium',
-      session?.profile.header.minimumDifficulty,trained?'trained':'human'),
+      session?.profile.header.minimumDifficulty,trained?'trained':'human',!!manualDefense),
     stop
   });
   globalThis.dispatchEvent?.(new Event('goblin-core-v2-ready'));

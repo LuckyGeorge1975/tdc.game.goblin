@@ -52,6 +52,7 @@
   const admissionByLevel=new Map(authored?.levels.map(level=>[level.id,{
    ...(Object.hasOwn(level,'aiAllowed')?{aiAllowed:level.aiAllowed}:{}),
    ...(Object.hasOwn(level,'minimumDifficulty')?{minimumDifficulty:level.minimumDifficulty}:{})}]));
+  const seatLayout=freeze({seatIds:['player','enemy'],maxSeats:2});
   await GoblinCatalogBase.initialize(data);data=GoblinCatalogBase.registry;
   if(levelData?.version!=='catalog-full-levels-v1'||levelData.levels?.length!==5)throw Error('FULL_LEVEL_CONTRACT');
   if(await GoblinCatalogBase.hash(levelData)!=='ff1e209a956dff2cf2ac9c45932e670fec643b0c5451574daf85bb863c5d9c79')throw Error('FULL_LEVEL_DIGEST');
@@ -76,12 +77,12 @@
     terrainDigest:await GoblinCatalogBase.hash(level.terrain),scope,records,cargo:catalogProfile.cargo,registry:data,
     full:{version:level.version,source:level.source,waves:level.waves,waveTemplates,turnLimit:level.turnLimit}};
    next[level.id]=freeze({title:level.title,kicker:'G.O.B.L.I.N.',kickerKey:'screen.library.category',sub:'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',scenarioVersion:1,ruleProfileId:requestedProfile,ruleProfile:data.dataVersion,objectiveVersion:1,objective:level.objective,losMode:'strict-supercover',catalog,terrain:level.terrain.filter(c=>TerrainRules.coverBonus(c.type)).map(c=>`${c.x},${c.y}`),terrainTypes:level.terrain,units,
-    ...admissionByLevel.get(level.id)});
+    ...(requestedProfile===publicProfile?{seatLayout}:{}),...admissionByLevel.get(level.id)});
   }
   if(profile!==null&&profile!==requestedProfile)throw Error('FULL_ADMISSION_CONTEXT');
   configs=freeze(next);profile=requestedProfile;
   if(profile===publicProfile)editorProfile=freeze({ruleProfileId:profile,ruleProfile:data.dataVersion,scenarioVersion:1,
-   objectiveVersion:1,objective:'core-and-escort',losMode:'strict-supercover',catalog:catalogProfile});
+   objectiveVersion:1,objective:'core-and-escort',losMode:'strict-supercover',catalog:catalogProfile,seatLayout});
   return configs;
  }
  const has=(id,profileId=profile)=>profileId===profile&&!!configs&&Object.hasOwn(configs,id);

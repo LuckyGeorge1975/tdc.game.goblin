@@ -96,7 +96,7 @@ test('only a successful start or accepted restart requests the initial view afte
   const start=flow.slice(flow.indexOf('    async function startMission() {'),flow.indexOf('    function libraryAssetId('));
   for(const succeeds of [false,true]){
     const calls=[],context={campaign:null,briefingDifficulty:'strong',briefingAttacker:'human',bindCampaignLesson(){},GameDialogs:{isOpen:()=>false},missionData:()=>({}),missionId:'iron-dust-v2',scenarioCatalog:{},
-      t:key=>key,renderScreen(){},IronDustBrowserV2:{available:true,startWithDifficulty:(difficulty,minimum,attacker)=>{assert.deepEqual([difficulty,minimum,attacker],['strong',undefined,'human']);return succeeds}},
+      t:key=>key,renderScreen(){},IronDustBrowserV2:{available:true,startSeats:selection=>{assert.equal(selection.player,null);assert.equal(selection.enemy,'strong');return succeeds}},
       document:{querySelector:()=>({})},GoblinUIV2:{resetView(){calls.push('reset')},startView(){calls.push('start-view')}},
       screen:'briefing',show(screen){context.screen=screen;calls.push(screen)},releasePause:()=>calls.push('resume')};
     runInNewContext(start+'\nglobalThis.start=startMission;',context);
@@ -115,12 +115,13 @@ test('only a successful start or accepted restart requests the initial view afte
 test('Iron Dust difficulty control starts at Medium, updates the choice and is scoped to its briefing',()=>{
   const start=flow.indexOf('    function difficultyControl(');
   const end=flow.indexOf('    function updateEditor(',start);
-  const context={campaign:null,briefingDifficulty:'medium',t:key=>key,IronDustBrowserV2:{difficulties:['weak','medium','strong']},
+  const context={campaign:null,briefingDifficulty:'medium',t:key=>key,IronDustBrowserV2:{
+    seatManager:()=>({seats:[{}, {ai:['weak','medium','strong'].map(id=>({id}))}]})},
     document:{createElement:tag=>({tag,children:[],append(node){this.children.push(node)}})}};
   runInNewContext(flow.slice(start,end),context);
   const [select]=context.difficultyControl().children;
   assert.equal(select.value,'medium');
-  assert.deepEqual(select.children.map(option=>option.value),['weak','medium','strong']);
+  assert.deepEqual(select.children.map(option=>option.value),['human','weak','medium','strong']);
   select.value='weak';
   select.onchange();
   assert.equal(context.difficultyControl().children[0].value,'weak');

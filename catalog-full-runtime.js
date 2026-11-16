@@ -198,15 +198,22 @@
   const order=ScenarioRuleProfiles.fullDifficulties;
   return order.indexOf(difficulty)>=order.indexOf(minimum);
  }
- function controllerOffers(config){
+ function controllerCapabilities(config){
   if(config?.ruleProfileId!=='FULL_CATALOG_v1')return null;
-  const minimumDifficulty=ScenarioRuleProfiles.fullMinimumDifficulty(config);
-  const allowed=ScenarioRuleProfiles.aiAllowed(config);
+  const seatIds=Object.freeze([...(config.seatLayout?.seatIds??controllerSides)]);
+  const level=Object.freeze({seatIds,maxSeats:config.seatLayout?.maxSeats??controllerSides.length,
+   minimumDifficulty:ScenarioRuleProfiles.fullMinimumDifficulty(config),aiAllowed:ScenarioRuleProfiles.aiAllowed(config)});
+  const seats=Object.freeze(Object.fromEntries(seatIds.map(side=>[side,Object.freeze({human:true,
+   ai:Object.freeze([...qualifiedControllers[side].values()].map(({id,difficulty})=>Object.freeze({id,difficulty})))})])));
+  return Object.freeze({level,seats});
+ }
+ function controllerOffers(config){
+  const capabilities=controllerCapabilities(config);
+  if(!capabilities)return null;
+  const {minimumDifficulty,aiAllowed:allowed}=capabilities.level;
   const result={minimumDifficulty,legacyStartAllowed:minimumDifficulty===null};
   for(const side of controllerSides){
-   const choices=allowed?[...qualifiedControllers[side].values()]
-    .filter(policy=>meetsMinimum(policy.difficulty,minimumDifficulty))
-    .map(({id,difficulty})=>Object.freeze({id,difficulty})):[];
+   const choices=allowed?capabilities.seats[side].ai.filter(policy=>meetsMinimum(policy.difficulty,minimumDifficulty)):[];
    const reason=choices.length?null:!allowed?'AI_LEVEL_FORBIDDEN':
     minimumDifficulty?'FULL_AI_MINIMUM_UNAVAILABLE':'FULL_AI_NOT_QUALIFIED';
    result[side]=Object.freeze({choices:Object.freeze(choices),reason});
@@ -753,7 +760,7 @@
  }
  root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,recordRoundAction,catalogCard,initialRoster,status,stealthText,deadlineRemoved,
   enemyHexShot,prepareControllers,controllerPort,startControlledEnemyTurn,enterControlledSide,allowsPlayerPhaseAdvance,
-  ownsPresentation,stageControlledPresentation,startControlledPresentation,controllerOffers,registerQualifiedController,
+  ownsPresentation,stageControlledPresentation,startControlledPresentation,controllerOffers,controllerCapabilities,registerQualifiedController,
   hexTacticalFacts,nativePlayerGateway});
  const oldCheckVictory=checkVictory;
  checkVictory=function(){

@@ -24,7 +24,7 @@ const hiddenSource = between(ui, "      if (!mode || document.body.classList.con
 const blastSource = between(ui, '    function renderTargetBlast(', '    function focusTargetCard(');
 const refreshSource = ui.match(/refresh: (\(\) => [\s\S]*?) \}\);/)[1];
 const querySource = between(bridge, '    query: command =>', '    previewFire:').trim().slice(7, -1);
-const queryReadySource = bridge.match(/  const queryReady = .*;/)[0];
+const queryReadySource = between(bridge, '  const queryReady =', '  globalThis.IronDustBrowserV2');
 const resumeSource = between(bridge, '    resume: ', '    dispatch:').trim().slice(8, -1);
 
 function scene() {
@@ -39,7 +39,8 @@ function scene() {
   command({type:'SelectWeapon', unitId:'ogre', weaponKey:'missiles'});
   const records = [];
   const context = {...lifeGlobals,
-    mode:'ready', trained:null, paused:false, pauseActive:false, screen:'play', savedAuto:false, waiting:[],
+    mode:'ready', trained:null, manualDefense:null, defensePort:{suppressesAutomaticDefense:false},
+    paused:false, pauseActive:false, screen:'play', savedAuto:false, waiting:[],
     get session() { return session; }, enemyFlow:{running:false,start(){}}, queryIronDustProfile,
     areaCache:{key:null,actors:new Map()}, GameDialogs:{isOpen:()=>false}, GoblinLanguage:{current:'de'}, core:()=>true,
     previewWeaponKey:actor=>actor.selectedWeapon, t:key=>key,
