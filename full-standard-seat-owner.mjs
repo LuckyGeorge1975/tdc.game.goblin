@@ -1,7 +1,7 @@
-import {createFullCatalogAiHost} from './src/core/full-catalog-ai-adapter.mjs?v=3';
-import {createOwnedFullCatalogSessionHost} from './src/core/full-catalog-session-host.mjs?v=2';
-import {selectWeakFullCatalog, selectMediumFullCatalog} from './src/core/full-catalog-difficulty.mjs?v=2';
-import {prepareFullAttack2a, FULL_ATTACK_2A_ENGINE, FULL_ATTACK_2A_ID} from './src/core/full-attack-2a.mjs?v=1';
+import {createFullCatalogAiHost} from './src/core/full-catalog-ai-adapter.mjs?v=4';
+import {createOwnedFullCatalogSessionHost} from './src/core/full-catalog-session-host.mjs?v=3';
+import {selectWeakFullCatalog, selectMediumFullCatalog} from './src/core/full-catalog-difficulty.mjs?v=3';
+import {prepareFullAttack2a, FULL_ATTACK_2A_ENGINE, FULL_ATTACK_2A_ID} from './src/core/full-attack-2a.mjs?v=2';
 
 const standardDefender = 'full-native-standard-defender';
 
@@ -15,9 +15,11 @@ export function standardFullSeatOffers(config, label) {
   return {player:[], enemy:[{id:standardDefender, label}]};
 }
 
-export function selectStandardFullDefender(decision) {
+export function selectStandardFullDefender(decision,report) {
   if (decision.side !== 'enemy') return undefined;
-  return decision.candidates.find(candidate=>candidate.facts.baseline === true)?.key;
+  const key=decision.candidates.find(candidate=>candidate.facts.baseline === true)?.key;
+  if (key!==undefined) report?.({key,explanationKey:'v2.round.standardAction'});
+  return key;
 }
 
 export function fullSeatFallback(session,selection,port) {

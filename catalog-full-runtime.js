@@ -6,6 +6,7 @@
  const registry=()=>legacySession.effectiveRules.catalog.registry;
  let state=null;
  let roundFireChoice=null;
+ let roundSelection=null;
  let controller=null;
  let presentationPending=false;
  const controllerSides=['player','enemy'];
@@ -402,7 +403,7 @@
    nextEnemy();
    if(nativeSlot)enterSide();
   }
-  function commit(mode,token,command,playerDispatch){
+  function commit(mode,token,command,playerDispatch,evidence){
    if(!valid(token,mode))return reject('FULL_CONTROL_STALE');
    if(phase==='enemy'){
     if(!nativeSlot||command?.actorId!==token.actorId||nativeSlot.actor!==units.find(unit=>unit.id===token.actorId)||
@@ -414,13 +415,16 @@
     const observed=events?.begin(session,null), before=observed?structuredClone(units):null;
     let accepted=false;
     try{
+     roundSelection=mode==='ai'&&evidence?{command,evidence}:null;
      const result=offer.execute(entry);
      if(!result.ok)return result;
+     if(command.type==='EnemyHold')recordRoundSelection('enemy','special',nativeSlot.actor);
      accepted=true;sequence++;permit=null;offer=null;
      nextEnemy(result.kind);
      publishSpectator();
      return {ok:true};
     }finally{
+     roundSelection=null;
      const hits=events?.finish(observed,legacySession,before,units,accepted,dist,unitAlive);
      committing=false;
      if(hits?.length)events.show(hits,session);
@@ -428,9 +432,11 @@
    }
    committing=true;
    try{
+    roundSelection=mode==='ai'&&evidence?{command,evidence}:null;
     if(exact(command,['type'])&&command.type==='EndPhase'){
      permit=null;
      advancingPhase=true;
+     recordRoundSelection('player','phase');
      advanceNativePlayerPhase();
      sequence++;
      publishSpectator();
@@ -441,14 +447,14 @@
     const result=playerDispatch(command,token.revision);
     if(result.ok){sequence++;permit=null;publishSpectator();}
     return result;
-   }finally{advancingPhase=false;committing=false;}
+   }finally{roundSelection=null;advancingPhase=false;committing=false;}
   }
   const port=Object.freeze({state,project,ticket,open,commit,
    controlBinding:()=>attached()?binding:null,
    qualifiedSelector(){
     const policy=authorised('ai')?policies[phase]:null;
     if(!policy)return null;
-    return policy.difficulty===null?batch=>policy.select(batch,port):policy.select;
+    return policy.difficulty===null?(batch,report)=>policy.select(batch,port,report):policy.select;
    },
    spectator:()=>allowsSpectator&&attached()?spectator:null,
    pause(){if(attached()){paused=true;invalidate();}},
@@ -486,20 +492,50 @@
   });
  }
  function recordAction(actor,command,result){if(!active())return;const key=result.kind==='hex-fire'?'v2.full.missile.resolved':result.kind==='collision'||result.collided?'v2.full.stealth.collision':result.kind==='engineering'?`v2.engineer.${command.job}`:result.kind==='fire'?'v2.ui.fire':result.kind==='ram'?'v2.ui.ram':['CatalogLoad','Embark'].includes(command.type)?'v2.ui.embark':command.type==='Unload'?'v2.ui.unload':command.type==='CatalogDeploy'?'v2.ui.catalog.deployDrone':'v2.ui.move';log(key,{},result.kind==='fire'?[actor.id,command.target.runtimeUnitId]:[actor.id]);const row=ensure().logs.at(-1);row.action={result:result.outcome?.result??null,ratio:result.outcome?.ratio??null}}
+ const roundEntity=u=>({id:u.id,labelKey:`library.unit.${u.catalogAssetId}.name`,cell:{x:u.x,y:u.y}});
+ function recordRoundSelection(side,kind,actor){
+  if(!roundSelection)return;
+  const {explanationKey}=roundSelection.evidence;
+  roundSelection=null;
+  // These native commands have no existing action row. Their private reason
+  // must precede the next slot or round boundary.
+  root.GoblinFullRoundSource?.recordPrivate?.({side,kind,actor:actor&&roundEntity(actor),explanationKey});
+ }
+ function acceptedSelection(actor,command,kind){
+  if(!roundSelection)return;
+  const {command:chosen,evidence}=roundSelection;
+  if((chosen.type==='Unload'?chosen.cargoId:chosen.actorId)!==actor.id)return;
+  const abbreviated=(chosen.type==='EnemyMove'&&kind==='move'&&!command.type) ||
+   (['Embark','Unload'].includes(chosen.type)&&command.type===chosen.type&&Object.keys(command).length===1);
+  if(!abbreviated&&JSON.stringify(chosen)!==JSON.stringify(command))return;
+  roundSelection=null;
+  return evidence;
+ }
  function recordRoundAction(actor,command,result){
   const source=root.GoblinFullRoundSource;
   if(!source||!active()||legacySession.ruleProfileId!=='FULL_CATALOG_v1'||gameOver)return;
   const visibleIds=projectedIds('player');
-  const entity=u=>({id:u.id,labelKey:`library.unit.${u.catalogAssetId}.name`,cell:{x:u.x,y:u.y}});
+  const entity=roundEntity;
   const targetId=command.target?.runtimeUnitId??result.targetId??result.cargoId;
   const target=units.find(unit=>unit.id===targetId);
   const kind=['move','collision'].includes(result.kind)?'move':['fire','hex-fire'].includes(result.kind)?'fire':result.kind==='ram'?'ram':'special';
+  const evidence=acceptedSelection(actor,command,kind);
+  const optionUnits=evidence?.options.length ? new Map(units.map(unit=>[unit.id,unit])) : null;
   const fireTarget=c=>units.find(unit=>unit.id===c.target?.runtimeUnitId);
   const fireCell=c=>c.type==='CatalogHexFire'?{x:c.x,y:c.y}:null;
-  const options=roundFireChoice?.checked.map(entry=>{
+  const options=optionUnits ? evidence.options.map(({candidate,selected,baseline,scores})=>{
+   const target=candidate.target;
+   const unit=optionUnits.get(target?.unitId);
+   const firingUnit=optionUnits.get(candidate.actorId);
+   const spotter=optionUnits.get(candidate.facts.spotterId);
+   return {kind:'fire',actor:firingUnit&&entity(firingUnit),target:unit&&entity(unit),
+    targetCell:target?.kind==='cell'?{x:target.x,y:target.y}:null,component:target?.componentId,
+    weaponRef:candidate.weaponRef,mode:candidate.facts.mode,spotter:spotter&&entity(spotter),
+    selected,baseline,scores};
+  }) : roundFireChoice?.checked.map(entry=>{
    const unit=fireTarget(entry.command);
    return {kind:'fire',target:unit&&entity(unit),targetCell:fireCell(entry.command),
-    component:entry.command.target?.componentId,selected:entry===roundFireChoice.selected};
+    component:entry.command.target?.componentId,selected:entry===roundFireChoice.selected,baseline:entry.baseline};
   });
   const hits=result.outcomes?.flatMap(hit=>{
    const unit=units.find(item=>item.id===hit.unitId);
@@ -515,7 +551,7 @@
   const after={...board,units:units.filter(unit=>visibleIds.has(unit.id)&&!unit.embarkedOn).map(entity)};
   source.record({side:actor.team,kind,actor:entity(actor),target:target&&entity(target),
    result:result.outcome?.result,targetCell:fireCell(command),hits,options,
-   explanationKey:roundFireChoice?.reason,snapshot:{...board,paths}},after,visibleIds);
+   explanationKey:evidence?.explanationKey??roundFireChoice?.reason,snapshot:{...board,paths}},after,visibleIds);
  }
  function catalogCard(entry){
   if(!active())return null;const r=registry().units[root.UnitVisuals.artKey(entry)];if(!r)return null;const t=r.target,system=t.systemDefinitionRef?GoblinSystems.createCatalogSystem(registry(),r.assetId??root.UnitVisuals.artKey(entry)):null;

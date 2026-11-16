@@ -1,5 +1,5 @@
-import {createFullCatalogAiAdapter,createOwnedFullCatalogAiAdapter,sameFullCatalogActionSlot} from './full-catalog-ai-adapter.mjs';
-import {createAiSessionHost} from './ai-session-host.mjs?v=2';
+import {createFullCatalogAiAdapter,createOwnedFullCatalogAiAdapter,sameFullCatalogActionSlot} from './full-catalog-ai-adapter.mjs?v=4';
+import {createAiSessionHost} from './ai-session-host.mjs?v=3';
 
 export function createFullCatalogSessionHost({host, read, readGeneration, select, selectEnemy, policy, onCommit, spectator = false}) {
   const adapter = createFullCatalogAiAdapter(host, readGeneration);
@@ -39,12 +39,8 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
     return {...state,session:state.sessionId,engine:state.generation};
   };
   const ai=createAiSessionHost({adapter,read,spectator:true,
-    select:async batch=>{
-      const attempt=attempted;
-      const key=await attempt.select(batch);
-      attempt.intent=adapter.remember(batch,key);
-      return key;
-    },commit:onCommit});
+    select:(batch,report)=>attempted.select(batch,report),
+    remember(batch,key,evidence){if(attempted)attempted.intent=adapter.remember(batch,key,evidence);},commit:onCommit});
   function continueChoice(attempt,state){
     if(!attempt.intent)return null;
     const result=adapter.resume(attempt.intent);

@@ -37,7 +37,7 @@ export function createAiDecisionAdapter({read, describe, apply}) {
       side, phase: batch.phase, slot: batch.slot, view: batch.view, candidates});
   }
 
-  function execute(request) {
+  function execute(request,evidence) {
     if (!request || typeof request !== 'object' || Object.keys(request).length !== 4 ||
         request.schemaVersion !== AI_DECISION_SCHEMA_VERSION || !Object.hasOwn(request, 'key') ||
         !Object.hasOwn(request, 'decisionId') || !Object.hasOwn(request, 'revision'))
@@ -53,7 +53,9 @@ export function createAiDecisionAdapter({read, describe, apply}) {
     if (!option) return reject('AI_UNKNOWN_CANDIDATE');
     active = null;
     // This output is for the trusted engine host. It contains raw events.
-    const result = apply(current.state, option);
+    const bound = evidence?.decisionId===request.decisionId && evidence.revision===request.revision &&
+      evidence.key===request.key ? evidence : undefined;
+    const result = apply(current.state,option,bound);
     if (result.error) return reject(result.error.code);
     consumed = {state: current.state, generation: current.generation};
     return {ok: true, decisionId: request.decisionId, key: request.key, ...result};

@@ -267,7 +267,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       binding.session = legacySession;
       if (!binding.port) throw new Error('FULL_CONTROLLER_OWNER');
       const host = setup.owner.bind(binding.session, setup.selection, ui, binding.port);
-      if (host) void import('./src/core/full-phase-lifecycle.mjs').then(({createFullPhaseLifecycle}) => {
+      if (host) void import('./src/core/full-phase-lifecycle.mjs?v=1').then(({createFullPhaseLifecycle}) => {
         if (fullSeatBinding !== binding || binding.session !== legacySession) return;
         binding.lifecycle = createFullPhaseLifecycle({port:binding.port, host, changed:ui.refresh});
         binding.lifecycle.sync();
@@ -659,7 +659,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const host = globalThis.IronDustBrowserV2;
       const origin = screen, epoch = host?.epoch, owner = legacySession;
       const binding = origin === 'full-seat' ? fullSeatBinding : null;
-      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=2');
+      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=3');
       if (screen !== origin || host?.epoch !== epoch || legacySession !== owner) return;
       if (binding && (binding !== fullSeatBinding || !binding.port.spectator()?.read())) return;
       const lifecycle = binding?.lifecycle;
@@ -1784,7 +1784,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       } else if (screen === 'round-analysis') {
         const analysis = roundAnalysis;
         analysis.renderRoundAnalysis(panel,analysis.round,{
-          t, previewMap:missionPreview, back:closeRoundAnalysis, selected:analysis.selected,
+          t, locale:GoblinLanguage.current, previewMap:missionPreview, back:closeRoundAnalysis, selected:analysis.selected,
           onSelect:index => { analysis.selected = index; }
         });
       } else if (screen === 'catalog') {

@@ -39,7 +39,9 @@ test('hidden rows, alternatives, identities, time and scores cannot shift the pl
     const hidden={kind:'move',side:'enemy',actor:phantom,elapsed:923};
     for(let n=0;n<extraHidden;n++)f.captureFull(hidden,{});
     const fire={kind:'fire',side:'player',actor:own,target:phantom,result:'D',
-      options:[{kind:'fire',target:phantom,score,selected:true}]};
+      explanationKey:secret,
+      options:Array.from({length:extraHidden},(_,index)=>({kind:'fire',target:phantom,
+        baseline:index===0,selected:index===0,scores:{basis:score+index,model:score-index}}))};
     f.captureFull(fire,{before:board(own),after:board(own),
       disclosure:{actor:'before',boardVisible:true}});
     const later=entity('now-visible',3);
@@ -49,11 +51,12 @@ test('hidden rows, alternatives, identities, time and scores cannot shift the pl
     return f.recorder.view();
   }
   const first=replay('phantom-a',1,1), second=replay('phantom-b',999,5);
-  assert.deepEqual(first,second);
+  assert.equal(JSON.stringify(first),JSON.stringify(second));
   assert.equal(first.latestComplete.rows.length,2);
   assert.equal(first.latestComplete.rows[0].target,undefined);
   assert.equal(first.latestComplete.rows[0].resultKey,undefined);
   assert.equal(first.latestComplete.rows[0].options,undefined);
+  assert.equal(first.latestComplete.rows[0].explanationKey,undefined);
   assert.equal(first.trace,undefined);
   assert.ok(Object.isFrozen(first.latestComplete.rows));
 });
@@ -131,7 +134,8 @@ test('capture belongs only to its issuing commit in its recorder and session',()
 test('rewind revokes unused captures even when their parent becomes current again',()=>{
   const f=fixture('spectator'), row={kind:'move',side:'enemy',actor:own};
   const root=f.recorder.checkpoint(), original=f.begin();
-  const old=original.captureRoundEvent(row);
+  const old=original.captureRoundEvent({...row,explanationKey:'v2.round.approach',
+    options:[{kind:'fire',target:own,scores:{basis:1,model:2}}]});
   f.capture(row);
   assert.throws(()=>original.add(old),/ROUND_RECEIPT_STALE/);
   const branch=f.begin(), discarded=branch.captureRoundEvent(row);
@@ -147,6 +151,7 @@ test('rewind revokes unused captures even when their parent becomes current agai
   f.close();
   assert.throws(()=>oldRound.add(unused),/ROUND_RECEIPT_STALE/);
   assert.deepEqual(f.recorder.view().latestComplete.rows.map(row=>row.kind),['fire']);
+  assert.equal(f.recorder.view().latestComplete.rows[0].explanationKey,undefined);
 });
 
 test('full trace requires real terminal or a separately bound spectator session',()=>{

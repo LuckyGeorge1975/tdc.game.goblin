@@ -10,6 +10,16 @@ const freeze = value => {
 };
 const point = ({x,y}) => ({x,y});
 
+function comparison(option) {
+  const scores = {};
+  if (Number.isFinite(option.scores?.basis)) scores.basis=option.scores.basis;
+  if (Number.isFinite(option.scores?.model)) scores.model=option.scores.model;
+  return {...(option.baseline===true?{baseline:true}:{}),
+    ...(typeof option.weaponRef==='string'||option.weaponRef===null?{weaponRef:option.weaponRef}:{}),
+    ...(['direct','indirect'].includes(option.mode)?{mode:option.mode}:{}),
+    ...(Object.keys(scores).length?{scores}:{})};
+}
+
 function encodeRound(round, perspective) {
   const tokens = new Map();
   function token(id, rowKey) {
@@ -35,9 +45,11 @@ function encodeRound(round, perspective) {
       result.options=row.options.map((option,i)=>({optionKey:`option-${i+1}`,
         descriptionKey:KINDS[option.kind],selected:option.selected===true,
         ...(option.target?{target:entity(option.target)}:{}),
+        ...(option.actor?{actor:entity(option.actor)}:{}),
+        ...(option.spotter?{spotter:entity(option.spotter)}:{}),
         ...(option.targetCell?{targetCell:point(option.targetCell)}:{}),
         ...(option.component?{component:option.component}:{}),
-        ...(Number.isFinite(option.score)?{score:option.score}:{})}));
+        ...(Number.isFinite(option.score)?{score:option.score}:{}),...comparison(option)}));
     }
     if (perspective !== 'player' && row.explanationKey) result.explanationKey=row.explanationKey;
     return result;
@@ -64,9 +76,11 @@ function copyRow(row) {
   }
   if (row.options) copy.options=row.options.filter(option=>Object.hasOwn(KINDS,option.kind))
     .map(option=>({kind:option.kind,target:subject(option.target),selected:option.selected===true,
+      ...(option.actor?{actor:subject(option.actor)}:{}),
+      ...(option.spotter?{spotter:subject(option.spotter)}:{}),
       ...(option.targetCell?{targetCell:point(option.targetCell)}:{}),
       ...(option.component?{component:option.component}:{}),
-      ...(Number.isFinite(option.score)?{score:option.score}:{})}));
+      ...(Number.isFinite(option.score)?{score:option.score}:{}),...comparison(option)}));
   return copy;
 }
 
@@ -128,6 +142,7 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority,
   let round = initialRound, terminal=false, playerView=null;
   const readBoard=mode==='spectator' && spectatorBoard ? ()=>freeze(structuredClone(spectatorBoard())) : null;
   const completed=[];
+  let fullView;
   let base={parent:null,board:readBoard?.()}, head=base;
   let generation=0;
   const checkpoints=new WeakMap();
@@ -208,11 +223,15 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority,
   function view() {
     const authority=live();
     if (!authority) return null;
-    if (mode==='spectator' || terminal && authority.ended) {
-      const perspective=mode==='spectator'?'spectator':'post-mission';
-      const rounds=completed.map(record=>encodeRound(record,perspective));
-      return Object.freeze({latestComplete:rounds.findLast(item=>item.completion==='complete')??null,
+    if (mode==='spectator' || authority.spectator===true || terminal && authority.ended) {
+      const perspective=mode==='spectator'||authority.spectator===true?'spectator':'post-mission';
+      const previous=fullView?.perspective===perspective?fullView.view.trace:[];
+      if (previous.length===completed.length && fullView?.perspective===perspective) return fullView.view;
+      const rounds=[...previous,...completed.slice(previous.length).map(record=>encodeRound(record,perspective))];
+      const view=Object.freeze({latestComplete:rounds.findLast(item=>item.completion==='complete')??null,
         terminalPartial:rounds.findLast(item=>item.completion==='terminal-partial')??null,trace:Object.freeze(rounds)});
+      fullView={perspective,view};
+      return view;
     }
     return Object.freeze({latestComplete:playerView,terminalPartial:null});
   }

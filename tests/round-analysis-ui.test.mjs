@@ -58,3 +58,37 @@ test('an empty terminal part is labeled separately and does not ask for a map', 
   assert.ok(all(panel).some(node => node.textContent === 'v2.round.partial 3'));
   assert.ok(all(panel).some(node => node.textContent === 'v2.round.noDecisions'));
 });
+
+test('the authorized fire comparison labels its two different scales and keeps zero',()=>{
+  const panel=doc.createElement('div');
+  renderRoundAnalysis(panel,{schemaVersion:1,roundNumber:1,completion:'complete',perspective:'spectator',rows:[
+    {descriptionKey:'Fire',explanationKey:'v2.round.modelTarget',options:[
+      {descriptionKey:'Target A',actor:{labelKey:'Tank',cell:{x:1,y:2}},weaponRef:null,mode:'direct',
+        baseline:true,scores:{basis:0,model:0}},
+      {descriptionKey:'Target B',selected:true,scores:{model:2}},
+      {descriptionKey:'Target C',scores:{basis:14}}
+    ]}
+  ]},{t,back(){},previewMap(){assert.fail('Unexpected map request');}});
+  const labels=all(all(panel).find(node=>node.tag==='details')).filter(node=>node.tag==='li')
+    .map(node=>node.textContent);
+  assert.deepEqual(labels,[
+    'Target A · Tank B-03 · v2.round.standardWeapon · v2.ui.artillery.direct · v2.round.baselineTarget · v2.round.basisScore 0 · v2.round.modelScore 0',
+    'Target B · v2.round.selected · v2.round.modelScore 2',
+    'Target C · v2.round.basisScore 14'
+  ]);
+});
+
+test('the deadline reason is visible with only the recorded basis value in the active locale',()=>{
+  const panel=doc.createElement('div');
+  renderRoundAnalysis(panel,{schemaVersion:1,roundNumber:2,completion:'complete',perspective:'spectator',rows:[
+    {descriptionKey:'Fire',explanationKey:'v2.round.deadlinePriority',options:[
+      {descriptionKey:'Core',selected:true,baseline:true,scores:{basis:1.25}},
+      {descriptionKey:'Guard'}
+    ]}
+  ]},{t,locale:'de',back(){},previewMap(){assert.fail('Unexpected map request');}});
+  assert.ok(all(panel).some(node=>node.tag==='p'&&node.textContent==='v2.round.deadlinePriority'));
+  assert.deepEqual(all(panel).filter(node=>node.tag==='li'&&node.textContent).map(node=>node.textContent),[
+    'Core · v2.round.selected · v2.round.baselineTarget · v2.round.basisScore 1,25',
+    'Guard'
+  ]);
+});

@@ -1,4 +1,4 @@
-import {createRoundRecorder} from './round-view-producer.mjs?v=3';
+import {createRoundRecorder} from './round-view-producer.mjs?v=5';
 
 export function createFullRoundSource(read) {
   let owner, recorder;
@@ -28,6 +28,10 @@ export function createFullRoundSource(read) {
   }
   return Object.freeze({
     start, record,
+    recordPrivate(event) {
+      const commit = current()?.beginCommit();
+      if (commit) commit.accept({roundNumber:read().round,events:[commit.captureRoundEvent(event)]});
+    },
     beginBoundary:() => current()?.beginCommit(),
     complete(commit, roundNumber, boundary) { commit?.accept({roundNumber,events:[],boundary}); },
     checkpoint(snapshot) {
@@ -45,6 +49,7 @@ export function createFullRoundSource(read) {
 if (typeof document !== 'undefined') {
   globalThis.GoblinFullRoundSource = createFullRoundSource(() =>
     GoblinCatalogFullRuntime.active() && legacySession.ruleProfileId === 'FULL_CATALOG_v1'
-      ? {session:legacySession,round:turn,side:phase,phase:turnPhase,ended:gameOver} : null);
+      ? {session:legacySession,round:turn,side:phase,phase:turnPhase,ended:gameOver,
+        spectator:!!GoblinCatalogFullRuntime.controllerPort()?.spectator?.()} : null);
   GoblinFullRoundSource.start();
 }

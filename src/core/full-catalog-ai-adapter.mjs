@@ -1,4 +1,4 @@
-import {createAiDecisionAdapter} from './ai-decision-adapter.mjs';
+import {createAiDecisionAdapter} from './ai-decision-adapter.mjs?v=1';
 
 const cellTarget = ({x, y}) => ({kind: 'cell', x, y});
 
@@ -70,8 +70,8 @@ export function sameFullCatalogActionSlot(left,right) {
 export function createOwnedFullCatalogAiAdapter(port,player) {
   const captured=new WeakMap();
   let prepared;
-  function commit(token,command){
-    const result=port.commit('ai',token,command,player.dispatch);
+  function commit(token,command,evidence){
+    const result=port.commit('ai',token,command,player.dispatch,evidence);
     return result.ok?{ok:true,action:command}:{ok:false,code:result.code??'AI_FULL_COMMAND_REJECTED'};
   }
   const adapter=createAiDecisionAdapter({
@@ -84,8 +84,8 @@ export function createOwnedFullCatalogAiAdapter(port,player) {
       prepared={token,commands:listed.map(({command})=>command)};
       return {ok:true,phase:token.phase,slot:opened.pass,view:projection.view,options:describeOptions(listed,side)};
     },
-    apply:(token,{command})=>{
-      const result=commit(token,command);
+    apply:(token,{command},evidence)=>{
+      const result=commit(token,command,evidence);
       return result.ok?{action:result.action}:{error:{code:result.code}};
     }
   });
@@ -95,17 +95,17 @@ export function createOwnedFullCatalogAiAdapter(port,player) {
       if(batch.ok)captured.set(batch,prepared);
       return batch;
     },
-    remember(batch,key){
+    remember(batch,key,evidence){
       const batchNative=captured.get(batch);
       const index=batch.candidates.findIndex(candidate=>candidate.key===key);
-      return batchNative&&index>=0 ? {token:batchNative.token,command:batchNative.commands[index]} : null;
+      return batchNative&&index>=0 ? {token:batchNative.token,command:batchNative.commands[index],evidence} : null;
     },
-    resume({token:original,command}){
+    resume({token:original,command,evidence}){
       const fresh=port.ticket('ai');
       if(!sameFullCatalogActionSlot(original,fresh)||fresh.generation===original.generation||
           fresh.revision!==original.revision||fresh.phase!==original.phase||fresh.actorId!==original.actorId)return null;
       // Only the recorded command is reused. The old permission never reaches commit.
-      return commit(fresh,command);
+      return commit(fresh,command,evidence);
     }
   });
 }

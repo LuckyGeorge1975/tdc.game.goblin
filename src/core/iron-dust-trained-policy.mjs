@@ -1,4 +1,4 @@
-import {createAiPolicyRegistry} from './ai-policy-registry.mjs';
+import {createAiPolicyRegistry} from './ai-policy-registry.mjs?v=1';
 import {IRON_DUST_TARGET_FEATURES, IRON_DUST_TARGET_FEATURE_VERSION} from './iron-dust-ai-adapter.mjs?v=5';
 
 export const IRON_DUST_TRAINED_SCOPE = Object.freeze({
@@ -19,18 +19,23 @@ function compile(bytes) {
     throw Error('IRON_DUST_TRAINED_MODEL_INVALID');
   const score = input => model.hidden.reduce((sum,node,index) => sum + model.output.weights[index] * Math.tanh(
     node.weights.reduce((value,weight,column) => value + weight * input[column],node.bias)),model.output.bias);
-  return ({candidates, baseline}) => {
+  return ({candidates,baseline},report) => {
     if (!candidates.every(candidate => candidate.kind==='fire' && candidate.target?.kind==='unit' &&
         candidate.actorId===baseline.unitId && candidate.weaponRef===(baseline.weaponKey??null) &&
         candidate.facts.featureVersion===id && weights(candidate.facts.features)))
       throw Error('IRON_DUST_TRAINED_SCOPE_INVALID');
     let selected = candidates.find(candidate => candidate.target.unitId===baseline.targetId);
     if (!selected) throw Error('IRON_DUST_TRAINED_BASELINE_MISSING');
-    let value = score(selected.facts.features);
+    const base = selected;
+    const baseScore = score(base.facts.features);
+    let value = baseScore;
+    const options = report ? [] : null;
     for (const candidate of candidates) {
-      const next = score(candidate.facts.features);
+      const next = candidate===base ? baseScore : score(candidate.facts.features);
+      options?.push({key:candidate.key,baseline:candidate===base,scores:{model:next}});
       if (next>value) { selected=candidate; value=next; }
     }
+    report?.({key:selected.key,explanationKey:selected===base?'v2.round.modelBaseline':'v2.round.modelTarget',options});
     return selected.key;
   };
 }

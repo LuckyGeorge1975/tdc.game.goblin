@@ -1,7 +1,8 @@
 // Presentation of an already redacted historical projection. The caller owns
 // session binding, round boundaries and permission to supply a perspective.
-export function renderRoundAnalysis(panel, round, {t, previewMap, back, selected = 0, onSelect = () => {}}) {
+export function renderRoundAnalysis(panel, round, {t, locale, previewMap, back, selected = 0, onSelect = () => {}}) {
   const doc = panel.ownerDocument;
+  const formatScore = new Intl.NumberFormat(locale,{maximumFractionDigits:4});
   function element(tag, className = '', text = '') {
     const node = doc.createElement(tag);
     node.className = className;
@@ -66,9 +67,20 @@ export function renderRoundAnalysis(panel, round, {t, previewMap, back, selected
       alternatives.append(element('summary', '', t('v2.round.alternatives')));
       const options = element('ul');
       for (const option of decision.options) {
-        const label = [t(option.descriptionKey), option.target && t(option.target.labelKey),
+        const {basis, model} = option.scores ?? {};
+        const actor=option.actor && [t(option.actor.labelKey),option.actor.cell&&hexLabel(option.actor.cell)]
+          .filter(Boolean).join(' ');
+        const mode=option.mode==='indirect' && option.spotter
+          ? t('v2.ui.artillery.indirectVia',{spotter:t(option.spotter.labelKey)})
+          : option.mode && t(`v2.ui.artillery.${option.mode}`);
+        const label = [t(option.descriptionKey),actor,
+          option.weaponRef===null?t('v2.round.standardWeapon'):option.weaponRef,mode,
+          option.target && t(option.target.labelKey),
           option.targetCell && hexLabel(option.targetCell), option.component,
-          option.selected && t('v2.round.selected'), Number.isFinite(option.score) && new Intl.NumberFormat(undefined,{maximumFractionDigits:4}).format(option.score)];
+          option.selected && t('v2.round.selected'),option.baseline && t('v2.round.baselineTarget'),
+          Number.isFinite(basis) && `${t('v2.round.basisScore')} ${formatScore.format(basis)}`,
+          Number.isFinite(model) && `${t('v2.round.modelScore')} ${formatScore.format(model)}`,
+          !Number.isFinite(basis) && !Number.isFinite(model) && Number.isFinite(option.score) && formatScore.format(option.score)];
         options.append(element('li', '', label.filter(Boolean).join(' · ')));
       }
       alternatives.append(options);

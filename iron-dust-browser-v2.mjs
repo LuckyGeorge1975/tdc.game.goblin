@@ -1,9 +1,9 @@
 import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
-import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=6';
+import {captureIronDustRoundCommit, createIronDustRoundRecorder} from './iron-dust-round-source.mjs?v=7';
 import {createIronDustAiAdapter} from './src/core/iron-dust-ai-adapter.mjs?v=5';
-import {createAiSessionHost} from './src/core/ai-session-host.mjs?v=2';
-import {createAiPolicyRegistry} from './src/core/ai-policy-registry.mjs';
-import {prepareIronDustTrainedPolicy, IRON_DUST_TRAINED_SCOPE} from './src/core/iron-dust-trained-policy.mjs?v=1';
+import {createAiSessionHost} from './src/core/ai-session-host.mjs?v=3';
+import {createAiPolicyRegistry} from './src/core/ai-policy-registry.mjs?v=1';
+import {prepareIronDustTrainedPolicy, IRON_DUST_TRAINED_SCOPE} from './src/core/iron-dust-trained-policy.mjs?v=2';
 import {choosePlayerAction} from './src/core/iron-dust-objective-policy.mjs?v=1';
 import {hexDistance} from './src/core/hex.mjs';
 import {createIronDustCommitRecorder} from './src/core/iron-dust-profile-replay.mjs?v=2';
@@ -31,6 +31,13 @@ export const IRON_DUST_V2_START_SEED = 8;
 // A future spectator owner supplies the approved policies, then schedules
 // advance() at the end of each committed engine action.
 const browserPolicies = createAiPolicyRegistry([]);
+const objectiveReasons = {
+  'advance-toward-objective':'v2.round.objectiveMove',
+  'select-weapon-for-objective':'v2.round.objectiveWeapon',
+  'select-weapon-for-threat':'v2.round.objectiveWeapon',
+  'no-usable-action':'v2.round.objectivePass',
+  'no-objective':'v2.round.objectivePass'
+};
 
 export function createIronDustDecisionHost({readSession, readEpoch, select, policy, feature, install, spectator,
   fireTarget}) {
@@ -53,8 +60,9 @@ export function createIronDustDecisionHost({readSession, readEpoch, select, poli
         engine:fireTarget?.engine ?? session.profile.profileVersion,
         profile:session.profile.header.ruleProfileId,feature};
     },
-    commit(result) {
-      install(Object.freeze({profile:result.profile,projection:projectIronDustProfile(result.profile,result.events)}),result.action);
+    commit(result,before,evidence) {
+      install(Object.freeze({profile:result.profile,projection:projectIronDustProfile(result.profile,result.events)}),
+        result.action,evidence);
     }
   });
 }
@@ -188,18 +196,18 @@ if (typeof document !== 'undefined') {
         return;
       }
       const {profile,projection}=session;
-      const action=choosePlayerAction({state:projection.state,hexDistance,
+      const {command:action,explanation}=choosePlayerAction({state:projection.state,hexDistance,
         query:command=>queryIronDustProfile(profile,command),
         queryWithWeapon(command,fire) {
           const next=dispatchIronDustProfile(profile,command);
           return next.profile?queryIronDustProfile(next.profile,fire):{available:false,error:next.error};
         }
-      }).command;
+      });
       if (action.type==='PlayerFire') {
         owner.shot=action;
         const result=await owner.fire.advance();
         if (!result.ok) throw Error(result.code);
-      } else if (!commitAction(action).session) owner.failed=true;
+      } else if (!commitAction(action,{explanationKey:objectiveReasons[explanation.reason]}).session) owner.failed=true;
     } catch(error) {
       if (owner===trained) {
         owner.failed=true;
@@ -223,16 +231,16 @@ if (typeof document !== 'undefined') {
       // Pause keeps this atomic fire decision valid. Leaving or restarting replaces its owner.
       readSession:()=>trained===owner?session:null,
       readEpoch:()=>epoch,
-      policy:{select:(context,batch)=>trainedPolicy.select(context,{...batch,baseline:owner.shot})},
+      policy:{select:(context,batch,report)=>trainedPolicy.select(context,{...batch,baseline:owner.shot},report)},
       spectator:true,feature:scope.feature,
       fireTarget:{engine:scope.engine,scope:()=>owner.shot&&
         {actorId:owner.shot.unitId,weaponRef:owner.shot.weaponKey??null}},
-      install(next,command) {
+      install(next,command,evidence) {
         const before=session;
         const roundCommit=rounds.beginCommit();
         const ticket=observePresentation(presentation,'begin',before,command,{action:{command}});
         observePresentation(presentation,'confirm',ticket,next);
-        takeAccepted(next,command,before,roundCommit);
+        takeAccepted(next,command,before,roundCommit,evidence);
         actionError=null;
         renderCurrent();
       }
@@ -254,20 +262,21 @@ if (typeof document !== 'undefined') {
     undo.title = t('v2.undo');
     globalThis.dispatchEvent?.(new Event('goblin-core-v2-render'));
   }
-  function commitAction(command) {
+  function commitAction(command,evidence) {
     if (mode !== 'ready' || !session) return {error:{code:'V2_NOT_READY'}};
     const before = session;
     const roundCommit = session.projection.mode === 'ended' ? null : rounds.beginCommit();
     const result = dispatchIronDustBrowserAction(session, command, presentation);
-    if (result.session) takeAccepted(result.session,command,before,roundCommit);
+    const choice=evidence??(command.type==='AutoEnemyAdvance'?{explanationKey:'v2.round.standardAction'}:undefined);
+    if (result.session) takeAccepted(result.session,command,before,roundCommit,choice);
     actionError = result.error?.code ?? null;
     renderCurrent();
     return result;
   }
-  function takeAccepted(next,command,before,roundCommit) {
+  function takeAccepted(next,command,before,roundCommit,evidence) {
     session=next;
     const {profile}=next, {events}=next.projection;
-    captureIronDustRoundCommit(roundCommit,before.profile,{profile,events});
+    captureIronDustRoundCommit(roundCommit,before.profile,{profile,events,action:command,evidence});
     trained?.replay.accept(before.profile,{action:command,profile,events});
     const cursor=before.projection.cursor;
     eventHistory.push(...events.map(event=>({...event,

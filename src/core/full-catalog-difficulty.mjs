@@ -19,6 +19,17 @@ function best(candidates, score) {
   return winner;
 }
 
+function select(candidate,reason,report,options) {
+  const key=candidate?.key;
+  if (key!==undefined) report?.({key,explanationKey:`v2.round.${reason}`,options});
+  return key;
+}
+
+function finishReason(candidate) {
+  if (candidate?.kind==='hold' || candidate?.kind==='end-phase') return 'rulePass';
+  return candidate?.facts.baseline?'standardAction':'firstOption';
+}
+
 function finish(candidates) {
   // A native weapon continuation can require an offered shot. It has no pass.
   return candidates.find(({kind})=>kind==='hold'||kind==='end-phase') ??
@@ -52,24 +63,29 @@ function approachOpenGoal(batch,opponents,units,abandonCore,moveScore) {
   return bestMove;
 }
 
-export function selectWeakFullCatalog(batch) {
+export function selectWeakFullCatalog(batch,report) {
   const {units,opponents}=board(batch);
   const {candidates}=batch;
-  const shot=best(candidates, ({kind,actorId,target,facts})=>{
+  const options=report?[]:null;
+  const shot=best(candidates, ({key,kind,actorId,target,facts})=>{
     if (kind!=='fire'&&kind!=='hex-fire') return 0;
     const targets=kind==='fire'?[units.get(target.unitId)]:
       (facts.hits??[]).map(hit=>units.get(hit.unitId));
     const visible=targets.filter(unit=>unit&&available(unit)&&unit.relation==='opponent');
-    return visible.length?1/(1+distanceTo(units.get(actorId),visible)):0;
+    const value=visible.length?1/(1+distanceTo(units.get(actorId),visible)):0;
+    options?.push({key,scores:{basis:value}});
+    return value;
   });
-  if (shot) return shot.key;
+  if (shot) return select(shot,'nearestFire',report,options);
   const move=opponents.length&&best(candidates, ({kind,actorId,target})=>{
     if (kind!=='move') return 0;
     const actor=units.get(actorId);
     const before=distanceTo(actor,opponents), after=distanceTo(target,opponents);
     return after<before?1/(1+after):0;
   });
-  return (move||finish(candidates))?.key;
+  if (move) return select(move,'approach',report);
+  const fallback=finish(candidates);
+  return select(fallback,finishReason(fallback),report,options);
 }
 
 function expectedEffect(target, {ratioCategory,effectKind,attack}, tactics) {
@@ -108,7 +124,7 @@ function situation(batch) {
   return {units,opponents,tactics,core,defending,safety,damageFraction,abandonCore,priority};
 }
 
-export function selectMediumFullCatalog(batch) {
+export function selectMediumFullCatalog(batch,report) {
   const {units,opponents,tactics,core,defending,safety,damageFraction,abandonCore,priority}=situation(batch);
   const {candidates}=batch;
   const retreat=best(candidates, ({kind,actorId,target})=>{
@@ -117,9 +133,10 @@ export function selectMediumFullCatalog(batch) {
     if (damageFraction(actor)>0.5||abandonCore(actor,target)) return 0;
     return safety(target)-safety(actor);
   });
-  if (retreat) return retreat.key;
+  if (retreat) return select(retreat,'retreat',report);
 
   let bestAttack, bestValue=0;
+  const options=report?[]:null;
   for (const candidate of candidates) {
     const {kind,actorId,target,facts}=candidate;
     if (!['fire','hex-fire','ram'].includes(kind)) continue;
@@ -130,12 +147,13 @@ export function selectMediumFullCatalog(batch) {
       const effect=kind==='ram'?2+victim.hp:expectedEffect(victim,hit,tactics);
       return total+effect*(victim.relation==='own'?-2:priority(actor,victim));
     },0);
+    if (kind!=='ram') options?.push({key:candidate.key,scores:{basis:value}});
     if (value>bestValue||value>0&&value===bestValue&&bestAttack.facts.expendable&&!facts.expendable) {
       bestAttack=candidate;
       bestValue=value;
     }
   }
-  if (bestAttack) return bestAttack.key;
+  if (bestAttack) return select(bestAttack,'effectAttack',report,options);
 
   function moveScore(actor,target) {
     const progress=opponents.length?distanceTo(actor,opponents)-distanceTo(target,opponents):0;
@@ -156,10 +174,11 @@ export function selectMediumFullCatalog(batch) {
     const progress=distanceTo(cargo,goal)-distanceTo(destination,goal);
     return progress>0?progress+(kind==='load'?0:1)+safety(destination)-safety(cargo):0;
   });
-  if (position) return position.key;
+  if (position) return select(position,'positionValue',report);
   const fallback=finish(candidates);
   const voluntaryMovePass=batch.side==='enemy'?batch.slot==='first'&&fallback?.kind==='hold':
     (batch.phase==='movement'||batch.phase==='gev')&&fallback?.kind==='end-phase';
   const approach=voluntaryMovePass&&approachOpenGoal(batch,opponents,units,abandonCore,moveScore);
-  return (approach||fallback)?.key;
+  if (approach) return select(approach,'approach',report);
+  return select(fallback,finishReason(fallback),report,options);
 }

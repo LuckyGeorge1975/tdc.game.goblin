@@ -39,11 +39,11 @@ export function createAiPolicyRegistry(pins, crypto = globalThis.crypto) {
     if (!covers(entry,scopes)) return null;
     const permitted = new Set(scopes.map(scopeKey));
     return Object.freeze({
-      select(context,decision) {
+      select(context,decision,report) {
         const scope = {...context,side:decision.side,slot:decision.slot};
         if (decision.schemaVersion !== entry.pin.schemaVersion || !permitted.has(scopeKey(scope)))
           throw new Error('AI_POLICY_SCOPE_MISMATCH');
-        return entry.select(decision);
+        return entry.select(decision,report);
       }
     });
   }

@@ -1,4 +1,4 @@
-import {createAiPolicyRegistry} from './ai-policy-registry.mjs';
+import {createAiPolicyRegistry} from './ai-policy-registry.mjs?v=1';
 import {hexDistance} from './hex.mjs';
 
 export const FULL_ATTACK_2A_ENGINE = '91cc3f4170d242631e4f821d12e259daabded6af';
@@ -48,9 +48,15 @@ function score(model, input) {
     node.weights.reduce((value,weight,j)=>value+weight*input[j],node.bias)),model.output.bias);
 }
 
-const endPhase=batch=>batch.candidates.find(candidate=>candidate.kind==='end-phase')?.key;
+function select(candidate,reason,report,options) {
+  const key=candidate?.key;
+  if (key!==undefined) report?.({key,explanationKey:`v2.round.${reason}`,options});
+  return key;
+}
 
-function selectMovement(batch) {
+const endPhase=(batch,report)=>select(batch.candidates.find(candidate=>candidate.kind==='end-phase'),'objectivePass',report);
+
+function selectMovement(batch,report) {
   const opponents=batch.view.units.filter(unit=>onBoard(unit)&&unit.relation==='opponent');
   const core=opponents.find(unit=>unit.objectiveTarget);
   for (const actor of batch.view.units) {
@@ -61,9 +67,9 @@ function selectMovement(batch) {
     const best=batch.candidates.filter(candidate=>candidate.kind==='move'&&candidate.actorId===actor.id&&
       hexDistance(candidate.target,target)<distance)
       .toSorted((a,b)=>hexDistance(a.target,target)-hexDistance(b.target,target)||a.target.y-b.target.y||a.target.x-b.target.x)[0];
-    if (best) return best.key;
+    if (best) return select(best,'objectiveMove',report);
   }
-  return endPhase(batch);
+  return endPhase(batch,report);
 }
 
 function targetsActiveDeadlineObjective(view, candidate) {
@@ -79,7 +85,7 @@ function targetsActiveDeadlineObjective(view, candidate) {
   return candidate.target.unitId===target.id;
 }
 
-function selectFire(batch, model) {
+function selectFire(batch, model, report) {
   const shots=[];
   let baseline;
   for (const candidate of batch.candidates) {
@@ -92,16 +98,21 @@ function selectFire(batch, model) {
     if (candidate.kind==='hex-fire'&&points<=0) continue;
     if (!baseline||points>baseline.points) baseline=shot;
   }
-  if (!baseline) return endPhase(batch);
-  if (!model||targetsActiveDeadlineObjective(batch.view,baseline.candidate)) return baseline.candidate.key;
+  if (!baseline) return endPhase(batch,report);
+  const deadline=targetsActiveDeadlineObjective(batch.view,baseline.candidate);
+  const options=()=>shots.map(shot=>({key:shot.candidate.key,baseline:shot===baseline,
+    scores:{basis:shot.points,model:shot.modelScore}}));
+  if (!model||deadline) return select(baseline.candidate,deadline?'deadlinePriority':'objectiveFire',
+    report,report?options():undefined);
   const {actorId,weaponRef}=baseline.candidate;
-  let selected=baseline.candidate, highest=score(model,baseline.input);
-  for (const {candidate,input} of shots) {
-    if (candidate===baseline.candidate||candidate.actorId!==actorId||candidate.weaponRef!==weaponRef) continue;
-    const value=score(model,input);
+  let selected=baseline.candidate, highest=baseline.modelScore=score(model,baseline.input);
+  for (const shot of shots) {
+    const {candidate,input}=shot;
+    if (shot===baseline||candidate.actorId!==actorId||candidate.weaponRef!==weaponRef) continue;
+    const value=shot.modelScore=score(model,input);
     if (value>highest) { selected=candidate; highest=value; }
   }
-  return selected.key;
+  return select(selected,selected===baseline.candidate?'modelBaseline':'modelTarget',report,report?options():undefined);
 }
 
 function compile(bytes) {
@@ -111,7 +122,7 @@ function compile(bytes) {
       model.rewardVersion!=='goblin-mission-win-pair-v1'||!Array.isArray(model.hidden)||model.hidden.length!==8||
       !model.hidden.every(node=>Number.isFinite(node?.bias)&&weights(node.weights,19))||
       !Number.isFinite(model.output?.bias)||!weights(model.output.weights,8)) throw Error('AI_POLICY_INVALID');
-  return batch=>selectFire(batch,model);
+  return (batch,report)=>selectFire(batch,model,report);
 }
 
 export async function prepareFullAttack2a({engine,modelBytes,crypto}) {
@@ -121,15 +132,15 @@ export async function prepareFullAttack2a({engine,modelBytes,crypto}) {
   await registry.install(FULL_ATTACK_2A_ID,modelBytes,compile);
   const policy=registry.bind(FULL_ATTACK_2A_ID,[scope]);
 
-  return function select(batch, port) {
+  return function choose(batch,port,report) {
     const state=port.state();
     if (!state||state.policyId!==FULL_ATTACK_2A_ID||state.profileId!==scope.profile||state.side!==scope.side||
         state.controller!=='ai'||state.ended||state.paused||!batch?.ok||batch.schemaVersion!==1||
         batch.side!==scope.side||batch.phase!==state.phase||batch.slot!==state.slot||
         batch.view?.side!==scope.side||batch.view.phase!==state.phase)
       throw Error('AI_POLICY_SCOPE_MISMATCH');
-    if (state.phase==='fire') return policy.select(scope,batch);
-    if (state.phase==='movement'||state.phase==='gev') return selectMovement(batch);
+    if (state.phase==='fire') return policy.select(scope,batch,report);
+    if (state.phase==='movement'||state.phase==='gev') return selectMovement(batch,report);
     throw Error('AI_POLICY_SCOPE_MISMATCH');
   };
 }
