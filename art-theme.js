@@ -1,9 +1,5 @@
 (function(){
   if(globalThis.goblinBootProfileError)return;
-  const fixedStyle=UnitVisuals.currentStyle();
-  try{if(localStorage.getItem('goblin-art-style')!==fixedStyle)
-    localStorage.setItem('goblin-art-style',fixedStyle)}catch{/* Storage is optional. */}
-
   function replaceWithArt(container,unit,view='icons'){
     const asset=view==='icons'?(UnitVisuals.resolve(unit).asset||null)
       :UnitVisuals.assetFor(unit,view);

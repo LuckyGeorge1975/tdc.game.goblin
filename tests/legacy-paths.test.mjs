@@ -33,9 +33,15 @@ test('all page-local scripts, styles and icons resolve under the Pages project p
   }
 });
 
-test('legacy localization catalog remains rooted at the published asset directory', () => {
-  const script = new URL('src/legacy/scripts/localization.js', `https://example.test${prefix}`);
-  const catalog = new URL('../../../assets/ui-copy/content-02.de.json', script);
-  assert.equal(catalog.pathname, `${prefix}assets/ui-copy/content-02.de.json`);
-  exactCase(join(root, catalog.pathname.slice(prefix.length)));
+test('all entrypoints use the published localization module and catalog', () => {
+  for (const page of pages) {
+    const html = readFileSync(join(root,page),'utf8');
+    const scripts = [...html.matchAll(/<script\b[^>]*\bsrc="([^"]*localization\.js[^"]*)"/g)];
+    assert.equal(scripts.length,1,page);
+    const script = new URL(scripts[0][1],`https://example.test${prefix}${page}`);
+    assert.equal(script.pathname,`${prefix}localization.js`);
+    const catalog = new URL('assets/ui-copy/content-02.de.json',script);
+    assert.equal(catalog.pathname,`${prefix}assets/ui-copy/content-02.de.json`);
+    exactCase(join(root,catalog.pathname.slice(prefix.length)));
+  }
 });

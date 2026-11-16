@@ -2,12 +2,12 @@
 
 **Dokumentversion:** 7
 
-Die Spieloberfläche verwendet ausschließlich `02-technical-illustration`. Der Renderer in `unit-visuals.js` und `src/legacy/scripts/unit-visuals.js` ordnet stabile Einheiten-IDs und Szenarioaliasse den vorhandenen Motiven zu. Ein anderes Set lässt sich weder über die Oberfläche noch über `UnitVisuals.setStyle` aktivieren. Eine früher lokal gespeicherte Auswahl wird beim Start auf Set 02 normalisiert.
+Die Spieloberfläche verwendet fest `02-technical-illustration`. Der Renderer in `unit-visuals.js` ordnet stabile Einheiten-IDs und Szenarioaliasse den Motiven zu. Die Zuordnung kommt aus der Laufzeit.
 
-Karte, Einheitenliste, Auswahl, Bibliotheksliste und Missionsvorschau verwenden die transparenten `assets/unit-art/sets/02-technical-illustration/icons/{unit}.png` mit 256 × 256 Pixeln. Die große Ansicht im Unit Guide lädt `library/{unit}@1024.webp` (1024 × 683 Pixel) mit transparentem `@768.png`-Fallback (768 × 512 Pixel). Der Browser lädt nur das unterstützte Format. Das [Manifest](../assets/unit-art/manifest.json) enthält die 26 stabilen Einheitenschlüssel.
+Karte, Einheitenliste, Auswahl und Missionsvorschau verwenden die Seitenableitungen unter `assets/unit-art/sets/02-technical-illustration/map-icons/`. Die große Ansicht im Unit Guide lädt `library/{unit}@1024.webp` (1024 × 683 Pixel) mit transparentem `@768.png`-Fallback (768 × 512 Pixel). Das [Manifest](../assets/unit-art/manifest.json) enthält die 26 stabilen Einheitenschlüssel.
 
 Team-, Ziel- und Auswahlmarker bleiben getrennte UI-Ebenen; die Motivdateien werden nicht für die Teamkennung verändert. Spielregeln und Szenariodaten ändern sich durch die feste Bildzuordnung nicht.
 
-Die zwölf derzeitigen Terrainansichten stammen weiterhin aus `sets/01-modular-stealth-geometry/terrain/`. `UnitVisuals.terrainAssetFor(type)` liefert diesen Fallback bis zur gesonderten Integration des neuen Kartenpakets. Die Terrainregeln stehen unabhängig davon in `src/legacy/scripts/terrain-rules.js`.
+Für die Kartentexturen lädt die Präsentation das Terrainpaket unter `assets/terrain-tiles/`. `UnitVisuals.terrainAssetFor(type)` bietet die Motive unter `sets/01-modular-stealth-geometry/terrain/` weiterhin als Fallback an. Die Terrainmechanik wird über `terrain-rules.js` und im modularen Pfad über `rules.mjs` geladen.
 
-Frühere Setdateien, Galerien, Quellen- und Testbelege bleiben im Repository. Ihre Herkunft und Formate sind in [assets/unit-art/README.md](../assets/unit-art/README.md) dokumentiert; die nachgelagerte Bereinigung wird getrennt entschieden.
+Herkunft, Formate und Generatoren der vorhandenen Sets sind im [Unit-Art-Handoff](../assets/unit-art/README.md) dokumentiert.

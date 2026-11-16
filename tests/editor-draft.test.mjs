@@ -204,6 +204,7 @@ test('editor flow keeps the validated draft across playtest and rejects an impor
     const button=()=>({}),actions=()=>({});
     const show=next=>{screen=next},releasePause=()=>{},renderScreen=()=>{},heading=x=>x,paragraph=x=>x;
     const GoblinUIV2={resetView(){},startView(){}},GoblinEditorUI={render(panel,view){globalThis.editorView=view}};
+    ${flow.match(/^    const ironDustSeatScreens = .*;$/m)[0]}
     ${flow.slice(flow.indexOf('    async function leaveMission('),flow.indexOf('    function libraryAssetId('))}
   `);
   const world = g.state();

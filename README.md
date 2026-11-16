@@ -1,126 +1,37 @@
-# G.O.B.L.I.N — Field Test
+# G.O.B.L.I.N. — Field Test
 
-G.O.B.L.I.N steht für **Ground Operations, Battlefield Logistics & Intelligence Network**. Dieses Repository enthält einen eigenständigen Browser-Prototypen für eine rundenbasierte Hexfeld-Taktikmission mit eigener UI, SVG-Karte und frei entwickelten Einheitenmarkern.
+G.O.B.L.I.N. steht für **Ground Operations, Battlefield Logistics & Intelligence Network**. Der Browserprototyp ist ein rundenbasiertes Taktikspiel auf einer Hexkarte. Versionsbasis ist [v0.1.31](CHANGELOG.md#0131---2026-11-16).
 
-## Aktueller Stand
+![FULL Atlas Proving Grounds, Build 31, Zug 1 in der Bewegungsphase](docs/images/field-test-0.1.31-full-atlas.webp)
 
-**0.1.31 / Build 31 vom 16.11.2026** ist der lokale Release-Kandidat. Im Vollkatalog und in Iron Dust V2 stehen trainierte Angreifer zur Wahl. Im Zuschauermodus lassen sich KI-Partien pausieren und abgeschlossene Runden mit den aufgezeichneten Entscheidungen ansehen. [Änderungen seit Build 30](CHANGELOG.md#0131---2026-11-16) · [Test-Handoff](reports/TEST_HANDOFF.md#build-0131--ki-und-rundenanalyse)
-
-![Build 0.1.31 – FULL Atlas Proving Grounds mit sichtbaren Einheiten auf der Hexkarte](docs/images/field-test-0.1.31-full-atlas.webp)
-
-*FULL Atlas Proving Grounds in Build 0.1.31, Englisch, Zug 1 in der Bewegungsphase. [Herkunft und Bildprüfung](reports/TEST_HANDOFF.md#readme-aufnahme-build-31)*
-
-## Frühere Desktopstände
-
-**0.1.30 / Build 30 vom 13.11.2026** ergänzte die Bibliotheksvorschau für Bewegungs- und Feuerreichweiten sowie das Speichern eigener Level im Browser. [Historische Atlas-Aufnahme](docs/images/field-test-0.1.30-full-atlas.webp) · [Build-30-Handoff](reports/TEST_HANDOFF.md#build-0130--bibliothek-und-eigene-level)
-
-**0.1.29 / Build 29 vom 12.11.2026** führte das Hex-Kontextmenü, die maximierbare Desktop-Karte und den kanonischen v3-Export im Level-Editor ein. [Historische Atlas-Aufnahme](docs/images/field-test-0.1.29-full-atlas.webp) · [Herkunft und Bildprüfung](reports/TEST_HANDOFF.md#readme-aufnahme-build-29)
-
-**0.1.28 / Build 28 vom 04.11.2026 ist der Field-Test-Build nach dem User Report vom 02.11.2026.** Die Spieloberfläche zeigt das aktuelle Terrainset, Missionsauswahl und Briefing kommen ohne Systemscrollleisten aus, das Spiel-Layout hat Kartenoverlays, eine Einheitenliste mit Bereitschaft und eine schaltbare Feldinfo. Neu sind Zurück/Nächste Einheit, überarbeitete Reichweiten, die Ereignisliste per Button und ein Aktionsablauf in drei Schritten: Einheit antippen öffnet das Aktionsmenü, die gewählte Aktion steht in der Befehlsleiste, ein Ziel öffnet eine Zielkarte mit Schritten bzw. Quote und Trefferchance und wird erst mit „Ausführen“ ausgeführt. Die Trainingslektionen beschreiben diesen Ablauf. Legacy-/FULL-Regeln, Missionen und Trainingswerte bleiben unverändert; der getrennte IronDust-v2-Corepfad nutzt die Legacy-Pixel-Sichtlinie und generisches Mehrwaffenfeuer. Feintest und Bericht folgen auf Pages: [Build-28-Handoff](reports/TEST_HANDOFF.md#build-0128--field-test-nach-user-report-0211). Die folgenden Absätze beschreiben den vorigen Stand 0.1.27.
-
-**0.1.27 / Build 27 ist der geprüfte Desktopstand vom 30.10.2026.** Die abgenommene Runtime ist `637c423af98cab8a13b6c7d41904516e18479a18`. Die unabhängige Gesamtregression (749/749) gehört zum ersten Paket `594cd33`; der anschließende FULL-OpenGround-Renderfix auf 637c423 ist mit gezielten Nachprüfungen beider Testerrollen abgenommen. Er ist gegenüber der früheren df1-/594-Runtime nicht bytegleich. Der letzte Nachlauf ergänzt ausschließlich die unten belegte Aufnahme und Dokumentation; abschließende Bild-/Dokumentprüfung und Legalzuordnung sowie die öffentliche Auslieferung werden separat nachgewiesen. [Zuordnung und Prüfgrenzen](reports/TEST_HANDOFF.md#finaler-bild--und-dokumentnachlauf).
-
-Der am 30.10.2026 vor der Build-27-Auslieferung bestätigte veröffentlichte Vorgänger ist **0.1.26 / Build 26**, Tag `v0.1.26` auf `195c2bc5a0c8dd97d6263430114d183cfd2aa082`. Er bleibt der Rückfallpunkt. Dieser zeitgebundene Vorgängerbeleg ist keine Aussage über einen späteren Deploystatus; tatsächliche Veröffentlichung, Tag und öffentliche Nachprüfung hält Koordination in `goblin-upe.6` fest.
-
-Der normale V2-Einstieg bietet fünf FULL-Missionen (`catalog-full-atlas`, `catalog-full-terrain-course`, `catalog-full-advance`, `catalog-full-siege`, `catalog-full-specialists`) mit dem genehmigten 26er-Projektregelprofil einschließlich Systemen, Engineering, Transport/Drohnen, Sicht/Tarnung, Feuer-/Raketenregeln und festen Verstärkungen. Drei kurze T01–T03-Lektionen führen durch Auswahl, Vorschau/Abbruch, Bewegung/BACK, Feuer/Phasen und Gelände/Sicht; Rückblick, Wiederholen und Missionswechsel sind integriert. Die Lektionen behalten ihre festen Field-Test-Werte. Historische Missionen/Piloten und der getrennte IronDust-Corepfad bleiben ausdrücklich bei ihren jeweiligen Regeln.
-
-Der unabhängige .5-Produktlauf auf df1ba35 absolvierte die drei Lektionen, normale Legacy-Hinweise und Recovery-/Navigationswege in einem durchgehend beobachteten Browserdokument mit 0 Errors/0 Rejections. Ältere ResizeObserver-Befunde bleiben historisch dokumentiert. Dies ist keine universelle Geräte-/Layoutfreigabe: Bei 1280×720 und langer französischer Recovery ist die Fit-Karte etwa 64 px hoch; Zoom/Pan bleiben verfügbar. Fingerproben und eine allgemeine Kleindesktop-/Mobilkomfortgarantie sind nicht Bestandteil dieses Belegs.
-
-[Historische FULL-Atlas-Aufnahme aus Build 0.1.27](docs/images/field-test-0.1.27-full-atlas.webp)
-
-*Echte Aufnahme aus Runtime `637c423`, Build 27, Deutsch/High, 1902×984. Normale FULL-Atlas-Ansicht mit 20 projizierten eigenen und sieben bekannten gegnerischen Einheiten, 96 Terrainbildern einschließlich 71 OpenGroundkacheln; keine Sichtfreischaltung. Verlustfreies WebP, 204.844 Bytes, decodierte RGBA-Pixel identisch zum Original-PNG. [Quelle, Hashes und Kompressionsbeleg](reports/TEST_HANDOFF.md#finaler-bild--und-dokumentnachlauf).*
-
-Die [frühere Atlas-Aufnahme](docs/images/field-test-0.1.26-atlas.webp) bleibt **historisch, aus Build 26**: französische Oberfläche, Runtime `74e594d`, 1440×900. Datei und damalige Herkunftsbelege im Build-26-Handoff bleiben erhalten.
-
-Änderungen stehen im [Changelog](CHANGELOG.md), aktuelle Abnahmebezüge und verbleibende Releasegates im [Build-27-Handoff](reports/TEST_HANDOFF.md#build-0127--erstes-lokales-releasepaket). Die [archivierten Notices](reports/CONTENT-NOTICES-V21.md) und der [datierte Herkunftszusatz](reports/CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md) beschreiben die 52 zusätzlichen Code-Wrackderivate und zwei Metadatendateien. Normale Builds und Pages brauchen das private Content-Repository nicht.
-
-### Historische Field-Test-Funktionen und weiterhin verfügbare alte Profile
-
-Die folgende ursprüngliche Funktionsliste beschreibt diese älteren Profile; ihre früheren Einschränkungen sind keine Aussage über den neuen FULL-Katalog:
-
-
-
-- Hexfeldkarte mit zwölf Terrainarten im ATLAS-Showcase: modusspezifische Bewegung, Deckung +1 auf Verteidigung und unterschiedliche Sichtblocker
-- Bewegung mit Gelände- und Belegungskosten sowie expliziten Bewegungsmodi für Kettenfahrzeuge, Infanterie, Skimmer und stationäre Einheiten
-- getrennte Movement-, Fire- und Skimmer-Manöverphasen
-- Einheitliche Spiel-Dialoge für Phasenende, Szenariowechsel und Neustart. Escape bricht ab; Tab und Enter bedienen den Dialog. Spielkürzel und AUTO sind währenddessen gesperrt. „Never ask again“ gilt ausschließlich für das Phasenende. Keine Browser-Messageboxen.
-- Taste `L` beim ausgewählten Transporter: ohne Fracht Ladeauswahl wie `+`; mit Fracht Zielfelder zum Entladen der ersten geladenen Einheit anzeigen. Es gelten dieselben Phasenregeln wie beim Klick.
-- `BACK` nimmt Befehle der aktuellen Phase einzeln zurück: Bewegung, Feuer, Rammen und Transport inklusive Aktionsstatus und Kampflog. Phasenwechsel und Spielende schließen die Historie ab. AUTO wartet nach dem letzten Befehl zwei Sekunden; mit AUTO aus bleibt Zeit bis zum manuellen Phasenwechsel. Wiederholte Schüsse verwenden denselben gespeicherten Würfelwurf.
-- Fire Range und Line-of-Sight-Prüfung. Die acht bisherigen Missionen behalten ihre historische Sichtlinien-Pixelabtastung. Das zusätzliche Supercover-Showcase verwendet `FIELD_TEST_SUPERCOVER_v1`: Berührt die Sichtlinie die Grenze zweier Zwischenhexe, sperrt bereits ein blockierendes Hex den Schuss in beiden Richtungen.
-- CRT-Kampfsystem mit NE, D und X sowie expliziten Verteidigungswerten
-- Deaktivierung, Wiederherstellung, Zerstörung und sichtbare Wracks
-- Goblin-Ramming gegen gegnerische Fahrzeuge
-- einfache Gegner-KI mit Bewegung und Feuer
-- Szenarien `IRON DUST`, `RELAY RUN`, `UNIT TRIAL` und `ATLAS / PROVING GROUNDS`. ATLAS zeigt alle 26 Einheitentypen; Einheiten-Spezialwerte und Siegbedingung sind dort noch vorläufig. Die Terrainregeln sind implementiert und in der [Regelmatrix](docs/RULE_MATRIX.md) dokumentiert.
-- Area-Modi `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`
-- optionales Hex-Grid und oberster Feld-Fokusmarker
-- Quick-Start-Guide, Einheitenbibliothek mit 26 Typen, Live-Werten, Aktionsprofil und „Auf Karte“-Funktion sowie kombinierte Feld- und Einheiteninformationen
-- Skimmer-Carrier-Transport im Szenario `UNIT TRIAL`: Kapazität wird in Infanterie-Stärkepunkten geführt; Ein-/Aussteigen verbraucht die Infanteriebewegung, nicht die Bewegung des Trägers
-- Transportierte Infanterie kann aus dem Skimmer Carrier feuern. Angriffe auf die Kombination verwenden einen gemeinsamen Würfelwurf, werden aber getrennt gegen Träger und Passagiere ausgewertet
-- Der GOBLIN SIEGEBREAKER besitzt einen eigenen Systemzustand für Hauptbatterie, Sekundärbatterien, Raketen, Nahbereichsschutz und 45 Ketteneinheiten. Gegnerische Treffer werden gegen ein einzelnes System ausgewertet; Kettenschäden reduzieren seine Bewegung bei 30, 15 und 0 verbleibenden Kettenpunkten.
-- In der Fire Phase lassen sich die noch verfügbaren Waffensysteme des Siegebreakers einzeln auswählen und abfeuern. Nicht verbrauchte Batterien halten die Einheit handlungsfähig; Raketenmunition bleibt über Runden hinweg verbraucht.
-- Der Strategic Missile Carrier ist in `UNIT TRIAL` spielbar: eine Rakete pro Mission, Angriff 6 auf ein sichtbares Feindziel innerhalb von acht Hexen und Angriff 3 auf alle Einheiten in Nachbarhexen. Friendly Fire ist möglich; `BACK` stellt die Rakete innerhalb der Feuerphase wieder her.
-- Einheitengrafiken werden zentral über [docs/UNIT_VISUALS.md](docs/UNIT_VISUALS.md) auf `02-technical-illustration` festgelegt. Karte, Listen und Bibliothek verwenden vorhandene Varianten derselben 26 Motive; Team- und Auswahlmarker bleiben getrennt.
-- Die [historischen Grafiksets](assets/unit-art/README.md) und ihre Herkunftsbelege bleiben im Repository erhalten. Die Spieloberfläche bietet keine Setumschaltung mehr; eine früher gespeicherte Auswahl wird auf Technische Illustration normalisiert. Herkunft und Grenzen stehen im [Unit-Art-Handoff](assets/unit-art/README.md) und in den [Content & Asset Notices](docs/CONTENT-NOTICES.md).
-- Vier auswählbare Legacy-Showcases K/U1/U2/U3, mobile Karten-/Truppen-/Intel-Navigation und die Niederlage bei simultaner vollständiger Ausschaltung. Die Showcases nutzen historische Field-Test-Werte; Katalog-Sonderregeln sind nicht vollständig umgesetzt.
-- Phasen- und Zugende-Overlays mit optionaler Bestätigungsunterdrückung
+[Herkunft und Prüfung der Aufnahme](reports/TEST_HANDOFF.md#readme-aufnahme-build-31)
 
 ## Lokal starten
-
-Im Projektordner:
 
 ```powershell
 node server.mjs
 ```
 
-Danach `http://localhost:4173` öffnen.
+Danach [localhost:4173](http://localhost:4173) öffnen. Der Spieleinstieg ist `index.html`. Das Repository enthält die zum Spielen benötigten Assetableitungen. Build und Spiel laden keine Dateien aus dem privaten Content-Repository.
 
-`index.html`, `release.js` und `server.mjs` liegen im Projektroot. Der lokale Einstieg lädt die integrierten Spielskripte aus dem Projektroot; der ältere Legacy-Pfad unter `src/legacy/` bleibt für seine Referenzen erhalten. Der modulare Pfad liegt unter `src/app/`, `src/core/` und `src/hex-renderer/`. Browser-URLs werden relativ zum jeweiligen HTML-Einstieg aufgelöst.
+## Spielen
 
-## Steuerung
+- **Levelwahl.** Fünf Vollkatalog-Missionen beginnen mit FULL Atlas Proving Grounds. Die Levelwahl bietet außerdem Iron Dust V2, die Field-Test-Missionen und Showcases sowie die Transport-, Spezialisten-, Artillerie-, Belagerungs- und Skimmer-Szenarien. Jede Mission verwendet ihr eigenes zugelassenes Regelprofil.
+- **Kampagnen und Tutorial.** Relay Line enthält zwei, Scorched Earth zwölf Missionen. Das Tutorial in der Startansicht führt durch T01 und T02. T03 ist als eigene Lektion in der Levelwahl verfügbar.
+- **Sitzwahl und Rundenanalyse.** FULL und Iron Dust V2 führen die Sitzübergabe im nativen Profil aus. Die Auswahl richtet sich nach den für den Sitz zugelassenen Strategien. Trainierte Modelle stehen für den Angriff bereit. Die Spieleransicht gibt nur sichtbare Ereignisse frei. Zuschauer und die Auswertung nach Missionsende können die aufgezeichneten Entscheidungen einsehen.
+- **Editor und eigene Level.** Der Editor kann eine Mission vorbereiten und im Browser speichern. Austauschformat sind `goblin-level-v3` und Pakete im Format `goblin-level-package-v3`. Die Levelwahl öffnet gespeicherte Missionen unter »Eigene Level«.
+- **Befehle.** Einheit auswählen, Aktion wählen, ein Ziel prüfen und ausführen. Das Spiel zeigt nur die im jeweiligen Regelprofil verfügbaren Befehle. Bewegungs-, Feuer- und Skimmer-Manöverphasen setzen ihren jeweiligen Befehlsraum.
 
-- Einheit oder Feld anklicken: Information und Fokusmarker anzeigen
-- Eigenes Fahrzeug auswählen, danach ein erreichbares Feld anklicken: bewegen
-- In der Feuerphase ein sichtbares Ziel anklicken: feuern
-- `F`: nächstes sichtbares Ziel in Reichweite angreifen
-- `ESC`: aktive Einheitenauswahl aufheben
-- `MOVEMENT RANGE`, `FIRE RANGE`, `LINE OF SIGHT`: Overlay wechseln
-- `GRID`: dezentes Hexraster ein-/ausblenden
-- `END TURN`: aktuelle Phase beenden bzw. Gegnerzug starten
+## Regeln, Tests und Build
 
-Nach Sieg oder Niederlage bleibt die Karte samt Combat Log sichtbar. Der Kampf wird nicht automatisch zurückgesetzt; nur `RESTART` startet die Mission neu.
-
-Gegnerische Fahrzeuge können zur Information und zur Anzeige ihrer Bereiche ausgewählt werden. Ein Angriff wird nur durch ein gültiges Ziel in der Feuerphase ausgelöst.
-
-## Regelbasis und Tests
-
-Die [Dokumentationsübersicht](docs/README.md) bündelt Regeln, Architektur, Gestaltung und Testplanung. Die [Berichtsübersicht](reports/REPORTS.md) führt Playtest-, QA-, Content- und Legal-Befunde.
-
-Die verbindliche Regelmatrix steht in [docs/RULE_MATRIX.md](docs/RULE_MATRIX.md). Die zentrale, testbare Regelbasis liegt in [rules.mjs](rules.mjs). Die Content-Abgrenzung, Benennungsstandards und offenen Prüfpunkte für Legal stehen in [reports/CONTENT-CLEARANCE.md](reports/CONTENT-CLEARANCE.md); die öffentlichen Herkunftshinweise in [docs/CONTENT-NOTICES.md](docs/CONTENT-NOTICES.md).
-
-Die aktuellen Regressionstests werden ausgeführt mit:
+Die [Projektdokumentation](docs/README.md) führt die [Regelmatrix](docs/RULE_MATRIX.md), die Architektur und die aktuellen Herkunftshinweise. [Content & Asset Notices](docs/CONTENT-NOTICES.md) dokumentiert die verwendeten Grafiken und Modelle.
 
 ```powershell
 node scripts/verify-release.mjs
-node --test tests/*.test.mjs
+node scripts/run-tests.mjs
+node scripts/run-tests.mjs --slow
 ```
 
-Für die tägliche Arbeit ist die Suite geteilt: `node scripts/run-tests.mjs` führt die schnelle Suite aus (rund eine Minute), `--slow` die aufgezeichneten Produkt-Replays mit Quellprovenienz, `--all` beides wie der Release-Workflow. Testlevel ist `catalog-full-atlas` mit allen 26 Katalogeinheiten und allen zwölf Geländetypen; nur seine Routen werden im Full-Profil vollständig nachgespielt.
+Die erste Testsuite prüft unter anderem native Befehle, Sitzübergabe, Tutorial und Editor. Die langsame Suite enthält aufgezeichnete Produkt-Replays. Für beide zusammen dient `node scripts/run-tests.mjs --all`. Trainingslektionen und Skripte liegen unter `assets/training/`. Aufgezeichnete Befehle werden mit den zugehörigen Profilen und Checkpoints geprüft.
 
-Die Tests decken unter anderem Szenariostatus, zwölf Terrainregeln, Wasserpassage, Deckungsbonus, Sichtlinie, Kampf, Transport, Undo und die Einheitenbibliothek ab.
-
-## Versionierung und Tester-Übergabe
-
-Die Versionslinie lautet vorerst `0.1.<Build>`. Jeder Push auf `main`, der über GitHub Pages veröffentlicht wird, benötigt eine höhere Buildnummer in [release.js](release.js), einen passenden Eintrag in [CHANGELOG.md](CHANGELOG.md) und eine aktualisierte Übergabe in [reports/TEST_HANDOFF.md](reports/TEST_HANDOFF.md). Der Pages-Workflow erzwingt diese Bedingungen und führt vor der Veröffentlichung die vollständige Testsuite aus.
-
-Tester geben die sichtbare Version aus der Kopfzeile in jedem Bericht an. Für strukturierte Rückmeldungen steht die GitHub-Issue-Vorlage **Test Report** bereit.
-
-## Bekannte Grenzen
-
-- Die Feuerergebnisse sind noch zufallsbasiert; ein reproduzierbarer Testwürfel fehlt.
-- ATLAS enthält alle 26 Motive, aber viele Spezialisten verwenden vorläufige Werte und noch keine eigene Sonderaktion; der Unit Guide kennzeichnet geplante Fähigkeiten.
-- Weitere strategische Raketenregeln (freies Zielen auf leere Hexfelder), Nahbereichsgefechte, Engineering, indirektes Feuer und Verstärkungen sind noch nicht vollständig spielbar; Transport ist zunächst auf den Skimmer Carrier begrenzt, bildet dessen grundlegende Bewegungs-, Feuer- und Schadensregeln aber ab.
-
-## Nächste Ausbaustufe
-
-Als Nächstes folgen geteiltes Feuer, Engineering und differenzierte Fähigkeiten der schweren Plattformen. Jede Stufe erhält eigene Regeltests und einen Szenario-Smoke-Test.
+[Changelog](CHANGELOG.md) und [Test-Handoff](reports/TEST_HANDOFF.md) ordnen Version und Prüfumfang zu. GitHub Pages prüft den Build vor der Bereitstellung. `scripts/package-itch.py` baut ein HTML5-Paket aus einem gepinnten Release-Tag.

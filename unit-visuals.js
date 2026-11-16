@@ -47,10 +47,6 @@
     return terrainKeys.has(type)?`assets/unit-art/sets/${terrainFallback}/terrain/${type}.svg`:null;
   }
 
-  function setStyle(id){
-    return id===fixedStyle;
-  }
-
   function currentStyle(){return fixedStyle}
 
   function resolveVector(unit){
@@ -310,5 +306,5 @@
 
   root.UnitVisuals=Object.freeze({register,resolve,draw,iconElement,watchMapImage,boundsFor,mapAngle,sortMapUnits,
     wreckFor,wreckLabel,wrecksAt,drawWreck,
-    assetFailed:asset=>failedMapAssets.has(asset),setAsset,polygonPoints,styles,artKey,assetFor,terrainAssetFor,setStyle,currentStyle});
+    assetFailed:asset=>failedMapAssets.has(asset),setAsset,polygonPoints,styles,artKey,assetFor,terrainAssetFor,currentStyle});
 })(globalThis);

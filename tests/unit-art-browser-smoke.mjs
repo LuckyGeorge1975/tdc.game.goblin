@@ -70,7 +70,7 @@ try {
   for (let n = 0; n < 50 && !await js('!!window.UnitVisuals'); n++) await new Promise(resolve => setTimeout(resolve, 100));
   assert.equal(await js('document.querySelector("#art-style-select")'), null);
   assert.equal(await js('UnitVisuals.currentStyle()'), '02-technical-illustration');
-  assert.equal(await js("localStorage.getItem('goblin-art-style')"), '02-technical-illustration');
+  assert.equal(await js("localStorage.getItem('goblin-art-style')"), '06-military-symbols');
   await js("document.querySelector('#unit-guide-open').click()");
   for (let n = 0; n < 30 && !await js('document.querySelector("#guide-symbol img")?.naturalWidth'); n++) await new Promise(resolve => setTimeout(resolve, 100));
   const first = await measure();

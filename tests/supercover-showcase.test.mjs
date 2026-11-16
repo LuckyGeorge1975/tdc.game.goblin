@@ -1,51 +1,39 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import vm from 'node:vm';
 import {supercoverIntermediateHexes} from '../src/core/supercover-line.mjs';
+import {artilleryScene} from './artillery-product-harness.mjs';
 
-const levels=JSON.parse(readFileSync(new URL('../assets/unit-art/levels/showcase-levels.json',import.meta.url),'utf8'));
-const atlas=JSON.parse(readFileSync(new URL('../assets/unit-art/levels/atlas-proving-grounds.json',import.meta.url),'utf8'));
 const key=({x,y})=>`${x},${y}`;
 const A={x:2,y:2},B={x:2,y:0},left={x:1,y:1},right={x:2,y:1};
 
 async function game(){
-  const nodes=new Map();
-  const element=()=>({innerHTML:'',textContent:'',checked:false,disabled:false,style:{},dataset:{},
-    classList:{add(){},remove(){},toggle(){},contains(){return false}},
-    setAttribute(){},addEventListener(){},appendChild(){},before(){},querySelector(){return null},animate(){},
-    insertAdjacentHTML(_,html){this.innerHTML=html+this.innerHTML}});
-  const document={querySelector(s){if(!nodes.has(s))nodes.set(s,element());return nodes.get(s)},
-    querySelectorAll(){return []},createElement:element,createElementNS:element,addEventListener(){}};
-  const context=vm.createContext({document,structuredClone,console,window:{},location:{search:''},URLSearchParams,
-    GameDialogs:{isOpen:()=>false,cancel(){},confirm:async()=>true},localStorage:{getItem(){return null}},
-    setTimeout(){return 1},clearTimeout(){},
-    fetch:async url=>({ok:true,json:async()=>String(url).includes('showcase-levels')?levels:atlas})});
-  const run=source=>vm.runInContext(source,context);
-  for(const file of ['unit-visuals.js','terrain-rules.js','ogre-systems.js','supercover-line.js','game.js',
-    'ogre-runtime.js','combat-feedback.js','siegebreaker-weapons.js','strategic-missile.js',
-    'scenario.js','command-history.js','atlas-level.js'])
-    run(readFileSync(new URL(`../src/legacy/scripts/${file}`,import.meta.url),'utf8'));
+  const game=artilleryScene(false,7,true);
+  game.context.location={search:''};
+  game.context.fetch=async path=>({ok:true,json:async()=>JSON.parse(
+    readFileSync(new URL('../'+path,import.meta.url),'utf8'))});
+  game.run(readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8'));
   await new Promise(resolve=>setImmediate(resolve));
-  run("draw=()=>{};updateSelection=()=>{};loadScenario('los-supercover-showcase')");
-  return {run,context};
+  game.run("loadScenario('los-supercover-showcase')");
+  return game;
 }
 
-test('showcase binds one immutable profile and leaves eight legacy missions unchanged',async()=>{
+test('the selectable showcase binds its own immutable rule profile',async()=>{
   const {run}=await game();
-  assert.equal(run('Object.keys(scenarioCatalog).length'),9);
-  assert.equal(run('activeRuleProfile.id'),'FIELD_TEST_SUPERCOVER_v1');
-  assert.equal(run('activeRuleProfile.scenarioVersion'),1);
-  assert.equal(run('activeRuleProfile.losMode'),'strict-supercover');
-  assert.equal(run('Object.isFrozen(activeRuleProfile)'),true);
+  assert.equal(run("Object.hasOwn(scenarioCatalog,'los-supercover-showcase')"),true);
+  assert.equal(run('legacySession.ruleProfileId'),'FIELD_TEST_SUPERCOVER_v1');
+  assert.equal(run('legacySession.scenarioVersion'),1);
+  assert.equal(run('legacySession.effectiveRules.losMode'),'strict-supercover');
+  assert.equal(run('Object.isFrozen(legacySession)'),true);
   assert.equal(run('units.filter(unit=>unit.team===\'player\').length'),4);
   assert.equal(run('units.filter(unit=>unit.team===\'enemy\').length'),3);
   run("scenarioCatalog['los-supercover-showcase'].ruleProfileId='FULL_CATALOG_v1'");
-  assert.equal(run('activeRuleProfile.id'),'FIELD_TEST_SUPERCOVER_v1');
-  assert.throws(()=>run("loadScenario('los-supercover-showcase')"),/SCENARIO_PROFILE_MISMATCH/);
+  assert.equal(run('legacySession.ruleProfileId'),'FIELD_TEST_SUPERCOVER_v1');
+  assert.throws(()=>run("loadScenario('los-supercover-showcase')"),/UNSUPPORTED_RULE_PROFILE/);
+  assert.equal(run('legacySession.ruleProfileId'),'FIELD_TEST_SUPERCOVER_v1');
   run("loadScenario('unit-trial')");
-  assert.equal(run('activeRuleProfile.id'),'FIELD_TEST_LEGACY_v1');
-  assert.equal(run('activeRuleProfile.losMode'),'legacy-pixel');
+  assert.equal(run('legacySession.ruleProfileId'),'FIELD_TEST_LEGACY_v1');
+  assert.notEqual(run('legacySession.effectiveRules.losMode'),'strict-supercover');
 });
 
 test('one boundary blocker vetoes preview, player fire and enemy fire symmetrically',async()=>{

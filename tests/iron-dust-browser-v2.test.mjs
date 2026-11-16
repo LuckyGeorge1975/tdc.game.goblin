@@ -276,10 +276,9 @@ test('Pages path starts v2, can restart, and locks a failed v2 start', async () 
   const visualContext={document};
   runInNewContext(readFileSync(new URL('../unit-visuals.js',import.meta.url),'utf8'),visualContext);
   const visuals=visualContext.UnitVisuals;
-  globalThis.UnitVisuals={styles:visuals.styles,setStyle:visuals.setStyle,
+  globalThis.UnitVisuals={styles:visuals.styles,
     assetFor:visuals.assetFor,resolve:visuals.resolve,
     terrainAssetFor:() => null,draw:() => {}};
-  globalThis.UnitVisuals.setStyle('02-technical-illustration');
   globalThis.GoblinLanguage = {t:key => key === 'mission.iron-dust-v2.title' ? titles[locale] :
     ({'v2.phase.movement':'BEWEGUNG','v2.phase.fire':'FEUER','v2.lose':'MISSION GESCHEITERT',
       'v2.error':'BEFEHL ABGELEHNT','v2.undo':'Rückgängig ist nicht verfügbar.',
@@ -316,7 +315,6 @@ test('Pages path starts v2, can restart, and locks a failed v2 start', async () 
     const beforeArtSwitch=JSON.stringify(bridge.session);
     const artPaths=new Set();
     for(const style of globalThis.UnitVisuals.styles){
-      globalThis.UnitVisuals.setStyle(style.id);
       globalThis.draw();
       const players=bridge.session.projection.state.units.filter(unit=>unit.team==='player');
       const cards=document.querySelector('#unit-roster').children;

@@ -303,6 +303,7 @@ test('tutorial campaign advances only from its confirmed lessons and isolates re
   let campaign=null,editorConfig=null,savedConfig=null,screen='menu',missionId='relay-run',startError='',started=false;
   const show=next=>{screen=next},missionData=id=>scenarioCatalog[id];
   const GoblinUIV2={resetView(){},startView(){}},renderScreen=()=>{},releasePause=()=>{};
+  ${flow.match(/^    const ironDustSeatScreens = .*;$/m)[0]}
   ${flow.slice(flow.indexOf('    function campaignAvailable('),flow.indexOf('    function libraryAssetId('))}
  `);
  g.run('openCampaign()');
