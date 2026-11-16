@@ -1,6 +1,6 @@
 // Local editor documents never enter the curated scenario registry.
 (function(root) {
-  const id = 'editor-draft', version = 'goblin-level-v3', historicalVersion = 'goblin-level-draft-v1';
+  const id = 'editor-draft', version = 'goblin-level-v3';
   const width = 12, height = 8, objective = 'core-and-escort';
   const admitted = new WeakSet();
   const maxLength = 65536;
@@ -27,7 +27,6 @@
       }))};
   }
   function eventData(draft) {
-    if (draft.version === root.GoblinLevelEvents?.version) return {hotspots:draft.hotspots,hooks:draft.hooks};
     if (!Object.hasOwn(draft,'events') && !Object.hasOwn(draft,'hotspots')) return null;
     const events = Object.hasOwn(draft,'waveTemplates') ? [] : Object.hasOwn(draft,'events') ? draft.events : [];
     if (!root.GoblinLevelEvents || !Array.isArray(events) || events.length > 24) fail('events');
@@ -54,19 +53,17 @@
   }
   function validate(draft) {
     if (!available()) fail('unavailable');
-    const oldEvents = draft?.version === root.GoblinLevelEvents?.version && draft?.version !== undefined;
-    const current = draft?.version === version;
+    if (draft?.version !== version) fail('schema');
     const fields = ['version','width','height','objective','terrain','units'];
-    if (oldEvents) fields.push('hotspots','hooks');
-    if (current) for (const key of ['id','scenarioVersion','ruleProfile','hotspots','events','goals','waveTemplates','briefing','aiAllowed','minimumDifficulty'])
+    for (const key of ['id','scenarioVersion','ruleProfile','hotspots','events','goals','waveTemplates','briefing','aiAllowed','minimumDifficulty'])
       if (Object.hasOwn(draft,key)) fields.push(key);
-    if (!exact(draft,fields) || (!oldEvents && !current && draft.version !== historicalVersion) ||
-        (current && Object.hasOwn(draft,'ruleProfile') && draft.ruleProfile !== profile().ruleProfileId) ||
-        !(current ? validSize(draft) : draft.width === width && draft.height === height) || draft.objective !== objective ||
+    if (!exact(draft,fields) ||
+        (Object.hasOwn(draft,'ruleProfile') && draft.ruleProfile !== profile().ruleProfileId) ||
+        !validSize(draft) || draft.objective !== objective ||
         Object.hasOwn(draft,'aiAllowed') && typeof draft.aiAllowed !== 'boolean' ||
         !Array.isArray(draft.terrain) || !Array.isArray(draft.units) ||
         draft.terrain.length > draft.width * draft.height || draft.units.length > draft.width * draft.height) fail('schema');
-    if (current) ScenarioRuleProfiles.fullMinimumDifficulty(draft);
+    ScenarioRuleProfiles.fullMinimumDifficulty(draft);
     const position = cell => Number.isInteger(cell.x) && cell.x >= 0 && cell.x < draft.width &&
       Number.isInteger(cell.y) && cell.y >= 0 && cell.y < draft.height;
     const validId = id => typeof id === 'string' && /^[a-z][a-z0-9-]{0,47}$/.test(id);
@@ -108,7 +105,7 @@
       const rule = registry.units[entry.assetId].target;
       const fields = ['id','assetId','team','x','y'];
       if (rule.strengthRef) fields.push('squads');
-      if (current && Object.hasOwn(entry,'name')) {
+      if (Object.hasOwn(entry,'name')) {
         if (typeof entry.name !== 'string' || !entry.name.trim() || entry.name.length > 100) fail('unit');
         fields.push('name');
       }
@@ -117,8 +114,7 @@
         if (!validId(entry.embarkedOn) || typeof entry.cargoBay !== 'string') fail('cargo');
         fields.push('embarkedOn','cargoBay');
       }
-      if (!exact(entry,fields) || typeof entry.id !== 'string' ||
-          !(oldEvents || current ? /^[a-z][a-z0-9-]{0,47}$/.test(entry.id) : /^(core|draft-[1-9][0-9]{0,2})$/.test(entry.id)) ||
+      if (!exact(entry,fields) || !validId(entry.id) ||
           !['player','enemy'].includes(entry.team)) fail('unit');
       if (!position(entry)) fail('bounds');
       if (ids.has(entry.id) || !template && !cargo && occupied.has(key(entry))) fail('collision');
@@ -150,17 +146,15 @@
       if (events.deadlineEvent && turnLimit === null) fail('goals');
       try { root.GoblinLevelEvents.validate(events,new Set(units.map(unit => unit.id)),position); }
       catch (error) {
-        if (!oldEvents) {
-          const references = (condition, depth = 0) => {
-            if (!condition || depth > 4) return false;
-            if (typeof condition.unitId === 'string') return !units.some(unit => unit.id === condition.unitId);
-            if (typeof condition.pathCrossesHotspot === 'string')
-              return Array.isArray(events.hotspots) && !events.hotspots.some(spot => spot?.id === condition.pathCrossesHotspot);
-            const group = condition.all ?? condition.any;
-            return Array.isArray(group) && group.some(child => references(child,depth+1));
-          };
-          if (events.hooks.some(hook => hook.when && references(hook.when))) fail('references');
-        }
+        const references = (condition, depth = 0) => {
+          if (!condition || depth > 4) return false;
+          if (typeof condition.unitId === 'string') return !units.some(unit => unit.id === condition.unitId);
+          if (typeof condition.pathCrossesHotspot === 'string')
+            return Array.isArray(events.hotspots) && !events.hotspots.some(spot => spot?.id === condition.pathCrossesHotspot);
+          const group = condition.all ?? condition.any;
+          return Array.isArray(group) && group.some(child => references(child,depth+1));
+        };
+        if (events.hooks.some(hook => hook.when && references(hook.when))) fail('references');
         throw error;
       }
     }
@@ -170,11 +164,10 @@
     const {events} = validate(draft);
     const sort = value => Array.isArray(value) ? value.map(sort) : value && typeof value === 'object'
       ? Object.fromEntries(Object.keys(value).sort().map(key => [key,sort(value[key])])) : value;
-    const canonical = sort({...draft,version,
+    const canonical = sort({...draft,
       ...(events ? {hotspots:events.hotspots,events:events.deadlineEvent ? draft.events : events.hooks.map(({id,when,show}) =>
         ({id,when,effect:{type:show.style==='general'?'general-dialog':'dialog',title:show.title,text:show.text}}))} : {})
     });
-    delete canonical.hooks;
     if (Object.hasOwn(draft,'waveTemplates')) {
       canonical.events = sort(draft.events);
       if (!Object.hasOwn(draft,'hotspots')) delete canonical.hotspots;

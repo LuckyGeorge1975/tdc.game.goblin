@@ -5,8 +5,9 @@ import {createIronDustProfile, dispatchIronDustProfile, IRON_DUST_ENEMY_DIFFICUL
 import {ironDustEnemyPolicy} from '../src/core/iron-dust-enemy-policy.mjs';
 import {queryIronDustEnemyIntent} from '../src/core/iron-dust-enemy-intent-probe.mjs';
 import {queryIronDustStandardFireAction} from '../src/core/iron-dust-standard-fire-action-probe.mjs';
-import {recordIronDustProfileReplay, playIronDustProfileReplay}
+import {playIronDustProfileReplay}
   from '../src/core/iron-dust-profile-replay.mjs';
+import {recordIronDustCommands} from './helpers/iron-dust-commit-replay.mjs';
 import {IRON_DUST_LEVEL_V3} from '../src/levels/iron-dust.v3.mjs';
 
 const seed = 2;
@@ -24,7 +25,7 @@ test('a registered level minimum clamps difficulty and remains bound through rep
   assert.equal(createIronDustProfile(seed, {difficulty:'strong',level}).header.enemyPolicy.difficulty, 'strong');
   assert.throws(() => createIronDustProfile(seed, {level:{...level,minimumDifficulty:'unknown'}}), /DIFFICULTY_INVALID/);
   assert.throws(() => createIronDustProfile(seed, {level:{...level,losMode:'strict'}}), /LEVEL_DATA_MISMATCH/);
-  const replay = recordIronDustProfileReplay(seed, commands.slice(0, 2), {difficulty:'weak',level});
+  const replay = recordIronDustCommands(below, commands.slice(0, 2));
   assert.equal(replay.header.profileHeader.minimumDifficulty, 'medium');
   assert.doesNotThrow(() => playIronDustProfileReplay(replay));
 });
@@ -34,7 +35,7 @@ test('three policies run and replay one common source route with the same dice r
   assert.deepEqual(createIronDustProfile(seed, {difficulty: 'medium'}), medium);
   const observations = [];
   for (const difficulty of IRON_DUST_ENEMY_DIFFICULTIES) {
-    const record = recordIronDustProfileReplay(seed, commands, {difficulty});
+    const record = recordIronDustCommands(createIronDustProfile(seed, {difficulty}), commands);
     assert.deepEqual(record.initialSnapshot.entry, medium.entry);
     assert.equal(record.header.profileHeader.enemyPolicy?.difficulty ?? 'medium', difficulty);
     const playback = playIronDustProfileReplay(JSON.parse(JSON.stringify(record)));
@@ -85,7 +86,7 @@ test('same sight and legal targets, different threat preferences', () => {
 test('unknown difficulty and mixed replay policy bindings reject', () => {
   assert.throws(() => createIronDustProfile(seed, {difficulty: 'expert'}),
     {code: 'IRON_DUST_DIFFICULTY_INVALID'});
-  const weak = recordIronDustProfileReplay(seed, [end, end, end, auto], {difficulty: 'weak'});
+  const weak = recordIronDustCommands(createIronDustProfile(seed, {difficulty:'weak'}), [end, end, end, auto]);
   for (const change of [
     replay => {replay.header.profileHeader.enemyPolicy.version = 'unrecognized'},
     replay => {replay.header.profileHeader.enemyPolicy.difficulty = 'strong'},

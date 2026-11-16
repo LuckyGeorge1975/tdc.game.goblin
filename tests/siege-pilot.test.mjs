@@ -9,7 +9,8 @@ import {recordSiegeTankProbeReplay,validateSiegeTankProbeReplay} from '../src/co
 import {recordArtillerySpotterProbeReplay,validateArtillerySpotterProbeReplay} from '../src/core/artillery-spotter-probe-replay.mjs';
 import {phaseScenario} from '../src/core/game-core.mjs';
 import {CORE_PROFILE_CONTRACT} from '../src/core/profile-contract.mjs';
-import {recordIronDustProfileReplay,validateIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
+import {createIronDustCommitRecorder,validateIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
+import {createIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
 const level=JSON.parse(fs.readFileSync(new URL('../assets/unit-art/levels/siege-pilot.v1.json',import.meta.url),'utf8'));
 const registry=JSON.parse(fs.readFileSync(new URL('../assets/unit-art/rules/unit-profiles.v1.json',import.meta.url),'utf8'));
 function scene(enabled=true){
@@ -79,7 +80,7 @@ test('fixed Siege loader/session freezes exact stats, digest and all starts are 
  assert.equal(g.run('Object.isFrozen(legacySession.effectiveRules.units[0].siegeFireBudget)'),true);
  assert.equal(g.run('units.every(u=>u.move===0||Number.isFinite(TerrainRules.movementCost(terrainTypeAt(u.x,u.y),u)))'),true);
  for(const mutation of ["c.scenarioVersion=2","c.ruleProfileId='FULL_CATALOG_v1'","c.units[0].damage=7","c.units[0].siegeFireBudget.used=['main-1']","c.units[2].y=4","c.sourceDigest='fake'","c.fireBudgetVersion='other'"]){const before=g.state();assert.throws(()=>g.run(`{const c=JSON.parse(JSON.stringify(scenarioCatalog['siege-pilot']));${mutation};ScenarioRuleProfiles.beginSession('siege-pilot',c)}`));assert.equal(g.state(),before);}
- for(const [old,validate] of [[recordProfileReplay({...structuredClone(phaseScenario),...structuredClone(CORE_PROFILE_CONTRACT)},7,[]),validateProfileReplay],[recordSiegeTankProbeReplay(7,[]),validateSiegeTankProbeReplay],[recordArtillerySpotterProbeReplay(7,[]),validateArtillerySpotterProbeReplay],[recordIronDustProfileReplay(7,[]),validateIronDustProfileReplay]]){const changed=structuredClone(old);changed.header.ruleProfileId=level.ruleProfileId;changed.header.scenarioId=level.id;assert.throws(()=>validate(changed),/MISMATCH/);}
+ for(const [old,validate] of [[recordProfileReplay({...structuredClone(phaseScenario),...structuredClone(CORE_PROFILE_CONTRACT)},7,[]),validateProfileReplay],[recordSiegeTankProbeReplay(7,[]),validateSiegeTankProbeReplay],[recordArtillerySpotterProbeReplay(7,[]),validateArtillerySpotterProbeReplay],[createIronDustCommitRecorder(createIronDustProfile(7)).snapshot(),validateIronDustProfileReplay]]){const changed=structuredClone(old);changed.header.ruleProfileId=level.ruleProfileId;changed.header.scenarioId=level.id;assert.throws(()=>validate(changed),/MISMATCH/);}
  g.context.fetch=async path=>({ok:true,json:async()=>JSON.parse(fs.readFileSync(new URL('../'+path,import.meta.url),'utf8'))});g.run("delete scenarioCatalog['siege-pilot']");g.run(fs.readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8'));await new Promise(r=>setImmediate(r));assert.equal(g.run("Object.keys(scenarioCatalog).filter(id=>id!=='artillery-pilot').length"),11);
 });
 

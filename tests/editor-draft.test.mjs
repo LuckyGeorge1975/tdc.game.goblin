@@ -53,6 +53,75 @@ test('production FULL v3 missions round-trip with starting cargo, waves and obje
   assert.throws(()=>g.run('GoblinEditorDraft.importLevels(pilotText)'),/schema/);
 });
 
+test('editor controls export and reimport v3, choose a package level and reject v2 without replacing the draft', async () => {
+  const g = await scene();
+  const source = file => readFileSync(new URL('../'+file,import.meta.url),'utf8');
+  const element = tag => ({
+    tag, children:[], dataset:{}, classList:{add(){}},
+    append(...children){this.children.push(...children);},
+    replaceChildren(){this.children=[];},
+    setAttribute(){}, addEventListener(){}, focus(){}, select(){}
+  });
+  Object.assign(g.context.document,{
+    createElement:element, createElementNS:(_,tag)=>element(tag), createTextNode:element
+  });
+  g.context.GoblinLanguage={t:key=>key};
+  g.context.TerrainDisplay={label:type=>type,svgIcon:()=>null};
+  g.context.element=element;
+  g.context.pilotText=source('assets/training/level-events-pilot.v3.json');
+  g.run(source('editor-ui.js'));
+  const flow=source('ui-v2-flow.js');
+  g.run(`{
+    let screen='editor', editorDraft=GoblinEditorDraft.parse(pilotText), editorCell={x:1,y:3};
+    let editorBusy=false, editorMoving=false, editorMissionOpen=false, editorError='';
+    let editorName='', editorSaved=null, editorSavedMessage='', editorImportLevels=null;
+    let editorConfig=null, editorReturnScenario=null, started=false;
+    const t=GoblinLanguage.t, renderScreen=()=>{}, show=next=>{screen=next};
+    const heading=()=>element('h2'),paragraph=()=>element('p'),actions=()=>element('actions');
+    const button=(textContent,onclick)=>({...element('button'),textContent,onclick});
+    const GoblinUIV2={resetView(){},startView(){}};
+    ${flow.slice(flow.indexOf('    function updateEditor('),flow.indexOf('    function libraryAssetId('))}
+    globalThis.editorTest={render:renderEditor,get draft(){return editorDraft;},
+      get error(){return editorError;},get screen(){return screen;}};
+  }`);
+  const descendants = node => [node,...node.children.flatMap(descendants)];
+  const render = () => {
+    const panel=element('panel');
+    g.context.panel=panel;
+    g.run('editorTest.render(panel)');
+    return descendants(panel);
+  };
+  function controls(nodes) {
+    return {json:nodes.find(node=>node.tag==='textarea' && node.rows===4),
+      click:key=>nodes.find(node=>node.textContent==='v2.editor.'+key && node.tag==='button').onclick()};
+  }
+  let ui=controls(render());
+  ui.click('export');
+  const exported=ui.json.value;
+  assert.equal(exported,g.context.pilotText.replaceAll('\r\n','\n').trimEnd());
+  ui.json.value=JSON.stringify({...JSON.parse(exported),version:'goblin-level-draft-v2'});
+  ui.click('import');
+  assert.equal(g.run('editorTest.error'),'schema');
+  assert.deepEqual(read(g,'editorTest.draft'),JSON.parse(exported));
+  ui.json.value=exported;
+  ui.click('import');
+  assert.equal(g.run('editorTest.error'),'');
+  assert.deepEqual(read(g,'editorTest.draft'),JSON.parse(exported));
+  ui.json.value=source('assets/unit-art/levels/catalog-full-levels.v3.json');
+  ui.click('import');
+  const nodes=render();
+  nodes.find(node=>node.tag==='select' && node.children[0]?.textContent==='catalog-full-atlas').selectedIndex=1;
+  controls(nodes).click('openPackageLevel');
+  assert.equal(g.run('editorTest.draft.id'),'catalog-full-terrain-course');
+  ui=controls(render());
+  ui.json.value=exported;
+  ui.click('import');
+  await ui.click('play');
+  assert.equal(g.run('editorTest.screen'),'play');
+  assert.deepEqual(read(g,'legacySession.config.levelEvents.hooks.map(hook=>hook.id)'),
+    JSON.parse(exported).events.map(event=>event.id));
+});
+
 test('solo hotspots, briefing and large localized event data survive canonical reimport', async () => {
   const g = await scene();
   g.run(`

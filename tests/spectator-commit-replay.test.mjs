@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {createIronDustSpectatorMatch,createSpectatorSession} from '../spectator-session.mjs';
-import {IRON_DUST_COMMIT_REPLAY_VERSION,createIronDustCommitRecorder,playIronDustProfileReplay,
-  recordIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
+import {IRON_DUST_COMMIT_REPLAY_VERSION,createIronDustCommitRecorder,playIronDustProfileReplay}
+  from '../src/core/iron-dust-profile-replay.mjs';
 import {createIronDustProfile,dispatchIronDustProfile,dispatchIronDustProfileEnemyFireChoice,
   projectIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
 import {IRON_DUST_SOURCE_VICTORY_TRACE_V2 as trace} from './iron-dust-source-victory-trace.v2.mjs';
@@ -27,7 +27,9 @@ test('the accepted sequence holds and retreats, captures AutoEnemyAdvance once a
     ['EndPhase','EndPhase','EndPhase','EnemyHold','EnemyMove',...Array(3).fill('AutoEnemyAdvance')]);
   assert.equal(snapshot.checkpoints.length,calls);
   assert.ok(Object.isFrozen(snapshot.commands[4].to));
-  const playback=playIronDustProfileReplay(JSON.parse(JSON.stringify(snapshot)));
+  const encoded=JSON.stringify(snapshot);
+  const playback=playIronDustProfileReplay(JSON.parse(encoded));
+  assert.deepEqual(playIronDustProfileReplay(JSON.parse(encoded)),playback);
   assert.equal(calls,8);
   assert.deepEqual(playback.checkpoints,snapshot.checkpoints);
   assert.equal(playback.steps[3].events[0].type,'EnemyHeld');
@@ -56,7 +58,6 @@ test('the recorder binds root actions, state, events and RNG through actual comp
   const snapshot=recorder.snapshot(), playback=playIronDustProfileReplay(snapshot);
   assert.deepEqual(playback.steps.map(({command,events,state})=>({action:command,events,state})),recorded);
   assert.equal(playback.steps[13].events[0].targetKey,'treads');
-  assert.throws(()=>recordIronDustProfileReplay(trace.seed,snapshot.commands),{code:'IRON_DUST_REPLAY_MISMATCH'});
   const tampered=structuredClone(snapshot);
   tampered.checkpoints[13].rngState++;
   assert.throws(()=>playIronDustProfileReplay(tampered),{code:'IRON_DUST_REPLAY_MISMATCH'});

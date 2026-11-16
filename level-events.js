@@ -1,5 +1,4 @@
 (function(root) {
-  const version = 'goblin-level-draft-v2';
   const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
     Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value,key));
   const validId = value => typeof value === 'string' && /^[a-z][a-z0-9-]{0,47}$/.test(value);
@@ -87,7 +86,7 @@
       if (session === legacySession) root.GoblinUIV2?.refresh();
     });
   }
-  root.GoblinLevelEvents = Object.freeze({version,validId,validate,begin,move,finish,show,pending:session=>pending.has(session)});
+  root.GoblinLevelEvents = Object.freeze({validId,validate,begin,move,finish,show,pending:session=>pending.has(session)});
   // An enemy turn can destroy units too, but has no reversible player command.
   const scheduleWithoutLevelEvents = scheduleGameTask;
   scheduleGameTask = function(action, delay) {

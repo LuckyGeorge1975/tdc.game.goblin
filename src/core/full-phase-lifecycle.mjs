@@ -1,4 +1,4 @@
-import {createSpectatorSession} from '../../spectator-session.mjs?v=1';
+import {createSpectatorSession} from '../../spectator-session.mjs?v=2';
 
 // One timer loop per continuous AI turn. The native owner remains responsible
 // for the current ticket, including an in-flight choice across pause/resume.

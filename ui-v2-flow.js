@@ -261,7 +261,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       binding.session = legacySession;
       if (!binding.port) throw new Error('FULL_CONTROLLER_OWNER');
       const host = setup.owner.bind(binding.session, setup.selection, ui, binding.port);
-      if (host) void import('./src/core/full-phase-lifecycle.mjs?v=1').then(({createFullPhaseLifecycle}) => {
+      if (host) void import('./src/core/full-phase-lifecycle.mjs?v=2').then(({createFullPhaseLifecycle}) => {
         if (fullSeatBinding !== binding || binding.session !== legacySession) return;
         binding.lifecycle = createFullPhaseLifecycle({port:binding.port, host, changed:ui.refresh});
         binding.lifecycle.sync();

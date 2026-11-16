@@ -9,14 +9,15 @@ import movement from '../movement-presentation.js';
 import {createCorePresentationObserver} from '../core-presentation.mjs';
 import {createIronDustBrowserSession,dispatchIronDustBrowserAction} from '../iron-dust-browser-v2.mjs';
 import {createIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
-import {recordIronDustProfileReplay,validateIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
+import {createIronDustCommitRecorder,playIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
 
 test('actual Core rocket command keeps state/RNG/replay identical through all modes, final impact, natural end and skip',()=>{
-  const finals=[];
+  const finals=[], replays=[];
   for(const mode of ['high','normal','off']){
     globalThis.GoblinPresentationPreferences={read:()=>({schemaVersion:1,mode})};
     let current=createIronDustBrowserSession(createIronDustProfile(1),1),control=current,time=0,id=0;
-    const owner=presentation.createOwner(),observer=createCorePresentationObserver(owner),callbacks=new Map(),frames=[],commands=[],tickets=new WeakMap();
+    const owner=presentation.createOwner(),observer=createCorePresentationObserver(owner),callbacks=new Map(),frames=[],tickets=new WeakMap();
+    const recorder=createIronDustCommitRecorder(current.profile);
     const q=movement.createQueue({now:()=>time,request:fn=>{callbacks.set(++id,fn);return id;},cancel:id=>callbacks.delete(id),
       render:frame=>frames.push(frame),finish(){}});
     const advance=ms=>{time+=ms;const pending=[...callbacks.values()];callbacks.clear();pending.forEach(fn=>fn());};
@@ -31,7 +32,8 @@ test('actual Core rocket command keeps state/RNG/replay identical through all mo
     const apply=command=>{
       const baseline=dispatchIronDustBrowserAction(control,command),observed=dispatchIronDustBrowserAction(current,command,observer);
       assert.deepEqual(observed,baseline);assert.ok(observed.session,JSON.stringify(observed.error));
-      control=baseline.session;current=observed.session;commands.push(command);
+      recorder.accept(current.profile,{action:command,profile:observed.session.profile,events:observed.session.projection.events});
+      control=baseline.session;current=observed.session;
     };
     const move=(x,y)=>apply({type:'Move',playerId:'player',unitId:'missile',to:{x,y}});
     const end=()=>apply({type:'EndPhase',playerId:'player'});
@@ -54,7 +56,10 @@ test('actual Core rocket command keeps state/RNG/replay identical through all mo
       }
     }finally{Math.random=savedRandom;}
     assert.equal(JSON.stringify(current),canonical);finals.push(canonical);
-    const replay=recordIronDustProfileReplay(1,commands);assert.deepEqual(validateIronDustProfileReplay(replay),replay);
+    const replay=recorder.snapshot();replays.push(replay);
+    assert.deepEqual(playIronDustProfileReplay(replay).finalState.state,current.projection.state);
   }
-  assert.equal(finals[0],finals[1]);assert.equal(finals[1],finals[2]);delete globalThis.GoblinPresentationPreferences;
+  assert.equal(finals[0],finals[1]);assert.equal(finals[1],finals[2]);
+  assert.deepEqual(replays[0],replays[1]);assert.deepEqual(replays[1],replays[2]);
+  delete globalThis.GoblinPresentationPreferences;
 });

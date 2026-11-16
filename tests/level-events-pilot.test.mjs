@@ -5,11 +5,11 @@ import {fullScene} from './catalog-full-harness.mjs';
 import {execute,read,enemy} from './artillery-product-harness.mjs';
 
 const source = path => readFileSync(new URL('../'+path,import.meta.url),'utf8');
-async function pilot(version = 2) {
+async function pilot() {
   const game = await fullScene('catalog-full-terrain-course',7,false,'FULL_CATALOG_v1');
   game.run(source('level-events.js'));
   game.run(source('editor-draft.js'));
-  game.context.draftText = source(`assets/training/level-events-pilot.v${version}.json`);
+  game.context.draftText = source('assets/training/level-events-pilot.v3.json');
   game.run(`
     const warnings=[], confirmations=[];
     GameDialogs.isOpen=()=>confirmations.length>0;
@@ -24,29 +24,34 @@ async function pilot(version = 2) {
   return game;
 }
 
-test('tutorial draft validates round-trip, exact declarative schema and old v1 import',async()=>{
+test('v3 event draft round-trips and rejects retired editor formats before applying them',async()=>{
   const game=await pilot();
   assert.deepEqual(read(game,'GoblinEditorDraft.parse(JSON.stringify(eventDraft))'),JSON.parse(game.context.draftText));
-  assert.equal(game.run("GoblinEditorDraft.parse(JSON.stringify({...GoblinEditorDraft.copyTemplate(),version:'goblin-level-draft-v1'})).version"),'goblin-level-draft-v1');
+  const world = game.state(), rng = game.rng();
+  assert.throws(()=>game.run("GoblinEditorDraft.parse(JSON.stringify({...GoblinEditorDraft.copyTemplate(),version:'goblin-level-draft-v1'}))"),/schema/);
+  assert.throws(()=>game.run("GoblinEditorDraft.importLevels(JSON.stringify({...GoblinEditorDraft.copyTemplate(),version:'goblin-level-draft-v2',hotspots:[],hooks:[]}))"),/schema/);
+  assert.throws(()=>game.run("GoblinEditorDraft.importLevels(JSON.stringify({version:'goblin-level-package-v2',levels:[eventDraft]}))"),/schema/);
+  assert.equal(game.state(),world);
+  assert.deepEqual(game.rng(),rng);
   assert.equal(game.run('GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(eventDraft)).version'),'goblin-level-v3');
   assert.equal(game.run('GoblinEditorDraft.exportJson(GoblinEditorDraft.parse(GoblinEditorDraft.exportJson(eventDraft)))===GoblinEditorDraft.exportJson(eventDraft)'),true);
   const canonicalExport=game.run('GoblinEditorDraft.exportJson(eventDraft)');
   assert.doesNotMatch(canonicalExport,/\r/);
   assert.equal(canonicalExport,source('assets/training/level-events-pilot.v3.json').replaceAll('\r\n','\n').trimEnd());
   for (const mutation of [
-    "d.hooks[0].when.unitId='unknown'",
+    "d.events[0].when.unitId='unknown'",
     "d.hotspots[0].radius=-1",
-    "d.hooks[0].show.effect='heal'",
-    "d.hooks[1].when.all[1].pathCrossesHotspot='unknown'",
-    "d.hooks[0].when={any:[]}",
-    "d.hooks[1].show.portrait='remote.jpg'"
+    "d.events[0].effect.type='heal'",
+    "d.events[1].when.all[1].pathCrossesHotspot='unknown'",
+    "d.events[0].when={any:[]}",
+    "d.events[1].effect.portrait='remote.jpg'"
   ]) {
-    assert.throws(()=>game.run(`{const d=structuredClone(eventDraft);${mutation};GoblinEditorDraft.parse(JSON.stringify(d))}`),/events/);
+    assert.throws(()=>game.run(`{const d=structuredClone(eventDraft);${mutation};GoblinEditorDraft.parse(JSON.stringify(d))}`),/events|references/);
   }
 });
 
 test('the editor pilot entry loads the shipped draft through the same validated import path',async()=>{
-  const game=await pilot(3), flow=source('ui-v2-flow.js');
+  const game=await pilot(), flow=source('ui-v2-flow.js');
   const start=flow.indexOf('    function updateEditor('), end=flow.indexOf('    async function playEditorDraft(',start);
   game.run(`
     let screen='editor',editorDraft=GoblinEditorDraft.copyTemplate(),editorBusy=false,editorMoving=false,
@@ -64,7 +69,7 @@ test('the editor pilot entry loads the shipped draft through the same validated 
 });
 
 test('only committed paths fire hooks, in order, and cut off Undo before the first notice',async()=>{
-  const game=await pilot(3);
+  const game=await pilot();
   const scout={type:'Move',actorId:'tutorial-scout',x:2,y:5};
   const tank={type:'Move',actorId:'tutorial-tank',x:4,y:3};
   assert.equal(execute(game,scout).ok,true);
@@ -99,8 +104,8 @@ test('OR action hooks cut the boundary and later commands in the same phase rema
   const tank={type:'Move',actorId:'tutorial-tank',x:4,y:3};
   await game.run(`
     const altered=structuredClone(eventDraft);
-    altered.hooks[0].when={any:[{event:'UnitActed',unitId:'tutorial-scout'},{event:'UnitDestroyed',unitId:'core'}]};
-    altered.hooks.splice(1,1);
+    altered.events[0].when={any:[{event:'UnitActed',unitId:'tutorial-scout'},{event:'UnitDestroyed',unitId:'core'}]};
+    altered.events.splice(1,1);
     GoblinEditorDraft.prepare(altered).then(loadEditorDraft);
   `);
   assert.equal(execute(game,scout).ok,true);
@@ -150,7 +155,7 @@ test('enemy turn destruction uses the same event queue without creating player h
   await game.run(`
     const ambush=structuredClone(eventDraft);
     ambush.units.push({id:'ambush-tank',assetId:'assault-tank',team:'enemy',x:3,y:5});
-    ambush.hooks[0].when={event:'UnitDestroyed',unitId:'tutorial-scout'};
+    ambush.events[0].when={event:'UnitDestroyed',unitId:'tutorial-scout'};
     GoblinEditorDraft.prepare(ambush).then(loadEditorDraft);
   `);
   game.context.rollQueue=[.99];

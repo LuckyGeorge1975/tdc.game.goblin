@@ -9,7 +9,8 @@ import {recordSiegeTankProbeReplay,validateSiegeTankProbeReplay} from '../src/co
 import {recordArtillerySpotterProbeReplay,validateArtillerySpotterProbeReplay} from '../src/core/artillery-spotter-probe-replay.mjs';
 import {phaseScenario} from '../src/core/game-core.mjs';
 import {CORE_PROFILE_CONTRACT} from '../src/core/profile-contract.mjs';
-import {recordIronDustProfileReplay,validateIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
+import {createIronDustCommitRecorder,validateIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
+import {createIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
 const level=JSON.parse(fs.readFileSync(new URL('../assets/unit-art/levels/skimmer-pilot.v1.json',import.meta.url),'utf8'));
 const registry=JSON.parse(fs.readFileSync(new URL('../assets/unit-art/rules/unit-profiles.v1.json',import.meta.url),'utf8'));
 function scene(enabled=true){
@@ -65,7 +66,7 @@ test('fixed source, full roster/terrain/profile/digest and session snapshots rej
   [recordProfileReplay({...structuredClone(phaseScenario),...structuredClone(CORE_PROFILE_CONTRACT)},7,[]),validateProfileReplay],
   [recordSiegeTankProbeReplay(7,[]),validateSiegeTankProbeReplay],
   [recordArtillerySpotterProbeReplay(7,[]),validateArtillerySpotterProbeReplay],
-  [recordIronDustProfileReplay(7,[]),validateIronDustProfileReplay]
+  [createIronDustCommitRecorder(createIronDustProfile(7)).snapshot(),validateIronDustProfileReplay]
  ];
  for(const [old,validate] of oldPairs){
    assert.doesNotThrow(()=>validate(old));

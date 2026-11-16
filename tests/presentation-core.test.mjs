@@ -4,24 +4,29 @@ import presentation from '../presentation-state.js';
 import {createCorePresentationObserver} from '../core-presentation.mjs';
 import {createIronDustBrowserSession,dispatchIronDustBrowserAction} from '../iron-dust-browser-v2.mjs';
 import {createIronDustProfile,queryIronDustProfile} from '../src/core/iron-dust-executable-profile.mjs';
-import {recordIronDustProfileReplay,validateIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
+import {createIronDustCommitRecorder,playIronDustProfileReplay,validateIronDustProfileReplay}
+  from '../src/core/iron-dust-profile-replay.mjs';
 
 const move=(unitId,x,y)=>({type:'Move',playerId:'player',unitId,to:{x,y}});
 const end={type:'EndPhase',playerId:'player'},enemy={type:'AutoEnemyAdvance',playerId:'enemy'};
 function pair(seed=8){
   let control=createIronDustBrowserSession(createIronDustProfile(seed),seed),current=control;
   const owner=presentation.createOwner(),observer=createCorePresentationObserver(owner);
-  observer.sync(current);const commands=[];
+  observer.sync(current);
+  const recorder=createIronDustCommitRecorder(current.profile);
   function apply(command){
     const before=JSON.stringify(current);
     const baseline=dispatchIronDustBrowserAction(control,command);
     const observed=dispatchIronDustBrowserAction(current,command,observer);
     assert.deepEqual(observed,baseline,'observer cannot alter state/RNG/profile/events/digests');
-    if(observed.session){control=baseline.session;current=observed.session;commands.push(command);}
+    if(observed.session){
+      recorder.accept(current.profile,{action:command,profile:observed.session.profile,events:observed.session.projection.events});
+      control=baseline.session;current=observed.session;
+    }
     else assert.equal(JSON.stringify(current),before);
     return observed;
   }
-  return {owner,observer,apply,commands,get session(){return current;},
+  return {owner,observer,apply,replay:recorder.snapshot,get session(){return current;},
     enemy(){let steps=0;while(current.projection.mode==='enemy'){
       assert.ok(++steps<20);apply(enemy);
     }}};
@@ -75,7 +80,7 @@ test('automatic enemy movement retains result order, cursor and already-resolved
     assert.deepEqual(event.path,event.sourceResults[event.sourceEventIndex].path);
   }
   assert.equal(new Set(events.map(e=>e.eventId)).size,events.length);
-  const replay=recordIronDustProfileReplay(8,game.commands);
+  const replay=game.replay();
   assert.deepEqual(validateIronDustProfileReplay(replay),replay);
   assert.equal(JSON.stringify(replay).includes('presentation-'),false);
 });
@@ -139,5 +144,7 @@ test('actual Core system weapon fire preserves used key, confirmed effects and r
       assert.equal(event.weapon.usedWeaponKey,null);assert.equal(event.effects[0].targetKey,event.sourceResults[0].targetKey);
     }
   }
-  assert.deepEqual(validateIronDustProfileReplay(recordIronDustProfileReplay(1,game.commands)),recordIronDustProfileReplay(1,game.commands));
+  const replay=game.replay();
+  assert.deepEqual(validateIronDustProfileReplay(replay),replay);
+  assert.deepEqual(playIronDustProfileReplay(replay).finalState.state,game.session.projection.state);
 });

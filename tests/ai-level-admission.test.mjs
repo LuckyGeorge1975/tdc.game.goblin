@@ -8,7 +8,8 @@ import {createIronDustSpectatorMatch} from '../spectator-session.mjs';
 import {createIronDustBrowserSession,createIronDustDecisionHost,dispatchIronDustBrowserAction} from '../iron-dust-browser-v2.mjs';
 import {IRON_DUST_LEVEL_V3} from '../src/levels/iron-dust.v3.mjs';
 import {validateIronDustLevelV3} from '../src/levels/iron-dust.v1.mjs';
-import {recordIronDustProfileReplay,playIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
+import {playIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
+import {recordIronDustCommands} from './helpers/iron-dust-commit-replay.mjs';
 
 const source=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
 const ui=source('ui-v2.js');
@@ -105,9 +106,9 @@ test('the Core start requires both compatible controller inputs and honors decla
   assert.equal(dispatchIronDustBrowserAction(blocked,{type:'EndPhase',playerId:'player'}).session.aiAllowed,false);
   assert.equal(calls,0);
   const commands=[{type:'EndPhase',playerId:'player'}];
-  const historical=recordIronDustProfileReplay(8,commands);
-  assert.deepEqual(recordIronDustProfileReplay(8,commands,{level:denied}),historical);
-  assert.equal(playIronDustProfileReplay(historical).steps.length,1);
+  const standard=recordIronDustCommands(createIronDustBrowserSession(undefined,8).profile,commands);
+  assert.deepEqual(recordIronDustCommands(blocked.profile,commands),standard);
+  assert.equal(playIronDustProfileReplay(standard).steps.length,1);
   const match=createIronDustSpectatorMatch({player:select,enemy:select});
   assert.equal((await match.advance()).ok,true);
   assert.equal(calls,1);

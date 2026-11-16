@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {createIronDustSpectatorMatch,createSpectatorSession} from '../spectator-session.mjs';
-import {playIronDustProfileReplay,recordIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
+import {playIronDustProfileReplay} from '../src/core/iron-dust-profile-replay.mjs';
 import {IRON_DUST_SOURCE_VICTORY_TRACE_V2 as trace} from './iron-dust-source-victory-trace.v2.mjs';
 
 const advancePhase=batch=>batch.candidates.find(item=>item.kind==='end-phase');
@@ -41,7 +41,7 @@ test('both Core controllers read their current authorized static objectives thro
       const baseline=batch.candidates.find(item=>item.facts.automatic||item.facts.baseline);
       assert.ok(baseline);return baseline.key;
     }
-  });
+  },{recordReplay:true});
   const queue=new Map();let handle=0;
   const viewer=createSpectatorSession(match,{schedule(fn){queue.set(++handle,fn);return handle;},cancel:id=>queue.delete(id)});
   viewer.resume();
@@ -57,9 +57,9 @@ test('both Core controllers read their current authorized static objectives thro
   assert.equal(final.ended,true);
   assert.equal(history.terminalPartial.roundNumber,final.roundNumber);
   assert.equal(final.units.some(unit=>unit.id==='core'),false);
-  // Each picked baseline has the same native result as its historical
-  // AutoEnemyAdvance equivalent, even when the adapter specifies the fire target.
-  const playback=playIronDustProfileReplay(recordIronDustProfileReplay(trace.seed,trace.commands));
+  const replay=JSON.stringify(match.replay());
+  const playback=playIronDustProfileReplay(JSON.parse(replay));
+  assert.deepEqual(playIronDustProfileReplay(JSON.parse(replay)),playback);
   const state=playback.finalState.state;
   assert.equal(state.victory.winner,'player');
   assert.equal(state.turn,final.roundNumber);

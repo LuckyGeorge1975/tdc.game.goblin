@@ -16,7 +16,7 @@ const source = path => fs.readFileSync(new URL(path, root), 'utf8').replaceAll('
 const canonical = sources => JSON.stringify(Object.keys(sources).sort().map(path => [path, sources[path]]));
 
 const GAMEPLAY = ['artillery-pilot-runtime.js', 'artillery-spotter-rules.js', 'atlas-level.js',
-  'assets/training/level-events-pilot.v2.json', 'assets/training/level-events-pilot.v3.json', 'assets/training/levels.v1.json',
+  'assets/training/level-events-pilot.v3.json', 'assets/training/levels.v1.json',
   'assets/training/levels.v3.json', 'assets/training/scripts.v1.json',
   'assets/unit-art/levels/artillery-pilot.v1.json', 'assets/unit-art/levels/artillery-pilot.v3.json', 'assets/unit-art/levels/atlas-proving-grounds.v3.json',
   'assets/unit-art/levels/catalog-full-levels.v1.json', 'assets/unit-art/levels/catalog-full-levels.v3.json',

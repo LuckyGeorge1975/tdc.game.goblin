@@ -8,7 +8,7 @@ import {createAiPolicyRegistry} from './src/core/ai-policy-registry.mjs?v=1';
 import {prepareIronDustTrainedPolicy, IRON_DUST_TRAINED_SCOPE} from './src/core/iron-dust-trained-policy.mjs?v=2';
 import {choosePlayerAction} from './src/core/iron-dust-objective-policy.mjs?v=1';
 import {hexDistance} from './src/core/hex.mjs';
-import {createIronDustCommitRecorder} from './src/core/iron-dust-profile-replay.mjs?v=2';
+import {createIronDustCommitRecorder} from './src/core/iron-dust-profile-replay.mjs?v=3';
 
 function observePresentation(observer,method,...args){
   try{return observer?.[method]?.(...args);}catch{return null;}
