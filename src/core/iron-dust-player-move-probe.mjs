@@ -26,7 +26,7 @@ const neighbors = ({x, y}) => y % 2 === 0
     {x, y: y - 1}, {x: x + 1, y: y - 1}, {x: x + 1, y}];
 
 // Match Legacy findMovementPath's neighbor order and equal-cost tie handling.
-function legacyMovePath(state, actor, to, allowance) {
+function* legacyMoveNodes(state, actor, allowance) {
   const occupied = new Set(state.units.filter(unit => unit.hp > 0 && unit.id !== actor.id).map(key));
   const best = new Map([[key(actor), 0]]);
   const queue = [{x: actor.x, y: actor.y, cost: 0, path: []}];
@@ -34,8 +34,8 @@ function legacyMovePath(state, actor, to, allowance) {
   while (queue.length) {
     queue.sort((a, b) => a.cost - b.cost);
     const node = queue.shift();
-    if (key(node) === key(to)) return node.path;
-    if (node.cost > allowance) continue;
+    if (node.cost !== best.get(key(node))) continue;
+    yield node;
     for (const next of neighbors(node)) {
       if (!inside(state.map, next) || occupied.has(key(next))) continue;
       const terrain = state.map.terrain.find(cell => cell.x === next.x && cell.y === next.y)?.type ??
@@ -46,7 +46,20 @@ function legacyMovePath(state, actor, to, allowance) {
       queue.push({...next, cost, path: [...node.path, next]});
     }
   }
-  return null;
+}
+
+function moveActor(state, unitId) {
+  if (!playerIds.includes(unitId)) return deny('MOVE_UNIT_UNSUPPORTED');
+  if (state.phase !== 'movement' && !(state.phase === 'gev' && unitId === 'gev'))
+    return deny('WRONG_PHASE');
+  const actor = state.units.find(unit => unit.id === unitId);
+  if (actor.hp <= 0 || actor.disabled) return deny('UNIT_UNAVAILABLE');
+  if (state.phase === 'gev' ? actor.secondMoved : actor.moved) return deny('ACTION_SPENT');
+  return {actor};
+}
+
+function movementAllowance(state, actor) {
+  return state.phase === 'gev' ? 2 : queryIronDustUnifiedUnit(state, actor.id).firstMove;
 }
 
 export function queryIronDustPlayerMove(state, command) {
@@ -57,25 +70,29 @@ export function queryIronDustPlayerMove(state, command) {
   if (state.victory.status !== 'ongoing') return deny('GAME_ENDED');
   if (command.playerId !== 'player' || state.activeTeam !== 'player')
     return deny('NOT_ACTIVE_TEAM');
-  if (!playerIds.includes(command.unitId)) return deny('MOVE_UNIT_UNSUPPORTED');
-  if (state.phase !== 'movement' && !(state.phase === 'gev' && command.unitId === 'gev'))
-    return deny('WRONG_PHASE');
-  const actor = state.units.find(unit => unit.id === command.unitId);
-  if (actor.hp <= 0 || actor.disabled) return deny('UNIT_UNAVAILABLE');
-  if (state.phase === 'gev' ? actor.secondMoved : actor.moved) return deny('ACTION_SPENT');
+  const actorChoice=moveActor(state,command.unitId);
+  if (actorChoice.error) return actorChoice;
+  const {actor}=actorChoice;
   if (!sameKeys(command.to, ['x', 'y']) || !inside(state.map, command.to))
     return deny('OUT_OF_BOUNDS');
   if (key(command.to) === key(actor)) return deny('UNREACHABLE');
-  const allowance = state.phase === 'gev' ? 2 :
-    queryIronDustUnifiedUnit(state, actor.id).firstMove;
-  const path = legacyMovePath(state, actor, command.to, allowance);
-  return path ? {available: true, resolverVersion: IRON_DUST_PLAYER_MOVE_PROBE_VERSION,
-    allowance, cost: path.reduce((sum, cell) => {
-      const terrain = state.map.terrain.find(item => item.x === cell.x && item.y === cell.y)?.type ??
-        state.map.defaultTerrain;
-      return sum + TerrainRules.movementCost(terrain,
-        actor.id === 'gev' ? {...actor, movementMode: 'gev'} : actor);
-    }, 0), path} : deny('UNREACHABLE');
+  const allowance=movementAllowance(state,actor);
+  for (const {x,y,cost,path} of legacyMoveNodes(state,actor,allowance)) {
+    if (x===command.to.x&&y===command.to.y) return {available:true,
+      resolverVersion:IRON_DUST_PLAYER_MOVE_PROBE_VERSION,allowance,cost,path};
+  }
+  return deny('UNREACHABLE');
+}
+
+export function listIronDustPlayerMoves(state, unitId) {
+  validateIronDustUnifiedStateProbe(state);
+  if (state.fixture!=='source'||state.victory.status!=='ongoing'||state.activeTeam!=='player') return [];
+  const {actor}=moveActor(state,unitId);
+  if (!actor) return [];
+  return [...legacyMoveNodes(state,actor,movementAllowance(state,actor))]
+    .filter(node=>node.path.length)
+    .map(({x,y,cost})=>({to:{x,y},cost}))
+    .sort((a,b)=>a.to.y-b.to.y||a.to.x-b.to.x);
 }
 
 export function preflightIronDustPlayerMove(state, command) {

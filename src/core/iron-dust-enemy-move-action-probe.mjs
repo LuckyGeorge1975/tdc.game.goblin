@@ -1,6 +1,7 @@
 import {validateIronDustUnifiedStateProbe} from './iron-dust-unified-state-probe.mjs';
 import {ironDustEnemyMovementNodes, queryIronDustEnemyIntent} from './iron-dust-enemy-intent-probe.mjs?v=2';
-import {inside, key} from './hex.mjs';
+import {inside, key, hexDistance} from './hex.mjs';
+import {listIronDustEnemyFireChoices} from './iron-dust-standard-fire-action-probe.mjs?v=2';
 
 export const IRON_DUST_ENEMY_MOVE_ACTION_VERSION = 'iron-dust-explicit-enemy-move-v1';
 const actors = ['guard', 'raider'];
@@ -33,18 +34,21 @@ function queryMoveAction(state, command, policy, explicit) {
   if (actor.hp <= 0 || actor.disabled) return deny('ENEMY_ACTOR_UNAVAILABLE');
   if (actor.moved || state.enemyPassed.includes(actor.id) ||
       state.firedActorIds.includes(actor.id)) return deny('ACTION_SPENT');
-  const intent = queryIronDustEnemyIntent(state,
-    {type: 'EnemyIntent', playerId: 'enemy', actorId: actor.id,
-      stage: 'move', claim: 'auto'}, policy);
-  if (!intent.available) return intent;
   if (explicit) {
+    if (listIronDustEnemyFireChoices(state,actor.id).length) return deny('FIRE_AVAILABLE');
     if (hold) return {available:true, resolverVersion:IRON_DUST_ENEMY_MOVE_ACTION_VERSION,
       kind:'hold',actorId:actor.id,reason:'HOLD'};
     if (!exact(command.to,['x','y']) || !inside(state.map,command.to) || key(command.to)===key(actor))
       return deny('ENEMY_MOVE_DESTINATION_INVALID');
-    const node = reachableEnemyMoves(state,actor).get(key(command.to));
-    return node ? explicitMove(actor.id,node,intent) : deny('ENEMY_MOVE_DESTINATION_UNREACHABLE');
+    const moves = reachableEnemyMoves(state,actor);
+    const node = moves.get(key(command.to));
+    return node ? explicitMove(actor.id,node,moveEventTarget(state,actor,moves))
+      : deny('ENEMY_MOVE_DESTINATION_UNREACHABLE');
   }
+  const intent = queryIronDustEnemyIntent(state,
+    {type: 'EnemyIntent', playerId: 'enemy', actorId: actor.id,
+      stage: 'move', claim: 'auto'}, policy);
+  if (!intent.available) return intent;
   if (hold ? intent.kind !== 'pass' || intent.reason !== 'HOLD' :
     intent.kind !== 'move') return deny('ENEMY_MOVE_INTENT_MISMATCH');
   if (!hold && (!exact(command.to, ['x', 'y']) ||
@@ -64,13 +68,21 @@ function reachableEnemyMoves(state, actor) {
   return best;
 }
 
-function explicitMove(actorId, node, automated) {
+function moveEventTarget(state,actor,moves) {
+  // Preserve the native receipt's legacy target reference for existing replays.
+  let target, distance=Infinity;
+  for (const unit of state.units) {
+    if (unit.team!=='player'||unit.hp<=0) continue;
+    const candidateDistance=hexDistance(actor,unit);
+    if (candidateDistance<distance) {target=unit;distance=candidateDistance;}
+  }
+  return target&&[...moves.values()].some(node=>hexDistance(node,target)<distance)?target.id:null;
+}
+
+function explicitMove(actorId, node, targetId = null) {
   const to={x:node.x,y:node.y};
-  // Selecting the historical destination keeps its historical tie and receipt.
-  const sameDestination=automated.kind==='move'&&key(automated.to)===key(to);
   return {available:true,resolverVersion:IRON_DUST_ENEMY_MOVE_ACTION_VERSION,
-    kind:'move',actorId,targetId:automated.targetId??null,to,
-    cost:sameDestination?automated.cost:node.cost,path:sameDestination?automated.path:node.path};
+    kind:'move',actorId,targetId,to,cost:node.cost,path:node.path};
 }
 
 export function queryIronDustEnemyMoveAction(state, command, policy = null) {
@@ -81,9 +93,9 @@ export function queryIronDustEnemyExplicitMoveAction(state, command, policy = nu
   return queryMoveAction(state,command,policy,true);
 }
 
-export function listIronDustEnemyExplicitMoves(state, actorId, automated) {
+export function listIronDustEnemyExplicitMoves(state, actorId) {
   const actor=unit(state,actorId);
-  return [...reachableEnemyMoves(state,actor).values()].map(node=>explicitMove(actorId,node,automated));
+  return [...reachableEnemyMoves(state,actor).values()].map(node=>explicitMove(actorId,node));
 }
 
 export function preflightIronDustEnemyMoveAction(state, command, policy = null) {

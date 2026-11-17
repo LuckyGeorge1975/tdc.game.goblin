@@ -10,7 +10,7 @@ import {IRON_DUST_ZERO_TREADS_STATE_VERSION,
   './iron-dust-unified-state-probe.mjs';
 import {ironDustCrtRatio} from './iron-dust-crt-ratio.mjs';
 import {IRON_DUST_ZERO_TREADS_ENEMY_TURN_CONTROLLER_VERSION,queryIronDustEnemyMoveChoice} from
-  './iron-dust-enemy-turn-controller-probe.mjs?v=2';
+  './iron-dust-enemy-turn-controller-probe.mjs?v=3';
 import {IRON_DUST_PLAYER_MOVE_PROBE_VERSION} from './iron-dust-player-move-probe.mjs';
 import {IRON_DUST_STANDARD_FIRE_ACTION_VERSION} from
   './iron-dust-standard-fire-action-probe.mjs';
@@ -20,8 +20,8 @@ export {IRON_DUST_ENEMY_DIFFICULTIES} from './iron-dust-enemy-policy.mjs';
 import {IRON_DUST_ZERO_TREADS_SOURCE_ACTION_ENTRY_VERSION,
   createIronDustZeroTreadsSourceActionEntry, validateIronDustSourceActionEntry,
   queryIronDustSourceActionEntry, dispatchIronDustSourceActionEntry, dispatchIronDustSourceEnemyFireChoice,
-  dispatchIronDustSourceEnemyMoveChoice} from
-  './iron-dust-source-action-entry-probe.mjs?v=2';
+  dispatchIronDustSourceEnemyMoveChoice,dispatchIronDustSourceEnemyMechanical} from
+  './iron-dust-source-action-entry-probe.mjs?v=3';
 
 // Internal executable profile boundary; no browser, level picker or replay import.
 export const IRON_DUST_PROFILE_VERSION = 'core-iron-dust-profile-v1';
@@ -192,6 +192,12 @@ export function dispatchIronDustProfileEnemyMoveChoice(profile,command) {
   catch {return {error:{code:'IRON_DUST_PROFILE_MISMATCH'}}}
   if (profile.entry.mode==='ended') return {error:{code:'GAME_ENDED'}};
   return applyEntryResult(profile,dispatchIronDustSourceEnemyMoveChoice(profile.entry,command));
+}
+
+export function dispatchIronDustProfileEnemyMechanical(profile) {
+  try {validateIronDustProfile(profile)}
+  catch {return {error:{code:'IRON_DUST_PROFILE_MISMATCH'}}}
+  return applyEntryResult(profile,dispatchIronDustSourceEnemyMechanical(profile.entry));
 }
 
 function applyEntryResult(profile, result) {

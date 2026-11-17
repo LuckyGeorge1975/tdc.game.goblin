@@ -4,9 +4,9 @@ import {queryIronDustEnemyIntent} from './iron-dust-enemy-intent-probe.mjs?v=2';
 import {queryIronDustEnemyMoveAction, dispatchIronDustEnemyMoveAction,
   queryIronDustEnemyExplicitMoveAction, dispatchIronDustEnemyExplicitMoveAction,
   listIronDustEnemyExplicitMoves} from
-  './iron-dust-enemy-move-action-probe.mjs?v=2';
-import {queryIronDustStandardFireAction, dispatchIronDustStandardFireAction} from
-  './iron-dust-standard-fire-action-probe.mjs';
+  './iron-dust-enemy-move-action-probe.mjs?v=3';
+import {queryIronDustStandardFireAction, dispatchIronDustStandardFireAction,listIronDustEnemyFireChoices} from
+  './iron-dust-standard-fire-action-probe.mjs?v=2';
 import {validIronDustEnemyPolicy} from './iron-dust-enemy-policy.mjs';
 
 // A diagnostic scheduler, separate from Core product profiles and Replay.
@@ -127,9 +127,8 @@ export function validateIronDustEnemyTurnController(value) {
   return value;
 }
 
-function nextAction(controller, decisionTrace) {
+function fixedAction(controller) {
   const {state, cursor} = controller;
-  const policy = controller.enemyPolicy ?? null;
   if (cursor.pass === 'finish') {
     const command = {type: 'EndPhase', playerId: 'enemy'};
     const query = queryIronDustStandardFireAction(state, command);
@@ -142,6 +141,16 @@ function nextAction(controller, decisionTrace) {
       state.enemyPassed.includes(actorId)))
     return {kind: 'skip', actorId, reason: state.firedActorIds.includes(actorId)
       ? 'FIRED' : 'PASSED'};
+  if (cursor.pass==='first'&&actor.disabled)
+    return {kind:'pass',actorId,reason:'DISABLED',command:{type:'EnemyPass',playerId:'enemy',actorId}};
+}
+
+function nextAction(controller, decisionTrace) {
+  const fixed=fixedAction(controller);
+  if (fixed) return fixed;
+  const {state,cursor}=controller;
+  const policy=controller.enemyPolicy??null;
+  const actorId=actors[cursor.index];
   const stage = cursor.pass === 'first' ? 'first-fire' : 'retry-fire';
   const intent = queryIronDustEnemyIntent(state, intentRequest(actorId, stage), policy, decisionTrace);
   if (!intent.available) return {error: intent.error};
@@ -163,6 +172,29 @@ function nextAction(controller, decisionTrace) {
   return {kind: move.kind === 'move' ? 'move' : 'hold', actorId, command,
     ...(move.kind === 'move' ? {targetId: move.targetId, to: move.to,
       cost: move.cost, path: move.path} : {reason: 'HOLD'})};
+}
+
+export function queryIronDustEnemyLegalSlot(controller) {
+  try {validateIronDustEnemyTurnController(controller)}
+  catch {return deny('ENEMY_CONTROLLER_STATE_MISMATCH')}
+  const {state,cursor}=controller;
+  if (cursor.pass==='complete') return deny('ENEMY_TURN_COMPLETE');
+  const fixed=fixedAction(controller);
+  if (fixed?.error) return {available:false,error:fixed.error};
+  if (fixed) return {available:true,kind:'mechanical',action:fixed};
+  const actorId=actors[cursor.index];
+  const fire=listIronDustEnemyFireChoices(state,actorId);
+  if (fire.length) return {available:true,kind:'fire',actorId,fire};
+  if (cursor.pass==='first') return {available:true,kind:'move',actorId};
+  return {available:true,kind:'mechanical',action:{kind:'pass',actorId,reason:'NO_TARGET',
+    command:{type:'EnemyPass',playerId:'enemy',actorId}}};
+}
+
+export function dispatchIronDustEnemyMechanical(controller) {
+  const slot=queryIronDustEnemyLegalSlot(controller);
+  if (!slot.available) return {error:slot.error};
+  if (slot.kind!=='mechanical') return {error:{code:'ENEMY_MANUAL_CHOICE_REQUIRED'}};
+  return applyControllerAction(controller,slot.action);
 }
 
 export function queryIronDustEnemyTurnController(controller, request, decisionTrace) {
@@ -192,10 +224,9 @@ export function dispatchIronDustEnemyTurnController(controller, request) {
 // The controller owns actor/pass eligibility. A choice can replace the target
 // of an already permitted fire attempt, including a different system component.
 export function queryIronDustEnemyFireChoice(controller, command) {
-  const request = {type: 'AdvanceEnemyTurn', playerId: 'enemy'};
-  const slot = queryIronDustEnemyTurnController(controller, request);
+  const slot=queryIronDustEnemyLegalSlot(controller);
   if (!slot.available) return slot;
-  if (slot.action.kind !== 'fire' || command?.attackerId !== slot.action.actorId ||
+  if (slot.kind!=='fire' || command?.attackerId!==slot.actorId ||
       !['EnemyUnitAttack', 'EnemySystemAttack'].includes(command?.type))
     return deny('ENEMY_FIRE_CHOICE_OUTSIDE_SLOT');
   return queryIronDustStandardFireAction(controller.state, command);
@@ -206,30 +237,23 @@ export function dispatchIronDustEnemyFireChoice(controller, command) {
   return check.available ? applyControllerAction(controller, {kind: 'fire', command}) : check;
 }
 
-function enemyMovementSlot(controller) {
-  const slot=queryIronDustEnemyTurnController(controller,{type:'AdvanceEnemyTurn',playerId:'enemy'});
-  if (!slot.available) return slot;
-  if (slot.cursor.pass!=='first' || !['move','hold'].includes(slot.action.kind))
-    return deny('ENEMY_MOVE_CHOICE_OUTSIDE_SLOT');
-  return slot;
-}
-
-export function listIronDustEnemyMoveChoices(controller) {
-  const slot=enemyMovementSlot(controller);
+export function listIronDustEnemyMoveChoices(controller, automation) {
+  const slot=queryIronDustEnemyLegalSlot(controller);
   if (!slot.available) return [];
-  const {actorId}=slot.action, common={playerId:'enemy',actorId};
-  const choices=listIronDustEnemyExplicitMoves(controller.state,actorId,slot.action).map(move=>({
+  if (slot.kind!=='move') return [];
+  const {actorId}=slot, common={playerId:'enemy',actorId};
+  const choices=listIronDustEnemyExplicitMoves(controller.state,actorId).map(move=>({
     command:{type:'EnemyMove',...common,to:move.to},cost:move.cost,path:move.path,
-    baseline:slot.action.kind==='move'&&move.to.x===slot.action.to.x&&move.to.y===slot.action.to.y
+    baseline:automation?.kind==='move'&&move.to.x===automation.to.x&&move.to.y===automation.to.y
   }));
-  choices.push({command:{type:'EnemyHold',...common},baseline:slot.action.kind==='hold'});
+  choices.push({command:{type:'EnemyHold',...common},baseline:automation?.kind==='hold'});
   return choices.sort((a,b)=>Number(b.baseline)-Number(a.baseline));
 }
 
 function withEnemyMovementSlot(controller, command, resolve) {
-  const slot=enemyMovementSlot(controller);
+  const slot=queryIronDustEnemyLegalSlot(controller);
   if (!slot.available) return slot;
-  if (command?.actorId!==slot.action.actorId) return deny('ENEMY_MOVE_CHOICE_OUTSIDE_SLOT');
+  if (slot.kind!=='move'||command?.actorId!==slot.actorId) return deny('ENEMY_MOVE_CHOICE_OUTSIDE_SLOT');
   return resolve(controller.state,command,controller.enemyPolicy??null);
 }
 

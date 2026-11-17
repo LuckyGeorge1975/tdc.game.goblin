@@ -85,6 +85,21 @@ export function preflightIronDustStandardFireAction(state, command) {
   return queryIronDustStandardFireAction(state, command);
 }
 
+export function listIronDustEnemyFireChoices(state, attackerId) {
+  const choices=[];
+  for (const target of state.units.filter(unit=>unit.team==='player'&&unit.hp>0&&!unit.embarkedOn)) {
+    const common={playerId:'enemy',attackerId,targetId:target.id};
+    const commands=target.ogreSystems
+      ? [...Object.keys(target.ogreSystems.weapons),'treads'].map(targetKey=>({type:'EnemySystemAttack',...common,targetKey}))
+      : [{type:'EnemyUnitAttack',...common}];
+    for (const command of commands) {
+      const query=queryIronDustStandardFireAction(state,command);
+      if (query.available) choices.push({command,query});
+    }
+  }
+  return choices;
+}
+
 export function dispatchIronDustStandardFireAction(state, command) {
   const query = queryIronDustStandardFireAction(state, command);
   if (!query.available) return {error: query.error};

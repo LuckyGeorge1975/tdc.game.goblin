@@ -261,7 +261,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       binding.session = legacySession;
       if (!binding.port) throw new Error('FULL_CONTROLLER_OWNER');
       const host = setup.owner.bind(binding.session, setup.selection, ui, binding.port);
-      if (host) void import('./src/core/full-phase-lifecycle.mjs?v=2').then(({createFullPhaseLifecycle}) => {
+      if (host) void import('./src/core/full-phase-lifecycle.mjs?v=3').then(({createFullPhaseLifecycle}) => {
         if (fullSeatBinding !== binding || binding.session !== legacySession) return;
         binding.lifecycle = createFullPhaseLifecycle({port:binding.port, host, changed:ui.refresh});
         binding.lifecycle.sync();
@@ -1013,15 +1013,17 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       label.textContent = t('v2.full.seat.player') + ' ';
       const select = document.createElement('select');
       select.id = 'v2-briefing-attacker';
-      const available = IronDustBrowserV2.seatManager().seats[0].ai.some(option=>option.id==='trained');
-      for (const attacker of available ? ['human','trained'] : ['human']) {
+      const policies = IronDustBrowserV2.seatManager().seats[0].ai;
+      const choices = ['human',...policies.map(policy=>policy.id)];
+      for (const attacker of choices) {
         const option = document.createElement('option');
         option.value = attacker;
-        option.textContent = t('v2.full.' + attacker);
+        option.textContent = t(attacker==='weak'?'v2.difficulty.weak':'v2.full.'+attacker);
         select.append(option);
       }
-      select.value = available ? briefingAttacker : 'human';
-      select.disabled = !available;
+      if (!choices.includes(briefingAttacker)) briefingAttacker = 'human';
+      select.value = briefingAttacker;
+      select.disabled = !policies.length;
       select.onchange = () => { briefingAttacker = select.value; };
       label.append(select);
       return label;

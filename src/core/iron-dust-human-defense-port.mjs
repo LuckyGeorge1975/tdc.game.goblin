@@ -1,4 +1,4 @@
-import {createIronDustAiAdapter} from './iron-dust-ai-adapter.mjs?v=6';
+import {createIronDustAiAdapter} from './iron-dust-ai-adapter.mjs?v=7';
 
 const reject = code => ({ok:false,code});
 const mechanicalKinds = new Set(['skip','pass','end-phase']);
