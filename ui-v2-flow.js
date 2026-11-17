@@ -897,12 +897,19 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     // Leaves a running mission (after confirmation) for the mission list or the main menu.
     async function leaveMission(next) {
       if (GameDialogs.isOpen()) return;
-      const training=globalThis.GoblinTrainingRuntime?.view()?.definition.mode==='learning';
+      const training=globalThis.GoblinTrainingRuntime?.view();
+      const completedLesson=training?.definition.mode==='learning'&&training.progress.status==='lesson-complete';
+      const unfinishedLesson=training?.definition.mode==='learning'&&
+        ['running','ready-for-debrief'].includes(training.progress.status);
       if (['pause', 'end', 'play', 'full-seat', 'full-handoff', ...ironDustSeatScreens].includes(screen)) {
         const menu = next === 'menu';
         const accepted = await GameDialogs.confirm({
           id: 'v2-flow-leave', title: t(menu ? 'v2.dialog.mainMenu.title' : 'dialog.changeMission.title'),
-          message: t(editorConfig ? 'v2.editor.returnConfirm' : campaign && !campaign.field ? 'v2.campaign.exitConfirm' : training?'training.exitConfirm':menu ? 'v2.dialog.mainMenu.body' : 'ui.dialog.leaveMission.body'),
+          message: t(editorConfig ? 'v2.editor.returnConfirm' :
+            unfinishedLesson ? 'training.exitConfirm' :
+            completedLesson ? 'v2.training.completedExit' :
+            campaign && !campaign.field ? 'v2.campaign.exitConfirm' :
+            menu ? 'v2.dialog.mainMenu.body' : 'ui.dialog.leaveMission.body'),
           acceptLabel: t(editorConfig ? 'v2.editor.return' : menu ? 'v2.dialog.mainMenu.confirm' : 'dialog.changeMission.confirm'), cancelLabel: t('dialog.changeMission.cancel')
         });
         if (!accepted) { renderScreen(false); return; }
@@ -920,7 +927,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           return;
         }
         if (campaign) clearCampaign();
-        if(training)GoblinTrainingRuntime.ack('exit');
+        if(unfinishedLesson)GoblinTrainingRuntime.ack('exit');
         if (globalThis.IronDustBrowserV2?.mode === 'ready') {
           IronDustBrowserV2.stop();
           loadScenario('iron-dust');

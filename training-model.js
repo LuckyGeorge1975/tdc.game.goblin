@@ -75,6 +75,6 @@
   advisory=freeze({definition,manifest,regions:{}});advisorySource=source;return advisory;
  }
  function advisoryFor(config){return advisory&&JSON.stringify(stable(config))===advisorySource?advisory:null}
- function copyKey(key){const match=/^mission\.(training-t0[123])\.(.+)$/.exec(key);if(!match||!has(match[1]))return null;const config=configs[match[1]],field=match[2];return field==='title'?config.titleKey:['objective.short','objective.full','briefing.short'].includes(field)?config.goalKey:field==='briefing.full'?'training.intro':field==='briefing.victory'?'training.readyForDebrief':field==='briefing.defeat'?'training.undoUnavailable':field==='end.victory'?'training.complete.title':null}
+ function copyKey(key){const match=/^mission\.(training-t0[123])\.(.+)$/.exec(key);if(!match||!has(match[1]))return null;const config=configs[match[1]],field=match[2];return field==='title'?config.titleKey:['objective.short','objective.full','briefing.short'].includes(field)?config.goalKey:field==='briefing.full'?'training.intro':field==='briefing.victory'?'training.readyForDebrief':field==='briefing.defeat'?'v2.training.defeatRule':field==='end.victory'?'training.complete.title':null}
  root.GoblinTrainingModel=Object.freeze({profile,ids,hash,initialize,initializeAdvisory,advisoryFor,has,validate,manifestFor,copyKey,get configs(){return configs}});
 })(globalThis);
