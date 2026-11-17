@@ -1,4 +1,4 @@
-import {createRoundRecorder} from './round-view-producer.mjs?v=5';
+import {createRoundRecorder} from './round-view-producer.mjs?v=6';
 
 export function createFullRoundSource(read) {
   let owner, recorder;
@@ -11,20 +11,32 @@ export function createFullRoundSource(read) {
       readAuthority:() => ({...read(),mode:'player'})});
   }
   const current = () => owner && read()?.session === owner ? recorder : null;
-  function record(event, after, visibleIds) {
+  function record(event, frames) {
     const active = current();
     if (!active) return;
     const commit = active.beginCommit();
-    const ownPath = event.side === 'player' && visibleIds.has(event.actor?.id);
-    const actor = visibleIds.has(event.actor?.id);
-    const target = visibleIds.has(event.target?.id);
-    const capture = commit.captureFullRoundEvent(event,{after,disclosure:{
-      actor:actor ? 'after' : null,target:target ? 'after' : null,
-      boardVisible:actor || target,resultVisible:target,
-      targetCellVisible:actor && event.side === 'player',
-      visibleSteps:ownPath ? event.snapshot.paths[0]?.cells.map(() => true) : undefined
-    }});
+    function evidence(side) {
+      const after=frames[side];
+      const visible=new Set(after.units.map(unit=>unit.id));
+      const actor=visible.has(event.actor?.id), target=visible.has(event.target?.id);
+      const ownAction=event.side===side && actor;
+      return {after,disclosure:{
+        actor:actor?'after':null,target:target?'after':null,
+        boardVisible:actor||target||event.hits?.some(hit=>visible.has(hit.target.id)),
+        resultVisible:target,targetCellVisible:ownAction,
+        visibleSteps:ownAction?event.snapshot.paths[0]?.cells.map(()=>true):undefined
+      }};
+    }
+    const capture=commit.captureFullSeatEvent(event,evidence('player'),evidence('enemy'));
     commit.accept({roundNumber:read().round,events:[capture]});
+  }
+  function view() {
+    const authority=read();
+    const active=current();
+    if (!active) return null;
+    if (!authority.port || authority.spectator || authority.ended) return active.view();
+    const seat=authority.port.state();
+    return seat?.humanReady?active.view(seat.side):null;
   }
   return Object.freeze({
     start, record,
@@ -42,7 +54,7 @@ export function createFullRoundSource(read) {
       const handle = checkpoints.get(snapshot);
       if (handle) current()?.rewind(handle);
     },
-    view:() => current()?.view() ?? null
+    view
   });
 }
 
@@ -50,6 +62,6 @@ if (typeof document !== 'undefined') {
   globalThis.GoblinFullRoundSource = createFullRoundSource(() =>
     GoblinCatalogFullRuntime.active() && legacySession.ruleProfileId === 'FULL_CATALOG_v1'
       ? {session:legacySession,round:turn,side:phase,phase:turnPhase,ended:gameOver,
-        spectator:!!GoblinCatalogFullRuntime.controllerPort()?.spectator?.()} : null);
+        port:GoblinCatalogFullRuntime.controllerPort(), spectator:!!GoblinCatalogFullRuntime.controllerPort()?.spectator?.()} : null);
   GoblinFullRoundSource.start();
 }

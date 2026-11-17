@@ -505,6 +505,9 @@ if (typeof document !== 'undefined') {
     get trainedActive() {return attackerOwner?.id==='trained';},
     get attackerActive() {return !!attackerOwner;},
     roundView: () => rounds?.view() ?? null,
+    // Iron Dust has one shared battlefield projection. Both humans use the
+    // existing redacted event view, scoped here to the active defense seat.
+    defenseRoundView: () => defenseOffer() ? rounds?.view() ?? null : null,
     replaySnapshot: () => replay?.snapshot() ?? null,
     seatManager,startSeats,takeSeat,defenseOffer,chooseDefense,
     get handoff() {return manualDefense?.pending??null;},

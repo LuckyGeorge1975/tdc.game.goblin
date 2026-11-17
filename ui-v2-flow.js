@@ -373,6 +373,15 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           ? button(t('ui.nav.resume'), lifecycle.resume)
           : button(t('ui.nav.pause'), lifecycle.pause));
       }
+      const seat=port.state();
+      if (seat?.ended || seat?.humanReady) {
+        const rounds=globalThis.GoblinFullRoundSource?.view();
+        if (rounds?.latestComplete)
+          controls.push(button(t('v2.round.latest'), () => openRoundAnalysis(rounds.latestComplete)));
+        if (seat.ended && rounds?.terminalPartial)
+          controls.push(button(t('v2.round.partial', {round:rounds.terminalPartial.roundNumber}),
+            () => openRoundAnalysis(rounds.terminalPartial)));
+      }
       if (!snapshot) { panel.append(actions(...controls)); return; }
       const {view, log} = snapshot;
       panel.append(paragraph(t('ui.hud.turn', {turn:view.turn})), fullSeatMap(view));
@@ -653,10 +662,21 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const host = globalThis.IronDustBrowserV2;
       const origin = screen, epoch = host?.epoch, owner = legacySession;
       const binding = origin === 'full-seat' ? fullSeatBinding : null;
+      const seat = binding?.port?.state();
       const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=3');
       if (screen !== origin || host?.epoch !== epoch || legacySession !== owner) return;
-      if (binding && (binding !== fullSeatBinding || !binding.port.spectator()?.read())) return;
-      const lifecycle = binding?.lifecycle;
+      if (origin === 'full-seat') {
+        const current=binding?.port.state();
+        if (!binding || binding !== fullSeatBinding || !current) return;
+        if (!binding.port.spectator()?.read()) {
+          if (!seat || current.generation !== seat.generation || current.side !== seat.side ||
+              !(current.humanReady || current.ended)) return;
+          const rounds=globalThis.GoblinFullRoundSource?.view();
+          if (round !== rounds?.latestComplete && round !== rounds?.terminalPartial) return;
+        }
+      }
+      if (origin === 'iron-dust-defense' && host?.defenseRoundView()?.latestComplete !== round) return;
+      const lifecycle = binding?.port.spectator()?.read() ? binding.lifecycle : null;
       const resumeSpectator = lifecycle && !lifecycle.paused && !binding.port.state()?.ended;
       if (resumeSpectator) lifecycle.pause();
       const resume = origin === 'log' && returnScreen === 'play' && !GoblinUIV2.project().gameOver && holdPlay();
@@ -1098,7 +1118,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       label.append(select);
       const commit=button(t('ui.dialog.confirm'),()=>host.chooseDefense(offer.ticket,select.value),'primary');
       commit.id='v2-iron-dust-defense-commit';
-      panel.append(label,actions(commit,restart,leave));
+      const round=host.defenseRoundView()?.latestComplete;
+      const controls=[commit,restart,leave];
+      if (round) controls.push(button(t('v2.round.latest'),()=>openRoundAnalysis(round)));
+      panel.append(label,actions(...controls));
     }
     function updateEditor(draft, cell = editorCell) {
       try {

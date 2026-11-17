@@ -521,7 +521,6 @@
  function recordRoundAction(actor,command,result){
   const source=root.GoblinFullRoundSource;
   if(!source||!active()||legacySession.ruleProfileId!=='FULL_CATALOG_v1'||gameOver)return;
-  const visibleIds=projectedIds('player');
   const entity=roundEntity;
   const targetId=command.target?.runtimeUnitId??result.targetId??result.cargoId;
   const target=units.find(unit=>unit.id===targetId);
@@ -555,10 +554,13 @@
   // visibility of any intermediate enemy step.
   const path=result.acceptedPrefix??result.path;
   const paths=path?.length&&actor.moveFrom?[{id:actor.id,cells:[actor.moveFrom,...path]}]:[];
-  const after={...board,units:units.filter(unit=>visibleIds.has(unit.id)&&!unit.embarkedOn).map(entity)};
+  const frames=Object.fromEntries(['player','enemy'].map(side=>{
+   const visibleIds=projectedIds(side);
+   return [side,{...board,units:units.filter(unit=>visibleIds.has(unit.id)&&!unit.embarkedOn).map(entity)}];
+  }));
   source.record({side:actor.team,kind,actor:entity(actor),target:target&&entity(target),
    result:result.outcome?.result,targetCell:fireCell(command),hits,options,
-   explanationKey:evidence?.explanationKey??roundFireChoice?.reason,snapshot:{...board,paths}},after,visibleIds);
+   explanationKey:evidence?.explanationKey??roundFireChoice?.reason,snapshot:{...board,paths}},frames);
  }
  function catalogCard(entry){
   if(!active())return null;const r=registry().units[root.UnitVisuals.artKey(entry)];if(!r)return null;const t=r.target,system=t.systemDefinitionRef?GoblinSystems.createCatalogSystem(registry(),r.assetId??root.UnitVisuals.artKey(entry)):null;

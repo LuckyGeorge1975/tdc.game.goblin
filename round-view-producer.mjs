@@ -139,7 +139,7 @@ export function visibleRoundPath(cells, canSee) {
 export function createRoundRecorder({session, mode, initialRound, readAuthority, spectatorBoard}) {
   if (!session || !['player','spectator'].includes(mode) || !Number.isSafeInteger(initialRound) || initialRound<1)
     throw Error('ROUND_SESSION_INVALID');
-  let round = initialRound, terminal=false, playerView=null;
+  let round = initialRound, terminal=false, playerView=null, enemyView=null;
   const readBoard=mode==='spectator' && spectatorBoard ? ()=>freeze(structuredClone(spectatorBoard())) : null;
   const completed=[];
   let fullView;
@@ -172,7 +172,7 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority,
     const all=[];
     for (let node=head;node!==base;node=node.parent) all.push(node);
     const ordered=all.reverse();
-    return {public:ordered.flatMap(node=>node.public),full:ordered.flatMap(node=>node.full)};
+    return {public:ordered.flatMap(node=>node.public),enemy:ordered.flatMap(node=>node.enemy),full:ordered.flatMap(node=>node.full)};
   }
   // The host opens this before applying the native action. A receipt and its
   // opaque event handles are valid only at this exact parent and undo generation.
@@ -190,6 +190,10 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority,
     return Object.freeze({
       captureRoundEvent:(...args)=>bind(captureRoundEvent(...args)),
       captureFullRoundEvent:(...args)=>bind(captureFullRoundEvent(...args)),
+      captureFullSeatEvent(event, player, enemy) {
+        const captured=captureFullRoundEvent(event,player);
+        return bind({...captured,enemy:captureFullRoundEvent(event,enemy).public});
+      },
       accept(receipt) {
         if (head!==parent || generation!==openedGeneration || round!==openedRound)
           throw Error('ROUND_RECEIPT_STALE');
@@ -210,17 +214,18 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority,
     if (boundary==='terminal-partial' && (!authority.ended || authority.round!==round)) throw Error('ROUND_BOUNDARY_INVALID');
     if (boundary===undefined && (authority.ended || authority.round!==round)) throw Error('ROUND_BOUNDARY_MISSING');
     if (boundary!==undefined && !['complete','terminal-partial'].includes(boundary)) throw Error('ROUND_BOUNDARY_INVALID');
-    head={parent:head,board:readBoard?.(),public:events.flatMap(event=>event.public?[event.public]:[]),full:events.map(event=>event.full)};
+    head={parent:head,board:readBoard?.(),public:events.flatMap(event=>event.public?[event.public]:[]),enemy:events.flatMap(event=>event.enemy?[event.enemy]:[]),full:events.map(event=>event.full)};
     if (!boundary) return;
     const captured=rows();
     completed.push({number:round,completion:boundary,rows:captured.full});
     if (boundary==='complete') {
       playerView=encodeRound({number:round,completion:boundary,rows:captured.public},'player');
+      enemyView=encodeRound({number:round,completion:boundary,rows:captured.enemy},'player');
       round++;
     } else terminal=true;
     base={parent:null,board:head.board};head=base;
   }
-  function view() {
+  function view(side = 'player') {
     const authority=live();
     if (!authority) return null;
     if (mode==='spectator' || authority.spectator===true || terminal && authority.ended) {
@@ -233,7 +238,7 @@ export function createRoundRecorder({session, mode, initialRound, readAuthority,
       fullView={perspective,view};
       return view;
     }
-    return Object.freeze({latestComplete:playerView,terminalPartial:null});
+    return Object.freeze({latestComplete:side==='enemy'?enemyView:playerView,terminalPartial:null});
   }
   // A live spectator trace is separate from the renderer's completed-round DTO.
   // Never attach it to the ordinary view, including terminal-withheld states.
