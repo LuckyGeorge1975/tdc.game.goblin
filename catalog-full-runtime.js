@@ -151,7 +151,8 @@
   return controller?.owns(legacySession) ? controller : null;
  }
  function controllerPort(){return controlOwner()?.port??null;}
- function ownsPresentation(){return presentationPending||!!controlOwner();}
+ function mapPort(){const owner=controlOwner();return owner?.mapPresentation?owner.port:null;}
+ function ownsPresentation(){const owner=controlOwner();return presentationPending||!!owner&&!owner.mapPresentation;}
  function stageControlledPresentation(){
   presentationPending=true;
   clearFullNativePresentation();
@@ -239,16 +240,18 @@
   }
   return Object.freeze(bound);
  }
- function prepareControllers(session,selection,ui,policyIds={},seed,draft){
+ function prepareControllers(session,selection,ui,policyIds={},seed,draft,mapPresentation=false){
   if(session.ruleProfileId!=='FULL_CATALOG_v1' || !exact(selection,['player','enemy']) ||
       !controllerSides.every(side=>['ai','human'].includes(selection[side])))throw admissionError('FULL_CONTROLLERS_INVALID');
   if(Object.values(selection).includes('ai'))ScenarioRuleProfiles.requireAi(session);
   const roles=Object.freeze({...selection});
   const policies=bindQualifiedControllers(session,roles,policyIds);
+  if(mapPresentation&&(roles.player!=='human'||roles.enemy!=='ai'||policies.enemy))
+   throw admissionError('FULL_MAP_CONTROLLER_INVALID');
   if(seed!==undefined&&(!Number.isInteger(seed)||seed<0||seed>0xffffffff))throw admissionError('FULL_SEED_INVALID');
   return ()=>{
    if(legacySession!==session||!active()||controlOwner())throw Error('FULL_CONTROLLER_OWNER');
-   controller=createControllerPort(session,roles,ui,policies,seed,draft);
+   controller=createControllerPort(session,roles,ui,policies,seed,draft,mapPresentation);
    return controller.port;
   };
  }
@@ -365,7 +368,7 @@
    draws:()=>draws
   };
  }
- function createControllerPort(session,roles,ui,policies,seed,draft){
+ function createControllerPort(session,roles,ui,policies,seed,draft,mapPresentation){
   const binding=Object.freeze({roles,policyIds:Object.freeze(Object.fromEntries(
    Object.entries(policies).map(([side,policy])=>[side,policy.id])))});
   const reject=code=>({ok:false,code});
@@ -533,7 +536,7 @@
    pause(){if(attached()){paused=true;invalidate();}},
    resume(){if(attached()&&paused){paused=false;enterSide();}},
    leave(){stopped=true;invalidate();cursor=null;nativeSlot=null;offer=null;latestSpectator=null;}});
-  return {owns,port,journal,startPresentation,enterSide,startEnemy,committing:()=>committing,advancingPhase:()=>advancingPhase};
+  return {owns,port,journal,mapPresentation,startPresentation,enterSide,startEnemy,committing:()=>committing,advancingPhase:()=>advancingPhase};
  }
  function fireView(binding){const out=copy(binding);if(out?.state)delete out.state.mainTargets;return out}
  function viewerUnit(u){const {specialistJournal,specialistSerial,...publicUnit}=u,out=copy(publicUnit);if(out.catalogFire)out.catalogFire=fireView(out.catalogFire);if(out.spotterId&&!known(out.spotterId))out.spotterId=null;return out}
@@ -832,7 +835,7 @@
   checkpointMission:snapshot=>controlOwner()?.journal?.checkpoint(snapshot),
   rewindMission:snapshot=>controlOwner()?.journal?.rewind(snapshot),
   aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,recordRoundAction,catalogCard,initialRoster,status,stealthText,deadlineRemoved,
-  enemyHexShot,prepareControllers,controllerPort,startControlledEnemyTurn,enterControlledSide,allowsPlayerPhaseAdvance,
+  enemyHexShot,prepareControllers,controllerPort,mapPort,nativeCommitActive:()=>!!controlOwner()?.committing(),startControlledEnemyTurn,enterControlledSide,allowsPlayerPhaseAdvance,
   ownsPresentation,stageControlledPresentation,startControlledPresentation,controllerOffers,controllerCapabilities,registerQualifiedController,
   hexTacticalFacts,nativePlayerGateway});
  const oldCheckVictory=checkVictory;

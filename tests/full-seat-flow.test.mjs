@@ -128,3 +128,57 @@ test('owned presentation reads only the assigned channel, including after revoca
   }};
   assert.equal(context.project(), null);
 });
+
+test('standard setup keeps the map and commits through the admitted human seat',async()=>{
+  const {context,dialogs,screens}=scene();
+  const config={ruleProfileId:'FULL_CATALOG_v1'};
+  const manager=createGameManager({maxSeats:2,seatIds:['player','enemy']},{
+    player:{human:true,ai:[]},enemy:{human:true,ai:[{id:'full-native-standard-defender',difficulty:null}]}
+  });
+  const permit={}, view={side:'player'};
+  let authorized=false,committed=0;
+  const port={
+    ticket:mode=>mode==='human'&&authorized?permit:null,
+    project:mode=>mode==='human'&&authorized?{view}:null
+  };
+  const owner={
+    configure:()=>manager,
+    offers:()=>({enemy:[{id:'full-native-standard-defender',label:'Standard'}]}),
+    nativeSetup:(_,selection)=>fullNativeSetup(manager,selection),
+    bind(){},
+    commitHuman(actualPort,actualPermit,actualView,command){
+      assert.equal(actualPort,port);
+      assert.equal(actualPermit,permit);
+      assert.equal(actualView,view);
+      assert.equal(command.type,'EndPhase');
+      committed++;
+      return {ok:true};
+    }
+  };
+  context.GoblinFullSeatOwner=owner;
+  context.legacySession={sessionId:4};
+  context.screen='play';
+  context.pauseActive=false;
+  const start=context.chooseFullSeats(config);
+  const dialog=dialogs[0];
+  dialog.returnValue='standard';
+  dialog.close();
+  const setup=await start;
+  assert.equal(setup.mapPresentation,true);
+  context.bindFullSeats(setup,control=>{
+    assert.equal(control.mapPresentation,true);
+    assert.equal(control.roles.player,'human');
+    assert.equal(control.roles.enemy,'ai');
+    assert.equal(control.ui.handoff({side:'player',generation:1,sessionId:4},()=>{
+      authorized=true;
+      return true;
+    }),true);
+    return port;
+  });
+  context.showStartedMission();
+  assert.deepEqual(screens,['play']);
+  assert.equal(context.commitFullMap({type:'EndPhase'}).ok,true);
+  authorized=false;
+  assert.equal(context.commitFullMap({type:'EndPhase'}).ok,false);
+  assert.equal(committed,1);
+});

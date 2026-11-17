@@ -533,6 +533,18 @@ function advanceNativePlayerPhase() {
   else if (turnPhase==='fire') setTurnPhase('gev');
   else if (turnPhase==='gev') startEnemyTurn();
 }
-$('#end-turn').onclick=()=>{if(!gameOver&&phase==='player'&&!globalThis.GoblinCatalogFullRuntime?.controllerPort?.())
-  confirmPhaseAdvance(advanceNativePlayerPhase)};$('#grid-toggle').onclick=()=>setGridVisible(!gridVisible);$('#reset-game').onclick=reset;document.querySelectorAll('.view-option:not(#grid-toggle)').forEach(button=>button.onclick=()=>setViewMode(button.dataset.view));document.addEventListener('keydown',e=>{if(e.key==='Escape'){selected=null;transportLoadMode=null;transportUnloadMode=null;updateSelection();draw()}if(e.key.toLowerCase()==='f'&&turnPhase==='fire'&&selected){const target=(globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(u=>u.team==='enemy'&&unitAlive(u)&&dist(selected,u)<=attackRange(selected)&&lineOfSight(selected,u)&&weaponTargetAllowed(selected,u));if(target)attack(selected,target)}});addLog('Mission online. Awaiting command.');updatePhaseControls();draw();
+$('#end-turn').onclick=()=>{
+  if(gameOver||phase!=='player')return;
+  const full=globalThis.GoblinCatalogFullRuntime;
+  const mapPort=full?.mapPort?.();
+  if(mapPort){
+    const seat=mapPort.state();
+    if(!seat?.humanReady)return;
+    confirmPhaseAdvance(()=>{
+      if(full.mapPort()===mapPort&&mapPort.state()?.generation===seat.generation)
+        globalThis.GoblinV2Flow?.commitFullMap({type:'EndPhase'});
+    });
+  }
+  else if(!full?.controllerPort?.())confirmPhaseAdvance(advanceNativePlayerPhase);
+};$('#grid-toggle').onclick=()=>setGridVisible(!gridVisible);$('#reset-game').onclick=reset;document.querySelectorAll('.view-option:not(#grid-toggle)').forEach(button=>button.onclick=()=>setViewMode(button.dataset.view));document.addEventListener('keydown',e=>{if(e.key==='Escape'){selected=null;transportLoadMode=null;transportUnloadMode=null;updateSelection();draw()}if(e.key.toLowerCase()==='f'&&turnPhase==='fire'&&selected){const target=(globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units).find(u=>u.team==='enemy'&&unitAlive(u)&&dist(selected,u)<=attackRange(selected)&&lineOfSight(selected,u)&&weaponTargetAllowed(selected,u));if(target)attack(selected,target)}});addLog('Mission online. Awaiting command.');updatePhaseControls();draw();
 }

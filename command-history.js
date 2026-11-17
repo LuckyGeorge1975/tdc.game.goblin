@@ -41,6 +41,8 @@ function commandStateKey(list) {
 
 function reversibleCommand(action, label, actorId = () => selected?.id) {
   return function(...args) {
+    const full=globalThis.GoblinCatalogFullRuntime;
+    if(full?.mapPort?.()&&!full.nativeCommitActive())return;
     if (commandDepth || phase !== 'player' || gameOver) return action(...args);
     const before = commandSnapshot(label), epoch = commandEpoch;
     const events = globalThis.GoblinLevelEvents;
@@ -121,21 +123,31 @@ if(typeof executeSpecialistCommand==='function')executeSpecialistCommand=reversi
 // Give BACK a short opportunity to cancel the automatic phase change.
 const originalAutoAdvance = maybeAutoAdvancePhase;
 maybeAutoAdvancePhase = function() {
-  if (globalThis.GoblinCatalogFullRuntime?.controllerPort?.()) return;
+  const full=globalThis.GoblinCatalogFullRuntime;
+  const mapPort=full?.mapPort?.();
+  if (full?.controllerPort?.()&&!mapPort) return;
   if (GameDialogs.isOpen()) return;
   if (!document.querySelector('#auto-end-turn')?.checked || phase !== 'player' || gameOver || phaseReadyUnits().length) return;
-  if (!commandDepth && !phaseCommands.length) return originalAutoAdvance();
+  if (!mapPort && !commandDepth && !phaseCommands.length) return originalAutoAdvance();
   clearTimeout(autoPhaseTimer);
   const epoch = commandEpoch;
   autoPhaseTimer = setTimeout(() => {
     autoPhaseTimer = null;
-    const advance = () => { if (epoch === commandEpoch) originalAutoAdvance(); };
+    const advance = () => {
+      if(epoch!==commandEpoch)return;
+      if(!mapPort){originalAutoAdvance();return;}
+      if(full.mapPort()!==mapPort||!mapPort.state()?.humanReady||GameDialogs.isOpen()||
+        !document.querySelector('#auto-end-turn')?.checked||phaseReadyUnits().length)return;
+      const previous=turnPhase;
+      if(globalThis.GoblinV2Flow?.commitFullMap({type:'EndPhase'})?.ok)
+        globalThis.GoblinUIV2?.notifyPhaseSkip(previous);
+    };
     if (globalThis.GoblinLevelEvents?.pending(legacySession)) GameDialogs.whenIdle().then(() => {
       if (epoch !== commandEpoch || autoPhaseTimer !== null) return;
       autoPhaseTimer = setTimeout(() => { autoPhaseTimer = null; advance(); }, 2000);
     });
     else advance();
-  }, 2000);
+  }, mapPort&&!phaseCommands.length?0:2000);
 };
 
 function commitPhaseBefore(action) {

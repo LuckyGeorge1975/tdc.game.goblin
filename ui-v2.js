@@ -199,6 +199,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       };
     }
     function query(command) {
+      const mapPort=globalThis.GoblinCatalogFullRuntime?.mapPort?.();
+      if (mapPort&&!mapPort.state()?.humanReady) return {ok:false,reason:t('ui.error.NOT_ACTIVE_TEAM')};
       if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
       if(globalThis.GoblinMovement?.busy())return {ok:false,reason:''};
       if (core()) {
@@ -314,6 +316,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (!check.ok) {globalThis.GoblinTrainingRuntime?.rejected(command);return check;}
       view.busy = true;
       try {
+        if (globalThis.GoblinCatalogFullRuntime?.mapPort?.()) {
+          const result=globalThis.GoblinV2Flow.commitFullMap(command);
+          return result.ok?result:{ok:false,reason:t('ui.error.INVALID_COMMAND')};
+        }
         const actor = units.find(unit => unit.id === command.actorId);
         selected = actor;
         const beforeExecution = revision();
@@ -343,7 +349,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if (core()) return {ok:false,reason:t('v2.undo')};
       if (view.busy || !phaseCommands.length || phase !== 'player' || gameOver) return { ok: false, reason: t('ui.error.ACTION_SPENT') };
       clearContext();
-      undoPhaseCommand();
+      const mapPort=globalThis.GoblinCatalogFullRuntime?.mapPort?.();
+      if(mapPort){
+        if(!mapPort.undo())return {ok:false,reason:t('ui.error.ACTION_SPENT')};
+      }else undoPhaseCommand();
       render();
       return { ok: true };
     }
