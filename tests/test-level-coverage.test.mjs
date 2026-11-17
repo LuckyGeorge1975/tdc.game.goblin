@@ -6,13 +6,13 @@ import vm from 'node:vm';
 // The Atlas level is the test level: it holds every catalog unit and every terrain type, so its recorded
 // victory and defeat routes stand in for replaying every level (catalog-full-trace replays only these two).
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
-const atlas = JSON.parse(read('assets/unit-art/levels/catalog-full-levels.v1.json')).levels.find(level => level.id === 'catalog-full-atlas');
+const atlas = JSON.parse(read('assets/unit-art/levels/catalog-full-levels.v3.json')).levels.find(level => level.id === 'catalog-full-atlas');
 const context = {}; context.globalThis = context;
 vm.runInNewContext(read('terrain-display.js') + '\nglobalThis.display = TerrainDisplay;', context);
 
 test('test level catalog-full-atlas contains every catalog unit', () => {
   const units = Object.keys(JSON.parse(read('assets/unit-art/rules/unit-profiles.catalog-approved.v1.json')).units);
-  const placed = new Set(JSON.stringify([atlas.units, atlas.waves, atlas.waveTemplates]).match(/"assetId":"[^"]+"/g).map(entry => entry.slice(11, -1)));
+  const placed = new Set([...atlas.units, ...(atlas.waveTemplates ?? [])].map(unit => unit.assetId));
   assert.equal(units.length, 26);
   assert.deepEqual(units.filter(unit => !placed.has(unit)), []);
 });

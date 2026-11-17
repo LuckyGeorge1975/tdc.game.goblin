@@ -153,7 +153,7 @@
       }
       for(const fire of fires){
         const actor=ticket.before.units.find(unit=>unit.id===fire.actorId);
-        const hexFire=['CATALOG_FULL_CANDIDATE_v1','FULL_CATALOG_v1'].includes(binding.ruleProfileId)&&ticket.command?.type==='CatalogHexFire'&&Object.keys(ticket.command).length===4&&Object.keys(ticket.command).every(k=>['type','actorId','x','y'].includes(k))&&fire.targetHex?.x===ticket.command.x&&fire.targetHex?.y===ticket.command.y&&Number.isInteger(fire.targetHex.x)&&Number.isInteger(fire.targetHex.y)&&fire.targetHex.x>=0&&fire.targetHex.x<12&&fire.targetHex.y>=0&&fire.targetHex.y<8;
+        const hexFire=binding.ruleProfileId==='FULL_CATALOG_v1'&&ticket.command?.type==='CatalogHexFire'&&Object.keys(ticket.command).length===4&&Object.keys(ticket.command).every(k=>['type','actorId','x','y'].includes(k))&&fire.targetHex?.x===ticket.command.x&&fire.targetHex?.y===ticket.command.y&&Number.isInteger(fire.targetHex.x)&&Number.isInteger(fire.targetHex.y)&&fire.targetHex.x>=0&&fire.targetHex.x<12&&fire.targetHex.y<8;
         const target=hexFire?{id:null,...fire.targetHex}:ticket.before.units.find(unit=>unit.id===fire.targetId);
         if(!actor||!target)continue;
         const eventId=`${sidecar.sessionInstanceId}/${sidecar.branchGeneration}/${acceptedSequence}/fire-${fire.sourceEventIndex}`;

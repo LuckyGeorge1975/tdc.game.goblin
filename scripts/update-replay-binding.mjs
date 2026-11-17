@@ -19,7 +19,7 @@ const GAMEPLAY = ['artillery-pilot-runtime.js', 'artillery-spotter-rules.js', 'a
   'assets/training/level-events-pilot.v3.json', 'assets/training/levels.v1.json',
   'assets/training/levels.v3.json', 'assets/training/scripts.v1.json',
   'assets/unit-art/levels/artillery-pilot.v1.json', 'assets/unit-art/levels/artillery-pilot.v3.json', 'assets/unit-art/levels/atlas-proving-grounds.v3.json',
-  'assets/unit-art/levels/catalog-full-levels.v1.json', 'assets/unit-art/levels/catalog-full-levels.v3.json',
+  'assets/unit-art/levels/catalog-full-levels.v3.json',
   'assets/unit-art/levels/showcase-levels.v3.json', 'assets/unit-art/levels/siege-pilot.v3.json', 'assets/unit-art/levels/skimmer-pilot.v3.json',
   'assets/unit-art/rules/artillery-pilot.v1.js',
   'assets/unit-art/rules/siege-pilot.v1.js', 'assets/unit-art/rules/skimmer-pilot.v1.js', 'assets/unit-art/rules/unit-profiles.catalog-approved.v1.json',

@@ -7,25 +7,25 @@ const read=p=>JSON.parse(fs.readFileSync(new URL('../'+p,import.meta.url),'utf8'
 async function model(){
  const c=vm.createContext({crypto:webcrypto,TextEncoder,console});
  for(const p of ['terrain-rules.js','ogre-systems.js','siege-tank-fire-budget.js','artillery-spotter-rules.js','catalog-specialists-fire.js','catalog-base-model.js','catalog-specialists-model.js','catalog-full-model.js','scenario-profile-manifest.js'])vm.runInContext(fs.readFileSync(new URL('../'+p,import.meta.url),'utf8'),c);
- c.data=read('assets/unit-art/rules/unit-profiles.catalog-approved.v1.json');c.levels=read('assets/unit-art/levels/catalog-full-levels.v1.json');
- await vm.runInContext('GoblinCatalogFullModel.initialize(data,levels,{profile:"CATALOG_FULL_CANDIDATE_v1"})',c);return c;
+ c.data=read('assets/unit-art/rules/unit-profiles.catalog-approved.v1.json');c.levels=read('assets/unit-art/levels/catalog-full-levels.v3.json');
+ await vm.runInContext('GoblinCatalogFullModel.initialize(data,levels,{profile:"FULL_CATALOG_v1"})',c);return c;
 }
-test('five fixed full candidates authorize 26 actual classes with Ninja systems and one-shot hex missile',async()=>{
+test('five FULL missions authorize 26 actual classes with Ninja systems and one-shot hex missile',async()=>{
  const c=await model(),configs=JSON.parse(vm.runInContext('JSON.stringify(GoblinCatalogFullModel.configs)',c));
  assert.equal(Object.keys(configs).length,5);
  const atlas=configs['catalog-full-atlas'];assert.equal(new Set(atlas.units.map(u=>u.catalogId)).size,26);
  const ninja=atlas.units.find(u=>u.catalogId==='U21');assert.equal(ninja.catalogSystems.treads,30);assert.equal(Object.hasOwn(ninja,'hp'),false);
  const missile=atlas.units.find(u=>u.catalogId==='U13');assert.equal(missile.ammunition,1);assert.equal(missile.range,8);
- for(const [id,config] of Object.entries(configs)){c.id=id;c.config=config;assert.equal(vm.runInContext('ScenarioRuleProfiles.beginSession(id,config).ruleProfileId',c),'CATALOG_FULL_CANDIDATE_v1')}
+ for(const [id,config] of Object.entries(configs)){c.id=id;c.config=config;assert.equal(vm.runInContext('ScenarioRuleProfiles.beginSession(id,config).ruleProfileId',c),'FULL_CATALOG_v1')}
  assert.equal(c.data.targetActive,false);
- assert.throws(()=>vm.runInContext("ScenarioRuleProfiles.beginSession('catalog-full-atlas',{...GoblinCatalogFullModel.configs['catalog-full-atlas'],ruleProfileId:'FULL_CATALOG_v1'})",c));
+ assert.throws(()=>vm.runInContext("ScenarioRuleProfiles.beginSession('catalog-full-atlas',{...GoblinCatalogFullModel.configs['catalog-full-atlas'],ruleProfileId:'foreign'})",c));
 });
 
-test('v3 full layout, waves and enemy turn limit reproduce the historical effective configurations',async()=>{
+test('the v3 FULL package reinitializes exactly and rejects altered fields or battlefield data',async()=>{
  const c=await model();
  const baseline=vm.runInContext('JSON.stringify(GoblinCatalogFullModel.configs)',c);
  c.author=read('assets/unit-art/levels/catalog-full-levels.v3.json');
- const initialize='GoblinCatalogFullModel.initialize(data,author,{profile:"CATALOG_FULL_CANDIDATE_v1"})';
+ const initialize='GoblinCatalogFullModel.initialize(data,author,{profile:"FULL_CATALOG_v1"})';
  await vm.runInContext(initialize,c);
  assert.equal(vm.runInContext('JSON.stringify(GoblinCatalogFullModel.configs)',c),baseline);
  c.author.levels[0].title='injected UI';

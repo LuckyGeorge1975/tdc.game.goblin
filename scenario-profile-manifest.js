@@ -9,7 +9,6 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   const losProbe=Object.freeze({id:'los-supercover-probe',scenarioVersion:1,
     objective:'core',ruleProfileId:'LEGACY_SUPERCOVER_PROBE_v1',losMode:'strict-supercover'});
   const fullIds=['catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists'];
-  const fullCandidateEntries=Object.freeze(Object.fromEntries(fullIds.map(id=>[id,Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:'CATALOG_FULL_CANDIDATE_v1',unitDataProfile:'catalog-approved-data-v1',losMode:'strict-supercover'})])));
   const trainingIds=['training-t01','training-t02','training-t03'];
   const entries=Object.freeze({
     ...Object.fromEntries(trainingIds.map(id=>[id,Object.freeze({scenarioVersion:1,objective:'learning',ruleProfileId:'TRAINING_FIELD_TEST_v1',unitDataProfile:'training-field-test-data-v1',losMode:'legacy-pixel-los-v1'})])),
@@ -125,7 +124,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     if(id==='artillery-pilot'){if(!globalThis.GoblinArtilleryPilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinArtilleryPilot.validate(config);}
     if(id==='siege-pilot'){if(!globalThis.GoblinSiegePilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinSiegePilot.validate(config);}
     if(id==='skimmer-pilot'){if(!globalThis.GoblinSkimmerPilot)reject('SCENARIO_PROFILE_MISMATCH','Pilot contract unavailable');GoblinSkimmerPilot.validate(config);}
-    const expected=fullIds.includes(id)&&config?.ruleProfileId==='CATALOG_FULL_CANDIDATE_v1'?fullCandidateEntries[id]:id===losProbe.id?losProbe:id==='iron-dust'&&
+    const expected=id===losProbe.id?losProbe:id==='iron-dust'&&
       config?.scenarioVersion===1&&config?.ruleProfileId===product
       ?historicalIronDust:entries[id];
     if(!config?.ruleProfileId||config.ruleProfileId!==expected?.ruleProfileId)

@@ -1,24 +1,20 @@
 # Versionierte Einheitenprofile
 
-## Aktueller Profilüberblick – 30.10.2026
+## Aktueller Profilüberblick – 17.11.2026
 
-Der aktuelle lokale Implementierungsstand trennt öffentliche **FULL_CATALOG_v1**-Zulassung und interne **CATALOG_FULL_CANDIDATE_v1**-Belege. Der Kandidat wurde auf `868a156` unabhängig 26/26 geprüft; der FULL-Einstieg wurde auf `e71e1969` anschließend unabhängig abgenommen und als lokaler Snapshot bereitgestellt. Dies ist kein neuer öffentlicher Releasebeleg.
+Die fünf Vollkatalog-Missionen spielen mit `FULL_CATALOG_v1`. Das v3-Levelpaket bindet jedes Szenario an `scenarioVersion: 1`, `objectiveVersion: 1`, `core-and-escort`, `catalog-approved-data-v1`, `catalog-full-mechanics-v1` und `strict-supercover`.
 
-Für beide Profile gelten dieselben fünf exakt gebundenen Szenarien, jeweils scenarioVersion 1 / objectiveVersion 1, core-and-escort, catalog-approved-data-v1, catalog-full-mechanics-v1 und strict-supercover:
+- `catalog-full-atlas`
+- `catalog-full-terrain-course`
+- `catalog-full-advance`
+- `catalog-full-siege`
+- `catalog-full-specialists`
 
-| Szenario-ID | Öffentliche Zulassung | Interne historische Zulassung |
-| --- | --- | --- |
-| catalog-full-atlas | FULL_CATALOG_v1 | CATALOG_FULL_CANDIDATE_v1 |
-| catalog-full-terrain-course | FULL_CATALOG_v1 | CATALOG_FULL_CANDIDATE_v1 |
-| catalog-full-advance | FULL_CATALOG_v1 | CATALOG_FULL_CANDIDATE_v1 |
-| catalog-full-siege | FULL_CATALOG_v1 | CATALOG_FULL_CANDIDATE_v1 |
-| catalog-full-specialists | FULL_CATALOG_v1 | CATALOG_FULL_CANDIDATE_v1 |
+Der kanonische Datendigest lautet `71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a`. Die aus v3 erzeugte normalisierte Levelkonfiguration hat weiterhin Digest `ff1e209a956dff2cf2ac9c45932e670fec643b0c5451574daf85bb863c5d9c79`. Die frühere Fähigkeitsmatrix und der Admissionnachtrag dokumentieren die damals geprüften Stände. [Aktuelles v3-Levelpaket](../assets/unit-art/levels/catalog-full-levels.v3.json) · [Genehmigte Registry](../assets/unit-art/rules/unit-profiles.catalog-approved.v1.json) · [Historische Fähigkeitsmatrix](../reports/CATALOG_FULL_MATRIX.json) · [Historischer Admissionnachtrag](../reports/CATALOG_FULL_ADMISSION.json)
 
-Kanonischer Datendigest 71acac02581cf0709875bf4656418d493d21a40c5bc74ac4ffeff9b115b2e51a; Levelpaket ff1e209a956dff2cf2ac9c45932e670fec643b0c5451574daf85bb863c5d9c79. Einzelne Mechanik-/Level-/Roster-/Terraindigests und Admissionbelege: [Admissionnachtrag](../reports/CATALOG_FULL_ADMISSION.json). Die [26er-Fähigkeitsmatrix](../reports/CATALOG_FULL_MATRIX.json) bleibt ausdrücklich Candidatebeleg; keine zweite Wertetabelle für 26 Klassen. Die kanonische [genehmigte Registry](../assets/unit-art/rules/unit-profiles.catalog-approved.v1.json) bleibt unverändert, einschließlich targetActive:false; Produktzulassung erfolgt über die exakten Profile.
+Im Vollkatalog gelten die angenommenen A–G-Regeln für Klassen, Bewegung, Infanterie-Stärke, Fracht, Systemwaffen, Pioniere, Split-/AP-/Spotterfeuer, Tarnung, Sensoren, Kollision, freie Hexrakete und Verstärkungen. Die weiter unten genannten Einzelregeln gelten für die jeweils benannten älteren Profile.
 
-Im FULL-Profil sind die angenommenen A–G-Familien angebunden: kanonische Klassen-/Bewegungs-/SP-/Frachtwerte, getrennte System-/Waffenslots, Pionieraktionen, Split-/AP-/Spotterfeuer, Tarn-/Sensor-/Kollisionsprojektion, freie Hexrakete und feste Verstärkungen/Limit der jeweiligen Mission. Aussagen unten wie „Split fehlt“, pauschaler Skimmer-Zusatzschritt 2 oder fehlendes Engineering/Hexfeuer/Wellen beziehen sich ausschließlich auf den jeweils historischen Legacy-/Pilotstand, **nicht** auf den aktuellen Vollkatalog. Keine dieser früheren Missionen wird rückwirkend auf neue Regeln umgestellt.
-
-Der normale V2-Einstieg lädt ausschließlich `FULL_CATALOG_v1`. Der interne Candidate-Vertrag wird von den lokalen Regressionstests für aufgezeichnete Befehle verwendet. Classic und der separate IronDust-Corepfad erhalten keine stillen FULL-Regeln. Die drei festen Lernprofile T01–T03 verwenden separat `TRAINING_FIELD_TEST_v1` mit den ursprünglichen Feldtestwerten und dem Lernziel `learning`. Sie erhalten keine FULL-Regeln. Gebündelter Implementierungs- und Prüfstand: [Training-Handoff](../reports/TRAINING_HANDOFF.md); unabhängige Produktabnahme steht aus.
+Die internen FULL-Regressionen verwenden ebenfalls `FULL_CATALOG_v1`. Zu jeder Mission gibt es eine feste Sieg- und Niederlagenfolge. Die drei Lernmissionen T01–T03 verwenden `TRAINING_FIELD_TEST_v1` und das Ziel `learning`. Classic und Iron Dust V2 führen ihre jeweiligen Regelprofile. [FULL-Replayindex](../tests/fixtures/catalog-full/index.v2.json) · [Trainingsnachweis](../reports/TRAINING_HANDOFF.md)
 
 ## Historische und profilgebundene Referenzabschnitte
 

@@ -210,8 +210,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const draft = ScenarioRuleProfiles.isDraftSession?.(legacySession);
       if ((!draft && (!scenarioCatalog[currentScenario] || !ScenarioRuleProfiles.entries[currentScenario])) ||
           legacySession?.scenarioId !== currentScenario ||
-          (!draft && legacySession.ruleProfileId !== ScenarioRuleProfiles.entries[currentScenario].ruleProfileId &&
-            !(globalThis.GoblinCatalogFullRuntime?.active()&&legacySession.ruleProfileId===GoblinCatalogFullModel.candidateProfile)) ||
+          (!draft && legacySession.ruleProfileId !== ScenarioRuleProfiles.entries[currentScenario].ruleProfileId) ||
           globalThis.IronDustBrowserV2?.active)
         return { ok: false, reason: t('ui.error.UNSUPPORTED_COMMAND') };
       if (GameDialogs.isOpen()) return { ok: false, reason: t('ui.error.INVALID_COMMAND') };

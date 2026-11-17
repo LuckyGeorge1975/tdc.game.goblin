@@ -17,7 +17,7 @@ function drawTerrainArtwork(x,y){
     !(['training-t01','training-t02','training-t03'].includes(currentScenario)&&legacySession?.scenarioId===currentScenario&&
       legacySession.ruleProfileId==='TRAINING_FIELD_TEST_v1'&&globalThis.GoblinTrainingModel?.has(currentScenario))&&
     !(['catalog-full-atlas','catalog-full-terrain-course','catalog-full-advance','catalog-full-siege','catalog-full-specialists'].includes(currentScenario)&&
-      legacySession?.scenarioId===currentScenario&&['FULL_CATALOG_v1','CATALOG_FULL_CANDIDATE_v1'].includes(legacySession.ruleProfileId)&&
+      legacySession?.scenarioId===currentScenario&&legacySession.ruleProfileId==='FULL_CATALOG_v1'&&
       globalThis.GoblinCatalogFullModel?.profile===legacySession.ruleProfileId&&GoblinCatalogFullModel.has(currentScenario,legacySession.ruleProfileId)))return false;
   const asset=UnitVisuals.terrainAssetFor(type);
   if(!asset)return false;
@@ -132,7 +132,7 @@ function lineOfSight(from,to){
   const session=legacySession;
   if(!session?.effectiveRules||!Object.isFrozen(session)||!Object.isFrozen(session.effectiveRules))return false;
   if(session.ruleProfileId==='LEGACY_SUPERCOVER_PROBE_v1'||
-     session.ruleProfileId==='FIELD_TEST_SUPERCOVER_v1'||session.ruleProfileId==='CATALOG_ARTILLERY_PILOT_v1'||session.ruleProfileId==='CATALOG_BASE_TRANSPORT_v1'||session.ruleProfileId==='CATALOG_SPECIALISTS_v1'||['CATALOG_FULL_CANDIDATE_v1','FULL_CATALOG_v1'].includes(session.ruleProfileId)){
+     session.ruleProfileId==='FIELD_TEST_SUPERCOVER_v1'||session.ruleProfileId==='CATALOG_ARTILLERY_PILOT_v1'||session.ruleProfileId==='CATALOG_BASE_TRANSPORT_v1'||session.ruleProfileId==='CATALOG_SPECIALISTS_v1'||session.ruleProfileId==='FULL_CATALOG_v1'){
     if(!(globalThis.GoblinCatalogFullModel?.has(session.scenarioId,session.ruleProfileId))&&!ScenarioRuleProfiles.isDraftSession?.(session)&&!['los-supercover-probe','los-supercover-showcase','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(session.scenarioId)||
        session.scenarioVersion!==1||
        session.effectiveRules.losMode!=='strict-supercover'||typeof GoblinHexSupercover==='undefined')return false;

@@ -1,11 +1,9 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';import {createHash} from 'node:crypto';
 import {fullScene} from './catalog-full-harness.mjs';import {read} from './artillery-product-harness.mjs';
 const loader=fs.readFileSync(new URL('../catalog-full-loader.js',import.meta.url),'utf8');
-test('Classic skips FULL registration; the former candidate URL loads the public profile',async()=>{
- for(const search of ['?ui=classic','?catalogCandidate=1&ui=classic']){
-  let calls=0;const c=vm.createContext({URLSearchParams,location:{search},fetch(){calls++;throw Error('unexpected fetch')}});await vm.runInContext(loader,c);assert.equal(calls,0);
- }
- const g=await fullScene('catalog-full-terrain-course',7,false,'FULL_CATALOG_v1');g.run("for(const id of Object.keys(scenarioCatalog))if(id.startsWith('catalog-full-'))delete scenarioCatalog[id]");g.context.location={search:'?catalogCandidate=1&scenario=catalog-full-terrain-course'};
+test('Classic skips FULL registration and the V2 URL loads the requested FULL mission',async()=>{
+ let calls=0;const c=vm.createContext({URLSearchParams,location:{search:'?ui=classic'},fetch(){calls++;throw Error('unexpected fetch')}});await vm.runInContext(loader,c);assert.equal(calls,0);
+ const g=await fullScene('catalog-full-terrain-course');g.run("for(const id of Object.keys(scenarioCatalog))if(id.startsWith('catalog-full-'))delete scenarioCatalog[id]");g.context.location={search:'?ui=v2&scenario=catalog-full-terrain-course'};
  g.context.fetch=async path=>({ok:true,json:async()=>structuredClone(path.includes('levels')?g.context.levelData:g.context.data)});
  await g.run(loader);assert.equal(read(g,"Object.keys(scenarioCatalog).filter(id=>id.startsWith('catalog-full-')).length"),5);assert.equal(read(g,'legacySession.ruleProfileId'),'FULL_CATALOG_v1');assert.equal(read(g,'currentScenario'),'catalog-full-terrain-course');
 });

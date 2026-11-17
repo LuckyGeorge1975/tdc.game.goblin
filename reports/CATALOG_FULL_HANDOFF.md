@@ -1,5 +1,7 @@
 # Vollkatalog – gebündelter Kandidat
 
+Historischer Prüfbericht zum unten genannten Stand. Für aktuelle Spielstarts und Replay-Fixtures gilt der heutige Profilvertrag. [Aktueller Profilüberblick](../docs/UNIT_RULE_PROFILES.md#aktueller-profilüberblick--17112026)
+
 `goblin-upe.4`, abgenommene Basis `1fef6ed55eda88681ba17d2d6c307c1f33f23312`. Dieser Bericht gehört zum neuen internen Kandidaten. Eine unabhängige Gesamtprüfung und das ausdrücklich neue FULL-Aktivierungsdelta folgen auf einer festen Commit-SHA; daraus folgt noch kein Release oder Previewwechsel.
 
 ## Spielbarer Umfang

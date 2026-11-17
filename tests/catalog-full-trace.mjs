@@ -11,7 +11,8 @@ function observer(g){
 export async function record(route,expected=null){
  assert.match(route.id,/^catalog-full-(atlas|terrain-course|advance|siege|specialists)$/);assert.equal(typeof route.intendedWin,'boolean');
  const g=await fullScene(route.id,route.seed,true);g.run(fs.readFileSync(new URL('../m1-unit-markers.js',import.meta.url),'utf8'));const observe=observer(g);
- const header={version:'catalog-full-product-trace-v2',publicSaveFormat:false,scenarioId:route.id,profile:'CATALOG_FULL_CANDIDATE_v1',session:read(g,'legacySession'),sources:sources(),seed:route.seed,rng:'xorshift32-test-v1'},initial=observe(g),steps=[];
+ const session=read(g,'legacySession');
+ const header={version:'catalog-full-product-trace-v2',publicSaveFormat:false,scenarioId:route.id,profile:session.ruleProfileId,session,sources:sources(),seed:route.seed,rng:'xorshift32-test-v1'},initial=observe(g),steps=[];
  if(expected){assert.deepEqual({...header,sources:bindReplaySources(expected.header.sources,expected.traceDigest)},expected.header);assert.deepEqual(initial,expected.initial)}
  for(const [index,command] of route.commands.entries()){
   const result=await apply(g,command,observe),facts=observe(g),step={command,result,...facts};
