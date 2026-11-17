@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {webcrypto} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import test from 'node:test';
 import {runInNewContext} from 'node:vm';
@@ -18,6 +19,7 @@ function scene() {
       addEventListener(name, listener) { this[name] = listener; }};
   }
   const context = {
+    crypto:webcrypto,
     document:{createElement:element,body:{append:node=>dialogs.push(node)}},
     heading:()=>element('h2'), actions:(...nodes)=>nodes,
     t:key=>key, paragraph:()=>element('p'),

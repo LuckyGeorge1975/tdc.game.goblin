@@ -31,6 +31,7 @@ function commandSnapshot(label) {
   if(globalThis.GoblinCatalogFullRuntime?.active())snapshot.catalogFull=GoblinCatalogFullRuntime.snapshot();
   globalThis.GoblinLegacyPresentation?.checkpoint(snapshot);
   globalThis.GoblinFullRoundSource?.checkpoint(snapshot);
+  globalThis.GoblinCatalogFullRuntime?.checkpointMission?.(snapshot);
   return snapshot;
 }
 
@@ -89,6 +90,7 @@ function undoPhaseCommand() {
   if(!fullOwnsPresentation())logEl.innerHTML = before.log;
   globalThis.GoblinLegacyPresentation?.afterUndo(before);
   globalThis.GoblinFullRoundSource?.rewind(before);
+  globalThis.GoblinCatalogFullRuntime?.rewindMission?.(before);
   updateSelection();
   if (focusedCell) showFieldInfo(focusedCell.x, focusedCell.y);
   if (selected) showUnitInfo(selected);
@@ -100,7 +102,7 @@ function undoPhaseCommand() {
 // Keep combat dice stable when a shot is undone and issued again.
 const originalCombatOutcome = combatOutcome;
 combatOutcome = function(...args) {
-  if (phase !== 'player') return originalCombatOutcome(...args);
+  if (phase !== 'player' || globalThis.GoblinCatalogFullRuntime?.hasMissionRandom?.()) return originalCombatOutcome(...args);
   const random = Math.random;
   Math.random = () => {
     if (phaseRollCursor === phaseRolls.length) phaseRolls.push(random());

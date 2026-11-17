@@ -236,7 +236,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       fullHandoff = null;
       fullSeatBinding = null;
       if (!setup) return start();
-      const binding = {...setup, session:null, generation:-1, port:null};
+      const seed = setup.seed ?? crypto.getRandomValues(new Uint32Array(1))[0];
+      const binding = {...setup, seed, session:null, generation:-1, port:null};
       fullSeatBinding = binding;
       const ui = {
         refresh() {
@@ -257,7 +258,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           return true;
         }
       };
-      binding.port = start({...native,ui});
+      binding.port = start({...native,ui,seed});
       binding.session = legacySession;
       if (!binding.port) throw new Error('FULL_CONTROLLER_OWNER');
       const host = setup.owner.bind(binding.session, setup.selection, ui, binding.port);
@@ -374,6 +375,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           : button(t('ui.nav.pause'), lifecycle.pause));
       }
       const seat=port.state();
+      if (port.canUndo()) controls.push(button(t('v2.full.undo'),()=>{
+        if(port.undo())renderScreen(false);
+      }));
+      if (port.canExportTraining()) controls.push(button(t('v2.training.exportMatch'),()=>
+        downloadTrainingArchive(port.trainingArchive(),'goblin-full-training.json')));
       if (seat?.ended || seat?.humanReady) {
         const rounds=globalThis.GoblinFullRoundSource?.view();
         if (rounds?.latestComplete)
@@ -657,13 +663,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function openSection(next) { if (next === 'catalog') libraryLiveId = null; returnScreen = screen; show(next); }
     function goBack() { show(returnScreen === 'play' && GoblinUIV2.project().gameOver ? 'end' : returnScreen); }
-    function downloadTrainingArchive() {
-      const archive=globalThis.IronDustBrowserV2?.trainingArchive();
+    function downloadTrainingArchive(archive,filename) {
       if (!archive) return;
       const url=URL.createObjectURL(new Blob([JSON.stringify(archive)],{type:'application/json'}));
       const link=document.createElement('a');
       link.href=url;
-      link.download='goblin-iron-dust-training.json';
+      link.download=filename;
       link.click();
       setTimeout(()=>URL.revokeObjectURL(url),1000);
     }
@@ -1837,7 +1842,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             button(t(editorConfig ? 'v2.editor.return' : 'screen.missionEnd.action.chooseMission'), goToLevels),
             button(t('screen.missionEnd.action.log'), () => openSection('log'))));
         if (state.scenario==='iron-dust-v2' && globalThis.IronDustBrowserV2?.canExportTraining)
-          panel.append(actions(button(t('v2.training.exportMatch'), downloadTrainingArchive)));
+          panel.append(actions(button(t('v2.training.exportMatch'),()=>downloadTrainingArchive(IronDustBrowserV2.trainingArchive(),'goblin-iron-dust-training.json'))));
         if (campaign?.field) {
           panel.append(paragraph(campaignPosition()));
           if (won) panel.append(actions(button(t(`v2.${campaign.field}.${campaign.index + 1 < fieldCampaigns[campaign.field].ids.length ? 'next' : 'finish'}`), advanceFieldCampaign, 'primary')));

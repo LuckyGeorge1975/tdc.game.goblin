@@ -23,7 +23,7 @@
     const state=ensureState(target),system=querySystemTarget(target,targetKey);
     if(!system)return null;
     const presentation=root.GoblinLegacyPresentation?.beforeResult('legacy-resolveSystemAttack',attacker,target);
-    const roll=Math.floor(Math.random()*6);
+    const roll=Math.floor(combatRandom()*6);
     let ratio,result;
     if(system.type==='treads'){
       ratio='1-1';result=roll>=4?'X':'NE';

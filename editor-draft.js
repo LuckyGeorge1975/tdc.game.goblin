@@ -2,7 +2,7 @@
 (function(root) {
   const id = 'editor-draft', version = 'goblin-level-v3';
   const width = 12, height = 8, objective = 'core-and-escort';
-  const admitted = new WeakSet();
+  const admitted = new WeakMap();
   const maxLength = 65536;
   const languages = ['de','en','es','fr'];
   const template = () => root.GoblinCatalogFullModel?.configs?.['catalog-full-terrain-course'];
@@ -224,10 +224,10 @@
         full:{version:'catalog-full-levels-v1',source:copy.version,waves,waveTemplates,
           ...(turnLimit !== null ? {turnLimit} : {}),
           ...(events?.deadlineEvent ? {deadlineEvent:events.deadlineEvent} : {})}}});
-    admitted.add(config);
+    admitted.set(config,copy);
     return config;
   }
   const unitTypes = () => Object.entries(profile().catalog.registry.units).map(([assetId, record]) =>
     ({assetId, squads:!!record.target.strengthRef}));
-  root.GoblinEditorDraft = Object.freeze({id,version,size,available,copyTemplate,validate,parse,importLevels,exportJson,prepare,unitTypes,isPrepared:config => admitted.has(config)});
+  root.GoblinEditorDraft = Object.freeze({id,version,size,available,copyTemplate,validate,parse,importLevels,exportJson,prepare,unitTypes,isPrepared:config => admitted.has(config),exportPrepared:config=>admitted.has(config)?structuredClone(admitted.get(config)):null});
 })(globalThis);

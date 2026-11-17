@@ -64,7 +64,7 @@
   if(!active()||!system(target))return oldOutcome(attacker,target);
   const targetIntent=intent?.area?intent.areaTarget:intent?.command.target;require(targetIntent?.runtimeUnitId===target.id,'SYSTEM_TARGET_INTENT_REQUIRED');
   const component=GoblinSystems.catalogTargets(target.catalogSystems,registry()).find(c=>c.id===targetIntent.componentId);require(component,'COMPONENT_UNAVAILABLE');
-  const passengers=[...carrierCargo(target)],roll=Math.floor(Math.random()*6),ratio=component.type==='treads'?'1-1':combatRatio(attacker.damage,component.defense+TerrainRules.coverBonus(terrainTypeAt(target.x,target.y))),result=component.type==='treads'?(roll>=4?'X':'NE'):ratio==='5-1'?'X':COMBAT_RULES.crt[ratio][roll];
+  const passengers=[...carrierCargo(target)],roll=Math.floor(combatRandom()*6),ratio=component.type==='treads'?'1-1':combatRatio(attacker.damage,component.defense+TerrainRules.coverBonus(terrainTypeAt(target.x,target.y))),result=component.type==='treads'?(roll>=4?'X':'NE'):ratio==='5-1'?'X':COMBAT_RULES.crt[ratio][roll];
   const applied=GoblinSystems.catalogApplyHit(target.catalogSystems,{targetId:component.id,result,attackStrength:attacker.damage,cause:{kind:intent.area?'area':'direct',commandId:intent.commandId,attackerId:attacker.id}},registry());
   target.catalogSystems=applied.state;const hits=passengers.map(unit=>({unit,outcome:applyCombatRoll(attacker,unit,roll)}));applyEffects(target,applied.effects);
   for(const hit of hits)if(unitDead(hit.unit)&&hit.outcome.result!=='X')hit.outcome={...hit.outcome,directResult:hit.outcome.result,result:'X',cause:'mechanical-cargo-loss'};
