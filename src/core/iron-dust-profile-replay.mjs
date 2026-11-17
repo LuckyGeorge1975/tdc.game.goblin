@@ -114,7 +114,7 @@ function validCommittedCommand(command) {
   }
 }
 
-function dispatchCommitted(profile,command) {
+export function dispatchIronDustCommittedCommand(profile,command) {
   if(command.type==='EnemyMove'||command.type==='EnemyHold')return dispatchIronDustProfileEnemyMoveChoice(profile,command);
   if(command.type==='EnemyUnitAttack'||command.type==='EnemySystemAttack')return dispatchIronDustProfileEnemyFireChoice(profile,command);
   return dispatchIronDustProfile(profile,command);
@@ -130,7 +130,7 @@ function simulate(initialSnapshot, commands) {
   let profile = initialSnapshot;
   const steps = [], checkpoints = [];
   for (const [commandIndex, command] of commands.entries()) {
-    const result = dispatchCommitted(profile,command);
+    const result = dispatchIronDustCommittedCommand(profile,command);
     if (!result.profile || !Array.isArray(result.events))
       reject('IRON_DUST_REPLAY_COMMAND_REJECTED');
     profile = result.profile;

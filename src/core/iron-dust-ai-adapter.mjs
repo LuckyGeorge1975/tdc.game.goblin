@@ -195,6 +195,10 @@ function describe(profile, side, scope, explicitEnemyMovement, weakAttack) {
     scope ? 'fire-target' : state.phase, view: project(state, side), options};
 }
 
+export function describeIronDustDemonstration(profile,side) {
+  return describe(profile,side,undefined,true,false);
+}
+
 export function createIronDustAiAdapter(read, {explicitEnemyMovement = false, weakAttack = false} = {}) {
   return createAiDecisionAdapter({read,
     describe: (profile, side, scope) => describe(profile, side, scope, explicitEnemyMovement, weakAttack),

@@ -657,6 +657,16 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function openSection(next) { if (next === 'catalog') libraryLiveId = null; returnScreen = screen; show(next); }
     function goBack() { show(returnScreen === 'play' && GoblinUIV2.project().gameOver ? 'end' : returnScreen); }
+    function downloadTrainingArchive() {
+      const archive=globalThis.IronDustBrowserV2?.trainingArchive();
+      if (!archive) return;
+      const url=URL.createObjectURL(new Blob([JSON.stringify(archive)],{type:'application/json'}));
+      const link=document.createElement('a');
+      link.href=url;
+      link.download='goblin-iron-dust-training.json';
+      link.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
     async function openRoundAnalysis(round) {
       if (!round) return;
       const host = globalThis.IronDustBrowserV2;
@@ -1826,6 +1836,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           actions(button(t('screen.missionEnd.action.retry'), confirmRestart, 'primary'),
             button(t(editorConfig ? 'v2.editor.return' : 'screen.missionEnd.action.chooseMission'), goToLevels),
             button(t('screen.missionEnd.action.log'), () => openSection('log'))));
+        if (state.scenario==='iron-dust-v2' && globalThis.IronDustBrowserV2?.canExportTraining)
+          panel.append(actions(button(t('v2.training.exportMatch'), downloadTrainingArchive)));
         if (campaign?.field) {
           panel.append(paragraph(campaignPosition()));
           if (won) panel.append(actions(button(t(`v2.${campaign.field}.${campaign.index + 1 < fieldCampaigns[campaign.field].ids.length ? 'next' : 'finish'}`), advanceFieldCampaign, 'primary')));

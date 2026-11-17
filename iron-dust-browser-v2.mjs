@@ -1,3 +1,4 @@
+import {createIronDustTrainingArchive} from './training-archive.mjs?v=1';
 import {createCorePresentationObserver} from './core-presentation.mjs?v=2';
 import {createGameManager,createPlayerController} from './src/core/game-manager.mjs?v=1';
 import {createIronDustHumanDefensePort} from './src/core/iron-dust-human-defense-port.mjs?v=2';
@@ -163,7 +164,7 @@ if (typeof document !== 'undefined') {
   let trainedPolicy = null;
   let attackerOwner = null;
   let manualDefense = null;
-  let replay = null;
+  let replay = null, trainingSeats = null;
   const presentation = globalThis.GoblinPresentation
     ? createCorePresentationObserver(globalThis.GoblinPresentation,()=>epoch) : null;
   const endButton = document.querySelector('#end-turn');
@@ -424,6 +425,7 @@ if (typeof document !== 'undefined') {
     cancelAttacker();
     manualDefense=null;
     replay=null;
+    trainingSeats=null;
     defensePort.invalidate();
     enemyFlow.cancel();
     paused = false;
@@ -435,7 +437,9 @@ if (typeof document !== 'undefined') {
       rounds = createIronDustRoundRecorder(session.profile, () => session?.profile,
         aiAttacker&&!defenderHuman?'spectator':'player');
       if (defenderHuman) manualDefense={permit:null,pending:null};
-      if (defenderHuman || aiAttacker) replay=createIronDustCommitRecorder(session.profile);
+      if (!profile || defenderHuman || aiAttacker) replay=createIronDustCommitRecorder(session.profile);
+      trainingSeats=!profile && (!aiAttacker || defenderHuman)
+        ? {attacker,defender:defenderHuman?'human':difficulty} : null;
       mode = 'ready';
       observePresentation(presentation,'sync',session);
       showGate('');
@@ -454,6 +458,7 @@ if (typeof document !== 'undefined') {
       cancelAttacker();
       manualDefense=null;
       replay=null;
+      trainingSeats=null;
       session = null;
       rounds = null;
       mode = 'error';
@@ -466,6 +471,7 @@ if (typeof document !== 'undefined') {
     cancelAttacker();
     manualDefense=null;
     replay=null;
+    trainingSeats=null;
     defensePort.invalidate();
     enemyFlow.cancel();
     paused = false;
@@ -486,6 +492,13 @@ if (typeof document !== 'undefined') {
     document.querySelectorAll('.view-option').forEach(button => { button.disabled = false; });
     document.querySelector('#quick-start-open').disabled = false;
     document.querySelector('#unit-guide-open').disabled = false;
+  }
+  const canExportTraining=()=>!!trainingSeats && session?.projection.mode==='ended' && !!replay;
+  function trainingArchive() {
+    if (!canExportTraining()) return null;
+    return createIronDustTrainingArchive(replay.snapshot(),{
+      ...trainingSeats,outcome:session.projection.state.victory.winner
+    });
   }
   const queryReady = () => mode === 'ready' && !!session && !attackerOwner && !paused && !enemyFlow.running &&
     !manualDefense?.pending && !defensePort.suppressesAutomaticDefense;
@@ -508,7 +521,9 @@ if (typeof document !== 'undefined') {
     // Iron Dust has one shared battlefield projection. Both humans use the
     // existing redacted event view, scoped here to the active defense seat.
     defenseRoundView: () => defenseOffer() ? rounds?.view() ?? null : null,
-    replaySnapshot: () => replay?.snapshot() ?? null,
+    get canExportTraining() {return canExportTraining();},
+    trainingArchive,
+    replaySnapshot: () => manualDefense||attackerOwner ? replay?.snapshot() ?? null : null,
     seatManager,startSeats,takeSeat,defenseOffer,chooseDefense,
     get handoff() {return manualDefense?.pending??null;},
     get pendingSeat() {return manualDefense?.pending?.side??null;},
