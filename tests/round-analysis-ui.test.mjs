@@ -21,7 +21,7 @@ test('unavailable fields, private extras and unobserved path gaps are not render
   const panel = doc.createElement('div');
   const shown = [];
   const round = {schemaVersion:1,roundNumber:5,completion:'complete',perspective:'player',rows:[
-    {descriptionKey:'Move', actor:{labelKey:'Visible actor',cell:{x:1,y:2},token:'private-id'},
+    {kind:'move',descriptionKey:'Move', actor:{labelKey:'Visible actor',cell:{x:1,y:2},token:'private-id'},
       snapshot:{width:12,height:8, units:[],visiblePathSegments:[
         {entityToken:'private-id',cells:[{x:1,y:2},{x:2,y:2}]},
         {entityToken:'private-id',cells:[{x:5,y:2},{x:6,y:2}]}
@@ -30,7 +30,7 @@ test('unavailable fields, private extras and unobserved path gaps are not render
       options:[{descriptionKey:'Target B',score:0,optionKey:'private-alternative'}]}
   ]};
   renderRoundAnalysis(panel,round,{
-    t, back(){}, onSelect:index=>shown.push(index),
+    t, back(){}, icon:name=>`<svg data-icon="${name}"></svg>`, onSelect:index=>shown.push(index),
     previewMap(map) {
       assert.deepEqual(map,{width:12,height:8,terrain:[],defaultTerrain:'open-ground',units:[]});
       const figure = doc.createElement('figure');
@@ -42,6 +42,12 @@ test('unavailable fields, private extras and unobserved path gaps are not render
   assert.deepEqual(svg.children.filter(node => node.tag === 'polyline').map(node => node.attrs.points),
     ['59,80 95,80','203,80 239,80']);
   assert.equal(svg.children.filter(node => node.tag === 'circle').length,2);
+  assert.deepEqual(svg.children.filter(node => node.attrs.class === 'v2-round-path-start')
+    .map(node => [node.attrs.x,node.attrs.y]), [['55','76'],['199','76']]);
+  const marker = svg.children.find(node => node.attrs.class === 'v2-round-action-marker');
+  assert.equal(marker.attrs.transform,'translate(84 60)');
+  assert.equal(marker.children.find(node => node.tag === 'title').textContent,'Move');
+  assert.match(marker.children.find(node => node.tag === 'g').innerHTML,/data-icon="movement"/);
   assert.ok(all(panel).some(node => node.textContent === 'v2.round.noReason'));
   all(panel).find(node => node.tag === 'button' && node.textContent.startsWith('2.')).onclick();
   assert.deepEqual(shown,[1]);

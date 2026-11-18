@@ -740,7 +740,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const origin = screen, epoch = host?.epoch, owner = legacySession;
       const binding = origin === 'full-seat' ? fullSeatBinding : null;
       const seat = binding?.port?.state();
-      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=4');
+      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=5');
       if (screen !== origin || host?.epoch !== epoch || legacySession !== owner) return;
       if (origin === 'full-seat') {
         const current=binding?.port.state();
@@ -2043,7 +2043,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       } else if (screen === 'round-analysis') {
         const analysis = roundAnalysis;
         analysis.renderRoundAnalysis(panel,analysis.round,{
-          t, locale:GoblinLanguage.current, previewMap:missionPreview, back:closeRoundAnalysis, selected:analysis.selected,
+          t, locale:GoblinLanguage.current, previewMap:missionPreview, icon:GoblinUIV2.svgIcon,
+          back:closeRoundAnalysis, selected:analysis.selected,
           onSelect:index => { analysis.selected = index; }
         });
       } else if (screen === 'catalog') {

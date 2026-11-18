@@ -1,8 +1,9 @@
+const actionIcons = Object.freeze({move:'movement',fire:'fire',ram:'ram'});
 const resultLabel = code => ({NE:'v2.feedback.noEffect',D:'v2.feedback.hit',X:'v2.feedback.heavyHit'})[code] ?? code;
 
 // Presentation of an already redacted historical projection. The caller owns
 // session binding, round boundaries and permission to supply a perspective.
-export function renderRoundAnalysis(panel, round, {t, locale, previewMap, back, selected = 0, onSelect = () => {}}) {
+export function renderRoundAnalysis(panel, round, {t, locale, previewMap, back, icon, selected = 0, onSelect = () => {}}) {
   const doc = panel.ownerDocument;
   const formatScore = new Intl.NumberFormat(locale,{maximumFractionDigits:4});
   function element(tag, className = '', text = '') {
@@ -51,7 +52,13 @@ export function renderRoundAnalysis(panel, round, {t, locale, previewMap, back, 
       const figure = previewMap({width,height,terrain,defaultTerrain,units:[]});
       const svg = figure.querySelector('svg');
       if (svg) {
-        addMapFocus(svg, decision);
+        const iconName = actionIcons[decision.kind];
+        addMapFocus(svg, decision, iconName && icon?.(iconName), t(decision.descriptionKey));
+        const origins = decision.snapshot.visiblePathSegments
+          .filter(segment => segment.cells.length >= 2)
+          .map(segment => hexLabel(segment.cells[0]));
+        if (origins.length)
+          figure.append(element('p', 'v2-round-path-label', t('v2.round.pathStarts', {cells:origins.join(', ')})));
         figure.append(element('figcaption', '', t('v2.round.mapLegend')));
       }
       detail.append(figure);
@@ -94,12 +101,13 @@ export function renderRoundAnalysis(panel, round, {t, locale, previewMap, back, 
   show(rows[selected] ? selected : 0, false);
 }
 
-function addMapFocus(svg, decision) {
-  const append = (tag, className, attrs) => {
+function addMapFocus(svg, decision, actionIcon, actionLabel) {
+  const append = (tag, className, attrs, parent = svg) => {
     const node = svg.ownerDocument.createElementNS(svg.namespaceURI, tag);
     node.setAttribute('class', className);
     for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
-    svg.append(node);
+    parent.append(node);
+    return node;
   };
   // Matches the existing V2 historical/briefing board geometry.
   const point = ({x,y}) => [23 + x * 36 + (y % 2 ? 18 : 0), 20 + y * 30];
@@ -116,9 +124,26 @@ function addMapFocus(svg, decision) {
     const [cx,cy] = point(unit.cell);
     append('circle', 'v2-round-unit', {cx,cy,r:5});
   }
+  for (const {cells} of decision.snapshot.visiblePathSegments) {
+    if (cells.length < 2) continue;
+    const [x,y] = point(cells[0]);
+    append('rect', 'v2-round-path-start', {x:x-4,y:y-4,width:8,height:8});
+  }
   if (decision.actor?.cell) {
     const [cx,cy] = point(decision.actor.cell);
     for (const r of [11,15]) append('circle', 'v2-round-actor', {cx,cy,r});
+    if (actionIcon) {
+      const dx = decision.actor.cell.x === decision.snapshot.width - 1 ? -25 : 25;
+      const dy = decision.actor.cell.y === 0 ? 20 : -20;
+      const badge = append('g','v2-round-action-marker',{transform:`translate(${cx+dx} ${cy+dy})`});
+      append('title','',{},badge).textContent = actionLabel;
+      append('rect','v2-round-action-background',{x:-10,y:-10,width:20,height:20,rx:4},badge);
+      const art = append('g','',{transform:'translate(-7 -7)'},badge);
+      art.innerHTML = actionIcon;
+      const icon = art.querySelector('svg');
+      icon?.setAttribute('width','14');
+      icon?.setAttribute('height','14');
+    }
   }
   const targetCell = decision.targetCell ?? decision.target?.cell;
   if (targetCell) {

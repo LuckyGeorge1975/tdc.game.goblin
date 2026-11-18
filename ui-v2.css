@@ -74,7 +74,7 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-level-detail { min-width: 0; padding: 16px; border: 1px solid var(--v2-line); border-radius: 10px; background: var(--v2-surface2); }
 .v2-level-detail h3 { margin: 0 0 12px; font-size: clamp(22px, 3vw, 30px); overflow-wrap: anywhere; }
 .v2-mission-map { margin: 0; overflow: hidden; border: 1px solid var(--v2-line); border-radius: 8px; background: #151b2b; }
-.v2-mission-map svg { display: block; width: 100%; height: auto; }
+.v2-mission-map > svg { display: block; width: 100%; height: auto; }
 .v2-terrain-list { list-style: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: 5px 8px; margin: 8px 0 0; padding: 0; }
 .v2-terrain-list li { display: flex; align-items: center; gap: 5px; min-width: 0; font-size: 11px; line-height: 1.15; color: var(--v2-text); overflow-wrap: normal; word-break: normal; }
 .v2-terrain-icon { display: block; width: 32px; height: 37.333px; flex: none; object-fit: contain; }
@@ -239,13 +239,18 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-round-decisions button { width: 100%; min-height: 44px; text-align: left; overflow-wrap: anywhere; }
 .v2-round-decisions button[aria-pressed="true"] { border-color: var(--v2-accent-text); }
 .v2-round-detail .v2-mission-map { margin: 0; }
-.v2-round-detail .v2-mission-map svg { max-height: min(43dvh, 370px); }
+.v2-round-detail .v2-mission-map > svg { max-height: min(43dvh, 370px); }
 .v2-round-explanation p { margin: 8px 0; }
 .v2-round-path, .v2-round-direction, .v2-round-actor, .v2-round-target { fill: none; stroke-width: 2.2; }
 .v2-round-path, .v2-round-direction, .v2-round-actor { stroke: var(--v2-accent-text); }
 .v2-round-path { stroke-dasharray: 3 4; }
 .v2-round-unit { fill: var(--v2-text); stroke: var(--v2-surface); }
 .v2-round-target { stroke: var(--v2-danger-text); }
+.v2-round-path-start { fill: var(--v2-accent-text); stroke: var(--v2-surface); stroke-width: 1.5; }
+.v2-round-action-marker { color: var(--v2-accent-text); }
+.v2-round-action-background { fill: var(--v2-surface); stroke: currentColor; stroke-width: 1.5; }
+.v2-round-action-marker .v2-icon { width: 14px; height: 14px; }
+.v2-round-detail .v2-round-path-label { margin: 2px 6px; font-size: .8rem; }
 @media (max-width: 660px) {
   .v2-round-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(80px, 1fr) minmax(0, 2fr); gap: 8px; }
 }
