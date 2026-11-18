@@ -1,4 +1,4 @@
-import {createRoundRecorder} from './round-view-producer.mjs?v=6';
+import {createRoundRecorder} from './round-view-producer.mjs?v=7';
 
 export function createFullRoundSource(read) {
   let owner, recorder;

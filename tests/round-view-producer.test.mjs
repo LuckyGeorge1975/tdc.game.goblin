@@ -38,7 +38,7 @@ test('hidden rows, alternatives, identities, time and scores cannot shift the pl
     const phantom=entity(secret,9);
     const hidden={kind:'move',side:'enemy',actor:phantom,elapsed:923};
     for(let n=0;n<extraHidden;n++)f.captureFull(hidden,{});
-    const fire={kind:'fire',side:'player',actor:own,target:phantom,result:'D',
+    const fire={kind:'fire',side:'player',actor:own,target:phantom,result:'D',effect:'v2.feedback.damaged',
       explanationKey:secret,
       options:Array.from({length:extraHidden},(_,index)=>({kind:'fire',target:phantom,
         baseline:index===0,selected:index===0,scores:{basis:score+index,model:score-index}}))};
@@ -55,6 +55,7 @@ test('hidden rows, alternatives, identities, time and scores cannot shift the pl
   assert.equal(first.latestComplete.rows.length,2);
   assert.equal(first.latestComplete.rows[0].target,undefined);
   assert.equal(first.latestComplete.rows[0].resultKey,undefined);
+  assert.equal(first.latestComplete.rows[0].effectKey,undefined);
   assert.equal(first.latestComplete.rows[0].options,undefined);
   assert.equal(first.latestComplete.rows[0].explanationKey,undefined);
   assert.equal(first.trace,undefined);
@@ -63,7 +64,7 @@ test('hidden rows, alternatives, identities, time and scores cannot shift the pl
 
 test('authorized effect excludes hidden source; reveal admits only released steps',()=>{
   const f=fixture(), concealed=entity('old-position',10);
-  f.captureFull({kind:'fire',side:'enemy',actor:concealed,target:own,result:'D'},
+  f.captureFull({kind:'fire',side:'enemy',actor:concealed,target:own,result:'D',effect:'v2.ui.disabled'},
     {before:board(own),after:board(own),disclosure:{target:'after',resultVisible:true}});
   const path=[0,1,2,3,4,5].map(cell), phantom=entity('phantom',5);
   f.captureFull({kind:'move',side:'enemy',actor:phantom,
@@ -78,6 +79,7 @@ test('authorized effect excludes hidden source; reveal admits only released step
   assert.equal(effect.kind,'observed-effect');
   assert.equal(effect.actor,undefined);
   assert.equal(effect.resultKey,'D');
+  assert.equal(effect.effectKey,'v2.ui.disabled');
   assert.deepEqual(reveal.snapshot.visiblePathSegments.map(s=>s.cells),[[cell(0),cell(1)],[cell(4),cell(5)]]);
   assert.deepEqual(unknownPath.snapshot.visiblePathSegments,[]);
   assert.notEqual(reveal.actor.token,unknownPath.actor.token);

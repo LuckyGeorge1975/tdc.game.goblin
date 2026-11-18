@@ -646,7 +646,7 @@
   });
   const hits=result.outcomes?.flatMap(hit=>{
    const unit=units.find(item=>item.id===hit.unitId);
-   return unit?[{target:entity(unit),result:hit.outcome.result}]:[];
+   return unit?[{target:entity(unit),result:hit.outcome.result,effect:combatEffect(unit,hit.outcome)}]:[];
   });
   const board={width:W,height:H,defaultTerrain:'open-ground',terrain:[...terrainTypes].map(([key,type])=>{
    const [x,y]=key.split(',').map(Number);return {x,y,type};
@@ -660,7 +660,8 @@
    return [side,{...board,units:units.filter(unit=>visibleIds.has(unit.id)&&!unit.embarkedOn).map(entity)}];
   }));
   source.record({side:actor.team,kind,actor:entity(actor),target:target&&entity(target),
-   result:result.outcome?.result,targetCell:fireCell(command),hits,options,
+   result:result.outcome?.result,effect:result.outcome&&target?combatEffect(target,result.outcome):undefined,
+   targetCell:fireCell(command),hits,options,
    explanationKey:evidence?.explanationKey??roundFireChoice?.reason,snapshot:{...board,paths}},frames);
  }
  function catalogCard(entry){

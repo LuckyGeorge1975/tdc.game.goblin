@@ -352,7 +352,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       update(nodes.title, t('v2.full.seats'));
       update(nodes.pause, t(binding.lifecycle?.paused ? 'ui.nav.resume' : 'ui.nav.pause'));
       update(nodes.restart, t('ui.nav.restart'));
-      update(nodes.leave, t('v2.ui.mainMenu'));
+      update(nodes.leave, t(editorConfig ? 'v2.editor.returnToEditor' : 'v2.ui.mainMenu'));
       nodes.pause.disabled = !binding.lifecycle || view.ended;
       update(nodes.turnLabel, t('ui.hud.turn', {turn:view.turn}));
       update(nodes.outcome, view.ended && typeof view.outcome === 'boolean'
@@ -423,7 +423,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (!port || binding.session !== legacySession) return;
       const lifecycle = binding.lifecycle;
       const controls = [button(t('ui.nav.restart'), confirmRestart),
-        button(t('v2.ui.mainMenu'), () => leaveMission('menu'))];
+        button(t(editorConfig ? 'v2.editor.returnToEditor' : 'v2.ui.mainMenu'), () => leaveMission('menu'))];
       if (lifecycle && !port.state()?.ended) {
         controls.unshift(lifecycle.paused
           ? button(t('ui.nav.resume'), lifecycle.resume)
@@ -740,7 +740,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const origin = screen, epoch = host?.epoch, owner = legacySession;
       const binding = origin === 'full-seat' ? fullSeatBinding : null;
       const seat = binding?.port?.state();
-      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=5');
+      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=6');
       if (screen !== origin || host?.epoch !== epoch || legacySession !== owner) return;
       if (origin === 'full-seat') {
         const current=binding?.port.state();
@@ -944,13 +944,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (['pause', 'end', 'play', 'full-seat', 'full-handoff', ...ironDustSeatScreens].includes(screen)) {
         const menu = next === 'menu';
         const accepted = await GameDialogs.confirm({
-          id: 'v2-flow-leave', title: t(menu ? 'v2.dialog.mainMenu.title' : 'dialog.changeMission.title'),
+          id: 'v2-flow-leave', title: t(editorConfig ? 'v2.editor.returnToEditor' : menu ? 'v2.dialog.mainMenu.title' : 'dialog.changeMission.title'),
           message: t(editorConfig ? 'v2.editor.returnConfirm' :
             unfinishedLesson ? 'training.exitConfirm' :
             completedLesson ? 'v2.training.completedExit' :
             campaign && !campaign.field ? 'v2.campaign.exitConfirm' :
             menu ? 'v2.dialog.mainMenu.body' : 'ui.dialog.leaveMission.body'),
-          acceptLabel: t(editorConfig ? 'v2.editor.return' : menu ? 'v2.dialog.mainMenu.confirm' : 'dialog.changeMission.confirm'), cancelLabel: t('dialog.changeMission.cancel')
+          acceptLabel: t(editorConfig ? 'v2.editor.returnToEditor' : menu ? 'v2.dialog.mainMenu.confirm' : 'dialog.changeMission.confirm'), cancelLabel: t('dialog.changeMission.cancel')
         });
         if (!accepted) { renderScreen(false); return; }
         if (globalThis.GoblinFullSeatOwner) {
@@ -1617,20 +1617,23 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           const name = libraryWeaponName(option);
           const choice = button('',()=>{libraryWeapon={key:selectionKey,id:option.id};renderScreen(false)});
           choice.innerHTML = GoblinUIV2.svgIcon(option.icon);
-          choice.id = `v2-library-weapon-${option.id}`; choice.title = name;
+          const label = document.createElement('span');
+          label.textContent = name;
+          choice.append(label);
+          choice.id = `v2-library-weapon-${option.id}`;
           choice.setAttribute('aria-label',name);
           choice.setAttribute('aria-pressed',String(option===weapon));
           rail.append(choice);
         }
-        preview.append(rail);
+        top.append(rail);
       }
+      top.append(artPanel,diagram);
       diagram.append(preview,caption);
       if (rule?.missileRuleRef && weapon) {
         const strike = StrategicMissile.STRIKE;
         caption.title = t('v2.ui.missileImpact',{direct:strike.directAttack,adjacent:strike.splashAttack});
         if (libraryMapMode === 'attack') caption.textContent += ' · ' + caption.title;
       }
-      top.append(artPanel,diagram);
       const tabs = document.createElement('div'); tabs.className = 'v2-library-tabs';
       for (const tab of ['description','stats','specials','strategy']) {
         const item = button(t(`v2.library.detail.${tab}`),()=>{libraryTab=tab;renderScreen(false)});
@@ -1977,7 +1980,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           paragraph(state.mission.objective),
           actions(button(t('ui.nav.resume'), () => { show('play'); releasePause(); }, 'primary'),
             button(t('ui.nav.restart'), confirmRestart)),
-          actions(button(t(editorConfig ? 'v2.editor.return' : 'ui.nav.missions'), goToLevels),
+          actions(button(t(editorConfig ? 'v2.editor.returnToEditor' : 'ui.nav.missions'), goToLevels),
             button(t('v2.library.title'), () => openSection('catalog')),
             button(t('ui.nav.settings'), () => openSection('options')),
             ...(editorConfig ? [] : [button(t('v2.ui.mainMenu'), () => leaveMission('menu'))])));
@@ -2001,7 +2004,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           paragraph(t(won && state.scenario === 'iron-dust-v2' ? 'v2.win' : won ? `mission.${campaign?.field ? missionId : state.scenario}.end.victory` : globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.playerAlive?'v2.full.limit.defeat':'screen.missionEnd.defeat.allUnits')),
           paragraph(t('ui.hud.turn', { turn: state.turn })),
           actions(button(t('screen.missionEnd.action.retry'), confirmRestart, 'primary'),
-            button(t(editorConfig ? 'v2.editor.return' : 'screen.missionEnd.action.chooseMission'), goToLevels),
+            button(t(editorConfig ? 'v2.editor.returnToEditor' : 'screen.missionEnd.action.chooseMission'), goToLevels),
             button(t('screen.missionEnd.action.log'), () => openSection('log'))));
         const mapPort=globalThis.GoblinCatalogFullRuntime?.mapPort?.();
         if(mapPort?.canExportTraining())
@@ -2206,8 +2209,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         content.tabIndex = 0;
         content.setAttribute('aria-label', t('v2.options.scrollArea'));
         const groups = {
-          general:[language,button(t('v2.cache.reload'), reloadGameCache),paragraph(t('ui.settings.note'))],
-          display:[grid,...displayOptions,alpha],
+          general:[language,button(t('v2.cache.reload'), reloadGameCache)],
+          display:[paragraph(t('ui.settings.note')),grid,...displayOptions,alpha],
           play:[animation,phaseNotice,autoSelect]
         };
         for (const key of Object.keys(groups)) {

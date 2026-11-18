@@ -1,5 +1,7 @@
 const KINDS = Object.freeze({move:'v2.ui.move',fire:'v2.ui.fire',ram:'v2.ui.ram',
   special:'v2.event.unknown',phase:'v2.event.PhaseChanged','observed-effect':'v2.event.unknown'});
+const EFFECTS = new Set(['v2.feedback.noEffect','v2.feedback.destroyed','v2.ui.disabled',
+  'v2.feedback.damaged','v2.feedback.systemLoss']);
 const RESULTS = Object.freeze({NE:'NE',D:'D',X:'X'});
 const freeze = value => {
   if (value && typeof value === 'object') {
@@ -34,8 +36,9 @@ function encodeRound(round, perspective) {
     if (row.actor) result.actor=entity(row.actor);
     if (row.target) result.target=entity(row.target);
     if (row.targetCell) result.targetCell=point(row.targetCell);
-    if (row.hits?.length) result.hits=row.hits.map(hit=>({target:entity(hit.target),resultKey:RESULTS[hit.result]}));
+    if (row.hits?.length) result.hits=row.hits.map(hit=>({target:entity(hit.target),resultKey:RESULTS[hit.result],...(hit.effect?{effectKey:hit.effect}:{})}));
     if (Object.hasOwn(RESULTS,row.result)) result.resultKey=RESULTS[row.result];
+    if (row.effect) result.effectKey=row.effect;
     if (row.snapshot) {
       const {width,height,defaultTerrain,terrain,units,paths} = row.snapshot;
       result.snapshot={width,height,defaultTerrain,terrain,units:units.map(entity),
@@ -63,9 +66,10 @@ function copyRow(row) {
   const subject = fact => fact && {id:fact.id,labelKey:fact.labelKey,...(fact.cell?{cell:point(fact.cell)}:{})};
   const copy={kind:row.kind,side:row.side,actor:subject(row.actor),target:subject(row.target),
     result:typeof row.result==='string'?row.result:null};
+  if (Object.hasOwn(RESULTS,row.result) && EFFECTS.has(row.effect)) copy.effect=row.effect;
   if (row.targetCell) copy.targetCell=point(row.targetCell);
   if (row.hits) copy.hits=row.hits.filter(hit=>Object.hasOwn(RESULTS,hit.result))
-    .map(hit=>({target:subject(hit.target),result:hit.result}));
+    .map(hit=>({target:subject(hit.target),result:hit.result,...(EFFECTS.has(hit.effect)?{effect:hit.effect}:{})}));
   if (row.explanationKey) copy.explanationKey=row.explanationKey;
   if (row.snapshot) {
     const {width,height,defaultTerrain,terrain,units,paths} = row.snapshot;
@@ -89,10 +93,10 @@ function copyRow(row) {
 function captureRoundEvent(event, publicEvidence = null) {
   const full=copyRow(event);
   if (!publicEvidence?.observable) return {full,public:null};
-  const {actor, target, result, snapshot, paths} = publicEvidence;
+  const {actor, target, result, effect, snapshot, paths} = publicEvidence;
   const named = !event.actor || actor?.id===event.actor.id;
   const visible={side:event.side,kind:named?event.kind:'observed-effect',
-    actor:named&&event.actor?actor:null,target:target?.id===event.target?.id?target:null,result};
+    actor:named&&event.actor?actor:null,target:target?.id===event.target?.id?target:null,result,effect};
   if (publicEvidence.targetCell) visible.targetCell=publicEvidence.targetCell;
   if (publicEvidence.hits) visible.hits=publicEvidence.hits;
   if (snapshot) visible.snapshot={...snapshot,paths:paths??[]};
@@ -120,7 +124,8 @@ function captureFullRoundEvent(event, {before,after,disclosure}) {
   const paths=ownsMarker ? steps.map(cells=>({id:actor.id,cells})):[];
   return captureRoundEvent(event,{observable:true,actor,target,snapshot,paths,hits,
     targetCell:disclosure.targetCellVisible===true?event.targetCell:null,
-    result:disclosure.resultVisible===true?event.result:null});
+    result:disclosure.resultVisible===true?event.result:null,
+    effect:disclosure.resultVisible===true?event.effect:undefined});
 }
 
 // Paths carry evidence per accepted step. A gap closes the current polyline.
