@@ -51,7 +51,7 @@
     }
     return {hotspots:Object.hasOwn(draft,'hotspots') ? draft.hotspots : [],hooks,deadlineEvent};
   }
-  function validate(draft) {
+  function validate(draft, working = false) {
     if (!available()) fail('unavailable');
     if (draft?.version !== version) fail('schema');
     const fields = ['version','width','height','objective','terrain','units'];
@@ -139,8 +139,8 @@
         owner.team !== unit.team || key(owner) !== key(unit) || bays.has(slot)) fail('cargo');
       bays.add(slot);
     }
-    if (!ids.has('core')) fail('core');
-    if (!units.some(unit => unit.team === 'player')) fail('player');
+    if (!working && !ids.has('core')) fail('core');
+    if (!working && !units.some(unit => unit.team === 'player')) fail('player');
     const events = eventData(draft);
     if (events) {
       if (events.deadlineEvent && turnLimit === null) fail('goals');
@@ -227,7 +227,12 @@
     admitted.set(config,copy);
     return config;
   }
+  function createBlank(width, height) {
+    const draft = {version,width,height,objective,terrain:[],units:[]};
+    validate(draft,true);
+    return draft;
+  }
   const unitTypes = () => Object.entries(profile().catalog.registry.units).map(([assetId, record]) =>
     ({assetId, squads:!!record.target.strengthRef}));
-  root.GoblinEditorDraft = Object.freeze({id,version,size,available,copyTemplate,validate,parse,importLevels,exportJson,prepare,unitTypes,isPrepared:config => admitted.has(config),exportPrepared:config=>admitted.has(config)?structuredClone(admitted.get(config)):null});
+  root.GoblinEditorDraft = Object.freeze({id,version,size,available,copyTemplate,createBlank,validate,validateWorking:draft=>validate(draft,true),parse,importLevels,exportJson,prepare,unitTypes,isPrepared:config => admitted.has(config),exportPrepared:config=>admitted.has(config)?structuredClone(admitted.get(config)):null});
 })(globalThis);

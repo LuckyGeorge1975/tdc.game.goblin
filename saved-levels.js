@@ -1,5 +1,6 @@
 (function (root) {
   const key = 'tdc.game.goblin.saved-levels.v1';
+  const workingKey = 'tdc.game.goblin.editor-working.v1';
   function read() {
     const raw = localStorage.getItem(key);
     if (raw === null) return [];
@@ -29,5 +30,21 @@
     localStorage.setItem(key, JSON.stringify({version:1, levels}));
     return entry;
   }
-  root.GoblinSavedLevels = Object.freeze({read, save});
+  function saveWorking(name, draft) {
+    GoblinEditorDraft.validateWorking(draft);
+    const data = JSON.stringify({name:name.trim().slice(0,80),draft});
+    if (data.length > 67000) throw Error('schema');
+    localStorage.setItem(workingKey,data);
+  }
+  function readWorking() {
+    const raw = localStorage.getItem(workingKey);
+    if (raw === null) return null;
+    if (raw.length > 67000) throw Error('schema');
+    const {name,draft} = JSON.parse(raw);
+    if (typeof name !== 'string' || name.length > 80) throw Error('schema');
+    GoblinEditorDraft.validateWorking(draft);
+    return {name,draft};
+  }
+  function clearWorking() { localStorage.removeItem(workingKey); }
+  root.GoblinSavedLevels = Object.freeze({read, save, readWorking, saveWorking, clearWorking});
 })(globalThis);

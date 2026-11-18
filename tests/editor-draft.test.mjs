@@ -53,70 +53,49 @@ test('production FULL v3 missions round-trip with starting cargo, waves and obje
   assert.throws(()=>g.run('GoblinEditorDraft.importLevels(pilotText)'),/schema/);
 });
 
-test('editor controls export and reimport v3, choose a package level and reject v2 without replacing the draft', async () => {
+test('editor file workflow exports and reloads v3, validates packages and plays the selected draft', async () => {
   const g = await scene();
   const source = file => readFileSync(new URL('../'+file,import.meta.url),'utf8');
-  const element = tag => ({
-    tag, children:[], dataset:{}, classList:{add(){}},
-    append(...children){this.children.push(...children);},
-    replaceChildren(){this.children=[];},
-    setAttribute(){}, addEventListener(){}, focus(){}, select(){}
-  });
-  Object.assign(g.context.document,{
-    createElement:element, createElementNS:(_,tag)=>element(tag), createTextNode:element
-  });
-  g.context.GoblinLanguage={t:key=>key};
-  g.context.TerrainDisplay={label:type=>type,svgIcon:()=>null};
-  g.context.element=element;
+  const disk = new Map();
+  g.context.localStorage = {getItem:key=>disk.get(key)??null,setItem:(key,value)=>disk.set(key,value),removeItem:key=>disk.delete(key)};
+  g.run(source('saved-levels.js'));
   g.context.pilotText=source('assets/training/level-events-pilot.v3.json');
-  g.run(source('editor-ui.js'));
+  g.context.packageText=source('assets/unit-art/levels/catalog-full-levels.v3.json');
+  g.context.GameDialogs={confirm:async()=>true};
   const flow=source('ui-v2-flow.js');
   g.run(`{
     let screen='editor', editorDraft=GoblinEditorDraft.parse(pilotText), editorCell={x:1,y:3};
-    let editorBusy=false, editorMoving=false, editorMissionOpen=false, editorError='';
+    let editorBusy=false, editorMoving=false, editorMissionOpen=false, editorError='', editorWorking=false;
     let editorName='', editorSaved=null, editorSavedMessage='', editorImportLevels=null;
     let editorConfig=null, editorReturnScenario=null, started=false;
-    const t=GoblinLanguage.t, renderScreen=()=>{}, show=next=>{screen=next};
-    const heading=()=>element('h2'),paragraph=()=>element('p'),actions=()=>element('actions');
-    const button=(textContent,onclick)=>({...element('button'),textContent,onclick});
+    const editorCamera={zoom:1,x:0,y:0};
+    const t=key=>key, renderScreen=()=>{}, show=next=>{screen=next};
+    const downloadJson=(text,name)=>globalThis.downloaded={text,name};
     const GoblinUIV2={resetView(){},startView(){}};
-    ${flow.slice(flow.indexOf('    function updateEditor('),flow.indexOf('    function libraryAssetId('))}
-    globalThis.editorTest={render:renderEditor,get draft(){return editorDraft;},
-      get error(){return editorError;},get screen(){return screen;}};
+    ${flow.slice(flow.indexOf('    function resetEditorCamera('),flow.indexOf('    function libraryAssetId('))}
+    globalThis.editorTest={
+      importFile:text=>importEditorFile({size:text.length,name:'test.json',text:async()=>text}),
+      save:(index,name)=>saveImportedLevel(editorImportLevels[index],name),
+      create:newEditorDraft, play:playEditorDraft, export:exportEditorFile,
+      get draft(){return editorDraft;},get error(){return editorError;},get screen(){return screen;}
+    };
   }`);
-  const descendants = node => [node,...node.children.flatMap(descendants)];
-  const render = () => {
-    const panel=element('panel');
-    g.context.panel=panel;
-    g.run('editorTest.render(panel)');
-    return descendants(panel);
-  };
-  function controls(nodes) {
-    return {json:nodes.find(node=>node.tag==='textarea' && node.rows===4),
-      click:key=>nodes.find(node=>node.textContent==='v2.editor.'+key && node.tag==='button').onclick()};
-  }
-  let ui=controls(render());
-  ui.click('export');
-  const exported=ui.json.value;
+  g.run('editorTest.export()');
+  const exported = read(g,'downloaded.text');
   assert.equal(exported,g.context.pilotText.replaceAll('\r\n','\n').trimEnd());
-  ui.json.value=JSON.stringify({...JSON.parse(exported),version:'goblin-level-draft-v2'});
-  ui.click('import');
-  assert.equal(g.run('editorTest.error'),'schema');
+  await g.run('editorTest.importFile("{bad}")');
+  assert.equal(g.run('editorTest.error'),'json');
   assert.deepEqual(read(g,'editorTest.draft'),JSON.parse(exported));
-  ui.json.value=exported;
-  ui.click('import');
-  assert.equal(g.run('editorTest.error'),'');
-  assert.deepEqual(read(g,'editorTest.draft'),JSON.parse(exported));
-  ui.json.value=source('assets/unit-art/levels/catalog-full-levels.v3.json');
-  ui.click('import');
-  const nodes=render();
-  nodes.find(node=>node.tag==='select' && node.children[0]?.textContent==='catalog-full-atlas').selectedIndex=1;
-  controls(nodes).click('openPackageLevel');
+  g.run('editorTest.create(6,5); GoblinSavedLevels.saveWorking("Blank",editorTest.draft)');
+  assert.deepEqual(read(g,'GoblinSavedLevels.readWorking().draft.units'),[]);
+  assert.throws(()=>g.run('GoblinEditorDraft.validate(editorTest.draft)'),/core/);
+  await g.run('editorTest.importFile(packageText)');
+  await g.run('editorTest.save(1,"Terrain course")');
   assert.equal(g.run('editorTest.draft.id'),'catalog-full-terrain-course');
-  ui=controls(render());
-  ui.json.value=exported;
-  ui.click('import');
-  await ui.click('play');
+  await g.run('editorTest.importFile(pilotText)');
+  await g.run('editorTest.save(0,"Pilot")');
+  assert.deepEqual(read(g,'GoblinEditorDraft.parse(GoblinSavedLevels.read().at(-1).level)'),JSON.parse(exported));
+  await g.run('editorTest.play()');
   assert.equal(g.run('editorTest.screen'),'play');
   assert.deepEqual(read(g,'legacySession.config.levelEvents.hooks.map(hook=>hook.id)'),
     JSON.parse(exported).events.map(event=>event.id));
@@ -268,8 +247,9 @@ test('editor flow keeps the validated draft across playtest and rejects an impor
   g.context.document.createElement = () => Object.assign(createElement(), {append() {}});
   g.run(`
     let screen='menu',campaign=null,started=false,editorDraft=null,editorCell={x:0,y:0},editorError='',editorBusy=false,editorMoving=false;
-    let editorConfig=null,editorReturnScenario=null;
+    let editorConfig=null,editorReturnScenario=null,editorBackScreen='menu';
     let editorSaved=null,editorName='',editorSavedMessage='',editorMissionOpen=false,editorImportLevels=null;
+    const editorCamera={zoom:1,x:0,y:0,palettes:{}};
     const button=()=>({}),actions=()=>({});
     const show=next=>{screen=next},releasePause=()=>{},renderScreen=()=>{},heading=x=>x,paragraph=x=>x;
     const GoblinUIV2={resetView(){},startView(){}},GoblinEditorUI={render(panel,view){globalThis.editorView=view}};
@@ -277,7 +257,7 @@ test('editor flow keeps the validated draft across playtest and rejects an impor
     ${flow.slice(flow.indexOf('    async function leaveMission('),flow.indexOf('    function libraryAssetId('))}
   `);
   const world = g.state();
-  g.run("openEditor();renderEditor({append(){}});editorView.import('{invalid')");
+  await g.run("openEditor();renderEditor({append(){}});editorView.importFile({size:8,name:'bad.json',text:async()=>'{invalid'})");
   const before = read(g,'editorDraft');
   assert.equal(g.run('editorError'),'json');
   assert.equal(g.state(),world);

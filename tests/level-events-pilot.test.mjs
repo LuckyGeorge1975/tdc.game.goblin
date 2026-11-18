@@ -52,10 +52,11 @@ test('v3 event draft round-trips and rejects retired editor formats before apply
 
 test('the editor pilot entry loads the shipped draft through the same validated import path',async()=>{
   const game=await pilot(), flow=source('ui-v2-flow.js');
-  const start=flow.indexOf('    function updateEditor('), end=flow.indexOf('    async function playEditorDraft(',start);
+  const start=flow.indexOf('    function resetEditorCamera('), end=flow.indexOf('    async function playEditorDraft(',start);
   game.run(`
     let screen='editor',editorDraft=GoblinEditorDraft.copyTemplate(),editorBusy=false,editorMoving=false,
-      editorCell={x:0,y:0},editorError='',requested='';
+      editorCell={x:0,y:0},editorError='',requested='',editorWorking=false;
+    const editorCamera={zoom:2,x:10,y:10,palettes:{}};
     const renderScreen=()=>{};
     const fetch=async path=>{requested=path;return {ok:true,text:async()=>draftText}};
     ${flow.slice(start,end)}
