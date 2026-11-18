@@ -10,7 +10,8 @@ test('level arrows select one available row and reveal it without opening briefi
   const calls = [];
   const rows = ['alpha', 'bravo', 'charlie'].map(id => ({id: 'v2-level-' + id,
     focus: options => calls.push(['focus', id, options.preventScroll]),
-    scrollIntoView: options => calls.push(['scroll', id, options.block])}));
+    scrollIntoView: options => calls.push(['scroll', id, options.block]),
+    getAttribute: name => name === 'aria-pressed' ? String(id === context.missionId) : null}));
   const list = {
     contains: row => rows.includes(row),
     querySelectorAll(selector) {
@@ -19,7 +20,7 @@ test('level arrows select one available row and reveal it without opening briefi
     }
   };
   const context = {
-    missionId: 'alpha', startError: 'old error', GameDialogs: {isOpen: () => false},
+    savedTab: false, missionId: 'alpha', startError: 'old error', GameDialogs: {isOpen: () => false},
     renderScreen: focus => calls.push(['render', focus]),
     document: {getElementById: id => rows.find(row => row.id === id)}
   };

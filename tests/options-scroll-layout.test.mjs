@@ -14,14 +14,14 @@ function node(tag='div'){
 }
 test('Options alone gets separate header, content scrollport and non-sticky footer',()=>{
   const start=flow.indexOf("        panel.classList.add('v2-options-panel');");
-  const end=flow.indexOf('        panel.append(header, content, footer);',start)+
-    '        panel.append(header, content, footer);'.length;
+  const end=flow.indexOf('        panel.append(header, layout, footer);',start)+
+    '        panel.append(header, layout, footer);'.length;
   assert.ok(start>0&&end>start);
   const panel=node(),classes=[],changes=[];panel.classList.add=value=>classes.push(value);
   const context={panel,t:key=>key,heading:()=>node('h2'),paragraph:()=>node('p'),
     button:(text,onclick)=>({...node('button'),textContent:text,onclick}),actions:(...children)=>{const el=node();el.append(...children);return el},
     document:{createElement:tag=>({...node(tag),addEventListener(){}}),createTextNode:text=>({text})},goBack(){},
-    reloadGameCache(){},optionsScrollObserver:null,ResizeObserver:class {observe(){}},
+    reloadGameCache(){},optionsCategory:'display',optionsScrollObserver:null,ResizeObserver:class {observe(){}},
     GoblinLanguage:{languages:['de','en','es','fr'],current:'fr'},
     GoblinUIV2:{gridVisible:false,targetsVisible:true,damageVisible:true,
       panelVisible:key=>key!=='unit',setPanelVisible:(key,visible)=>changes.push([key,visible])},
@@ -29,11 +29,13 @@ test('Options alone gets separate header, content scrollport and non-sticky foot
   vm.runInNewContext(readFileSync(new URL('../presentation-preferences.js',import.meta.url),'utf8'),context);
   vm.runInNewContext(flow.slice(start,end),context);
   assert.deepEqual(classes,['v2-options-panel']);
-  assert.deepEqual(panel.children.map(el=>el.className),['v2-screen-header','v2-screen-main v2-options-main','v2-screen-footer']);
+  assert.deepEqual(panel.children.map(el=>el.className),['v2-screen-header','v2-library-layout v2-options-layout','v2-screen-footer']);
   const descendants=el=>el.children?.flatMap(child=>[child,...descendants(child)])||[];
+  const categories=panel.children[1].children[0].children;
+  assert.deepEqual(categories.map(category=>category.id),['v2-options-category-general','v2-options-category-display','v2-options-category-play']);
   const inputs=descendants(panel.children[1]).filter(el=>el.tag==='input');
   assert.deepEqual(inputs.map(el=>el.id),['v2-grid','v2-targets','v2-damage','v2-panel-roster','v2-panel-unit',
-    'v2-panel-field','v2-panel-legend','v2-phase-notice-option','v2-auto-select-ready','v2-overlay-alpha']);
+    'v2-panel-field','v2-panel-legend','v2-overlay-alpha']);
   const toggles=inputs.filter(el=>el.id.startsWith('v2-panel-'));
   assert.deepEqual(toggles.map(el=>el.checked),[true,false,true,true]);
   for(const toggle of toggles){toggle.checked=!toggle.checked;toggle.onchange();}
@@ -42,8 +44,8 @@ test('Options alone gets separate header, content scrollport and non-sticky foot
   assert.match(rule('.v2-screen-panel.v2-foundation.v2-options-panel'),/grid-template-rows:\s*auto minmax\(0, 1fr\) auto/);
   assert.match(rule('.v2-screen-panel.v2-foundation.v2-options-panel'),/overflow:\s*hidden/);
   assert.doesNotMatch(rule('.v2-screen-panel.v2-foundation.v2-options-panel'),/max-height|height:/);
-  assert.match(rule('.v2-options-panel > .v2-options-main'),/min-height:\s*0/);
-  assert.match(rule('.v2-options-panel > .v2-options-main'),/overflow-y:\s*auto/);
+  assert.match(rule('.v2-options-layout > .v2-options-main'),/min-height:\s*0/);
+  assert.match(rule('.v2-options-layout > .v2-options-main'),/overflow-y:\s*auto/);
   assert.match(rule('.v2-options-panel > .v2-screen-footer'),/position:\s*static/);
 });
 
@@ -64,15 +66,15 @@ test('screen transition and language rerender preserve the new Options content s
 });
 
 test('focus clearance and original checkbox-row/Back sizes remain available',()=>{
-  assert.match(rule('.v2-options-panel > .v2-options-main'),/padding:\s*5px/);
-  assert.match(rule('.v2-options-panel > .v2-options-main'),/scroll-padding:\s*5px/);
+  assert.match(rule('.v2-options-layout > .v2-options-main'),/padding:\s*5px/);
+  assert.match(rule('.v2-options-layout > .v2-options-main'),/scroll-padding:\s*5px/);
   assert.match(rule('.v2-setting-check'),/min-height:\s*56px/);
   assert.match(rule('.v2-foundation button'),/min-height:\s*44px/);
 });
 
 test('resetting transient game cache only reloads after confirmation', async () => {
   const start=flow.indexOf('    async function reloadGameCache(');
-  const end=flow.indexOf('    function renderSavedLevels(',start);
+  const end=flow.indexOf('    function savedLevelPreview(',start);
   let accepted=false, reloads=0;
   const context={t:key=>key,GameDialogs:{isOpen:()=>false,confirm:async()=>accepted},location:{reload(){reloads++;}}};
   vm.runInNewContext(flow.slice(start,end),context);

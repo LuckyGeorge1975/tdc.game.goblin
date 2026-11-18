@@ -118,7 +118,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let campaign = null;
     let editorDraft = null, editorCell = {x:0,y:0}, editorError = '', editorBusy = false, editorMoving = false;
     let editorConfig = null, editorReturnScenario = null;
-    let savedConfig = null, savedTitle = '', savedTab = false, savedStarting = false, savedError = '';
+    let savedConfig = null, savedTitle = '', savedTab = false, savedLevelId = null, savedStarting = false, savedError = '';
+    let editorBackScreen = 'menu', optionsCategory = 'general';
     let editorSaved = null, editorName = '', editorSavedMessage = '';
     let editorMissionOpen = false, editorImportLevels = null;
     let optionsScrollObserver = null;
@@ -678,7 +679,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const previous = screen;
       if (previous === 'editor' && next !== 'editor') editorMoving = false;
       const active = document.activeElement;
-      if (previous === 'levels') focusMemory.set(previous, savedTab ? 'v2-level-tab-own' : `v2-level-${missionId}`);
+      if (previous === 'levels') focusMemory.set(previous, savedTab && !savedLevelId ? 'v2-level-tab-own' : `v2-level-${savedTab ? savedLevelId : missionId}`);
       else if (surface.contains(active) && active.id) focusMemory.set(previous, active.id);
       const currentPanel = surface.querySelector('.v2-screen-panel');
       if (currentPanel) scrollMemory.set(previous, {
@@ -759,8 +760,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (resumeSpectator && binding === fullSeatBinding) binding.lifecycle.resume();
     }
     function selectLevel(id) {
-      missionId = id;
-      startError = '';
+      if (savedTab) { savedLevelId = id; savedError = ''; }
+      else { missionId = id; startError = ''; }
       renderScreen(false);
     }
     function stepLevelSelection(event) {
@@ -770,7 +771,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const focused = event.target.closest('.v2-level-choice');
       if (!focused || !list.contains(focused)) return;
       const rows = [...list.querySelectorAll('.v2-level-choice:not(:disabled)')];
-      const active = rows.findIndex(row => row.id === `v2-level-${missionId}`);
+      const active = rows.findIndex(row => row.getAttribute('aria-pressed') === 'true');
       const next = rows[(active < 0 ? rows.indexOf(focused) : active) + direction];
       event.preventDefault();
       if (!next) return;
@@ -1004,10 +1005,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       releasePause();
       if (screen === 'play') GoblinUIV2.startView();
     }
-    function openEditor() {
+    function openEditor(back = 'menu') {
       if (!globalThis.GoblinEditorDraft?.available()) return;
       editorDraft ??= GoblinEditorDraft.copyTemplate();
       editorError = '';
+      editorBackScreen = back;
       show('editor');
     }
     function editSavedLevel(entry) {
@@ -1018,7 +1020,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       editorName = entry.name;
       editorSavedMessage = '';
       editorCell = {x:0,y:0};
-      openEditor();
+      openEditor('levels');
     }
     async function saveEditorLevel(overwrite) {
       if (editorBusy || screen !== 'editor' || GameDialogs.isOpen()) return;
@@ -1029,6 +1031,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (screen !== 'editor') return;
       try {
         editorSaved = GoblinSavedLevels.save(editorName, editorDraft, previous);
+        if (editorBackScreen === 'levels') savedLevelId = editorSaved.id;
         editorSavedMessage = t('v2.saved.success');
         editorError = '';
       } catch (error) {
@@ -1077,33 +1080,35 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         message:t('v2.cache.confirm'),acceptLabel:t('v2.cache.reload'),cancelLabel:t('ui.dialog.cancel')}))
         location.reload();
     }
-    function renderSavedLevels(panel) {
-      const list = document.createElement('section');
-      list.className = 'v2-screen-main v2-saved-levels';
+    function savedLevelPreview(entry) {
+      if (!GoblinEditorDraft.available()) return {error:'v2.saved.previewUnavailable'};
       try {
-        const entries = GoblinSavedLevels.read();
-        if (!entries.length) list.append(paragraph(t('v2.saved.empty')));
-        for (const entry of entries) {
-          const row = document.createElement('article');
-          const title = document.createElement('strong');
-          title.textContent = entry.name;
-          const play = button(t('v2.saved.play'), () => startSavedLevel(entry));
-          const edit = button(t('v2.saved.edit'), () => editSavedLevel(entry));
-          let valid = false;
-          if (GoblinEditorDraft.available()) {
-            try { GoblinEditorDraft.parse(entry.level); valid = true; }
-            catch { row.append(paragraph(t('v2.saved.readError'))); }
-          }
-          play.disabled = edit.disabled = savedStarting || !valid;
-          row.append(title, actions(play, edit));
-          list.append(row);
-        }
-      } catch { list.append(paragraph(t('v2.saved.readError'))); }
-      if (savedError) list.append(paragraph(savedError));
-      const footer = document.createElement('footer');
-      footer.className = 'v2-screen-footer';
-      footer.append(actions(button(t('ui.nav.back'), () => show('menu'))));
-      panel.append(list, footer);
+        const draft = GoblinEditorDraft.parse(entry.level);
+        const {units} = GoblinEditorDraft.validate(draft);
+        const {width,height,terrain} = draft;
+        const visible = GoblinCatalogFullRuntime.initialRoster({
+          ...GoblinCatalogFullModel.editorProfile, width, height, terrainTypes:terrain, units
+        });
+        return {data:{width,height,defaultTerrain:'open-ground',terrain,
+          units:visible.filter(unit => !unit.embarkedOn)}};
+      } catch { return {error:'v2.saved.invalidPreview'}; }
+    }
+    function levelChoices() {
+      if (!savedTab) {
+        const ids = [...Object.keys(ScenarioRuleProfiles.entries), 'iron-dust-v2'];
+        const choices = ids.map(id => ({id, name:t(`mission.${id}.title`),
+          summary:t(id === 'iron-dust-v2' ? 'v2.objective' : `mission.${id}.objective.short`),
+          data:missionData(id)}));
+        if (!choices.some(choice => choice.id === missionId)) missionId = ids[0];
+        return {choices,selected:choices.find(choice => choice.id === missionId)};
+      }
+      try {
+        const choices = GoblinSavedLevels.read().map(entry => ({id:entry.id, name:entry.name, entry}));
+        if (!choices.some(choice => choice.id === savedLevelId)) savedLevelId = choices[0]?.id ?? null;
+        const selected = choices.find(choice => choice.id === savedLevelId);
+        if (selected) Object.assign(selected, savedLevelPreview(selected.entry));
+        return {choices, selected};
+      } catch { return {choices:[],error:'v2.saved.readError'}; }
     }
     function ironDustAttackerControl() {
       const label = document.createElement('label');
@@ -1345,7 +1350,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         draft:editorDraft, cell:editorCell, busy:editorBusy, error:editorError, moving:editorMoving,
         missionOpen:editorMissionOpen, setMissionOpen:open => { editorMissionOpen = open; },
         select:selectEditorCell, setMoving:setEditorMoving,
-        update:updateEditor, pilot:loadEditorPilot, play:playEditorDraft, back:() => show('menu'),
+        update:updateEditor, pilot:loadEditorPilot, play:playEditorDraft, back:() => show(editorBackScreen),
         import(text) {
           try {
             const levels = GoblinEditorDraft.importLevels(text);
@@ -1737,7 +1742,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const choose = button(t('ui.start.choose'), () => show('levels'), 'primary'); choose.id = 'v2-menu-choose';
         const tutorial = button(t('v2.campaign.title'), openCampaign); tutorial.id = 'v2-menu-campaign';
         tutorial.disabled = !campaignAvailable();
-        const editor = button(t('v2.editor.title'), openEditor); editor.id = 'v2-menu-editor';
+        const editor = button(t('v2.editor.title'), () => openEditor()); editor.id = 'v2-menu-editor';
         editor.disabled = !globalThis.GoblinEditorDraft?.available();
         const units = button(t('v2.library.title'), () => openSection('catalog')); units.id = 'v2-menu-units';
         const settings = button(t('ui.nav.settings'), () => openSection('options')); settings.id = 'v2-menu-settings';
@@ -1762,50 +1767,67 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         renderEditor(panel);
       } else if (screen === 'levels') {
         const header = document.createElement('header'); header.className = 'v2-screen-header';
-        const builtIn = button(t('v2.saved.builtIn'), () => { savedTab = false; renderScreen(false); });
-        const own = button(t('v2.saved.own'), () => { savedTab = true; savedError = ''; renderScreen(false); });
+        const builtIn = button(t('v2.saved.builtIn'), () => { savedTab = false; swapLevelTab(); });
+        const own = button(t('v2.saved.own'), () => { savedTab = true; swapLevelTab(); });
+        function swapLevelTab() {
+          savedError = '';
+          const list = panel.querySelector('.v2-level-list');
+          if (list) list.scrollTop = 0;
+          renderScreen(false);
+        }
         builtIn.id = 'v2-level-tab-built-in'; own.id = 'v2-level-tab-own';
         builtIn.setAttribute('aria-pressed', String(!savedTab)); own.setAttribute('aria-pressed', String(savedTab));
         header.append(heading(t('ui.levels.title')), actions(builtIn, own));
-        panel.append(header);
-        if (savedTab) {
-          renderSavedLevels(panel);
-          return finishScreen(panel, focus, lastFocus, lastIndex);
-        }
+        const {choices,selected,error} = levelChoices();
         const layout = document.createElement('div'); layout.className = 'v2-level-layout v2-screen-main';
         const list = document.createElement('div'); list.className = 'v2-level-list';
         list.addEventListener('keydown', stepLevelSelection);
-        const ids = [...Object.keys(ScenarioRuleProfiles.entries), 'iron-dust-v2'];
-        if (!ids.includes(missionId)) missionId = ids[0];
-        for (const id of ids) {
-          const available = !!missionData(id);
-          const choose = button('', () => selectLevel(id), 'v2-level-choice');
-          const title = document.createElement('strong'); title.textContent = t(`mission.${id}.title`);
-          const summary = document.createElement('span');
-          summary.textContent = t(id === 'iron-dust-v2' ? 'v2.objective' : `mission.${id}.objective.short`);
-          choose.append(title, summary);
-          choose.id = `v2-level-${id}`;
-          choose.setAttribute('aria-pressed', String(id === missionId));
-          if (!available) choose.title = t('screen.briefing.dataUnavailable');
-          choose.disabled = !available;
+        for (const choice of choices) {
+          const choose = button('', () => selectLevel(choice.id), 'v2-level-choice');
+          const title = document.createElement('strong'); title.textContent = choice.name;
+          choose.append(title);
+          if (choice.summary) {
+            const summary = document.createElement('span'); summary.textContent = choice.summary;
+            choose.append(summary);
+          }
+          choose.id = `v2-level-${choice.id}`;
+          choose.setAttribute('aria-pressed', String(choice === selected));
+          choose.disabled = !savedTab && !choice.data;
+          if (choose.disabled) choose.title = t('screen.briefing.dataUnavailable');
           list.append(choose);
         }
         const detail = document.createElement('section'); detail.className = 'v2-level-detail';
-        detail.setAttribute('aria-label', t(`mission.${missionId}.title`));
-        const detailTitle = document.createElement('h3'); detailTitle.textContent = t(`mission.${missionId}.title`);
-        const data = missionData(missionId);
-        detail.append(detailTitle, missionPreview(data),
-          paragraph(t(missionId === 'iron-dust-v2' ? 'v2.objective' : `mission.${missionId}.objective.short`)),
-          missionStats(data));
+        if (selected) {
+          detail.setAttribute('aria-label', selected.name);
+          const title = document.createElement('h3'); title.textContent = selected.name;
+          detail.append(title);
+          if (selected.data) {
+            detail.append(missionPreview(selected.data));
+            if (selected.summary) detail.append(paragraph(selected.summary));
+            if (savedTab) detail.append(paragraph(t('v2.saved.mapSize',{width:selected.data.width,height:selected.data.height}), 'v2-screen-meta'));
+            detail.append(missionStats(selected.data));
+          } else detail.append(paragraph(t(selected.error ?? 'screen.briefing.dataUnavailable'), 'v2-status'));
+        } else detail.append(paragraph(t(error ?? 'v2.saved.empty'), 'v2-status'));
+        if (savedError) {
+          const status = paragraph(savedError, 'v2-status'); status.setAttribute('role','status');
+          detail.append(status);
+        }
         layout.append(steppedList(list), detail);
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), () => show('menu')); back.id = 'v2-levels-back';
-        const select = button(t('ui.levels.select'), () => show('briefing'), 'primary');
+        const select = button(t(savedTab ? 'v2.saved.play' : 'ui.levels.select'),
+          () => savedTab ? startSavedLevel(selected.entry) : show('briefing'), 'primary');
         select.id = 'v2-levels-select';
-        select.disabled = !data;
-        select.setAttribute('aria-label', `${t('ui.levels.select')}: ${t(`mission.${missionId}.title`)}`);
-        footer.append(actions(back, select));
-        panel.append(layout, footer);
+        select.disabled = savedStarting || !selected?.data;
+        if (selected) select.setAttribute('aria-label', t(savedTab ? 'v2.saved.play' : 'ui.levels.select') + ' · ' + selected.name);
+        const buttons = [back,select];
+        if (savedTab) {
+          const edit = button(t('v2.saved.edit'), () => editSavedLevel(selected.entry)); edit.id = 'v2-levels-edit';
+          edit.disabled = savedStarting || !selected?.data;
+          buttons.splice(1,0,edit);
+        }
+        footer.append(actions(...buttons));
+        panel.append(header, layout, footer);
       } else if (screen === 'relay-campaign') {
         const field = fieldCampaigns[fieldKey];
         panel.append(heading(t(`v2.${fieldKey}.title`)), paragraph(t(`v2.${fieldKey}.intro`)));
@@ -2022,7 +2044,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         panel.classList.add('v2-options-panel');
         const header = document.createElement('header'); header.className = 'v2-screen-header';
         header.append(heading(t('ui.nav.settings')));
-        const content = document.createElement('div'); content.className = 'v2-screen-main v2-options-main';
+        const layout = document.createElement('div'); layout.className = 'v2-library-layout v2-options-layout';
+        const categories = document.createElement('nav'); categories.className = 'v2-library-list v2-options-categories';
+        categories.setAttribute('aria-label', t('ui.nav.settings'));
+        const content = document.createElement('div'); content.className = 'v2-library-detail v2-options-main';
         const language = document.createElement('label');
         language.textContent = t('ui.settings.language');
         const languageSelect = document.createElement('select'); languageSelect.id = 'v2-language';
@@ -2097,8 +2122,24 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         autoSelect.append(autoSelectInput, document.createTextNode(t('v2.autoSelectReady')));
         content.tabIndex = 0;
         content.setAttribute('aria-label', t('v2.options.scrollArea'));
-        content.append(language, animation, grid, ...displayOptions, phaseNotice, autoSelect, alpha,
-          button(t('v2.cache.reload'), reloadGameCache), paragraph(t('ui.settings.note')));
+        const groups = {
+          general:[language,button(t('v2.cache.reload'), reloadGameCache),paragraph(t('ui.settings.note'))],
+          display:[grid,...displayOptions,alpha],
+          play:[animation,phaseNotice,autoSelect]
+        };
+        for (const key of Object.keys(groups)) {
+          const category = button(t(`v2.options.category.${key}`), () => {
+            if (optionsCategory === key) return;
+            content.scrollTop = 0;
+            optionsCategory = key;
+            renderScreen(false);
+          }, 'v2-library-choice');
+          category.id = `v2-options-category-${key}`;
+          if (key === optionsCategory) category.setAttribute('aria-current','true');
+          categories.append(category);
+        }
+        content.append(...groups[optionsCategory]);
+        layout.append(categories, content);
         const footer = document.createElement('footer'); footer.className = 'v2-screen-footer';
         const back = button(t('ui.nav.back'), goBack); back.id = 'v2-options-back';
         const up = button('↑', () => content.scrollBy({top:-content.clientHeight * .8}));
@@ -2126,7 +2167,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         observer.observe(content);
         for (const child of content.children) observer.observe(child);
         optionsScrollObserver = observer;
-        panel.append(header, content, footer);
+        panel.append(header, layout, footer);
       }
       finishScreen(panel, focus, lastFocus, lastIndex);
     }
@@ -2233,7 +2274,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         else if (screen === 'campaign-complete' || screen === 'relay-campaign') returnToCampaignMenu();
         else if (screen === 'editor' && !editorBusy) {
           if (editorMoving) setEditorMoving(false);
-          else show('menu');
+          else show(editorBackScreen);
         }
         else if (screen === 'catalog-detail') returnToLibrary();
         else if (screen === 'levels') show('menu');
