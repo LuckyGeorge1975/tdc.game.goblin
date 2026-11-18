@@ -59,15 +59,15 @@ test('library switches between four localized areas and keeps unit and terrain d
     document: {createElement: node, readyState: 'loading', addEventListener() {}},
     location: {href: import.meta.url}, URL, URLSearchParams,
     libraryKind: 'units', screen: 'play', returnScreen: '', libraryIndex: 0, terrainIndex: 0,
-    libraryTab: 'range', libraryLiveId:null, libraryFullRegistry:()=>null, terrainIds: ['open-ground', 'rubble-field'], unitGuideEntries: ['first', 'second'],
-    libraryTarget: entry => ({unit: {id: entry}}), GameDialogs: {isOpen: () => false},
-    GoblinUIV2: {project: () => ({})}, matchMedia: () => ({matches: false}), renderScreen() {},
+    libraryTab: 'range', libraryLiveId: null, libraryFullRegistry:()=>null, terrainIds: ['open-ground', 'rubble-field'], unitGuideEntries: [{coreUnitId:'first'}, {coreUnitId:'second'}],
+    GameDialogs: {isOpen: () => false},
+    GoblinUIV2: {project: () => ({scenario: 'iron-dust-v2', units: [{id:'first'}, {id:'second'}]})}, matchMedia: () => ({matches: false}), renderScreen() {},
     button: (textContent, onclick) => ({...node('button'), textContent, onclick}),
     paragraph: textContent => ({...node('p'), textContent}),
     show: screen => { context.screen = screen; }
   };
   runInNewContext(readFileSync(new URL('../localization.js', import.meta.url), 'utf8'), context);
-  runInNewContext(slice('    function libraryKindSwitch(', '    function findUnit('), context);
+  runInNewContext(slice('    function libraryKindSwitch(', '    globalThis.GoblinV2Flow ='), context);
   for (const lang of context.GoblinLanguage.languages) {
     context.t = key => {
       const text = context.GoblinLanguage.t(key, {}, lang);

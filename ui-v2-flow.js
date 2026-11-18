@@ -126,7 +126,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let briefingAttacker = 'human';
     const ironDustSeatScreens = ['iron-dust-handoff','iron-dust-defense'];
     let syncingIronDustSeat = false;
-    let libraryIndex = 0, libraryTab = 'description', libraryArtSide = 'own', libraryMapMode = 'move';
+    let libraryIndex = 0, libraryTab = 'description', libraryMapMode = 'move';
     let libraryWeapon = null, libraryRule = null, libraryLiveId = null;
     let libraryKind = 'units', terrainIndex = 0;
     const focusMemory = new Map(), scrollMemory = new Map();
@@ -1338,17 +1338,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       row?.focus({preventScroll:true});
     }
-    function libraryTarget(entry, state) {
-      if (!started || state.gameOver || !['play', 'pause', 'catalog', 'catalog-detail'].includes(returnScreen))
-        return {reason:'screen.library.mapUnavailable.noMission'};
-      const asset = libraryAssetId(entry);
+    function libraryLiveUnit(entry, state) {
+      if (!started || state.gameOver || !['play', 'pause', 'catalog', 'catalog-detail'].includes(returnScreen)) return null;
       const matches = state.units.filter(unit => !unit.embarkedOn && (state.scenario === 'iron-dust-v2'
-        ? unit.id === entry.coreUnitId : (unit.catalogAssetId ?? UnitVisuals.artKey(unit)) === asset));
-      const match = matches.find(unit=>unit.id===libraryLiveId) ?? (matches.length === 1 ? matches[0] : null);
-      if (!match && matches.length > 1) return {reason:'v2.library.ambiguous'};
-      if (!match) return {reason:'screen.library.mapUnavailable.notPresent'};
-      if (unitDead(match)) return {unit:match,reason:'screen.library.mapUnavailable.destroyed'};
-      return {unit:match};
+        ? unit.id === entry.coreUnitId : (unit.catalogAssetId ?? UnitVisuals.artKey(unit)) === libraryAssetId(entry)));
+      const match = matches.find(unit => unit.id === libraryLiveId) ?? (matches.length === 1 ? matches[0] : null);
+      return match && !unitDead(match) ? match : null;
     }
     function libraryFullRegistry(state) {
       const model = globalThis.GoblinCatalogFullModel;
@@ -1424,7 +1419,6 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const registry = libraryFullRegistry(state), id = libraryAssetId(entry);
       const rule = registry?.units[id]?.target;
       const system = rule?.systemDefinitionRef ? GoblinSystems.createCatalogSystem(registry,id) : null;
-      const target = libraryTarget(entry,state);
       const detail = document.createElement('section'); detail.className = 'v2-library-detail v2-library-unit-detail';
       const title = mobile ? heading(libraryName(entry)) : document.createElement('h3');
       if (!mobile) title.textContent = libraryName(entry);
@@ -1432,15 +1426,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       identity.append(title, paragraph(GoblinLanguage.translate(entry.role)));
       const top = document.createElement('div'); top.className = 'v2-library-unit-top';
       const artPanel = document.createElement('div'); artPanel.className = 'v2-library-art-panel';
-      const artId = libraryAssetId(entry);
-      const enemyArt = `assets/unit-art/sets/02-technical-illustration/library-enemy/${artId}`;
-      const art = libraryArtSide === 'enemy' ? `${enemyArt}@768.png`
-        : UnitVisuals.assetFor(entry, 'library', 'png') || UnitVisuals.resolve(entry).asset;
+      const art = UnitVisuals.assetFor(entry, 'library', 'png') || UnitVisuals.resolve(entry).asset;
       if (art) {
         const figure = document.createElement('figure'); figure.className = 'v2-library-art';
         const picture = document.createElement('picture');
-        const webp = libraryArtSide === 'enemy' ? `${enemyArt}@1024.webp`
-          : UnitVisuals.assetFor(entry, 'library', 'webp');
+        const webp = UnitVisuals.assetFor(entry, 'library', 'webp');
         if (webp) {
           const source = document.createElement('source'); source.srcset = webp; source.type = 'image/webp';
           picture.append(source);
@@ -1448,29 +1438,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const image = document.createElement('img'); image.src = art; image.alt = libraryName(entry);
         image.onerror = () => picture.replaceWith(UnitVisuals.iconElement(entry, 'v2-library-fallback'));
         const caption = document.createElement('figcaption');
-        caption.textContent = `${libraryName(entry)} · ${t(`v2.ui.preview.${libraryArtSide}`)}`;
+        caption.textContent = libraryName(entry);
         picture.append(image); figure.append(picture, caption); artPanel.append(figure);
       }
 
-      const find = button(t('screen.library.showOnMap'), () => findUnit(target.unit.id));
-      find.id = 'v2-library-find'; find.disabled = !!target.reason;
-      const mapRow = document.createElement('div'); mapRow.className = 'v2-library-map-action';
-      mapRow.append(find);
-      if (target.reason) mapRow.append(paragraph(t(target.reason), 'v2-library-unavailable'));
-      const artSwitch = document.createElement('div'); artSwitch.className = 'v2-library-art-switch';
-      for (const side of ['own', 'enemy']) {
-        const choice = button(t(`v2.ui.preview.${side}`), () => {
-          if (libraryArtSide === side) return;
-          libraryArtSide = side;
-          renderScreen(false);
-          document.getElementById(`v2-library-art-${side}`)?.focus({preventScroll:true});
-        });
-        choice.id = `v2-library-art-${side}`;
-        choice.setAttribute('aria-pressed', String(libraryArtSide === side));
-        artSwitch.append(choice);
-      }
-
-      artPanel.append(artSwitch);
       const weapons = libraryReferenceWeapons(entry,registry);
       const selectionKey = `${state.profile}:${registry?.dataVersion ?? 'legacy'}:${id}`;
       if (libraryWeapon?.key !== selectionKey || !weapons.some(weapon=>weapon.id===libraryWeapon.id))
@@ -1494,7 +1465,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         t('v2.library.noMovement')) : weapon ? `${libraryWeaponName(weapon)} · ${t('v2.ui.range')} ${weapon.range}` : t('v2.library.noWeapon');
       figure.title = t('v2.library.schematic');
       preview.append(figure, modes);
-      if (libraryMapMode === 'attack' && weapons.length) {
+      if (libraryMapMode === 'attack' && weapons.length > 1) {
         const rail = document.createElement('div'); rail.className = 'v2-library-weapon-rail';
         for (const option of weapons) {
           const name = libraryWeaponName(option);
@@ -1542,7 +1513,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (profile.bonus > 0) body.append(paragraph(t('screen.library.value.skimmerManeuver')));
         if (weapon?.count > 1) body.append(paragraph(t('v2.library.slotCount',{count:weapon.count})));
         if (system) body.append(paragraph(t('v2.library.systemBands',{points:rule.movement.join(' / ')})));
-        if (target.unit && !target.reason) body.append(paragraph(t('v2.library.livePosition',{hex:`${String.fromCharCode(65+target.unit.x)}-${String(target.unit.y+1).padStart(2,'0')}`})));
+        const liveUnit = libraryLiveUnit(entry, state);
+        if (liveUnit) body.append(paragraph(t('v2.library.livePosition',{hex:`${String.fromCharCode(65+liveUnit.x)}-${String(liveUnit.y+1).padStart(2,'0')}`})));
       } else {
         const strategy = libraryTab === 'strategy';
         if (strategy) body.append(paragraph(rule ? t(`library.unit.${id}.tactics`) : t('v2.library.noStrategy')));
@@ -1562,7 +1534,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (links.length) body.append(actions(...links));
         if (!strategy && refs?.length === 0) body.append(paragraph(t('v2.library.noSpecials')));
       }
-      detail.append(identity,top,tabs,body,mapRow);
+      detail.append(identity,top,tabs,body);
       return detail;
     }
     // Terrain entries of the library (UR-D): the former terrain card of the game screen, with its rules.
@@ -1648,19 +1620,15 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       else {
         const state = GoblinUIV2.project();
         libraryLiveId = key;
-        const index = unitGuideEntries.findIndex(entry => libraryTarget(entry, {...state, gameOver: false}).unit?.id === key);
+        const unit = state.units.find(item => item.id === key && !item.embarkedOn);
+        const index = unit ? unitGuideEntries.findIndex(entry => state.scenario === 'iron-dust-v2'
+          ? entry.coreUnitId === unit.id
+          : libraryAssetId(entry) === (unit.catalogAssetId ?? UnitVisuals.artKey(unit))) : -1;
         if (index >= 0) { libraryIndex = index; libraryTab = 'description'; }
       }
       show(matchMedia('(max-width: 900px)').matches ? 'catalog-detail' : 'catalog');
     }
-    function findUnit(id) {
-      const unit = GoblinUIV2.project().units.find(item => item.id === id && unitAlive(item));
-      if (!unit || !started) return;
-      show('play');
-      releasePause();
-      GoblinUIV2.focusUnit(unit.id);
-    }
-    globalThis.GoblinV2Flow = Object.freeze({ findUnit, openLibrary, commitFullMap, hasStarted: () => started });
+    globalThis.GoblinV2Flow = Object.freeze({ openLibrary, commitFullMap, hasStarted: () => started });
     function renderScreen(focus = true) {
       optionsScrollObserver?.disconnect();
       optionsScrollObserver = null;
@@ -1968,8 +1936,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           renderScreen(false);
         });
         next.id = 'v2-library-next';
-        const mapAction = detail.querySelector('.v2-library-map-action');
-        footer.append(actions(back, count, next), ...(mapAction ? [mapAction] : []));
+        footer.append(actions(back, count, next));
         panel.append(detail, footer);
       } else if (screen === 'legal') {
         const notice = paragraph('G.O.B.L.I.N. is an independent game prototype by Think Design Code, available as a noncommercial public preview. It is not affiliated with or endorsed by any third-party game or product line and is not an official adaptation. The project uses code-generated artwork and AI-assisted design. Unit Guide illustrations, including enemy variants, were generated with ChatGPT.');
