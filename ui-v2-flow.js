@@ -379,6 +379,36 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       if (focus) nodes.title.focus({preventScroll:true});
     }
+    function seatCommandLabel(command, roster) {
+      const name = id => {
+        if (!id) return '';
+        const unit = roster.get(id);
+        return unit ? t(`library.unit.${unit.assetId}.name`) : t('v2.feedback.unit');
+      };
+      const labels = {
+        Move:'v2.ui.move', EnemyMove:'v2.ui.move', EnemyHold:'v2.feedback.hold', CatalogFire:'v2.ui.fire', CatalogHexFire:'v2.ui.missile',
+        CatalogRam:'v2.ui.ram', CatalogLoad:'v2.ui.embark', Embark:'v2.ui.embark',
+        Unload:'v2.ui.unload', CatalogDeploy:'v2.ui.catalog.deployDrone', EndPhase:'v2.event.PhaseChanged'
+      };
+      const job = command.job === 'repair-vehicle'
+        ? command.option === 'disabled' ? 'repair-disabled' : 'repair-hp'
+        : command.job;
+      const label = command.type === 'Engineer' ? `v2.engineer.${job}` : labels[command.type];
+      const targetId = command.target?.runtimeUnitId ?? command.carrierId ?? command.cargoId;
+      const findVisibleUnit = id => roster.has(id) ? units.find(unit => unit.id === id) : null;
+      const actor = command.weaponId && findVisibleUnit(command.actorId);
+      const target = command.target?.componentId && findVisibleUnit(targetId);
+      const slot = (unit,id) => unit?.catalogSystems ? GoblinSpecialistsRuntime.slotLabel(unit,id) : '';
+      const weapon = actor?.catalogFire?.ruleRef === 'siege-tank-fire-budget-v1'
+        ? GoblinSiegeWeapons.label(command.weaponId)
+        : slot(actor,command.weaponId);
+      const mode = command.mode === 'indirect' && command.spotterId
+        ? t('v2.ui.artillery.indirectVia',{spotter:name(command.spotterId)}) : '';
+      const cell = Number.isInteger(command.x) && Number.isInteger(command.y)
+        ? `${String.fromCharCode(65 + command.x)}-${String(command.y + 1).padStart(2,'0')}` : '';
+      return [name(command.actorId), t(label ?? 'v2.feedback.action'), weapon, mode,
+        name(targetId), slot(target,command.target?.componentId), cell].filter(Boolean).join(' · ');
+    }
     function renderFullSeat(panel, focus) {
       const binding = fullSeatBinding;
       const port = binding?.port;
@@ -425,11 +455,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const list = document.createElement('select');
         list.setAttribute('aria-label', t('v2.full.seats'));
         const available = opened.entries ? commands : [...commands, {type:'EndPhase'}];
+        const roster = new Map(view.units.map(unit => [unit.id, unit]));
         for (const [index, command] of available.entries()) {
           const option = document.createElement('option');
           option.value = String(index);
-          option.textContent = [command.type, command.actorId,
-            command.target?.runtimeUnitId, Number.isInteger(command.x) && (String.fromCharCode(65 + command.x) + '-' + String(command.y + 1).padStart(2,'0'))].filter(Boolean).join(' · ');
+          option.textContent = seatCommandLabel(command, roster);
           list.append(option);
         }
         const act = button(t('ui.dialog.confirm'), async () => {
@@ -701,7 +731,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const origin = screen, epoch = host?.epoch, owner = legacySession;
       const binding = origin === 'full-seat' ? fullSeatBinding : null;
       const seat = binding?.port?.state();
-      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=3');
+      const {renderRoundAnalysis} = await import('./round-analysis-ui.mjs?v=4');
       if (screen !== origin || host?.epoch !== epoch || legacySession !== owner) return;
       if (origin === 'full-seat') {
         const current=binding?.port.state();
@@ -882,6 +912,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         message: t('dialog.restart.body'), acceptLabel: t('dialog.restart.confirm'), cancelLabel: t('dialog.restart.cancel')
       });
       if (!accepted) { renderScreen(false); return; }
+      ironDefenseMove = null;
       const setup = globalThis.GoblinFullSeatOwner && fullSeatBinding?.session === legacySession ? fullSeatBinding : null;
       if (campaign?.field) globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadEditorDraft(fieldCampaigns[campaign.field].configs[campaign.index],control)) : loadEditorDraft(fieldCampaigns[campaign.field].configs[campaign.index]);
       else if (editorConfig || savedConfig) globalThis.GoblinFullSeatOwner ? bindFullSeats(setup, control=>loadEditorDraft(editorConfig || savedConfig,control)) : loadEditorDraft(editorConfig || savedConfig);
@@ -941,6 +972,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       show(next);
     }
     async function startMission() {
+      ironDefenseMove = null;
       if (GameDialogs.isOpen()) return;
       if (!missionData(missionId)) {
         startError = t('screen.briefing.dataUnavailable'); renderScreen(false); return;
@@ -1123,13 +1155,22 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         else if (next==='iron-dust-defense') renderScreen(false);
       } finally {syncingIronDustSeat=false;}
     }
+    let ironDefenseMove = null;
+    function ironDefenseMoveText() {
+      if (!ironDefenseMove) return '';
+      const {actorId,hex} = ironDefenseMove;
+      return t('v2.feedback.moved',{actor:t('v2.unit.'+actorId),hex});
+    }
     function renderIronDustSeat(panel) {
       const host=IronDustBrowserV2;
       const leave=button(t('v2.ui.mainMenu'),()=>leaveMission('menu'));
       const restart=button(t('ui.nav.restart'),confirmRestart);
       if (screen==='iron-dust-handoff') {
         const handoff=host.handoff;
-        const take=button(t('v2.full.takeSeat'),()=>host.takeSeat(handoff),'primary');
+        const take=button(t('v2.full.takeSeat'),()=>{
+          ironDefenseMove = null;
+          host.takeSeat(handoff);
+        },'primary');
         take.id='v2-iron-dust-take-seat';
         panel.append(heading(t('v2.full.handoff')),paragraph(t('v2.full.seat.'+handoff?.side)),
           actions(take,restart,leave));
@@ -1141,31 +1182,49 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       if (!offer) {panel.append(actions(restart,leave));return;}
       const {width,height,cells,defaultTerrain}=offer.view.terrain;
       const units=offer.view.units.filter(unit=>unit.hp>0&&!unit.embarkedOn).map(unit=>({...unit,
-        team:unit.relation==='own'?'enemy':'player',core:unit.objectiveTarget}));
+        team:unit.relation==='own'?'player':'enemy',core:unit.objectiveTarget}));
       panel.append(missionPreview({width,height,terrain:cells,defaultTerrain,units}));
       const label=document.createElement('label');
       label.textContent=t('v2.full.seat.enemy');
+      const relations = new Map(offer.view.units.map(unit => [unit.id, unit.relation]));
+      const name = id => [t('v2.unit.' + id),
+        relations.get(id) && t(relations.get(id) === 'own' ? 'v2.feedback.own' : 'v2.feedback.opponent')]
+        .filter(Boolean).join(' · ');
       const select=document.createElement('select');
       select.id='v2-iron-dust-defense-command';
       for (const candidate of offer.candidates) {
         const option=document.createElement('option');
         option.value=candidate.key;
-        const actor=t('v2.unit.'+candidate.actorId);
+        const actor=name(candidate.actorId);
         const target=candidate.target;
-        if (candidate.kind==='hold') option.textContent=t('v2.event.EnemyHeld',{actor});
+        if (candidate.kind==='hold') option.textContent=[actor,t('v2.feedback.hold')].join(' · ');
         else if (candidate.kind==='move') {
           const cell=String.fromCharCode(65+target.x)+'-'+String(target.y+1).padStart(2,'0');
           option.textContent=[actor,t('v2.ui.move'),cell].join(' · ');
-        } else option.textContent=[actor,t('v2.ui.fire'),t('v2.unit.'+target.unitId),target.componentId]
+        } else option.textContent=[actor,t('v2.ui.fire'),name(target.unitId),target.componentId]
           .filter(Boolean).join(' · ');
         select.append(option);
       }
       label.append(select);
-      const commit=button(t('ui.dialog.confirm'),()=>host.chooseDefense(offer.ticket,select.value),'primary');
+      const commit=button(t('ui.dialog.confirm'),()=>{
+        const candidate = offer.candidates.find(item => item.key === select.value);
+        if (!candidate || !host.chooseDefense(offer.ticket,select.value).ok) return;
+        if (candidate.kind === 'move') {
+          const {x,y} = candidate.target;
+          ironDefenseMove = {actorId:candidate.actorId, hex:`${String.fromCharCode(65+x)}-${String(y+1).padStart(2,'0')}`};
+        }
+        if (screen === 'iron-dust-defense') renderScreen(false);
+        else if (screen === 'play') GoblinUIV2.refresh();
+      },'primary');
       commit.id='v2-iron-dust-defense-commit';
       const round=host.defenseRoundView()?.latestComplete;
       const controls=[commit,restart,leave];
       if (round) controls.push(button(t('v2.round.latest'),()=>openRoundAnalysis(round)));
+      if (ironDefenseMove) {
+        const status = paragraph(ironDefenseMoveText(), 'v2-status');
+        status.setAttribute('role','status');
+        panel.append(status);
+      }
       panel.append(label,actions(...controls));
     }
     function updateEditor(draft, cell = editorCell) {
@@ -1628,7 +1687,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       show(matchMedia('(max-width: 900px)').matches ? 'catalog-detail' : 'catalog');
     }
-    globalThis.GoblinV2Flow = Object.freeze({ openLibrary, commitFullMap, hasStarted: () => started });
+    globalThis.GoblinV2Flow = Object.freeze({ openLibrary, commitFullMap, hasStarted: () => started,
+      ironDefenseMoveStatus: () => screen === 'play' && IronDustBrowserV2.attackerActive ? ironDefenseMoveText() : '' });
     function renderScreen(focus = true) {
       optionsScrollObserver?.disconnect();
       optionsScrollObserver = null;

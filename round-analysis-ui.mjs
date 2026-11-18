@@ -1,3 +1,5 @@
+const resultLabel = code => ({NE:'v2.feedback.noEffect',D:'v2.feedback.hit',X:'v2.feedback.heavyHit'})[code] ?? code;
+
 // Presentation of an already redacted historical projection. The caller owns
 // session binding, round boundaries and permission to supply a perspective.
 export function renderRoundAnalysis(panel, round, {t, locale, previewMap, back, selected = 0, onSelect = () => {}}) {
@@ -34,7 +36,7 @@ export function renderRoundAnalysis(panel, round, {t, locale, previewMap, back, 
     const item = element('li');
     const text = [decision.actor && t(decision.actor.labelKey), t(decision.descriptionKey),
       decision.target && t(decision.target.labelKey), decision.targetCell && hexLabel(decision.targetCell),
-      decision.resultKey && t(decision.resultKey)].filter(Boolean);
+      decision.resultKey && t(resultLabel(decision.resultKey))].filter(Boolean);
     const choice = button(`${index + 1}. ${text.join(' · ')}`, () => show(index));
     item.append(choice);
     list.append(item);
@@ -59,7 +61,7 @@ export function renderRoundAnalysis(panel, round, {t, locale, previewMap, back, 
     if (decision.hits?.length) {
       const hits = element('ul');
       for (const hit of decision.hits)
-        hits.append(element('li','', [t(hit.target.labelKey),t(hit.resultKey)].join(' · ')));
+        hits.append(element('li','', [t(hit.target.labelKey),t(resultLabel(hit.resultKey))].join(' · ')));
       reason.append(hits);
     }
     if (decision.options?.length) {

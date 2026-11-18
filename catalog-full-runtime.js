@@ -554,20 +554,52 @@
   const logs=ensure().logs;
   const scoped=onlyKnown?logs.filter(visible):logs;
   const rows=all?scoped:scoped.slice(-4);
-  return formatLogEntries(rows,visible);
+  return formatLogEntries(rows,visible,team);
  }
- function formatLogEntries(rows,visible){
+ // UI effects stay out of the command history and replay snapshots.
+ const actionFeedback = new WeakMap();
+ function combatEffect(target,outcome){
+  if(!target||!outcome||outcome.result==='NE')return 'v2.feedback.noEffect';
+  if(unitDead(target))return 'v2.feedback.destroyed';
+  if(outcome.system)return outcome.loss>0?'v2.feedback.systemLoss':'v2.feedback.noEffect';
+  return target.disabled?'v2.ui.disabled':'v2.feedback.damaged';
+ }
+ function formatLogEntries(rows,visible,team=null){
+  const text=(key,params)=>root.GoblinLanguage?.t(key,params)??key;
   return rows.toReversed().map(entry=>{
    const disclosed=visible(entry),key=disclosed?entry.key:'v2.full.stealth.contactLost';
-   let message=root.GoblinLanguage?.t(key,disclosed?entry.params:{})??key;
+   let message=text(key,disclosed?entry.params:{});
    if(disclosed&&entry.action){
     message+=` · ${entry.subjects.map(id=>GoblinCatalogRuntime.name(units.find(u=>u.id===id))).join(' → ')}`;
-    if(entry.action.result)message+=` · ${entry.action.result}${entry.action.ratio?' ('+entry.action.ratio+')':''}`;
+    const feedback=actionFeedback.get(entry);
+    const effect=feedback?.effect??{NE:'v2.feedback.noEffect',D:'v2.feedback.hit',X:'v2.feedback.heavyHit'}[entry.action.result];
+    if(effect)message+=` · ${text(effect)}`;
+    if(feedback?.hits){
+     const hits=feedback.hits.filter(hit=>team===null||(hit.viewers.includes(team)&&known(hit.id,team)));
+     const effects=hits.map(hit=>`${GoblinCatalogRuntime.name(units.find(u=>u.id===hit.id))}: ${text(hit.effect)}`);
+     message+=` · ${effects.join(' · ')||text('v2.feedback.noVisibleEffect')}`;
+    }
    }
    return {time:'',source:'COMMAND',message};
   });
  }
- function recordAction(actor,command,result){if(!active())return;const key=result.kind==='hex-fire'?'v2.full.missile.resolved':result.kind==='collision'||result.collided?'v2.full.stealth.collision':result.kind==='engineering'?`v2.engineer.${command.job}`:result.kind==='fire'?'v2.ui.fire':result.kind==='ram'?'v2.ui.ram':['CatalogLoad','Embark'].includes(command.type)?'v2.ui.embark':command.type==='Unload'?'v2.ui.unload':command.type==='CatalogDeploy'?'v2.ui.catalog.deployDrone':'v2.ui.move';log(key,{},result.kind==='fire'?[actor.id,command.target.runtimeUnitId]:[actor.id]);const row=ensure().logs.at(-1);row.action={result:result.outcome?.result??null,ratio:result.outcome?.ratio??null}}
+ function recordAction(actor,command,result){if(!active())return;const key=result.kind==='hex-fire'?'v2.full.missile.resolved':result.kind==='collision'||result.collided?'v2.full.stealth.collision':result.kind==='engineering'?`v2.engineer.${command.job}`:result.kind==='fire'?'v2.ui.fire':result.kind==='ram'?'v2.ui.ram':['CatalogLoad','Embark'].includes(command.type)?'v2.ui.embark':command.type==='Unload'?'v2.ui.unload':command.type==='CatalogDeploy'?'v2.ui.catalog.deployDrone':'v2.ui.move';log(key,{},result.kind==='fire'?[actor.id,command.target.runtimeUnitId]:[actor.id]);
+  const row=ensure().logs.at(-1);
+  row.action={result:result.outcome?.result??null,ratio:result.outcome?.ratio??null};
+  if(result.kind==='fire'){
+   const target=units.find(u=>u.id===command.target.runtimeUnitId);
+   actionFeedback.set(row,{effect:combatEffect(target,result.outcome)});
+  }
+  if(result.kind==='hex-fire'){
+   const hits=result.outcomes.flatMap(hit=>{
+    const target=units.find(u=>u.id===hit.unitId);
+    const effect=combatEffect(target,hit.outcome);
+    if(effect==='v2.feedback.noEffect')return [];
+    return [{id:hit.unitId,effect,viewers:controllerSides.filter(side=>known(hit.unitId,side))}];
+   });
+   actionFeedback.set(row,{hits});
+  }
+ }
  const roundEntity=u=>({id:u.id,labelKey:`library.unit.${u.catalogAssetId}.name`,cell:{x:u.x,y:u.y}});
  function recordRoundSelection(side,kind,actor){
   if(!roundSelection)return;
@@ -827,7 +859,14 @@
   if(full.deadlineEvent && value.deadlineRemoved !== !coreAlive())throw Error('FULL_RESTORE_DEADLINE');
   const config=full.waves;
   if(config.waves.length){GoblinCatalogWaves.validate(value.waves,config);if(JSON.stringify(value.ownTurns)!==JSON.stringify(value.waves.ownTurns))throw Error('FULL_RESTORE_TURNS')}else if(value.waves!==null)throw Error('FULL_RESTORE_WAVES');
+  const previousLogs=state?.sessionId===value.sessionId?state.logs:null;
   state=copy(value);
+  for(const [index,row] of state.logs.entries()){
+   const previous=previousLogs?.[index];
+   if(!previous||JSON.stringify(previous)!==JSON.stringify(row))break;
+   const feedback=actionFeedback.get(previous);
+   if(feedback)actionFeedback.set(row,feedback);
+  }
  }
  root.GoblinCatalogFullRuntime=Object.freeze({active,known,roster,
   missionRandom:()=>controlOwner()?.journal?.draw(),

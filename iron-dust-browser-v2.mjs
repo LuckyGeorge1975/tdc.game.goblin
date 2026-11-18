@@ -333,6 +333,7 @@ if (typeof document !== 'undefined') {
     const t = key => globalThis.GoblinLanguage?.t(key) ?? key;
     endButton.textContent = session.projection.mode === 'ended' ? t('v2.ended') :
       session.projection.mode === 'enemy' ? t('v2.enemy') :
+      attackerOwner ? t('v2.feedback.autoAttack') :
         session.projection.state.phase === 'gev' ? t('v2.endTurn') : t('v2.next');
     const undo = document.querySelector('#undo-command');
     undo.disabled = true;

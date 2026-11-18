@@ -13,8 +13,10 @@ test('empty legal hex shot consumes one ammo/action with zero RNG and BACK resto
  const g=await scene(),actor=read(g,"units.find(u=>u.catalogId==='U13')");g.run("setTurnPhase('fire')");
  const command={type:'CatalogHexFire',actorId:actor.id,x:0,y:0};assert.equal(read(g,`query(${JSON.stringify(command)})`).ok,true);
  const before=read(g,'GoblinCatalogFullRuntime.snapshot()'),rolls=g.rolls();assert.equal(execute(g,command).ok,true);assert.equal(g.rolls(),rolls);
+ assert.match(read(g,'GoblinCatalogFullRuntime.logEntries()[0].message'), /v2\.feedback\.noVisibleEffect/);
  assert.equal(read(g,`units.find(u=>u.id===${JSON.stringify(actor.id)}).ammunition`),0);
  g.run('undoPhaseCommand()');assert.deepEqual(read(g,'GoblinCatalogFullRuntime.snapshot()'),before);assert.equal(read(g,`units.find(u=>u.id===${JSON.stringify(actor.id)}).ammunition`),1);
+ assert.equal(read(g,'GoblinCatalogFullRuntime.logEntries().length'),before.logs.length);
 });
 test('committed movement uses known occupancy and stops before first hidden collision; BACK restores reveal and movement',async()=>{
  const g=await scene();g.run("units.filter(u=>u.team==='player'&&u.id!=='u3-player-ninja').forEach(u=>u.disabled=true);const actor=units.find(u=>u.id==='u3-player-ninja'),hidden=units.find(u=>u.catalogId==='U21'&&u.team==='enemy');actor.x=1;actor.y=0;hidden.x=4;hidden.y=0;GoblinCatalogFullRuntime.refresh()");

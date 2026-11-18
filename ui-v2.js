@@ -1598,14 +1598,16 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const terminal = at('#v2-terminal'); terminal.hidden = !state.gameOver;
       terminal.classList.toggle('v2-failed', state.gameOver && !state.objective.outcome);
       terminal.textContent = state.gameOver ? t(state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '';
+      const automaticAttack = IronDustBrowserV2.attackerActive && state.phase === 'player' && !state.gameOver;
       const phaseButton = at('#v2-phase-action');
       const next = {movement:'dialog.phaseAdvance.confirm.toFire',
         fire:'dialog.phaseAdvance.confirm.toGev',gev:'dialog.phaseAdvance.confirm.toEnemy'}[state.turnPhase];
-      phaseButton.textContent = state.phase === 'enemy' ? t('v2.enemy') : state.gameOver ? t('v2.ended') :
+      phaseButton.textContent = automaticAttack ? t('v2.feedback.autoAttack') :
+        state.phase === 'enemy' ? t('v2.enemy') : state.gameOver ? t('v2.ended') :
         `${t(next)} · ${t('dialog.phaseAdvance.pending',{pendingCount:state.ready})}`;
       phaseButton.setAttribute('aria-label',phaseButton.textContent);
       splitPhaseLabel(phaseButton);
-      phaseButton.disabled = state.phase !== 'player' || !IronDustBrowserV2.query({type:'EndPhase',playerId:'player'}).available ||
+      phaseButton.disabled = automaticAttack || state.gameOver || state.phase !== 'player' || !IronDustBrowserV2.query({type:'EndPhase',playerId:'player'}).available ||
         GameDialogs.isOpen() || view.busy;
       at('#v2-pause').disabled = GameDialogs.isOpen() || (view.busy && !IronDustBrowserV2.attackerActive);
       const coreUndo = at('#v2-undo');
@@ -1613,7 +1615,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       backLabel(coreUndo, 0);
       renderTurnControls(state);
       at('#v2-units-label').textContent = t('ui.hud.units');
-      at('#v2-message').textContent = view.message;
+      at('#v2-message').textContent = globalThis.GoblinV2Flow?.ironDefenseMoveStatus() || view.message;
       renderRoster(state, unit => [strengthText(unit), unit.secondMoved ? t('v2.ui.secondMoved') :
         unit.fired ? t('v2.ui.fired') : unit.moved ? t('v2.ui.moved') : '']);
       renderFieldInfo(state, actor, cell => state.cells.find(item => item.x === cell.x && item.y === cell.y)?.type);
