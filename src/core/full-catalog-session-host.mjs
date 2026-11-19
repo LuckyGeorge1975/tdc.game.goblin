@@ -1,6 +1,6 @@
-import {createFullCatalogAiAdapter,createOwnedFullCatalogAiAdapter,sameFullCatalogActionSlot} from './full-catalog-ai-adapter.mjs?v=4';
+import {createFullCatalogAiAdapter,createOwnedFullCatalogAiAdapter,sameFullCatalogActionSlot} from './full-catalog-ai-adapter.mjs?v=5';
 import {createAiSessionHost} from './ai-session-host.mjs?v=3';
-import {createPlayerController} from './game-manager.mjs?v=1';
+import {createPlayerController} from './game-manager.mjs?v=2';
 
 export function createFullCatalogSessionHost({host, read, readGeneration, select, selectEnemy, policy, onCommit, spectator = false}) {
   const adapter = createFullCatalogAiAdapter(host, readGeneration);
@@ -53,7 +53,7 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
   async function advance(){
     if(pending)return {ok:false,code:'AI_HOST_UNAVAILABLE'};
     const state=read();
-    const choose=state?.policyId?port.qualifiedSelector():select?.[state?.side];
+    const choose=state?.policyId?port.qualifiedSelector(batch=>adapter.captureStrongDecision(batch)):select?.[state?.side];
     if(!state||typeof choose!=='function')return {ok:false,code:'AI_HOST_WRONG_SIDE'};
     const ticket=port.ticket('ai');
     if(!ticket)return {ok:false,code:'AI_FULL_NO_NEW_ACTION'};

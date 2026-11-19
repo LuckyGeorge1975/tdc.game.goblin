@@ -1609,7 +1609,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       splitPhaseLabel(phaseButton);
       phaseButton.disabled = automaticAttack || state.gameOver || state.phase !== 'player' || !IronDustBrowserV2.query({type:'EndPhase',playerId:'player'}).available ||
         GameDialogs.isOpen() || view.busy;
-      at('#v2-pause').disabled = GameDialogs.isOpen() || (view.busy && !IronDustBrowserV2.attackerActive);
+      at('#v2-pause').disabled = GameDialogs.isOpen() ||
+        (view.busy && !IronDustBrowserV2.attackerActive && !IronDustBrowserV2.computing);
       const coreUndo = at('#v2-undo');
       coreUndo.hidden = false; coreUndo.disabled = true;
       backLabel(coreUndo, 0);

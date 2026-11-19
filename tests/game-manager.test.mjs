@@ -28,8 +28,8 @@ test('AI permission and minimum govern only AI, qualification belongs to each se
   const minimum=createGameManager({...level,minimumDifficulty:'medium'},capabilities);
   assert.deepEqual(minimum.assign({player:null,enemy:null}),
     [{seatId:'player',controller:'human'},{seatId:'enemy',controller:'human'}]);
-  assert.deepEqual(minimum.seats.map(seat=>seat.ai.map(option=>option.id)),[[],['enemy-strong']]);
-  assert.throws(()=>minimum.assign({player:'trained',enemy:null}),{code:'AI_BELOW_MINIMUM'});
+  assert.deepEqual(minimum.seats.map(seat=>seat.ai.map(option=>option.id)),[['trained'],['enemy-strong']]);
+  assert.equal(minimum.assign({player:'trained',enemy:null})[0].policyId,'trained');
   assert.throws(()=>minimum.assign({player:null,enemy:'enemy-weak'}),{code:'AI_BELOW_MINIMUM'});
   assert.throws(()=>minimum.assign({player:null,enemy:'trained'}),{code:'AI_SEAT_NOT_QUALIFIED'});
   const learning=createGameManager({...level,aiAllowed:false},capabilities);

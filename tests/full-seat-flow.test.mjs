@@ -49,7 +49,7 @@ test('FULL start distinguishes standard play from explicit seats and limits offe
   const standard = context.chooseFullSeats(config);
   dialogs[0].returnValue = 'standard';
   dialogs[0].close();
-  assert.equal(await standard, null);
+  assert.equal(await standard, false);
   const configured = context.chooseFullSeats(config);
   const dialog = dialogs[1];
   const [player,enemy] = dialog.children[0].children.filter(node=>node.tag==='label');
@@ -59,7 +59,7 @@ test('FULL start distinguishes standard play from explicit seats and limits offe
   dialog.close();
   assert.equal((await configured).selection.player, null);
   const forged = context.chooseFullSeats(config);
-  dialogs[2].children[0].children[2].children[0].value = 'test';
+  dialogs[2].children[0].children.filter(node=>node.tag==='label')[1].children[0].value = 'test';
   dialogs[2].returnValue = 'configured';
   dialogs[2].close();
   assert.equal(await forged, false);
@@ -129,7 +129,7 @@ test('owned presentation reads only the assigned channel, including after revoca
   assert.equal(context.project(), null);
 });
 
-test('standard setup keeps the map and commits through the admitted human seat',async()=>{
+test('an internal map binding commits through the admitted human seat',async()=>{
   const {context,dialogs,screens}=scene();
   const config={ruleProfileId:'FULL_CATALOG_v1'};
   const manager=createGameManager({maxSeats:2,seatIds:['player','enemy']},{
@@ -159,11 +159,7 @@ test('standard setup keeps the map and commits through the admitted human seat',
   context.legacySession={sessionId:4};
   context.screen='play';
   context.pauseActive=false;
-  const start=context.chooseFullSeats(config);
-  const dialog=dialogs[0];
-  dialog.returnValue='standard';
-  dialog.close();
-  const setup=await start;
+  const setup={owner,config,selection:{player:null,enemy:'full-native-standard-defender'},mapPresentation:true};
   assert.equal(setup.mapPresentation,true);
   context.bindFullSeats(setup,control=>{
     assert.equal(control.mapPresentation,true);

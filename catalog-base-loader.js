@@ -4,6 +4,7 @@
   const response=await fetch('assets/unit-art/rules/unit-profiles.catalog-approved.v1.json');
   if(!response.ok)throw new Error(`HTTP ${response.status}`);
   const configs=await GoblinCatalogBase.initialize(await response.json());
+  if (['v2',null].includes(new URLSearchParams(globalThis.location?.search||'').get('ui'))) return;
   for(const [id,config] of Object.entries(configs))ScenarioRuleProfiles.validate(id,config);
   for(const [id,config] of Object.entries(configs)){
    scenarioCatalog[id]=config;const option=document.createElement('option');option.value=id;option.textContent=config.title;option.dataset.titleKey=`mission.${id}.title`;$('#scenario-select').appendChild(option);

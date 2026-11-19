@@ -31,6 +31,13 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     'showcase-specialists':Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:product,unitDataProfile:atlasData}),
     'los-supercover-showcase':Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:'FIELD_TEST_SUPERCOVER_v1',unitDataProfile:atlasData,losMode:'strict-supercover'})
   });
+  const fullMissions = new Map();
+  function registerFullMission(id,config) {
+    if (!Object.hasOwn(entries,id) || trainingIds.includes(id) || fullIds.includes(id) ||
+        !globalThis.GoblinEditorDraft?.isPrepared(config) || config.ruleProfileId!=='FULL_CATALOG_v1')
+      reject('SCENARIO_PROFILE_MISMATCH','Invalid FULL mission migration');
+    fullMissions.set(id,config);
+  }
   // Historical stats and traits stay in profile-owned records. Factories run only during resolution.
   const legacyUnitProfiles={
     "goblin-siegebreaker":{"name":"GOBLIN SIEGEBREAKER","type":"HEAVY ASSAULT","hp":5,"maxHp":5,"defense":5,"range":2,"move":3,"damage":3,"icon":"G","ogreSystems":()=>GoblinSystems.createMarkIII()},
@@ -117,6 +124,8 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   }
   function validate(id,config){
     aiAllowed(config);
+    if (fullMissions.has(id) && JSON.stringify(fullMissions.get(id))===JSON.stringify(config)) return {scenarioVersion:config.scenarioVersion,
+      objective:config.objective,ruleProfileId:config.ruleProfileId};
     if(trainingIds.includes(id)){if(!globalThis.GoblinTrainingModel)reject('SCENARIO_PROFILE_MISMATCH','Training contract unavailable');GoblinTrainingModel.validate(id,config);return entries[id]}
     if(fullIds.includes(id)){if(!globalThis.GoblinCatalogFullModel)reject('SCENARIO_PROFILE_MISMATCH','Full contract unavailable');GoblinCatalogFullModel.validate(id,config);}
     if(['catalog-siege','catalog-specialists'].includes(id)){if(!globalThis.GoblinCatalogSpecialistsModel)reject('SCENARIO_PROFILE_MISMATCH','Specialists contract unavailable');GoblinCatalogSpecialistsModel.validate(id,config);}
@@ -145,6 +154,7 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   };
   let nextSessionId=1;
   const draftSessions = new WeakSet();
+  const migratedSessions = new WeakSet();
   function beginDraftSession(config){
     const editor=globalThis.GoblinEditorDraft;
     if(!editor?.isPrepared(config))reject('SCENARIO_PROFILE_MISMATCH','Editor draft was not validated');
@@ -154,7 +164,10 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
   }
   function beginSession(id,config){
     validate(id,config);
-    return buildSession(id,config,false);
+    const migrated=fullMissions.has(id)&&config.ruleProfileId==='FULL_CATALOG_v1';
+    const session=buildSession(id,config,migrated);
+    if(migrated)migratedSessions.add(session);
+    return session;
   }
   function buildSession(id,config,draft){
     aiAllowed(config);
@@ -192,7 +205,8 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         terrainTypes:source.terrainTypes??[],units:source.units},config:source});
     return session;
   }
-  return {schemaVersion:1,product,entries,legacyLevel,validate,beginSession,beginDraftSession,aiAllowed,requireAi,checkEnemyControllers,
+  return {schemaVersion:1,product,entries,legacyLevel,validate,beginSession,beginDraftSession,registerFullMission,aiAllowed,requireAi,checkEnemyControllers,
     fullDifficulties,fullMinimumDifficulty,
-    isDraftSession:session=>draftSessions.has(session)};
+    isDraftSession:session=>draftSessions.has(session),isMigratedSession:session=>migratedSessions.has(session),
+    migrationDraft:id=>fullMissions.has(id)?globalThis.GoblinEditorDraft.exportPrepared(fullMissions.get(id)):null};
 })());

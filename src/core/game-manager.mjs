@@ -3,7 +3,7 @@ const validId = id => typeof id==='string' && /^[a-z][a-z0-9-]*$/.test(id);
 const reject = code => {throw Object.assign(Error(code),{code});};
 
 function meetsMinimum(difficulty,minimum) {
-  return minimum===null || difficulties.indexOf(difficulty)>=difficulties.indexOf(minimum);
+  return minimum===null || difficulty===null || difficulties.indexOf(difficulty)>=difficulties.indexOf(minimum);
 }
 
 // The level supplies the available seats. The profile supplies the native

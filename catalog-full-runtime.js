@@ -1,7 +1,8 @@
 // One authoritative world adapter; the pure visibility reducer owns disclosure rules.
 (function(root){
  const active=()=>!root.IronDustBrowserV2?.active&&legacySession?.ruleProfileId===root.GoblinCatalogFullModel?.profile&&
-  (root.GoblinCatalogFullModel.has(legacySession.scenarioId)||ScenarioRuleProfiles.isDraftSession?.(legacySession));
+  (root.GoblinCatalogFullModel.has(legacySession.scenarioId)||ScenarioRuleProfiles.isDraftSession?.(legacySession)||
+   ScenarioRuleProfiles.isMigratedSession?.(legacySession));
  const copy=v=>JSON.parse(JSON.stringify(v));
  const registry=()=>legacySession.effectiveRules.catalog.registry;
  let state=null;
@@ -188,6 +189,7 @@
  const nativePlayerGateway=Object.freeze({query:nativePlayerQuery,dispatch:nativePlayerDispatch});
  function registerQualifiedController({side,id,difficulty,select}){
   const validDifficulty=id==='full-attack-2a'?side==='player'&&difficulty===null:
+   id==='full-defender-control-trial'?side==='enemy'&&difficulty===null:
    ScenarioRuleProfiles.fullDifficulties.includes(difficulty);
   if(!controllerSides.includes(side)||typeof id!=='string'||!id||
       !validDifficulty||typeof select!=='function'||
@@ -195,7 +197,7 @@
   qualifiedControllers[side].set(id,Object.freeze({id,difficulty,select}));
  }
  function meetsMinimum(difficulty,minimum){
-  if(minimum===null)return true;
+  if(minimum===null||difficulty===null)return true;
   const order=ScenarioRuleProfiles.fullDifficulties;
   return order.indexOf(difficulty)>=order.indexOf(minimum);
  }
@@ -365,6 +367,7 @@
    archive(){return gameOver&&initial?copy({version:'goblin-training-archive-v1',
     profile:session.ruleProfileId,seats,outcome:terminalOutcome()?'player':'enemy',
     replay:{version:'full-native-journal-v1',seed,level,initial,entries}}):null;},
+   prefix(){return initial?copy({version:'full-native-journal-v1',seed,level,initial,entries,digest:digest()}):null;},
    draws:()=>draws
   };
  }
@@ -527,10 +530,17 @@
    },
    trainingArchive:()=>attached()&&!allowsSpectator?journal?.archive()??null:null,
    canExportTraining:()=>attached()&&!allowsSpectator&&gameOver&&!!journal,
-   qualifiedSelector(){
+   simulationSnapshot(token){
+    if(!valid(token,'ai')||!journal)return null;
+    return copy({config:session.config,replay:journal.prefix(),
+      draft:journal.prefix()?.level.draft??ScenarioRuleProfiles.migrationDraft?.(session.scenarioId)??null,
+      turn,phase,turnPhase,gameOver,side:phase});
+   },
+   qualifiedSelector(capture){
     const policy=authorised('ai')?policies[phase]:null;
     if(!policy)return null;
-    return policy.difficulty===null?(batch,report)=>policy.select(batch,port,report):policy.select;
+    return policy.difficulty===null||policy.difficulty==='strong'
+     ?(batch,report)=>policy.select(batch,port,report,capture):policy.select;
    },
    spectator:()=>allowsSpectator&&attached()?spectator:null,
    pause(){if(attached()){paused=true;invalidate();}},

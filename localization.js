@@ -819,6 +819,27 @@
     'v2.full.standard': {de:'Standardpartie',en:'Standard match',es:'Partida estándar',fr:'Partie standard'},
     'v2.full.standardDefender': {de:'Standardverteidiger',en:'Standard defender',es:'Defensor estándar',fr:'Défenseur standard'},
     'v2.full.trained': {de:'Trainiert',en:'Trained',es:'Entrenada',fr:'Entraînée'},
+    'v2.full.trainedExperimental': {de:'Trainiert (experimentell)',en:'Trained (experimental)',es:'Entrenada (experimental)',fr:'Entraînée (expérimental)'},
+    'v2.full.rule.weak': {de:'Regel Gering',en:'Rule Low',es:'Reglas Bajo',fr:'Règles Faible'},
+    'v2.full.rule.medium': {de:'Regel Mittel',en:'Rule Medium',es:'Reglas Medio',fr:'Règles Moyen'},
+    'v2.full.rule.strong': {de:'Regel Stark',en:'Rule Strong',es:'Reglas Fuerte',fr:'Règles Fort'},
+    'v2.full.computing': {de:'KI berechnet den Zug …',en:'AI is calculating the turn …',es:'La IA está calculando el turno …',fr:'L’IA calcule le tour …'},
+    'v2.full.strongTiming': {de:'Stark simuliert alle verfügbaren Aktionen samt vollständiger Gegenantwort. Die Berechnung kann mehrere Sekunden dauern. Pause und Verlassen bleiben erreichbar.',en:'Strong simulates every available action and a complete reply. Calculation can take several seconds. Pause and leave remain available.',es:'Fuerte simula todas las acciones disponibles y una respuesta completa. El cálculo puede tardar varios segundos. Se puede pausar o salir.',fr:'Fort simule toutes les actions disponibles et une réponse complète. Le calcul peut durer plusieurs secondes. La pause et la sortie restent accessibles.'},
+    'v2.full.ironTrainedDefenderNote': {
+      de:'Das trainierte Netz bewertet Feuerziele und Plattformkomponenten. Bewegung folgt der mittleren Regelstrategie. Im Vergleich über zwölf Seeds erzielte es bisher weniger Siege und mehr offene Partien als die Regelreferenz.',
+      en:'The trained network scores fire targets and platform components. Movement follows the medium rule strategy. Across twelve seeds it has so far achieved fewer wins and more unfinished matches than the rule reference.',
+      es:'La red entrenada evalúa objetivos de fuego y componentes de plataformas. El movimiento sigue la estrategia de reglas media. En doce semillas obtuvo menos victorias y más partidas sin resolver que la referencia de reglas.',
+      fr:'Le réseau entraîné évalue les cibles de tir et les composants des plateformes. Le déplacement suit la stratégie de règles moyenne. Sur douze graines, il a obtenu moins de victoires et davantage de parties inachevées que la référence.'
+    },
+    'v2.full.migratedObjective': {de:'Vollkatalogregeln. Kommandokern und Eskorte ausschalten, mindestens eine eigene Einheit erhalten.',en:'Full catalogue rules. Eliminate the Command Core and its escort, and preserve at least one friendly unit.',es:'Reglas del catálogo completo. Elimina el núcleo de mando y su escolta, y conserva al menos una unidad propia.',fr:'Règles du catalogue complet. Éliminez le noyau de commandement et son escorte, et conservez au moins une unité alliée.'},
+    'v2.full.migratedDefeat': {de:'Die Angriffsseite verliert, wenn alle ihre Einheiten ausgeschaltet sind.',en:'The attacking side loses when all its units are eliminated.',es:'El bando atacante pierde cuando todas sus unidades quedan eliminadas.',fr:'Le camp attaquant perd lorsque toutes ses unités sont éliminées.'},
+    'v2.full.trainedUnavailable': {de:'Das trainierte Modell für diesen Sitz konnte nicht geladen oder geprüft werden.',en:'The trained model for this seat could not be loaded or verified.',es:'No se pudo cargar o verificar el modelo entrenado para este puesto.',fr:'Le modèle entraîné pour ce siège n’a pas pu être chargé ou vérifié.'},
+    'v2.full.trainedDefenderNote': {
+      de:'Das Kontrollmodell wurde mit Missionsausgängen trainiert und wählt Feuerziele innerhalb des Regelzugs. Bewegung und übrige Aktionen folgen den Regeln. Die Spielstärke ist noch nicht nachgewiesen.',
+      en:'The control model was trained on mission outcomes and selects fire targets within the rule-based turn. Movement and other actions follow the rules. Playing strength has yet to be demonstrated.',
+      es:'El modelo de control se entrenó con resultados de misión y elige objetivos de fuego dentro del turno basado en reglas. El movimiento y las demás acciones siguen las reglas. Su fuerza de juego aún no se ha demostrado.',
+      fr:'Le modèle de contrôle a été entraîné sur les issues de mission et choisit les cibles de tir dans le tour régi par les règles. Le déplacement et les autres actions suivent les règles. Son niveau de jeu reste à démontrer.'
+    },
     'v2.full.minimumUnavailable': {de:'Keine geprüfte KI ab Stufe {minimum} verfügbar.',en:'No qualified AI at {minimum} or above.',es:'No hay una IA validada de nivel {minimum} o superior.',fr:'Aucune IA validée au niveau {minimum} ou supérieur.'},
     'v2.full.aiForbidden': {de:'Diese Mission erlaubt keine KI.',en:'This mission does not allow AI.',es:'Esta misión no permite usar IA.',fr:'Cette mission n’autorise pas l’IA.'},
     'v2.full.aiUnavailable': {de:'Für diese Seite ist keine KI freigegeben.',en:'No AI is approved for this side.',es:'No hay una IA aprobada para este bando.',fr:'Aucune IA n’est approuvée pour ce camp.'},

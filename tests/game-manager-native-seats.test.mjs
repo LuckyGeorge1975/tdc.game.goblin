@@ -8,6 +8,7 @@ import {createFullCatalogAiHost} from '../src/core/full-catalog-ai-adapter.mjs';
 import {createOwnedFullCatalogSessionHost} from '../src/core/full-catalog-session-host.mjs';
 import {selectWeakFullCatalog} from '../src/core/full-catalog-difficulty.mjs';
 import {prepareFullAttack2a,FULL_ATTACK_2A_ENGINE,FULL_ATTACK_2A_ID} from '../src/core/full-attack-2a.mjs';
+import {prepareDefenderTrial} from '../src/core/full-defender-trial.mjs';
 import {createIronDustBrowserSession,createIronDustDecisionHost,dispatchIronDustBrowserAction}
   from '../iron-dust-browser-v2.mjs';
 import {createIronDustProfile,IRON_DUST_ENEMY_DIFFICULTIES} from '../src/core/iron-dust-executable-profile.mjs';
@@ -21,7 +22,7 @@ const readJson=file=>JSON.parse(readFileSync(new URL('../'+file,import.meta.url)
 const modelBytes=Buffer.from(readJson('assets/ai/full-attack-2a.json').base64,'base64');
 const endPhase={type:'EndPhase'};
 
-async function atlasMatch(selection,minimumDifficulty) {
+async function atlasMatch(selection,minimumDifficulty,trainedDefender=false) {
   const game=fullShell(7);
   const data=readJson('assets/unit-art/levels/catalog-full-levels.v3.json');
   if(minimumDifficulty) data.levels.find(level=>level.id===atlas).minimumDifficulty=minimumDifficulty;
@@ -44,6 +45,16 @@ async function atlasMatch(selection,minimumDifficulty) {
     plans.push({side:'player',phase:batch.phase});
     return trained(batch,port,report);
   }});
+  if (trainedDefender) {
+    const id='full-defender-control-trial';
+    const model=readFileSync(new URL('../assets/ai/'+id+'.json',import.meta.url));
+    const select=await prepareDefenderTrial(id,model);
+    full.registerQualifiedController({side:'enemy',id,difficulty:null,select(batch,_port,report){
+      assert.equal(batch.view.side,'enemy');
+      plans.push({side:'enemy',phase:batch.phase});
+      return select(batch,report);
+    }});
+  }
   const config=game.run(`scenarioCatalog['${atlas}']`);
   const manager=createFullGameManager(config,full);
   assert.equal(manager.maxSeats,2);
@@ -82,11 +93,11 @@ async function advanceSide({port,host},side) {
   assert.notEqual(port.state().side,side,'native controller did not reach the opposing seat');
 }
 
-test('Atlas native human/human keeps both seats with an unmet AI minimum and revokes foreign views',async()=>{
+test('Atlas native human/human keeps both seats independently of the AI minimum and revokes foreign views',async()=>{
   const match=await atlasMatch({player:null,enemy:null},'strong');
   const {manager,port,host,plans,player}=match;
   assert.equal(manager.maxSeats,2);
-  assert.deepEqual(manager.seats.map(seat=>seat.ai.length),[0,0]);
+  assert.deepEqual(manager.seats.map(seat=>seat.ai.length),[1,0]);
   take(match,'player');
   const old=port.open('human').permit, openingRng=match.game.rng();
   assert.equal(commitFullHumanCommand(port,old,{side:'enemy'},endPhase,player.dispatch).code,'FULL_CONTROL_STALE');
@@ -98,6 +109,23 @@ test('Atlas native human/human keeps both seats with an unmet AI minimum and rev
   assert.equal(humanCommit(match).ok,true);
   assert.equal((await host.advance()).code,'AI_HOST_WRONG_SIDE');
   assert.deepEqual(plans,[]);
+});
+
+test('Atlas trained defender meets the selection minimum and plans only after human handoff',async()=>{
+  const match=await atlasMatch({player:null,enemy:'full-defender-control-trial'},'strong',true);
+  assert.deepEqual(match.manager.seats.map(seat=>seat.ai.map(policy=>policy.id)),
+    [[FULL_ATTACK_2A_ID],['full-defender-control-trial']]);
+  take(match,'player');
+  assert.equal((await match.host.advance()).code,'AI_HOST_WRONG_SIDE');
+  assert.deepEqual(match.plans,[]);
+  for(let phase=0;phase<3;phase++) assert.equal(humanCommit(match,endPhase).ok,true);
+  await advanceSide(match,'enemy');
+  assert.ok(match.plans.length>0);
+  assert.ok(match.plans.every(plan=>plan.side==='enemy'));
+  take(match,'player');
+  const previous=match.plans.length;
+  assert.equal((await match.host.advance()).code,'AI_HOST_WRONG_SIDE');
+  assert.equal(match.plans.length,previous);
 });
 
 test('Atlas native human/weak and weak/human switch sides through the existing owner',async()=>{

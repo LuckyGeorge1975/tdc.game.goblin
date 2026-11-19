@@ -8,6 +8,7 @@ import {queryIronDustEnemyMoveAction, dispatchIronDustEnemyMoveAction,
 import {queryIronDustStandardFireAction, dispatchIronDustStandardFireAction,listIronDustEnemyFireChoices} from
   './iron-dust-standard-fire-action-probe.mjs?v=2';
 import {validIronDustEnemyPolicy} from './iron-dust-enemy-policy.mjs';
+import {isDeepFrozenData} from './frozen-state-validation.mjs';
 
 // A diagnostic scheduler, separate from Core product profiles and Replay.
 // Legacy performs a whole first pass before any actor's retry pass.
@@ -19,6 +20,7 @@ const controllerVersionFor = state => state?.targetPolicyVersion ===
   ? IRON_DUST_ZERO_TREADS_ENEMY_TURN_CONTROLLER_VERSION
   : IRON_DUST_ENEMY_TURN_CONTROLLER_VERSION;
 const actors = ['guard', 'raider'];
+const validatedFrozenControllers=new WeakSet();
 const clone = value => JSON.parse(JSON.stringify(value));
 const freeze = value => {
   if (value && typeof value === 'object') {
@@ -75,7 +77,18 @@ export function createIronDustEnemyTurnController(state, policy = null) {
     digest: stamp(copy, cursor, policy)});
 }
 
+export function forkIronDustEnemyControllerRng(controller, rngState) {
+  validateIronDustEnemyTurnController(controller);
+  if (!Number.isInteger(rngState) || rngState < 0 || rngState > 0xffffffff)
+    throw Error('IRON_DUST_SIMULATION_RNG_INVALID');
+  const copy=clone(controller);
+  copy.state.rng.state=rngState;
+  copy.digest=stamp(copy.state,copy.cursor,copy.enemyPolicy??null);
+  return freeze(copy);
+}
+
 export function validateIronDustEnemyTurnController(value) {
+  if(validatedFrozenControllers.has(value)) return value;
   const policy = value?.enemyPolicy ?? null;
   if (!exact(value, ['controllerVersion', 'executable', 'state', 'cursor', 'digest',
       ...Object.keys(policyField(policy))]) || !validIronDustEnemyPolicy(policy) ||
@@ -124,6 +137,7 @@ export function validateIronDustEnemyTurnController(value) {
       (value.cursor.pass === 'finish' && !actors.every(resolvedRetry)))
     throw Object.assign(new Error('ENEMY_CONTROLLER_STATE_MISMATCH'),
       {code: 'ENEMY_CONTROLLER_STATE_MISMATCH'});
+  if(isDeepFrozenData(value)) validatedFrozenControllers.add(value);
   return value;
 }
 

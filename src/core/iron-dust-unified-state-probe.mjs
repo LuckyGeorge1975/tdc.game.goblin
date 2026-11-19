@@ -1,9 +1,11 @@
 import TerrainRules from '../../terrain-rules-module.mjs';
 import {hexDistance} from './hex.mjs';
+import {isDeepFrozenData} from './frozen-state-validation.mjs';
 import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1} from '../levels/iron-dust-core-data.v1.mjs';
 import {IRON_DUST_LEGACY_LOS_PROBE_V1, hasIronDustLegacyLineOfSight} from './iron-dust-legacy-los-probe.mjs';
 
 export const IRON_DUST_UNIFIED_STATE_VERSION = 'iron-dust-unified-state-probe-v1';
+const validatedFrozenStates=new WeakSet();
 export const IRON_DUST_ZERO_TREADS_STATE_VERSION = 'iron-dust-unified-state-probe-v2';
 export const IRON_DUST_ZERO_TREADS_POLICY_VERSION = 'skip-depleted-treads-v1';
 export const IRON_DUST_NEAR_CORE_FIXTURE_VERSION = 'iron-dust-near-core-fixture-v1';
@@ -155,6 +157,7 @@ export function createIronDustZeroTreadsUnifiedStateProbe(seed) {
 }
 
 export function validateIronDustUnifiedStateProbe(state) {
+  if(validatedFrozenStates.has(state)) return state;
   const corrected = state?.capabilityVersion === IRON_DUST_ZERO_TREADS_STATE_VERSION;
   if (!state || Object.keys(state).length !== (corrected ? 21 : 20) ||
       ![IRON_DUST_UNIFIED_STATE_VERSION, IRON_DUST_ZERO_TREADS_STATE_VERSION]
@@ -184,6 +187,7 @@ export function validateIronDustUnifiedStateProbe(state) {
       new Set(state.units.filter(unit => unit.hp > 0).map(unit => `${unit.x},${unit.y}`)).size !==
         state.units.filter(unit => unit.hp > 0).length ||
       !same(state.victory, expectedVictory(state.units))) reject('UNIFIED_STATE_MISMATCH');
+  if(isDeepFrozenData(state)) validatedFrozenStates.add(state);
   return state;
 }
 

@@ -90,6 +90,15 @@ export function createOwnedFullCatalogAiAdapter(port,player) {
     }
   });
   return Object.freeze({...adapter,
+    captureStrongDecision(batch){
+      const native=captured.get(batch);
+      if(!native||port.ticket('ai')!==native.token||batch.side!==native.token.side)return null;
+      const snapshot=port.simulationSnapshot(native.token);
+      if(!snapshot)return null;
+      return {version:1,profile:'FULL_CATALOG_v1',side:batch.side,revision:batch.revision,
+        rootView:batch.view,snapshot,
+        actions:native.commands.map((action,index)=>({index,action:structuredClone(action)}))};
+    },
     open(side,scope){
       const batch=adapter.open(side,scope);
       if(batch.ok)captured.set(batch,prepared);

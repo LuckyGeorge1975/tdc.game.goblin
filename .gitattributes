@@ -8,3 +8,5 @@ tests/fixtures/artillery-product-traces.v1.json -text
 tests/fixtures/catalog-full/index.v2.json -text
 # Preserve the approved PureDirector contribution byte for byte.
 training-director.js -text whitespace=-blank-at-eol
+assets/ai/full-defender-control-trial.json -text
+assets/ai/iron-dust-defender-bpn.json -text

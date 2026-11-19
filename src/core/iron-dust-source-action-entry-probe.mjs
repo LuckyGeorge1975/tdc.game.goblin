@@ -4,9 +4,10 @@ import {createIronDustUnifiedStateProbe, createIronDustZeroTreadsUnifiedStatePro
 import {queryIronDustStandardFireAction, dispatchIronDustStandardFireAction} from
   './iron-dust-standard-fire-action-probe.mjs';
 import {createIronDustEnemyTurnController, validateIronDustEnemyTurnController,
-  queryIronDustEnemyTurnController, dispatchIronDustEnemyTurnController,
+  queryIronDustEnemyTurnController, dispatchIronDustEnemyTurnController, forkIronDustEnemyControllerRng,
   dispatchIronDustEnemyFireChoice, dispatchIronDustEnemyMoveChoice, dispatchIronDustEnemyMechanical} from
   './iron-dust-enemy-turn-controller-probe.mjs?v=3';
+import {isDeepFrozenData} from './frozen-state-validation.mjs';
 
 // The sole source-game command boundary for this inactive technical probe.
 // Older action modules remain independently importable diagnostic fixtures.
@@ -43,6 +44,7 @@ const wrap = (mode, value, version = IRON_DUST_SOURCE_ACTION_ENTRY_VERSION) => {
     executable: false, mode, payload, digest: stamp(version, mode, payload)});
 };
 const stateOf = entry => entry.mode === 'enemy' ? entry.payload.state : entry.payload;
+const validatedFrozenEntries=new WeakSet();
 
 export function createIronDustSourceActionEntry(seed) {
   const state = createIronDustUnifiedStateProbe(seed, {fixture: 'source'});
@@ -56,7 +58,17 @@ export function createIronDustZeroTreadsSourceActionEntry(seed) {
   return wrap('player', state, IRON_DUST_ZERO_TREADS_SOURCE_ACTION_ENTRY_VERSION);
 }
 
+export function forkIronDustSourceEntryRng(entry, rngState) {
+  validateIronDustSourceActionEntry(entry);
+  if (!Number.isInteger(rngState) || rngState < 0 || rngState > 0xffffffff)
+    throw Error('IRON_DUST_SIMULATION_RNG_INVALID');
+  const payload=entry.mode==='enemy'?forkIronDustEnemyControllerRng(entry.payload,rngState):clone(entry.payload);
+  if(entry.mode!=='enemy') payload.rng.state=rngState;
+  return wrap(entry.mode,payload,entry.entryVersion);
+}
+
 export function validateIronDustSourceActionEntry(entry) {
+  if(validatedFrozenEntries.has(entry)) return entry;
   if (!exact(entry, ['entryVersion', 'executable', 'mode', 'payload', 'digest']) ||
       ![IRON_DUST_SOURCE_ACTION_ENTRY_VERSION,
         IRON_DUST_ZERO_TREADS_SOURCE_ACTION_ENTRY_VERSION].includes(entry.entryVersion) ||
@@ -83,6 +95,7 @@ export function validateIronDustSourceActionEntry(entry) {
     throw Object.assign(new Error('SOURCE_ENTRY_STATE_MISMATCH'),
       {code: 'SOURCE_ENTRY_STATE_MISMATCH'});
   }
+  if(isDeepFrozenData(entry)) validatedFrozenEntries.add(entry);
   return entry;
 }
 

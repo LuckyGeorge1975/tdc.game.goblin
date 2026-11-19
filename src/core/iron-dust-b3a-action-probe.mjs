@@ -6,6 +6,7 @@ import {IRON_DUST_NEAR_CORE_FIXTURE_VERSION, IRON_DUST_REST_OGRE_FIXTURE_VERSION
   validateIronDustUnifiedStateProbe,
   queryIronDustFireGeometry} from './iron-dust-unified-state-probe.mjs';
 import {queryIronDustB2Action, dispatchIronDustB2Action} from './iron-dust-b2-action-probe.mjs';
+import {ironDustCrtRatio} from './iron-dust-crt-ratio.mjs';
 
 export const IRON_DUST_B3A_ACTION_VERSION = 'iron-dust-explicit-enemy-system-turn-v1';
 const fixtures = ['source', 'adjacent', IRON_DUST_NEAR_CORE_FIXTURE_VERSION,
@@ -40,14 +41,8 @@ const remaining = weapon => Math.max(0, Math.min(weapon.remaining,
 const movement = treads => treads >= 31 ? 3 : treads >= 16 ? 2 : treads > 0 ? 1 : 0;
 const helpless = systems => systems.treads === 0 &&
   Object.values(systems.weapons).every(weapon => remaining(weapon) === 0);
-const ratio = (attack, defense) => {
-  const strength = Math.max(0, attack), guarded = Math.max(1, defense);
-  if (strength >= guarded * 5) return '5-1';
-  if (strength * 2 < guarded) return '1-2';
-  return `${Math.min(4, Math.max(1, Math.floor(strength / guarded)))}-1`;
-};
 
-export function queryIronDustB3aAction(state, command) {
+function queryAction(state, command, includeShot) {
   validateIronDustUnifiedStateProbe(state);
   if (!fixtures.includes(state.fixture)) return deny('B3A_FIXTURE_UNSUPPORTED');
   if (!command || typeof command.type !== 'string') return deny('B3A_COMMAND_INVALID');
@@ -89,11 +84,32 @@ export function queryIronDustB3aAction(state, command) {
   const geometry = queryIronDustFireGeometry(state, actorId, 'ogre', actor.range,
     {outOfRange: 'SYSTEM_OUT_OF_RANGE', sightBlocked: 'SYSTEM_SIGHT_BLOCKED'});
   if (!geometry.available) return geometry;
+  let shot;
+  if (includeShot) {
+    const treads = command.targetKey === 'treads';
+    const weapon = systems.weapons[command.targetKey];
+    const effectiveDefense = treads ? null : weapon.defense + geometry.cover;
+    const targetRemaining = treads ? systems.treads : remaining(weapon);
+    shot = {effectKind: treads ? 'tread-roll-5-6' : 'component-crt',
+      attack: actor.damage, range: actor.range, distance: geometry.distance,
+      ratioCategory: treads ? null : ironDustCrtRatio(actor.damage, effectiveDefense),
+      disabledTarget: target.disabled, targetRemaining,
+      maxTreadLoss: treads ? Math.min(targetRemaining, actor.damage) : 0};
+  }
   return {available: true, direction: 'enemy-to-system', attackerId: actorId,
     targetId: 'ogre', targetKey: command.targetKey, turn: state.turn,
     availableSystemTargets: [...Object.keys(systems.weapons).filter(key =>
       remaining(systems.weapons[key]) > 0),
-      ...(!corrected || systems.treads > 0 ? ['treads'] : [])]};
+      ...(!corrected || systems.treads > 0 ? ['treads'] : [])],
+    ...(shot ? {shot} : {})};
+}
+
+export function queryIronDustB3aAction(state, command) {
+  return queryAction(state, command, false);
+}
+
+export function queryIronDustEnemySystemFireFacts(state, command) {
+  return command?.type === 'EnemySystemAttack' ? queryAction(state, command, true).shot ?? null : null;
 }
 
 export function preflightIronDustB3aAction(state, command) {
@@ -102,7 +118,7 @@ export function preflightIronDustB3aAction(state, command) {
 
 // Explicit enemy action only: no AI, target choice, product or replay activation.
 export function dispatchIronDustB3aAction(state, command) {
-  const query = queryIronDustB3aAction(state, command);
+  const query = queryAction(state, command, true);
   if (!query.available) return {error: query.error};
   if (!['EnemySystemAttack', 'EnemyPass'].includes(command.type) &&
       !(command.type === 'EndPhase' && state.phase === 'enemy'))
@@ -136,16 +152,14 @@ export function dispatchIronDustB3aAction(state, command) {
       turn: next.turn, pendingActorIds: pending(next)});
   } else {
     const actor = unit(next, command.attackerId), target = unit(next, 'ogre');
-    const systems = target.ogreSystems, treadHit = command.targetKey === 'treads';
+    const systems = target.ogreSystems, {shot} = query;
+    const treadHit = shot.effectKind === 'tread-roll-5-6';
     next.rng.state = (Math.imul(1664525, next.rng.state) + 1013904223) >>> 0;
     const roll = next.rng.state % 6;
-    const geometry = queryIronDustFireGeometry(next, actor.id, 'ogre', actor.range,
-      {outOfRange: 'SYSTEM_OUT_OF_RANGE', sightBlocked: 'SYSTEM_SIGHT_BLOCKED'});
-    const combatRatio = treadHit ? '1-1' : ratio(actor.damage,
-      systems.weapons[command.targetKey].defense + geometry.cover);
+    const combatRatio = treadHit ? '1-1' : shot.ratioCategory;
     const result = treadHit ? (roll >= 4 ? 'X' : 'NE') :
       (combatRatio === '5-1' ? 'X' : crt[combatRatio][roll]);
-    const loss = result === 'X' ? (treadHit ? Math.min(systems.treads, actor.damage) : 1) : 0;
+    const loss = result === 'X' ? (treadHit ? shot.maxTreadLoss : 1) : 0;
     if (treadHit) systems.treads -= loss;
     else systems.weapons[command.targetKey].destroyed += loss;
     if (helpless(systems)) target.hp = 0;

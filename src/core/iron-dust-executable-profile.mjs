@@ -1,4 +1,5 @@
 import TerrainRules from '../../terrain-rules-module.mjs';
+import {isDeepFrozenData} from './frozen-state-validation.mjs';
 import {IRON_DUST_CORE_DATA_V1, validateIronDustCoreDataV1} from
   '../levels/iron-dust-core-data.v1.mjs';
 import {IRON_DUST_LEVEL_V3} from '../levels/iron-dust.v3.mjs';
@@ -20,7 +21,7 @@ export {IRON_DUST_ENEMY_DIFFICULTIES} from './iron-dust-enemy-policy.mjs';
 import {IRON_DUST_ZERO_TREADS_SOURCE_ACTION_ENTRY_VERSION,
   createIronDustZeroTreadsSourceActionEntry, validateIronDustSourceActionEntry,
   queryIronDustSourceActionEntry, dispatchIronDustSourceActionEntry, dispatchIronDustSourceEnemyFireChoice,
-  dispatchIronDustSourceEnemyMoveChoice,dispatchIronDustSourceEnemyMechanical} from
+  dispatchIronDustSourceEnemyMoveChoice,dispatchIronDustSourceEnemyMechanical, forkIronDustSourceEntryRng} from
   './iron-dust-source-action-entry-probe.mjs?v=3';
 
 // Internal executable profile boundary; no browser, level picker or replay import.
@@ -50,6 +51,15 @@ const digest = value => {
   return `fnv1a64:${hash.toString(16).padStart(16, '0')}`;
 };
 const stateOf = entry => entry.mode === 'enemy' ? entry.payload.state : entry.payload;
+const validatedFrozenProfiles=new WeakSet();
+const sourceStartDigests=new Map();
+function sourceStartDigest(seed) {
+  if(sourceStartDigests.has(seed)) return sourceStartDigests.get(seed);
+  const value=digest(createIronDustZeroTreadsSourceActionEntry(seed));
+  sourceStartDigests.set(seed,value);
+  if(sourceStartDigests.size>128) sourceStartDigests.delete(sourceStartDigests.keys().next().value);
+  return value;
+}
 const terrain = Object.fromEntries(['open-ground', 'rubble-field'].map(type => {
   const rule = TerrainRules.rules[type];
   return [type, {cost: rule.cost, cover: rule.cover, blocksLos: rule.blocksLos}];
@@ -99,7 +109,16 @@ export function createIronDustProfile(seed, {difficulty = 'medium', minimumDiffi
   return wrap(entry, digest(entry), policy, minimumDifficulty);
 }
 
+// Trusted search copies keep the native state validators and source binding.
+// Callers install these copies only inside the isolated simulation worker.
+export function forkIronDustProfileRng(profile, rngState) {
+  validateIronDustProfile(profile);
+  return wrap(forkIronDustSourceEntryRng(profile.entry,rngState),profile.sourceStartDigest,
+    profile.header.enemyPolicy??null,profile.header.minimumDifficulty);
+}
+
 export function validateIronDustProfile(profile) {
+  if(validatedFrozenProfiles.has(profile)) return profile;
   try {
     const policy = profile?.header?.enemyPolicy ?? null;
     const minimumDifficulty = profile?.header?.minimumDifficulty;
@@ -115,7 +134,6 @@ export function validateIronDustProfile(profile) {
           profile.entry)) fail();
     validateIronDustSourceActionEntry(profile.entry);
     const state = stateOf(profile.entry);
-    const start = createIronDustZeroTreadsSourceActionEntry(state.rng.seed);
     if (profile.entry.entryVersion !== IRON_DUST_PROFILE_HEADER.entryVersion ||
         state.capabilityVersion !== IRON_DUST_PROFILE_HEADER.stateVersion ||
         state.sourceScenarioId !== IRON_DUST_PROFILE_HEADER.sourceScenarioId ||
@@ -124,8 +142,9 @@ export function validateIronDustProfile(profile) {
         profile.entry.mode === 'enemy' &&
           (profile.entry.payload.controllerVersion !== IRON_DUST_PROFILE_HEADER.controllerVersion ||
             JSON.stringify(profile.entry.payload.enemyPolicy ?? null) !== JSON.stringify(policy)) ||
-        profile.sourceStartDigest !== digest(start)) fail();
+        profile.sourceStartDigest !== sourceStartDigest(state.rng.seed)) fail();
   } catch {fail()}
+  if(isDeepFrozenData(profile)) validatedFrozenProfiles.add(profile);
   return profile;
 }
 

@@ -1,11 +1,13 @@
 import TerrainRules from '../../terrain-rules-module.mjs';
 import {inside} from './hex.mjs';
+import {isDeepFrozenData} from './frozen-state-validation.mjs';
 import {queryIronDustUnifiedUnit, validateIronDustUnifiedStateProbe} from './iron-dust-unified-state-probe.mjs';
 
 // Explicit normal moves on the existing inactive seven-unit state. The older
 // B1 fixture and its historical command oracle retain their original scope.
 export const IRON_DUST_PLAYER_MOVE_PROBE_VERSION = 'iron-dust-player-move-probe-v1';
 const playerIds = ['ogre', 'gev', 'missile', 'infantry'];
+const movementNodeCache=new WeakMap();
 const clone = value => JSON.parse(JSON.stringify(value));
 const freeze = value => {
   if (value && typeof value === 'object') {
@@ -48,6 +50,18 @@ function* legacyMoveNodes(state, actor, allowance) {
   }
 }
 
+function movementNodes(state,actor,allowance) {
+  const cached=movementNodeCache.get(state)?.get(actor.id);
+  if(cached?.allowance===allowance) return cached.nodes;
+  const nodes=[...legacyMoveNodes(state,actor,allowance)];
+  if(isDeepFrozenData(state)) {
+    let actors=movementNodeCache.get(state);
+    if(!actors) {actors=new Map();movementNodeCache.set(state,actors);}
+    actors.set(actor.id,{allowance,nodes});
+  }
+  return nodes;
+}
+
 function moveActor(state, unitId) {
   if (!playerIds.includes(unitId)) return deny('MOVE_UNIT_UNSUPPORTED');
   if (state.phase !== 'movement' && !(state.phase === 'gev' && unitId === 'gev'))
@@ -77,9 +91,9 @@ export function queryIronDustPlayerMove(state, command) {
     return deny('OUT_OF_BOUNDS');
   if (key(command.to) === key(actor)) return deny('UNREACHABLE');
   const allowance=movementAllowance(state,actor);
-  for (const {x,y,cost,path} of legacyMoveNodes(state,actor,allowance)) {
+  for (const {x,y,cost,path} of movementNodes(state,actor,allowance)) {
     if (x===command.to.x&&y===command.to.y) return {available:true,
-      resolverVersion:IRON_DUST_PLAYER_MOVE_PROBE_VERSION,allowance,cost,path};
+      resolverVersion:IRON_DUST_PLAYER_MOVE_PROBE_VERSION,allowance,cost,path:clone(path)};
   }
   return deny('UNREACHABLE');
 }
@@ -89,7 +103,7 @@ export function listIronDustPlayerMoves(state, unitId) {
   if (state.fixture!=='source'||state.victory.status!=='ongoing'||state.activeTeam!=='player') return [];
   const {actor}=moveActor(state,unitId);
   if (!actor) return [];
-  return [...legacyMoveNodes(state,actor,movementAllowance(state,actor))]
+  return movementNodes(state,actor,movementAllowance(state,actor))
     .filter(node=>node.path.length)
     .map(({x,y,cost})=>({to:{x,y},cost}))
     .sort((a,b)=>a.to.y-b.to.y||a.to.x-b.to.x);

@@ -22,7 +22,7 @@ function area(batch, target) {
   return counts;
 }
 
-function encode(batch, candidate) {
+export function encodeFullFireEffects(batch, candidate) {
   const {effectKind,ratioCategory,attack,range,objectiveTarget,disabledTarget,mode}=candidate.facts;
   if (!kinds.includes(effectKind)||!Number.isFinite(attack)||!Number.isFinite(range)) return null;
   const crt=effectKind.endsWith('-crt');
@@ -43,7 +43,7 @@ function objectiveScore(batch, candidate, input) {
   return 24*input[12]+5*input[13]+ratios.indexOf(candidate.facts.ratioCategory)+material+treads;
 }
 
-function score(model, input) {
+export function scoreFullFireEffects(model, input) {
   return model.hidden.reduce((sum,node,i)=>sum+model.output.weights[i]*Math.tanh(
     node.weights.reduce((value,weight,j)=>value+weight*input[j],node.bias)),model.output.bias);
 }
@@ -90,7 +90,7 @@ function selectFire(batch, model, report) {
   let baseline;
   for (const candidate of batch.candidates) {
     if (candidate.kind!=='fire'&&candidate.kind!=='hex-fire') continue;
-    const input=encode(batch,candidate);
+    const input=encodeFullFireEffects(batch,candidate);
     if (!input) continue;
     const points=objectiveScore(batch,candidate,input);
     const shot={candidate,input,points};
@@ -105,11 +105,11 @@ function selectFire(batch, model, report) {
   if (!model||deadline) return select(baseline.candidate,deadline?'deadlinePriority':'objectiveFire',
     report,report?options():undefined);
   const {actorId,weaponRef}=baseline.candidate;
-  let selected=baseline.candidate, highest=baseline.modelScore=score(model,baseline.input);
+  let selected=baseline.candidate, highest=baseline.modelScore=scoreFullFireEffects(model,baseline.input);
   for (const shot of shots) {
     const {candidate,input}=shot;
     if (shot===baseline||candidate.actorId!==actorId||candidate.weaponRef!==weaponRef) continue;
-    const value=shot.modelScore=score(model,input);
+    const value=shot.modelScore=scoreFullFireEffects(model,input);
     if (value>highest) { selected=candidate; highest=value; }
   }
   return select(selected,selected===baseline.candidate?'modelBaseline':'modelTarget',report,report?options():undefined);

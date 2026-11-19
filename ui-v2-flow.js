@@ -124,7 +124,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     let editorMissionOpen = false, editorImportLevels = null, editorWorking = false;
     const editorCamera = {zoom:1,x:0,y:0,palettes:{}};
     let optionsScrollObserver = null;
-    let briefingDifficulty = 'medium';
+    let briefingDifficulty = 'weak';
     let briefingAttacker = 'human';
     const ironDustSeatScreens = ['iron-dust-handoff','iron-dust-defense'];
     let syncingIronDustSeat = false;
@@ -166,10 +166,9 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const owner = globalThis.GoblinFullSeatOwner;
       if (fullSetupDialog) return Promise.resolve(false);
       if (!owner || config?.ruleProfileId !== 'FULL_CATALOG_v1') return null;
+      if (owner.ready && !owner.readyState) return owner.ready.then(() => chooseFullSeats(config));
       const game = owner.configure(config);
       if (!game) return null;
-      const legacyStartAllowed = game.minimumDifficulty === null;
-      const legacyOffers = owner.offers(config);
       const dialog = document.createElement('dialog');
       dialog.className = 'game-dialog';
       const form = document.createElement('form');
@@ -182,10 +181,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         label.textContent = t('v2.full.seat.' + side) + ' ';
         const select = document.createElement('select');
         const choices = new Map([['', {label:t('v2.full.human')}]]);
-        for (const {id,difficulty} of ai) {
-          const legacy = legacyOffers?.[side]?.find(offer=>offer.id===id);
-          const labelKey = difficulty === null ? 'v2.full.trained' : 'v2.difficulty.' + difficulty;
-          choices.set(id, {label:legacy?.label ?? t(labelKey)});
+        const order = ['weak','medium','strong',null];
+        for (const {id,difficulty} of ai.toSorted((left,right)=>order.indexOf(left.difficulty)-order.indexOf(right.difficulty))) {
+          const labelKey = difficulty === null ? 'v2.full.trainedExperimental' : 'v2.full.rule.' + difficulty;
+          choices.set(id, {label:t(labelKey)});
         }
         for (const [id, {label:copy}] of choices) {
           const option = document.createElement('option');
@@ -193,8 +192,28 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           option.textContent = copy;
           select.append(option);
         }
+        select.value = side === 'enemy' && ai.length ? ai[0].id : '';
         label.append(select);
         form.append(label);
+        if (owner.unavailable?.includes(side))
+          form.append(paragraph(t('v2.full.trainedUnavailable'), 'v2-screen-meta'));
+        const searchNote=paragraph(t('v2.full.strongTiming'),'v2-screen-meta');
+        const showSearchNote=()=>{searchNote.hidden=!select.value.endsWith('-strong');};
+        select.addEventListener('change',showSearchNote);
+        showSearchNote();
+        form.append(searchNote);
+        if (side === 'enemy' && choices.has('full-defender-control-trial')) {
+          const note = paragraph('', 'v2-screen-meta');
+          note.id = 'v2-full-trained-description';
+          select.setAttribute('aria-describedby',note.id);
+          const update = () => {
+            note.hidden = select.value !== 'full-defender-control-trial';
+            note.textContent = note.hidden ? '' : t('v2.full.trainedDefenderNote');
+          };
+          select.addEventListener('change',update);
+          update();
+          form.append(note);
+        }
         if (aiUnavailable) {
           const reason = aiUnavailable === 'AI_MINIMUM_UNAVAILABLE' ?
             t('v2.full.minimumUnavailable').replace('{minimum}', t('v2.difficulty.' + game.minimumDifficulty)) :
@@ -208,24 +227,16 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const submit = document.createElement('button');
       submit.value = 'configured';
       submit.textContent = t('screen.briefing.startMission');
-      const standard = document.createElement('button');
-      standard.value = 'standard';
-      standard.autofocus = true;
-      standard.textContent = t('v2.full.standard');
       const cancel = document.createElement('button');
       cancel.value = 'cancel';
       cancel.textContent = t('ui.dialog.cancel');
-      form.append(legacyStartAllowed ? actions(standard, submit, cancel) : actions(submit, cancel));
+      form.append(actions(submit, cancel));
       dialog.append(form);
       document.body.append(dialog);
       return new Promise(resolve => {
         dialog.addEventListener('close', () => {
           fullSetupDialog = null;
           dialog.remove();
-          if (dialog.returnValue === 'standard' && legacyStartAllowed) {
-            const defender=legacyOffers?.enemy[0]?.id;
-            return resolve(defender?{owner,config,selection:{player:null,enemy:defender},mapPresentation:true}:null);
-          }
           if (dialog.returnValue !== 'configured' ||
               selectors.some(({select, choices}) => !choices.has(select.value))) return resolve(false);
           const selection = Object.freeze(Object.fromEntries(
@@ -356,7 +367,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       nodes.pause.disabled = !binding.lifecycle || view.ended;
       update(nodes.turnLabel, t('ui.hud.turn', {turn:view.turn}));
       update(nodes.outcome, view.ended && typeof view.outcome === 'boolean'
-        ? t(view.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '');
+        ? t(view.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') :
+        binding.owner.computing?.(binding.port)?t('v2.full.computing'):'');
       nodes.outcome.hidden = !nodes.outcome.textContent;
 
       const rounds = nodes.rounds = globalThis.GoblinFullRoundSource?.view();
@@ -443,7 +455,14 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           controls.push(button(t('v2.round.partial', {round:rounds.terminalPartial.roundNumber}),
             () => openRoundAnalysis(rounds.terminalPartial)));
       }
-      if (!snapshot) { panel.append(actions(...controls)); return; }
+      if (!snapshot) {
+        if(binding.owner.computing?.(port)){
+          const status=paragraph(t('v2.full.computing'),'v2-status');
+          status.setAttribute('role','status');
+          panel.append(status);
+        }
+        panel.append(actions(...controls)); return;
+      }
       const {view, log} = snapshot;
       panel.append(paragraph(t('ui.hud.turn', {turn:view.turn})), fullSeatMap(view));
       const entries = document.createElement('div');
@@ -983,6 +1002,16 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     async function startMission() {
       ironDefenseMove = null;
       if (GameDialogs.isOpen()) return;
+      const requestedMission=missionId;
+      if (missionId!=='iron-dust-v2'&&!missionId.startsWith('training-')) {
+        try { await globalThis.GoblinFullMissions?.ready; }
+        catch {
+          startError=t('screen.briefing.dataUnavailable');
+          renderScreen(false);
+          return;
+        }
+        if(screen!=='briefing'||missionId!==requestedMission)return;
+      }
       if (!missionData(missionId)) {
         startError = t('screen.briefing.dataUnavailable'); renderScreen(false); return;
       }
@@ -1154,14 +1183,19 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       for (const attacker of choices) {
         const option = document.createElement('option');
         option.value = attacker;
-        option.textContent = t(attacker==='weak'?'v2.difficulty.weak':'v2.full.'+attacker);
+        option.textContent = t(attacker==='human'?'v2.full.human':attacker==='trained'?
+          'v2.full.trainedExperimental':'v2.full.rule.'+attacker);
         select.append(option);
       }
       if (!choices.includes(briefingAttacker)) briefingAttacker = 'human';
       select.value = briefingAttacker;
-      select.disabled = !policies.length;
-      select.onchange = () => { briefingAttacker = select.value; };
-      label.append(select);
+      const note=paragraph(t('v2.full.strongTiming'),'v2-screen-meta');
+      note.id='v2-iron-strong-attacker-note';
+      select.setAttribute('aria-describedby',note.id);
+      const update=()=>{briefingAttacker=select.value;note.hidden=briefingAttacker!=='strong';};
+      select.onchange=update;
+      update();
+      label.append(select,note);
       return label;
     }
     function difficultyControl() {
@@ -1174,13 +1208,23 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       for (const difficulty of choices) {
         const option = document.createElement('option');
         option.value = difficulty;
-        option.textContent = t(difficulty==='human'?'v2.full.human':'v2.difficulty.' + difficulty);
+        option.textContent = t(difficulty==='human'?'v2.full.human':difficulty==='trained'?
+          'v2.full.trainedExperimental':'v2.full.rule.' + difficulty);
         select.append(option);
       }
       if (!choices.includes(briefingDifficulty)) briefingDifficulty = difficulties[0]??'human';
       select.value = briefingDifficulty;
-      select.onchange = () => { briefingDifficulty = select.value; };
-      label.append(select);
+      const note=paragraph(t('v2.full.ironTrainedDefenderNote'),'v2-screen-meta');
+      note.id='v2-iron-trained-defender-note';
+      select.setAttribute('aria-describedby',note.id);
+      const update=()=>{
+        briefingDifficulty=select.value;
+        note.hidden=!['trained','strong'].includes(briefingDifficulty);
+        note.textContent=t(briefingDifficulty==='strong'?'v2.full.strongTiming':'v2.full.ironTrainedDefenderNote');
+      };
+      select.onchange=update;
+      update();
+      label.append(select,note);
       return label;
     }
     function syncIronDustSeat() {
@@ -1930,6 +1974,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         panel.append(actions(button(t('ui.nav.back'), returnToCampaignMenu)));
       } else if (screen === 'briefing') {
         const data = missionData(missionId);
+        const migrated = globalThis.GoblinFullMissions?.has(missionId)===true;
         const header = document.createElement('header'); header.className = 'v2-screen-header';
         if (campaign) header.append(paragraph(campaignPosition(), 'v2-briefing-number'));
         const legacyNumber = missionId !== 'iron-dust-v2' &&
@@ -1939,14 +1984,15 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (campaign?.field === 'scorched')
           header.append(paragraph(t(`mission.${missionId}.story.briefing`), 'v2-briefing-intro'));
         header.append(paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
+        if (migrated) header.append(paragraph(t('v2.full.migratedObjective')));
         if (missionId === 'iron-dust-v2' && data) {
           header.append(ironDustAttackerControl(), difficultyControl());
         }
         if (campaign?.index === 0 && !campaign.field) header.append(paragraph(t('v2.campaign.session')));
-        if(GoblinCatalogBase.has(missionId)||globalThis.GoblinCatalogSpecialistsModel?.has(missionId)||globalThis.GoblinCatalogFullModel?.has(missionId))header.append(paragraph(t(`mission.${missionId}.budget`)));
-        if(missionId==='artillery-pilot')header.append(paragraph(t('mission.artillery-pilot.budget')));
-        if(missionId==='siege-pilot')header.append(paragraph(t('mission.siege-pilot.budget')));
-        if(missionId==='skimmer-pilot')header.append(paragraph(t('mission.skimmer-pilot.budget')));
+        if(!migrated&&(GoblinCatalogBase.has(missionId)||globalThis.GoblinCatalogSpecialistsModel?.has(missionId)||globalThis.GoblinCatalogFullModel?.has(missionId)))header.append(paragraph(t(`mission.${missionId}.budget`)));
+        if(!migrated&&missionId==='artillery-pilot')header.append(paragraph(t('mission.artillery-pilot.budget')));
+        if(!migrated&&missionId==='siege-pilot')header.append(paragraph(t('mission.siege-pilot.budget')));
+        if(!migrated&&missionId==='skimmer-pilot')header.append(paragraph(t('mission.skimmer-pilot.budget')));
         if(globalThis.GoblinCatalogFullModel?.has(missionId)){
           const full=scenarioCatalog[missionId].catalog.full;
           for(const wave of full.waves.waves){const unit=full.waveTemplates.find(u=>u.id===wave.templateId);header.append(paragraph(t('v2.full.wave.announcement',{team:t(`ui.team.${wave.team}`),unit:t(`library.unit.${unit.catalogAssetId}.name`),turn:wave.dueOwnTurn})));header.append(paragraph(t('v2.full.wave.entries',{entries:wave.entries.map(cell=>`${String.fromCharCode(65+cell.x)}-${String(cell.y+1).padStart(2,'0')}`).join(' → ')})));}
@@ -1960,7 +2006,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         for (const [index, outcome] of ['victory', 'defeat'].entries()) {
           const label = document.createElement('h3'); label.textContent = t(`screen.briefing.${outcome}`);
           conditions.children[index].append(label,
-            paragraph(t(campaign?.field === 'scorched' ? `v2.scorched.${outcome}` : `mission.${missionId}.briefing.${outcome}`)));
+            paragraph(t(migrated ? outcome==='victory'?'v2.full.migratedObjective':'v2.full.migratedDefeat' :
+              campaign?.field === 'scorched' ? `v2.scorched.${outcome}` : `mission.${missionId}.briefing.${outcome}`)));
         }
         const preview = document.createElement('section'); preview.className = 'v2-briefing-preview';
         const previewLabel = document.createElement('h3');
