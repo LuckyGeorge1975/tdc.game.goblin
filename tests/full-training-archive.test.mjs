@@ -17,6 +17,41 @@ const draft={
 };
 const plain=value=>JSON.parse(JSON.stringify(value));
 
+test('all qualified rule and trained seats round-trip native FULL archives with strict metadata',async()=>{
+  const level=await fixture();
+  for(const side of ['player','enemy'])for(const difficulty of ['weak','medium','strong',null]){
+    const policy=difficulty===null?
+      side==='player'?'full-attack-2a':'full-defender-control-trial':side+'-'+difficulty;
+    const seats={player:{controller:'human'},enemy:{controller:'human'}};
+    seats[side]={controller:'ai',policy,difficulty};
+    const host=await openFullTrainingReplay({seats,replay:{version:'full-native-journal-v1',
+      seed:313,level,initial:'',entries:[]}});
+    for(let step=0;step<40&&!host.port.state().ended;step++){
+      const frame=host.inspect();
+      const command=frame.state.side==='player'?{type:'EndPhase'}:
+        frame.opened.entries.find(entry=>entry.baseline).command;
+      assert.equal(host.commit(frame,command).ok,true);
+    }
+    assert.equal(host.port.state().ended,true,policy);
+    const archive=plain(host.port.trainingArchive());
+    assert.deepEqual(archive.seats,seats);
+    const imported=await importFullTrainingArchive(archive);
+    assert.equal(imported.outcome,archive.outcome);
+    assert.ok(imported.demonstrations.length>0);
+    assert.ok(imported.demonstrations.every(row=>row.side!==side));
+    for(const replacement of [
+      {...seats[side],difficulty:difficulty==='weak'?'strong':'weak'},
+      {...seats[side],policy:(side==='player'?'enemy':'player')+'-strong'},
+      {...seats[side],policy:'unqualified-policy'},
+      {...seats[side],extra:true}
+    ]){
+      const invalid=structuredClone(archive);
+      invalid.seats[side]=replacement;
+      await assert.rejects(()=>importFullTrainingArchive(invalid),/FULL_TRAINING_ARCHIVE_INVALID/);
+    }
+  }
+});
+
 async function fixture() {
   const game=fullShell();
   await game.run("GoblinCatalogFullModel.initialize(data,levelData,{profile:'FULL_CATALOG_v1'})");

@@ -822,6 +822,7 @@
     'v2.full.trainedExperimental': {de:'Trainiert (experimentell)',en:'Trained (experimental)',es:'Entrenada (experimental)',fr:'Entraînée (expérimental)'},
     'v2.full.rule.weak': {de:'Regel Gering',en:'Rule Low',es:'Reglas Bajo',fr:'Règles Faible'},
     'v2.full.rule.medium': {de:'Regel Mittel',en:'Rule Medium',es:'Reglas Medio',fr:'Règles Moyen'},
+    'v2.round.lookahead': {de:'Die KI hat die vollständigen Antwortvorschauen verglichen.',en:'The AI compared the complete reply simulations.',es:'La IA ha comparado las simulaciones de respuesta completas.',fr:'L’IA a comparé les simulations de réponse complètes.'},
     'v2.full.rule.strong': {de:'Regel Stark',en:'Rule Strong',es:'Reglas Fuerte',fr:'Règles Fort'},
     'v2.full.computing': {de:'KI berechnet den Zug …',en:'AI is calculating the turn …',es:'La IA está calculando el turno …',fr:'L’IA calcule le tour …'},
     'v2.full.remainingObjectives': {de:'Verbleibende Pflichtziele {count}',en:'Required targets remaining {count}',es:'Objetivos obligatorios restantes {count}',fr:'Cibles obligatoires restantes {count}'},

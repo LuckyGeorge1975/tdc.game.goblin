@@ -35,7 +35,7 @@ export function createStrongSearchController({capture,profile,reference,workerFa
       const wallMs=performance.now()-started;
       onSearch?.({side:batch.side,revision:batch.revision,workers:pool.workerCount,wallMs,
         targetMs:5000,overTarget:wallMs>5000,chosen:chosen.index,branches});
-      report?.({key,explanationKey:'v2.round.effectAttack',
+      report?.({key,explanationKey:'v2.round.lookahead',
         options:branches.map(branch=>({key:batch.candidates[branch.index].key,scores:{basis:branch.score}}))});
       return key;
     } finally {pending=false;}

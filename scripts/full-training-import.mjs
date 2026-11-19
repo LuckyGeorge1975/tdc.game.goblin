@@ -41,8 +41,9 @@ export async function openFullTrainingReplay(archive) {
       expect(side==='enemy'&&seat.difficulty===null);
       continue;
     }
-    expect(['weak','medium'].includes(seat.difficulty)&&seat.policy===side+'-'+seat.difficulty ||
-      side==='player'&&seat.policy===FULL_ATTACK_2A_ID&&seat.difficulty===null);
+    expect(['weak','medium','strong'].includes(seat.difficulty)&&seat.policy===side+'-'+seat.difficulty ||
+      side==='player'&&seat.policy===FULL_ATTACK_2A_ID&&seat.difficulty===null ||
+      side==='enemy'&&seat.policy==='full-defender-control-trial'&&seat.difficulty===null);
     policyIds[side]=seat.policy;
     full.registerQualifiedController({side,id:seat.policy,difficulty:seat.difficulty,select:()=>null});
   }
