@@ -17,5 +17,6 @@ async function respond({id,op,value}) {
 }
 globalThis.addEventListener('message',async({data})=>{
   try {globalThis.postMessage({id:data.id,result:await respond(data)});}
-  catch(error) {globalThis.postMessage({id:data.id,error:error.message??'STRONG_WORKER_FAILED'});}
+  catch(error) {globalThis.postMessage({id:data.id,error:error.message??'STRONG_WORKER_FAILED',
+    diagnosticStack:typeof error.stack==='string'?error.stack:null});}
 });

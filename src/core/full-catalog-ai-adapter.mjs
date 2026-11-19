@@ -143,6 +143,7 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
         if (!check.ok) continue;
         const preview = command.type==='CatalogFire' ? specialists.firePreview(command,false,tactics) : null;
         available.push({command,displayCell:cell,facts:{
+          ...(command.type==='Move'?{observedCellsAfterMove:full.observedCells('player',command)}:{}),
           ...(Number.isFinite(check.cost)?{cost:check.cost}:{}),
           ...(check.weapon?{attack:check.weapon.attack,range:check.weapon.range}:{}),
           ...(preview?.ok?{ratioCategory:preview.ratioCategory,effectKind:preview.effectKind,
@@ -165,7 +166,7 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
     for (const {x,y} of cells(full.aiProjection('enemy'))) {
       const command = {type:'EnemyMove',actorId:slot.actorId,x,y};
       const check = slot.query(command);
-      if(check.ok)options.push({command,facts:{path:check.path}});
+      if(check.ok)options.push({command,facts:{path:check.path,observedCellsAfterMove:full.observedCells('enemy',command)}});
     }
     return options;
   }

@@ -63,6 +63,10 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
     pending=true;
     try{
       const result=await ai.advance();
+      if(attempt.interrupted&&!attempt.intent){
+        if(attempted===attempt)attempted=null;
+        return {ok:false,code:'AI_HOST_STALE'};
+      }
       if(result.ok){attempt.intent=null;return result;}
       if(result.code==='AI_HOST_STALE')return continueChoice(attempt,read())??result;
       attempt.intent=null;
@@ -71,6 +75,9 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
     finally{pending=false;}
   }
   return Object.freeze({advance,
-    pause(){port.pause();ai.pause();},resume(){port.resume();ai.resume();},
+    pause(){
+      if(pending&&port.state()?.difficulty==='strong'&&attempted)attempted.interrupted=true;
+      port.pause();ai.pause();
+    },resume(){port.resume();ai.resume();},
     leave(){port.leave();ai.stop();attempted=null;}});
 }

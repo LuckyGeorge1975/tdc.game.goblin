@@ -51,7 +51,8 @@ export async function createHeadlessFullEngine({readSource}={}) {
   let serial=0;
   const root=Object.create(null);
   Object.assign(root,{globalThis:root,window:root,document:documentStub(),Math:Object.create(Math),
-    structuredClone,console,URLSearchParams,URL,TextEncoder,TextDecoder,crypto:globalThis.crypto,
+    structuredClone:(...args)=>globalThis.structuredClone(...args),
+    console,URLSearchParams,URL,TextEncoder,TextDecoder,crypto:globalThis.crypto,
     performance:globalThis.performance,localStorage:{getItem(){return null;},setItem(){},removeItem(){}},
     GameDialogs:{isOpen:()=>false,cancel(){},confirm:async()=>true,warn:async()=>true},
     setTimeout(fn){timers.set(++serial,fn);return serial;},clearTimeout(id){timers.delete(id);},
@@ -67,6 +68,36 @@ export async function createHeadlessFullEngine({readSource}={}) {
     let workerReferences=false;
     let workerReload=null;
     let workerRollContext=null;
+    let workerKnowledgeIds=null;
+    let workerUnmodeledEnemy=0,workerUnmodeledPlayer=0;
+    const workerNativeVictoryOutcome=victoryOutcome;
+    victoryOutcome=function(profile,roster) {
+      const outcome=workerNativeVictoryOutcome(profile,roster);
+      if(workerKnowledgeIds===null)return outcome;
+      if(outcome===true&&workerUnmodeledEnemy!==0)return null;
+      if(outcome===false&&workerUnmodeledPlayer!==0&&
+        !roster.some(unit=>unit.team==='player'&&unitAlive(unit)))return null;
+      return outcome;
+    };
+    const workerNativeWaves=GoblinCatalogWaves;
+    root.GoblinCatalogWaves=Object.freeze({...workerNativeWaves,
+      beginTurn(state,request,config) {
+        const result=workerNativeWaves.beginTurn(state,request,config);
+        if(workerKnowledgeIds===null)return result;
+        const effects=result.effects.filter(effect=>{
+          const template=config.waves.find(wave=>wave.id===effect.waveId)?.templateId;
+          return workerKnowledgeIds.has(template);
+        });
+        return Object.freeze({...result,effects:Object.freeze(effects)});
+      },
+      pendingEnemy(state) {
+        if(workerKnowledgeIds===null)return workerNativeWaves.pendingEnemy(state);
+        const config=JSON.parse(state.configBinding);
+        workerNativeWaves.validate(state,config);
+        return state.waves.filter((row,index)=>row.status==='pending'&&
+          config.waves[index].team==='enemy'&&workerKnowledgeIds.has(config.waves[index].templateId)).length;
+      }
+    });
     const workerNativeCombatRandom=combatRandom;
     const workerNativeCombatOutcome=combatOutcome;
     combatOutcome=function(attacker,target) {
@@ -89,6 +120,7 @@ export async function createHeadlessFullEngine({readSource}={}) {
         Object.assign(scenarioCatalog,GoblinCatalogFullModel.configs);
       },
       load(id,controls) {
+        workerKnowledgeIds=null;
         const port=loadScenario(id,controls);
         return {port,session:legacySession};
       },
@@ -104,6 +136,7 @@ export async function createHeadlessFullEngine({readSource}={}) {
         if(draft) {
           const prepared=await GoblinEditorDraft.prepare(structuredClone(draft));
           workerReload=()=>{
+            workerKnowledgeIds=null;
             const port=loadEditorDraft(prepared,controls);
             return {port,session:legacySession};
           };
@@ -114,6 +147,7 @@ export async function createHeadlessFullEngine({readSource}={}) {
         if(typeof id!=='string')throw Error('FULL_WORKER_CONFIG_INVALID');
         scenarioCatalog[id]=structuredClone(config);
         workerReload=()=>{
+          workerKnowledgeIds=null;
           const port=loadScenario(id,controls);
           return {port,session:legacySession};
         };
@@ -130,6 +164,19 @@ export async function createHeadlessFullEngine({readSource}={}) {
         // with an incomplete native owner and cargo authority.
         if(units.some(unit=>unit.team===view.side&&!ids.has(unit.id)))
           throw Error('FULL_MODEL_OWN_UNIT_MISSING');
+        const unknownTargets=(kinds,known)=>{
+          const goals=kinds.map(kind=>view.objectives?.find(goal=>goal.kind===kind));
+          if(goals.some(goal=>!Number.isSafeInteger(goal?.remaining)||goal.remaining<0))return null;
+          return Math.max(0,goals.reduce((sum,goal)=>sum+goal.remaining,0)-known);
+        };
+        const knownEnemy=view.units.filter(unit=>unit.alive&&
+          unit.relation===(view.side==='enemy'?'own':'opponent')).length;
+        const knownPlayer=view.units.filter(unit=>unit.alive&&
+          unit.relation===(view.side==='player'?'own':'opponent')).length;
+        workerUnmodeledEnemy=unknownTargets(view.side==='player'?['destroy-core','destroy-escort']:
+          ['protect-core','protect-escort'],knownEnemy);
+        workerUnmodeledPlayer=view.side==='player'?0:unknownTargets(['destroy-player-force'],knownPlayer);
+        workerKnowledgeIds=ids;
         units.splice(0,units.length,...units.filter(unit=>ids.has(unit.id)));
         const full=GoblinCatalogFullRuntime,s=full.ensure();
         const clocks=structuredClone(s.visibility.teamFire);
@@ -145,7 +192,8 @@ export async function createHeadlessFullEngine({readSource}={}) {
           runtimeUnitId:binding.runtimeUnitId,viewerTeam:view.side,untilFireEnd:Number.MAX_SAFE_INTEGER}));
         s.visibility={...visibility,reveals};
         full.refresh();
-        return {knownIds:units.map(unit=>unit.id)};
+        return {knownIds:units.map(unit=>unit.id),
+          unmodeledTargets:{enemy:workerUnmodeledEnemy,player:workerUnmodeledPlayer}};
       },
       setModalRoll(face) {
         const faces=Array.isArray(face)?face:[face];

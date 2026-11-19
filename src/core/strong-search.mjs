@@ -2,7 +2,7 @@ export async function evaluateStrongBranch(packet,index,createSimulationPort) {
   if(!Number.isInteger(index)||packet.actions[index]?.index!==index) throw Error('STRONG_ACTION_ORDER');
   const started=performance.now();
   const port=await createSimulationPort(packet);
-  const rootTurn=port.status().turn;
+  const initialStatus=port.status();
   const continuation=[];
   let adjustment=0,opponentSeen=false;
   function accept(action) {
@@ -21,7 +21,7 @@ export async function evaluateStrongBranch(packet,index,createSimulationPort) {
       const status=port.status();
       if(status.ended) break;
       if(status.side!==packet.side) opponentSeen=true;
-      if(status.side===packet.side&&(opponentSeen||status.turn>rootTurn)) break;
+      if(status.side===packet.side&&(opponentSeen||status.turn>initialStatus.turn)) break;
       // A guard reports an invalid/non-progressing reference policy. Partial
       // replies never enter the candidate ranking.
       if(continuation.length>=10000) throw Error('STRONG_SIMULATION_NO_HANDOVER');

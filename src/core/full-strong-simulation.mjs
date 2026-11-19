@@ -1,6 +1,7 @@
 import {createHeadlessFullEngine} from './full-worker-engine.mjs';
 import {createFullCatalogAiHost,createOwnedFullCatalogAiAdapter} from './full-catalog-ai-adapter.mjs';
 import {selectMediumFullCatalog} from './full-catalog-difficulty.mjs';
+import {createFullExplorationPolicy} from './full-exploration-policy.mjs';
 
 let levelSource;
 async function levels() {
@@ -16,7 +17,15 @@ export async function createSimulationPort(packet,{engineFactory=createHeadlessF
   const engine=await engineFactory();
   const full=engine.root.GoblinCatalogFullRuntime;
   const known=new Set(packet.rootView.units.map(unit=>unit.id));
+  const opponents=packet.rootView.units.filter(unit=>unit.alive&&unit.relation==='opponent');
+  const goals=packet.rootView.objectives??[];
+  const fullyKnown=packet.side==='player'
+    ?goals.find(goal=>goal.kind==='destroy-core')?.remaining===opponents.filter(unit=>unit.objectiveTarget).length&&
+      goals.find(goal=>goal.kind==='destroy-escort')?.remaining===opponents.filter(unit=>!unit.objectiveTarget).length
+    :goals.find(goal=>goal.kind==='destroy-player-force')?.remaining===opponents.length;
   const history=[];
+  const explorations=new Map();
+  let unmodeledTargets;
   let port,player,adapter;
   await engine.initialize(config.catalog.registry,levelData??await(levelSource??=levels()));
   install(await engine.loadConfig(config,replay.seed,replay.level.id,draft));
@@ -42,7 +51,7 @@ export async function createSimulationPort(packet,{engineFactory=createHeadlessF
   replayPrefix();
   const initial=port.simulationSnapshot(port.ticket('ai'));
   if(initial?.replay.digest!==replay.digest)throw Error('FULL_STRONG_REPLAY_DIGEST');
-  engine.applyRootKnowledge(packet.rootView);
+  unmodeledTargets=engine.applyRootKnowledge(packet.rootView).unmodeledTargets;
   function restore() {
     engine.setModalRoll(null);
     install(engine.reload());
@@ -63,11 +72,34 @@ export async function createSimulationPort(packet,{engineFactory=createHeadlessF
       return sum+(unit.team===side?value:-value);
     },0);
   }
+  function explorationFor(side) {
+    if(!explorations.has(side))explorations.set(side,createFullExplorationPolicy({side,
+      ...(side===packet.side&&packet.explorationState?{initialState:packet.explorationState}:{})}));
+    return explorations.get(side);
+  }
+  function publicView(view) {
+    if(!unmodeledTargets)throw Error('FULL_MODEL_PUBLIC_TARGETS_REQUIRED');
+    const objectives=view.objectives.map(goal=>{
+      const extra=goal.kind==='destroy-escort'||goal.kind==='protect-escort'?unmodeledTargets.enemy:
+        goal.kind==='destroy-player-force'?unmodeledTargets.player:0;
+      if(!extra)return goal;
+      return {...goal,remaining:goal.remaining+extra,
+        ...(goal.kind.startsWith('destroy-')?{satisfied:false}:{})};
+    });
+    return {...view,objectives,objectiveRemaining:objectives.filter(goal=>goal.kind.startsWith('destroy-'))
+      .reduce((count,goal)=>count+goal.remaining,0)};
+  }
+  function accepted(side) {
+    const view=port.project('ai')?.view;
+    explorationFor(side).accepted(view?.side===side?publicView(view):undefined);
+  }
   function open() {
-    const batch=adapter.open(port.state().side);
-    if(!batch.ok)throw Error(batch.code??'FULL_STRONG_OPEN_FAILED');
-    const captured=adapter.captureStrongDecision(batch);
+    const native=adapter.open(port.state().side);
+    if(!native.ok)throw Error(native.code??'FULL_STRONG_OPEN_FAILED');
+    const captured=adapter.captureStrongDecision(native);
     if(!captured)throw Error('FULL_STRONG_CAPTURE_STALE');
+    const batch={...native,view:publicView(native.view)};
+    explorationFor(batch.side).observe(batch.view);
     return {view:batch.view,batch,options:batch.candidates.map((candidate,index)=>
       ({candidate,action:captured.actions[index].action}))};
   }
@@ -91,10 +123,12 @@ export async function createSimulationPort(packet,{engineFactory=createHeadlessF
     return outcomes.indexOf(modal);
   }
   function commit(action) {
+    const side=port.state().side;
     if(!['CatalogFire','CatalogHexFire'].includes(action.type)) {
       engine.setModalRoll(null);
       nativeCommit(action);
       history.push({action:structuredClone(action),faces:[]});
+      accepted(side);
       return {events:[],expectedAdjustment:0};
     }
     let expected=0;
@@ -113,12 +147,16 @@ export async function createSimulationPort(packet,{engineFactory=createHeadlessF
     });
     nativeCommit(action);
     history.push({action:structuredClone(action),faces});
+    accepted(side);
     return {events:[],expectedAdjustment:expected-material(packet.side)};
   }
   return Object.freeze({open,commit,
     choose(opened) {
       const key=selectMediumFullCatalog(opened.batch);
-      return opened.options.find(option=>option.candidate.key===key)?.action;
+      const chosen=opened.batch.candidates.find(candidate=>candidate.key===key);
+      const search=['hold','end-phase'].includes(chosen?.kind)?
+        explorationFor(opened.batch.side).select(opened.batch):undefined;
+      return opened.options.find(option=>option.candidate.key===(search??key))?.action;
     },
     status() {
       const state=engine.state();
@@ -126,9 +164,7 @@ export async function createSimulationPort(packet,{engineFactory=createHeadlessF
     },
     evaluate(side) {
       const {ended,winner}=engine.state();
-      const goal=packet.rootView.objectives?.find(item=>item.kind===(
-        side==='player'?'destroy-escort':'destroy-player-force'));
-      const certainWin=winner===side&&goal?.satisfied===true;
+      const certainWin=winner===side&&fullyKnown;
       return (ended?(winner!==side?-100000:certainWin?100000:0):0)+material(side);
     },
     dispose:engine.dispose

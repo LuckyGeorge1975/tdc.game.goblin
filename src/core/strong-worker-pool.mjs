@@ -22,7 +22,11 @@ export function createStrongWorkerPool({workerFactory,hardwareConcurrency}={}) {
           const pending=requests.get(data?.id);
           if(!pending) return;
           requests.delete(data.id);
-          if(data.error) pending.reject(Error(data.error));
+          if(data.error) {
+            const error=Error(data.error);
+            if(typeof data.diagnosticStack==='string')error.stack=data.diagnosticStack;
+            pending.reject(error);
+          }
           else pending.resolve(data.result);
         });
         worker.addEventListener('error',event=>{

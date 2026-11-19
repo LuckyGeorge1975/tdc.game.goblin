@@ -84,13 +84,37 @@
   return sideProjection(team);
  }
  function sideProjection(team){
-  return {side:team,phase:turnPhase,turn,terrain:boardTerrain(),
-   ...(controllerPort() || Object.hasOwn(ensure(),'deadlineRemoved') ? {objectives:publicObjectives(team)} : {}),
+  return {side:team,phase:turnPhase,turn,terrain:boardTerrain(),observedCells:observedCells(team),
+   ...(controllerPort() || Object.hasOwn(ensure(),'deadlineRemoved') ?
+    {objectives:publicObjectives(team),objectiveRemaining:publicObjectiveCount(team)} : {}),
    units:boardUnits(roster(team),team)};
  }
  function boardTerrain(){
   return {width:W,height:H,defaultTerrain:'open-ground',
    cells:[...terrainTypes].map(([key,type])=>{const [x,y]=key.split(',').map(Number);return {x,y,type}})};
+ }
+ let sensorCoverageCache=null;
+ function observedCells(team,move=null){
+  const terrainKey=JSON.stringify([W,H,[...terrainTypes]]);
+  if(sensorCoverageCache?.key!==terrainKey)sensorCoverageCache={key:terrainKey,cells:new Map()};
+  const distance=registry().definitions.stealth['phantom-stealth-v1'].detectionDistance;
+  const observed=new Map();
+  for(const unit of units.filter(unit=>unit.team===team&&unitAlive(unit)&&!unit.disabled&&!unit.embarkedOn)){
+   const observer=move?.actorId===unit.id?{x:move.x,y:move.y}:unit;
+   const key=observer.x+','+observer.y;
+   let cells=sensorCoverageCache.cells.get(key);
+   if(!cells){
+    cells=[];
+    for(let y=Math.max(0,observer.y-distance);y<=Math.min(H-1,observer.y+distance);y++)
+     for(let x=Math.max(0,observer.x-distance-1);x<=Math.min(W-1,observer.x+distance+1);x++){
+      const cell={x,y};
+      if(dist(observer,cell)<=distance&&lineOfSight(observer,cell))cells.push(cell);
+     }
+    sensorCoverageCache.cells.set(key,cells);
+   }
+   for(const cell of cells)observed.set(cell.x+','+cell.y,cell);
+  }
+  return [...observed.values()].sort((left,right)=>left.y-right.y||left.x-right.x).map(cell=>({...cell}));
  }
  function tacticalProjection(team){
   const view=sideProjection(team);
@@ -119,18 +143,24 @@
   const s=ensure();
   const target={kind:'unit',unitId:'core'};
   const playerAlive=units.some(unit=>unit.team==='player'&&unitAlive(unit));
+  const escorts=units.filter(unit=>unit.team==='enemy'&&!unit.core&&unitAlive(unit)).length+pendingEnemy();
+  const attackers=units.filter(unit=>unit.team==='player'&&unitAlive(unit)).length;
   const goals=team==='player' ? [
-   {kind:'destroy-core',target,satisfied:!coreAlive()},
-   {kind:'destroy-escort'},
+   {kind:'destroy-core',target,satisfied:!coreAlive(),remaining:Number(coreAlive())},
+   {kind:'destroy-escort',satisfied:escorts===0,remaining:escorts},
    {kind:'survive',satisfied:playerAlive}
   ] : [
-   {kind:'protect-core',target,satisfied:coreAlive()},
-   {kind:'protect-escort'},
-   {kind:'destroy-player-force',satisfied:!playerAlive}
+   {kind:'protect-core',target,satisfied:coreAlive(),remaining:Number(coreAlive())},
+   {kind:'protect-escort',remaining:escorts},
+   {kind:'destroy-player-force',satisfied:!playerAlive,remaining:attackers}
   ];
   if(Number.isSafeInteger(turnLimit(s)))goals.push({kind:'enemy-turn-limit',turns:turnLimit(s),
    completedEnemyTurns:s.visibility.teamFire.enemy.completed});
   return goals;
+ }
+ function publicObjectiveCount(team){
+  return publicObjectives(team).filter(goal=>goal.kind.startsWith('destroy-'))
+   .reduce((count,goal)=>count+goal.remaining,0);
  }
  function turnLimit(s){
   return s.deadlineRemoved ? null : legacySession.effectiveRules.catalog.full.turnLimit;
@@ -248,7 +278,7 @@
   if(Object.values(selection).includes('ai'))ScenarioRuleProfiles.requireAi(session);
   const roles=Object.freeze({...selection});
   const policies=bindQualifiedControllers(session,roles,policyIds);
-  if(mapPresentation&&(roles.player!=='human'||roles.enemy!=='ai'||policies.enemy))
+  if(mapPresentation&&(roles.player!=='human'||roles.enemy!=='ai'))
    throw admissionError('FULL_MAP_CONTROLLER_INVALID');
   if(seed!==undefined&&(!Number.isInteger(seed)||seed<0||seed>0xffffffff))throw admissionError('FULL_SEED_INVALID');
   return ()=>{
@@ -305,7 +335,7 @@
    for(let y=0;y<H;y++)for(let x=0;x<W;x++){
     const command={type:'EnemyMove',actorId:actor.id,x,y};
     const checked=queryStep(command);
-    if(checked.ok)entries.push({command,facts:{path:checked.path},
+    if(checked.ok)entries.push({command,facts:{path:checked.path,observedCellsAfterMove:observedCells('enemy',command)},
      baseline:planned?.step?.x===x&&planned?.step?.y===y});
    }
   }
@@ -393,7 +423,8 @@
    };
    latestSpectator=freeze({view:{side:'spectator',sessionId:session.sessionId,revision:sequence,
     turn,phase:turnPhase,activeSide:gameOver?null:phase,ended:gameOver,outcome:terminalOutcome(),
-    terrain:boardTerrain(),units:boardUnits(units,null),objectives:{
+    terrain:boardTerrain(),units:boardUnits(units,null),objectiveRemaining:{
+     player:publicObjectiveCount('player'),enemy:publicObjectiveCount('enemy')},objectives:{
      player:publicObjectives('player'),enemy:publicObjectives('enemy')}},
     log:formatLogEntries(ensure().logs,()=>true)});
   }
@@ -556,7 +587,7 @@
  function refresh(){if(!active())return;event('refresh');if(selected&&!known(selected.id))selected=null}
  function log(key,params={},subjects=[],audience=null){if(active())ensure().logs.push({key,params:copy(params),subjects:[...subjects],
   ...(audience&&controllerPort()?{audience}:{})})}
- function status(){if(!active())return null;const s=ensure();return {pendingEnemy:pendingEnemy(),enemyTurns:s.visibility.teamFire.enemy.completed,turnLimit:turnLimit(s)}}
+ function status(){if(!active())return null;const s=ensure();return {pendingEnemy:pendingEnemy(),enemyTurns:s.visibility.teamFire.enemy.completed,turnLimit:turnLimit(s),remainingObjectives:publicObjectiveCount('player')}}
  function stealthText(u){if(!active()||!registry().units[u.catalogAssetId]?.target.stealthRef)return '';const t=(key,params={})=>root.GoblinLanguage?.t(key,params)??key,parts=[t('v2.full.stealth.capability'),t('v2.full.stealth.sensorRule',{range:2}),t('v2.full.stealth.movementRule'),t('v2.full.stealth.eventRule')];if(u.team==='enemy'&&unitAlive(u)&&known(u.id)){const s=ensure();parts.push(t(s.visibility.reveals.some(r=>r.runtimeUnitId===u.id&&r.viewerTeam==='player'&&r.untilFireEnd>s.visibility.teamFire.player.completed)?'v2.full.stealth.eventExpiry':'v2.full.stealth.sensorContact'))}return parts.join(' · ')}
  function logEntries(all=false,team='player',onlyKnown=false){
   if(!active())return [];
@@ -887,7 +918,7 @@
   aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,recordRoundAction,catalogCard,initialRoster,status,stealthText,deadlineRemoved,
   enemyHexShot,prepareControllers,controllerPort,mapPort,nativeCommitActive:()=>!!controlOwner()?.committing(),startControlledEnemyTurn,enterControlledSide,allowsPlayerPhaseAdvance,
   ownsPresentation,stageControlledPresentation,startControlledPresentation,controllerOffers,controllerCapabilities,registerQualifiedController,
-  hexTacticalFacts,nativePlayerGateway});
+  hexTacticalFacts,nativePlayerGateway,observedCells});
  const oldCheckVictory=checkVictory;
  checkVictory=function(){
   // Native combat reaches this boundary after applying damage and before finishing the mission.

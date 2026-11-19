@@ -76,6 +76,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       if(!status){status=document.createElement('p');status.id='v2-objective-members';at('#v2-objective').after(status);}
       status.textContent=members.length?t('v2.ui.objectiveMembers',{done,total:members.length}):'';
       if(state.fullStatus){if(state.fullStatus.pendingEnemy)status.textContent+=' · '+t('v2.full.objective.pendingWaves');if(Number.isSafeInteger(state.fullStatus.turnLimit)&&state.fullStatus.turnLimit>0)status.textContent+=' · '+t('v2.full.limit.status',{current:state.fullStatus.enemyTurns,limit:state.fullStatus.turnLimit});}
+      if(Number.isSafeInteger(state.fullStatus?.remainingObjectives))
+        status.textContent+=' · '+t('v2.full.remainingObjectives',{count:state.fullStatus.remainingObjectives});
       status.title=members.map(member => `${state.units.find(unit=>unit.id===member.unitId)?.name || member.unitId}: ${t(member.state==='satisfied'?'v2.ui.destroyed':'v2.ui.objectivePending')}`).join('\n');
     }
 
@@ -1669,6 +1671,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       zoomIn.disabled = view.zoom >= 4;
       center.disabled = !view.actorId;
       if (core()) { renderCore(state); if (centerFireActor) centerSelectedActor(state); return; }
+      const fullMap=globalThis.GoblinCatalogFullRuntime?.mapPort?.();
+      const computing=fullMap&&globalThis.GoblinFullSeatOwner?.computing?.(fullMap);
+      const aiFailed=fullMap&&globalThis.GoblinFullSeatOwner?.failure?.(fullMap);
       const learningResult=state.objective.goalMode==='learning'?t(globalThis.GoblinTrainingRuntime?.status()==='lesson-complete'?'training.complete.title':'training.failure.title'):null;
       const actor = state.units.find(unit => unit.id === view.actorId);
       if (!actor || unitDead(actor)) { view.actorId = null; clearContext(); }
@@ -1678,7 +1683,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-map-label').textContent = GoblinLanguage.translate('TACTICAL MAP');
       at('#v2-units-label').textContent = t('ui.hud.units');
       at('#v2-profile').textContent = state.profile==='TRAINING_FIELD_TEST_v1'?t('training.label'):globalThis.GoblinCatalogFullRuntime?.active()?t('v2.full.profile'):state.profile==='CATALOG_SPECIALISTS_v1'?t('v2.specialists.profile'):state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
-      at('#v2-phase').textContent = state.gameOver ? learningResult??t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
+      at('#v2-phase').textContent = computing?t('v2.full.computing'):
+        state.gameOver ? learningResult??t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
         view.phaseSkip?.turn === state.turn ? t(view.phaseSkip.key) : t(`phase.${state.turnPhase}.label`);
       renderPhaseNotice(state);
       at('#v2-turn').textContent = `${t('ui.hud.turn', { turn: state.turn })} · ${state.objective.goalMode === 'learning'?t('training.learningGoal'):state.objective.goalMode === 'core'
@@ -1686,9 +1692,10 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         : t('hud.objective.progress.enemies', { remainingEnemies: state.objective.enemyAlive, totalEnemies: globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.goalMode==='core-and-escort'?state.objective.total:state.objective.enemyTotal })}`;
       at('#v2-map').setAttribute('aria-label', `${t('ui.hud.map')}: ${t('v2.ui.selectHex')}`);
       const terminal = at('#v2-terminal');
-      terminal.hidden = !state.gameOver;
-      terminal.classList.toggle('v2-failed', state.gameOver && (state.objective.goalMode==='learning'?globalThis.GoblinTrainingRuntime?.status()==='lesson-failed':state.objective.outcome === false));
-      terminal.textContent = state.gameOver ? learningResult??t(state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '';
+      terminal.hidden = !state.gameOver&&!aiFailed;
+      terminal.classList.toggle('v2-failed',!!aiFailed||state.gameOver && (state.objective.goalMode==='learning'?globalThis.GoblinTrainingRuntime?.status()==='lesson-failed':state.objective.outcome === false));
+      terminal.textContent = aiFailed?t('v2.full.aiFailed'):
+        state.gameOver ? learningResult??t(state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '';
       const next = { movement: 'dialog.phaseAdvance.confirm.toFire', fire: 'dialog.phaseAdvance.confirm.toGev', gev: 'dialog.phaseAdvance.confirm.toEnemy' }[state.turnPhase];
       const phaseButton = at('#v2-phase-action');
       phaseButton.textContent = next ? `${t(next)} · ${t('dialog.phaseAdvance.pending', { pendingCount: state.ready })}`
@@ -1697,7 +1704,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       splitPhaseLabel(phaseButton);
       phaseButton.disabled = !next || state.phase !== 'player' || state.gameOver || GameDialogs.isOpen() || view.busy ||
         !!globalThis.GoblinTrainingRuntime?.holdingShotResult();
-      at('#v2-pause').disabled = GameDialogs.isOpen() || view.busy;
+      at('#v2-pause').disabled = GameDialogs.isOpen() || (view.busy&&!computing&&!aiFailed);
       const undoButton = at('#v2-undo');
       undoButton.hidden = false;
       undoButton.disabled = !state.undo.available || view.busy;

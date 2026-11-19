@@ -9,17 +9,24 @@ const atlas='catalog-full-atlas';
 const snapshot=game=>read(game,'({units,turn,phase,turnPhase,gameOver,full:GoblinCatalogFullRuntime.snapshot()})');
 const baseline=batch=>batch.candidates.find(candidate=>candidate.facts.baseline).key;
 
-async function run(select) {
+async function run(select,strong=false) {
   const game=await fullScene(atlas,7,false,'FULL_CATALOG_v1');
-  const port=game.run('loadScenario("catalog-full-atlas",{roles:{player:"ai",enemy:"ai"}})');
+  const calls=[], commits=[];
+  let port;
+  const choose=batch=>{
+    calls.push(port.ticket('ai'));
+    return select(batch,calls.length);
+  };
+  if(strong)game.context.GoblinCatalogFullRuntime.registerQualifiedController({
+    side:'enemy',id:'test-strong',difficulty:'strong',select:choose});
+  port=game.run(strong?
+    'loadScenario("catalog-full-atlas",{roles:{player:"ai",enemy:"ai"},policyIds:{enemy:"test-strong"}})':
+    'loadScenario("catalog-full-atlas",{roles:{player:"ai",enemy:"ai"}})');
   for(let n=0;n<3;n++)assert.equal(port.commit('ai',port.open('ai').permit,{type:'EndPhase'}).ok,true);
   const player=createFullCatalogAiHost(game.context.GoblinCatalogFullRuntime,game.context.GoblinSpecialistsUI,
     game.run('({query,dispatch})'),()=>game.run('phase'),game.context.GoblinSpecialistsRuntime);
-  const calls=[], commits=[];
-  const host=createOwnedFullCatalogSessionHost({port,player,select:{enemy:batch=>{
-    calls.push(port.ticket('ai'));
-    return select(batch,calls.length);
-  }},onCommit:({action},before)=>commits.push({action,generation:before.generation})});
+  const host=createOwnedFullCatalogSessionHost({port,player,select:{enemy:choose},
+    onCommit:({action},before)=>commits.push({action,generation:before.generation})});
   return {game,port,host,calls,commits};
 }
 
@@ -38,6 +45,22 @@ test('a rejected choice stays rejected across pause and resume, with no policy r
   assert.equal(commits.length,0);
   assert.deepEqual(game.rng(),rng);
   assert.deepEqual(snapshot(game),state);
+});
+
+test('an explicitly paused strong worker attempt can restart its unspent slot after resume',async()=>{
+  const deferred=Promise.withResolvers();
+  const match=await run((batch,count)=>count===1?deferred.promise:baseline(batch),true);
+  const original=match.port.ticket('ai');
+  const pending=match.host.advance();
+  match.host.pause();
+  deferred.reject(Error('STRONG_SEARCH_STOPPED'));
+  assert.equal((await pending).code,'AI_HOST_STALE');
+  assert.equal(match.commits.length,0);
+  match.host.resume();
+  assert.equal(match.port.ticket('ai').slot,original.slot);
+  assert.deepEqual(await match.host.advance(),{ok:true});
+  assert.equal(match.calls.length,2);
+  assert.equal(match.commits.length,1);
 });
 
 test('a valid choice still running on resume can commit only with fresh permission, then the next action plans normally',async()=>{

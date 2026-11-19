@@ -534,7 +534,7 @@ if (typeof document !== 'undefined') {
       if (defenderHuman) manualDefense={permit:null,pending:null};
       if (!profile || defenderHuman || aiAttacker) replay=createIronDustCommitRecorder(session.profile);
       trainingSeats=!profile && (!aiAttacker || defenderHuman)
-        ? {attacker,defender:defenderHuman?'human':difficulty} : null;
+        ? {attacker,defender:defenderHuman?'human':defender} : null;
       mode = 'ready';
       observePresentation(presentation,'sync',session);
       showGate('');

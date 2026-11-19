@@ -5,6 +5,7 @@ import {selectWeakFullCatalog, selectMediumFullCatalog} from './src/core/full-ca
 import {prepareFullAttack2a, FULL_ATTACK_2A_ENGINE, FULL_ATTACK_2A_ID} from './src/core/full-attack-2a.mjs?v=3';
 import {prepareDefenderTrial} from './src/core/full-defender-trial.mjs?v=1';
 import {createStrongSearchController} from './src/core/strong-search-controller.mjs?v=1';
+import {createFullExplorationPolicy} from './src/core/full-exploration-policy.mjs?v=1';
 
 const standardDefender = 'full-native-standard-defender';
 
@@ -67,11 +68,32 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
   const full = globalThis.GoblinCatalogFullRuntime;
   const specialists = globalThis.GoblinSpecialistsRuntime;
   const searches = new WeakMap();
+  const explorations = new WeakMap();
+  const failures = new WeakMap();
   const computing = new WeakSet(), hooks = new WeakMap();
+  function explorationFor(port,side) {
+    let seats=explorations.get(port);
+    if(!seats){seats=new Map();explorations.set(port,seats);}
+    if(!seats.has(side))seats.set(side,createFullExplorationPolicy({side}));
+    return seats.get(side);
+  }
+  function selectWithExploration(batch,port,report,choose) {
+    const exploration=explorationFor(port,batch.side);
+    exploration.observe(batch.view);
+    const key=choose();
+    const selected=batch.candidates.find(candidate=>candidate.key===key);
+    return ['hold','end-phase'].includes(selected?.kind)?exploration.select(batch,report)??key:key;
+  }
   async function selectStrong(batch,port,report,capture) {
+    explorationFor(port,batch.side).observe(batch.view);
     let search = searches.get(port);
     if (!search) {
-      search = createStrongSearchController({profile:'FULL_CATALOG_v1',capture,reference:selectMediumFullCatalog,
+      search = createStrongSearchController({profile:'FULL_CATALOG_v1',
+        capture:decision=>{
+          const packet=capture(decision);
+          return packet&&{...packet,explorationState:explorationFor(port,decision.side).snapshot()};
+        },
+        reference:decision=>explorationFor(port,decision.side).select(decision)??selectMediumFullCatalog(decision),
         onSearch({side,wallMs,workers}) {
           const end=performance.now();
           performance.measure('goblin-ai-search',{start:end-wallMs,end,
@@ -80,13 +102,23 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
       searches.set(port,search);
     }
     computing.add(port);
+    failures.delete(port);
     hooks.get(port)?.refresh();
     try {return await search.select(batch,report);}
+    catch(error){
+      if(error.message!=='STRONG_SEARCH_STOPPED'&&!port.state()?.paused&&port.state())
+        failures.set(port,error.message);
+      throw error;
+    }
     finally {computing.delete(port);hooks.get(port)?.refresh();}
   }
   for (const side of ['player', 'enemy']) {
-    full.registerQualifiedController({side, id:side + '-weak', difficulty:'weak', select:selectWeakFullCatalog});
-    full.registerQualifiedController({side, id:side + '-medium', difficulty:'medium', select:selectMediumFullCatalog});
+    full.registerQualifiedController({side, id:side + '-weak', difficulty:'weak',
+      select:(batch,report)=>selectWithExploration(batch,full.controllerPort(),report,
+        ()=>selectWeakFullCatalog(batch,report))});
+    full.registerQualifiedController({side, id:side + '-medium', difficulty:'medium',
+      select:(batch,report)=>selectWithExploration(batch,full.controllerPort(),report,
+        ()=>selectMediumFullCatalog(batch,report))});
     full.registerQualifiedController({side, id:side + '-strong', difficulty:'strong', select:selectStrong});
   }
   const player = createFullCatalogAiHost(full, globalThis.GoblinSpecialistsUI, full.nativePlayerGateway,
@@ -101,7 +133,8 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
       const {base64} = await response.json();
       const modelBytes = Uint8Array.from(atob(base64),character=>character.charCodeAt(0));
       const select = await prepareFullAttack2a({engine:FULL_ATTACK_2A_ENGINE,modelBytes});
-      full.registerQualifiedController({side:'player',id:FULL_ATTACK_2A_ID,difficulty:null,select});
+      full.registerQualifiedController({side:'player',id:FULL_ATTACK_2A_ID,difficulty:null,
+        select:(batch,port,report)=>selectWithExploration(batch,port,report,()=>select(batch,port,report))});
     })(),
     (async () => {
       const id = 'full-defender-control-trial';
@@ -109,7 +142,7 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
       if (!response.ok) throw Error('AI_POLICY_MODEL_UNAVAILABLE');
       const select = await prepareDefenderTrial(id,await response.arrayBuffer());
       full.registerQualifiedController({side:'enemy',id,difficulty:null,
-        select:(batch,_port,report)=>select(batch,report)});
+        select:(batch,port,report)=>selectWithExploration(batch,port,report,()=>select(batch,report))});
     })()
   ]).then(results => {
     for (const [index,result] of results.entries()) {
@@ -125,6 +158,7 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
     get readyState() { return readyState; },
     get unavailable() { return [...unavailable]; },
     computing:port=>computing.has(port),
+    failure:port=>failures.get(port)??null,
     offers:config => standardFullSeatOffers(config, GoblinLanguage.t('v2.full.standardDefender')),
     configure:config=>createFullGameManager(config,full),
     nativeSetup:(config,selection)=>fullNativeSetup(createFullGameManager(config,full),selection),
@@ -132,10 +166,28 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
     bind(session, selection, ui, port) {
       hooks.set(port,ui);
       const select=fullSeatFallback(session,selection,port);
-      const host=createOwnedFullCatalogSessionHost({port,player,select,onCommit:ui.refresh});
+      const host=createOwnedFullCatalogSessionHost({port,player,select,onCommit(_result,before){
+        const projection=port.project('ai')?.view;
+        explorationFor(port,before.side).accepted(projection?.side===before.side?projection:undefined);
+        ui.refresh();
+      }});
       return Object.freeze({...host,
+        async advance(){
+          const result=await host.advance();
+          const state=port.state();
+          if(!result.ok&&state?.controller==='ai'&&!state.paused&&!state.ended&&
+              !['AI_HOST_STALE','AI_HOST_UNAVAILABLE'].includes(result.code)){
+            if(!failures.has(port))failures.set(port,result.code);
+            ui.refresh();
+          }
+          return result;
+        },
         pause(){searches.get(port)?.invalidate();host.pause();},
-        leave(){searches.get(port)?.stop();searches.delete(port);hooks.delete(port);host.leave();}
+        leave(){
+          searches.get(port)?.stop();searches.delete(port);
+          for(const exploration of explorations.get(port)?.values()??[])exploration.reset();
+          explorations.delete(port);failures.delete(port);hooks.delete(port);host.leave();
+        }
       });
     },
     playerCommands: port => player.humanPlayerOptions(port).map(entry=>entry.command),

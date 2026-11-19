@@ -176,10 +176,16 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       const title = heading(t('v2.full.seats'));
       dialog.setAttribute('aria-labelledby', title.id = 'v2-full-seat-heading');
       form.append(title);
+      const minimumNote=game.minimumDifficulty===null?null:
+        paragraph(t('v2.full.minimumSelection',{minimum:t('v2.full.rule.'+game.minimumDifficulty)}),'v2-screen-meta');
+      if(minimumNote){minimumNote.id='v2-full-minimum-note';form.append(minimumNote);}
       const selectors = game.seats.map(({id:side,ai,aiUnavailable}) => {
         const label = document.createElement('label');
         label.textContent = t('v2.full.seat.' + side) + ' ';
         const select = document.createElement('select');
+        const descriptions=minimumNote?[minimumNote]:[];
+        const describe=()=>select.setAttribute('aria-describedby',
+          descriptions.filter(note=>!note.hidden).map(note=>note.id).join(' '));
         const choices = new Map([['', {label:t('v2.full.human')}]]);
         const order = ['weak','medium','strong',null];
         for (const {id,difficulty} of ai.toSorted((left,right)=>order.indexOf(left.difficulty)-order.indexOf(right.difficulty))) {
@@ -195,20 +201,26 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         select.value = side === 'enemy' && ai.length ? ai[0].id : '';
         label.append(select);
         form.append(label);
-        if (owner.unavailable?.includes(side))
-          form.append(paragraph(t('v2.full.trainedUnavailable'), 'v2-screen-meta'));
+        if (owner.unavailable?.includes(side)){
+          const note=paragraph(t('v2.full.trainedUnavailable'), 'v2-screen-meta');
+          note.id='v2-full-model-unavailable-'+side;
+          descriptions.push(note);form.append(note);
+        }
         const searchNote=paragraph(t('v2.full.strongTiming'),'v2-screen-meta');
-        const showSearchNote=()=>{searchNote.hidden=!select.value.endsWith('-strong');};
+        searchNote.id='v2-full-search-note-'+side;
+        descriptions.push(searchNote);
+        const showSearchNote=()=>{searchNote.hidden=!select.value.endsWith('-strong');describe();};
         select.addEventListener('change',showSearchNote);
         showSearchNote();
         form.append(searchNote);
         if (side === 'enemy' && choices.has('full-defender-control-trial')) {
           const note = paragraph('', 'v2-screen-meta');
           note.id = 'v2-full-trained-description';
-          select.setAttribute('aria-describedby',note.id);
+          descriptions.push(note);
           const update = () => {
             note.hidden = select.value !== 'full-defender-control-trial';
             note.textContent = note.hidden ? '' : t('v2.full.trainedDefenderNote');
+            describe();
           };
           select.addEventListener('change',update);
           update();
@@ -219,9 +231,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             t('v2.full.minimumUnavailable').replace('{minimum}', t('v2.difficulty.' + game.minimumDifficulty)) :
             t(aiUnavailable === 'AI_LEVEL_FORBIDDEN' ? 'v2.full.aiForbidden' : 'v2.full.aiUnavailable');
           const note = paragraph(reason, 'v2-screen-meta');
-          select.setAttribute('aria-describedby', note.id = 'v2-full-seat-reason-' + side);
+          note.id='v2-full-seat-reason-'+side;
+          descriptions.push(note);
           form.append(note);
         }
+        describe();
         return {side, select, choices};
       });
       const submit = document.createElement('button');
@@ -241,7 +255,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
               selectors.some(({select, choices}) => !choices.has(select.value))) return resolve(false);
           const selection = Object.freeze(Object.fromEntries(
             selectors.map(({side, select}) => [side, select.value || null])));
-          resolve({owner,config,selection});
+          resolve({owner,config,selection,mapPresentation:selection.player===null&&selection.enemy!==null});
         }, {once:true});
         dialog.showModal();
         fullSetupDialog = dialog;
@@ -347,6 +361,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const controls = actions(pause, restart, leave);
         controls.classList.add('v2-full-spectator-controls');
         const turnLabel = paragraph('');
+        const objective = paragraph('', 'v2-full-objective');
+        objective.setAttribute('role','status');
         const outcome = paragraph('', 'v2-full-spectator-outcome');
         outcome.setAttribute('role', 'status');
         const map = document.createElement('div');
@@ -354,8 +370,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         log.className = 'v2-screen-log';
         log.tabIndex = 0;
         panel.classList.add('v2-full-spectator');
-        panel.append(title, controls, turnLabel, outcome, actions(latest, partial), map, log);
-        binding.spectatorScreen = {panel,title,pause,restart,leave,latest,partial,turnLabel,outcome,map,log};
+        panel.append(title, controls, turnLabel, objective, outcome, actions(latest, partial), map, log);
+        binding.spectatorScreen = {panel,title,pause,restart,leave,latest,partial,turnLabel,objective,outcome,map,log};
       }
       const nodes = binding.spectatorScreen;
       const {view,log} = snapshot;
@@ -366,8 +382,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       update(nodes.leave, t(editorConfig ? 'v2.editor.returnToEditor' : 'v2.ui.mainMenu'));
       nodes.pause.disabled = !binding.lifecycle || view.ended;
       update(nodes.turnLabel, t('ui.hud.turn', {turn:view.turn}));
+      const remaining=view.objectiveRemaining;
+      update(nodes.objective,remaining?[t('v2.full.seat.player')+' '+t('v2.full.remainingObjectives',{count:remaining.player}),
+        t('v2.full.seat.enemy')+' '+t('v2.full.remainingObjectives',{count:remaining.enemy})].join(' · '):'');
       update(nodes.outcome, view.ended && typeof view.outcome === 'boolean'
         ? t(view.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') :
+        binding.owner.failure?.(binding.port)?t('v2.full.aiFailed'):
         binding.owner.computing?.(binding.port)?t('v2.full.computing'):'');
       nodes.outcome.hidden = !nodes.outcome.textContent;
 
@@ -456,6 +476,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
             () => openRoundAnalysis(rounds.terminalPartial)));
       }
       if (!snapshot) {
+        if(binding.owner.failure?.(port))panel.append(paragraph(t('v2.full.aiFailed'),'v2-status'));
         if(binding.owner.computing?.(port)){
           const status=paragraph(t('v2.full.computing'),'v2-status');
           status.setAttribute('role','status');
@@ -464,7 +485,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         panel.append(actions(...controls)); return;
       }
       const {view, log} = snapshot;
-      panel.append(paragraph(t('ui.hud.turn', {turn:view.turn})), fullSeatMap(view));
+      panel.append(paragraph(t('ui.hud.turn', {turn:view.turn})));
+      if(Number.isSafeInteger(view.objectiveRemaining)){
+        const objective=paragraph(t('v2.full.remainingObjectives',{count:view.objectiveRemaining}),'v2-full-objective');
+        objective.setAttribute('role','status');
+        panel.append(objective);
+      }
+      panel.append(fullSeatMap(view));
       const entries = document.createElement('div');
       entries.className = 'v2-screen-log';
       entries.append(...log.map(line=>paragraph(line.message)));
@@ -1191,8 +1218,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       select.value = briefingAttacker;
       const note=paragraph(t('v2.full.strongTiming'),'v2-screen-meta');
       note.id='v2-iron-strong-attacker-note';
-      select.setAttribute('aria-describedby',note.id);
-      const update=()=>{briefingAttacker=select.value;note.hidden=briefingAttacker!=='strong';};
+      const minimum=IronDustBrowserV2.seatManager().minimumDifficulty;
+      const update=()=>{
+        briefingAttacker=select.value;note.hidden=briefingAttacker!=='strong';
+        select.setAttribute('aria-describedby',[minimum===null?null:'v2-iron-minimum-note',
+          note.hidden?null:note.id].filter(Boolean).join(' '));
+      };
       select.onchange=update;
       update();
       label.append(select,note);
@@ -1216,11 +1247,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       select.value = briefingDifficulty;
       const note=paragraph(t('v2.full.ironTrainedDefenderNote'),'v2-screen-meta');
       note.id='v2-iron-trained-defender-note';
-      select.setAttribute('aria-describedby',note.id);
+      const minimum=IronDustBrowserV2.seatManager().minimumDifficulty;
       const update=()=>{
         briefingDifficulty=select.value;
         note.hidden=!['trained','strong'].includes(briefingDifficulty);
         note.textContent=t(briefingDifficulty==='strong'?'v2.full.strongTiming':'v2.full.ironTrainedDefenderNote');
+        select.setAttribute('aria-describedby',[minimum===null?null:'v2-iron-minimum-note',
+          note.hidden?null:note.id].filter(Boolean).join(' '));
       };
       select.onchange=update;
       update();
@@ -1986,6 +2019,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         header.append(paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
         if (migrated) header.append(paragraph(t('v2.full.migratedObjective')));
         if (missionId === 'iron-dust-v2' && data) {
+          const minimum=IronDustBrowserV2.seatManager().minimumDifficulty;
+          if(minimum!==null){
+            const note=paragraph(t('v2.full.minimumSelection',{minimum:t('v2.full.rule.'+minimum)}),'v2-screen-meta');
+            note.id='v2-iron-minimum-note';
+            header.append(note);
+          }
           header.append(ironDustAttackerControl(), difficultyControl());
         }
         if (campaign?.index === 0 && !campaign.field) header.append(paragraph(t('v2.campaign.session')));

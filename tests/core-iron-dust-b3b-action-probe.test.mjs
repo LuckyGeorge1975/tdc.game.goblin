@@ -70,7 +70,7 @@ function legacy() {
       map.defaultTerrain,
     Math: Object.assign(Object.create(Math), {random: () => 0})});
   vm.runInContext(`${text.slice(crtStart, crtEnd + 1)}\n${['combatRatio', 'effectiveDefense',
-    'applyCombatRoll', 'combatOutcome'].map(name => extract(text, name)).join('\n')}`, context);
+    'applyCombatRoll', 'combatRandom', 'combatOutcome'].map(name => extract(text, name)).join('\n')}`, context);
   return context;
 }
 

@@ -1,3 +1,4 @@
+import {effectiveIronDustDifficulty} from './src/core/iron-dust-enemy-policy.mjs';
 export const TRAINING_ARCHIVE_VERSION='goblin-training-archive-v1';
 const profile='CORE_IRON_DUST_v2';
 const exact=(value,keys)=>value && typeof value==='object' && !Array.isArray(value) &&
@@ -29,11 +30,14 @@ export async function importIronDustTrainingArchive(archive) {
   if (!exact(archive,['version','profile','seats','outcome','replay']) ||
       archive.version!==TRAINING_ARCHIVE_VERSION || archive.profile!==profile ||
       !exact(archive.seats,['player','enemy']) ||
-      !validSeat(archive.seats.player,['weak','trained']) ||
-      !validSeat(archive.seats.enemy,['weak','medium','strong']) ||
+      !validSeat(archive.seats.player,['weak','medium','strong','trained']) ||
+      !validSeat(archive.seats.enemy,['weak','medium','strong','trained']) ||
       ![archive.seats.player,archive.seats.enemy].some(seat=>seat.controller==='human')) invalid();
+  const header=archive.replay?.header?.profileHeader;
+  const defender=archive.seats.enemy.policy;
+  const expectedRule=defender==='trained'?effectiveIronDustDifficulty('medium',header?.minimumDifficulty):defender;
   if(archive.seats.enemy.controller==='ai'&&
-     (archive.replay?.header?.profileHeader?.enemyPolicy?.difficulty??'medium')!==archive.seats.enemy.policy) invalid();
+     (header?.enemyPolicy?.difficulty??'medium')!==expectedRule) invalid();
 
   const {dispatchIronDustCommittedCommand,playIronDustProfileReplay}=
     await import('./src/core/iron-dust-profile-replay.mjs?v=4');

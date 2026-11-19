@@ -33,6 +33,18 @@ test('worker allocation reserves hardware and caps the pool',()=>{
   assert.deepEqual([1,2,4,8,32].map(strongWorkerCount),[1,1,2,4,8]);
 });
 
+test('a native opponent turn with no available actors still completes the model response',async()=>{
+  let turn=1;
+  const result=await evaluateStrongBranch({side:'player',actions:[{index:0,action:{type:'EndPhase'}}]},0,()=>({
+    status:()=>({side:'player',turn,ended:false,winner:null}),
+    commit(){turn++;return {events:[]};},
+    open(){throw Error('an additional own turn would exceed the response boundary');},
+    evaluate:()=>0
+  }));
+  assert.equal(result.continuation.length,1);
+  assert.equal(result.final.turn,2);
+});
+
 test('all native Iron Dust defender fire choices get complete modal reply branches without consuming live RNG',async()=>{
   const profile=at(13),initial=JSON.stringify(profile),{batch,packet}=packetFor(profile);
   const other=packetFor(forkIronDustProfileRng(profile,246813579)).packet;
