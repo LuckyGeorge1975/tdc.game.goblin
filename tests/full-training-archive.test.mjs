@@ -63,8 +63,10 @@ test('all qualified rule and trained seats round-trip native FULL archives with 
     assert.deepEqual(archive.seats,seats);
     const imported=await importFullTrainingArchive(archive);
     assert.equal(imported.outcome,archive.outcome);
-    assert.ok(imported.demonstrations.length>0);
-    assert.ok(imported.demonstrations.every(row=>row.side!==side));
+    assert.equal(imported.provenance.status,'declared-replay');
+    assert.deepEqual(imported.demonstrations,[]);
+    assert.ok(imported.declaredDemonstrations.length>0);
+    assert.ok(imported.declaredDemonstrations.every(row=>row.side!==side));
     for(const replacement of [
       {...seats[side],difficulty:difficulty==='weak'?'strong':'weak'},
       {...seats[side],policy:(side==='player'?'enemy':'player')+'-strong'},
@@ -137,7 +139,7 @@ test('FULL archives keep the seeded stream on the effective undo branch across u
   assert.deepEqual(await play(313,true),clean);
   assert.notEqual((await play(911,false)).effectiveRoll,clean.effectiveRoll);
   const imported=await importFullTrainingArchive(clean.archive);
-  const choice=imported.demonstrations.find(step=>step.command.target?.componentId==='treads');
+  const choice=imported.declaredDemonstrations.find(step=>step.command.target?.componentId==='treads');
   assert.equal(choice.candidates[choice.selected].facts.effectKind,'tread-roll-5-6');
   assert.doesNotMatch(JSON.stringify(choice.candidates),/"(?:rng|seed|roll|draws)":/i);
   const damaged=structuredClone(clean.archive);

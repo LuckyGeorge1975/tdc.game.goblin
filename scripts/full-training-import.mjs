@@ -7,6 +7,8 @@ import {FULL_ATTACK_2A_ID} from '../src/core/full-attack-2a.mjs';
 import {TRAINING_ARCHIVE_VERSION} from '../training-archive.mjs';
 import {gameplaySourceHashes} from '../tests/helpers/replay-source-binding.mjs';
 import {verifyTrainingSources} from '../full-training-source-binding.mjs';
+import {registerFullExperimentReplay,revalidateFullExperimentCatalog,validateFullExperimentRecording,validateFullExperimentDecision} from './full-experiment-policies.mjs';
+import {fullTrainingDecisionFrame,fullTrainingDecisionTraceRow,verifyFullTrainingCapture} from './full-training-capture.mjs';
 
 const source=file=>readFileSync(new URL('../'+file,import.meta.url),'utf8');
 const plain=value=>JSON.parse(JSON.stringify(value));
@@ -18,13 +20,14 @@ function exact(value,keys){
     keys.every(key=>Object.hasOwn(value,key));
 }
 
-export async function openFullTrainingReplay(archive) {
+export async function openFullTrainingReplay(archive,{experimentCatalog}={}) {
   const {replay,seats}=archive;
   expect(exact(seats,['player','enemy']));
   expect(exact(replay,['version','sources','seed','level','initial','entries']) && replay.version==='full-native-journal-v1' &&
     Number.isInteger(replay.seed)&&replay.seed>=0&&replay.seed<=0xffffffff &&
     Array.isArray(replay.entries));
   verifyTrainingSources(replay.sources,gameplaySourceHashes());
+  if(experimentCatalog)await revalidateFullExperimentCatalog(experimentCatalog);
   expect(exact(replay.level,['id','digest'])||exact(replay.level,['id','digest','draft']));
   const roles={}, policyIds={};
   const game=fullShell();
@@ -44,13 +47,20 @@ export async function openFullTrainingReplay(archive) {
       expect(side==='enemy'&&seat.difficulty===null);
       continue;
     }
+    if(typeof seat.policy==='string'&&seat.policy.startsWith('full-experiment:')){
+      full.registerQualifiedController({side,id:side+'-medium',difficulty:'medium',select:()=>null});
+      registerFullExperimentReplay({catalog:experimentCatalog,id:seat.policy,side,difficulty:seat.difficulty,
+        full,root:game.context});
+      validateFullExperimentRecording(experimentCatalog,seat.policy,{seed:replay.seed});
+      policyIds[side]=seat.policy;
+      continue;
+    }
     expect(['weak','medium','strong'].includes(seat.difficulty)&&seat.policy===side+'-'+seat.difficulty ||
       side==='player'&&seat.policy===FULL_ATTACK_2A_ID&&seat.difficulty===null ||
       side==='enemy'&&seat.policy==='full-defender-control-trial'&&seat.difficulty===null);
     policyIds[side]=seat.policy;
     full.registerQualifiedController({side,id:seat.policy,difficulty:seat.difficulty,select:()=>null});
   }
-  expect(Object.values(roles).includes('human'));
   let pending;
   game.context.control={roles,policyIds,seed:replay.seed,ui:{handoff(_seat,take){pending=take;}}};
   game.context.levelId=replay.level.id;
@@ -73,8 +83,9 @@ export async function openFullTrainingReplay(archive) {
   expect(port?.state()?.levelDigest===replay.level.digest);
   const player=createFullCatalogAiHost(full,game.context.GoblinSpecialistsUI,full.nativePlayerGateway,
     ()=>port.state()?.side,game.context.GoblinSpecialistsRuntime);
-  function inspect(){
+  function inspect({record=false}={}){
     if(port.state()?.pending) expect(pending());
+    if(record)return fullTrainingDecisionFrame(port,player);
     const state=port.state();
     const opened=port.open(state.controller);
     expect(opened&&!state.ended);
@@ -90,19 +101,26 @@ export async function openFullTrainingReplay(archive) {
   return {game,port,inspect,commit};
 }
 
-export async function importFullTrainingArchive(archive) {
+export async function importFullTrainingArchive(archive,{experimentCatalog,capture}={}) {
   expect(exact(archive,['version','profile','seats','outcome','replay']) &&
     archive.version===TRAINING_ARCHIVE_VERSION&&archive.profile==='FULL_CATALOG_v1'&&
-    ['player','enemy','draw'].includes(archive.outcome));
-  const host=await openFullTrainingReplay(archive);
+    ['player','enemy','draw'].includes(archive.outcome)&&exact(archive.seats,['player','enemy']));
+  const verified=capture?verifyFullTrainingCapture(archive,capture):null;
+  const experiments=Object.values(archive.seats).filter(seat=>seat.policy?.startsWith('full-experiment:'));
+  const host=await openFullTrainingReplay(archive,{experimentCatalog});
   const demonstrations=[];
   for (const [commandIndex,entry] of archive.replay.entries.entries()){
     expect(exact(entry,['side','slot','command','draws','digest']) &&
       Number.isInteger(entry.draws)&&entry.draws>=0&&typeof entry.digest==='string');
-    const frame=host.inspect();
+    const frame=host.inspect({record:!!verified||experiments.length>0});
     const {state,view,candidates}=frame;
     expect(entry.side===state.side&&entry.slot===state.slot);
-    if(candidates){
+    const seat=archive.seats[entry.side];
+    if(seat.policy?.startsWith('full-experiment:'))
+      validateFullExperimentDecision(experimentCatalog,seat.policy,frame,host.port,commandIndex,entry.command);
+    if(verified)assert.deepEqual(fullTrainingDecisionTraceRow(frame,commandIndex,entry.command,archive.seats[entry.side]),
+      verified.trace.decisions[commandIndex],'FULL_CAPTURE_DECISION_TRACE');
+    if(candidates&&state.controller==='human'){
       const selected=candidates.findIndex(item=>JSON.stringify(item.command)===JSON.stringify(entry.command));
       expect(selected>=0);
       const clean=candidates.map(({command,facts})=>({command,facts}));
@@ -112,7 +130,11 @@ export async function importFullTrainingArchive(archive) {
     expect(host.commit(frame,entry.command).ok);
   }
   expect(host.port.state()?.ended);
+  for(const seat of experiments)validateFullExperimentRecording(experimentCatalog,seat.policy,{seed:archive.replay.seed,
+    acceptedCommands:archive.replay.entries.length});
   assert.deepEqual(plain(host.port.trainingArchive()),archive);
   return {profile:archive.profile,outcome:archive.outcome,seed:archive.replay.seed,
-    acceptedCommands:archive.replay.entries.length,demonstrations};
+    acceptedCommands:archive.replay.entries.length,
+    provenance:verified?.provenance??{status:'declared-replay'},
+    demonstrations:verified?demonstrations:[],declaredDemonstrations:verified?[]:demonstrations};
 }

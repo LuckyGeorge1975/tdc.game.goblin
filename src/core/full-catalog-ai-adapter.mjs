@@ -27,6 +27,7 @@ function describeOptions(listed,side) {
         ...(command.bayId?{bayId:command.bayId}:{}),
         ...(command.job?{job:command.job,option:command.option}:{})}}}));
 }
+export {describeOptions as describeFullCatalogOptions};
 
 export function createFullCatalogAiAdapter(host, readGeneration) {
   let slot = null;

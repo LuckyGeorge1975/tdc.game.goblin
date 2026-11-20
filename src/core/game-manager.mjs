@@ -1,5 +1,6 @@
 const difficulties = Object.freeze(['weak','medium','strong']);
 const validId = id => typeof id==='string' && /^[a-z][a-z0-9-]*$/.test(id);
+const validPolicyId = id => validId(id) || typeof id==='string'&&/^full-experiment:[a-f0-9]{64}$/.test(id);
 const reject = code => {throw Object.assign(Error(code),{code});};
 
 function meetsMinimum(difficulty,minimum) {
@@ -23,7 +24,7 @@ export function createGameManager({maxSeats,seatIds,aiAllowed=true,minimumDiffic
     if (typeof capability?.human!=='boolean' || !Array.isArray(capability.ai)) reject('GAME_SEAT_CAPABILITY_INVALID');
     const policies = new Map();
     for (const policy of capability.ai) {
-      if (!validId(policy?.id) || policies.has(policy.id) ||
+      if (!validPolicyId(policy?.id) || policies.has(policy.id) ||
           policy.difficulty!==null && !difficulties.includes(policy.difficulty)) reject('GAME_SEAT_CAPABILITY_INVALID');
       policies.set(policy.id,Object.freeze({id:policy.id,difficulty:policy.difficulty}));
     }

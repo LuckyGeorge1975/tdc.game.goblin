@@ -253,13 +253,16 @@
  }
  const nativePlayerGateway=Object.freeze({query:nativePlayerQuery,dispatch:nativePlayerDispatch});
  function registerQualifiedController({side,id,difficulty,select}){
-  const validDifficulty=id==='full-attack-2a'?side==='player'&&difficulty===null:
+  const experiment=typeof id==='string'&&id.startsWith('full-experiment:');
+  const validDifficulty=experiment?root.GoblinFullExperimentCatalog?.qualifies({side,id,difficulty,select})===true:
+   id==='full-attack-2a'?side==='player'&&difficulty===null:
    id==='full-defender-control-trial'?side==='enemy'&&difficulty===null:
    ScenarioRuleProfiles.fullDifficulties.includes(difficulty);
   if(!controllerSides.includes(side)||typeof id!=='string'||!id||
       !validDifficulty||typeof select!=='function'||
       qualifiedControllers[side].has(id))throw admissionError('FULL_AI_QUALIFICATION_INVALID');
-  qualifiedControllers[side].set(id,Object.freeze({id,difficulty,select}));
+  if(experiment&&!qualifiedControllers[side].has(side+'-medium'))throw admissionError('FULL_AI_QUALIFICATION_INVALID');
+  qualifiedControllers[side].set(id,Object.freeze({id,difficulty,select,experiment}));
  }
  function meetsMinimum(difficulty,minimum){
   if(minimum===null||difficulty===null)return true;
@@ -373,10 +376,11 @@
  }
  function createMissionJournal(session,seed,seats,draft){
   const entries=[], checkpoints=new WeakMap();
-  const sources=root.GoblinFullTrainingSources?.current()??null;
+  const sources=copy(root.GoblinFullTrainingSources?.current()??null);
+  const recordedSeats=copy(seats);
   let word=seed, draws=0, initial=null;
   const level={id:session.scenarioId,digest:session.effectiveRules.catalog.levelDigest};
-  if(draft)level.draft=draft;
+  if(draft)level.draft=copy(draft);
   // The accepted branch owns the cursor for unit, component and area fire.
   function draw(){
    word=(word+0x6d2b79f5)>>>0;
@@ -394,9 +398,24 @@
     s.waves&&{ownTurns:s.waves.ownTurns,waves:s.waves.waves},draws,word],(key,item)=>
      (key==='commandId'||key==='eventId')&&typeof item==='string'&&item.startsWith(session.sessionId+'/')
       ?item.slice(item.indexOf('/')+1):item);
+   return hashText(value);
+  }
+  function hashText(value){
    let hash=2166136261;
    for(let index=0;index<value.length;index++)hash=Math.imul(hash^value.charCodeAt(index),16777619);
    return (hash>>>0).toString(16).padStart(8,'0');
+  }
+  // Recording identity is separate from the neutral world/RNG prefix used by Strong.
+  const context=JSON.stringify([session.ruleProfileId,seed,level,
+   sources&&Object.keys(sources).sort().map(path=>[path,sources[path]]),recordedSeats]);
+  function recording(){
+   const boundInitial=hashText(JSON.stringify([context,initial]));
+   let previous=boundInitial;
+   const boundEntries=entries.map(entry=>{
+    previous=hashText(JSON.stringify([context,previous,entry.side,entry.slot,entry.command,entry.draws,entry.digest]));
+    return {...entry,digest:previous};
+   });
+   return {initial:boundInitial,entries:boundEntries};
   }
   return {
    draw,
@@ -413,8 +432,8 @@
    },
    exportBound:()=>!!sources,
    archive(){return gameOver&&initial&&sources?copy({version:'goblin-training-archive-v1',
-    profile:session.ruleProfileId,seats,outcome:terminalOutcome()==='draw'?'draw':terminalOutcome()===true?'player':'enemy',
-    replay:{version:'full-native-journal-v1',sources,seed,level,initial,entries}}):null;},
+    profile:session.ruleProfileId,seats:recordedSeats,outcome:terminalOutcome()==='draw'?'draw':terminalOutcome()===true?'player':'enemy',
+    replay:{version:'full-native-journal-v1',sources,seed,level,...recording()}}):null;},
    prefix(){return initial?copy({version:'full-native-journal-v1',seed,level,initial,entries,digest:digest()}):null;},
    draws:()=>draws
   };
@@ -483,7 +502,7 @@
      log:logEntries(true,lastHumanSide,true)};
    }
    if(!authorised(mode))return null;
-   return {view:mode==='ai'&&policies[phase]?.difficulty!=null?tacticalProjection(phase):sideProjection(phase),
+   return {view:mode==='ai'&&(policies[phase]?.difficulty!=null||policies[phase]?.experiment)?tacticalProjection(phase):sideProjection(phase),
     ...(mode==='human'?{log:logEntries(true,phase,true)}:{})};
   }
   function ticket(mode){
@@ -541,8 +560,8 @@
     try{undoPhaseCommand();permit=null;return true;}
     finally{undoing=false;}
    },
-   trainingArchive:()=>attached()&&!allowsSpectator?journal?.archive()??null:null,
-   canExportTraining:()=>attached()&&!allowsSpectator&&gameOver&&!!journal?.exportBound(),
+   trainingArchive:()=>attached()?journal?.archive()??null:null,
+   canExportTraining:()=>attached()&&gameOver&&!!journal?.exportBound(),
    simulationSnapshot(token){
     if(!valid(token,'ai')||!journal)return null;
     return copy({config:session.config,replay:journal.prefix(),
@@ -552,6 +571,8 @@
    qualifiedSelector(capture){
     const policy=authorised('ai')?policies[phase]:null;
     if(!policy)return null;
+    if(policy.experiment)return (batch,report)=>policy.select(batch,
+     ()=>qualifiedControllers[batch.side].get(batch.side+'-medium').select(batch,report),port,report,capture);
     return policy.difficulty===null||policy.difficulty==='strong'
      ?(batch,report)=>policy.select(batch,port,report,capture):policy.select;
    },
