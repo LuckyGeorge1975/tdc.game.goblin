@@ -27,10 +27,10 @@ const commands=[{type:'Move',actorId:'own',x:1,y:2},{type:'Engineer',actorId:'ow
   {type:'CatalogLoad',actorId:'own',cargoId:'other'},{type:'CatalogDeploy',actorId:'own',x:2,y:2},
   {type:'CatalogRam',actorId:'own',targetId:'other'},
   {type:'CatalogFire',actorId:'own',target:{runtimeUnitId:'other'}},{type:'CatalogHexFire',actorId:'own',x:2,y:2}];
-function seat(side,outcome=null){
+function seat(side,outcome=null,withoutSnapshot=false){
   const panel=new Node('panel'),session={},permit={side},commits=[],undos=[];
   let ticket=0,refreshed=0,confirmed=0;
-  const state={side,phase:'movement',humanReady:true,ended:outcome!==null};
+  const state={side,phase:'movement',humanReady:outcome===null,ended:outcome!==null,outcome};
   const port={state:()=>state,canUndo:()=>!state.ended,canExportTraining:()=>false,
     ticket:mode=>({side,mode,number:++ticket}),undo:value=>{undos.push(value);return value?.number===ticket;},
     open:()=>state.ended?null:{permit,pass:state.phase,entries:null}};
@@ -39,7 +39,7 @@ function seat(side,outcome=null){
   const binding={session,port,owner:{playerCommands:()=>commands,
     commitHuman:(...args)=>{commits.push(args);return {ok:true};}},lifecycle:{paused:false,pause(){},resume(){},sync(){}}};
   const context=vm.createContext({panel,fullSeatBinding:binding,legacySession:session,editorConfig:null,
-    screen:'full-seat',units:[],GoblinUIV2:{fullSeatPresentation:()=>snapshot},
+    screen:'full-seat',units:[],GoblinUIV2:{fullSeatPresentation:()=>withoutSnapshot?null:snapshot},
     GoblinFullRoundSource:{view:()=>null},document:{createElement:tag=>new Node(tag)},
     t:translate,heading:text=>new Node('heading',text),paragraph:(text,cls)=>new Node('p',text),
     actions:(...children)=>{const node=new Node('actions');node.append(...children);return node;},
@@ -132,5 +132,17 @@ test('a terminal result replaces the phase-action caption even when the last pha
       learningResult:null,t:key=>key,at:()=>action});
     vm.runInContext(outcomeCode+code,context);
     assert.equal(action.textContent,context.outcomeKey(outcome));
+  }
+});
+
+test('terminal human results remain visible when native human projection is closed',()=>{
+  for(const side of ['player','enemy'])for(const outcome of ['draw',true,false]){
+    const view=seat(side,outcome,true),content=texts(view.panel);
+    assert.equal(nodes(view.panel).some(node=>node.tag==='select'),false);
+    if(outcome==='draw'){
+      assert.equal(content.filter(text=>text==='screen.missionEnd.draw.title').length,1);
+      assert.ok(content.includes('screen.missionEnd.draw.allUnits'));
+    }else assert.ok(content.some(text=>text.startsWith('v2.full.winner:')&&
+      text.includes(outcome?'v2.full.seat.player':'v2.full.seat.enemy')));
   }
 });

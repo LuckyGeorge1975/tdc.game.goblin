@@ -483,6 +483,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           controls.push(button(t('v2.round.partial', {round:rounds.terminalPartial.roundNumber}),
             () => openRoundAnalysis(rounds.terminalPartial)));
       }
+      if(seat?.ended){
+        const result=paragraph(fullOutcomeText(seat.outcome),'v2-full-outcome');
+        result.setAttribute('role','status');panel.append(result);
+        if(seat.outcome==='draw')panel.append(paragraph(t('screen.missionEnd.draw.allUnits')));
+      }
       if (!snapshot) {
         if(binding.owner.failure?.(port))panel.append(paragraph(t('v2.full.aiFailed'),'v2-status'));
         if(binding.owner.computing?.(port)){
@@ -494,11 +499,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       const {view, log} = snapshot;
       panel.append(paragraph(t('ui.hud.turn', {turn:view.turn})));
-      if(view.ended){
-        const result=paragraph(fullOutcomeText(view.outcome),'v2-full-outcome');
-        result.setAttribute('role','status');panel.append(result);
-        if(view.outcome==='draw')panel.append(paragraph(t('screen.missionEnd.draw.allUnits')));
-      }else if(['movement','fire','gev'].includes(view.phase)){
+      if(!view.ended&&['movement','fire','gev'].includes(view.phase)){
         panel.append(paragraph(t('v2.full.seat.'+view.side)+' · '+t('phase.'+view.phase+'.label')));
       }
       if(Number.isSafeInteger(view.objectiveRemaining)){
