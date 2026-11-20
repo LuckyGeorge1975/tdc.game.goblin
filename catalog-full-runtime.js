@@ -52,12 +52,41 @@
   return state;
  }
  let projectionCache = null;
+ function sameProjectionTerrain(cache){
+  if(cache.terrain.length!==terrain.size||cache.terrainTypes.length!==terrainTypes.size)return false;
+  let same=true,index=0;
+  terrain.forEach(value=>{if(value!==cache.terrain[index++])same=false});
+  index=0;
+  terrainTypes.forEach((value,key)=>{
+   const previous=cache.terrainTypes[index++];
+   if(previous[0]!==key||previous[1]!==value)same=false;
+  });
+  return same;
+ }
+ function projectionUnitKey(unit){
+  return [unit.id,unit.x,unit.y,unitAlive(unit),!!unit.disabled,unit.embarkedOn??null,
+   unit.catalogId,unit.catalogAssetId,unit.team];
+ }
+ function sameProjectionUnits(previous){
+  return previous.length===units.length&&units.every((unit,index)=>{
+   const row=previous[index];
+   return row[0]===unit.id&&row[1]===unit.x&&row[2]===unit.y&&row[3]===unitAlive(unit)&&
+    row[4]===!!unit.disabled&&row[5]===(unit.embarkedOn??null)&&
+    row[6]===unit.catalogId&&row[7]===unit.catalogAssetId&&row[8]===unit.team;
+  });
+ }
  function projectionContext() {
   const visibility = ensure().visibility;
-  const key = JSON.stringify([revision(), W, H, [...terrain], visibility,
-   units.map(u => [u.catalogId, u.catalogAssetId, u.team])]);
-  if (projectionCache?.session !== legacySession || projectionCache.key !== key) {
-   projectionCache = {session: legacySession, key, visibility, facts: null, teams: new Map()};
+  const visibilityKey=JSON.stringify(visibility),cache=projectionCache;
+  // Compare every input of the former nested JSON key. Native mutations, even
+  // in-place terrain/roster edits, still invalidate the existing projection.
+  if(!cache||cache.session!==legacySession||cache.sessionId!==legacySession.sessionId||
+    cache.turn!==turn||cache.phase!==phase||cache.turnPhase!==turnPhase||
+    cache.width!==W||cache.height!==H||cache.visibilityKey!==visibilityKey||
+    !sameProjectionUnits(cache.units)||!sameProjectionTerrain(cache)){
+   projectionCache={session:legacySession,sessionId:legacySession.sessionId,turn,phase,turnPhase,width:W,height:H,
+    units:units.map(projectionUnitKey),terrain:[...terrain],terrainTypes:[...terrainTypes],
+    visibilityKey,visibility,facts:null,teams:new Map()};
   }
   return projectionCache;
  }
