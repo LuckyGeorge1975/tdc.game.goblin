@@ -1,4 +1,4 @@
-const goalKinds=new Set(['destroy-core','destroy-escort','destroy-player-force']);
+const goalKinds=new Set(['destroy-core','destroy-escort','destroy-player-force','destroy-opponent-force']);
 const dimensions=terrain=>Number.isInteger(terrain?.width)&&terrain.width>0&&
   Number.isInteger(terrain.height)&&terrain.height>0;
 const inside=(cell,width,height)=>Number.isInteger(cell?.x)&&Number.isInteger(cell.y)&&

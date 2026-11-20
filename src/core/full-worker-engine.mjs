@@ -173,9 +173,11 @@ export async function createHeadlessFullEngine({readSource}={}) {
           unit.relation===(view.side==='enemy'?'own':'opponent')).length;
         const knownPlayer=view.units.filter(unit=>unit.alive&&
           unit.relation===(view.side==='player'?'own':'opponent')).length;
-        workerUnmodeledEnemy=unknownTargets(view.side==='player'?['destroy-core','destroy-escort']:
-          ['protect-core','protect-escort'],knownEnemy);
-        workerUnmodeledPlayer=view.side==='player'?0:unknownTargets(['destroy-player-force'],knownPlayer);
+        const symmetric=view.objectives?.some(goal=>goal.kind==='destroy-opponent-force');
+        workerUnmodeledEnemy=symmetric?(view.side==='enemy'?0:unknownTargets(['destroy-opponent-force'],knownEnemy)):
+          unknownTargets(view.side==='player'?['destroy-core','destroy-escort']:['protect-core','protect-escort'],knownEnemy);
+        workerUnmodeledPlayer=view.side==='player'?0:
+          unknownTargets([symmetric?'destroy-opponent-force':'destroy-player-force'],knownPlayer);
         workerKnowledgeIds=ids;
         units.splice(0,units.length,...units.filter(unit=>ids.has(unit.id)));
         const full=GoblinCatalogFullRuntime,s=full.ensure();

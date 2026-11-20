@@ -84,6 +84,12 @@ try{
 function victoryProfile(config){
   if(config?.objective==='learning'&&config.training?.definition?.binding.ruleProfileId==='TRAINING_FIELD_TEST_v1'&&globalThis.GoblinTrainingModel?.has(config.training.definition.binding.scenarioId))return {version:1,objectiveCode:'learning',requiresCore:false,requiresAllEnemies:false,requiresPlayerSurvival:true};
   if(config?.objectiveVersion!==1)throw new Error('Unsupported objective contract version');
+  if(config.objective==='eliminate-opponent'){
+    const full=config.catalog?.full;
+    if(!full||full.waves?.waves?.length||full.waveTemplates?.length||full.turnLimit!=null||full.deadlineEvent)
+      throw new Error('Unsupported elimination objective combination');
+    return {version:1,objectiveCode:config.objective,requiresCore:false,requiresAllEnemies:true,requiresPlayerSurvival:true};
+  }
   if(config.objective!=='core'&&config.objective!=='core-and-escort')throw new Error('Unsupported objective');
   return {version:1,objectiveCode:config.objective,requiresCore:true,requiresAllEnemies:config.objective==='core-and-escort',requiresPlayerSurvival:true};
 }

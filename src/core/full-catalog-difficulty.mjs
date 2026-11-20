@@ -39,6 +39,7 @@ function finish(candidates) {
 function openMovementTargets(batch,opponents) {
   const goals=batch.view.objectives??[];
   const open=kind=>goals.find(goal=>goal.kind===kind&&goal.satisfied!==true);
+  if(open('destroy-opponent-force')) return opponents;
   if (batch.side==='enemy') return open('destroy-player-force')?opponents:[];
   const core=open('destroy-core')?.target;
   if (core?.kind==='unit') {

@@ -143,6 +143,12 @@
   const s=ensure();
   const target={kind:'unit',unitId:'core'};
   const playerAlive=units.some(unit=>unit.team==='player'&&unitAlive(unit));
+  if(legacySession.effectiveRules.objective==='eliminate-opponent'){
+   const opponent=team==='player'?'enemy':'player';
+   const remaining=units.filter(unit=>unit.team===opponent&&unitAlive(unit)).length;
+   return [{kind:'destroy-opponent-force',remaining,satisfied:remaining===0},
+    {kind:'survive',satisfied:units.some(unit=>unit.team===team&&unitAlive(unit))}];
+  }
   const escorts=units.filter(unit=>unit.team==='enemy'&&!unit.core&&unitAlive(unit)).length+pendingEnemy();
   const attackers=units.filter(unit=>unit.team==='player'&&unitAlive(unit)).length;
   const goals=team==='player' ? [

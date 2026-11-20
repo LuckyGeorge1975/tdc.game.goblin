@@ -19,7 +19,8 @@ export async function createSimulationPort(packet,{engineFactory=createHeadlessF
   const known=new Set(packet.rootView.units.map(unit=>unit.id));
   const opponents=packet.rootView.units.filter(unit=>unit.alive&&unit.relation==='opponent');
   const goals=packet.rootView.objectives??[];
-  const fullyKnown=packet.side==='player'
+  const forceGoal=goals.find(goal=>goal.kind==='destroy-opponent-force');
+  const fullyKnown=forceGoal ? forceGoal.remaining===opponents.length : packet.side==='player'
     ?goals.find(goal=>goal.kind==='destroy-core')?.remaining===opponents.filter(unit=>unit.objectiveTarget).length&&
       goals.find(goal=>goal.kind==='destroy-escort')?.remaining===opponents.filter(unit=>!unit.objectiveTarget).length
     :goals.find(goal=>goal.kind==='destroy-player-force')?.remaining===opponents.length;
@@ -80,7 +81,8 @@ export async function createSimulationPort(packet,{engineFactory=createHeadlessF
   function publicView(view) {
     if(!unmodeledTargets)throw Error('FULL_MODEL_PUBLIC_TARGETS_REQUIRED');
     const objectives=view.objectives.map(goal=>{
-      const extra=goal.kind==='destroy-escort'||goal.kind==='protect-escort'?unmodeledTargets.enemy:
+      const extra=goal.kind==='destroy-opponent-force'?(view.side==='player'?unmodeledTargets.enemy:unmodeledTargets.player):
+        goal.kind==='destroy-escort'||goal.kind==='protect-escort'?unmodeledTargets.enemy:
         goal.kind==='destroy-player-force'?unmodeledTargets.player:0;
       if(!extra)return goal;
       return {...goal,remaining:goal.remaining+extra,

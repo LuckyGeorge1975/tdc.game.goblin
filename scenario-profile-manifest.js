@@ -32,8 +32,10 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
     'los-supercover-showcase':Object.freeze({scenarioVersion:1,objective:'core-and-escort',ruleProfileId:'FIELD_TEST_SUPERCOVER_v1',unitDataProfile:atlasData,losMode:'strict-supercover'})
   });
   const fullMissions = new Map();
+  const symmetricFullIds=['ai-urban-8','ai-plains-12','ai-mountains-18','ai-coast-24'];
   function registerFullMission(id,config) {
-    if (!Object.hasOwn(entries,id) || trainingIds.includes(id) || fullIds.includes(id) ||
+    if ((!Object.hasOwn(entries,id)&&!symmetricFullIds.includes(id)) || trainingIds.includes(id) || fullIds.includes(id) ||
+        symmetricFullIds.includes(id)&&config?.objective!=='eliminate-opponent' ||
         !globalThis.GoblinEditorDraft?.isPrepared(config) || config.ruleProfileId!=='FULL_CATALOG_v1')
       reject('SCENARIO_PROFILE_MISMATCH','Invalid FULL mission migration');
     fullMissions.set(id,config);
@@ -187,8 +189,10 @@ const ScenarioRuleProfiles=Object.freeze((()=>{
         reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} hat ungültige Einheitenwerte; Partie wurde nicht geladen.`);
       unitIds.add(unit.id);
     }
+    const symmetric=draft&&config.ruleProfileId==='FULL_CATALOG_v1'&&config.objective==='eliminate-opponent';
     if(!config.units.some(unit=>unit.team==='player')||
-      (!trainingIds.includes(id)&&config.units.filter(unit=>unit.team==='enemy'&&unit.core).length!==1))
+      (symmetric?!config.units.some(unit=>unit.team==='enemy'):
+       !trainingIds.includes(id)&&config.units.filter(unit=>unit.team==='enemy'&&unit.core).length!==1))
       reject('SCENARIO_PROFILE_MISMATCH',`Szenario ${id} hat keine gültige Parteien- oder Kernbelegung; Partie wurde nicht geladen.`);
     const source=JSON.parse(JSON.stringify(config));
     const session=freeze({schemaVersion:1,sessionId:nextSessionId++,scenarioId:id,
