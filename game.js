@@ -140,7 +140,7 @@ function lineOfSight(from,to){
   if(!session?.effectiveRules||!Object.isFrozen(session)||!Object.isFrozen(session.effectiveRules))return false;
   if(session.ruleProfileId==='LEGACY_SUPERCOVER_PROBE_v1'||
      session.ruleProfileId==='FIELD_TEST_SUPERCOVER_v1'||session.ruleProfileId==='CATALOG_ARTILLERY_PILOT_v1'||session.ruleProfileId==='CATALOG_BASE_TRANSPORT_v1'||session.ruleProfileId==='CATALOG_SPECIALISTS_v1'||session.ruleProfileId==='FULL_CATALOG_v1'){
-    if(!(globalThis.GoblinCatalogFullModel?.has(session.scenarioId,session.ruleProfileId))&&!ScenarioRuleProfiles.isDraftSession?.(session)&&!['los-supercover-probe','los-supercover-showcase','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(session.scenarioId)||
+    if(!(globalThis.GoblinCatalogFullModel?.has(session.scenarioId,session.ruleProfileId))&&!ScenarioRuleProfiles.isDraftSession?.(session)&&!ScenarioRuleProfiles.isMigratedSession?.(session)&&!['los-supercover-probe','los-supercover-showcase','artillery-pilot','catalog-transport','catalog-maneuver','catalog-siege','catalog-specialists'].includes(session.scenarioId)||
        session.scenarioVersion!==1||
        session.effectiveRules.losMode!=='strict-supercover'||typeof GoblinHexSupercover==='undefined')return false;
     return GoblinHexSupercover.intermediateHexes(from,to)

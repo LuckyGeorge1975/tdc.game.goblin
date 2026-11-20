@@ -1,0 +1,182 @@
+{
+  "sourceCommit": "c570070f2250735a33eb638d7e9a8d198d968ccc",
+  "traceSha256": "f88ad677b3f8e92daa28984250614733b2c1e430e09d8ffc5e1ece0abd509aaa",
+  "levelId": "ai-urban-8",
+  "seed": 1672235193,
+  "commands": [
+    {
+      "type": "Move",
+      "actorId": "a-2",
+      "x": 3,
+      "y": 3
+    },
+    {
+      "type": "Move",
+      "actorId": "a-5",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "type": "Move",
+      "actorId": "a-6",
+      "x": 3,
+      "y": 4
+    },
+    {
+      "type": "Move",
+      "actorId": "a-1",
+      "x": 2,
+      "y": 1
+    },
+    {
+      "type": "Move",
+      "actorId": "a-3",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "type": "Move",
+      "actorId": "a-4",
+      "x": 4,
+      "y": 2
+    },
+    {
+      "type": "EndPhase"
+    },
+    {
+      "type": "EndPhase"
+    },
+    {
+      "type": "EndPhase"
+    },
+    {
+      "type": "Move",
+      "actorId": "b-5",
+      "x": 6,
+      "y": 2
+    },
+    {
+      "type": "Move",
+      "actorId": "b-6",
+      "x": 4,
+      "y": 6
+    },
+    {
+      "type": "Move",
+      "actorId": "b-1",
+      "x": 4,
+      "y": 7
+    },
+    {
+      "type": "Move",
+      "actorId": "b-3",
+      "x": 6,
+      "y": 3
+    },
+    {
+      "type": "Move",
+      "actorId": "b-2",
+      "x": 5,
+      "y": 4
+    },
+    {
+      "type": "Move",
+      "actorId": "b-4",
+      "x": 4,
+      "y": 5
+    },
+    {
+      "type": "EndPhase"
+    },
+    {
+      "type": "EndPhase"
+    },
+    {
+      "type": "EndPhase"
+    },
+    {
+      "type": "Move",
+      "actorId": "a-4",
+      "x": 4,
+      "y": 0
+    },
+    {
+      "type": "Move",
+      "actorId": "a-5",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "type": "Move",
+      "actorId": "a-3",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "type": "Move",
+      "actorId": "a-6",
+      "x": 2,
+      "y": 5
+    },
+    {
+      "type": "Move",
+      "actorId": "a-1",
+      "x": 3,
+      "y": 1
+    },
+    {
+      "type": "Move",
+      "actorId": "a-2",
+      "x": 4,
+      "y": 3
+    },
+    {
+      "type": "EndPhase"
+    },
+    {
+      "type": "EndPhase"
+    },
+    {
+      "type": "EndPhase"
+    },
+    {
+      "type": "Move",
+      "actorId": "b-3",
+      "x": 7,
+      "y": 2
+    },
+    {
+      "type": "Move",
+      "actorId": "b-4",
+      "x": 4,
+      "y": 4
+    },
+    {
+      "type": "Move",
+      "actorId": "b-6",
+      "x": 5,
+      "y": 6
+    },
+    {
+      "type": "Move",
+      "actorId": "b-1",
+      "x": 2,
+      "y": 7
+    },
+    {
+      "type": "Move",
+      "actorId": "b-2",
+      "x": 5,
+      "y": 3
+    },
+    {
+      "type": "Move",
+      "actorId": "b-5",
+      "x": 6,
+      "y": 1
+    },
+    {
+      "type": "EndPhase"
+    }
+  ]
+}
