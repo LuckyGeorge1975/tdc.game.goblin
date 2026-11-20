@@ -107,6 +107,7 @@ export async function importFullTrainingArchive(archive,{experimentCatalog,captu
     ['player','enemy','draw'].includes(archive.outcome)&&exact(archive.seats,['player','enemy']));
   const verified=capture?verifyFullTrainingCapture(archive,capture):null;
   const experiments=Object.values(archive.seats).filter(seat=>seat.policy?.startsWith('full-experiment:'));
+  const validatedInterventions=new Map();
   const host=await openFullTrainingReplay(archive,{experimentCatalog});
   const demonstrations=[];
   for (const [commandIndex,entry] of archive.replay.entries.entries()){
@@ -115,9 +116,9 @@ export async function importFullTrainingArchive(archive,{experimentCatalog,captu
     const frame=host.inspect({record:!!verified||experiments.length>0});
     const {state,view,candidates}=frame;
     expect(entry.side===state.side&&entry.slot===state.slot);
-    const seat=archive.seats[entry.side];
-    if(seat.policy?.startsWith('full-experiment:'))
-      validateFullExperimentDecision(experimentCatalog,seat.policy,frame,host.port,commandIndex,entry.command);
+    // The sealed global index is mandatory even when the current seat differs.
+    const checked=experiments.filter(seat=>validateFullExperimentDecision(experimentCatalog,seat.policy,
+      frame,host.port,commandIndex,entry.command));
     if(verified)assert.deepEqual(fullTrainingDecisionTraceRow(frame,commandIndex,entry.command,archive.seats[entry.side]),
       verified.trace.decisions[commandIndex],'FULL_CAPTURE_DECISION_TRACE');
     if(candidates&&state.controller==='human'){
@@ -128,10 +129,11 @@ export async function importFullTrainingArchive(archive,{experimentCatalog,captu
         view,command:entry.command,candidates:clean,selected}));
     }
     expect(host.commit(frame,entry.command).ok);
+    for(const seat of checked)validatedInterventions.set(seat.policy,(validatedInterventions.get(seat.policy)??0)+1);
   }
   expect(host.port.state()?.ended);
   for(const seat of experiments)validateFullExperimentRecording(experimentCatalog,seat.policy,{seed:archive.replay.seed,
-    acceptedCommands:archive.replay.entries.length});
+    acceptedCommands:archive.replay.entries.length,validatedInterventions:validatedInterventions.get(seat.policy)??0});
   assert.deepEqual(plain(host.port.trainingArchive()),archive);
   return {profile:archive.profile,outcome:archive.outcome,seed:archive.replay.seed,
     acceptedCommands:archive.replay.entries.length,

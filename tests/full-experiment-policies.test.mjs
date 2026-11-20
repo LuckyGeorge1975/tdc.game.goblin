@@ -104,6 +104,49 @@ test('recomputed native journals cannot hide a changed intervention prefix, offe
  await assert.rejects(()=>importFullTrainingArchive(noIntervention.archive,{experimentCatalog:catalog}),/FULL_EXPERIMENT_COMMAND_DRIFT/);
 });
 
+test('a sealed intervention cannot be skipped by pointing at the other seat, another phase, or beyond the accepted journal',async()=>{
+ const env=await environment(), map=await level();
+ for(const side of ['player','enemy']){
+  const branch=await fireIntervention(map,side), opponent=side==='player'?'enemy':'player';
+  const wrongIndices=side==='player'?[4,0,2,6]:[1,3,5,6];
+  for(const commandIndex of wrongIndices){
+   const pkg=await policyPackage(env,side,'single-fire-intervention',{intervention:{...branch.spec,commandIndex},
+    selectorSource:"throw Error('DATA_ONLY_INTERVENTION_SCOPE_TEST');\n"});
+   const catalog=await prepareFullExperimentCatalog(pkg);
+   for(const opponentController of ['human','ai']){
+    const seats=humanSeats();seats[side]={controller:'ai',policy:pkg.id,difficulty:'medium'};
+    if(opponentController==='ai')seats[opponent]={controller:'ai',policy:opponent+'-medium',difficulty:'medium'};
+    const original=await play(map,seats,{experimentCatalog:catalog});
+    assert.equal(original.archive.replay.entries.length,6);
+    await assert.rejects(()=>importFullTrainingArchive(original.archive,{experimentCatalog:catalog}),
+     /FULL_EXPERIMENT_(INTERVENTION_SCOPE|PREFIX_DRIFT|INTERVENTION_MISSED)/,
+     `${side} intervention index ${commandIndex}, opponent ${opponentController}`);
+   }
+  }
+ }
+});
+
+test('module comments cannot hide dynamic imports or uninventoried static requests',async()=>{
+ const variants=[
+  "import /* guarded, never executed */ ('./unlisted.mjs');\n",
+  "import {nothing} from /* guarded, never executed */ './unlisted.mjs';\n",
+  "import /* side effect */ './unlisted.mjs';\n",
+  "export * from /* re-export */ './unlisted.mjs';\n",
+  "const sample = `${import /* embedded expression */ ('./unlisted.mjs')}`;\n",
+  "import {nothing} from './un\\u006cisted.mjs';\n"
+ ];
+ for(const selectorSource of variants){
+  const env=await environment(), pkg=await policyPackage(env,'player','frozen-fire-model',{selectorSource});
+  await assert.rejects(()=>prepareFullExperimentCatalog(pkg),/FULL_EXPERIMENT_(DYNAMIC_IMPORT|UNBOUND_DEPENDENCY)/);
+ }
+ const env=await environment(), pkg=await policyPackage(env,'player','frozen-fire-model',{selectorSource:
+  "import /* real listed dependency */ {nothing} from /* legal comment */ './fire-network.mjs';\n"+
+  "const note = \"import /* text */ ('./unlisted.mjs')\";\n"+
+  "const expression = /import.*from/; const template = `import('text')`;\n"+
+  "// import('./unlisted.mjs')\n/* export * from './unlisted.mjs' */\n"});
+ await prepareFullExperimentCatalog(pkg);
+});
+
 test('experiment base delegation preserves the actual production Medium exploration and accepted-command lifecycle on both seats',async()=>{
  const env=await environment();
  for(const side of ['player','enemy']){

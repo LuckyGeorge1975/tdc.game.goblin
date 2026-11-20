@@ -4,6 +4,7 @@ import {dirname,basename,resolve,relative} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {encodeFullFireEffects} from '../src/core/full-attack-2a.mjs';
 import {describeFullCatalogOptions} from '../src/core/full-catalog-ai-adapter.mjs';
+import {fullExperimentModuleRequests} from './full-experiment-module-requests.mjs';
 import {artifact,artifactList,canonicalBytes,check,currentSourcesHash,engineRoot,exact,freeze,hash,isCommit,isHash,json,text,textHash} from './full-training-artifacts.mjs';
 
 const catalogs=new WeakMap(), bridges=new WeakMap();
@@ -65,8 +66,7 @@ export async function prepareFullExperimentCatalog({artifactRoot,entries,runtime
   for(const [path,item] of code){
    if(item.native)continue;
    const source=text(item.data);
-   check(!/\bimport\s*\(/.test(source),'FULL_EXPERIMENT_DYNAMIC_IMPORT');
-   const imports=[...source.matchAll(/(?:\bfrom\s*|\bimport\s*)['"]([^'"]+)['"]/g)].map(match=>match[1]);
+   const imports=fullExperimentModuleRequests(source);
    for(const specifier of imports){
     if(specifier.startsWith('node:'))continue;
     check(specifier.startsWith('./')||specifier.startsWith('../'));
@@ -127,16 +127,19 @@ export async function revalidateFullExperimentCatalog(catalog){
   entries:[policy.reference],runtimeCommit:state.runtimeCommit,engineArchivePath:state.engineArchivePath});
 }
 
-export function validateFullExperimentRecording(catalog,id,{seed,caseId,acceptedCommands}){
+export function validateFullExperimentRecording(catalog,id,{seed,caseId,acceptedCommands,validatedInterventions}){
  const policy=catalogs.get(catalog)?.policies.get(id);check(policy,'FULL_EXPERIMENT_NOT_TRUSTED');
  const spec=policy.intervention;if(!spec)return;
  check(spec.seed===seed&&(caseId===undefined||spec.caseId===caseId),'FULL_EXPERIMENT_RECORDING_SCOPE');
- if(acceptedCommands!==undefined)check(acceptedCommands>spec.commandIndex,'FULL_EXPERIMENT_INTERVENTION_MISSED');
+ if(acceptedCommands!==undefined)check(acceptedCommands>spec.commandIndex&&validatedInterventions===1,
+  'FULL_EXPERIMENT_INTERVENTION_MISSED');
 }
 
 export function validateFullExperimentDecision(catalog,id,frame,port,commandIndex,command){
  const policy=catalogs.get(catalog)?.policies.get(id);check(policy,'FULL_EXPERIMENT_NOT_TRUSTED');
- const spec=policy.intervention;if(!spec||commandIndex!==spec.commandIndex)return;
+ const spec=policy.intervention;if(!spec||commandIndex!==spec.commandIndex)return false;
+ check(frame.state.side===spec.side&&frame.state.controller==='ai'&&frame.state.policyId===id,
+  'FULL_EXPERIMENT_INTERVENTION_SCOPE');
  const replay=port.simulationSnapshot(port.ticket('ai'))?.replay;
  check(replay&&spec.turn===frame.view.turn&&spec.phase===frame.state.slot&&
   hash(canonicalBytes(replay))===spec.prefixSha256,'FULL_EXPERIMENT_PREFIX_DRIFT');
@@ -150,6 +153,7 @@ export function validateFullExperimentDecision(catalog,id,frame,port,commandInde
  for(const [name,index] of [['reference',reference],['alternative',alternative]])check(
   hash(canonicalBytes(encodeFullFireEffects({view:frame.view},candidates[index])))===hash(canonicalBytes(spec[name+'Features'])),
   'FULL_EXPERIMENT_FEATURE_DRIFT');
+ return true;
 }
 
 function bridgeFor(root){
