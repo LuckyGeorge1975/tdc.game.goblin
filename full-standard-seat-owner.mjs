@@ -43,7 +43,8 @@ export function standardFullSeatOffers(config, label) {
 
 export function selectStandardFullDefender(decision,report) {
   if (decision.side !== 'enemy') return undefined;
-  const key=decision.candidates.find(candidate=>candidate.facts.baseline === true)?.key;
+  const key=(decision.candidates.find(candidate=>candidate.facts.baseline === true)??
+    decision.candidates.find(candidate=>candidate.kind==='end-phase'))?.key;
   if (key!==undefined) report?.({key,explanationKey:'v2.round.standardAction'});
   return key;
 }

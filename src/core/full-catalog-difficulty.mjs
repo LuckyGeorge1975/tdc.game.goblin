@@ -177,8 +177,7 @@ export function selectMediumFullCatalog(batch,report) {
   });
   if (position) return select(position,'positionValue',report);
   const fallback=finish(candidates);
-  const voluntaryMovePass=batch.side==='enemy'?batch.slot==='first'&&fallback?.kind==='hold':
-    (batch.phase==='movement'||batch.phase==='gev')&&fallback?.kind==='end-phase';
+  const voluntaryMovePass=(batch.phase==='movement'||batch.phase==='gev')&&fallback?.kind==='end-phase';
   const approach=voluntaryMovePass&&approachOpenGoal(batch,opponents,units,abandonCore,moveScore);
   if (approach) return select(approach,'approach',report);
   return select(fallback,finishReason(fallback),report,options);

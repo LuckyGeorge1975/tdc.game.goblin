@@ -84,9 +84,9 @@ test('known-world terminal guards preserve the symmetric public rest for either 
       assert.equal(view.objectiveRemaining,hidden?2:1);
       const modeled=engine.applyRootKnowledge(view);
       assert.equal(modeled.unmodeledTargets[opposite],hidden?1:0);
-      if(side==='player')commit(port,host,{type:'EndPhase'});
+      commit(port,host,{type:'EndPhase'});
       const opened=port.open('ai');
-      const options=side==='player'?host.playerOptions(true):opened.entries;
+      const options=host.playerOptions(true);
       const shot=options.find(({command})=>command.type==='CatalogFire'&&
         command.actorId==='own'&&command.target.runtimeUnitId==='target');
       assert.ok(shot);

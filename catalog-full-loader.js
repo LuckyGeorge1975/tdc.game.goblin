@@ -3,10 +3,13 @@
  const params=new URLSearchParams(globalThis.location?.search||'');
  if(!['v2',null].includes(params.get('ui')))return;
  try{
+  const {prepareBrowserTrainingSources}=await import('./full-training-source-binding.mjs');
+  const bound=await prepareBrowserTrainingSources();
+  globalThis.GoblinFullTrainingSources=Object.freeze({current:()=>bound.sources});
   const profile=GoblinCatalogFullModel.publicProfile;
-  const responses=await Promise.all(['assets/unit-art/rules/unit-profiles.catalog-approved.v1.json','assets/unit-art/levels/catalog-full-levels.v3.json'].map(path=>fetch(path)));
-  if(responses.some(r=>!r.ok))throw Error('FULL_SOURCE_UNAVAILABLE');
-  const [data,levels]=await Promise.all(responses.map(r=>r.json()));
+  // Admission consumes the exact verified bytes, never a second, potentially newer server response.
+  const [data,levels]=['assets/unit-art/rules/unit-profiles.catalog-approved.v1.json',
+   'assets/unit-art/levels/catalog-full-levels.v3.json'].map(path=>JSON.parse(bound.readSource(path)));
   if(globalThis.GoblinLanguage&&await GoblinLanguage.ready!==true)throw Error('FULL_COPY_UNAVAILABLE');
   const configs=await GoblinCatalogFullModel.initialize(data,levels,{profile});
   for(const [id,config] of Object.entries(configs))ScenarioRuleProfiles.validate(id,config);

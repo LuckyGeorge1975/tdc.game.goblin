@@ -166,6 +166,8 @@ test('a native simultaneous elimination is a distinct draw and its seeded archiv
   assert.equal(game.run('units.filter(unitAlive).length'),0);
   assert.equal(port.state().outcome,'draw');
   assert.equal(port.state().ended,true);
+  assert.deepEqual(JSON.parse(JSON.stringify(full.snapshot().journal.at(-1))),
+    {type:'mission-end',outcome:'draw',effects:[]});
   const archive=JSON.parse(JSON.stringify(port.trainingArchive()));
   assert.equal(archive.outcome,'draw');
   assert.equal(archive.replay.entries.at(-1).draws,2);
@@ -210,6 +212,63 @@ test('human Undo on either seat rewinds its effective journal and repeats the sa
     assert.equal(shots.length,3,'the discarded shot is absent from the effective journal');
     assert.ok(shots.every(entry=>entry.draws===1));
     assert.equal((await importFullTrainingArchive(archive)).acceptedCommands,archive.replay.entries.length);
+  }
+});
+
+test('an event barrier on either seat commits its trigger and earlier actions while later own actions remain reversible',async()=>{
+  for(const side of ['player','enemy']){
+    const game=await fullScene();for(const file of ['level-events.js','editor-draft.js'])game.run(readSource(file));
+    const prefix=side==='player'?'p':'e';
+    const source=draft([
+      unit('p-before','assault-tank','player',1,1),unit('p-trigger','assault-tank','player',2,1),unit('p-after','assault-tank','player',1,3),
+      unit('e-before','assault-tank','enemy',6,6),unit('e-trigger','assault-tank','enemy',5,6),unit('e-after','assault-tank','enemy',6,4)]);
+    source.events=[{id:'own-move-barrier',when:{event:'UnitMoved',unitId:prefix+'-trigger'},
+      effect:{type:'dialog',title:'Barrier',text:'Only subsequent actions can be undone.'}}];
+    game.context.source=source;
+    game.run('GameDialogs.warn=()=>Promise.resolve(true)');
+    await game.run(`GoblinEditorDraft.prepare(source).then(config=>{globalThis.port=loadEditorDraft(config,
+      {roles:{player:'human',enemy:'human'},seed:7,ui:{handoff(_seat,take){take()}}})})`);
+    const port=game.context.port,full=game.context.GoblinCatalogFullRuntime;
+    const host=hostFor(full,game.context.GoblinSpecialistsUI,port,game.context.GoblinSpecialistsRuntime);
+    const accept=command=>assert.equal(port.commit('human',port.open('human').permit,command,host.dispatch).ok,true);
+    if(side==='enemy')for(let i=0;i<3;i++)accept({type:'EndPhase'});
+    const move=id=>host.humanPlayerOptions(port).find(({command})=>command.type==='Move'&&command.actorId===prefix+'-'+id).command;
+    accept(move('before'));assert.equal(port.canUndo(),true);
+    accept(move('trigger'));
+    await new Promise(resolve=>setImmediate(resolve));
+    assert.equal(port.canUndo(),false);
+    assert.equal(port.undo(port.ticket('human')),false);
+    const barrier=JSON.stringify(full.snapshot());
+    accept(move('after'));assert.equal(port.canUndo(),true);
+    assert.equal(port.undo(port.ticket('human')),true);
+    assert.equal(JSON.stringify(full.snapshot()),barrier);
+    assert.equal(port.canUndo(),false);
+    assert.ok(full.roster(side).filter(unit=>unit.id.startsWith(prefix)&&unit.moved).every(unit=>unit.id!==prefix+'-after'));
+    assert.equal(full.roster(side).find(unit=>unit.id===prefix+'-before').moved,true);
+    assert.equal(full.roster(side).find(unit=>unit.id===prefix+'-trigger').moved,true);
+  }
+});
+
+test('the existing non-exportable FULL start also reuses its phase die after Undo on either seat',async()=>{
+  for(const side of ['player','enemy']){
+    const game=await fullScene();for(const file of ['level-events.js','editor-draft.js'])game.run(readSource(file));
+    game.context.source=draft([unit('p','assault-tank','player',2,2),unit('e','assault-tank','enemy',3,2)]);
+    await game.run(`GoblinEditorDraft.prepare(source).then(config=>{globalThis.port=loadEditorDraft(config,
+      {roles:{player:'human',enemy:'human'},ui:{handoff(_seat,take){take()}}})})`);
+    const port=game.context.port,full=game.context.GoblinCatalogFullRuntime;
+    const host=hostFor(full,game.context.GoblinSpecialistsUI,port,game.context.GoblinSpecialistsRuntime);
+    const accept=command=>assert.equal(port.commit('human',port.open('human').permit,command,host.dispatch).ok,true);
+    if(side==='enemy')for(let i=0;i<3;i++)accept({type:'EndPhase'});
+    accept({type:'EndPhase'});
+    const shot=host.humanPlayerOptions(port).find(({command})=>command.type==='CatalogFire').command;
+    accept(shot);
+    const roll=full.roster(side).find(unit=>unit.id===shot.actorId).specialistJournal.at(-1).result.outcome.roll;
+    const used=game.rng();
+    assert.equal(port.undo(port.ticket('human')),true);
+    accept(shot);
+    assert.equal(full.roster(side).find(unit=>unit.id===shot.actorId).specialistJournal.at(-1).result.outcome.roll,roll);
+    assert.deepEqual(game.rng(),used);
+    assert.equal(port.trainingArchive(),null);
   }
 });
 

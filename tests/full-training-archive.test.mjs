@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 import test from 'node:test';
 import {fullShell} from './catalog-full-harness.mjs';
 import {importFullTrainingArchive,openFullTrainingReplay} from '../scripts/full-training-import.mjs';
+import {gameplaySourceHashes} from './helpers/replay-source-binding.mjs';
 
 const draft={
   id:'journal-undo-test',version:'goblin-level-v3',scenarioVersion:1,width:10,height:7,
@@ -26,7 +27,7 @@ test('migrated mission archive replay keeps the original mission ID and rejects 
   for(const level of levels){
     const config=await game.context.GoblinEditorDraft.prepare(level);
     const archive={seats:{player:{controller:'human'},enemy:{controller:'human'}},replay:{
-      version:'full-native-journal-v1',seed:7,level:{id:level.id,digest:config.catalog.levelDigest},
+      version:'full-native-journal-v1',sources:gameplaySourceHashes(),seed:7,level:{id:level.id,digest:config.catalog.levelDigest},
       initial:'',entries:[]}};
     const host=await openFullTrainingReplay(archive);
     assert.equal(host.port.state().levelDigest,config.catalog.levelDigest);
@@ -38,7 +39,7 @@ test('migrated mission archive replay keeps the original mission ID and rejects 
     await assert.rejects(()=>openFullTrainingReplay(forged),/FULL_TRAINING_ARCHIVE_INVALID/);
   }
   await assert.rejects(()=>openFullTrainingReplay({seats:{player:{controller:'human'},enemy:{controller:'human'}},
-    replay:{version:'full-native-journal-v1',seed:7,level:{id:'unknown-mission',digest:'forged'},
+    replay:{version:'full-native-journal-v1',sources:gameplaySourceHashes(),seed:7,level:{id:'unknown-mission',digest:'forged'},
       initial:'',entries:[]}}),/FULL_TRAINING_ARCHIVE_INVALID/);
 });
 
@@ -49,12 +50,12 @@ test('all qualified rule and trained seats round-trip native FULL archives with 
       side==='player'?'full-attack-2a':'full-defender-control-trial':side+'-'+difficulty;
     const seats={player:{controller:'human'},enemy:{controller:'human'}};
     seats[side]={controller:'ai',policy,difficulty};
-    const host=await openFullTrainingReplay({seats,replay:{version:'full-native-journal-v1',
+    const host=await openFullTrainingReplay({seats,replay:{version:'full-native-journal-v1',sources:gameplaySourceHashes(),
       seed:313,level,initial:'',entries:[]}});
     for(let step=0;step<40&&!host.port.state().ended;step++){
       const frame=host.inspect();
       const command=frame.state.side==='player'?{type:'EndPhase'}:
-        frame.opened.entries.find(entry=>entry.baseline).command;
+        host.game.context.GoblinCatalogFullRuntime.referenceCommand();
       assert.equal(host.commit(frame,command).ok,true);
     }
     assert.equal(host.port.state().ended,true,policy);
@@ -92,7 +93,7 @@ test('FULL archives keep the seeded stream on the effective undo branch across u
   async function play(seed,undo) {
     const host=await openFullTrainingReplay({
       seats:{player:{controller:'human'},enemy:{controller:'human'}},
-      replay:{version:'full-native-journal-v1',seed,level,initial:'',entries:[]}
+      replay:{version:'full-native-journal-v1',sources:gameplaySourceHashes(),seed,level,initial:'',entries:[]}
     });
     const ambient=host.game.run('Math.random');
     const ambientRng=host.game.rng();
@@ -109,7 +110,7 @@ test('FULL archives keep the seeded stream on the effective undo branch across u
     if(undo){
       commit(unit);
       oldRoll=roll();
-      assert.equal(host.port.undo(),true);
+      assert.equal(host.port.undo(host.port.ticket('human')),true);
     }
     commit(treads);
     const effectiveRoll=roll();
@@ -117,7 +118,7 @@ test('FULL archives keep the seeded stream on the effective undo branch across u
     for(let step=0;step<40&&!host.port.state().ended;step++){
       const frame=host.inspect();
       const command=frame.state.side==='player'?{type:'EndPhase'}:
-        frame.opened.entries.find(entry=>entry.baseline).command;
+        host.game.context.GoblinCatalogFullRuntime.referenceCommand();
       assert.equal(host.commit(frame,command).ok,true);
     }
     assert.equal(host.game.run('Math.random'),ambient);
@@ -145,4 +146,40 @@ test('FULL archives keep the seeded stream on the effective undo branch across u
   const counterfeit=structuredClone(clean.archive);
   counterfeit.replay.entries[1].draws++;
   await assert.rejects(importFullTrainingArchive(counterfeit));
+});
+
+test('native archive import rejects unbound, forged and genuinely different gameplay sources',async()=>{
+  const level=await fixture();
+  const original=gameplaySourceHashes();
+  const host=await openFullTrainingReplay({seats:{player:{controller:'human'},enemy:{controller:'human'}},
+    replay:{version:'full-native-journal-v1',sources:original,seed:313,level,initial:'',entries:[]}});
+  // Changing the page's later metadata must not rebind a journal already started.
+  host.game.context.GoblinFullTrainingSources={current:()=>({'game.js':'f'.repeat(64)})};
+  while(!host.port.state().ended)assert.equal(host.commit(host.inspect(),{type:'EndPhase'}).ok,true);
+  const archive=plain(host.port.trainingArchive());
+  assert.equal(host.port.canExportTraining(),true);
+  assert.deepEqual(archive.replay.sources,original);
+  assert.equal((await importFullTrainingArchive(archive)).acceptedCommands,6);
+  const missing=structuredClone(archive);delete missing.replay.sources;
+  await assert.rejects(()=>importFullTrainingArchive(missing),/FULL_TRAINING_ARCHIVE_INVALID/);
+  for(const path of ['game.js','terrain-rules.js']){
+    const forged=structuredClone(archive);forged.replay.sources[path]='f'.repeat(64);
+    await assert.rejects(()=>importFullTrainingArchive(forged),/FULL_TRAINING_SOURCE_BINDING/);
+  }
+  const changed=structuredClone(archive);
+  const {createHash}=await import('node:crypto');
+  const next=readFileSync(new URL('../unit-life.js',import.meta.url),'utf8').replaceAll('\r\n','\n')
+    .replace('unit.hp>0','unit.hp>1');
+  changed.replay.sources['unit-life.js']=createHash('sha256').update(next).digest('hex');
+  await assert.rejects(()=>importFullTrainingArchive(changed),/FULL_TRAINING_SOURCE_BINDING/);
+  const extra=structuredClone(archive);extra.replay.sources['ui-v2.js']='f'.repeat(64);
+  await assert.rejects(()=>importFullTrainingArchive(extra),/FULL_TRAINING_SOURCE_BINDING/);
+  delete host.game.context.GoblinFullTrainingSources;
+  host.game.context.control.ui.handoff=(_seat,take)=>take();
+  const unbound=await host.game.run('GoblinEditorDraft.prepare(GoblinEditorDraft.parse(draftText)).then(config=>loadEditorDraft(config,control))');
+  while(!unbound.state().ended)
+    assert.equal(unbound.commit('human',unbound.open('human').permit,{type:'EndPhase'}).ok,true);
+  assert.equal(unbound.canExportTraining(),false);
+  assert.equal(unbound.trainingArchive(),null);
+  assert.equal(host.port.canExportTraining(),false,'detached bound port cannot export');
 });

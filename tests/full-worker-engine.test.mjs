@@ -147,7 +147,7 @@ test('a publicly known native deadline still ends the model when undisclosed tar
   view.objectives=view.objectives.map(goal=>goal.kind==='destroy-core'?{...goal,remaining:1}:
     goal.kind==='destroy-escort'?{...goal,remaining:1}:goal);
   instance.applyRootKnowledge(view);
-  for(let index=0;index<3;index++)
+  for(let index=0;index<6;index++)
     assert.equal(port.commit('ai',port.open('ai').permit,{type:'EndPhase'}).ok,true);
   assert.equal(instance.state().ended,true);
   assert.equal(instance.state().winner,'enemy');
@@ -172,12 +172,16 @@ test('the defender model also keeps an unresolved public player target instead o
       goal.kind==='destroy-player-force'?{...goal,remaining:hidden?2:1}:goal);
     const knowledge=instance.applyRootKnowledge(view);
     assert.equal(knowledge.unmodeledTargets.player,hidden?1:0);
+    assert.equal(port.commit('ai',port.open('ai').permit,{type:'EndPhase'}).ok,true);
     const opened=port.open('ai');
-    const shot=opened.entries.find(entry=>entry.command.type==='CatalogFire'&&
+    const full=instance.root.GoblinCatalogFullRuntime;
+    const host=createFullCatalogAiHost(full,instance.root.GoblinSpecialistsUI,full.nativePlayerGateway,
+      ()=>port.state()?.side,instance.root.GoblinSpecialistsRuntime);
+    const shot=host.playerOptions(true).find(entry=>entry.command.type==='CatalogFire'&&
       entry.command.target.runtimeUnitId==='lead');
     assert.ok(shot);
     instance.setModalRoll(5);
-    assert.equal(port.commit('ai',opened.permit,shot.command).ok,true);
+    assert.equal(port.commit('ai',opened.permit,shot.command,host.dispatch).ok,true);
     assert.equal(instance.state().ended,!hidden);
     assert.equal(instance.state().winner,hidden?null:'enemy');
     instance.dispose();

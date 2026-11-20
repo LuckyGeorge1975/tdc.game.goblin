@@ -6,11 +6,12 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {canonicalSources,normalizeSource} from '../../full-training-source-binding.mjs';
+export {canonicalSources};
 
 const manifest = JSON.parse(fs.readFileSync(new URL('../fixtures/replay-source-binding.v1.json', import.meta.url), 'utf8'));
 const hash = value => createHash('sha256').update(value).digest('hex');
-export const readSource = path => fs.readFileSync(new URL('../../' + path, import.meta.url), 'utf8').replaceAll('\r\n', '\n');
-export const canonicalSources = sources => JSON.stringify(Object.keys(sources).sort().map(path => [path, sources[path]]));
+export const readSource = path => normalizeSource(fs.readFileSync(new URL('../../' + path, import.meta.url), 'utf8'));
 let verified = false;
 
 // Hashes every bound gameplay source and recorded fixture once per process; an injected reader always checks.

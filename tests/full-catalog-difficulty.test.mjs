@@ -55,7 +55,7 @@ test('Medium only replaces a voluntary movement pass with the best legal approac
     view:{...batch.view,objectives:[{kind:'destroy-player-force',satisfied:false}]},candidates:[{...end,kind:'hold'},first,shot]}),shot.key);
 });
 
-test('the pinned trained attacker is unranked, session-bound and legal only without a minimum',async()=>{
+test('the pinned trained attacker is session-bound and follows the central AI selection rank',async()=>{
   const game=await boot();
   setupEditor(game);
   game.context.draft=imported();
@@ -76,11 +76,11 @@ test('the pinned trained attacker is unranked, session-bound and legal only with
   const offers=game.run('trainedLevels.map(level=>GoblinCatalogFullRuntime.controllerOffers(level))');
   assert.deepEqual(JSON.parse(JSON.stringify(offers[0].player.choices)),[{id:FULL_ATTACK_2A_ID,difficulty:null}]);
   assert.equal(offers[0].enemy.choices.length,0);
-  assert.equal(offers[1].player.choices.length,0);
+  assert.deepEqual(JSON.parse(JSON.stringify(offers[1].player.choices)),[{id:FULL_ATTACK_2A_ID,difficulty:null}]);
   assert.equal(offers[2].player.choices.length,0);
   const roles={player:'ai',enemy:'human'}, ids={player:FULL_ATTACK_2A_ID};
   const startDraft=index=>`(control=>loadEditorDraft(trainedLevels[${index}],control))`;
-  assert.throws(()=>start(game,startDraft(1),roles,ids),{code:'FULL_AI_BELOW_MINIMUM'});
+  assert.equal(start(game,startDraft(1),roles,ids).state().policyId,FULL_ATTACK_2A_ID);
   assert.throws(()=>start(game,startDraft(2),roles,ids),{code:'AI_LEVEL_FORBIDDEN'});
   const port=start(game,startDraft(0),roles,ids);
   assert.equal(port.state().policyId,FULL_ATTACK_2A_ID);

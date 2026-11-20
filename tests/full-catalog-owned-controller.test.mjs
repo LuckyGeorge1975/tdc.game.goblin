@@ -20,7 +20,7 @@ function load(game,roles,ui={}){
 
 function playerHost(game){
   return createFullCatalogAiHost(game.context.GoblinCatalogFullRuntime,game.context.GoblinSpecialistsUI,
-    game.run('({query,dispatch})'),()=>game.run('phase'),game.context.GoblinSpecialistsRuntime);
+    game.context.GoblinCatalogFullRuntime.nativePlayerGateway,()=>game.run('phase'),game.context.GoblinSpecialistsRuntime);
 }
 
 function controller(game,port,select,onCommit){
@@ -35,13 +35,13 @@ function endPlayer(port,role){
   for(let phase=0;phase<3;phase++)assert.equal(port.commit(role,port.open(role).permit,nextPlayerPhase).ok,true);
 }
 
-function keepBaseline(port,role){
+function keepBaseline(game,port,role){
+  const player=playerHost(game);
   for(let count=0;port.state()?.side==='enemy'&&count<100;count++){
     const opened=port.open(role);
-    assert.ok(opened);
-    const preferred=opened.entries.find(option=>option.baseline);
-    assert.ok(preferred,opened.permit.actorId);
-    assert.equal(port.commit(role,opened.permit,preferred.command).ok,true);
+    const command=game.context.GoblinCatalogFullRuntime.referenceCommand();
+    assert.ok(opened&&command);
+    assert.equal(port.commit(role,opened.permit,command,player.dispatch).ok,true);
   }
   assert.notEqual(port.state()?.side,'enemy');
 }
@@ -55,63 +55,56 @@ function placeFight(game){
   }`);
 }
 
-test('native phase commands need no dialog and choosing every baseline preserves the Atlas turn and dice',async()=>{
-  const original=await full();
-  original.run("loadScenario('catalog-full-atlas');setTurnPhase('fire');setTurnPhase('gev');startEnemyTurn()");
-  const job=[...original.timers].find(([,task])=>String(task).includes('const foes='));
-  assert.ok(job);
-  original.timers.delete(job[0]);
-  job[1]();
-
-  const game=await full();
-  const port=load(game,{player:'ai',enemy:'ai'});
-  game.run("GameDialogs.confirm=()=>{throw Error('unexpected phase ACK')}");
-  const commits=[], owners=[];
+test('shared native phase and reference choices match direct own-port commits including seeded dice',async()=>{
+  async function make(){
+    const game=await full();for(const file of ['level-events.js','editor-draft.js'])game.run(script(file));
+    game.context.source={version:'goblin-level-v3',width:6,height:5,objective:'core-and-escort',terrain:[],units:[
+      {id:'p',assetId:'assault-tank',team:'player',x:1,y:2},
+      {id:'e',assetId:'guard-tank',team:'enemy',x:2,y:2},
+      {id:'core',assetId:'command-core',team:'enemy',x:5,y:4}]};
+    await game.run('GoblinEditorDraft.prepare(source).then(config=>{globalThis.port=loadEditorDraft(config,{roles:{player:"ai",enemy:"ai"},seed:7})})');
+    return {game,port:game.context.port};
+  }
+  const expected=await make();endPlayer(expected.port,'ai');keepBaseline(expected.game,expected.port,'ai');
+  const {game,port}=await make();game.run("GameDialogs.confirm=()=>{throw Error('unexpected phase ACK')}");
+  const commits=[],owners=[];
   const host=controller(game,port,{
     player:batch=>{owners.push(batch.side);return chooseEndPhase(batch)},
-    enemy:batch=>{owners.push(batch.side);return batch.candidates.find(option=>option.facts.baseline).key}
+    enemy:batch=>{owners.push(batch.side);return (batch.candidates.find(c=>c.facts.baseline)||batch.candidates.find(c=>c.kind==='end-phase')).key}
   },receipt=>commits.push(receipt.action));
-  for(let count=0;port.state().side==='player'&&game.run('turn')===1&&count<3;count++)
-    assert.equal((await host.advance()).ok,true);
-  for(let count=0;port.state().side==='enemy'&&count<100;count++)
-    assert.equal((await host.advance()).ok,true);
+  for(let count=0;game.run('turn')===1&&count<30;count++)assert.equal((await host.advance()).ok,true);
   assert.deepEqual(commits.slice(0,3).map(c=>c.type),['EndPhase','EndPhase','EndPhase']);
   assert.deepEqual(owners.slice(0,3),['player','player','player']);
   assert.ok(owners.slice(3).every(side=>side==='enemy'));
-  assert.deepEqual(game.rng(),original.rng());
-  assert.deepEqual(snapshot(game),snapshot(original));
+  assert.deepEqual(snapshot(game),snapshot(expected.game));
+  const replay=port.simulationSnapshot(port.ticket('ai')).replay;
+  assert.deepEqual(JSON.parse(JSON.stringify(replay)),
+    JSON.parse(JSON.stringify(expected.port.simulationSnapshot(expected.port.ticket('ai')).replay)));
+  assert.equal(replay.entries.reduce((count,entry)=>count+entry.draws,0),1);
 });
 
-test('only the first opportunity combines fire, movement and hold; a hold keeps native retry fire',async()=>{
-  const game=await full();
-  const port=load(game,{player:'ai',enemy:'ai'});
-  placeFight(game);
-  endPlayer(port,'ai');
-  const dread='catalog-full-atlas-20';
-  let held=false,retried=false;
-  for(let count=0;port.state().side==='enemy'&&count<100;count++){
-    const {permit,pass,entries}=port.open('ai');
-    const preferred=entries.find(option=>option.baseline);
-    if(permit.actorId===dread&&!held){
-      const type=new Set(entries.map(item=>item.command.type));
-      assert.ok(type.has('EnemyMove')&&type.has('CatalogFire')&&type.has('EnemyHold'));
-      const hold=entries.find(item=>item.command.type==='EnemyHold').command;
-      const before=snapshot(game), rng=game.rng();
-      assert.equal(port.commit('ai',permit,{...hold,actorId:'catalog-full-atlas-1'}).code,'FULL_CONTROL_ACTOR');
-      assert.deepEqual(snapshot(game),before);
-      assert.equal(port.commit('ai',permit,hold).ok,true);
-      assert.deepEqual(game.rng(),rng);
-      assert.equal(port.commit('ai',permit,hold).code,'FULL_CONTROL_STALE');
-      held=true;
-      continue;
-    }
-    if(permit.actorId===dread&&pass==='retry'){
-      assert.ok(entries.every(option=>option.command.type==='CatalogFire'));
-      retried=true;
-    }
-    assert.equal(port.commit('ai',permit,preferred.command).ok,true);
-  }
-  assert.ok(held&&retried);
+test('the enemy has the same distinct movement, fire and GEV opportunities with stale actor tickets rejected',async()=>{
+  const game=await full(),port=load(game,{player:'ai',enemy:'ai'}),player=playerHost(game);
+  placeFight(game);endPlayer(port,'ai');
+  const movement=port.open('ai'),moves=player.playerOptions();
+  assert.equal(movement.pass,'movement');
+  assert.equal(movement.permit.actorId,null);
+  assert.ok(moves.some(entry=>entry.command.type==='Move'));
+  assert.ok(!moves.some(entry=>['CatalogFire','CatalogHexFire','EnemyHold'].includes(entry.command.type)));
+  const move=moves.find(entry=>entry.command.type==='Move').command;
+  const before=snapshot(game),rng=game.rng();
+  assert.equal(port.commit('ai',movement.permit,{...move,actorId:'catalog-full-atlas-1'},player.dispatch).code,'FULL_CONTROL_ACTOR');
+  assert.deepEqual(snapshot(game),before);assert.deepEqual(game.rng(),rng);
+  assert.equal(port.commit('ai',movement.permit,{type:'EndPhase'}).ok,true);
+  assert.equal(port.commit('ai',movement.permit,move,player.dispatch).code,'FULL_CONTROL_STALE');
+  assert.equal(port.state().phase,'fire');
+  const shots=player.playerOptions();
+  assert.ok(shots.some(entry=>entry.command.type==='CatalogFire'&&entry.command.actorId==='catalog-full-atlas-20'));
+  assert.ok(shots.every(entry=>['CatalogFire','CatalogHexFire'].includes(entry.command.type)));
+  assert.equal(port.commit('ai',port.ticket('ai'),move,player.dispatch).ok,false);
+  assert.equal(port.commit('ai',port.ticket('ai'),{type:'EndPhase'}).ok,true);
+  assert.equal(port.state().phase,'gev');
+  assert.ok(player.playerOptions().every(entry=>entry.command.type==='Move'));
 });
 
 test('human transfer exposes a side only after takeover; phase and input tickets are revoked at restart and leave',async()=>{
@@ -138,7 +131,7 @@ test('human transfer exposes a side only after takeover; phase and input tickets
   assert.equal(second.accept(),true);
   assert.equal(port.project('human').view.side,'enemy');
   assert.ok(port.project('human').view.objectives.some(goal=>goal.kind==='protect-escort'));
-  keepBaseline(port,'human');
+  keepBaseline(game,port,'human');
   const waiting=handoffs.at(-1);
   assert.equal(waiting.seat.side,'player');
   const replaced=load(game,{player:'human',enemy:'human'},ui);
@@ -158,7 +151,7 @@ test('delayed enemy AI choice cannot affect a replacement session or trigger the
   let calls=0;
   const host=controller(game,port,{enemy:batch=>{
     calls++;
-    return next.promise.then(()=>batch.candidates.find(option=>option.facts.baseline).key);
+    return next.promise.then(()=>(batch.candidates.find(option=>option.facts.baseline)||batch.candidates.find(option=>option.kind==='end-phase')).key);
   }});
   const moving=host.advance();
   assert.equal((await host.advance()).code,'AI_HOST_UNAVAILABLE');
@@ -195,7 +188,7 @@ test('a revision change invalidates a delayed choice without opening another pla
   let calls=0;
   const host=controller(game,port,{enemy:batch=>{
     calls++;
-    return choice.promise.then(()=>batch.candidates.find(option=>option.facts.baseline).key);
+    return choice.promise.then(()=>(batch.candidates.find(option=>option.facts.baseline)||batch.candidates.find(option=>option.kind==='end-phase')).key);
   }});
   const before=port.ticket('ai');
   const pending=host.advance();

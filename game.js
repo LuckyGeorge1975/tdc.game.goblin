@@ -158,7 +158,7 @@ function lineOfSight(from,to){
   for(let i=1;i<steps;i++){const t=i/steps,cell=nearestHex(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t);if((cell.x!==from.x||cell.y!==from.y)&&(cell.x!==to.x||cell.y!==to.y)&&TerrainRules.blocksLos(terrainTypeAt(cell.x,cell.y)))return false}
   return true;
 }
-function findEnemyStep(foe,target){
+function findEnemyStep(foe,target,allowance=foe.move){
   const occupied=new Set((globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster(foe.team):units).filter(u=>unitAlive(u)&&(!globalThis.GoblinCatalogFullRuntime?.active()||!u.embarkedOn)&&u!==foe).map(u=>`${u.x},${u.y}`));
   const queue=[{x:foe.x,y:foe.y,cost:0,path:[]}],seen=new Map([[`${foe.x},${foe.y}`,0]]);let best=null;
   while(queue.length){
@@ -166,7 +166,7 @@ function findEnemyStep(foe,target){
     if(node.path.length&&dist(node,target)<dist(foe,target)&&(!best||dist(node,target)<dist(best,target)||dist(node,target)===dist(best,target)&&node.cost<best.cost))best=node;
     hexNeighbors(node.x,node.y).forEach(next=>{
       const key=`${next.x},${next.y}`,stepCost=movementCost(foe,key);
-      if(next.x<0||next.x>=W||next.y<0||next.y>=H||occupied.has(key)||node.cost+stepCost>foe.move)return;
+      if(next.x<0||next.x>=W||next.y<0||next.y>=H||occupied.has(key)||node.cost+stepCost>allowance)return;
       if(!seen.has(key)||node.cost+stepCost<seen.get(key)){seen.set(key,node.cost+stepCost);queue.push({x:next.x,y:next.y,cost:node.cost+stepCost,path:[...node.path,next]})}
     });
   }

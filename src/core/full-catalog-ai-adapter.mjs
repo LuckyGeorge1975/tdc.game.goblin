@@ -153,6 +153,9 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
             ...(tactics?full.hexTacticalFacts(check):{})}:{})}});
       }
     }
+    const reference=full.referenceCommand?.();
+    const baseline=reference&&available.find(entry=>JSON.stringify(entry.command)===JSON.stringify(reference));
+    if(baseline)baseline.baseline=true;
     return available;
   }
   function humanPlayerOptions(port) {

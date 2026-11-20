@@ -65,9 +65,8 @@ test('real low, medium and trained players search after the known core falls wit
         assert.equal(game.run('units.find(unit=>unit.id==="core").hp'),0,policy);
         assert.equal(port.state().ended,false);
         assert.equal(handoffs.at(-1).take(),true);
-        const opened=port.open('human');
-        const hold=opened.entries.find(entry=>entry.command.type==='EnemyHold').command;
-        assert.equal(port.commit('human',opened.permit,hold).ok,true);
+        for(let phase=0;phase<3;phase++)
+          assert.equal(port.commit('human',port.open('human').permit,{type:'EndPhase'}).ok,true);
         assert.equal(port.state().side,'player');
         const view=port.project('ai').view;
         assert.equal(view.units.some(unit=>unit.id==='phantom'),false);

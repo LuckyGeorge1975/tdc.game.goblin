@@ -349,8 +349,31 @@
   if(previous==='enemy')root.GoblinFullRoundSource?.complete(boundary,turn-1,'complete');
   controlOwner()?.enterSide();
  }
+ function referenceCommand(){
+  if(!active()||gameOver||!controllerSides.includes(phase))return null;
+  const known=roster(phase),actors=known.filter(unit=>unit.team===phase&&unitAlive(unit)&&!unit.disabled);
+  if(turnPhase==='fire'){
+   for(const actor of actors){
+    const shot=GoblinSpecialistsRuntime.enemyShots(actor).next().value;
+    if(shot)return copy(shot.baseline);
+   }
+  }else if(turnPhase==='movement'||turnPhase==='gev'){
+   for(const actor of actors){
+    const secondary=turnPhase==='gev';
+    if(!canMoveUnit(actor,secondary))continue;
+    const target=known.filter(unit=>unit.team!==phase&&unitAlive(unit))
+     .sort((left,right)=>dist(actor,left)-dist(actor,right))[0];
+    const step=target&&findEnemyStep(actor,target,movementBudget(actor,secondary));
+    if(!step)continue;
+    const command={type:'Move',actorId:actor.id,x:step.x,y:step.y};
+    if(moveQuery(command).ok)return command;
+   }
+  }
+  return {type:'EndPhase'};
+ }
  function createMissionJournal(session,seed,seats,draft){
   const entries=[], checkpoints=new WeakMap();
+  const sources=root.GoblinFullTrainingSources?.current()??null;
   let word=seed, draws=0, initial=null;
   const level={id:session.scenarioId,digest:session.effectiveRules.catalog.levelDigest};
   if(draft)level.draft=draft;
@@ -388,9 +411,10 @@
    accept(side,slot,command,previousDraws){
     entries.push({side,slot,command:copy(command),draws:draws-previousDraws,digest:digest()});
    },
-   archive(){return gameOver&&initial?copy({version:'goblin-training-archive-v1',
+   exportBound:()=>!!sources,
+   archive(){return gameOver&&initial&&sources?copy({version:'goblin-training-archive-v1',
     profile:session.ruleProfileId,seats,outcome:terminalOutcome()==='draw'?'draw':terminalOutcome()===true?'player':'enemy',
-    replay:{version:'full-native-journal-v1',seed,level,initial,entries}}):null;},
+    replay:{version:'full-native-journal-v1',sources,seed,level,initial,entries}}):null;},
    prefix(){return initial?copy({version:'full-native-journal-v1',seed,level,initial,entries,digest:digest()}):null;},
    draws:()=>draws
   };
@@ -514,7 +538,7 @@
     finally{undoing=false;}
    },
    trainingArchive:()=>attached()&&!allowsSpectator?journal?.archive()??null:null,
-   canExportTraining:()=>attached()&&!allowsSpectator&&gameOver&&!!journal,
+   canExportTraining:()=>attached()&&!allowsSpectator&&gameOver&&!!journal?.exportBound(),
    simulationSnapshot(token){
     if(!valid(token,'ai')||!journal)return null;
     return copy({config:session.config,replay:journal.prefix(),
@@ -873,7 +897,7 @@
   aiProjection,readyUnits,viewerUnit,fireView,ensure,facts,revision,commandRevision,event,fireBoundary,reveal,refresh,snapshot,restore,validateRoster,hexQuery,executeHex,hasHexAction,enemyHex,chooseEnemyFire,enemyStep,moveQuery,executeMove,ramCollision,beginTurn,pendingEnemy,terminalOutcome,enemyBegin,enemyEnd,log,logEntries,recordAction,recordRoundAction,catalogCard,initialRoster,status,stealthText,deadlineRemoved,
   enemyHexShot,prepareControllers,controllerPort,mapPort,nativeCommitActive:()=>!!controlOwner()?.committing(),
   nativeUndoActive:()=>!!controlOwner()?.undoing(),enterControlledSide,allowsPlayerPhaseAdvance,
-  ownsPresentation,stageControlledPresentation,startControlledPresentation,controllerOffers,controllerCapabilities,registerQualifiedController,advancePhase,
+  ownsPresentation,stageControlledPresentation,startControlledPresentation,controllerOffers,controllerCapabilities,registerQualifiedController,advancePhase,referenceCommand,
   hexTacticalFacts,nativePlayerGateway,observedCells});
  const oldCheckVictory=checkVictory;
  checkVictory=function(){
@@ -882,6 +906,16 @@
   return oldCheckVictory();
  };
  const oldSetPhase=setTurnPhase;setTurnPhase=function(next){if(active()&&controllerSides.includes(phase)){if(turnPhase==='fire'&&next!=='fire')fireBoundary(phase,false);if(next==='fire'&&turnPhase!=='fire')fireBoundary(phase,true)}return oldSetPhase(next)};
- const oldFinish=finish;finish=function(win){const roundCommit=!gameOver&&root.GoblinFullRoundSource?.beginBoundary();if(active()){const s=ensure();s.terminalOutcome=win;for(const team of ['player','enemy'])if(s.visibility.teamFire[team].active)fireBoundary(team,false);if(s.waves){const result=GoblinCatalogWaves.discardPending(s.waves);s.waves=result.state;s.journal.push({type:'mission-end',outcome:win,effects:copy(result.effects)})}}const result=oldFinish(win);root.GoblinFullRoundSource?.complete(roundCommit,turn,'terminal-partial');return result};
+ const oldFinish=finish;finish=function(win){
+  const roundCommit=!gameOver&&root.GoblinFullRoundSource?.beginBoundary();
+  if(active()&&!gameOver){
+   const s=ensure();s.terminalOutcome=win;
+   for(const team of controllerSides)if(s.visibility.teamFire[team].active)fireBoundary(team,false);
+   let effects=[];
+   if(s.waves){const result=GoblinCatalogWaves.discardPending(s.waves);s.waves=result.state;effects=copy(result.effects)}
+   s.journal.push({type:'mission-end',outcome:win,effects});
+  }
+  const result=oldFinish(win);root.GoblinFullRoundSource?.complete(roundCommit,turn,'terminal-partial');return result;
+ };
  const oldHex=handleHex;handleHex=function(x,y){if(!active())return oldHex(x,y);focusedCell={x,y};const occupant=roster().find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);if(!occupant&&selected?.team==='player'&&['movement','gev'].includes(turnPhase))return executeSpecialistCommand({type:'Move',actorId:selected.id,x,y});if(occupant)return handleUnitClick(occupant);showFieldInfo(x,y);draw()};
 })(globalThis);

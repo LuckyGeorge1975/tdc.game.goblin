@@ -22,11 +22,17 @@ export async function prepareDefenderTrial(id,bytes,crypto=globalThis.crypto) {
      !Number.isFinite(model.output.bias))throw Error('FULL_DEFENDER_TRIAL_CONTRACT');
 
   return function select(batch,report) {
-    if(batch.side!=='enemy'||!['first','retry'].includes(batch.slot))return undefined;
-    const baseline=batch.candidates.find(candidate=>candidate.facts.baseline===true);
-    if(!baseline)return undefined;
+    if(!batch?.ok||batch.side!=='enemy'||!['movement','fire','gev'].includes(batch.phase)||batch.slot!==batch.phase)
+      throw Error('FULL_DEFENDER_TRIAL_SCOPE');
+    const baseline=batch.candidates.find(candidate=>candidate.facts.baseline===true)??
+      batch.candidates.find(candidate=>candidate.kind==='end-phase');
+    if(!baseline)throw Error('FULL_DEFENDER_REFERENCE_UNAVAILABLE');
     const start=fire(baseline)?encodeFullFireEffects(batch,baseline):null;
-    if(!start)return baseline.key;
+    if(!start){
+      if(fire(baseline))throw Error('FULL_DEFENDER_FEATURES_UNAVAILABLE');
+      report?.({key:baseline.key,explanationKey:'v2.round.standardAction'});
+      return baseline.key;
+    }
     let selected=baseline, highest=scoreFullFireEffects(model,start);
     const options=[];
     for(const candidate of batch.candidates){

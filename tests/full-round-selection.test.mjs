@@ -36,7 +36,7 @@ async function run(reporting,reference,select) {
   const {game,source,full,player} = context;
   game.context.draft=JSON.parse(text(deadlines));
   await game.run('GoblinEditorDraft.prepare(draft).then(level=>globalThis.admitted=level)');
-  const reported=[], commands=[];
+  const reported=[], commands=[], acceptedPasses=[];
   full.registerQualifiedController({side:'player',id:FULL_ATTACK_2A_ID,difficulty:null,
     select(batch,port,report) {
       return select(batch,port,reporting ? (evidence)=>{
@@ -60,7 +60,10 @@ async function run(reporting,reference,select) {
     policyIds:{player:'${FULL_ATTACK_2A_ID}'}})`);
   const host=createOwnedFullCatalogSessionHost({port,player,select:{enemy:reporting?
     selectStandardFullDefender:batch=>selectStandardFullDefender(batch)},
-    onCommit({action}) { commands.push(action); }
+    onCommit({action},before) {
+      commands.push(action);
+      if(action.type==='EndPhase')acceptedPasses.push(before.side);
+    }
   });
   const snapshots=[];
   for (let index=0; !port.state()?.ended && index<80; index++) {
@@ -74,7 +77,7 @@ async function run(reporting,reference,select) {
   assert.equal(port.state()?.ended,true);
   assert.equal(port.state()?.outcome,true);
   if (reference) assert.equal(snapshots.length,reference.length);
-  return {context,commands,snapshots,reported,rounds:source.view().trace};
+  return {context,commands,acceptedPasses,snapshots,reported,rounds:source.view().trace};
 }
 
 test('native FULL attaches only actual deadline and model evidence without affecting commands or draws',async t=>{
@@ -87,7 +90,7 @@ test('native FULL attaches only actual deadline and model evidence without affec
   assert.ok(protectedShots.length>0 && modelShots.length>0);
   assert.ok(rows.some(row=>row.explanationKey==='v2.round.objectiveMove'));
   assert.equal(rows.filter(row=>row.explanationKey==='v2.round.objectivePass').length,
-    active.commands.filter(action=>action.type==='EndPhase').length);
+    active.acceptedPasses.filter(side=>side==='player').length);
   assert.ok(rows.some(row=>row.explanationKey==='v2.round.standardAction'));
   for (const row of [...protectedShots,...modelShots]) {
     assert.equal(row.kind,'fire');

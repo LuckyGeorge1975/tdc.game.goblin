@@ -5,6 +5,8 @@ import {queryBridge} from '../tests/artillery-product-harness.mjs';
 import {createFullCatalogAiHost} from '../src/core/full-catalog-ai-adapter.mjs';
 import {FULL_ATTACK_2A_ID} from '../src/core/full-attack-2a.mjs';
 import {TRAINING_ARCHIVE_VERSION} from '../training-archive.mjs';
+import {gameplaySourceHashes} from '../tests/helpers/replay-source-binding.mjs';
+import {verifyTrainingSources} from '../full-training-source-binding.mjs';
 
 const source=file=>readFileSync(new URL('../'+file,import.meta.url),'utf8');
 const plain=value=>JSON.parse(JSON.stringify(value));
@@ -19,9 +21,10 @@ function exact(value,keys){
 export async function openFullTrainingReplay(archive) {
   const {replay,seats}=archive;
   expect(exact(seats,['player','enemy']));
-  expect(exact(replay,['version','seed','level','initial','entries']) && replay.version==='full-native-journal-v1' &&
+  expect(exact(replay,['version','sources','seed','level','initial','entries']) && replay.version==='full-native-journal-v1' &&
     Number.isInteger(replay.seed)&&replay.seed>=0&&replay.seed<=0xffffffff &&
     Array.isArray(replay.entries));
+  verifyTrainingSources(replay.sources,gameplaySourceHashes());
   expect(exact(replay.level,['id','digest'])||exact(replay.level,['id','digest','draft']));
   const roles={}, policyIds={};
   const game=fullShell();

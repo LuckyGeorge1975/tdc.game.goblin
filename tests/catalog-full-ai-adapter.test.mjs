@@ -1,159 +1,73 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {fullScene} from './catalog-full-harness.mjs';
-import {read} from './artillery-product-harness.mjs';
-import {createFullCatalogAiAdapter, createFullCatalogAiHost} from '../src/core/full-catalog-ai-adapter.mjs';
-import {createFullCatalogSessionHost} from '../src/core/full-catalog-session-host.mjs';
+import {nativeSession,closeAtlas,request} from './helpers/full-native-test-session.mjs';
+import {createOwnedFullCatalogSessionHost} from '../src/core/full-catalog-session-host.mjs';
 import {createFullRoundSource} from '../full-round-source.mjs';
 
-const full = id => fullScene(id,7,false,'FULL_CATALOG_v1');
-const snapshot = game => [game.state(),read(game,'GoblinCatalogFullRuntime.snapshot()'),game.rng()];
-const request = (batch, candidate) => ({schemaVersion:1,decisionId:batch.decisionId,
-  revision:batch.revision,key:candidate.key});
-
-function hostFor(game) {
-  const player = game.run('({query, dispatch, previewFire})');
-  return createFullCatalogAiHost(game.context.GoblinCatalogFullRuntime,
-    game.context.GoblinSpecialistsUI,player,()=>game.run('phase'),game.context.GoblinSpecialistsRuntime);
-}
-
-function schedule(game, fire = null, step = null) {
-  Object.assign(game.context,{chooseStep:step,chooseFire:fire});
-  game.run("setTurnPhase('fire');setTurnPhase('gev');startEnemyTurn(chooseStep,chooseFire)");
-  const job = [...game.timers].find(([,callback])=>String(callback).includes('const foes='));
-  assert.ok(job);
-  game.timers.delete(job[0]);
-  return job[1];
-}
-
-function closeAtlas(game) {
-  game.run(`const shooter=units.find(u=>u.id==='catalog-full-atlas-20');
-    const targetSystem=units.find(u=>u.id==='catalog-full-atlas-1');
-    const opposing=units.find(u=>u.id==='catalog-full-atlas-2');
-    shooter.x=1;shooter.y=1;targetSystem.x=2;targetSystem.y=1;opposing.x=1;opposing.y=2;
-    terrain.clear();terrainTypes.clear();GoblinCatalogFullRuntime.refresh();`);
-}
-
-test('FULL spectator host uses native player and synchronous enemy commits',async()=>{
-  const game = await full('catalog-full-atlas');
-  closeAtlas(game);
-  const receipts = [];
-  const session = createFullCatalogSessionHost({host:hostFor(game),spectator:true,
-    read:()=>({session:game.run('legacySession.sessionId'),side:game.run('phase'),ended:game.run('gameOver')}),
-    readGeneration:()=>1,
-    select:batch=>batch.candidates.find(candidate=>candidate.kind==='move').key,
-    selectEnemy:batch=>batch.candidates.find(candidate=>candidate.facts.baseline)?.key,
-    onCommit:(receipt,before)=>receipts.push([receipt.action.type,before.side])
-  });
-  assert.deepEqual(await session.advancePlayer(),{ok:true});
-  schedule(game,session.chooseEnemyFire,session.chooseEnemyStep)();
-  assert.deepEqual(receipts[0],['Move','player']);
-  assert.ok(receipts.some(([type,side])=>type==='CatalogFire'&&side==='enemy'));
-  session.stop();
-  assert.equal((await session.advancePlayer()).code,'AI_HOST_UNAVAILABLE');
+test('FULL spectator host commits through the same native port on both seats',async()=>{
+  const f=await nativeSession(),receipts=[];closeAtlas(f.game);
+  const choose=batch=>batch.candidates.find(c=>c.kind==='end-phase').key;
+  const session=createOwnedFullCatalogSessionHost({port:f.port,player:f.host,
+    select:{player:choose,enemy:choose},onCommit:(receipt,before)=>receipts.push([receipt.action.type,before.side])});
+  for(let step=0;step<6;step++)assert.equal((await session.advance()).ok,true);
+  assert.deepEqual(receipts,[...Array.from({length:3},()=>['EndPhase','player']),...Array.from({length:3},()=>['EndPhase','enemy'])]);
+  assert.equal(f.game.run('turn'),2);session.leave();
+  assert.equal((await session.advance()).ok,false);
 });
 
-test('player projection excludes concealed Phantom and dispatch revalidates after revision change',async()=>{
-  const g = await full('catalog-full-atlas');
-  g.run(`const phantom=units.find(u=>u.catalogId==='U21');
-    phantom.x=11;phantom.y=7;GoblinCatalogFullRuntime.refresh();`);
-  let generation=1;
-  const adapter=createFullCatalogAiAdapter(hostFor(g),()=>generation);
-  const before=snapshot(g);
-  const batch=adapter.open('player');
+test('projection hides an undisclosed Phantom and revisions revoke native decisions',async()=>{
+  const f=await nativeSession();
+  f.game.run(`{const phantom=units.find(u=>u.catalogId==='U21');phantom.x=11;phantom.y=7;GoblinCatalogFullRuntime.refresh()}`);
+  const before=f.facts(),batch=f.adapter.open('player');
   assert.equal(batch.ok,true);
-  const phantomId=g.run('phantom.id');
-  assert.equal(JSON.stringify(batch).includes(phantomId),false);
-  assert.equal(adapter.open('enemy').ok,false);
-  assert.deepEqual(snapshot(g),before);
-  const candidate=batch.candidates.find(c=>c.kind==='move');
-  assert.ok(candidate);
-  generation++;
-  assert.equal(adapter.execute(request(batch,candidate)).code,'AI_STALE_DECISION');
-  const next=adapter.open('player');
-  const move=next.candidates.find(c=>c.kind==='move');
-  const result=adapter.execute(request(next,move));
-  assert.equal(result.ok,true);
-  assert.equal(result.action.type,'Move');
-  assert.deepEqual(read(g,`units.filter(u=>u.id===${JSON.stringify(move.actorId)}).map(u=>[u.x,u.y])`),[[move.target.x,move.target.y]]);
-  assert.equal(adapter.execute(request(next,move)).code,'AI_STALE_DECISION');
+  assert.equal(JSON.stringify(batch).includes(f.game.run("units.find(u=>u.catalogId==='U21').id")),false);
+  assert.equal(f.adapter.open('enemy').ok,false);assert.deepEqual(f.facts(),before);
+  const next=f.adapter.open('player'),move=next.candidates.find(c=>c.kind==='move');
+  f.game.run('GoblinCatalogFullRuntime.refresh()');
+  assert.equal(f.adapter.execute(request(next,move)).code,'AI_STALE_DECISION');
+  const fresh=f.adapter.open('player'),choice=fresh.candidates.find(c=>c.kind==='move');
+  assert.equal(f.adapter.execute(request(fresh,choice)).ok,true);
+  assert.equal(f.adapter.execute(request(fresh,choice)).code,'AI_STALE_DECISION');
 });
 
-test('Atlas selects an alternative component in the same enemy weapon slot',async()=>{
-  const g=await full('catalog-full-atlas');closeAtlas(g);
-  const source=createFullRoundSource(()=>g.run('({session:legacySession,round:turn,side:phase,phase:turnPhase,ended:gameOver})'));
-  g.context.GoblinFullRoundSource=source;
-  source.start();
-  const adapter=createFullCatalogAiAdapter(hostFor(g),()=>1);
-  let proof, oldExecute, oldRequest;
-  schedule(g,adapter.chooseEnemyFire((batch,execute)=>{
-    if(!batch.ok || proof || batch.candidates[0]?.actorId!=='catalog-full-atlas-20')return;
-    const baseline=batch.candidates.find(c=>c.facts.baseline);
-    const alternative=batch.candidates.find(c=>c.target?.kind==='component'&&c.target.componentId==='treads'&&c.key!==baseline.key);
-    assert.ok(alternative);
-    assert.equal(alternative.facts.effectKind,'tread-roll-5-6');
-    assert.equal(alternative.facts.ratioCategory,null);
-    assert.equal(batch.slot,'first');
-    assert.ok(batch.candidates.every(c=>c.weaponRef===baseline.weaponRef));
-    assert.equal(batch.view.units.find(u=>u.id===alternative.actorId).relation,'own');
-    const draws=g.rolls();
-    oldRequest=request(batch,alternative);oldExecute=execute;
-    const result=execute(oldRequest);
-    assert.equal(result.ok,true);
-    assert.equal(result.action.target.componentId,'treads');
-    assert.equal(g.rolls(),draws+1);
-    assert.equal(read(g,'shooter.specialistJournal.at(-1).command.target.componentId'),'treads');
-    assert.equal(execute(oldRequest).code,'AI_STALE_DECISION');
-    proof=true;
-  }))();
-  assert.ok(proof);
-  assert.equal(oldExecute(oldRequest).code,'AI_STALE_DECISION');
-  assert.equal(g.run('phase'),'player');
-  assert.ok(source.view().latestComplete.rows.every(row=>!row.options));
-  g.run('finish(false)');
-  assert.ok(source.view().latestComplete.rows.some(row=>row.options?.length>1&&
-    row.options.some(option=>option.selected&&option.component==='treads')));
+test('Atlas selects alternative component fire in its common fire phase with private round evidence',async()=>{
+  const f=await nativeSession();closeAtlas(f.game);
+  const source=createFullRoundSource(()=>f.game.run('({session:legacySession,round:turn,side:phase,phase:turnPhase,ended:gameOver})'));
+  f.game.context.GoblinFullRoundSource=source;source.start();
+  for(let i=0;i<4;i++)f.endPhase();
+  const batch=f.adapter.open('enemy');assert.equal(batch.slot,'fire');
+  const alternative=batch.candidates.find(c=>c.actorId==='catalog-full-atlas-20'&&c.target?.componentId==='treads');
+  assert.ok(alternative);assert.equal(alternative.facts.effectKind,'tread-roll-5-6');
+  assert.equal(alternative.facts.ratioCategory,null);
+  assert.equal(batch.view.units.find(u=>u.id===alternative.actorId).relation,'own');
+  assert.ok(batch.candidates.filter(c=>c.actorId===alternative.actorId&&c.weaponRef===alternative.weaponRef).length>1);
+  const cmd=request(batch,alternative);
+  assert.equal(f.adapter.execute(cmd,{...cmd,explanationKey:'v2.round.standardAction',options:[
+    {candidate:alternative,selected:true,baseline:false,scores:{model:1}}]}).ok,true);
+  assert.equal(f.adapter.execute(cmd).code,'AI_STALE_DECISION');
+  const replay=f.port.simulationSnapshot(f.port.ticket('ai')).replay;
+  assert.equal(replay.entries.at(-1).draws,1);
+  assert.equal(f.game.run('units.find(u=>u.id==="catalog-full-atlas-20").specialistJournal.at(-1).command.target.componentId'),'treads');
+  assert.ok(!(source.view().latestComplete?.rows??[]).some(row=>row.options));
+  f.game.run('finish(false)');
+  assert.ok(source.view().trace.flatMap(round=>round.rows).some(row=>row.options?.some(option=>option.selected&&option.component==='treads')));
 });
 
-test('FULL baseline selection matches the existing turn and stale session cannot fire',async()=>{
-  const expected=await full('catalog-full-atlas');closeAtlas(expected);schedule(expected)();
-  const g=await full('catalog-full-atlas');closeAtlas(g);
-  const adapter=createFullCatalogAiAdapter(hostFor(g),()=>1);
-  let selected=0;
-  schedule(g,adapter.chooseEnemyFire((batch,execute)=>{
-    assert.equal(batch.ok,true);
-    const baseline=batch.candidates.find(c=>c.facts.baseline);
-    assert.equal(execute(request(batch,baseline)).ok,true);
-    selected++;
-  }))();
-  assert.ok(selected>1);
-  assert.deepEqual(snapshot(g),snapshot(expected));
-  const restarted=await full('catalog-full-atlas');closeAtlas(restarted);
-  const next=createFullCatalogAiAdapter(hostFor(restarted),()=>1);
-  let afterRestart;
-  schedule(restarted,next.chooseEnemyFire((batch,execute)=>{
-    restarted.run("loadScenario('catalog-full-atlas')");
-    afterRestart=snapshot(restarted);
-    assert.equal(execute(request(batch,batch.candidates[0])).code,'AI_STALE_DECISION');
-  }))();
-  assert.ok(afterRestart);
-  assert.deepEqual(snapshot(restarted),afterRestart);
+test('all own native candidates remain in a batch and a replaced session cannot execute them',async()=>{
+  const f=await nativeSession();closeAtlas(f.game);for(let i=0;i<4;i++)f.endPhase();
+  const batch=f.adapter.open('enemy'),options=f.host.playerOptions(true);
+  assert.equal(batch.candidates.filter(c=>c.kind!=='end-phase').length,options.length);
+  assert.ok(batch.candidates.some(c=>c.actorId==='catalog-full-atlas-20'));
+  f.game.run('loadScenario(currentScenario,controls)');const before=f.facts();
+  assert.equal(f.adapter.execute(request(batch,batch.candidates[0])).code,'AI_STALE_DECISION');
+  assert.deepEqual(f.facts(),before);
 });
 
-test('Hold at the existing first slot leaves the retry fire choice available',async()=>{
-  const g=await full('catalog-full-atlas');closeAtlas(g);
-  const adapter=createFullCatalogAiAdapter(hostFor(g),()=>1);
-  const observed=[];
-  const step=adapter.chooseEnemyStep((batch,execute)=>{
-    if(batch.candidates[0]?.actorId!=='catalog-full-atlas-20')return;
-    const hold=batch.candidates.find(c=>c.kind==='hold');
-    const result=execute(request(batch,hold));
-    observed.push([batch.slot,result.ok]);
-  });
-  const fire=adapter.chooseEnemyFire(batch=>{
-    if(batch.candidates[0]?.actorId==='catalog-full-atlas-20' && observed.length===1)
-      observed.push([batch.slot,batch.candidates.some(c=>c.facts.baseline)]);
-  });
-  schedule(g,fire,step)();
-  assert.deepEqual(observed,[['first-movement',true],['retry',true]]);
+test('ending movement retains legal fire choices and ends with a separate GEV phase',async()=>{
+  const f=await nativeSession();closeAtlas(f.game);for(let i=0;i<3;i++)f.endPhase();
+  assert.equal(f.adapter.open('enemy').slot,'movement');f.endPhase();
+  const batch=f.adapter.open('enemy');assert.equal(batch.slot,'fire');
+  assert.ok(batch.candidates.some(c=>c.actorId==='catalog-full-atlas-20'&&c.kind==='fire'));
+  f.endPhase();assert.equal(f.adapter.open('enemy').slot,'gev');f.endPhase();
+  assert.equal(f.port.state().side,'player');assert.equal(f.game.run('turn'),2);
 });

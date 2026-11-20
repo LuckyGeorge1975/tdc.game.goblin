@@ -107,7 +107,8 @@ function undoPhaseCommand() {
 // Keep combat dice stable when a shot is undone and issued again.
 const originalCombatOutcome = combatOutcome;
 combatOutcome = function(...args) {
-  if (phase !== 'player' || globalThis.GoblinCatalogFullRuntime?.hasMissionRandom?.()) return originalCombatOutcome(...args);
+  const full=globalThis.GoblinCatalogFullRuntime;
+  if ((!full?.active()&&phase!=='player')||full?.hasMissionRandom?.()) return originalCombatOutcome(...args);
   const random = Math.random;
   Math.random = () => {
     if (phaseRollCursor === phaseRolls.length) phaseRolls.push(random());

@@ -5,6 +5,7 @@ import test from 'node:test';
 import {fullScene} from './catalog-full-harness.mjs';
 import {listAiTrainingCorpus} from '../scripts/ai-training-corpus.mjs';
 import {openFullTrainingReplay} from '../scripts/full-training-import.mjs';
+import {gameplaySourceHashes} from './helpers/replay-source-binding.mjs';
 import {createFullGameManager,fullNativeSetup} from '../full-standard-seat-owner.mjs';
 import {selectWeakFullCatalog,selectMediumFullCatalog} from '../src/core/full-catalog-difficulty.mjs';
 import {prepareFullAttack2a,FULL_ATTACK_2A_ID,FULL_ATTACK_2A_ENGINE} from '../src/core/full-attack-2a.mjs';
@@ -147,7 +148,7 @@ test('new regular mission archive IDs reconstruct trusted levels and reject forg
   for(const level of levels){
     const prepared=await api.prepare(level);
     const archive={seats:{player:{controller:'human'},enemy:{controller:'human'}},replay:{
-      version:'full-native-journal-v1',seed:7,level:{id:level.id,digest:prepared.catalog.levelDigest},initial:'',entries:[]}};
+      version:'full-native-journal-v1',sources:gameplaySourceHashes(),seed:7,level:{id:level.id,digest:prepared.catalog.levelDigest},initial:'',entries:[]}};
     const host=await openFullTrainingReplay(archive);
     assert.equal(host.game.run('currentScenario'),level.id);
     assert.equal(host.port.state().levelDigest,prepared.catalog.levelDigest);
