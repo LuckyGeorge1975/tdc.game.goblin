@@ -189,3 +189,62 @@ test('regular mission choices and objective markers use all new IDs and actual d
     assert.equal(markers.objective.code,'eliminate-opponent');
   }
 });
+
+test('editor save and overwrite follow central validation for symmetric and incomplete drafts',async()=>{
+  const game=await fullScene(),disk=new Map();
+  game.context.localStorage={getItem:key=>disk.get(key)??null,setItem:(key,value)=>disk.set(key,value),
+    removeItem:key=>disk.delete(key)};
+  for(const file of ['level-events.js','editor-draft.js','saved-levels.js'])game.run(source(file));
+  game.context.GoblinEditorUI={render(_panel,view){game.context.editorSaveView=view;}};
+  game.context.document={createElement:()=>({append(){}}),createTextNode:text=>text};
+  game.context.GameDialogs={isOpen:()=>false,confirm:async()=>true};
+  game.context.initialDraft=levels[0];
+  const flow=source('ui-v2-flow.js');
+  game.run(`{
+    const screen='editor',editorBusy=false,editorMoving=false,editorCell={x:0,y:0},editorCamera={},editorMissionOpen=false;
+    const panel={append(){}},heading=text=>text,t=key=>key,button=(text,onclick)=>({textContent:text,onclick});
+    const paragraph=text=>({textContent:text,setAttribute(){}}),renderScreen=()=>{};
+    const selectEditorCell=()=>{},setEditorMoving=()=>{},updateEditor=()=>{},loadEditorPilot=()=>{},playEditorDraft=()=>{};
+    const show=()=>{},newEditorDraft=()=>{},importEditorFile=()=>{},exportEditorFile=()=>{},saveImportedLevel=()=>{};
+    let editorDraft=initialDraft,editorName='Saved test',editorSaved=null,editorWorking=false,editorSavedMessage='',editorError='';
+    let editorImportLevels=null,editorBackScreen='menu',savedLevelId=null;
+    ${flow.slice(flow.indexOf('    async function saveEditorLevel('),flow.indexOf('    async function startSavedLevel('))}
+    ${flow.slice(flow.indexOf('    function renderEditor('),flow.indexOf('    function libraryAssetId('))}
+    globalThis.editorSaveTest={render:()=>renderEditor(panel),save:saveEditorLevel,
+      setDraft:draft=>{editorDraft=draft;},get saved(){return editorSaved;},get working(){return editorWorking;}};
+  }`);
+  const api=game.context.editorSaveTest,store=game.context.GoblinSavedLevels;
+  api.render();
+  assert.equal(game.context.editorSaveView.save.textContent,'v2.saved.saveNew');
+  await api.save(false);
+  api.render();
+  const savedId=api.saved.id;
+  assert.equal(game.context.editorSaveView.overwrite.disabled,false);
+  api.setDraft(levels[3]);
+  await api.save(true);
+  assert.equal(api.saved.id,savedId);
+  assert.equal(JSON.parse(store.read()[0].level).width,24);
+  api.setDraft({...levels[0],units:levels[0].units.filter(unit=>unit.team==='player')});
+  api.render();
+  assert.equal(game.context.editorSaveView.save.textContent,'v2.editor.workingSave');
+  assert.equal(game.context.editorSaveView.overwrite.disabled,true);
+  await api.save(false);
+  assert.equal(api.working,true);
+  assert.ok(store.readWorking().draft.units.every(unit=>unit.team==='player'));
+  assert.equal(store.read().length,1);
+  api.setDraft(game.context.GoblinEditorDraft.createBlank(8,8));
+  await api.save(false);
+  assert.equal(store.readWorking().draft.objective,'core-and-escort');
+  assert.equal(store.readWorking().draft.units.length,0);
+  api.setDraft(game.context.GoblinEditorDraft.copyTemplate());
+  api.render();
+  assert.equal(game.context.editorSaveView.save.textContent,'v2.saved.saveNew');
+  assert.equal(game.context.editorSaveView.overwrite.disabled,false);
+  await api.save(false);
+  assert.equal(store.read().length,2);
+  const invalid=structuredClone(levels[0]);
+  invalid.units[0].x=999;
+  api.setDraft(invalid);
+  await api.save(false);
+  assert.equal(store.read().length,2);
+});

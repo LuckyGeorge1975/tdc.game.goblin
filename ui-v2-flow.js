@@ -1108,7 +1108,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       try {
         try { GoblinEditorDraft.validate(editorDraft); }
         catch (error) {
-          if (previous || !['core','player'].includes(error.message)) throw error;
+          if (previous || !['core','player','enemy'].includes(error.message)) throw error;
           GoblinSavedLevels.saveWorking(editorName,editorDraft);
           editorWorking = true;
           editorSavedMessage = t('v2.editor.workingSaved');
@@ -1510,7 +1510,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       name.oninput = () => { editorName = name.value; };
       const label = document.createElement('label');
       label.append(document.createTextNode(t('v2.saved.name')), name);
-      const ready = editorDraft.units.some(unit=>unit.id==='core') && editorDraft.units.some(unit=>unit.team==='player');
+      let ready=false;
+      try { GoblinEditorDraft.validate(editorDraft); ready=true; } catch { /* Incomplete working draft. */ }
       const save = button(t(ready ? 'v2.saved.saveNew' : 'v2.editor.workingSave'), () => saveEditorLevel(false));
       const overwrite = button(t('v2.saved.overwrite'), () => saveEditorLevel(true));
       save.disabled = editorBusy || editorMoving;
