@@ -600,13 +600,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           defaultTerrain: source.map.defaultTerrain, terrain: source.map.terrain,
           units: source.units};
       }
-      if (!Object.hasOwn(ScenarioRuleProfiles.entries, id)) return null;
+      if (!Object.hasOwn(ScenarioRuleProfiles.entries, id)&&!globalThis.GoblinFullMissions?.has(id)) return null;
       const config = scenarioCatalog[id];
       if (!config) return null;
       try { ScenarioRuleProfiles.validate(id, config); } catch { return null; }
       if (!Array.isArray(config.terrain) || !Array.isArray(config.units) ||
           (config.terrainTypes !== undefined && !Array.isArray(config.terrainTypes))) return null;
-      return {width: 12, height: 8, defaultTerrain: 'open-ground',
+      return {width: config.width??12, height: config.height??8, defaultTerrain: 'open-ground',
         terrain: [
           ...config.terrain.map(key => {
             const [x, y] = key.split(',').map(Number);
@@ -1177,7 +1177,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         const {units} = GoblinEditorDraft.validate(draft);
         const {width,height,terrain} = draft;
         const visible = GoblinCatalogFullRuntime.initialRoster({
-          ...GoblinCatalogFullModel.editorProfile, width, height, terrainTypes:terrain, units
+          ...GoblinCatalogFullModel.editorProfile,objective:draft.objective, width, height, terrainTypes:terrain, units
         });
         return {data:{width,height,defaultTerrain:'open-ground',terrain,
           units:visible.filter(unit => !unit.embarkedOn)}};
@@ -1185,9 +1185,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
     }
     function levelChoices() {
       if (!savedTab) {
-        const ids = [...Object.keys(ScenarioRuleProfiles.entries), 'iron-dust-v2'];
+        const ids = [...new Set([...Object.keys(ScenarioRuleProfiles.entries),
+          ...(globalThis.GoblinFullMissions?.ids??[]), 'iron-dust-v2'])];
         const choices = ids.map(id => ({id, name:t(`mission.${id}.title`),
-          summary:t(id === 'iron-dust-v2' ? 'v2.objective' : `mission.${id}.objective.short`),
+          summary:t(id === 'iron-dust-v2' ? 'v2.objective' : scenarioCatalog[id]?.objective==='eliminate-opponent'?
+            'v2.full.symmetricObjective':`mission.${id}.objective.short`),
           data:missionData(id)}));
         if (!choices.some(choice => choice.id === missionId)) missionId = ids[0];
         return {choices,selected:choices.find(choice => choice.id === missionId)};
@@ -2008,6 +2010,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       } else if (screen === 'briefing') {
         const data = missionData(missionId);
         const migrated = globalThis.GoblinFullMissions?.has(missionId)===true;
+        const symmetric=scenarioCatalog[missionId]?.objective==='eliminate-opponent';
         const header = document.createElement('header'); header.className = 'v2-screen-header';
         if (campaign) header.append(paragraph(campaignPosition(), 'v2-briefing-number'));
         const legacyNumber = missionId !== 'iron-dust-v2' &&
@@ -2017,7 +2020,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         if (campaign?.field === 'scorched')
           header.append(paragraph(t(`mission.${missionId}.story.briefing`), 'v2-briefing-intro'));
         header.append(paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
-        if (migrated) header.append(paragraph(t('v2.full.migratedObjective')));
+        if (migrated) header.append(paragraph(t(symmetric?'v2.full.symmetricObjective':'v2.full.migratedObjective')));
         if (missionId === 'iron-dust-v2' && data) {
           const minimum=IronDustBrowserV2.seatManager().minimumDifficulty;
           if(minimum!==null){
@@ -2045,7 +2048,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         for (const [index, outcome] of ['victory', 'defeat'].entries()) {
           const label = document.createElement('h3'); label.textContent = t(`screen.briefing.${outcome}`);
           conditions.children[index].append(label,
-            paragraph(t(migrated ? outcome==='victory'?'v2.full.migratedObjective':'v2.full.migratedDefeat' :
+            paragraph(t(migrated ? outcome==='victory'?(symmetric?'v2.full.symmetricObjective':'v2.full.migratedObjective'):'v2.full.migratedDefeat' :
               campaign?.field === 'scorched' ? `v2.scorched.${outcome}` : `mission.${missionId}.briefing.${outcome}`)));
         }
         const preview = document.createElement('section'); preview.className = 'v2-briefing-preview';

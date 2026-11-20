@@ -183,7 +183,8 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
         ...(globalThis.GoblinCatalogFullRuntime?.active()?{fullStatus:GoblinCatalogFullRuntime.status()}:{}),
         revision: snapshotRevision, scenario: currentScenario, profile: legacySession.ruleProfileId,
         markers:M1UnitMarkers.legacy(legacySession, roster, snapshotRevision, objective.outcome),
-        mission: { title: t(`mission.${currentScenario}.title`), objective: t(`mission.${currentScenario}.objective.short`) },
+        mission: { title: t(`mission.${currentScenario}.title`), objective: t(legacySession.effectiveRules.objective==='eliminate-opponent'?
+          'v2.full.symmetricObjective':`mission.${currentScenario}.objective.short`) },
         turn:displayed?.turn??turn, phase:shownPhase, turnPhase:shownTurnPhase, gameOver:shownGameOver, objective: structuredClone(objective),
         ready: phase === 'player' && !gameOver ? phaseReadyUnits().length : 0,
         undo: { available: phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },

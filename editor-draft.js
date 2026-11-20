@@ -10,7 +10,7 @@
   const available = () => !!profile();
   const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
     Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
-  const size = Object.freeze({minWidth:6,maxWidth:18,minHeight:5,maxHeight:12});
+  const size = Object.freeze({minWidth:6,maxWidth:24,minHeight:5,maxHeight:24});
   const validSize = ({width,height}) => Number.isInteger(width) && width >= size.minWidth && width <= size.maxWidth &&
     Number.isInteger(height) && height >= size.minHeight && height <= size.maxHeight;
   const key = cell => cell.x + ',' + cell.y;
@@ -59,7 +59,7 @@
       if (Object.hasOwn(draft,key)) fields.push(key);
     if (!exact(draft,fields) ||
         (Object.hasOwn(draft,'ruleProfile') && draft.ruleProfile !== profile().ruleProfileId) ||
-        !validSize(draft) || draft.objective !== objective ||
+        !validSize(draft) || ![objective,'eliminate-opponent'].includes(draft.objective) ||
         Object.hasOwn(draft,'aiAllowed') && typeof draft.aiAllowed !== 'boolean' ||
         !Array.isArray(draft.terrain) || !Array.isArray(draft.units) ||
         draft.terrain.length > draft.width * draft.height || draft.units.length > draft.width * draft.height) fail('schema');
@@ -74,6 +74,8 @@
       if (!valid(draft.briefing) && !(exact(draft.briefing,languages) && languages.every(lang => valid(draft.briefing[lang]))))
         fail('briefing');
     }
+    const symmetric=draft.objective==='eliminate-opponent';
+    if(symmetric&&(Object.hasOwn(draft,'goals')||Object.hasOwn(draft,'waveTemplates')))fail('goalCombination');
     let turnLimit = null;
     if (Object.hasOwn(draft,'goals')) {
       const goal = Array.isArray(draft.goals) && draft.goals.length === 1 && draft.goals[0];
@@ -118,8 +120,8 @@
           !['player','enemy'].includes(entry.team)) fail('unit');
       if (!position(entry)) fail('bounds');
       if (ids.has(entry.id) || !template && !cargo && occupied.has(key(entry))) fail('collision');
-      if ((entry.id === 'core') !== (entry.assetId === 'command-core') ||
-          entry.id === 'core' && entry.team !== 'enemy') fail('core');
+      if (!symmetric&&((entry.id === 'core') !== (entry.assetId === 'command-core') ||
+          entry.id === 'core' && entry.team !== 'enemy')) fail('core');
       if (rule.strengthRef && (!Number.isInteger(entry.squads) || entry.squads < 1 || entry.squads > 3)) fail('unit');
       if (template && (cargo || entry.assetId === 'command-core' || !waves.waves.some(wave =>
         wave.templateId === entry.id && wave.team === entry.team))) fail('waves');
@@ -139,8 +141,9 @@
         owner.team !== unit.team || key(owner) !== key(unit) || bays.has(slot)) fail('cargo');
       bays.add(slot);
     }
-    if (!working && !ids.has('core')) fail('core');
+    if (!working && !symmetric && !ids.has('core')) fail('core');
     if (!working && !units.some(unit => unit.team === 'player')) fail('player');
+    if (!working && symmetric && !units.some(unit => unit.team === 'enemy')) fail('enemy');
     const events = eventData(draft);
     if (events) {
       if (events.deadlineEvent && turnLimit === null) fail('goals');
@@ -212,11 +215,11 @@
     const {minimumDifficulty,...battlefield} = copy;
     const [levelDigest,rosterDigest,terrainDigest] = await Promise.all(
       [battlefield,units,terrainTypes].map(value => GoblinCatalogBase.hash(value)));
-    const config = freeze({...source, ...(copy.width !== width || copy.height !== height ? {width:copy.width,height:copy.height} : {}),
+    const config = freeze({...source,objective:copy.objective, ...(copy.width !== width || copy.height !== height ? {width:copy.width,height:copy.height} : {}),
       ...(Object.hasOwn(copy,'aiAllowed') ? {aiAllowed:copy.aiAllowed} : {}),
       ...(minimumDifficulty!==undefined?{minimumDifficulty}:{}),
       title:'Editor draft', kicker:'G.O.B.L.I.N.', kickerKey:'v2.editor.title',
-      sub:'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
+      sub:copy.objective==='eliminate-opponent'?'Gegnerischen Verband vollständig ausschalten; eigene Einheit erhalten.':'Kern und alle Gegner ausschalten; eigene Einheit erhalten.',
       ...(copy.briefing ? {briefing:copy.briefing} : {}),
       ...(events ? {levelEvents:{hotspots:events.hotspots,hooks:events.hooks}} : {}),
       units,terrainTypes,terrain:terrainTypes.filter(cell => TerrainRules.coverBonus(cell.type)).map(key),

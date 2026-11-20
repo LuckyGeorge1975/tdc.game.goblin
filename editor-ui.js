@@ -110,6 +110,15 @@
     group.disabled = busy || moving;
     const limit = node('input');
     limit.type = 'number'; limit.min = '1'; limit.step = '1'; limit.value = draft.goals?.[0]?.turns ?? '';
+    const objective=select(['core-and-escort','eliminate-opponent'].map(value=>
+      [value,label('objective.'+value)]),draft.objective);
+    const objectiveNote=node('p',label('symmetricObjectiveNote'));
+    const updateObjective=()=>{
+      const symmetric=objective.value==='eliminate-opponent';
+      limit.disabled=symmetric;objectiveNote.hidden=!symmetric;
+    };
+    objective.onchange=updateObjective;
+    updateObjective();
     let briefing = draft.briefing ?? '';
     const limits = GoblinEditorDraft.size;
     const width = coordinate(draft.width-1,limits.maxWidth), height = coordinate(draft.height-1,limits.maxHeight);
@@ -118,11 +127,11 @@
       button('applySize',() => {
         const next = {...draft,width:width.valueAsNumber,height:height.valueAsNumber};
         view.update(next,{x:Math.min(view.cell.x,next.width-1),y:Math.min(view.cell.y,next.height-1)});
-      }),field(label('turnLimit'),limit));
+      }),field(label('objective'),objective),objectiveNote,field(label('turnLimit'),limit));
     messageEditor(group,label('briefing'),briefing,600,next => { briefing = next; });
     group.append(button('applyMission',() => {
-      const next = {...draft};
-      if (limit.value === '') delete next.goals;
+      const next = {...draft,objective:objective.value};
+      if (limit.value === '' || objective.value==='eliminate-opponent') delete next.goals;
       else next.goals = [{type:'enemy-turn-limit',turns:limit.valueAsNumber}];
       if (briefing === '') delete next.briefing;
       else next.briefing = briefing;
@@ -392,12 +401,13 @@
       const list = palette('v2-editor-units-' + team,t('ui.team.'+team));
       for (const type of types) {
         const {assetId,squads} = type;
-        if (team === 'player' && assetId === 'command-core') continue;
+        if (draft.objective!=='eliminate-opponent'&&team === 'player' && assetId === 'command-core') continue;
         const icon = UnitVisuals.iconElement({visualKey:assetId,team},'v2-editor-unit-icon');
         const option = paletteOption(unitName(assetId),() => {
           const freeId = Array.from({length:draft.units.length+(draft.waveTemplates?.length??0)+1},(_,i) => 'draft-'+(i+1))
             .find(id => !draft.units.some(unit=>unit.id===id) && !draft.waveTemplates?.some(unit=>unit.id===id));
-          const id = assetId === 'command-core' ? 'core' : current && current.id !== 'core' ? current.id : freeId;
+          const id = draft.objective==='eliminate-opponent'?(current?.id??freeId):
+            assetId === 'command-core' ? 'core' : current && current.id !== 'core' ? current.id : freeId;
           const unit = {id,assetId,team,...cell,...(squads ? {squads:current?.squads ?? 2} : {}),
             ...(current?.name && assetId===current.assetId ? {name:current.name} : {})};
           const units = current ? draft.units.map(item=>item===current ? unit : item) : [...draft.units,unit];
@@ -424,7 +434,7 @@
     if (!moving) status.append(node('p',label('fieldTools')));
     if (moving && current) status.append(node('p',t('v2.editor.pickDestination',{unit:unitName(current.assetId)})));
     if (cargo.length) status.append(node('p',t('v2.editor.cargo',{units:cargo.map(unit=>unitName(unit.assetId)).join(', ')})));
-    const error = node('p',view.error ? label('error.' + (['json','schema','unit','terrain','bounds','collision','core','player','startTerrain','events','unavailable','references','briefing','goals','cargo','waves'].includes(view.error) ? view.error : 'unavailable')) : '');
+    const error = node('p',view.error ? label('error.' + (['json','schema','unit','terrain','bounds','collision','core','player','enemy','startTerrain','events','unavailable','references','briefing','goals','goalCombination','cargo','waves'].includes(view.error) ? view.error : 'unavailable')) : '');
     error.className = 'v2-status'; error.setAttribute('role','status'); error.hidden = !view.error;
     const controls = node('div'); controls.className = 'v2-screen-actions v2-editor-actions';
     const file = node('input'); file.type = 'file'; file.accept = '.json,application/json'; file.hidden = true;

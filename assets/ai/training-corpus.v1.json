@@ -1,0 +1,28 @@
+{
+  "version": "goblin-ai-training-corpus-v1",
+  "profile": "FULL_CATALOG_v1",
+  "package": "assets/unit-art/levels/ai-training-missions.v3.json",
+  "packageSha256": "4aee303752c8cb649efabb169b75a788e222a5c5fae944c7f98d14020ddb3315",
+  "controlledSides": [
+    "player",
+    "enemy"
+  ],
+  "levels": [
+    {
+      "id": "ai-urban-8",
+      "sha256": "b79068affc06086249dd6670da45ce892f05d45629c356c243eccb48993325ac"
+    },
+    {
+      "id": "ai-plains-12",
+      "sha256": "8d974caa1face4b5771bc481c0502713a73016dfd3e1a13e7fa9f687cbe3c07f"
+    },
+    {
+      "id": "ai-mountains-18",
+      "sha256": "bc795ce30e58d2f5c10f730c34cc46651280c6329c3243740a86f642b37e7a9f"
+    },
+    {
+      "id": "ai-coast-24",
+      "sha256": "62954638adf27ad367deb2e6fcd805317c0a56e1f30e080c4edd1aa0171f8777"
+    }
+  ]
+}

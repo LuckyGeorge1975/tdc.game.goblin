@@ -33,7 +33,8 @@
         rules.objectiveVersion===1&&rules.unitDataProfile==='training-field-test-data-v1'&&rules.losMode==='legacy-pixel-los-v1'&&
         rules.training?.definition?.binding.scenarioId===binding.scenarioId)return snapshot(binding,roster,'learning',[],null);
     if(!Object.isFrozen(session)||!Object.isFrozen(rules)||!legacyProfiles.has(binding.profileId)||
-        rules?.objectiveVersion!==1||!['core','core-and-escort'].includes(rules.objective)||
+        rules?.objectiveVersion!==1||(!['core','core-and-escort'].includes(rules.objective)&&
+          !(binding.profileId==='FULL_CATALOG_v1'&&rules.objective==='eliminate-opponent'))||
         !Array.isArray(rules.units))return unsupported(binding);
     if(binding.profileId==='CATALOG_SKIMMER_PILOT_v1'&&(binding.scenarioId!=='skimmer-pilot'||session.scenarioVersion!==1||rules.movement?.version!=='skimmer-pilot-budget-v1'||rules.sourceDigest!==root.GoblinSkimmerPilot?.digest))return unsupported(binding);
     if(binding.profileId==='CATALOG_SIEGE_PILOT_v1'&&(binding.scenarioId!=='siege-pilot'||session.scenarioVersion!==1||rules.fireBudgetVersion!=='siege-tank-fire-budget-v1'||rules.sourceDigest!==root.GoblinSiegePilot?.digest))return unsupported(binding);
@@ -41,7 +42,8 @@
     if(binding.profileId==='CATALOG_BASE_TRANSPORT_v1'&&(!root.GoblinCatalogBase?.has(binding.scenarioId)||session.scenarioVersion!==1||rules.losMode!=='strict-supercover'||rules.catalog?.dataDigest!==root.GoblinCatalogBase.digest||!Object.isFrozen(rules.catalog.records)))return unsupported(binding);
     if(binding.profileId==='CATALOG_SPECIALISTS_v1'&&(!root.GoblinCatalogSpecialistsModel?.has(binding.scenarioId)||session.scenarioVersion!==1||rules.catalog?.dataDigest!==root.GoblinCatalogBase?.digest||rules.catalog?.mechanicsVersion!=='catalog-specialists-mechanics-v1'||!Object.isFrozen(rules.catalog.registry)))return unsupported(binding);
     const full=binding.profileId==='FULL_CATALOG_v1';
-    if(full&&(!(root.GoblinCatalogFullModel?.has(binding.scenarioId,binding.profileId)||typeof ScenarioRuleProfiles!=='undefined'&&ScenarioRuleProfiles.isDraftSession?.(session))||rules.catalog?.mechanicsVersion!=='catalog-full-mechanics-v1'||!Object.isFrozen(rules.catalog.registry)))return unsupported(binding);
+    if(full&&(!(root.GoblinCatalogFullModel?.has(binding.scenarioId,binding.profileId)||typeof ScenarioRuleProfiles!=='undefined'&&
+        (ScenarioRuleProfiles.isDraftSession?.(session)||ScenarioRuleProfiles.isMigratedSession?.(session)))||rules.catalog?.mechanicsVersion!=='catalog-full-mechanics-v1'||!Object.isFrozen(rules.catalog.registry)))return unsupported(binding);
     const enemies=(full?roster:rules.units).filter(unit=>unit.team==='enemy');
     const members=rules.objective==='core'?enemies.filter(unit=>unit.core):enemies;
     if(!members.length||(rules.objective==='core'&&members.length!==1))return unsupported(binding);

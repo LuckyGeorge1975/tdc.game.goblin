@@ -1,0 +1,68 @@
+{
+  "baseCommit": "3e4f7ff63e7c5dd96ea930e8e5563569e4e97967",
+  "conversion": "proposal declarations to existing goblin-level-v3 with eliminate-opponent",
+  "levels": [
+    {
+      "id": "ai-urban-8",
+      "source": "ai-urban-8.proposal.json",
+      "sourceSha256": "64f720583d5de7abc047344dc5b4259d5d92e2c947a37d7ca7058d5fa0e3ca86",
+      "dimensions": [
+        8,
+        8
+      ],
+      "unitsPerSide": 6,
+      "exactRosterAndStartStateParity": true,
+      "rotationalTerrainSymmetry": true,
+      "sourceUnitsAndTerrainUnchanged": true,
+      "canonicalLevelSha256": "b79068affc06086249dd6670da45ce892f05d45629c356c243eccb48993325ac"
+    },
+    {
+      "id": "ai-plains-12",
+      "source": "ai-plains-12.proposal.json",
+      "sourceSha256": "39736bb964989dd0b53662daf71188e82dfdce58f4f27350a2f2481d27547091",
+      "dimensions": [
+        12,
+        12
+      ],
+      "unitsPerSide": 8,
+      "exactRosterAndStartStateParity": true,
+      "rotationalTerrainSymmetry": true,
+      "sourceUnitsAndTerrainUnchanged": true,
+      "canonicalLevelSha256": "8d974caa1face4b5771bc481c0502713a73016dfd3e1a13e7fa9f687cbe3c07f"
+    },
+    {
+      "id": "ai-mountains-18",
+      "source": "ai-mountains-18.proposal.json",
+      "sourceSha256": "b74342cb9633b20467a2447bdd2e1afd050d5a26b89d7ddb3447a2caf01cae76",
+      "dimensions": [
+        18,
+        16
+      ],
+      "unitsPerSide": 12,
+      "exactRosterAndStartStateParity": true,
+      "rotationalTerrainSymmetry": true,
+      "sourceUnitsAndTerrainUnchanged": true,
+      "canonicalLevelSha256": "bc795ce30e58d2f5c10f730c34cc46651280c6329c3243740a86f642b37e7a9f"
+    },
+    {
+      "id": "ai-coast-24",
+      "source": "ai-coast-24.proposal.json",
+      "sourceSha256": "1c42b41e42456f0ddfb4cd7d6a8e3357db5c577e95eb649783228814f74df4c0",
+      "dimensions": [
+        24,
+        24
+      ],
+      "unitsPerSide": 18,
+      "exactRosterAndStartStateParity": true,
+      "rotationalTerrainSymmetry": true,
+      "sourceUnitsAndTerrainUnchanged": true,
+      "canonicalLevelSha256": "62954638adf27ad367deb2e6fcd805317c0a56e1f30e080c4edd1aa0171f8777"
+    }
+  ],
+  "package": {
+    "path": "assets/unit-art/levels/ai-training-missions.v3.json",
+    "sha256": "4aee303752c8cb649efabb169b75a788e222a5c5fae944c7f98d14020ddb3315",
+    "characters": 42169,
+    "utf8Bytes": 42190
+  }
+}
