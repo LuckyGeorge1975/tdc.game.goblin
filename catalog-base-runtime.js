@@ -16,9 +16,10 @@
  const keys={WRONG_PHASE:'v2.reject.phase',UNAVAILABLE:'v2.reject.unavailable',UNSUPPORTED_CARGO:'v2.reject.catalog.unsupportedCargo',CARGO_SPENT:'v2.reject.catalog.cargoNotReady',CARGO_CAPACITY:'v2.reject.catalog.capacity',DRONE_LOAD_BUDGET:'v2.reject.catalog.droneLoadBudget',CARGO_TURN:'v2.reject.catalog.sameTurn',DEPLOY_CELL:'v2.reject.catalog.deployCell',DRONE_DEPLOY_BUDGET:'v2.reject.catalog.droneDeployBudget',DRONE_LAND:'v2.reject.catalog.droneLand',DEPLOY_TERRAIN:'v2.reject.catalog.infantryTerrain',DRONE_NOT_READY:'v2.reject.catalog.droneNotReady',ABOARD_FIRE:'v2.reject.catalog.aboardFire',NO_WEAPON:'v2.reject.catalog.noWeapon',FIRE_SPENT:'v2.reject.spent',FIRE_TARGET:'v2.reject.target',INVALID_COMMAND:'ui.error.INVALID_COMMAND',INVALID_CARRIER:'v2.ui.embark',MOVE_SPENT:'ui.error.ACTION_SPENT',UNREACHABLE:'ui.error.UNREACHABLE'};
  const fail=(code,reason)=>({ok:false,code,reason:text(keys[code],reason,{capacity:3})});
  const ok=Object.freeze({ok:true});
+ const actingTeam=()=>root.GoblinCatalogFullRuntime?.active()?phase:'player';
  function loadQuery(cargo,c){
-  if(phase!=='player'||gameOver||turnPhase!=='movement')return fail('WRONG_PHASE','Laden nur in der Bewegungsphase.');
-  if(!ready(cargo)||!ready(c)||cargo.team!=='player'||c.team!==cargo.team||!carrier(c)||cargo===c)return fail('UNAVAILABLE','Aktive eigene Fracht und aktiven Transporter wählen.');
+  if(phase!==actingTeam()||gameOver||turnPhase!=='movement')return fail('WRONG_PHASE','Laden nur in der Bewegungsphase.');
+  if(!ready(cargo)||!ready(c)||cargo.team!==actingTeam()||c.team!==cargo.team||!carrier(c)||cargo===c)return fail('UNAVAILABLE','Aktive eigene Fracht und aktiven Transporter wählen.');
   if(!drone(cargo)&&!passenger(cargo))return fail('UNSUPPORTED_CARGO','Dieser Typ kann nicht eingeladen werden.');
   if(cargo.embarkedOn||cargo.moved||cargo.disembarkedThisTurn||dist(cargo,c)!==1)return fail('CARGO_SPENT','Fracht muss benachbart sein und ihre Bewegung noch besitzen; kein erneutes Laden nach Ausstieg.');
   const aboard=carrierCargo(c),cost=drone(cargo)?cargoDefinition(spec(cargo).cargoRef).cargoCost:cargo.hp;
@@ -27,8 +28,8 @@
   return ok;
  }
  function unloadQuery(c,cargo,x,y){
-  if(phase!=='player'||gameOver||turnPhase!=='movement')return fail('WRONG_PHASE','Aufstellen und Aussteigen nur in der Bewegungsphase.');
-  if(!ready(c)||!ready(cargo)||c.team!=='player'||cargo.team!==c.team||!carrier(c)||cargo.embarkedOn!==c.id)return fail('UNAVAILABLE','Aktiven Transporter und aktive eigene Fracht wählen.');
+  if(phase!==actingTeam()||gameOver||turnPhase!=='movement')return fail('WRONG_PHASE','Aufstellen und Aussteigen nur in der Bewegungsphase.');
+  if(!ready(c)||!ready(cargo)||c.team!==actingTeam()||cargo.team!==c.team||!carrier(c)||cargo.embarkedOn!==c.id)return fail('UNAVAILABLE','Aktiven Transporter und aktive eigene Fracht wählen.');
   if(cargo.embarkedThisTurn||cargo.disembarkedThisTurn)return fail('CARGO_TURN','Nicht im selben Zug ein- und ausladen.');
   if(!pos(x,y)||dist(c,{x,y})!==1||units.some(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y))return fail('DEPLOY_CELL','Freies benachbartes Feld wählen.');
   if(drone(cargo)){
@@ -38,7 +39,7 @@
   return ok;
  }
  function fireQuery(u,target){
-  if(!ready(u)||u.team!=='player'||phase!=='player'||gameOver||turnPhase!=='fire')return fail('WRONG_PHASE','Aktive eigene Einheit in der Feuerphase wählen.');
+  if(!ready(u)||u.team!==actingTeam()||phase!==actingTeam()||gameOver||turnPhase!=='fire')return fail('WRONG_PHASE','Aktive eigene Einheit in der Feuerphase wählen.');
   if(spec(u).fireRuleRef!=='single-fire-v1')return fail('NO_WEAPON','Keine Feueraktion in diesem Profil.');
   if(u.fired)return fail('FIRE_SPENT','Keine unverbrauchte Feueraktion.');
   if(drone(u)&&u.embarkedOn)return fail('ABOARD_FIRE','Diese Fracht kann an Bord nicht feuern.');
@@ -53,7 +54,7 @@
   const fields={Move:['type','actorId','x','y'],Fire:['type','actorId','x','y'],Embark:['type','actorId','carrierId','x','y'],Unload:['type','actorId','cargoId','x','y']}[command.type];
   if(!fields||Object.keys(command).length!==fields.length||!fields.every(k=>Object.hasOwn(command,k)))return fail('INVALID_COMMAND','Befehl gehört nicht zu diesem Regelprofil.');
   const u=units.find(u=>u.id===command.actorId),{x,y}=command;
-  if(phase!=='player'||gameOver||!ready(u)||u.team!=='player'||!pos(x,y))return fail('UNAVAILABLE','Einheit oder Ziel nicht verfügbar.');
+  if(phase!==actingTeam()||gameOver||!ready(u)||u.team!==actingTeam()||!pos(x,y))return fail('UNAVAILABLE','Einheit oder Ziel nicht verfügbar.');
   const target=(root.GoblinCatalogFullRuntime?.active()?root.GoblinCatalogFullRuntime.roster(u.team):units).find(u=>unitAlive(u)&&!u.embarkedOn&&u.x===x&&u.y===y);
   if(command.type==='Embark')return target?.id===command.carrierId?loadQuery(u,target):fail('INVALID_CARRIER','Transporter wählen.');
   if(command.type==='Unload')return unloadQuery(u,units.find(u=>u.id===command.cargoId),x,y);
@@ -84,7 +85,7 @@
  };
  const oldPhase=phaseCanAct;phaseCanAct=function(u,name=turnPhase){
   if(!active())return oldPhase(u,name);
-  if(!ready(u)||u.team!=='player')return false;
+  if(!ready(u)||u.team!==actingTeam())return false;
   if(name==='fire')return units.some(t=>fireQuery(u,t).ok);
   if(name==='movement'){
    if(units.some(c=>loadQuery(u,c).ok))return true;

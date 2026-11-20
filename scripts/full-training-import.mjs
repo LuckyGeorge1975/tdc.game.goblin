@@ -90,7 +90,7 @@ export async function openFullTrainingReplay(archive) {
 export async function importFullTrainingArchive(archive) {
   expect(exact(archive,['version','profile','seats','outcome','replay']) &&
     archive.version===TRAINING_ARCHIVE_VERSION&&archive.profile==='FULL_CATALOG_v1'&&
-    ['player','enemy'].includes(archive.outcome));
+    ['player','enemy','draw'].includes(archive.outcome));
   const host=await openFullTrainingReplay(archive);
   const demonstrations=[];
   for (const [commandIndex,entry] of archive.replay.entries.entries()){

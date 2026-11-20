@@ -74,6 +74,11 @@ export async function createHeadlessFullEngine({readSource}={}) {
     victoryOutcome=function(profile,roster) {
       const outcome=workerNativeVictoryOutcome(profile,roster);
       if(workerKnowledgeIds===null)return outcome;
+      if(outcome==='draw'){
+        if(workerUnmodeledEnemy>0&&workerUnmodeledPlayer===0)return false;
+        if(workerUnmodeledPlayer>0&&workerUnmodeledEnemy===0)return true;
+        if(workerUnmodeledEnemy!==0||workerUnmodeledPlayer!==0)return null;
+      }
       if(outcome===true&&workerUnmodeledEnemy!==0)return null;
       if(outcome===false&&workerUnmodeledPlayer!==0&&
         !roster.some(unit=>unit.team==='player'&&unitAlive(unit)))return null;
@@ -204,7 +209,8 @@ export async function createHeadlessFullEngine({readSource}={}) {
         workerModalRoll=Array.isArray(face)?[...face]:face;
       },
       state(){return {turn,phase,turnPhase,ended:gameOver,winner:gameOver?
-        (GoblinCatalogFullRuntime.terminalOutcome()?'player':'enemy'):null};}
+        (GoblinCatalogFullRuntime.terminalOutcome()==='draw'?'draw':
+          GoblinCatalogFullRuntime.terminalOutcome()===true?'player':'enemy'):null};}
     };
   }`);
   // The scripts refer to their timer registry only through the stub closures.

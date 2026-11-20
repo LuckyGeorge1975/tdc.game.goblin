@@ -42,8 +42,9 @@ function commandStateKey(list) {
 function reversibleCommand(action, label, actorId = () => selected?.id) {
   return function(...args) {
     const full=globalThis.GoblinCatalogFullRuntime;
-    if(full?.mapPort?.()&&!full.nativeCommitActive())return;
-    if (commandDepth || phase !== 'player' || gameOver) return action(...args);
+    if(full?.controllerPort?.()&&!full.nativeCommitActive())return {ok:false,code:'FULL_CONTROL_STALE'};
+    const ownPhase=full?.active()?['player','enemy'].includes(phase):phase==='player';
+    if (commandDepth || !ownPhase || gameOver) return action(...args);
     const before = commandSnapshot(label), epoch = commandEpoch;
     const events = globalThis.GoblinLevelEvents;
     const work = events?.begin(legacySession, actorId(...args));
@@ -71,7 +72,9 @@ function reversibleCommand(action, label, actorId = () => selected?.id) {
 }
 
 function undoPhaseCommand() {
-  if (!phaseCommands.length || phase !== 'player' || gameOver) return;
+  const full=globalThis.GoblinCatalogFullRuntime,port=full?.controllerPort?.();
+  if (!phaseCommands.length || (full?.active()?!['player','enemy'].includes(phase):phase!=='player') || gameOver ||
+      port&&(!port.canUndo()||!full.nativeUndoActive())) return;
   clearTimeout(autoPhaseTimer);
   autoPhaseTimer = null;
   closePhaseConfirm(false);

@@ -80,7 +80,7 @@ export function createOwnedFullCatalogAiAdapter(port,player) {
       const opened=port.open('ai'), projection=port.project('ai');
       if(scope!==undefined||!opened||!projection||opened.permit!==token||token.side!==side)
         return {ok:false,code:'AI_FULL_SCOPE_UNAVAILABLE'};
-      const listed=side==='enemy'?opened.entries:[...player.playerOptions(!!projection.view.tactics),{command:{type:'EndPhase'},facts:{}}];
+      const listed=[...player.playerOptions(!!projection.view.tactics),{command:{type:'EndPhase'},facts:{}}];
       prepared={token,commands:listed.map(({command})=>command)};
       return {ok:true,phase:token.phase,slot:opened.pass,view:projection.view,options:describeOptions(listed,side)};
     },
@@ -130,11 +130,11 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
   }
   function composePlayerOptions(safetyView,tactics) {
     if (!safetyView) return [];
-    const roster = full.roster('player');
+    const roster = full.roster(safetyView.side);
     const view = {turnPhase:safetyView.phase,units:roster};
     const allCells = cells(safetyView);
     const seen = new Set(), available = [];
-    for (const actor of roster.filter(unit=>unit.team==='player')) for (const cell of allCells) {
+    for (const actor of roster.filter(unit=>unit.team===safetyView.side)) for (const cell of allCells) {
       for (const {command} of specialistsUi.commands(view,actor,cell)) {
         const key = JSON.stringify(command);
         if (seen.has(key)) continue;
@@ -143,7 +143,7 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
         if (!check.ok) continue;
         const preview = command.type==='CatalogFire' ? specialists.firePreview(command,false,tactics) : null;
         available.push({command,displayCell:cell,facts:{
-          ...(command.type==='Move'?{observedCellsAfterMove:full.observedCells('player',command)}:{}),
+          ...(command.type==='Move'?{observedCellsAfterMove:full.observedCells(safetyView.side,command)}:{}),
           ...(Number.isFinite(check.cost)?{cost:check.cost}:{}),
           ...(check.weapon?{attack:check.weapon.attack,range:check.weapon.range}:{}),
           ...(preview?.ok?{ratioCategory:preview.ratioCategory,effectKind:preview.effectKind,
@@ -158,7 +158,7 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
   function humanPlayerOptions(port) {
     if (port !== full.controllerPort()) return [];
     const view = port?.project('human')?.view;
-    return view?.side === 'player' ? composePlayerOptions(view,false) : [];
+    return view?.side === port.state()?.side ? composePlayerOptions(view,false) : [];
   }
   function enemyStepOptions(slot) {
     const hold = {type:'EnemyHold',actorId:slot.actorId};
@@ -172,6 +172,6 @@ export function createFullCatalogAiHost(full, specialistsUi, player, currentPhas
   }
   return Object.freeze({revision:()=>active()?full.commandRevision():null,phase:currentPhase,
     project:full.aiProjection,dispatch:player.dispatch,
-    playerOptions:(tactics=false)=>composePlayerOptions(full.aiProjection('player'),tactics),
+    playerOptions:(tactics=false)=>composePlayerOptions(full.aiProjection(currentPhase()),tactics),
     humanPlayerOptions,enemyStepOptions});
 }

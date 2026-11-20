@@ -14,7 +14,8 @@
  let intent=null;
  function validateOwner(u){if(system(u))require(u.catalogSystems.unitId===record(u).assetId,'SYSTEM_OWNER_MISMATCH')}
  function sync(u){if(!system(u))return;validateOwner(u);GoblinSystems.validateCatalogSystem(u.catalogSystems,registry());u.alive=!GoblinSystems.catalogIsHelpless(u.catalogSystems,registry());u.move=GoblinSystems.catalogMovement(u.catalogSystems,registry())}
- const worldPhase=(u,required)=>!gameOver&&(u.team==='player'?phase==='player'&&turnPhase===required:phase==='enemy'&&required==='fire');
+ const actingTeam=()=>root.GoblinCatalogFullRuntime?.active()?phase:'player';
+ const worldPhase=(u,required)=>!gameOver&&(root.GoblinCatalogFullRuntime?.active()?u.team===phase&&turnPhase===required:u.team==='player'?phase==='player'&&turnPhase===required:phase==='enemy'&&required==='fire');
  const targetKey=t=>GoblinCatalogSpecialistFire.targetKey(t);
  function resolveTarget(t,viewerTeam='player'){
   require(exact(t,t?.kind==='unit'?['kind','runtimeUnitId']:['kind','runtimeUnitId','componentId']),'INVALID_TYPED_TARGET');
@@ -25,7 +26,7 @@
  function fireQuery(command,allowEnemy=false,preview=false){
   require(exact(command,['type','actorId','target','weaponId','mode','spotterId'])&&command.type==='CatalogFire','INVALID_SPECIALISTS_FIRE');
   const u=units.find(u=>u.id===command.actorId);require(alive(u)&&!u.disabled&&(!u.embarkedOn||rules(u).passengerRef),'ACTOR_UNAVAILABLE');
-  require((u.team==='player'||allowEnemy)&&worldPhase(u,'fire'),'WRONG_FIRE_PHASE');
+  require((u.team===actingTeam()||allowEnemy)&&worldPhase(u,'fire'),'WRONG_FIRE_PHASE');
   const target=resolveTarget(command.target,u.team),t=target.unit;require(u.team!==t.team,'FRIENDLY_DIRECT_TARGET');
   const rule=rules(u),distance=dist(u,t),los=lineOfSight(u,t);let attack,nextSystem=null,nextFire=null,effects=[];
   if(system(u)){
@@ -83,7 +84,7 @@
   root.GoblinCatalogFullRuntime?.reveal(t.id,'incoming-direct',outcome.result);
   if(q.nextSystem){u.catalogSystems=q.nextSystem;applyEffects(u,q.effects)}else if(q.nextFire)u.catalogFire=q.nextFire;else u.fired=true;
   u.acted=true;t.lastOutcome=outcome.result;t.justHit=true;appendJournal(u,intent.command,{kind:'fire',weapon:q.weapon,target:intent.command.target,outcome:{...outcome,passengers:(outcome.passengers??[]).map(h=>({unitId:h.unit.id,outcome:h.outcome}))}});
-  addLog(`${GoblinCatalogRuntime.name(u)} / ${system(u)?slotLabel(u,intent.command.weaponId):u.catalogFire?.ruleRef==='siege-tank-fire-budget-v1'?GoblinSiegeWeapons.label(intent.command.weaponId):text(intent.command.mode==='indirect'?'v2.ui.artillery.indirect':'v2.ui.fire')} → ${GoblinCatalogRuntime.name(t)}${q.component?' / '+slotLabel(t,q.component.id):''}: ${outcome.result} (${outcome.ratio})`);reportPassengerHits(u,outcome,u.team==='enemy');selected=u.team==='player'?u:null;updateSelection();draw();setTimeout(()=>{t.justHit=false;draw()},560);if(!checkVictory()&&u.team==='player')maybeAutoAdvancePhase();
+  addLog(`${GoblinCatalogRuntime.name(u)} / ${system(u)?slotLabel(u,intent.command.weaponId):u.catalogFire?.ruleRef==='siege-tank-fire-budget-v1'?GoblinSiegeWeapons.label(intent.command.weaponId):text(intent.command.mode==='indirect'?'v2.ui.artillery.indirect':'v2.ui.fire')} → ${GoblinCatalogRuntime.name(t)}${q.component?' / '+slotLabel(t,q.component.id):''}: ${outcome.result} (${outcome.ratio})`);reportPassengerHits(u,outcome,u.team==='enemy');selected=u.team===actingTeam()?u:null;updateSelection();draw();setTimeout(()=>{t.justHit=false;draw()},560);if(!checkVictory()&&u.team==='player')maybeAutoAdvancePhase();
  };
  const inside=c=>Number.isInteger(c?.x)&&c.x>=0&&c.x<W&&Number.isInteger(c?.y)&&c.y>=0&&c.y<H;
  const wreckKey=u=>JSON.stringify(['wreck',legacySession.sessionId,u.id]);
@@ -94,7 +95,7 @@
  }
  function engineeringQuery(command){
   require(exact(command,['type','actorId','job','target','option'])&&command.type==='Engineer','INVALID_ENGINEER_COMMAND');
-  const u=units.find(u=>u.id===command.actorId),r=rules(u);require(alive(u)&&r?.engineeringRef&&u.team==='player'&&worldPhase(u,'movement')&&!u.disabled&&!u.embarkedOn&&!u.moved&&!u.disembarkedThisTurn&&u.jobTurn!==turn,'ENGINEER_UNAVAILABLE');
+  const u=units.find(u=>u.id===command.actorId),r=rules(u);require(alive(u)&&r?.engineeringRef&&u.team===actingTeam()&&worldPhase(u,'movement')&&!u.disabled&&!u.embarkedOn&&!u.moved&&!u.disembarkedThisTurn&&u.jobTurn!==turn,'ENGINEER_UNAVAILABLE');
   const d=registry().definitions.engineering[r.engineeringRef];
   if(system(u))require(u.catalogSystems.components.some((c,i)=>u.catalogSystems.rules.definition.components[i].kind==='tool'&&!c.destroyed&&c.readyFromTurn<=u.catalogSystems.turn),'READY_TOOL_REQUIRED');
   let cost=0,nextSystem=null,targetUnit=null,terrainChange=null,materialGain=0;
@@ -134,7 +135,7 @@
  function cargoQuery(c){
   const loading=c?.type==='CatalogLoad';require(exact(c,loading?['type','actorId','carrierId','bayId']:['type','actorId','cargoId','bayId','x','y'])&&(loading||c.type==='CatalogDeploy'),'INVALID_FORGE_CARGO_COMMAND');
   const cargo=units.find(u=>u.id===(loading?c.actorId:c.cargoId)),carrier=units.find(u=>u.id===(loading?c.carrierId:c.actorId));
-  require(alive(cargo)&&alive(carrier)&&rules(cargo).cargoRef==='drone-cargo-v1'&&forge(carrier)&&cargo.team==='player'&&carrier.team===cargo.team&&!cargo.disabled&&!carrier.disabled&&worldPhase(carrier,'movement')&&!carrier.moved,'FORGE_CARGO_UNAVAILABLE');require(readyBay(carrier,c.bayId),'BAY_UNAVAILABLE');
+  require(alive(cargo)&&alive(carrier)&&rules(cargo).cargoRef==='drone-cargo-v1'&&forge(carrier)&&cargo.team===actingTeam()&&carrier.team===cargo.team&&!cargo.disabled&&!carrier.disabled&&worldPhase(carrier,'movement')&&!carrier.moved,'FORGE_CARGO_UNAVAILABLE');require(readyBay(carrier,c.bayId),'BAY_UNAVAILABLE');
   if(loading){require(!cargo.embarkedOn&&!cargo.moved&&!cargo.fired&&!cargo.disembarkedThisTurn&&dist(cargo,carrier)===1&&!carrierCargo(carrier).some(u=>u.cargoBay===c.bayId),'FORGE_LOAD_UNAVAILABLE')}
   else {require(cargo.embarkedOn===carrier.id&&cargo.cargoBay===c.bayId&&!cargo.embarkedThisTurn&&!cargo.disembarkedThisTurn&&inside(c)&&dist(carrier,c)===1&&!units.some(u=>unitAlive(u)&&!u.embarkedOn&&u.x===c.x&&u.y===c.y)&&!registry().definitions.cargo['carrier-cargo-v1'].droneDeployExcludedTerrain.includes(terrainTypeAt(c.x,c.y)),'FORGE_DEPLOY_UNAVAILABLE')}
   return {ok:true,cargo,carrier,loading};
@@ -231,11 +232,11 @@
   if(system(u)&&u.catalogSystems.turn<turn){require(u.catalogSystems.turn+1===turn,'SYSTEM_TURN_DRIFT');u.catalogSystems=GoblinSystems.catalogResetFire(u.catalogSystems,turn,registry()).state;sync(u)}
   if(u.catalogFire&&u.catalogFire.state.turn<turn)u.catalogFire=GoblinCatalogSpecialistFire.reset(u.catalogFire,u.id,turn,registry());
  }}
- const oldReset=resetActionState;resetActionState=function(){oldReset();if(active())resetOwned('player')};
+ const oldReset=resetActionState;resetActionState=function(){oldReset();if(active())resetOwned(actingTeam())};
  const oldEnemyTurn=enemyTurn;enemyTurn=function(...args){if(active())resetOwned('enemy');return oldEnemyTurn(...args)};
  // A stationary engineer or Forge can still work or deploy. Readiness must not commit its phase early.
  function hasMovementAction(u){
-  if(!alive(u)||u.team!=='player'||u.disabled||u.embarkedOn||u.moved)return false;
+  if(!alive(u)||u.team!==actingTeam()||u.disabled||u.embarkedOn||u.moved)return false;
   const legal=c=>{try{if(c.type==='Engineer')engineeringQuery(c);else cargoQuery(c);return true}catch{return false}};
   const cells=[];for(let y=Math.max(0,u.y-1);y<=Math.min(H-1,u.y+1);y++)for(let x=Math.max(0,u.x-1);x<=Math.min(W-1,u.x+1);x++)if(dist(u,{x,y})<=1)cells.push({kind:'cell',x,y});
   if(rules(u).engineeringRef){
@@ -250,12 +251,12 @@
   if(rules(u).cargoRef==='drone-cargo-v1')for(const carrier of units.filter(forge))for(const bayId of carrier.droneBays)if(legal({type:'CatalogLoad',actorId:u.id,carrierId:carrier.id,bayId}))return true;
   return false;
  }
- const oldPhase=phaseCanAct;phaseCanAct=function(u,name=turnPhase){if(!active())return oldPhase(u,name);if(name==='fire')return alive(u)&&u.team==='player'&&!u.disabled&&hasFireAction(u);return name==='movement'&&hasMovementAction(u)||oldPhase(u,name)};
+ const oldPhase=phaseCanAct;phaseCanAct=function(u,name=turnPhase){if(!active())return oldPhase(u,name);if(name==='fire')return alive(u)&&u.team===actingTeam()&&!u.disabled&&hasFireAction(u);return name==='movement'&&hasMovementAction(u)||oldPhase(u,name)};
  const oldMovement=movementBudget;movementBudget=function(u,second=false){return active()&&u?.catalogSystems?(second?0:GoblinSystems.catalogMovement(u.catalogSystems,registry())):oldMovement(u,second)};
  const oldRange=attackRange;attackRange=function(u){if(active()&&system(u))return weapons(u).find(w=>w.id===u.selectedSlot)?.range??0;return oldRange(u)};
  function ramQuery(c){
   require(exact(c,['type','actorId','targetId','x','y'])&&c.type==='CatalogRam','INVALID_RAM_COMMAND');const u=units.find(u=>u.id===c.actorId),t=units.find(t=>t.id===c.targetId);
-  require(alive(u)&&u.team==='player'&&worldPhase(u,'movement')&&['U01','U20'].includes(record(u).catalogId)&&!u.disabled&&!u.embarkedOn&&!u.moved,'RAM_ACTOR_UNAVAILABLE');
+  require(alive(u)&&u.team===actingTeam()&&worldPhase(u,'movement')&&['U01','U20'].includes(record(u).catalogId)&&!u.disabled&&!u.embarkedOn&&!u.moved,'RAM_ACTOR_UNAVAILABLE');
   require(alive(t)&&(!root.GoblinCatalogFullRuntime?.active()||root.GoblinCatalogFullRuntime.known(t.id,u.team))&&t.team!==u.team&&!t.embarkedOn&&!t.core&&!system(t)&&!rules(t).infantry&&rules(t).repairClass==='vehicle'&&c.x===t.x&&c.y===t.y,'RAM_TARGET_UNAVAILABLE');
   const path=findMovementPath(u,t,movementBudget(u),u);require(path?.length,'RAM_UNREACHABLE');return {ok:true,actor:u,target:t,path};
  }

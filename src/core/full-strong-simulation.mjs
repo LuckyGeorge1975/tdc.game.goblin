@@ -167,7 +167,7 @@ export async function createSimulationPort(packet,{engineFactory=createHeadlessF
     evaluate(side) {
       const {ended,winner}=engine.state();
       const certainWin=winner===side&&fullyKnown;
-      return (ended?(winner!==side?-100000:certainWin?100000:0):0)+material(side);
+      return (ended?(winner==='draw'?0:winner!==side?-100000:certainWin?100000:0):0)+material(side);
     },
     dispose:engine.dispose
   });
