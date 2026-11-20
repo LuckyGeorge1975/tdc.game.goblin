@@ -429,7 +429,7 @@
   const allowsSpectator=roles.player==='ai'&&roles.enemy==='ai';
   let ready=false,latestSpectator=null;
   let generation=0,sequence=0,paused=false,stopped=false,committing=false,advancingPhase=false,undoing=false;
-  let seat,pending,permit;
+  let seat,pending,permit,lastHumanSide;
   const owns=current=>current===session;
   const attached=()=>ready&&!presentationPending&&owns(legacySession)&&active()&&!stopped;
   const spectator=Object.freeze({read:()=>allowsSpectator&&attached()?latestSpectator:null});
@@ -463,7 +463,7 @@
    pending=handoff;
    ui?.handoff?.(handoff,()=>{
     if(!attached()||paused||gameOver||pending!==handoff||phase!==handoff.side)return false;
-    pending=null;seat=phase;
+    pending=null;seat=phase;lastHumanSide=phase;
     return true;
    });
   }
@@ -478,6 +478,10 @@
   }
   function project(mode){
    if(mode==='spectator')return spectator.read();
+   if(mode==='human'&&attached()&&gameOver&&!paused&&lastHumanSide){
+    return {view:{...sideProjection(lastHumanSide),activeSide:null,ended:true,outcome:terminalOutcome()},
+     log:logEntries(true,lastHumanSide,true)};
+   }
    if(!authorised(mode))return null;
    return {view:mode==='ai'&&policies[phase]?.difficulty!=null?tacticalProjection(phase):sideProjection(phase),
     ...(mode==='human'?{log:logEntries(true,phase,true)}:{})};
