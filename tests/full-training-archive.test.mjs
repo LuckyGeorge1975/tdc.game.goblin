@@ -17,6 +17,31 @@ const draft={
 };
 const plain=value=>JSON.parse(JSON.stringify(value));
 
+test('migrated mission archive replay keeps the original mission ID and rejects an unknown ID or digest',async()=>{
+  const game=fullShell();
+  await game.run("GoblinCatalogFullModel.initialize(data,levelData,{profile:'FULL_CATALOG_v1'})");
+  for(const file of ['level-events.js','editor-draft.js'])
+    game.run(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
+  const levels=JSON.parse(readFileSync(new URL('../assets/unit-art/levels/full-migrated-missions.v3.json',import.meta.url),'utf8')).levels;
+  for(const level of levels){
+    const config=await game.context.GoblinEditorDraft.prepare(level);
+    const archive={seats:{player:{controller:'human'},enemy:{controller:'human'}},replay:{
+      version:'full-native-journal-v1',seed:7,level:{id:level.id,digest:config.catalog.levelDigest},
+      initial:'',entries:[]}};
+    const host=await openFullTrainingReplay(archive);
+    assert.equal(host.port.state().levelDigest,config.catalog.levelDigest);
+    assert.equal(host.game.run('currentScenario'),level.id);
+    assert.equal(host.game.run('legacySession.ruleProfileId'),'FULL_CATALOG_v1');
+    assert.equal(host.commit(host.inspect(),{type:'EndPhase'}).ok,true);
+    const forged=structuredClone(archive);
+    forged.replay.level.digest='forged';
+    await assert.rejects(()=>openFullTrainingReplay(forged),/FULL_TRAINING_ARCHIVE_INVALID/);
+  }
+  await assert.rejects(()=>openFullTrainingReplay({seats:{player:{controller:'human'},enemy:{controller:'human'}},
+    replay:{version:'full-native-journal-v1',seed:7,level:{id:'unknown-mission',digest:'forged'},
+      initial:'',entries:[]}}),/FULL_TRAINING_ARCHIVE_INVALID/);
+});
+
 test('all qualified rule and trained seats round-trip native FULL archives with strict metadata',async()=>{
   const level=await fixture();
   for(const side of ['player','enemy'])for(const difficulty of ['weak','medium','strong',null]){

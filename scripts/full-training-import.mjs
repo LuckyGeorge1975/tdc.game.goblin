@@ -57,7 +57,14 @@ export async function openFullTrainingReplay(archive) {
     expect(replay.level.id==='editor-draft');
     port=await game.run('GoblinEditorDraft.prepare(GoblinEditorDraft.parse(draftText)).then(config=>loadEditorDraft(config,control))');
   } else {
-    expect(game.context.GoblinCatalogFullModel.has(replay.level.id));
+    if(!game.context.GoblinCatalogFullModel.has(replay.level.id)){
+      const levels=game.context.GoblinEditorDraft.importLevels(
+        source('assets/unit-art/levels/full-migrated-missions.v3.json'));
+      const level=levels.find(level=>level.id===replay.level.id);
+      expect(level);
+      game.context.migratedConfig=await game.context.GoblinEditorDraft.prepare(level);
+      game.run('ScenarioRuleProfiles.registerFullMission(levelId,migratedConfig);scenarioCatalog[levelId]=migratedConfig');
+    }
     port=game.run('loadScenario(levelId,control)');
   }
   expect(port?.state()?.levelDigest===replay.level.digest);
