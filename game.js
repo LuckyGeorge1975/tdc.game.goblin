@@ -477,6 +477,10 @@ function enemyTurn(chooseEnemyAction, chooseEnemyFireTarget) {
 }
 async function confirmPhaseAdvance(action) {
   if (GameDialogs.isOpen()) return;
+  const port = globalThis.GoblinCatalogFullRuntime?.controllerPort?.();
+  const permit = port?.ticket('human');
+  if (port && !permit) return;
+  const beforeSession = legacySession, beforeSide = phase;
   const ready = phaseReadyUnits();
   if (!ready.length) { action(); return; }
   const beforeTurn = turn, beforePhase = turnPhase;
@@ -493,7 +497,10 @@ async function confirmPhaseAdvance(action) {
     rememberLabel: t('dialog.phaseAdvance.remember', 'Do not ask again when changing phases'),
     rememberKey: 'goblin-never-ask-phase'
   });
-  if (accepted && !gameOver && phase === 'player' && turn === beforeTurn && turnPhase === beforePhase) action();
+  if (accepted && !gameOver && legacySession === beforeSession && phase === beforeSide &&
+      turn === beforeTurn && turnPhase === beforePhase &&
+      (port ? globalThis.GoblinCatalogFullRuntime?.controllerPort?.() === port &&
+        port.ticket('human') === permit : phase === 'player')) action();
 }
 function closePhaseConfirm(accepted) { if (!accepted) GameDialogs.cancel('phase-end'); }
 function fireTargetVisible(unit,target){return globalThis.GoblinArtilleryWeapons?.active(unit)?GoblinArtilleryWeapons.queryChoice(unit,target).ok:lineOfSight(unit,target)}
