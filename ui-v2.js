@@ -55,6 +55,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       buttons:[...at('#v2-area-controls').querySelectorAll('[data-area]'),at('#v2-area-grid'),
         at('#v2-area-targets'),at('#v2-area-damage')]});
     const t = (key, params) => globalThis.GoblinLanguage?.t(key, params) || key;
+    function outcomeKey(outcome,short=false) {
+      if(outcome==='draw')return short?'v2.draw':'screen.missionEnd.draw.title';
+      return short?(outcome===true?'v2.win':'v2.lose'):
+        outcome===true?'screen.missionEnd.victory.title':'screen.missionEnd.defeat.title';
+    }
     const core = () => globalThis.IronDustBrowserV2?.mode === 'ready';
     function addRosterArt(button, unit) {
       button.prepend(UnitVisuals.iconElement(unit, 'v2-roster-art'));
@@ -176,6 +181,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       const roster=displayed?.units??(globalThis.GoblinCatalogFullRuntime?.active()?GoblinCatalogFullRuntime.roster():units);
       const shownPhase=displayed?.activeTeam??phase,shownTurnPhase=displayed?.phase??turnPhase,shownGameOver=displayed?.gameOver??gameOver;
       const objective = objectiveSnapshot(victoryProfile(legacySession.effectiveRules), globalThis.GoblinCatalogFullRuntime?.active()?units:roster);
+      const mapPort=globalThis.GoblinCatalogFullRuntime?.mapPort?.();
       if(!displayed)idleLegacyLogEntries=legacyLogEntries();
       const logEntries = idleLegacyLogEntries;
       const snapshotRevision = revision();
@@ -187,7 +193,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
           'v2.full.symmetricObjective':`mission.${currentScenario}.objective.short`) },
         turn:displayed?.turn??turn, phase:shownPhase, turnPhase:shownTurnPhase, gameOver:shownGameOver, objective: structuredClone(objective),
         ready: phase === 'player' && !gameOver ? phaseReadyUnits().length : 0,
-        undo: { available: phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },
+        undo: { available: mapPort?mapPort.canUndo():phaseCommands.length > 0 && phase === 'player' && !gameOver, count: phaseCommands.length },
         units: roster.map(source=>{const { id, name, type, team, x, y, hp, maxHp, visualKey, catalogId, catalogAssetId, halfUnit, forceBudgetWeight, droneReadyTurn, artilleryFire, artilleryChoice, siegeFireBudget, siegeWeapon, attack, defense, move, range, damage, disabled, embarkedOn, core, infantry, engineering, ogreSystems, transportCapacity, strategicMissile, missilesRemaining }=source;const projected={ id, name:catalogId?GoblinCatalogRuntime.name({id}):name, type, team, x, y, hp, maxHp, visualKey, catalogId, catalogAssetId, halfUnit, forceBudgetWeight, droneReadyTurn, artilleryChoice, artilleryFire:artilleryFire?structuredClone(artilleryFire):null, siegeWeapon, siegeFireBudget:siegeFireBudget?structuredClone(siegeFireBudget):null, disabled: !!disabled, embarkedOn: embarkedOn || null,
             attack: attack ?? damage ?? null, defense: defense ?? null, move: move ?? null, secondaryMove: movementBudget({id,team,move,gev:isGevUnit(roster.find(item=>item.id===id))},true), range: range ?? null,
             core: !!core, infantry: !!infantry, engineering:!!engineering,
@@ -350,12 +356,15 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
     function undo() {
       if (globalThis.GoblinCatalogFullRuntime?.ownsPresentation?.()) return {ok:false,reason:t('ui.error.INVALID_COMMAND')};
       if (core()) return {ok:false,reason:t('v2.undo')};
-      if (view.busy || !phaseCommands.length || phase !== 'player' || gameOver) return { ok: false, reason: t('ui.error.ACTION_SPENT') };
-      clearContext();
+      if (view.busy || gameOver) return { ok: false, reason: t('ui.error.ACTION_SPENT') };
       const mapPort=globalThis.GoblinCatalogFullRuntime?.mapPort?.();
       if(mapPort){
-        if(!mapPort.undo())return {ok:false,reason:t('ui.error.ACTION_SPENT')};
-      }else undoPhaseCommand();
+        if(!mapPort.canUndo()||!mapPort.undo(mapPort.ticket('human')))return {ok:false,reason:t('ui.error.ACTION_SPENT')};
+        clearContext();
+      }else{
+        if(!phaseCommands.length||phase!=='player')return {ok:false,reason:t('ui.error.ACTION_SPENT')};
+        clearContext();undoPhaseCommand();
+      }
       render();
       return { ok: true };
     }
@@ -370,7 +379,7 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-map').scrollLeft = 0; at('#v2-map').scrollTop = 0;
       render();
     }
-    globalThis.GoblinUIV2 = Object.freeze({ project, fullSeatPresentation, query, previewFire, dispatch, undo, resetView, startView, focusUnit, notifyPhaseSkip, legacyAiHost,
+    globalThis.GoblinUIV2 = Object.freeze({ project, fullSeatPresentation, outcomeKey, query, previewFire, dispatch, undo, resetView, startView, focusUnit, notifyPhaseSkip, legacyAiHost,
       get gridVisible() { return view.gridVisible; }, setGridVisible(value) { setViewFlag('gridVisible',value); },
       get targetsVisible() { return view.targetsVisible; }, setTargetsVisible(value) { setViewFlag('targetsVisible',value); },
       get damageVisible() { return view.damageVisible; }, setDamageVisible(value) { setViewFlag('damageVisible',value); },
@@ -1594,13 +1603,13 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-map-label').textContent = GoblinLanguage.translate('TACTICAL MAP');
       at('#v2-map').setAttribute('aria-label', `${t('ui.hud.map')}: ${t('v2.ui.selectHex')}`);
       at('#v2-profile').textContent = state.profile==='TRAINING_FIELD_TEST_v1'?t('training.label'):globalThis.GoblinCatalogFullRuntime?.active()?t('v2.full.profile'):state.profile==='CATALOG_SPECIALISTS_v1'?t('v2.specialists.profile'):state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
-      at('#v2-phase').textContent = state.gameOver ? t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
+      at('#v2-phase').textContent = state.gameOver ? t(outcomeKey(state.objective.outcome,true)) :
         state.phase === 'enemy' ? t('v2.enemy') : t(`v2.phase.${state.turnPhase}`);
       renderPhaseNotice(state);
       at('#v2-turn').textContent = `${t('ui.hud.turn',{turn:state.turn})} · ${t('v2.ui.coreHp')} ${state.objective.coreHp}/${state.objective.coreMax}`;
       const terminal = at('#v2-terminal'); terminal.hidden = !state.gameOver;
-      terminal.classList.toggle('v2-failed', state.gameOver && !state.objective.outcome);
-      terminal.textContent = state.gameOver ? t(state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '';
+      terminal.classList.toggle('v2-failed', state.gameOver && state.objective.outcome===false);
+      terminal.textContent = state.gameOver ? t(outcomeKey(state.objective.outcome)) : '';
       const automaticAttack = IronDustBrowserV2.attackerActive && state.phase === 'player' && !state.gameOver;
       const phaseButton = at('#v2-phase-action');
       const next = {movement:'dialog.phaseAdvance.confirm.toFire',
@@ -1685,8 +1694,9 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       at('#v2-units-label').textContent = t('ui.hud.units');
       at('#v2-profile').textContent = state.profile==='TRAINING_FIELD_TEST_v1'?t('training.label'):globalThis.GoblinCatalogFullRuntime?.active()?t('v2.full.profile'):state.profile==='CATALOG_SPECIALISTS_v1'?t('v2.specialists.profile'):state.profile==='CATALOG_BASE_TRANSPORT_v1'?t('v2.catalog.profile'):state.profile;
       at('#v2-phase').textContent = computing?t('v2.full.computing'):
-        state.gameOver ? learningResult??t(state.objective.outcome ? 'v2.win' : 'v2.lose') :
-        view.phaseSkip?.turn === state.turn ? t(view.phaseSkip.key) : t(`phase.${state.turnPhase}.label`);
+        state.gameOver ? learningResult??t(outcomeKey(state.objective.outcome,true)) :
+        view.phaseSkip?.turn === state.turn ? t(view.phaseSkip.key) :
+        (state.profile==='FULL_CATALOG_v1'&&state.phase==='enemy'?t('v2.full.seat.enemy')+' · ':'')+t(`phase.${state.turnPhase}.label`);
       renderPhaseNotice(state);
       at('#v2-turn').textContent = `${t('ui.hud.turn', { turn: state.turn })} · ${state.objective.goalMode === 'learning'?t('training.learningGoal'):state.objective.goalMode === 'core'
         ? t('hud.objective.progress.core', { currentHp: state.objective.coreHp, maxHp: state.objective.coreMax })
@@ -1696,11 +1706,11 @@ if ((goblinUiChoice === null || goblinUiChoice === 'v2') && !globalThis.goblinBo
       terminal.hidden = !state.gameOver&&!aiFailed;
       terminal.classList.toggle('v2-failed',!!aiFailed||state.gameOver && (state.objective.goalMode==='learning'?globalThis.GoblinTrainingRuntime?.status()==='lesson-failed':state.objective.outcome === false));
       terminal.textContent = aiFailed?t('v2.full.aiFailed'):
-        state.gameOver ? learningResult??t(state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : '';
+        state.gameOver ? learningResult??t(outcomeKey(state.objective.outcome)) : '';
       const next = { movement: 'dialog.phaseAdvance.confirm.toFire', fire: 'dialog.phaseAdvance.confirm.toGev', gev: 'dialog.phaseAdvance.confirm.toEnemy' }[state.turnPhase];
       const phaseButton = at('#v2-phase-action');
-      phaseButton.textContent = next ? `${t(next)} · ${t('dialog.phaseAdvance.pending', { pendingCount: state.ready })}`
-        : state.gameOver&&learningResult?learningResult:t(state.gameOver ? (state.objective.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') : 'phase.enemy.label');
+      phaseButton.textContent = state.gameOver ? learningResult??t(outcomeKey(state.objective.outcome)) :
+        next ? `${t(next)} · ${t('dialog.phaseAdvance.pending', { pendingCount: state.ready })}` : t('phase.enemy.label');
       phaseButton.setAttribute('aria-label', phaseButton.textContent);
       splitPhaseLabel(phaseButton);
       phaseButton.disabled = !next || state.phase !== 'player' || state.gameOver || GameDialogs.isOpen() || view.busy ||

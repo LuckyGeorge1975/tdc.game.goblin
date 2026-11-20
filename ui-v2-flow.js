@@ -381,12 +381,15 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       update(nodes.restart, t('ui.nav.restart'));
       update(nodes.leave, t(editorConfig ? 'v2.editor.returnToEditor' : 'v2.ui.mainMenu'));
       nodes.pause.disabled = !binding.lifecycle || view.ended;
-      update(nodes.turnLabel, t('ui.hud.turn', {turn:view.turn}));
+      const active=binding.port.state();
+      update(nodes.turnLabel, t('ui.hud.turn', {turn:view.turn})+
+        (!view.ended&&['player','enemy'].includes(active?.side)&&['movement','fire','gev'].includes(active.phase)?
+          ' · '+t('v2.full.seat.'+active.side)+' · '+t('phase.'+active.phase+'.label'):''));
       const remaining=view.objectiveRemaining;
       update(nodes.objective,remaining?[t('v2.full.seat.player')+' '+t('v2.full.remainingObjectives',{count:remaining.player}),
         t('v2.full.seat.enemy')+' '+t('v2.full.remainingObjectives',{count:remaining.enemy})].join(' · '):'');
-      update(nodes.outcome, view.ended && typeof view.outcome === 'boolean'
-        ? t(view.outcome ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title') :
+      update(nodes.outcome, view.ended
+        ? fullOutcomeText(view.outcome) :
         binding.owner.failure?.(binding.port)?t('v2.full.aiFailed'):
         binding.owner.computing?.(binding.port)?t('v2.full.computing'):'');
       nodes.outcome.hidden = !nodes.outcome.textContent;
@@ -413,6 +416,11 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       if (focus) nodes.title.focus({preventScroll:true});
     }
+    function fullOutcomeText(outcome) {
+      if(outcome==='draw')return t('screen.missionEnd.draw.title');
+      return typeof outcome==='boolean'?t('v2.full.winner',{
+        side:t(outcome?'v2.full.seat.player':'v2.full.seat.enemy')}):'';
+    }
     function seatCommandLabel(command, roster) {
       const name = id => {
         if (!id) return '';
@@ -428,7 +436,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         ? command.option === 'disabled' ? 'repair-disabled' : 'repair-hp'
         : command.job;
       const label = command.type === 'Engineer' ? `v2.engineer.${job}` : labels[command.type];
-      const targetId = command.target?.runtimeUnitId ?? command.carrierId ?? command.cargoId;
+      const targetId = command.target?.runtimeUnitId ?? command.targetId ?? command.carrierId ?? command.cargoId;
       const findVisibleUnit = id => roster.has(id) ? units.find(unit => unit.id === id) : null;
       const actor = command.weaponId && findVisibleUnit(command.actorId);
       const target = command.target?.componentId && findVisibleUnit(targetId);
@@ -463,7 +471,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       const seat=port.state();
       if (port.canUndo()) controls.push(button(t('v2.full.undo'),()=>{
-        if(port.undo())renderScreen(false);
+        if(port.undo(port.ticket('human')))renderScreen(false);
       }));
       if (port.canExportTraining()) controls.push(button(t('v2.training.exportMatch'),()=>
         downloadTrainingArchive(port.trainingArchive(),'goblin-full-training.json')));
@@ -486,6 +494,13 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
       }
       const {view, log} = snapshot;
       panel.append(paragraph(t('ui.hud.turn', {turn:view.turn})));
+      if(view.ended){
+        const result=paragraph(fullOutcomeText(view.outcome),'v2-full-outcome');
+        result.setAttribute('role','status');panel.append(result);
+        if(view.outcome==='draw')panel.append(paragraph(t('screen.missionEnd.draw.allUnits')));
+      }else if(['movement','fire','gev'].includes(view.phase)){
+        panel.append(paragraph(t('v2.full.seat.'+view.side)+' · '+t('phase.'+view.phase+'.label')));
+      }
       if(Number.isSafeInteger(view.objectiveRemaining)){
         const objective=paragraph(t('v2.full.remainingObjectives',{count:view.objectiveRemaining}),'v2-full-objective');
         objective.setAttribute('role','status');
@@ -2022,6 +2037,7 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           header.append(paragraph(t(`mission.${missionId}.story.briefing`), 'v2-briefing-intro'));
         header.append(paragraph(t(`mission.${missionId}.briefing.short`), 'v2-briefing-intro'));
         if (migrated) header.append(paragraph(t(symmetric?'v2.full.symmetricObjective':'v2.full.migratedObjective')));
+        if(symmetric)header.append(paragraph(t('v2.full.symmetricDraw')));
         if (missionId === 'iron-dust-v2' && data) {
           const minimum=IronDustBrowserV2.seatManager().minimumDifficulty;
           if(minimum!==null){
@@ -2049,7 +2065,8 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
         for (const [index, outcome] of ['victory', 'defeat'].entries()) {
           const label = document.createElement('h3'); label.textContent = t(`screen.briefing.${outcome}`);
           conditions.children[index].append(label,
-            paragraph(t(migrated ? outcome==='victory'?(symmetric?'v2.full.symmetricObjective':'v2.full.migratedObjective'):'v2.full.migratedDefeat' :
+            paragraph(t(migrated ? outcome==='victory'?(symmetric?'v2.full.symmetricObjective':'v2.full.migratedObjective'):
+              symmetric?'v2.full.symmetricDefeat':'v2.full.migratedDefeat' :
               campaign?.field === 'scorched' ? `v2.scorched.${outcome}` : `mission.${missionId}.briefing.${outcome}`)));
         }
         const preview = document.createElement('section'); preview.className = 'v2-briefing-preview';
@@ -2090,8 +2107,10 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           } else if(complete&&training.next)panel.append(actions(button(t('training.nextLesson'),()=>{missionId=training.next;show('briefing')},'primary')));
         }else{
         const won = state.objective.outcome === true;
-        panel.append(heading(t(won ? 'screen.missionEnd.victory.title' : 'screen.missionEnd.defeat.title')),
-          paragraph(t(won && state.scenario === 'iron-dust-v2' ? 'v2.win' : won ? `mission.${campaign?.field ? missionId : state.scenario}.end.victory` : globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.playerAlive?'v2.full.limit.defeat':'screen.missionEnd.defeat.allUnits')),
+        const draw=state.objective.outcome==='draw';
+        panel.append(heading(t(GoblinUIV2.outcomeKey(state.objective.outcome))),
+          paragraph(t(draw?'screen.missionEnd.draw.allUnits':won&&state.objective.goalMode==='eliminate-opponent'?
+            'v2.full.symmetricVictory':won && state.scenario === 'iron-dust-v2' ? 'v2.win' : won ? `mission.${campaign?.field ? missionId : state.scenario}.end.victory` : globalThis.GoblinCatalogFullRuntime?.active()&&state.objective.playerAlive?'v2.full.limit.defeat':'screen.missionEnd.defeat.allUnits')),
           paragraph(t('ui.hud.turn', { turn: state.turn })),
           actions(button(t('screen.missionEnd.action.retry'), confirmRestart, 'primary'),
             button(t(editorConfig ? 'v2.editor.returnToEditor' : 'screen.missionEnd.action.chooseMission'), goToLevels),
