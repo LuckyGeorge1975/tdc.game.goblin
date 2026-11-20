@@ -189,7 +189,7 @@ function explicitEnemyFireFacts(state, command, query, target) {
     ]};
 }
 
-function enemyOptions(profile, state, explicitMovement) {
+function enemyOptions(profile, state, explicitMovement, explicitFireFeatures) {
   const slot=explicitMovement?queryIronDustEnemyLegalSlot(profile.entry.payload):null;
   const action=slot?(slot.action??slot):queryIronDustProfile(profile,automaticEnemy).action;
   if (!action?.kind) return [];
@@ -211,7 +211,7 @@ function enemyOptions(profile, state, explicitMovement) {
     const target = component ? {kind:'component',unitId:command.targetId,componentId:command.targetKey}
       : unitTarget(command.targetId);
     const targetUnit = state.units.find(unit => unit.id === command.targetId);
-    const facts = explicitMovement ? explicitEnemyFireFacts(state, command, query, targetUnit) :
+    const facts = explicitMovement||explicitFireFeatures ? explicitEnemyFireFacts(state, command, query, targetUnit) :
       component ? {} : {ratioCategory:ironDustCrtRatio(query.attack,query.effectiveDefense),
         disabledTarget:targetUnit.disabled};
     return option(command,'fire',action.actorId,target,null,facts,'enemy-fire');
@@ -222,7 +222,7 @@ function enemyOptions(profile, state, explicitMovement) {
   return options;
 }
 
-function describe(profile, side, scope, explicitEnemyMovement, weakAttack, objectiveAttack) {
+function describe(profile, side, scope, explicitEnemyMovement, weakAttack, objectiveAttack, explicitEnemyFireFeatures) {
   try {validateIronDustProfile(profile)}
   catch {return unavailable('IRON_DUST_PROFILE_MISMATCH')}
   if (profile.entry.mode === 'ended') return unavailable('GAME_ENDED');
@@ -233,7 +233,7 @@ function describe(profile, side, scope, explicitEnemyMovement, weakAttack, objec
       side !== 'player' || state.phase !== 'fire' || typeof scope.actorId !== 'string' ||
       !(scope.weaponRef === null || typeof scope.weaponRef === 'string')))
     return unavailable('AI_SCOPE_UNAVAILABLE');
-  const options = side === 'player' ? playerOptions(profile, state, scope, weakAttack, objectiveAttack) : enemyOptions(profile, state, explicitEnemyMovement);
+  const options = side === 'player' ? playerOptions(profile, state, scope, weakAttack, objectiveAttack) : enemyOptions(profile, state, explicitEnemyMovement, explicitEnemyFireFeatures);
   return {ok: true, phase: state.phase, slot: side === 'enemy' ? profile.entry.payload.cursor.pass :
     scope ? 'fire-target' : state.phase, view: project(state, side), options};
 }
@@ -246,9 +246,9 @@ export function describeIronDustSearch(profile,side) {
   return describe(profile,side,undefined,true,false,true);
 }
 
-export function createIronDustAiAdapter(read, {explicitEnemyMovement = false, weakAttack = false, objectiveAttack = false} = {}) {
+export function createIronDustAiAdapter(read, {explicitEnemyMovement = false, explicitEnemyFireFeatures = false, weakAttack = false, objectiveAttack = false} = {}) {
   return createAiDecisionAdapter({read,
-    describe: (profile, side, scope) => describe(profile, side, scope, explicitEnemyMovement, weakAttack, objectiveAttack),
+    describe: (profile, side, scope) => describe(profile, side, scope, explicitEnemyMovement, weakAttack, objectiveAttack, explicitEnemyFireFeatures),
     apply(profile,{command,executeKind}) {
     const dispatch=executeKind==='enemy-fire'?dispatchIronDustProfileEnemyFireChoice:
       executeKind==='enemy-move'?dispatchIronDustProfileEnemyMoveChoice:

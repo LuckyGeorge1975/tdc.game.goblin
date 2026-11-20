@@ -48,11 +48,12 @@ const objectiveReasons = {
 };
 
 export function createIronDustDecisionHost({readSession, readEpoch, select, policy, feature, install, spectator,
-  fireTarget, weakAttack=false, objectiveAttack=false, explicitEnemyMovement=false, side:ownedSide}) {
+  fireTarget, weakAttack=false, objectiveAttack=false, explicitEnemyMovement=false,
+  explicitEnemyFireFeatures=false, side:ownedSide}) {
   if(readSession()?.aiAllowed===false)
     throw Object.assign(Error('AI control is disabled for this level'),{code:'AI_LEVEL_FORBIDDEN'});
   const native = createIronDustAiAdapter(() => ({state:readSession()?.profile,generation:readEpoch()}),
-    {weakAttack,objectiveAttack,explicitEnemyMovement});
+    {weakAttack,objectiveAttack,explicitEnemyMovement,explicitEnemyFireFeatures});
   const adapter = fireTarget ? {
     open: side => native.open(side,fireTarget.scope()),
     execute: native.execute,
@@ -290,7 +291,7 @@ if (typeof document !== 'undefined') {
     const owner=defenderOwner={id,host:null,pending:null,pendingGeneration:0};
     owner.host=createIronDustDecisionHost({readSession:()=>defenderOwner===owner?session:null,
       readEpoch:()=>epoch,side:'enemy',spectator:true,
-      explicitEnemyMovement:id==='strong',objectiveAttack:id==='strong',
+      explicitEnemyMovement:id==='strong',objectiveAttack:id==='strong',explicitEnemyFireFeatures:id==='trained',
       select(batch,report) {
         if(id==='strong')return searchStrong(batch,report);
         const baseline=batch.candidates.find(candidate=>candidate.facts.baseline||candidate.facts.automatic);
