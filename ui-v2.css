@@ -170,8 +170,9 @@ body.ui-v2-active:has(.game-dialog[open]) :is(.v2-target-card, .v2-phase-notice,
 .v2-library-diagram .v2-library-range { width: 100%; text-align: center; margin: 0; gap: 2px; }
 .v2-library-range-caption { margin: 0; min-height: 3em; font-size: 12px; line-height: 1.2; }
 .v2-library-diagram svg.guide-range-svg { position: absolute; inset: 46px 38px 0 6px; width: calc(100% - 44px); height: calc(100% - 46px); }
-.v2-library-weapon-rail { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap: 4px; }
-.v2-library-weapon-rail button { display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 0; min-height: 44px; padding: 3px 6px; }
+.v2-library-weapon-rail { position: absolute; z-index: 1; inset: 46px 0 0 auto; width: 36px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
+.v2-library-weapon-rail button { display: flex; flex: none; align-items: center; justify-content: center; min-width: 0; min-height: 44px; width: 100%; padding: 3px 2px; }
+.v2-library-weapon-rail button > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .v2-library-weapon-rail button[aria-pressed="true"] { border-color: var(--v2-accent-text); background: var(--v2-surface3); }
 .v2-library-weapon-rail .v2-icon { flex: none; width: 20px; height: 20px; }
 .v2-library-unit-detail .v2-library-tabs { flex: none; gap: 4px; }

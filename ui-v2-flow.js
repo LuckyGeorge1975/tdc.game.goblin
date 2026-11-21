@@ -1717,11 +1717,12 @@ if (globalThis.GoblinUIV2 && !globalThis.goblinBootProfileError) {
           label.textContent = name;
           choice.append(label);
           choice.id = `v2-library-weapon-${option.id}`;
+          choice.title = name;
           choice.setAttribute('aria-label',name);
           choice.setAttribute('aria-pressed',String(option===weapon));
           rail.append(choice);
         }
-        top.append(rail);
+        preview.append(rail);
       }
       top.append(artPanel,diagram);
       diagram.append(preview,caption);
