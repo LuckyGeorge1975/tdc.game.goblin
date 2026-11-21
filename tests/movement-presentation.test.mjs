@@ -28,6 +28,20 @@ function item({path=[{x:3,y:2}],from={x:2,y:2},angle=0,mode='normal',team='playe
 function queue(){const c=clock(),frames=[],finished=[],diagnostics=[];
   return {c,frames,finished,diagnostics,q:movement.createQueue({...c,render:x=>frames.push(x),finish:x=>finished.push(x),diagnostic:x=>diagnostics.push(x)})};}
 
+test('idle completion waits for the whole presentation queue and supports abort, skip, clear and OFF',async()=>{
+  const s=queue();
+  s.q.enqueue(item());s.q.enqueue(item({id:'second'}));
+  let completed=false;
+  const ready=s.q.whenIdle().then(value=>{completed=value;return value;});
+  const cancelled=new AbortController(), waiting=s.q.whenIdle({signal:cancelled.signal});
+  cancelled.abort();assert.equal(await waiting,false);
+  assert.equal(completed,false);s.q.skip();await Promise.resolve();assert.equal(completed,false);
+  s.q.skip();s.c.advance(100);await Promise.resolve();assert.equal(completed,false);
+  s.c.advance(120);assert.equal(await ready,true);assert.equal(completed,true);
+  s.q.enqueue(item());const cleared=s.q.whenIdle();s.q.clear();assert.equal(await cleared,true);
+  s.q.enqueue(item({mode:'off'}));assert.equal(await s.q.whenIdle(),true);assert.equal(s.c.callbacks.size,0);
+});
+
 test('turns use shortest route and clockwise 180; real hex waypoint corners are never shortcut',()=>{
   for(const [to,degrees,duration]of [[{x:2,y:3},60,110],[{x:1,y:3},120,160],[{x:1,y:2},180,210]]){
     const value=item({path:[to]}),p=movement.plan(value.event,0),turn=p.segments[0];

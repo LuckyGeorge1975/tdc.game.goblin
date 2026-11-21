@@ -31,6 +31,22 @@ function chooseEndPhase(batch){
   return batch.candidates.find(option=>option.kind==='end-phase').key;
 }
 
+test('a presentation-busy native commit retains the exact legal intent without another strategy call',async()=>{
+  const game=await full();game.context.control={roles:{player:'ai',enemy:'ai'},seed:7};
+  const port=game.run('loadScenario("catalog-full-atlas",control)');
+  let busy=true,choices=0,commits=0;
+  game.context.GoblinMovement={busy:()=>busy};
+  const host=controller(game,port,{player:batch=>{choices++;return batch.candidates.find(c=>c.kind==='move').key;}},()=>commits++);
+  const before=JSON.stringify(port.simulationSnapshot(port.ticket('ai'))),rng=game.rng();
+  assert.equal((await host.advance()).code,'PRESENTATION_BUSY');
+  assert.equal(JSON.stringify(port.simulationSnapshot(port.ticket('ai'))),before);
+  busy=false;
+  assert.equal((await host.advance()).ok,true);
+  assert.equal(choices,1);assert.equal(commits,1);assert.deepEqual(game.rng(),rng);
+  const replay=port.simulationSnapshot(port.ticket('ai')).replay;
+  assert.equal(replay.entries.length,1);assert.equal(replay.entries[0].command.type,'Move');
+});
+
 function endPlayer(port,role){
   for(let phase=0;phase<3;phase++)assert.equal(port.commit(role,port.open(role).permit,nextPlayerPhase).ok,true);
 }

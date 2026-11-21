@@ -1,5 +1,5 @@
-import {createFullCatalogAiHost} from './src/core/full-catalog-ai-adapter.mjs?v=5';
-import {createOwnedFullCatalogSessionHost} from './src/core/full-catalog-session-host.mjs?v=5';
+import {createFullCatalogAiHost} from './src/core/full-catalog-ai-adapter.mjs?v=6';
+import {createOwnedFullCatalogSessionHost} from './src/core/full-catalog-session-host.mjs?v=6';
 import {createGameManager,createPlayerController} from './src/core/game-manager.mjs?v=2';
 import {selectWeakFullCatalog, selectMediumFullCatalog} from './src/core/full-catalog-difficulty.mjs?v=3';
 import {prepareFullAttack2a, FULL_ATTACK_2A_ENGINE, FULL_ATTACK_2A_ID} from './src/core/full-attack-2a.mjs?v=3';
@@ -8,6 +8,44 @@ import {createStrongSearchController} from './src/core/strong-search-controller.
 import {createFullExplorationPolicy} from './src/core/full-exploration-policy.mjs?v=1';
 
 const standardDefender = 'full-native-standard-defender';
+
+// The presentation queue owns readiness; this owner owns cancellation and seat
+// freshness. Waiting is outside strategy selection and its compute measurements.
+export function withFullPresentationBarrier(port,host,movement=()=>globalThis.GoblinMovement){
+  let epoch=0,closed=false,paused=false,pending=false,abort=new AbortController();
+  function invalidate(){epoch++;abort.abort();abort=new AbortController();}
+  return Object.freeze({
+    async advance(){
+      if(closed||paused||pending)return {ok:false,code:'AI_HOST_UNAVAILABLE'};
+      const before=port.state();
+      if(!before||before.ended||before.paused||before.controller!=='ai')return {ok:false,code:'AI_HOST_WRONG_SIDE'};
+      const expected=epoch,signal=abort.signal;
+      const current=()=>{
+        const state=port.state();
+        return !closed&&!paused&&epoch===expected&&state?.sessionId===before.sessionId&&
+          state.side===before.side&&state.controller==='ai'&&!state.paused&&!state.ended;
+      };
+      const wait=()=>{
+        const queue=movement();
+        return !queue?.busy()?Promise.resolve(true):queue.whenIdle?.({signal})??Promise.resolve(false);
+      };
+      pending=true;
+      try{
+        if(!await wait()||!current())return {ok:false,code:'AI_HOST_STALE'};
+        let result=await host.advance();
+        while(result.code==='PRESENTATION_BUSY'&&current()&&movement()?.busy()){
+          if(!await wait()||!current())return {ok:false,code:'AI_HOST_STALE'};
+          result=await host.advance(); // The native host retains this exact intent.
+        }
+        if(result.ok)await wait(); // Accepted once, even if presentation is cancelled.
+        return result;
+      }finally{pending=false;}
+    },
+    pause(){if(closed||paused)return;paused=true;invalidate();host.pause();},
+    resume(){if(closed||!paused)return;paused=false;host.resume();},
+    leave(){if(closed)return;closed=true;invalidate();host.leave();}
+  });
+}
 
 export function createFullGameManager(config,full) {
   const capabilities=full.controllerCapabilities(config);
@@ -167,17 +205,17 @@ if (typeof document !== 'undefined' && globalThis.GoblinV2Flow) {
     bind(session, selection, ui, port) {
       hooks.set(port,ui);
       const select=fullSeatFallback(session,selection,port);
-      const host=createOwnedFullCatalogSessionHost({port,player,select,onCommit(_result,before){
+      const host=withFullPresentationBarrier(port,createOwnedFullCatalogSessionHost({port,player,select,onCommit(_result,before){
         const projection=port.project('ai')?.view;
         explorationFor(port,before.side).accepted(projection?.side===before.side?projection:undefined);
         ui.refresh();
-      }});
+      }}));
       return Object.freeze({...host,
         async advance(){
           const result=await host.advance();
           const state=port.state();
           if(!result.ok&&state?.controller==='ai'&&!state.paused&&!state.ended&&
-              !['AI_HOST_STALE','AI_HOST_UNAVAILABLE'].includes(result.code)){
+              !['AI_HOST_STALE','AI_HOST_UNAVAILABLE','PRESENTATION_BUSY'].includes(result.code)){
             if(!failures.has(port))failures.set(port,result.code);
             ui.refresh();
           }

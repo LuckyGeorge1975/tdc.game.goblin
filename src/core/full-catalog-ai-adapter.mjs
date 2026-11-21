@@ -112,9 +112,10 @@ export function createOwnedFullCatalogAiAdapter(port,player) {
     },
     resume({token:original,command,evidence}){
       const fresh=port.ticket('ai');
-      if(!sameFullCatalogActionSlot(original,fresh)||fresh.generation===original.generation||
+      if(!sameFullCatalogActionSlot(original,fresh)||(fresh!==original&&fresh.generation===original.generation)||
           fresh.revision!==original.revision||fresh.phase!==original.phase||fresh.actorId!==original.actorId)return null;
-      // Only the recorded command is reused. The old permission never reaches commit.
+      // Busy retries keep the still-current permit; pause/resume needs a fresh one.
+      // Only the recorded command is reused, never a stale permission.
       return commit(fresh,command,evidence);
     }
   });

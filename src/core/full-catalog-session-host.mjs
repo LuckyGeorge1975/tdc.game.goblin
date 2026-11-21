@@ -1,4 +1,4 @@
-import {createFullCatalogAiAdapter,createOwnedFullCatalogAiAdapter,sameFullCatalogActionSlot} from './full-catalog-ai-adapter.mjs?v=5';
+import {createFullCatalogAiAdapter,createOwnedFullCatalogAiAdapter,sameFullCatalogActionSlot} from './full-catalog-ai-adapter.mjs?v=6';
 import {createAiSessionHost} from './ai-session-host.mjs?v=3';
 import {createPlayerController} from './game-manager.mjs?v=2';
 
@@ -46,6 +46,7 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
     if(!attempt.intent)return null;
     const result=adapter.resume(attempt.intent);
     if(!result)return null;
+    if(result.code==='PRESENTATION_BUSY')return result;
     attempt.intent=null;
     if(result.ok)onCommit(result,state);
     return result.ok?{ok:true}:result;
@@ -69,6 +70,7 @@ export function createOwnedFullCatalogSessionHost({port,player,select,onCommit=(
       }
       if(result.ok){attempt.intent=null;return result;}
       if(result.code==='AI_HOST_STALE')return continueChoice(attempt,read())??result;
+      if(result.code==='PRESENTATION_BUSY')return result;
       attempt.intent=null;
       return result;
     }

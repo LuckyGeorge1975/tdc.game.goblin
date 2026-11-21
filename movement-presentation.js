@@ -81,7 +81,19 @@
   }
   function createQueue({now,request,cancel,render,finish,diagnostic=()=>{}}){
     let queue=[],active=null,frame=null,generation=0,display=null,returnAt=null,overlayStart=null;
-    function clear(){generation++;if(frame!==null)cancel(frame);frame=null;queue=[];active=null;display=null;returnAt=null;overlayStart=null;finish(false);}
+    const idleWaiters=new Set();
+    const busy=()=>!!active||queue.length>0||!!display;
+    function idle(){if(!busy())for(const done of [...idleWaiters])done(true);}
+    function whenIdle({signal}={}){
+      if(signal?.aborted)return Promise.resolve(false);
+      if(!busy())return Promise.resolve(true);
+      return new Promise(resolve=>{
+        const done=value=>{idleWaiters.delete(done);signal?.removeEventListener('abort',abort);resolve(value);};
+        const abort=()=>done(false);
+        idleWaiters.add(done);signal?.addEventListener('abort',abort,{once:true});
+      });
+    }
+    function clear(){generation++;if(frame!==null)cancel(frame);frame=null;queue=[];active=null;display=null;returnAt=null;overlayStart=null;finish(false);idle();}
     function schedule(){if(frame!==null)return;const expected=generation;
       frame=request(()=>{if(expected!==generation)return;frame=null;tick();});}
     function next(time){
@@ -121,7 +133,7 @@
         if(returnAt===null)returnAt=time;
         const opacity=Math.max(0,Math.min(1,(time-returnAt-100)/120));
         render({...display,event:null,motion:null,dust:false,overlayOpacity:opacity});
-        if(opacity<1)schedule();else{display=null;returnAt=null;overlayStart=null;finish(true);}
+        if(opacity<1)schedule();else{display=null;returnAt=null;overlayStart=null;finish(true);idle();}
       }
     }
     return Object.freeze({
@@ -131,7 +143,7 @@
         queue.push(item);tick();
       },
       skip(){if(!active)return false;display={state:active.after,sidecar:active.sidecar};active=null;tick();return true;},
-      clear,busy:()=>!!active||queue.length>0||!!display,read:()=>({active:active?.event.eventId??null,queued:queue.length,generation})
+      clear,busy,whenIdle,read:()=>({active:active?.event.eventId??null,queued:queue.length,generation})
     });
   }
   const api=Object.freeze({plan,sample,particles,center,shortest,createQueue});
@@ -233,7 +245,7 @@
     render:value=>{try{paint(value);}catch(error){queue.clear();console.warn('Movement display settled after render failure',error);}},
     finish,diagnostic:value=>{console.warn('Movement presentation checkpoint',value);root.dispatchEvent(new CustomEvent('goblin-movement-diagnostic',{detail:value}));}});
   root.GoblinMovement=Object.freeze({
-    busy:queue.busy,skip:queue.skip,clear:queue.clear,read:queue.read,
+    busy:queue.busy,whenIdle:queue.whenIdle,skip:queue.skip,clear:queue.clear,read:queue.read,
     presentingFire:()=>!!displayContext?.fire,
     projectedState:()=>displayContext?JSON.parse(JSON.stringify(displayContext.state)):null,
     wrecksAt:(x,y)=>displayContext?(displayContext.sidecar?.wrecks??[]).filter(w=>w.position.x===x&&w.position.y===y):null,
