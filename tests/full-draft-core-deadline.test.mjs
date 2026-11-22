@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import test from 'node:test';
 import {fullScene} from './catalog-full-harness.mjs';
-import {execute, read} from './artillery-product-harness.mjs';
+import {execute, read, enemy} from './artillery-product-harness.mjs';
 import {createFullCatalogAiAdapter, createFullCatalogAiHost} from '../src/core/full-catalog-ai-adapter.mjs';
 
 const script = name => readFileSync(new URL('../' + name, import.meta.url), 'utf8');
@@ -31,11 +31,7 @@ function moveLead(game) {
 }
 
 function advanceOpponent(game) {
-  game.run("if(turnPhase==='movement')setTurnPhase('fire');if(turnPhase==='fire')setTurnPhase('gev');startEnemyTurn()");
-  const task = [...game.timers].find(([,callback])=>String(callback).includes('const foes='));
-  assert.ok(task);
-  game.timers.delete(task[0]);
-  task[1]();
+  enemy(game);
 }
 
 function adapterFor(game) {

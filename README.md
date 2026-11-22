@@ -24,6 +24,8 @@ Danach [localhost:4173](http://localhost:4173) öffnen. Der Spieleinstieg ist `i
 
 ## Regeln, Tests und Build
 
+Regel Stark kann auf großen Karten lange rechnen. Eine allgemeine Antwortzeit ist nicht zugesichert. Die Auswahl Trainiert bedeutet keinen nachgewiesenen Spielstärkevorteil; die neu untersuchten Trainingsmodelle werden nicht übernommen.
+
 Die [Projektdokumentation](docs/README.md) führt die [Regelmatrix](docs/RULE_MATRIX.md), die Architektur und die aktuellen Herkunftshinweise. [Content & Asset Notices](docs/CONTENT-NOTICES.md) dokumentiert die verwendeten Grafiken und Modelle.
 
 ```powershell

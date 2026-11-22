@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {catalogScene,read,execute} from './catalog-product-harness.mjs';
+import {nativeEnemy} from './artillery-product-harness.mjs';
 export const digest=v=>createHash('sha256').update(JSON.stringify(v)).digest('hex');
 // New recordings bind the gameplay sources; recorded traces keep their original header (see replay-source-binding).
 export const sources=()=>gameplaySourceHashes();
@@ -17,6 +18,7 @@ export async function apply(g,step,observe=facts){
  if(step.kind==='Undo'){g.run('undoPhaseCommand()');return {ok:true}}
  if(step.kind==='Advance'){g.run("$('#end-turn').onclick()");await new Promise(r=>setImmediate(r));return {ok:true}}
  if(step.kind==='Enemy'){
+  if(g.context.GoblinCatalogFullRuntime?.active()){nativeEnemy(g);return {ok:true};}
   assert.equal(g.run('phase'),'enemy');const job=[...g.timers.entries()].find(([,f])=>String(f).includes('const foes='));assert.ok(job);g.timers.delete(job[0]);job[1]();return {ok:true};
  }
  if(step.kind==='Restart'){g.run('loadScenario(currentScenario)');return {ok:true}}

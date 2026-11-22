@@ -84,11 +84,12 @@ test('a native enemy commit publishes a frame once; a foreign or stale commit pu
   const before=watcher.read();
   assert.equal(before.view.activeSide,'enemy');
   const {permit,entries}=port.open('ai');
-  const move=entries.find(option=>option.command.type==='EnemyMove');
-  const action=(move??entries.find(option=>option.baseline)).command;
+  assert.equal(entries,null);
+  const action=game.context.GoblinCatalogFullRuntime.referenceCommand();
+  const move=action.type==='Move';
   assert.equal(port.commit('ai',permit,{...action,actorId:'core'}).code,'FULL_CONTROL_ACTOR');
   assert.equal(watcher.read(),before);
-  assert.equal(port.commit('ai',permit,action).ok,true);
+  assert.equal(port.commit('ai',permit,action,game.context.GoblinCatalogFullRuntime.nativePlayerGateway.dispatch).ok,true);
   const after=watcher.read();
   assert.equal(after.view.revision,before.view.revision+1);
   if(move){

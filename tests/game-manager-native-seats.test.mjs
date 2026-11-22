@@ -80,10 +80,11 @@ function take({port,handoffs},side){
   assert.equal(port.project('human').view.side,side);
 }
 
-function humanCommit({port,player},command){
+function humanCommit({game,port,player},command){
   const offer=port.open('human');
   const view=port.project('human').view;
-  const chosen=command??offer.entries.find(option=>option.baseline).command;
+  assert.equal(offer.entries,null);
+  const chosen=command??game.context.GoblinCatalogFullRuntime.referenceCommand();
   return commitFullHumanCommand(port,offer.permit,view,chosen,player.dispatch);
 }
 

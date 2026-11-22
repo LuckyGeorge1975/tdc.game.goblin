@@ -22,7 +22,7 @@ async function load(bundle=showcase,search='',registry=profiles,atlasSource=atla
     document:{createElement:()=>({dataset:{}})},
     fetch:async url=>({ok:true,json:async()=>url.includes('unit-profiles')?registry:url.includes('showcase-levels')?bundle:url.includes('-pilot.v3.json')?JSON.parse(readFileSync(new URL('../'+url,import.meta.url),'utf8')):atlasSource}),
     console:{error:(...items)=>errors.push(items)},addLog:()=>{},
-    location:{search},loadScenario:id=>loaded.push(id),URLSearchParams
+    location:{search:search+(search?'&':'?')+'ui=classic'},loadScenario:id=>loaded.push(id),URLSearchParams
   });
   for(const file of ['artillery-spotter-rules.js','siege-tank-fire-budget.js','skimmer-budget.js','assets/unit-art/rules/artillery-pilot.v1.js','assets/unit-art/rules/siege-pilot.v1.js','assets/unit-art/rules/skimmer-pilot.v1.js'])vm.runInContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
   vm.runInContext(manifestSource,context);

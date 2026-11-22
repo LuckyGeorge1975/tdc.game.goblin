@@ -20,6 +20,7 @@ function legacy() {
     Math: Object.assign(Object.create(Math), {random: () => 0}),
     terrainTypeAt: () => 'open-ground'});
   const game = readFileSync(new URL('../game.js', import.meta.url), 'utf8');
+  vm.runInContext(game.match(/^function combatRandom\(\).*$/m)[0],context);
   const crtStart = game.indexOf('const COMBAT_RULES='), crtEnd = game.indexOf('const builtInLevels', crtStart) - 1;
   const start = game.indexOf('function combatRatio('), opening = game.indexOf('{', start);
   let depth = 0, end = -1;

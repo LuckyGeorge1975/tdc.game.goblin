@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {fullScene} from './catalog-full-harness.mjs';
-import {execute} from './artillery-product-harness.mjs';
+import {execute,nativeEnemy} from './artillery-product-harness.mjs';
 import {createFullRoundSource} from '../full-round-source.mjs';
 
 test('native U13 terminal shot retains the selected hex and concrete hit',async()=>{
@@ -40,10 +40,7 @@ test('native FULL commits publish a completed round and rewind discarded actions
   assert.ok(execute(g,{type:'Move',actorId:actor,...moves[1]}).ok);
   assert.equal(source.view().latestComplete,null);
   g.run("setTurnPhase('fire');setTurnPhase('gev');startEnemyTurn()");
-  const job = [...g.timers].find(([,callback])=>String(callback).includes('const foes='));
-  assert.ok(job);
-  g.timers.delete(job[0]);
-  job[1]();
+  nativeEnemy(g);
   const round = source.view().latestComplete;
   assert.equal(round.roundNumber,1);
   assert.equal(round.perspective,'player');
@@ -91,7 +88,8 @@ test('FULL round uses the authorized seat and keeps concealed event coordinates 
   assert.equal(seats.at(-1).take(),true);
   for(let step=0;step<80&&port.state().side==='enemy';step++) {
     const offer=port.open('human');
-    assert.equal(port.commit('human',offer.permit,offer.entries.find(entry=>entry.baseline).command).ok,true);
+    assert.equal(offer.entries,null);
+    assert.equal(port.commit('human',offer.permit,game.context.GoblinCatalogFullRuntime.referenceCommand(),game.context.GoblinCatalogFullRuntime.nativePlayerGateway.dispatch).ok,true);
   }
   assert.equal(seats.at(-1).seat.side,'player');
   assert.equal(source.view(),null);

@@ -26,7 +26,7 @@ function scene(enabled=true){
     querySelectorAll:s=>s==='.view-option:not(#grid-toggle)'?buttons:[],createElement:element,
     createElementNS:element,addEventListener(){}};
   const math=Object.create(Math);math.random=()=>{rolls++;return context.rollQueue?.shift()??.91;};
-  const context=vm.createContext({document,Math:math,structuredClone,console,URLSearchParams,window:{},
+  const context=vm.createContext({document,Math:math,structuredClone,console,URLSearchParams,window:{},location:{search:'?ui=classic'},
     localStorage:{getItem(){return null;}},GameDialogs:{isOpen:()=>false,cancel(){},confirm:async()=>true},
     setTimeout(fn){timers.set(++id,fn);return id;},clearTimeout(key){timers.delete(key);},
     scheduleGameTask(fn){timers.set(++id,fn);return id;}});

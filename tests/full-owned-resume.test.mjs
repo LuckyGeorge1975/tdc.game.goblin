@@ -7,7 +7,8 @@ import {createOwnedFullCatalogSessionHost} from '../src/core/full-catalog-sessio
 
 const atlas='catalog-full-atlas';
 const snapshot=game=>read(game,'({units,turn,phase,turnPhase,gameOver,full:GoblinCatalogFullRuntime.snapshot()})');
-const baseline=batch=>batch.candidates.find(candidate=>candidate.facts.baseline).key;
+const baseline=batch=>(batch.candidates.find(candidate=>candidate.facts.baseline)??
+  batch.candidates.find(candidate=>candidate.kind==='end-phase')).key;
 
 async function run(select,strong=false) {
   const game=await fullScene(atlas,7,false,'FULL_CATALOG_v1');
@@ -24,7 +25,7 @@ async function run(select,strong=false) {
     'loadScenario("catalog-full-atlas",{roles:{player:"ai",enemy:"ai"}})');
   for(let n=0;n<3;n++)assert.equal(port.commit('ai',port.open('ai').permit,{type:'EndPhase'}).ok,true);
   const player=createFullCatalogAiHost(game.context.GoblinCatalogFullRuntime,game.context.GoblinSpecialistsUI,
-    game.run('({query,dispatch})'),()=>game.run('phase'),game.context.GoblinSpecialistsRuntime);
+    game.context.GoblinCatalogFullRuntime.nativePlayerGateway,()=>game.run('phase'),game.context.GoblinSpecialistsRuntime);
   const host=createOwnedFullCatalogSessionHost({port,player,select:{enemy:choose},
     onCommit:({action},before)=>commits.push({action,generation:before.generation})});
   return {game,port,host,calls,commits};
@@ -68,7 +69,8 @@ test('a valid choice still running on resume can commit only with fresh permissi
   const {game,port,host,calls,commits}=await run((batch,count)=>count===1?deferred.promise.then(()=>baseline(batch)):baseline(batch));
   const uncontrolled=await run(baseline);
   const first=port.open('ai');
-  const expected=first.entries.find(candidate=>candidate.baseline).command;
+  assert.equal(first.entries,null);
+  const expected=game.context.GoblinCatalogFullRuntime.referenceCommand();
   const pending=host.advance();
   assert.equal((await host.advance()).code,'AI_HOST_UNAVAILABLE');
   host.pause();

@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {fullScene} from './catalog-full-harness.mjs';import {read,execute} from './artillery-product-harness.mjs';
+import {fullScene} from './catalog-full-harness.mjs';import {read,execute,nativeEnemy} from './artillery-product-harness.mjs';
 function controlledDamage(g){g.run("globalThis.destroyControlled=u=>{if(!u.catalogSystems){u.hp=0;return}while(!GoblinSystems.catalogIsHelpless(u.catalogSystems,GoblinSpecialistsRuntime.registry())){const target=GoblinSystems.catalogChooseTarget(u.catalogSystems,GoblinSpecialistsRuntime.registry()),hit=GoblinSystems.catalogApplyHit(u.catalogSystems,{targetId:target.id,result:'X',attackStrength:1000,cause:{kind:'direct',commandId:'controlled-terminal',attackerId:'boundary-fixture'}},GoblinSpecialistsRuntime.registry());u.catalogSystems=hit.state;GoblinSpecialistsRuntime.applyEffects(u,hit.effects)}}")}
 test('Ninja actual owner obeys all tread bands, remains a system and never gains GEV or ram',async()=>{
  const g=await fullScene();g.run("globalThis.actor=units.find(u=>u.id==='u3-player-ninja')");
@@ -17,10 +17,11 @@ test('real U3 retries exactly three times, duplicate BeginTurn reuses full reque
  const last=read(g,'GoblinCatalogFullRuntime.snapshot()');assert.equal(last.waves.waves[0].attempts,3);assert.equal(last.waves.waves[0].status,'failed');assert.equal(read(g,"units.some(u=>u.id==='u3-wave-guard')"),false);assert.equal(read(g,'GoblinCatalogFullRuntime.pendingEnemy()'),0);
  assert.equal(last.journal.filter(e=>e.type==='begin-turn'&&e.effects.some(f=>f.type==='WaveFailed')).length,1);
 });
-test('the actual scheduled enemy callback is idempotent and its whole fire-move-fire window ends once',async()=>{
- const g=await fullScene();g.run("setTurnPhase('fire');setTurnPhase('gev');startEnemyTurn()");
- const callback=[...g.timers.values()].find(f=>String(f).includes('const foes='));assert.ok(callback);callback();
- const before=g.state(),full=read(g,'GoblinCatalogFullRuntime.snapshot()'),rng=g.rng();callback();assert.equal(g.state(),before);assert.deepEqual(read(g,'GoblinCatalogFullRuntime.snapshot()'),full);assert.deepEqual(g.rng(),rng);
+test('a native enemy turn ends once and a consumed permission cannot replay its first command',async()=>{
+ const g=await fullScene();const port=g.run("loadScenario(currentScenario,{roles:{player:'ai',enemy:'ai'}})");
+ for(let n=0;n<3;n++)assert.equal(port.commit('ai',port.open('ai').permit,{type:'EndPhase'}).ok,true);
+ const first=nativeEnemy(g);assert.ok(first);
+ const before=g.state(),full=read(g,'GoblinCatalogFullRuntime.snapshot()'),rng=g.rng();assert.equal(port.commit('ai',first.permit,first.command).code,'FULL_CONTROL_STALE');assert.equal(g.state(),before);assert.deepEqual(read(g,'GoblinCatalogFullRuntime.snapshot()'),full);assert.deepEqual(g.rng(),rng);
  assert.deepEqual(full.ownTurns,{player:2,enemy:1});assert.deepEqual(full.visibility.teamFire,{player:{completed:1,active:false},enemy:{completed:1,active:false}});
 });
 test('frozen area victims share one carrier roll; surviving infantry ejects without a second ground roll',async()=>{

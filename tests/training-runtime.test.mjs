@@ -286,10 +286,12 @@ test('training source/manifest mutations reject before World/RNG; Classic gets n
  g.context.location={search:'?ui=classic'};g.context.fetch=()=>{throw Error('Classic must not fetch training sources')};await g.run(fs.readFileSync(new URL('../training-loader.js',import.meta.url),'utf8'));assert.deepEqual(snapshot(g),before);
 });
 test('actual end-screen branch keeps normal advisory battle results separate from learning completion',async()=>{
+ const ui=fs.readFileSync(new URL('../ui-v2.js',import.meta.url),'utf8');
+ const outcome=ui.slice(ui.indexOf('    function outcomeKey('),ui.indexOf('    const core =',ui.indexOf('    function outcomeKey(')));
  const source=fs.readFileSync(new URL('../ui-v2-flow.js',import.meta.url),'utf8'),start=source.indexOf('        const training=globalThis.GoblinTrainingRuntime?.view();'),end=source.indexOf("      } else if (screen === 'log')",start),body=source.slice(start,end);
  for(const lesson of [null,'training-t01','training-t02']){
   const g=await trainingScene(lesson??'training-t01',true);if(lesson)for(const action of route(lesson))apply(g,action);else g.run("loadScenario('iron-dust')");
-  g.run(`{globalThis.headings=[];globalThis.buttons=[];const campaign=null,editorConfig=null,state={objective:{outcome:true},scenario:currentScenario,turn:1};const panel={append(){}},heading=x=>headings.push(x),paragraph=x=>x,actions=(...x)=>x,button=(key)=>buttons.push(key),confirmRestart=()=>{},goToLevels=()=>{};${body}}`);
+  g.run(`{${outcome}const GoblinUIV2={outcomeKey};globalThis.headings=[];globalThis.buttons=[];const campaign=null,editorConfig=null,state={objective:{outcome:true},scenario:currentScenario,turn:1};const panel={append(){}},heading=x=>headings.push(x),paragraph=x=>x,actions=(...x)=>x,button=(key)=>buttons.push(key),confirmRestart=()=>{},goToLevels=()=>{};${body}}`);
   assert.equal(read(g,'headings[0]'),lesson?'training.complete.title':'screen.missionEnd.victory.title');
   assert.equal(read(g,"buttons.includes('training.nextLesson')"),!!lesson);
  }

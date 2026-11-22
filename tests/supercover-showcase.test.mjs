@@ -9,7 +9,7 @@ const A={x:2,y:2},B={x:2,y:0},left={x:1,y:1},right={x:2,y:1};
 
 async function game(){
   const game=artilleryScene(false,7,true);
-  game.context.location={search:''};
+  game.context.location={search:'?ui=classic'};
   game.context.fetch=async path=>({ok:true,json:async()=>JSON.parse(
     readFileSync(new URL('../'+path,import.meta.url),'utf8'))});
   game.run(readFileSync(new URL('../atlas-level.js',import.meta.url),'utf8'));

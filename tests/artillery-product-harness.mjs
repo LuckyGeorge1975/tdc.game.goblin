@@ -15,7 +15,7 @@ export function artilleryScene(enabled=true, initialSeed=7,entrypointOrder=false
     querySelectorAll:s=>s==='.view-option:not(#grid-toggle)'?buttons:[],createElement:element,
     createElementNS:element,addEventListener(){}};
   const math=Object.create(Math);math.random=()=>{rolls++;if(context.rollQueue?.length)return context.rollQueue.shift();rngState^=rngState<<13;rngState^=rngState>>>17;rngState^=rngState<<5;rngState>>>=0;return rngState/4294967296;};
-  const context=vm.createContext({document,Math:math,structuredClone,console,URLSearchParams,window:{},
+  const context=vm.createContext({document,Math:math,structuredClone,console,URLSearchParams,window:{},location:{search:'?ui=classic'},
     localStorage:{getItem(){return null;}},GameDialogs:{isOpen:()=>false,cancel(){},confirm:async()=>true},
     setTimeout(fn){timers.set(++id,fn);return id;},clearTimeout(key){timers.delete(key);},
     scheduleGameTask(fn){timers.set(++id,fn);return id;}});
@@ -42,7 +42,35 @@ export function queryBridge(g){
 }
 export function enemy(g){
  g.run("if(turnPhase==='movement')setTurnPhase('fire');if(turnPhase==='fire')setTurnPhase('gev');startEnemyTurn()");
+ if(g.context.GoblinCatalogFullRuntime?.active())return nativeEnemy(g);
  const task=[...g.timers.values()].find(fn=>String(fn).includes('const foes='));if(!task)throw new Error('Missing actual enemy callback');task();
+}
+// Rule-only scenes have no controller owner; controller integration scenes do.
+// Both consume the current reference commands and common movement/fire/GEV path,
+// rather than searching for the removed Legacy enemy timer.
+export function nativeEnemy(g){
+ const full=g.context.GoblinCatalogFullRuntime,port=full.controllerPort();
+ let first;
+ for(let step=0;g.run("phase==='enemy'&&!gameOver");step++){
+  if(step>=512)throw Error('NATIVE_ENEMY_TURN_DID_NOT_FINISH');
+  const command=full.referenceCommand();
+  if(!port){
+   if(command.type==='EndPhase')full.advancePhase();
+   else{
+    const check=full.nativePlayerGateway.query(command);
+    if(!check.ok)throw Error('FULL_REFERENCE_QUERY: '+check.code);
+    g.context.referenceCommand=command;
+    g.run('executeSpecialistCommand(referenceCommand)');
+   }
+   continue;
+  }
+  const offer=port.open('ai');
+  if(!offer||!command)throw Error('NATIVE_ENEMY_OFFER_UNAVAILABLE');
+  first??={port,permit:offer.permit,command};
+  const result=port.commit('ai',offer.permit,command,full.nativePlayerGateway.dispatch);
+  if(!result.ok)throw Error('NATIVE_ENEMY_COMMIT: '+result.code);
+ }
+ return first;
 }
 export function command(g,actorId,targetId,mode='direct',spotterId=null){return JSON.parse(g.run(`JSON.stringify((()=>{const u=units.find(u=>u.id==='${targetId}');return {type:'FireArtillery',actorId:'${actorId}',x:u.x,y:u.y,mode:'${mode}',spotterId:${JSON.stringify(spotterId)}}})())`));}
 export function execute(g,cmd){return g.run(`dispatch(${JSON.stringify(cmd)},revision())`)}

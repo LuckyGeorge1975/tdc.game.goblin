@@ -37,6 +37,7 @@ function legacy() {
     terrainTypeAt: (x, y) => map.terrain.find(cell => cell.x === x && cell.y === y)?.type ??
       map.defaultTerrain,
     Math: Object.assign(Object.create(Math), {random: () => 0})});
+  vm.runInContext(extract(text,'combatRandom'),context);
   vm.runInContext(`${text.slice(crtStart, crtEnd + 1)}\n${['combatRatio', 'effectiveDefense',
     'applyCombatRoll', 'combatOutcome'].map(name => extract(text, name)).join('\n')}`, context);
   return context;

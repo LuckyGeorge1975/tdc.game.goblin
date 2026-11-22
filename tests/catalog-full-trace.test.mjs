@@ -1,3 +1,4 @@
+import {assertHistoricalFullTransition} from './helpers/historical-full-transition.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {gunzipSync} from 'node:zlib';import {createHash} from 'node:crypto';
 import {decode} from './helpers/trace-object-table.mjs';import {replay} from './catalog-full-trace.mjs';import {streamDigest} from './catalog-specialists-trace.mjs';
 import {bindReplaySources} from './helpers/replay-source-binding.mjs';
@@ -23,7 +24,7 @@ test('all ten FULL fixtures have the current profile, bound sources and the inde
  }
 });
 // Only the Atlas test level (every unit, every terrain type; see test-level-coverage) is replayed; the other levels keep their fixtures.
-for(const [key,info] of Object.entries(index.traces).filter(([key])=>key.startsWith('catalog-full-atlas-')))test(key+' replays complete world/visibility/waves/history/events/RNG/sidecar',async()=>{const trace=load(info);await replay(trace);const end=trace.steps.at(-1);assert.equal(end.world.gameOver,true);assert.equal(end.full.terminalOutcome,info.outcome);assert.equal(end.rng.draws,info.rngDraws);assert.ok(trace.steps.filter(s=>s.command.kind==='Command').every(s=>s.result.query.ok&&s.result.result.ok))});
+for(const [key,info] of Object.entries(index.traces).filter(([key])=>key.startsWith('catalog-full-atlas-')))test(key+' retains its immutable complete oracle and rejects the authorised inactive-side initial-state transition',async()=>{const trace=load(info);await assertHistoricalFullTransition(trace);const end=trace.steps.at(-1);assert.equal(end.world.gameOver,true);assert.equal(end.full.terminalOutcome,info.outcome);assert.equal(end.rng.draws,info.rngDraws);assert.ok(trace.steps.filter(s=>s.command.kind==='Command').every(s=>s.result.query.ok&&s.result.result.ok))});
 test('full trace rejects foreign profiles/sources/seed/owner/state/clock/order/event changes without rebinding oracle values',async()=>{
  const original=load(index.traces['catalog-full-advance-victory']);
  for(const mutate of [t=>t.header.profile='CATALOG_FULL_CANDIDATE_v1',t=>t.header.sources['catalog-full-runtime.js']='foreign',t=>t.route.seed++,t=>t.initial.full.ownTurns.player++,t=>t.initial.world.units[0].catalogSystems.unitId='foreign',t=>t.steps[0].world.units[0].x=99,t=>t.route.commands.reverse(),t=>t.steps.at(-1).events[0].actor.positionBefore.x=99]){const trace=structuredClone(original);mutate(trace);const {traceDigest,...body}=trace;trace.traceDigest=streamDigest(body);await assert.rejects(()=>replay(trace))}
