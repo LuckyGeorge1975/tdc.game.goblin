@@ -2,6 +2,15 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden im jeweiligen Release-Issue nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.32] - 2026-11-22
+
+- In regulären FULL-Missionen lässt sich jeder vorhandene Sitz mit Mensch oder einer zugelassenen KI belegen. Die Auswahl bietet Gering, Mittel, Stark und Trainiert und berücksichtigt die Mindeststufe der Mission. Tutorials bleiben für Menschen. Trainiert verwendet die bestehenden Modelle; die neu untersuchten Trainingsmodelle werden wegen fehlenden allgemeinen Stärkegewinns nicht übernommen.
+- Beide FULL-Seiten verwenden denselben Ablauf aus Bewegung, Feuer, berechtigtem GEV-Manöver und Zugende sowie dieselben Katalogbefehle. Vier symmetrische Missionen ergänzen die Levelwahl. Die vollständige gegenseitige Vernichtung beider Verbände endet unentschieden.
+- Stark modelliert im Vollkatalog nur bekannte Einheiten. Die gemeinsame Zielgesamtzahl bleibt öffentlich; unbekannte Positionen bleiben verborgen. KI-Suche und Sitzwechsel räumen ihre lokalen Worker auf.
+- Eigene Level lassen sich im überarbeiteten Karteneditor über validierte JSON-Dateien austauschen und vor dem Start prüfen. Einstellungen sind gruppiert; die Rundenansicht markiert sichtbare Weganfänge und Aktionen. Native Trainingsarchive sind an den ausgeführten Regelcode gebunden; eigene Aufnahmen und ausdrücklich lokale Versuchspakete weisen ihre Herkunft gesondert nach.
+- Die Bibliothek zeigt mehrere Waffen vertikal rechts in der Vorschau. Die Kartengröße bleibt beim Waffen- und Ansichtswechsel gleich. KI-Züge warten auf das Ende der laufenden Animation; Pause, Fortsetzen und Verlassen verwerfen überholte Ausführungen.
+- Der weiterhin manuell gestartete itch.io-Workflow dokumentiert erfolgreiche Uploads künftig mit einem eigenen unveränderlichen `itch-v<Version>`-Tag am ausgelieferten Pagescommit. Reine Paketläufe erzeugen kein Veröffentlichungstag.
+
 ## [0.1.31] - 2026-11-16
 
 - Im Vollkatalog lässt sich die Steuerung je Seite im Briefing wählen. Berechtigte Missionen bieten den trainierten Angreifer. In Iron Dust V2 stehen Mensch und Trainiert für den Angriff und Schwach, Mittel und Stark für die Verteidigung zur Wahl.

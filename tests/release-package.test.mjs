@@ -2,11 +2,11 @@ import test from 'node:test';import assert from 'node:assert/strict';import fs f
 const file=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8'),hash=b=>createHash('sha256').update(b).digest('hex');
 test('release metadata, fallback, notices, dated supplement and current handoff have concrete consistent values',()=>{
  const context=vm.createContext({});vm.runInContext(file('release.js'),context);const r=context.GOBLIN_RELEASE;
- assert.deepEqual(JSON.parse(JSON.stringify(r)),{version:'0.1.31',build:31,releasedAt:'2026-11-16',tag:'v0.1.31',status:'release-candidate'});
- const index=file('index.html');assert.match(index,/id="build-version" class="build">FIELD TEST 0\.1\.31</);assert.match(index,/release\.js\?v=31/);
- assert.match(file('docs/CONTENT-NOTICES.md'),/\*\*Document version:\*\* 24/);assert.match(file('reports/REPORTS.md'),/CONTENT-CLEARANCE-DESKTOP-0\.1\.27-2026-10-30\.md/);
+ assert.deepEqual(JSON.parse(JSON.stringify(r)),{version:'0.1.32',build:32,releasedAt:'2026-11-22',tag:'v0.1.32',status:'release-candidate'});
+ const index=file('index.html');assert.match(index,/id="build-version" class="build">FIELD TEST 0\.1\.32</);assert.match(index,/release\.js\?v=32/);
+ assert.match(file('docs/CONTENT-NOTICES.md'),/\*\*Document version:\*\* 25/);assert.match(file('reports/REPORTS.md'),/CONTENT-CLEARANCE-DESKTOP-0\.1\.27-2026-10-30\.md/);
  for(const p of ['README.md','CHANGELOG.md','reports/TEST_HANDOFF.md','docs/CONTENT-NOTICES.md','reports/CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md'])assert.doesNotMatch(file(p),/\[(?:RELEASEVERSION|PAKETDATUM|RUNTIME-SHA|PAKET-SHA|ZUSATZ-DATEI)\]/);
- assert.match(file('reports/TEST_HANDOFF.md'),/df1ba35d935971f7cc28835ae7d8d32f3d65178a/);assert.match(file('README.md'),/historisch, aus Build 26/);
+ assert.match(file('reports/TEST_HANDOFF.md'),/a6a3d78bf82c1a7f2a8187d9bcf0356556147daf/);assert.match(file('README.md'),/historischen Aufnahme aus Build 31/);
 });
 test('all 54 retained wreck/metadata runtime hashes match receipt and package links stay inside shipped files',()=>{
  const r=JSON.parse(file('assets/unit-art/wrecks-source.json')),rows=[...r.wrecks,...r.metadata];assert.equal(r.wrecks.length,52);assert.equal(rows.length,54);

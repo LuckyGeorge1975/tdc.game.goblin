@@ -2,6 +2,22 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## Build 0.1.32 · Gemeinsame FULL-Züge und Desktopkorrekturen
+
+| Feld | Stand am 22.11.2026 |
+|---|---|
+| Version | `0.1.32` |
+| Build | `32` |
+| Status | Isolierter Pages-Releasekandidat für `goblin-7iya`. Push und Tag erst nach fester Gesamtfreigabe durch Koordination. Öffentlicher Nachtest folgt auf den Deploy. |
+| Rückfallpunkt | `v0.1.31`, öffentliches Pagesrelease auf `8ae5fb72af5f319903caf4a0ba53eb678c30b26e` gemäß erfolgreichem Pageslauf `43842852194`. Das bestehende annotierte Tagobjekt ist `5488921885b6fc57629b597f2f5e633d8a61ad6e`; vor Veröffentlichung erneut zuordnen. |
+| Runtimebasis | `a6a3d78bf82c1a7f2a8187d9bcf0356556147daf`, unabhängig abgenommene Kombination der Bibliothekskorrektur `d61084b` und des Animations-/KI-Lifecyclefixes `749e9d2`. |
+| Umfang | [Änderungen seit Build 31](../CHANGELOG.md#0132---2026-11-22). Gemeinsame FULL-Befehle und Phasen, vier symmetrische Karten, zentral gebundene Sitzwahl, Unentschieden, Editor und sichtbare Rundenanalyse. |
+| Modelle | Bestehende trainierte Produktmodelle bleiben unverändert. Der neue native Trainingsbatch wurde unabhängig geprüft, zeigte keinen allgemeinen Stärkegewinn und wird nicht übernommen. |
+| Wiederverwendete QA | `goblin-ywuq.1/.2`: Bibliothek bei 1280×560/660, realer HIGH-Atlaslauf mit Mensch/Gering bis Zug 2, Pause/Fortsetzen und Verlassen/Neustart bei laufender Präsentation; 535 Sichtschutzsamples ohne Fehler. Voller aktueller Pages-Testlauf und Release-Verifier müssen auf diesem Kandidaten bestehen. |
+| Herkunft und Grenzen | Vorhandene Katalog-, Content- und Legalbelege behalten ihre Grenzen. Koordination prüft den aktuellen Content-/Legalnachlauf und offene Tutorialbefunde vor Freigabe. Keine neue Rechte- oder Stärkenbehauptung. |
+| Kanäle | Abgeschlossene Features gehen nach den erforderlichen Gates auf Pages. itch.io bündelt Features/Epics nur nach manueller Nutzerfreigabe. Der Nutzer testet Pages und startet Butler selbst. Der manuelle Upload erzeugt erst bei Erfolg ein zusätzliches unveränderliches `itch-v<Version>`-Tag am Pagescommit samt Paket-/Laufbelegen; Paketläufe ohne Upload erhalten keins. |
+| README-Bild | Vorhandene Aufnahme bleibt ausdrücklich als historischer Build 31 bezeichnet; keine rückwirkende Umbenennung oder neue Bildquelle. |
+
 ## Build 0.1.31 · KI und Rundenanalyse
 
 | Feld | Stand am 16.11.2026 |
