@@ -16,7 +16,18 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Wiederverwendete QA | `goblin-ywuq.1/.2`: Bibliothek bei 1280×560/660, realer HIGH-Atlaslauf mit Mensch/Gering bis Zug 2, Pause/Fortsetzen und Verlassen/Neustart bei laufender Präsentation; 535 Sichtschutzsamples ohne Fehler. Voller aktueller Pages-Testlauf und Release-Verifier müssen auf diesem Kandidaten bestehen. |
 | Herkunft und Grenzen | Vorhandene Katalog-, Content- und Legalbelege behalten ihre Grenzen. Koordination prüft den aktuellen Content-/Legalnachlauf und offene Tutorialbefunde vor Freigabe. Keine neue Rechte- oder Stärkenbehauptung. |
 | Kanäle | Abgeschlossene Features gehen nach den erforderlichen Gates auf Pages. itch.io bündelt Features/Epics nur nach manueller Nutzerfreigabe. Der Nutzer testet Pages und startet Butler selbst. Der manuelle Upload erzeugt erst bei Erfolg ein zusätzliches unveränderliches `itch-v<Version>`-Tag am Pagescommit samt Paket-/Laufbelegen; Paketläufe ohne Upload erhalten keins. |
-| README-Bild | Vorhandene Aufnahme bleibt ausdrücklich als historischer Build 31 bezeichnet; keine rückwirkende Umbenennung oder neue Bildquelle. |
+| Testumgebung | Pages-CI verwendet ausdrücklich Node `24.14.0`, dessen eingebauter Acorn `8.15.0` durch den bestehenden Parserhash qualifiziert ist. Die Ermittlung des vorherigen Pagesrelease berücksichtigt nur `v[0-9]*`, keine `itch-v*`-Tags. |
+| README-Bild | [Echte FULL-Atlas-Aufnahme aus Build 32](#readme-aufnahme-build-32). Frühere Bilder behalten ihre Herkunft. |
+
+### README-Aufnahme Build 32
+
+| Feld | Beleg |
+|---|---|
+| Quellcommit | `a6ed74f05ac9cfb190655fb4046cddf97124311b`, isolierter Metadatenstand mit Version `0.1.32` auf der abgenommenen Runtime `a6a3d78`. Das LF-Archiv stimmt in 1981 Gitblobs bytegenau überein. |
+| Aufnahme | Regulärer Atlasstart mit Mensch/Gering, Deutsch, Zug 1, Bewegungsphase; 27 projizierte Einheiten. Echter Pages-Unterpfad `/tdc.game.goblin/`, Viewport 1280×800. Der Buildwert wurde im Browser geprüft. Probe: `.tools/qa-release032-a6ed/readme-screenshot-probe.json`. |
+| Original | `.tools/qa-release032-a6ed/field-test-0.1.32-full-atlas.png`, 794881 Bytes, SHA256 `9ac22d8c26d383d0e91d3ff1f791657e6ea1ce0c267d1f363f05dca0c3e814b0`. |
+| README-Ableitung | [field-test-0.1.32-full-atlas.webp](../docs/images/field-test-0.1.32-full-atlas.webp), 1280×800, 150356 Bytes, SHA256 `cb2b04b6ea6a8f5f5c665ef17bb33e920fa99765cec5100da96ae55f23e9f759`. Pillow RGB, Qualität 90, Methode 6; dekodiert und visuell geprüft. |
+| Grenze | Der optionale Unterstützungslink wurde auf einer QA-Kopie mit `https://example.org/goblin-support` konfiguriert und nicht geöffnet. Keine Änderung des Produktindex und kein tatsächlicher Zahlungsanbieter aus dieser Probe. Das Bild ist kein Nachweis einer bereits bestandenen vollständigen CI oder Veröffentlichung. |
 
 ## Build 0.1.31 · KI und Rundenanalyse
 

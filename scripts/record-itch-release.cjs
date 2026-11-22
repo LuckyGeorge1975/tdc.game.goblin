@@ -6,6 +6,7 @@ module.exports = async function record({github, context, env}) {
   assert.equal(`${context.repo.owner}/${context.repo.repo}`, 'LuckyGeorge1975/tdc.game.goblin');
   assert.equal(env.PUBLISH_RESULT, 'success');
   assert.equal(env.UPLOAD_VERIFIED, 'true');
+  assert.match(env.GITHUB_RUN_ATTEMPT, /^[1-9]\d*$/);
   assert.match(env.RELEASE_VERSION, /^\d+\.\d+\.\d+$/);
   assert.equal(env.RELEASE_TAG, `v${env.RELEASE_VERSION}`);
   assert.match(env.PAGES_COMMIT, /^[a-f0-9]{40}$/);
@@ -19,7 +20,7 @@ module.exports = async function record({github, context, env}) {
   const receipt = {version:env.RELEASE_VERSION, tag:`itch-v${env.RELEASE_VERSION}`,
     pagesTag:env.RELEASE_TAG, commit:env.PAGES_COMMIT, package:env.PACKAGE_FILENAME,
     packageSha256:env.PACKAGE_SHA256, pagesRun:env.PAGES_RUN,
-    uploadRun:`${prefix}${context.runId}/attempts/${context.runAttempt}`,
+    uploadRun:`${prefix}${context.runId}/attempts/${env.GITHUB_RUN_ATTEMPT}`,
     uploadLogSha256:env.UPLOAD_LOG_SHA256, channel:'luckygeorge/goblin:html5'};
   const api = github.rest.git, repo = context.repo;
   async function existing() {

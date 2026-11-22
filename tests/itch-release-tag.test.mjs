@@ -14,7 +14,7 @@ function setup(object=null,{race=null}={}) {
   const calls=[];
   let current=object;
   const context={eventName:'workflow_dispatch',ref:'refs/heads/main',repo:{owner:'LuckyGeorge1975',repo:'tdc.game.goblin'},runId:123,runAttempt:2};
-  const env={PUBLISH_RESULT:'success',UPLOAD_VERIFIED:'true',RELEASE_VERSION:'0.1.32',RELEASE_TAG:'v0.1.32',PAGES_COMMIT:sha,
+  const env={GITHUB_RUN_ATTEMPT:'2',PUBLISH_RESULT:'success',UPLOAD_VERIFIED:'true',RELEASE_VERSION:'0.1.32',RELEASE_TAG:'v0.1.32',PAGES_COMMIT:sha,
     PACKAGE_SHA256:'c'.repeat(64),UPLOAD_LOG_SHA256:'d'.repeat(64),PACKAGE_FILENAME:`goblin-v0.1.32-html5-${sha.slice(0,12)}.zip`,PAGES_RUN:'https://github.com/LuckyGeorge1975/tdc.game.goblin/actions/runs/12'};
   const github={rest:{git:{
     async getRef(){if(!current)throw {status:404};return {data:{object:current}};},
@@ -52,7 +52,7 @@ test('creation races accept only an already-created identical commit',async()=>{
   await assert.rejects(record(setup(null,{race:{type:'commit',sha:other}})),/another commit/);
 });
 test('missing or inconsistent provenance fails before API mutations',async()=>{
-  for(const [key,value] of [['PACKAGE_SHA256','bad'],['PAGES_RUN','https://example.org/12'],['RELEASE_TAG','v0.1.31'],['PACKAGE_FILENAME','goblin-v0.1.31-html5-aaaaaaaaaaaa.zip']]){
+  for(const [key,value] of [['GITHUB_RUN_ATTEMPT',''],['PACKAGE_SHA256','bad'],['PAGES_RUN','https://example.org/12'],['RELEASE_TAG','v0.1.31'],['PACKAGE_FILENAME','goblin-v0.1.31-html5-aaaaaaaaaaaa.zip']]){
     const f=setup();f.env[key]=value;await assert.rejects(record(f));assert.deepEqual(f.calls,[]);
   }
 });

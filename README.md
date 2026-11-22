@@ -2,9 +2,9 @@
 
 G.O.B.L.I.N. steht für **Ground Operations, Battlefield Logistics & Intelligence Network**. Der Browserprototyp ist ein rundenbasiertes Taktikspiel auf einer Hexkarte. Versionsbasis ist [v0.1.32](CHANGELOG.md#0132---2026-11-22).
 
-![FULL Atlas Proving Grounds, Build 31, Zug 1 in der Bewegungsphase](docs/images/field-test-0.1.31-full-atlas.webp)
+![FULL Atlas Proving Grounds, Build 32, Zug 1 in der Bewegungsphase](docs/images/field-test-0.1.32-full-atlas.webp)
 
-[Herkunft und Prüfung der historischen Aufnahme aus Build 31](reports/TEST_HANDOFF.md#readme-aufnahme-build-31)
+[Herkunft und Prüfung der Aufnahme aus Build 32](reports/TEST_HANDOFF.md#readme-aufnahme-build-32)
 
 ## Lokal starten
 
