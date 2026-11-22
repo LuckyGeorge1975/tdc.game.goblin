@@ -108,6 +108,7 @@ jobs:
           printf 'run=%s\n' "$pages_run" >> "$GITHUB_OUTPUT"
       - name: Upload browser build to itch.io
         id: upload
+        shell: bash
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
           RELEASE_VERSION: ${{ needs.package.outputs.version }}

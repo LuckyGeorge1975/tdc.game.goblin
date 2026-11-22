@@ -1,7 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import record from '../scripts/record-itch-release.cjs';
+import {readFileSync} from 'node:fs';
 const sha='a'.repeat(40), other='b'.repeat(40);
+test('Butler log pipeline uses the explicit GitHub bash pipefail shell before marking success',()=>{
+  const workflow=readFileSync(new URL('../.github/workflows/deploy-itch.yml',import.meta.url),'utf8');
+  const upload=workflow.split('      - name: Upload browser build to itch.io')[1].split('      - name: Retain successful Butler output')[0];
+  assert.match(upload,/\r?\n        shell: bash\r?\n/);
+  assert.ok(upload.indexOf('butler" push')<upload.indexOf('verified=true'));
+  assert.match(workflow,/if: \$\{\{ inputs.publish && needs.publish.result == 'success' \}\}/);
+});
 function setup(object=null,{race=null}={}) {
   const calls=[];
   let current=object;
