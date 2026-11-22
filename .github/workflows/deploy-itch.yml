@@ -53,6 +53,10 @@ jobs:
   publish:
     if: ${{ inputs.publish && github.ref == 'refs/heads/main' && github.repository == 'LuckyGeorge1975/tdc.game.goblin' }}
     needs: package
+    outputs:
+      pages_run: ${{ steps.pages.outputs.run }}
+      upload_verified: ${{ steps.upload.outputs.verified }}
+      upload_log_sha256: ${{ steps.upload.outputs.log_sha256 }}
     permissions:
       actions: read
     runs-on: ubuntu-latest
@@ -80,6 +84,7 @@ jobs:
           unzip -q "$archive" -d "$RUNNER_TEMP/butler"
           chmod +x "$RUNNER_TEMP/butler/linux-amd64/butler"
       - name: Confirm the current Pages release
+        id: pages
         env:
           GH_TOKEN: ${{ github.token }}
           EXPECTED_SHA: ${{ inputs.pages_commit }}
@@ -100,7 +105,9 @@ jobs:
             --output "$RUNNER_TEMP/published-release.js"
           diff --strip-trailing-cr "$RUNNER_TEMP/packaged-release.js" "$RUNNER_TEMP/published-release.js"
           printf 'Pages workflow: %s\n' "$pages_run" >> "$GITHUB_STEP_SUMMARY"
+          printf 'run=%s\n' "$pages_run" >> "$GITHUB_OUTPUT"
       - name: Upload browser build to itch.io
+        id: upload
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
           RELEASE_VERSION: ${{ needs.package.outputs.version }}
@@ -110,5 +117,48 @@ jobs:
             exit 1
           fi
           "$RUNNER_TEMP/butler/linux-amd64/butler" push "$RUNNER_TEMP/itch-build/$ZIP_NAME" \
-            luckygeorge/goblin:html5 --userversion "$RELEASE_VERSION"
+            luckygeorge/goblin:html5 --userversion "$RELEASE_VERSION" 2>&1 | tee "$RUNNER_TEMP/butler-upload.log"
+          printf 'verified=true\nlog_sha256=%s\n' "$(sha256sum "$RUNNER_TEMP/butler-upload.log" | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
           printf 'Uploaded version %s to `luckygeorge/goblin:html5`.\n' "$RELEASE_VERSION" >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain successful Butler output
+        uses: actions/upload-artifact@v4
+        with:
+          name: itch-upload-log
+          path: ${{ runner.temp }}/butler-upload.log
+          if-no-files-found: error
+
+  record-release:
+    if: ${{ inputs.publish && needs.publish.result == 'success' }}
+    needs: [package, publish]
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout trusted workflow helpers
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Record immutable itch release tag
+        uses: actions/github-script@v7
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          PAGES_COMMIT: ${{ inputs.pages_commit }}
+          RELEASE_VERSION: ${{ needs.package.outputs.version }}
+          PACKAGE_SHA256: ${{ needs.package.outputs.sha256 }}
+          PACKAGE_FILENAME: ${{ needs.package.outputs.filename }}
+          PAGES_RUN: ${{ needs.publish.outputs.pages_run }}
+          UPLOAD_VERIFIED: ${{ needs.publish.outputs.upload_verified }}
+          UPLOAD_LOG_SHA256: ${{ needs.publish.outputs.upload_log_sha256 }}
+          PUBLISH_RESULT: ${{ needs.publish.result }}
+        with:
+          script: |
+            const record = require('./scripts/record-itch-release.cjs');
+            const receipt = await record({github, context, env: process.env});
+            require('node:fs').writeFileSync('itch-release-receipt.json', JSON.stringify(receipt, null, 2) + '\n');
+            await core.summary.addHeading('Verified itch.io release').addCodeBlock(JSON.stringify(receipt, null, 2), 'json').write();
+      - name: Retain release tag receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: itch-release-receipt
+          path: itch-release-receipt.json
+          if-no-files-found: error
