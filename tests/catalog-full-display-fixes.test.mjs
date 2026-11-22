@@ -9,14 +9,17 @@ test('saved FULL draft without a limit omits the counter, while a real limit is 
   const body = cut(ui,'      if(state.fullStatus){','      status.title=');
   g.run(`
     function renderLimit(fullStatus) {
-      const state={fullStatus},status={textContent:''},t=(key,params)=>[key,params?.current,params?.limit].join('/');
+      const state={fullStatus},status={textContent:''},t=(key,params)=>key==='v2.full.remainingObjectives'?[key,params.count].join('/'):[key,params?.current,params?.limit].join('/');
       ${body}
       return status.textContent;
     }
   `);
-  assert.equal(g.run('renderLimit(GoblinCatalogFullRuntime.status())'),'');
+  const remaining=g.run('GoblinCatalogFullRuntime.status().remainingObjectives');
+  assert.ok(Number.isSafeInteger(remaining));
+  assert.equal(g.run('renderLimit(GoblinCatalogFullRuntime.status())'),` · v2.full.remainingObjectives/${remaining}`);
   assert.equal(g.run('renderLimit({turnLimit:null,enemyTurns:0})'),'');
   assert.equal(g.run('renderLimit({turnLimit:8,enemyTurns:2})'),' · v2.full.limit.status/2/8');
+  assert.equal(g.run('renderLimit({turnLimit:8,enemyTurns:2,remainingObjectives:3})'),' · v2.full.limit.status/2/8 · v2.full.remainingObjectives/3');
   const briefing = cut(flow,'          if(Number.isSafeInteger(full.turnLimit)','        const conditions');
   g.run(`function briefingLimit(full){
     const output=[],header={append(value){output.push(value)}},paragraph=x=>x,t=(key,{limit})=>[key,limit].join('/');

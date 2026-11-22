@@ -115,9 +115,11 @@ test('only a successful start or accepted restart requests the initial view afte
 test('Iron Dust difficulty control starts at Medium, updates the choice and is scoped to its briefing',()=>{
   const start=flow.indexOf('    function difficultyControl(');
   const end=flow.indexOf('    function updateEditor(',start);
-  const context={campaign:null,briefingDifficulty:'medium',t:key=>key,IronDustBrowserV2:{
-    seatManager:()=>({seats:[{}, {ai:['weak','medium','strong'].map(id=>({id}))}]})},
-    document:{createElement:tag=>({tag,children:[],append(node){this.children.push(node)}})}};
+  const node=tag=>({tag,children:[],attributes:{},append(...nodes){this.children.push(...nodes)},setAttribute(key,value){this.attributes[key]=value}});
+  const context={campaign:null,briefingDifficulty:'medium',t:key=>key,
+    paragraph:copy=>({...node('p'),textContent:copy}),IronDustBrowserV2:{
+    seatManager:()=>({minimumDifficulty:null,seats:[{}, {ai:['weak','medium','strong'].map(id=>({id}))}]})},
+    document:{createElement:node}};
   runInNewContext(flow.slice(start,end),context);
   const [select]=context.difficultyControl().children;
   assert.equal(select.value,'medium');
@@ -126,5 +128,7 @@ test('Iron Dust difficulty control starts at Medium, updates the choice and is s
   select.onchange();
   assert.equal(context.difficultyControl().children[0].value,'weak');
   assert.match(flow,/if \(next === 'briefing' && previous !== 'briefing'\) \{\s*briefingDifficulty = 'medium'/);
-  assert.match(flow,/if \(missionId === 'iron-dust-v2' && data\) \{\s*header\.append\(ironDustAttackerControl\(\), difficultyControl\(\)\)/);
+  const briefing=flow.slice(flow.indexOf("        if (missionId === 'iron-dust-v2' && data) {"),flow.indexOf('        if (campaign?.index === 0'));
+  assert.match(briefing,/header\.append\(ironDustAttackerControl\(\), difficultyControl\(\)\)/);
+  assert.match(briefing,/note\.id='v2-iron-minimum-note'/);
 });

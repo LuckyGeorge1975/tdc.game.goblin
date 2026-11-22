@@ -75,7 +75,7 @@ test('Siegebreaker intel uses localized compact weapon names and exposes full la
 
 for(const runtime of ['core','legacy'])test(`active ${runtime} intel uses exact contextual names across language changes, repeats and Undo`,async()=>{
   const {context,intel,live,setLanguage}=await scene('de',runtime),before=JSON.stringify(context.state);
-  const expected={de:['Wrack: Feindlicher Skimmer','Wrack: Belagerungspanzer','Wrack: Scout Alpha'],
+  const expected={de:['Wrack: Raider-Skimmer','Wrack: Belagerungspanzer','Wrack: Scout Alpha'],
     en:['Wreck: Raider Skimmer','Wreck: Siege Tank','Wreck: Scout Alpha'],
     es:['Restos: Deslizador asaltante','Restos: Tanque de asedio','Restos: Scout Alpha'],
     fr:['Épave : Aéroglisseur maraudeur','Épave : Char de siège','Épave : Scout Alpha']};
@@ -99,7 +99,7 @@ test('wreck name lookup validates visual context and keeps custom/unknown names 
   const {context}=await scene('de','legacy'),label=context.UnitVisuals.wreckLabel;
   assert.equal(label({id:'guard',name:'GUARD TANK',visualKey:'guard-tank'}),'Wrack: Wachpanzer');
   assert.equal(label({id:'guard',name:'SIEGE TANK',visualKey:'siege-tank'}),'Wrack: Belagerungspanzer');
-  assert.equal(label({unitId:'raider',nameKeyOrRuntimeName:'RAIDER SKIMMER',visualKey:'raider-skimmer'}),'Wrack: Feindlicher Skimmer');
+  assert.equal(label({unitId:'raider',nameKeyOrRuntimeName:'RAIDER SKIMMER',visualKey:'raider-skimmer'}),'Wrack: Raider-Skimmer');
   assert.equal(label({id:'raider',name:'RAIDER SKIMMER',visualKey:'siege-tank'}),'Wrack: RAIDER SKIMMER');
   assert.equal(label({id:'raider',name:'Custom Falcon',visualKey:'raider-skimmer'}),'Wrack: Custom Falcon');
   assert.equal(label({id:'unknown',name:'Custom Beacon',visualKey:'unmapped'}),'Wrack: Custom Beacon');

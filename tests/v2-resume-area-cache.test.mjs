@@ -60,7 +60,7 @@ function scene() {
     record(value) { records.push(value); },
   };
   runInNewContext(`
-    const attackerOwner=null, manualDefense=null, defensePort={suppressesAutomaticDefense:false};
+    const attackerOwner=null, defenderOwner=null, manualDefense=null, defensePort={suppressesAutomaticDefense:false};
     const fullSeatBinding=null;
     ${queryReadySource}
     globalThis.IronDustBrowserV2 = {

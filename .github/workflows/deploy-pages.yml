@@ -25,9 +25,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Use qualified test runtime
+        # The source-bound experiment parser qualifies this exact Node/Acorn build.
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.14.0'
+      - name: Confirm test runtime
+        run: node --version
       - name: Verify release handoff
         run: |
-          previous_tag="$(git describe --tags --abbrev=0 HEAD^)"
+          previous_tag="$(git describe --tags --match 'v[0-9]*' --abbrev=0 HEAD^)"
           node scripts/verify-release.mjs --previous="$previous_tag"
       - name: Run regression tests
         run: node --test tests/*.test.mjs
