@@ -24,6 +24,8 @@ Danach [localhost:4173](http://localhost:4173) öffnen. Der Spieleinstieg ist `i
 
 ## Regeln, Tests und Build
 
+Lokales Autoplay und Feuerzieltraining starten über `scripts/Start-AiAutoplay.ps1` und `scripts/Start-AiTraining.ps1`. Der [Werkzeugleitfaden](docs/AI-TRAINING.md) beschreibt den dynamischen Levelordner, Gesamtbudget, Stop/Resume und die Modellgrenzen. Diese Werkzeuge führen keine automatische Produktübernahme durch.
+
 Regel Stark kann auf großen Karten lange rechnen. Eine allgemeine Antwortzeit ist nicht zugesichert. Die Auswahl Trainiert bedeutet keinen nachgewiesenen Spielstärkevorteil; die neu untersuchten Trainingsmodelle werden nicht übernommen.
 
 Die [Projektdokumentation](docs/README.md) führt die [Regelmatrix](docs/RULE_MATRIX.md), die Architektur und die aktuellen Herkunftshinweise. [Content & Asset Notices](docs/CONTENT-NOTICES.md) dokumentiert die verwendeten Grafiken und Modelle.

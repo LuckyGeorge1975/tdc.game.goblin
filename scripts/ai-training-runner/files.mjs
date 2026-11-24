@@ -1,5 +1,5 @@
 import {createHash,randomUUID} from 'node:crypto';
-import {readFile,writeFile,rename,mkdir,open,readdir,unlink} from 'node:fs/promises';
+import {readFile,rename,mkdir,open,readdir,unlink} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {hostname} from 'node:os';
 export const hash=value=>createHash('sha256').update(value).digest('hex');
@@ -38,6 +38,10 @@ export async function lock(root,resume=false){
    await unlink(path);await once(path,owner);
   }finally{await unlink(recovery);}
  }
+ try{
+  const rows=await events(root);
+  if(rows.some(e=>e.type==='child-start'&&!rows.some(done=>done.type==='child-exit'&&done.token===e.token)&&alive(e.pid)))throw Error('OWNED_CHILD_STILL_ALIVE');
+ }catch(error){const current=await read(path);if(current.token===token)await unlink(path);throw error;}
  return async()=>{const current=await read(path);if(current.token!==token||current.pid!==process.pid||current.host!==hostname())throw Error('LOCK_OWNER_CHANGED');await unlink(path);};
 }
 export async function initialize(root){await mkdir(root,{recursive:false});for(const dir of ['journal','attempts','snapshots','fit'])await mkdir(resolve(root,dir));}

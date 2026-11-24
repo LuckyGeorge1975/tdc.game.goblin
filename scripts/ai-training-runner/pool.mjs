@@ -9,7 +9,7 @@ export async function discover(directory,validateLevel){
  }}await visit(base);
  for(const path of files){
   const bytes=await readFile(path);if(bytes.length>1024*1024)throw Error('LEVEL_FILE_TOO_LARGE');
-  let parsed;try{parsed=JSON.parse(bytes.toString('utf8'));}catch{throw Error('LEVEL_JSON_INVALID: '+path);}
+  let parsed;try{parsed=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}catch{throw Error('LEVEL_JSON_INVALID: '+path);}
   const list=parsed?.version==='goblin-level-package-v3'&&Object.keys(parsed).sort().join(',')==='levels,version'?parsed.levels:[parsed];
   if(!Array.isArray(list)||!list.length)throw Error('LEVEL_PACKAGE_EMPTY');
   for(const level of list){

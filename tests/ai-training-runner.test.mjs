@@ -28,6 +28,17 @@ test('fixed masterseed gives balanced maps and seat pairings, disjoint seeds and
  const seeds=[...plan.data,...plan.evaluation].map(j=>j.seed);assert.equal(new Set(seeds).size,seeds.length);
  assert.ok(plan.data.filter(j=>j.levelId==='c').every(j=>j.seats.player==='medium'&&j.seats.enemy==='medium'));
  for(const patch of [{maxGames:1001},{maxEpochs:5001},{workers:2},{evaluationGames:29},{strategies:['human']}])assert.throws(()=>configuration(patch));
+ for(const invalid of [null,[],false])assert.throws(()=>configuration(invalid));
+});
+test('native trained originals remain scheduled while model arms obey their separate controlled-seat capabilities',()=>{
+ const pool={levels:[{id:'a'}]},config=configuration({maxGames:100,evaluationGames:30,strategies:['medium','trained']});
+ const overlays=(_l,p,e)=>['player','enemy'].filter(s=>(s==='player'?p:e)==='medium');
+ const plan=makePlan(pool,config,()=>true,overlays);
+ assert.ok(plan.data.some(f=>f.seats.player==='trained'&&f.seats.enemy==='trained'));
+ assert.ok(plan.evaluation.some(f=>f.sides.length===1));
+ assert.ok(plan.evaluation.every(f=>f.sides.every(s=>f.seats[s]==='medium')));
+ const rawOnly=makePlan(pool,configuration({...config,strategies:['trained']}),()=>true,()=>[]);
+ assert.ok(rawOnly.data.length);assert.deepEqual(rawOnly.evaluation,[]);assert.deepEqual(rawOnly.evaluationExcludedLevels,['a']);
 });
 test('exclusive controller lock, immutable journal chain and atomic status detect a competing writer and tampering',async()=>{
  const parent=await temporary(),root=resolve(parent,'run');await initialize(root);
@@ -35,6 +46,7 @@ test('exclusive controller lock, immutable journal chain and atomic status detec
  const log=await journal(root);await log.append({type:'manifest-bound',manifestDigest:'a'});await log.append({type:'game-start',jobId:'one'});
  assert.equal((await events(root)).length,2);
  const path=resolve(root,'journal','00000001.json'),row=JSON.parse(await readFile(path));row.jobId='tampered';await writeFile(path,JSON.stringify(row));await assert.rejects(events(root),/DIGEST/);
- await release();const again=await lock(root);await again();
+ await release();await assert.rejects(lock(root),/DIGEST/);
+ const clean=resolve(parent,'clean');await initialize(clean);const cleanRelease=await lock(clean);await cleanRelease();const again=await lock(clean);await again();
  await once(resolve(root,'immutable.json'),{});await assert.rejects(once(resolve(root,'immutable.json'),{}),{code:'EEXIST'});
 });

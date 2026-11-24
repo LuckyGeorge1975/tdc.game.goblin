@@ -1,5 +1,5 @@
 import {readFile,writeFile} from 'node:fs/promises';
-import {resolve} from 'node:path';
+import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const [requestPath]=process.argv.slice(2);
 const stop=new AbortController();
@@ -10,6 +10,7 @@ const started=new Promise((accept,reject)=>{process.once('disconnect',()=>reject
 const request=JSON.parse(await readFile(requestPath,'utf8'));
 await started;
 if(request.engineRoot!==fileURLToPath(new URL('../../',import.meta.url)))throw Error('CHILD_ENGINE_ROOT_CHANGED');
+if(request.runRoot!==resolve(dirname(requestPath),'capture')||request.returnPath!==resolve(dirname(requestPath),'returned.json'))throw Error('CHILD_CASE_ROOT_CHANGED');
 const core=await import(new URL('../ai-training-core/index.mjs',import.meta.url));
 try{
  const result=await core.runCase({...request,signal:stop.signal});

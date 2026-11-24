@@ -1,9 +1,11 @@
 import {readFile} from 'node:fs/promises';
-import {resolve} from 'node:path';
+import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-const request=JSON.parse(await readFile(process.argv[2],'utf8'));
+const requestPath=process.argv[2],request=JSON.parse(await readFile(requestPath,'utf8'));
 if(request.engineRoot!==fileURLToPath(new URL('../../',import.meta.url)))throw Error('CHILD_ENGINE_ROOT_CHANGED');
+if(request.runRoot!==resolve(dirname(requestPath),'capture')||request.returnPath!==resolve(dirname(requestPath),'returned.json'))throw Error('CHILD_CASE_ROOT_CHANGED');
 const core=await import(new URL('../ai-training-core/index.mjs',import.meta.url));
 const result=JSON.parse(await readFile(request.returnPath,'utf8'));
+const started=performance.now(),cpu=process.cpuUsage();
 await core.verifyCase({engineRoot:request.engineRoot,caseRoot:request.runRoot,result,manifest:request.manifest});
-process.send?.({verified:true});process.disconnect?.();
+process.send?.({verified:true,timing:{wallMs:performance.now()-started,cpuUs:process.cpuUsage(cpu),animations:0}});process.disconnect?.();
