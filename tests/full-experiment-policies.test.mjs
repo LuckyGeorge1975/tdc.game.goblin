@@ -51,7 +51,7 @@ test('runtime qualification invokes exactly the registered native Medium callbac
   if(side==='enemy')for(let i=0;i<3;i++)assert.equal(port.commit('human',port.open('human').permit,{type:'EndPhase'},player.dispatch).ok,true);
   const adapter=createOwnedFullCatalogAiAdapter(port,player), batch=adapter.open(side);
   assert.equal(batch.ok,true);assert.ok(batch.view.tactics?.crt);
-  const selected=port.qualifiedSelector()(batch);
+  const selected=await port.qualifiedSelector()(batch);
   assert.equal(selected,batch.candidates[0].key);assert.equal(calls,1);assert.equal(seen,batch);
   assert.deepEqual(registered.finish('native'),{synthetic:true});
   port.leave();assert.equal(port.qualifiedSelector(),null);

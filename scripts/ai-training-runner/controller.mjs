@@ -19,6 +19,12 @@ async function tooling(){
  return Promise.all(files.sort().map(async path=>({path,sha256:hash((await readFile(resolve(engineRoot,path),'utf8')).replaceAll('\r\n','\n'))})));
 }
 async function exists(path){try{await stat(path);return true;}catch(e){if(e.code==='ENOENT')return false;throw e;}}
+function checkEvaluation(start,request,rows){
+ if(start?.split!=='test')return;
+ const frozen=rows.find(e=>e.type==='models-frozen'&&e.sequence<start.sequence);
+ if(!frozen||start.modelFreezeSha256!==frozen.sha256||hash(canonical(frozen.freeze))!==frozen.sha256)throw Error('EVALUATION_FREEZE_BINDING_CHANGED');
+ if(request.model&&!frozen.freeze.models.some(item=>canonical(item.model)===canonical(request.model)))throw Error('EVALUATION_MODEL_NOT_FROZEN');
+}
 export async function start({output,levelDirectory,config,resume=false}){
  const core=await coreApi(),root=resolve(output);let manifest;
  if(!resume){
@@ -63,6 +69,7 @@ async function operate(root,manifest,phase,resume,core,options={}){
    if(hash(canonical(result))!==entry.resultSha256)throw Error('RESULT_TAMPERED');
    const requestPath=resolve(root,entry.attempt,'request.json'),request=await read(requestPath);
    if(log.rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt)?.requestSha256!==hash(canonical(request)))throw Error('CASE_REQUEST_CHANGED');
+   checkEvaluation(log.rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt),request,log.rows);
    await freshVerify(requestPath);
    completed.set(entry.jobId,{result,attempt:entry.attempt});
   }
@@ -72,6 +79,7 @@ async function operate(root,manifest,phase,resume,core,options={}){
    if(completed.has(entry.jobId)||!await exists(resolve(root,entry.attempt,'returned.json')))continue;
    const requestPath=resolve(root,entry.attempt,'request.json'),request=await read(requestPath);
    if(entry.requestSha256!==hash(canonical(request)))throw Error('CASE_REQUEST_CHANGED');
+   checkEvaluation(entry,request,log.rows);
    let result;try{result=await read(resolve(root,entry.attempt,'returned.json'));}catch(error){if(error instanceof SyntaxError)continue;throw error;}
    if(!['native','technical-limit'].includes(result.completion))continue;
    await freshVerify(requestPath);
@@ -97,7 +105,9 @@ async function operate(root,manifest,phase,resume,core,options={}){
    const request={engineRoot,runRoot:resolve(dir,'capture'),returnPath:resolve(dir,'returned.json'),manifest:evaluationManifest??manifest,caseId:jobId,level,seed:family.seed,seats:family.seats,
     intervention,model,limits:{commandLimit:manifest.config.commandLimit,roundLimit:manifest.config.roundLimit,wallMs:null,workers:1}};
    await once(resolve(dir,'request.json'),request);
-   await log.append({type:'game-start',jobId,attempt,split:family.split,token,requestSha256:hash(canonical(request))});
+   const modelFreezeSha256=isTest?log.rows.find(e=>e.type==='models-frozen')?.sha256:null;
+   if(isTest&&!modelFreezeSha256)throw Error('EVALUATION_REQUIRES_FROZEN_MODELS');
+   await log.append({type:'game-start',jobId,attempt,split:family.split,token,modelFreezeSha256,requestSha256:hash(canonical(request))});
    await status({status:'RUNNING',jobId});
    const started=performance.now(),cpu=process.cpuUsage();
    let exit;
@@ -190,7 +200,9 @@ async function operate(root,manifest,phase,resume,core,options={}){
     freeze={manifestDigest,datasetSha256:hash(dataBytes),fitPolicy,models};if(await exists(resolve(root,'freeze.json')))throw Error('FREEZE_WITHOUT_JOURNAL');await log.append({type:'models-frozen',sha256:hash(canonical(freeze)),freeze});await atomic(resolve(root,'freeze.json'),freeze);
    }
    if(freeze.manifestDigest!==manifestDigest||freeze.datasetSha256!==hash(dataBytes)||log.rows.find(e=>e.type==='models-frozen')?.sha256!==hash(canonical(freeze)))throw Error('MODEL_FREEZE_TAMPERED');
-   const evaluationManifest={...manifest,modelFreeze:freeze},outcomes=[];
+   // Model headers retain their original training-manifest identity. The prior
+   // models-frozen journal event and each game-start bind the evaluation bytes.
+   const evaluationManifest=manifest,outcomes=[];
    for(const family of manifest.plan.evaluation){
     const reference=await game(family,'reference',null,null,evaluationManifest);if(!reference)break;
     for(const side of family.sides){
@@ -220,7 +232,7 @@ async function operate(root,manifest,phase,resume,core,options={}){
  finally{stopWatcher?.close();process.off('SIGINT',stop);process.off('SIGTERM',stop);await release();}
 }
 export async function stopRun(output){await atomic(resolve(output,'STOP'),{requestedAt:new Date().toISOString()});}
-export async function inspect(output,verify=false){const root=resolve(output),manifest=await read(resolve(root,'manifest.json')),rows=await events(root);if(verify){const core=await coreApi();await checkBinding(manifest,core);if(rows.find(e=>e.type==='manifest-bound')?.manifestDigest!==hash(canonical(manifest)))throw Error('MANIFEST_TAMPERED');for(const entry of rows.filter(e=>e.type==='game-complete')){const result=await read(resolve(root,entry.resultPath));if(hash(canonical(result))!==entry.resultSha256)throw Error('RESULT_TAMPERED');const requestPath=resolve(root,entry.attempt,'request.json');if(rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt)?.requestSha256!==hash(canonical(await read(requestPath))))throw Error('CASE_REQUEST_CHANGED');await freshVerify(requestPath);}
+export async function inspect(output,verify=false){const root=resolve(output),manifest=await read(resolve(root,'manifest.json')),rows=await events(root);if(verify){const core=await coreApi();await checkBinding(manifest,core);if(rows.find(e=>e.type==='manifest-bound')?.manifestDigest!==hash(canonical(manifest)))throw Error('MANIFEST_TAMPERED');for(const entry of rows.filter(e=>e.type==='game-complete')){const result=await read(resolve(root,entry.resultPath));if(hash(canonical(result))!==entry.resultSha256)throw Error('RESULT_TAMPERED');const requestPath=resolve(root,entry.attempt,'request.json');if(rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt)?.requestSha256!==hash(canonical(await read(requestPath))))throw Error('CASE_REQUEST_CHANGED');checkEvaluation(rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt),await read(requestPath),rows);await freshVerify(requestPath);}
  const policy=rows.find(e=>e.type==='fit-policy-bound');
  if(policy){if(hash(canonical(policy.policy))!==policy.sha256)throw Error('FIT_POLICY_CHANGED');if(await exists(resolve(root,'fit-policy.json'))&&hash(canonical(await read(resolve(root,'fit-policy.json'))))!==policy.sha256)throw Error('FIT_POLICY_CHANGED');}
  const frozen=rows.find(e=>e.type==='models-frozen');
