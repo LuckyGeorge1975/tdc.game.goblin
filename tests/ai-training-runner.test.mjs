@@ -5,7 +5,8 @@ import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {discover} from '../scripts/ai-training-runner/pool.mjs';
 import {makePlan,configuration} from '../scripts/ai-training-runner/plan.mjs';
-import {initialize,once,events,journal,lock} from '../scripts/ai-training-runner/files.mjs';
+import {initialize,once,events,journal,lock,hash,canonical} from '../scripts/ai-training-runner/files.mjs';
+import {assertPlannedRequest,assertResultIdentity,assertBoundJob} from '../scripts/ai-training-runner/job-identity.mjs';
 const temporary=async()=>{const base=fileURLToPath(new URL('../.tools/runner-tests/',import.meta.url));await mkdir(base,{recursive:true});return mkdtemp(resolve(base,'case-'));};
 const validateLevel=async({level})=>{assert.equal(level.version,'goblin-level-v3');return {level,strategies:{player:['weak','medium'],enemy:['medium']}};};
 test('recursive level discovery snapshots packages, detects additions/removals, and rejects empty/duplicate/malformed pools',async()=>{
@@ -49,4 +50,44 @@ test('exclusive controller lock, immutable journal chain and atomic status detec
  await release();await assert.rejects(lock(root),/DIGEST/);
  const clean=resolve(parent,'clean');await initialize(clean);const cleanRelease=await lock(clean);await cleanRelease();const again=await lock(clean);await again();
  await once(resolve(root,'immutable.json'),{});await assert.rejects(once(resolve(root,'immutable.json'),{}),{code:'EEXIST'});
+});
+function identityFixture(){
+ const seats={player:'medium',enemy:'medium'},level={id:'map',version:'goblin-level-v3',scenarioVersion:1};
+ const manifest={binding:{codeSha256:'bound-code'},config:{commandLimit:20,roundLimit:3},pool:{levels:[{id:'map',level,validation:{levelDigest:'native-digest'}}]},plan:{data:[{id:'data-00000',levelId:'map',seed:7,seats,split:'train'}],evaluation:[{id:'test-00000',levelId:'map',seed:8,seats,split:'test',sides:['player','enemy']}]}};
+ const request={manifest,caseId:'data-00000-reference',level,seed:7,seats,limits:{commandLimit:20,roundLimit:3,wallMs:null,workers:1},runRoot:resolve('case','capture'),intervention:null,model:null};
+ const result={binding:manifest.binding,caseId:request.caseId,seed:7,seats,level:'map',caseRoot:request.runRoot,manifestSha256:hash(canonical(manifest)),completion:'native',levelDigest:'native-digest',intervention:null,model:null};
+ return {request,result};
+}
+test('job identity rejects intact results assigned to another planned slot and every changed execution identity',()=>{
+ const {request,result}=identityFixture();assert.doesNotThrow(()=>assertResultIdentity(request,result));
+ const different={...request,caseId:'test-00000-reference',seed:8};assert.doesNotThrow(()=>assertPlannedRequest(different));assert.throws(()=>assertResultIdentity(different,result),/JOB_IDENTITY/);
+ for(const patch of [{caseId:'missing'},{seed:9},{seats:{player:'weak',enemy:'medium'}},{level:{...request.level,scenarioVersion:2}},{limits:{...request.limits,commandLimit:21}},{intervention:{side:'player'}},{model:{side:'player',sha256:'a'.repeat(64)}}])assert.throws(()=>assertPlannedRequest({...request,...patch}),/JOB_IDENTITY/);
+ for(const patch of [{caseId:'other'},{seed:9},{seats:{player:'weak',enemy:'medium'}},{level:'other'},{levelDigest:'other'},{caseRoot:resolve('other','capture')},{manifestSha256:'other'},{binding:{codeSha256:'other'}},{intervention:{side:'player'}},{model:{side:'player',sha256:'a'.repeat(64)}}])assert.throws(()=>assertResultIdentity(request,{...result,...patch}),/JOB_IDENTITY/);
+ const intervention={caseId:request.caseId,seed:7,side:'player',commandIndex:0};
+ const alternative={...request,caseId:'data-00000-alternative-player',intervention};
+ assert.doesNotThrow(()=>assertResultIdentity(alternative,{...result,caseId:alternative.caseId,intervention:{...intervention,caseId:alternative.caseId}}));
+ assert.throws(()=>assertResultIdentity(alternative,{...result,caseId:alternative.caseId,intervention:{...intervention,caseId:alternative.caseId,commandIndex:1}}),/RESULT_INTERVENTION/);
+ const model={side:'enemy',sha256:'a'.repeat(64),path:'frozen.json',trainingDataSha256:'b'.repeat(64)},candidate={...request,caseId:'test-00000-candidate-enemy',seed:8,model};
+ assert.doesNotThrow(()=>assertResultIdentity(candidate,{...result,caseId:candidate.caseId,seed:8,model:{side:'enemy',sha256:model.sha256}}));
+ assert.throws(()=>assertResultIdentity(candidate,{...result,caseId:candidate.caseId,seed:8,model:{side:'enemy',sha256:'c'.repeat(64)}}),/RESULT_MODEL/);
+});
+test('worker request trust comes from the run manifest and pre-spawn journal, including prior model freeze',async()=>{
+ const parent=await temporary(),root=resolve(parent,'run');await initialize(root);const {request}=identityFixture();
+ const dir=resolve(root,'attempts','slot');await mkdir(dir);const path=resolve(dir,'request.json');request.runRoot=resolve(dir,'capture');
+ await once(resolve(root,'manifest.json'),request.manifest);await once(path,request);
+ const log=await journal(root);await log.append({type:'manifest-bound',manifestDigest:hash(canonical(request.manifest))});
+ await log.append({type:'game-start',attempt:'attempts/slot',jobId:request.caseId,split:'train',requestSha256:hash(canonical(request))});
+ await assert.doesNotReject(assertBoundJob(request,path));
+ await assert.rejects(assertBoundJob({...request,seed:9},path),/JOB_IDENTITY/);
+ const forged=structuredClone(request);forged.manifest.plan.data[0].seed=9;forged.seed=9;
+ await assert.rejects(assertBoundJob(forged,path),/TRUSTED_MANIFEST/);
+ const model={side:'player',sha256:'a'.repeat(64),path:'frozen.json',trainingDataSha256:'b'.repeat(64)},freeze={manifestDigest:hash(canonical(request.manifest)),models:[{model}]};
+ await log.append({type:'models-frozen',freeze,sha256:hash(canonical(freeze))});
+ const testDir=resolve(root,'attempts','eval');await mkdir(testDir);const testPath=resolve(testDir,'request.json');
+ const candidate={...request,caseId:'test-00000-candidate-player',seed:8,model,runRoot:resolve(testDir,'capture')};await once(testPath,candidate);
+ await log.append({type:'game-start',attempt:'attempts/eval',jobId:candidate.caseId,split:'test',modelFreezeSha256:hash(canonical(freeze)),requestSha256:hash(canonical(candidate))});
+ await assert.doesNotReject(assertBoundJob(candidate,testPath));
+ const foreignDir=resolve(root,'attempts','foreign');await mkdir(foreignDir);const foreign={...candidate,model:{...model,sha256:'f'.repeat(64)}};
+ await log.append({type:'game-start',attempt:'attempts/foreign',jobId:foreign.caseId,split:'test',modelFreezeSha256:hash(canonical(freeze)),requestSha256:hash(canonical(foreign))});
+ await assert.rejects(assertBoundJob(foreign,resolve(foreignDir,'request.json')),/FROZEN_MODEL/);
 });

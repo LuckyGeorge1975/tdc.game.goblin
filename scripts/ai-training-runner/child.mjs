@@ -1,6 +1,7 @@
 import {readFile,writeFile} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {assertBoundJob,assertResultIdentity} from './job-identity.mjs';
 const [requestPath]=process.argv.slice(2);
 const stop=new AbortController();
 process.on('message',message=>{if(message?.type==='stop')stop.abort();});
@@ -13,7 +14,9 @@ if(request.engineRoot!==fileURLToPath(new URL('../../',import.meta.url)))throw E
 if(request.runRoot!==resolve(dirname(requestPath),'capture')||request.returnPath!==resolve(dirname(requestPath),'returned.json'))throw Error('CHILD_CASE_ROOT_CHANGED');
 const core=await import(new URL('../ai-training-core/index.mjs',import.meta.url));
 try{
+ await assertBoundJob(request,requestPath);
  const result=await core.runCase({...request,signal:stop.signal});
+ assertResultIdentity(request,result);
  await writeFile(request.returnPath,JSON.stringify(result)+'\n',{flag:'wx'});
  process.send?.({type:'complete'});
 }catch(error){console.error(error.stack??String(error));process.exitCode=1;}

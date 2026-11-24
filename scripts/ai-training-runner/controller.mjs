@@ -9,6 +9,7 @@ import {hash,canonical,read,once,atomic,initialize,journal,lock,events} from './
 import {discover} from './pool.mjs';
 import {configuration,makePlan} from './plan.mjs';
 import {report} from './report.mjs';
+import {assertPlannedRequest} from './job-identity.mjs';
 const engineRoot=fileURLToPath(new URL('../../',import.meta.url));
 const coreApi=()=>import(new URL('../ai-training-core/index.mjs',import.meta.url));
 const legalSeats=(entry,p,e)=>entry.validation.strategies.player.includes(p)&&entry.validation.strategies.enemy.includes(e);
@@ -68,6 +69,7 @@ async function operate(root,manifest,phase,resume,core,options={}){
    const result=await read(resolve(root,entry.resultPath));
    if(hash(canonical(result))!==entry.resultSha256)throw Error('RESULT_TAMPERED');
    const requestPath=resolve(root,entry.attempt,'request.json'),request=await read(requestPath);
+   assertPlannedRequest(request,manifest,entry.jobId);
    if(log.rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt)?.requestSha256!==hash(canonical(request)))throw Error('CASE_REQUEST_CHANGED');
    checkEvaluation(log.rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt),request,log.rows);
    await freshVerify(requestPath);
@@ -78,6 +80,7 @@ async function operate(root,manifest,phase,resume,core,options={}){
   for(const entry of log.rows.filter(e=>e.type==='game-start')){
    if(completed.has(entry.jobId)||!await exists(resolve(root,entry.attempt,'returned.json')))continue;
    const requestPath=resolve(root,entry.attempt,'request.json'),request=await read(requestPath);
+   assertPlannedRequest(request,manifest,entry.jobId);
    if(entry.requestSha256!==hash(canonical(request)))throw Error('CASE_REQUEST_CHANGED');
    checkEvaluation(entry,request,log.rows);
    let result;try{result=await read(resolve(root,entry.attempt,'returned.json'));}catch(error){if(error instanceof SyntaxError)continue;throw error;}
@@ -104,6 +107,7 @@ async function operate(root,manifest,phase,resume,core,options={}){
    const level=manifest.pool.levels.find(l=>l.id===family.levelId).level;
    const request={engineRoot,runRoot:resolve(dir,'capture'),returnPath:resolve(dir,'returned.json'),manifest:evaluationManifest??manifest,caseId:jobId,level,seed:family.seed,seats:family.seats,
     intervention,model,limits:{commandLimit:manifest.config.commandLimit,roundLimit:manifest.config.roundLimit,wallMs:null,workers:1}};
+   assertPlannedRequest(request,manifest,jobId);
    await once(resolve(dir,'request.json'),request);
    const modelFreezeSha256=isTest?log.rows.find(e=>e.type==='models-frozen')?.sha256:null;
    if(isTest&&!modelFreezeSha256)throw Error('EVALUATION_REQUIRES_FROZEN_MODELS');
@@ -232,7 +236,7 @@ async function operate(root,manifest,phase,resume,core,options={}){
  finally{stopWatcher?.close();process.off('SIGINT',stop);process.off('SIGTERM',stop);await release();}
 }
 export async function stopRun(output){await atomic(resolve(output,'STOP'),{requestedAt:new Date().toISOString()});}
-export async function inspect(output,verify=false){const root=resolve(output),manifest=await read(resolve(root,'manifest.json')),rows=await events(root);if(verify){const core=await coreApi();await checkBinding(manifest,core);if(rows.find(e=>e.type==='manifest-bound')?.manifestDigest!==hash(canonical(manifest)))throw Error('MANIFEST_TAMPERED');for(const entry of rows.filter(e=>e.type==='game-complete')){const result=await read(resolve(root,entry.resultPath));if(hash(canonical(result))!==entry.resultSha256)throw Error('RESULT_TAMPERED');const requestPath=resolve(root,entry.attempt,'request.json');if(rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt)?.requestSha256!==hash(canonical(await read(requestPath))))throw Error('CASE_REQUEST_CHANGED');checkEvaluation(rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt),await read(requestPath),rows);await freshVerify(requestPath);}
+export async function inspect(output,verify=false){const root=resolve(output),manifest=await read(resolve(root,'manifest.json')),rows=await events(root);if(verify){const core=await coreApi();await checkBinding(manifest,core);if(rows.find(e=>e.type==='manifest-bound')?.manifestDigest!==hash(canonical(manifest)))throw Error('MANIFEST_TAMPERED');for(const entry of rows.filter(e=>e.type==='game-complete')){const result=await read(resolve(root,entry.resultPath));if(hash(canonical(result))!==entry.resultSha256)throw Error('RESULT_TAMPERED');const requestPath=resolve(root,entry.attempt,'request.json');if(rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt)?.requestSha256!==hash(canonical(await read(requestPath))))throw Error('CASE_REQUEST_CHANGED');assertPlannedRequest(await read(requestPath),manifest,entry.jobId);checkEvaluation(rows.find(e=>e.type==='game-start'&&e.attempt===entry.attempt),await read(requestPath),rows);await freshVerify(requestPath);}
  const policy=rows.find(e=>e.type==='fit-policy-bound');
  if(policy){if(hash(canonical(policy.policy))!==policy.sha256)throw Error('FIT_POLICY_CHANGED');if(await exists(resolve(root,'fit-policy.json'))&&hash(canonical(await read(resolve(root,'fit-policy.json'))))!==policy.sha256)throw Error('FIT_POLICY_CHANGED');}
  const frozen=rows.find(e=>e.type==='models-frozen');
