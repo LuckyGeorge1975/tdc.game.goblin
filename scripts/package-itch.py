@@ -40,7 +40,10 @@ ASSET_TYPES = {
 REQUIRED_DATA = (
     'CHANGELOG.md',
     'assets/ai/full-attack-2a.json',
+    'assets/ai/full-defender-control-trial.json',
     'assets/ai/iron-dust-target-bpn.json',
+    'assets/ai/iron-dust-defender-bpn.json',
+    'assets/ai/training-corpus.v1.json',
     'reports/CONTENT-NOTICES-V21.md',
     'assets/terrain-map-study/portable/manifest.json',
     'assets/training/levels.v3.json',

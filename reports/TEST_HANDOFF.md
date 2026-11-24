@@ -8,7 +8,7 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 |---|---|
 | Version | `0.1.33` |
 | Build | `33` |
-| Status | Isolierter Metadatenkandidat für `goblin-iysu.2`. Noch keine Veröffentlichung. Finaler Volltest, Release-, Content-/Legalprüfung und Browsernachlauf stehen aus. |
+| Status | Finaler Pages-Releasekandidat für `goblin-iysu.2`. Freigaben des genauen Finalcommits, vollständiger Testsatz und tatsächlicher Deploy werden im Release-Issue dokumentiert. |
 | Rückfallpunkt | Öffentliches Pagesrelease `v0.1.32` auf `79d390db2ec747cbec07cdc98315559695303f34`; annotiertes Tagobjekt `1abf4e95c04d32b86ca4ca13b92f70e910a1d2ab`, erfolgreicher Pageslauf `45019836592`. `v0.1.33` war bei Vorbereitung nicht vorhanden. |
 | Quellbasis | `09e158bc28e23999fff1526a71e64fb53371406e`, unabhängig technisch abgenommen. Spielregeln, Runtime-Modelle und zwölf Trainingslevel bleiben unverändert. |
 | Umfang | [Änderungen seit Build 32](../CHANGELOG.md#0133---2026-11-24), [Werkzeugleitfaden](../docs/AI-TRAINING.md). Zwei lokale PS-Einstiege, dynamischer Pool, Standardobergrenze 1000 Gesamtstarts einschließlich 300 reservierter Evaluationsspiele, höchstens 5000 Epochen, gebundene Code-/Aufnahme-/Jobbelege und Stop/Resume. |
@@ -17,7 +17,19 @@ Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 | Herkunft und Grenzen | Vorhandene Notices v25 und vier Runtime-Modellbytes bleiben erhalten. Keine privaten Trainingslogs oder Datensätze, neuen Modellgewichte oder QA-Dateien werden in dieses Release übernommen. |
 | Kanäle | Pages erst nach allen Gates durch Koordination. itch.io und Butler bleiben ausschließlich manuell beim Nutzer. Keine Defaultänderung aus diesem Kandidaten. |
 | Testumgebung | Node `24.14.0`; finaler vollständiger Node-Testsatz auf raw Git-exakten LF-Produktdateien mit echter Kandidaten-HEAD-/Indexmetadatenbasis, danach Byteabgleich. Kein Testskip und keine Sourceguardlockerung. Verifier gegen `v0.1.32`, Source/SRI und Workflowlint. |
-| README-Bild | Bisherige Aufnahme ist noch ausdrücklich Build 32. Eine echte Aufnahme dieses Metadatenstands mit sichtbaren Einheiten wird vor dem finalen Kandidaten ergänzt. |
+| ZIP-Parität | Das HTML5-Rezept führt die vier bestehenden Laufzeitmodelle und das Korpusmanifest ausdrücklich auf. Inventar, rohe ZIP-Bytes und die Dateizahlgrenze werden separat mit Python-Standardbibliothek geprüft. Das ist kein Uploadbeleg. |
+| Auslieferung | Pages wird aus einem frischen, raw Git-exakten Stagingverzeichnis ausschließlich getrackter HEAD-Dateien gebaut. Optionale Supportkonfiguration erfolgt nur dort; ungetrackte Logs, Trainingsausgaben und private Testdateien bleiben außerhalb des Uploadpfads. Vor Deploy prüft CI das tatsächliche Actions-`artifact.tar` gegen Staging und Git; die separate kompakte JSON-Quittung enthält Commit, TAR-/Inventarhash und Dateizahl ohne Support-URL. |
+| README-Bild | [Echte FULL-Atlas-Aufnahme aus Build 33](#readme-aufnahme-build-33). Prefix und zweimaliger cachefreier Reload bestätigt, keine Runtime-/Konsolen-/Netzwerkfehler im beobachteten Ablauf. |
+
+### README-Aufnahme Build 33
+
+| Feld | Beleg |
+|---|---|
+| Quellcommit | `448ceb5e6a1b79a9a842d49114afaeb821a224db`, fester Metadatenstand mit Version 0.1.33 auf abgenommener Quellbasis `09e158bc28e23999fff1526a71e64fb53371406e`; 2029 raw Gitblobs bytegleich geprüft. Der spätere Packaging-/Dokunachlauf verändert die Spielruntime nicht. |
+| Aufnahme | Regulärer Atlasstart Mensch/Gering, Deutsch, Zug 1, Bewegungsphase, Goblin Siegebreaker ausgewählt. Pages-Unterpfad `/tdc.game.goblin/`, 1280×800/DPR1; Karte und Einheiten sichtbar, 20 eigene Einheitenbuttons. Build 33 und zwei cachefreie Reloads im Browser belegt. |
+| Original | `.tools/qa-release033-bedienung/field-test-0.1.33-full-atlas.png`, 783158 Bytes, SHA256 `17d6a72b605e5b3d071097413188f24b60a27aaa8c6649501172ae15caa20e59`. Unverändert erhalten. |
+| README-Ableitung | [field-test-0.1.33-full-atlas.webp](../docs/images/field-test-0.1.33-full-atlas.webp), 1280×800, 170292 Bytes, SHA256 `3e700def2eff921285e8bb7f97a99500e0480b1608309cd70aadc2f98684b13b`. Pillow RGB/Qualität 90/Methode 6; dekodiert und visuell gegen Original geprüft. |
+| Herkunft und Grenze | Bildmanifest `.tools/qa-release033-bedienung/image-manifest.json` SHA256 `2dcd8e1ba3d7e8e16f1f072a6897acd26bf0a3782c1cc226528d6028277a0d91`; Browser- und HTTP-Belege separat erhalten. Die Aufnahme ist kein eigenständiger Nachweis des finalen Volltests oder einer Veröffentlichung. QA-Ressourcen sind beendet. |
 
 ## Build 0.1.32 · Gemeinsame FULL-Züge und Desktopkorrekturen
 

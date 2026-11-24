@@ -6,7 +6,7 @@ test('release metadata, fallback, notices, dated supplement and current handoff 
  const index=file('index.html');assert.match(index,/id="build-version" class="build">FIELD TEST 0\.1\.33</);assert.match(index,/release\.js\?v=33/);
  assert.match(file('docs/CONTENT-NOTICES.md'),/\*\*Document version:\*\* 25/);assert.match(file('reports/REPORTS.md'),/CONTENT-CLEARANCE-DESKTOP-0\.1\.27-2026-10-30\.md/);
  for(const p of ['README.md','CHANGELOG.md','reports/TEST_HANDOFF.md','docs/CONTENT-NOTICES.md','reports/CONTENT-CLEARANCE-DESKTOP-0.1.27-2026-10-30.md'])assert.doesNotMatch(file(p),/\[(?:RELEASEVERSION|PAKETDATUM|RUNTIME-SHA|PAKET-SHA|ZUSATZ-DATEI)\]/);
- assert.match(file('reports/TEST_HANDOFF.md'),/a6a3d78bf82c1a7f2a8187d9bcf0356556147daf/);assert.match(file('README.md'),/Aufnahme aus Build 32/);
+ assert.match(file('reports/TEST_HANDOFF.md'),/09e158bc28e23999fff1526a71e64fb53371406e/);assert.match(file('README.md'),/Aufnahme aus Build 33/);
 });
 test('all 54 retained wreck/metadata runtime hashes match receipt and package links stay inside shipped files',()=>{
  const r=JSON.parse(file('assets/unit-art/wrecks-source.json')),rows=[...r.wrecks,...r.metadata];assert.equal(r.wrecks.length,52);assert.equal(rows.length,54);

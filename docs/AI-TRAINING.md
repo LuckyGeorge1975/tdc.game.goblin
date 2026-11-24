@@ -6,6 +6,8 @@ Die Werkzeuge laufen mit Node.js **24.14.0** und PowerShell ohne Agenten, Browse
 
 Im Repository, mit auf dem PATH verfügbarem Node:
 
+Die Starter benötigen einen Git-Checkout mit `.git` und tatsächlichem HEAD für die Codebindung; ein reines Source-ZIP genügt nicht.
+
 ```powershell
 ./scripts/Start-AiAutoplay.ps1 -Output './training-runs/Versuch 01' -Seed 12345
 ./scripts/Start-AiTraining.ps1 -Dataset './training-runs/Versuch 01'

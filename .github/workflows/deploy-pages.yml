@@ -38,16 +38,28 @@ jobs:
           node scripts/verify-release.mjs --previous="$previous_tag"
       - name: Run regression tests
         run: node --test tests/*.test.mjs
+      - name: Check runtime ZIP inventory
+        run: python3 tests/itch-runtime-package.test.py
       - name: Configure Pages
         uses: actions/configure-pages@v5
+      - name: Stage only committed Pages files
+        shell: bash
+        run: node scripts/stage-pages.mjs --output "$RUNNER_TEMP/pages-site"
       - name: Configure optional project support link
+        shell: bash
+        working-directory: ${{ runner.temp }}/pages-site
         env:
           GOBLIN_SUPPORT_URL: ${{ secrets.GOBLIN_SUPPORT_URL }}
         run: node scripts/configure-pages-support.mjs
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: ${{ runner.temp }}/pages-site
+      - name: Verify actual Pages artifact
+        shell: bash
+        env:
+          GOBLIN_SUPPORT_URL: ${{ secrets.GOBLIN_SUPPORT_URL }}
+        run: node scripts/verify-pages-artifact.mjs --staging "$RUNNER_TEMP/pages-site" --artifact "$RUNNER_TEMP/artifact.tar" --proof "$RUNNER_TEMP/pages-artifact-proof.json"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

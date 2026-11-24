@@ -9,6 +9,8 @@ Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließli
 - Eigene Aufnahmen und Ergebnisse werden an tatsächlichen Code, vorab festgelegte Fälle, Seeds, Level und Sitzbelegungen sowie native Aufnahmebelege gebunden. Ein Verifier prüft Integrität und Jobzuordnung; technische Limits erhalten kein erfundenes Ergebnislabel.
 - Alle vier nativen KI-Strategien können Originalpartien spielen. Kontrollierte Feuerinterventionen und neue Modelloverlays unterstützen in diesem Werkzeugpaket Gering, Mittel und Stark. Trainiert bleibt als Originalstrategie erhalten und wird nicht still ersetzt. Die Funktionsproben zeigen keinen Stärkegewinn; es werden keine neuen Modellgewichte übernommen.
 
+- Das Pages-Paket wird aus getrackten Dateien des festen Commits erstellt. Lokale Test- und Trainingsausgaben werden nicht in den Upload übernommen; die optionale Supportkonfiguration wird ausschließlich in der Paketkopie eingefügt. Das HTML5-Paketrezept enthält ausdrücklich alle vier bereits verwendeten Laufzeitmodelle und das Korpusmanifest.
+
 ## [0.1.32] - 2026-11-22
 
 - In regulären FULL-Missionen lässt sich jeder vorhandene Sitz mit Mensch oder einer zugelassenen KI belegen. Die Auswahl bietet Gering, Mittel, Stark und Trainiert und berücksichtigt die Mindeststufe der Mission. Tutorials bleiben für Menschen. Trainiert verwendet die bestehenden Modelle; die neu untersuchten Trainingsmodelle werden wegen fehlenden allgemeinen Stärkegewinns nicht übernommen.
