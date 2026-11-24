@@ -4,7 +4,7 @@ import {readFile,realpath} from 'node:fs/promises';
 import {resolve,relative,isAbsolute,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {canonicalSources,normalizeSource} from '../full-training-source-binding.mjs';
-import {gameplaySourceHashes} from '../tests/helpers/replay-source-binding.mjs';
+import {gameplaySourceHashes} from './ai-training-core/sources.mjs';
 
 export const engineRoot=fileURLToPath(new URL('../',import.meta.url));
 export const hash=bytes=>createHash('sha256').update(bytes).digest('hex');

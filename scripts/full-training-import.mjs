@@ -1,11 +1,9 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {fullShell} from '../tests/catalog-full-harness.mjs';
-import {queryBridge} from '../tests/artillery-product-harness.mjs';
 import {createFullCatalogAiHost} from '../src/core/full-catalog-ai-adapter.mjs';
 import {FULL_ATTACK_2A_ID} from '../src/core/full-attack-2a.mjs';
 import {TRAINING_ARCHIVE_VERSION} from '../training-archive.mjs';
-import {gameplaySourceHashes} from '../tests/helpers/replay-source-binding.mjs';
+import {gameplaySourceHashes} from './ai-training-core/sources.mjs';
 import {verifyTrainingSources} from '../full-training-source-binding.mjs';
 import {registerFullExperimentReplay,revalidateFullExperimentCatalog,validateFullExperimentRecording,validateFullExperimentDecision} from './full-experiment-policies.mjs';
 import {fullTrainingDecisionFrame,fullTrainingDecisionTraceRow,verifyFullTrainingCapture} from './full-training-capture.mjs';
@@ -20,7 +18,7 @@ function exact(value,keys){
     keys.every(key=>Object.hasOwn(value,key));
 }
 
-export async function openFullTrainingReplay(archive,{experimentCatalog}={}) {
+export async function openFullTrainingReplay(archive,{experimentCatalog,createGame}={}) {
   const {replay,seats}=archive;
   expect(exact(seats,['player','enemy']));
   expect(exact(replay,['version','sources','seed','level','initial','entries']) && replay.version==='full-native-journal-v1' &&
@@ -30,11 +28,11 @@ export async function openFullTrainingReplay(archive,{experimentCatalog}={}) {
   if(experimentCatalog)await revalidateFullExperimentCatalog(experimentCatalog);
   expect(exact(replay.level,['id','digest'])||exact(replay.level,['id','digest','draft']));
   const roles={}, policyIds={};
-  const game=fullShell();
+  const game=createGame?await createGame():(await import('../tests/catalog-full-harness.mjs')).fullShell();
   await game.run("GoblinCatalogFullModel.initialize(data,levelData,{profile:'FULL_CATALOG_v1'})");
   game.run('Object.assign(scenarioCatalog,GoblinCatalogFullModel.configs)');
   for(const file of ['level-events.js','editor-draft.js'])game.run(source(file));
-  queryBridge(game);
+  if(!createGame)(await import('../tests/artillery-product-harness.mjs')).queryBridge(game);
   const full=game.context.GoblinCatalogFullRuntime;
   for(const side of ['player','enemy']) {
     const seat=seats[side];
@@ -101,14 +99,14 @@ export async function openFullTrainingReplay(archive,{experimentCatalog}={}) {
   return {game,port,inspect,commit};
 }
 
-export async function importFullTrainingArchive(archive,{experimentCatalog,capture}={}) {
+export async function importFullTrainingArchive(archive,{experimentCatalog,capture,createGame}={}) {
   expect(exact(archive,['version','profile','seats','outcome','replay']) &&
     archive.version===TRAINING_ARCHIVE_VERSION&&archive.profile==='FULL_CATALOG_v1'&&
     ['player','enemy','draw'].includes(archive.outcome)&&exact(archive.seats,['player','enemy']));
   const verified=capture?verifyFullTrainingCapture(archive,capture):null;
   const experiments=Object.values(archive.seats).filter(seat=>seat.policy?.startsWith('full-experiment:'));
   const validatedInterventions=new Map();
-  const host=await openFullTrainingReplay(archive,{experimentCatalog});
+  const host=await openFullTrainingReplay(archive,{experimentCatalog,createGame});
   const demonstrations=[];
   for (const [commandIndex,entry] of archive.replay.entries.entries()){
     expect(exact(entry,['side','slot','command','draws','digest']) &&

@@ -13,6 +13,10 @@ const nativePaths=['full-standard-seat-owner.mjs','src/core/full-catalog-difficu
 const shared=['version','mode','profile','side','basePolicyId','runtimeCommit','engineArchiveSha256',
  'nativeSourcesSha256','runManifestSha256','selectorArtifacts','featureSchemaRef','featureSchemaSha256',
  'outcomeSchemaRef','outcomeSchemaSha256','selectionConfigRef','selectionConfigSha256'];
+function baseDifficulty(side,id){
+ const difficulty=['weak','medium','strong'].find(value=>id===side+'-'+value);
+ check(difficulty,'FULL_EXPERIMENT_BASE_POLICY');return difficulty;
+}
 export const FULL_EXPERIMENT_MODEL_VERSION='goblin-full-symmetric-fire-bpn-v1';
 export const FULL_EXPERIMENT_FEATURE_VERSION='goblin-full-fire-effects-v1';
 export const FULL_EXPERIMENT_REWARD_VERSION='goblin-native-mission-points-pair-v1';
@@ -48,8 +52,9 @@ export async function prepareFullExperimentCatalog({artifactRoot,entries,runtime
    ['interventionSpecRef','interventionSpecSha256'])]));
   check(entry.version==='goblin-full-experiment-policy-v1'&&entry.profile==='FULL_CATALOG_v1'&&
    ['player','enemy'].includes(entry.side)&&['single-fire-intervention','frozen-fire-model'].includes(entry.mode)&&
-   entry.basePolicyId===entry.side+'-medium'&&entry.runtimeCommit===runtimeCommit&&
+   entry.runtimeCommit===runtimeCommit&&
    entry.engineArchiveSha256===engineArchiveSha256&&entry.nativeSourcesSha256===currentSourcesHash()&&isHash(entry.runManifestSha256));
+  const difficulty=baseDifficulty(entry.side,entry.basePolicyId);
   const packageRoot=dirname(original.absolute);
   // Each identity has its own immutable module paths, including transitive imports.
   check(basename(packageRoot)===reference.sha256,'FULL_EXPERIMENT_PACKAGE_ID_PATH');
@@ -109,7 +114,7 @@ export async function prepareFullExperimentCatalog({artifactRoot,entries,runtime
     hash(canonicalBytes(intervention.referenceFeatures))!==hash(canonicalBytes(intervention.alternativeFeatures)));
   }
   check(!policies.has(id));
-  policies.set(id,{id,entry:freeze(entry),difficulty:usesModel?null:'medium',packageRoot,code,
+  policies.set(id,{id,entry:freeze(entry),difficulty:usesModel?null:difficulty,packageRoot,code,
    model:freeze(model),intervention:freeze(intervention),selectionConfig:freeze(selectionConfig),reference:freeze({...reference}),artifactRoot});
  }
  const handle=Object.freeze({});catalogs.set(handle,{policies,runtimeCommit,engineArchiveSha256,engineArchivePath});return handle;
@@ -174,8 +179,10 @@ export function registerFullExperimentReplay({catalog,id,side,difficulty,full,ro
  full.registerQualifiedController({side,id,difficulty,select});
 }
 
-export async function registerFullExperimentController({catalog,id,full,root,onDecision}){
+export async function registerFullExperimentController({catalog,id,full,root,onDecision,baseSelector,onError}){
  const policy=catalogs.get(catalog)?.policies.get(id);check(policy,'FULL_EXPERIMENT_NOT_TRUSTED');
+ check(baseSelector?baseSelector.id===policy.entry.basePolicyId&&typeof baseSelector.select==='function':
+  policy.entry.basePolicyId===policy.entry.side+'-medium','FULL_EXPERIMENT_BASE_SELECTOR_REQUIRED');
  // Recheck the complete package before executing the explicitly trusted local entry.
  await prepareFullExperimentCatalog({artifactRoot:policy.artifactRoot,entries:[policy.reference],
   runtimeCommit:catalogs.get(catalog).runtimeCommit,engineArchivePath:catalogs.get(catalog).engineArchivePath});
@@ -183,11 +190,14 @@ export async function registerFullExperimentController({catalog,id,full,root,onD
  const selector=module.createExperimentalFireSelector({mode:policy.entry.mode,side:policy.entry.side,
   encode:encodeFullFireEffects,model:policy.model,intervention:policy.intervention,selectionConfig:policy.selectionConfig});
  for(const item of policy.code.values())check(textHash(await readFile(item.absolute))===item.sha256);
- const select=(batch,chooseNativeBase,port,_report,capture)=>{
+ const attemptSelect=async(batch,chooseNativeBase,port,report,capture)=>{
   const replay=port.simulationSnapshot(port.ticket('ai'))?.replay;check(replay);
   const context={commandIndex:replay.entries.length,prefixSha256:hash(canonicalBytes(replay))};
+  // Resolve the actual declared native selector once. Existing package selectors
+  // still receive a synchronous key; asynchronous Strong is never downgraded.
+  const key=await(baseSelector?baseSelector.select(batch,port,report,capture):chooseNativeBase());
   const choose=()=>{
-   const key=chooseNativeBase(), spec=policy.intervention;
+   const spec=policy.intervention;
    if(spec&&context.commandIndex===spec.commandIndex){
     check(replay.seed===spec.seed,'FULL_EXPERIMENT_RECORDING_SCOPE');
     const packet=capture?.(batch), index=batch.candidates.findIndex(item=>item.key===key);
@@ -195,9 +205,10 @@ export async function registerFullExperimentController({catalog,id,full,root,onD
    }
    return key;
   };
-  const result=selector.select(batch,choose,context);
+  const result=await selector.select(batch,choose,context);
   onDecision?.({batch,context,result});return result.key;
  };
+ const select=async(...args)=>{try{return await attemptSelect(...args);}catch(error){onError?.(error);throw error;}};
  bridgeFor(root).set(select,{side:policy.entry.side,id,difficulty:policy.difficulty});
  full.registerQualifiedController({side:policy.entry.side,id,difficulty:policy.difficulty,select});
  return Object.freeze({id,finish:completion=>selector.finish(completion)});
