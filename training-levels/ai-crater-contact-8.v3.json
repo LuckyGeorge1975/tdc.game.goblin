@@ -1,0 +1,145 @@
+{
+  "version": "goblin-level-v3",
+  "id": "ai-crater-contact-8",
+  "scenarioVersion": 1,
+  "width": 8,
+  "height": 8,
+  "objective": "eliminate-opponent",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "aiAllowed": true,
+  "briefing": "Kraterkontakt. Vier Einheiten je Seite. Nutze Kraterdeckung, unterstütze die Infanterie mit den Aufklärungspanzern und konzentriere Feuer auf einzelne Ziele. Beide Seiten müssen den gegnerischen Verband vollständig ausschalten.",
+  "terrain": [
+    {
+      "x": 2,
+      "y": 0,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "rubble-field"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "crater"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "crater"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "type": "crater"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "type": "crater"
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "type": "rubble-field"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "crater"
+    }
+  ],
+  "units": [
+    {
+      "id": "a-1",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 1,
+      "y": 1
+    },
+    {
+      "id": "a-2",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 2,
+      "y": 2
+    },
+    {
+      "id": "a-3",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 1,
+      "y": 2,
+      "squads": 2
+    },
+    {
+      "id": "a-4",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 2,
+      "y": 3,
+      "squads": 2
+    },
+    {
+      "id": "b-1",
+      "assetId": "recon-tank",
+      "team": "enemy",
+      "x": 6,
+      "y": 6
+    },
+    {
+      "id": "b-2",
+      "assetId": "recon-tank",
+      "team": "enemy",
+      "x": 5,
+      "y": 5
+    },
+    {
+      "id": "b-3",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 6,
+      "y": 5,
+      "squads": 2
+    },
+    {
+      "id": "b-4",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 5,
+      "y": 4,
+      "squads": 2
+    }
+  ]
+}

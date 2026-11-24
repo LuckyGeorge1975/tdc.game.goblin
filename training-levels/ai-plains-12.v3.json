@@ -1,0 +1,846 @@
+{
+  "version": "goblin-level-v3",
+  "id": "ai-plains-12",
+  "scenarioVersion": 1,
+  "width": 12,
+  "height": 12,
+  "ruleProfile": "FULL_CATALOG_v1",
+  "objective": "eliminate-opponent",
+  "briefing": "Offene Feuerlinien mit wenigen Waldinseln prüfen Distanzhaltung, Flankierung, Zielwahl und Rückzug im Skimmer-Manöver. Je Seite acht mobile Einheiten, ohne Systemplattformen oder stationäre Geschütze.",
+  "terrain": [
+    {
+      "x": 0,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "type": "open-ground"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "type": "ridge"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 11,
+      "y": 1,
+      "type": "open-ground"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "type": "open-ground"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "type": "open-ground"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "open-ground"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "open-ground"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "open-ground"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "open-ground"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "crater"
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "type": "open-ground"
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "type": "open-ground"
+    },
+    {
+      "x": 10,
+      "y": 2,
+      "type": "open-ground"
+    },
+    {
+      "x": 11,
+      "y": 2,
+      "type": "open-ground"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "type": "open-ground"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "type": "open-ground"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "type": "open-ground"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "open-ground"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "open-ground"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "type": "open-ground"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "type": "ridge"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "type": "open-ground"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "type": "open-ground"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "type": "open-ground"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "type": "open-ground"
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "type": "open-ground"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "type": "open-ground"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "type": "open-ground"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "type": "open-ground"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "forest"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "open-ground"
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "type": "open-ground"
+    },
+    {
+      "x": 9,
+      "y": 5,
+      "type": "open-ground"
+    },
+    {
+      "x": 10,
+      "y": 5,
+      "type": "open-ground"
+    },
+    {
+      "x": 11,
+      "y": 5,
+      "type": "open-ground"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "type": "open-ground"
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "type": "open-ground"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "type": "open-ground"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "type": "open-ground"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "type": "open-ground"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "forest"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "type": "open-ground"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "open-ground"
+    },
+    {
+      "x": 9,
+      "y": 6,
+      "type": "open-ground"
+    },
+    {
+      "x": 10,
+      "y": 6,
+      "type": "open-ground"
+    },
+    {
+      "x": 11,
+      "y": 6,
+      "type": "open-ground"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "type": "open-ground"
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "type": "open-ground"
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "type": "open-ground"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "type": "ridge"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "type": "open-ground"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "type": "open-ground"
+    },
+    {
+      "x": 8,
+      "y": 7,
+      "type": "open-ground"
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "type": "open-ground"
+    },
+    {
+      "x": 10,
+      "y": 7,
+      "type": "open-ground"
+    },
+    {
+      "x": 11,
+      "y": 7,
+      "type": "open-ground"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 0,
+      "y": 9,
+      "type": "open-ground"
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "type": "open-ground"
+    },
+    {
+      "x": 2,
+      "y": 9,
+      "type": "open-ground"
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "type": "open-ground"
+    },
+    {
+      "x": 4,
+      "y": 9,
+      "type": "crater"
+    },
+    {
+      "x": 5,
+      "y": 9,
+      "type": "open-ground"
+    },
+    {
+      "x": 6,
+      "y": 9,
+      "type": "open-ground"
+    },
+    {
+      "x": 7,
+      "y": 9,
+      "type": "crater"
+    },
+    {
+      "x": 8,
+      "y": 9,
+      "type": "open-ground"
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "type": "open-ground"
+    },
+    {
+      "x": 10,
+      "y": 9,
+      "type": "open-ground"
+    },
+    {
+      "x": 11,
+      "y": 9,
+      "type": "open-ground"
+    },
+    {
+      "x": 0,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 1,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 3,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 4,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 5,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 6,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 7,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 8,
+      "y": 10,
+      "type": "ridge"
+    },
+    {
+      "x": 9,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 10,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 11,
+      "y": 10,
+      "type": "open-ground"
+    },
+    {
+      "x": 0,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 1,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 2,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 4,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 5,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 6,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 7,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 8,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 9,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 10,
+      "y": 11,
+      "type": "open-ground"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "type": "open-ground"
+    }
+  ],
+  "units": [
+    {
+      "id": "a-1",
+      "assetId": "combat-skimmer",
+      "team": "player",
+      "x": 1,
+      "y": 2
+    },
+    {
+      "id": "a-2",
+      "assetId": "combat-skimmer",
+      "team": "player",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "id": "a-3",
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 1,
+      "y": 5
+    },
+    {
+      "id": "a-4",
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 2,
+      "y": 1
+    },
+    {
+      "id": "a-5",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 1,
+      "y": 7
+    },
+    {
+      "id": "a-6",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "id": "a-7",
+      "assetId": "rocket-artillery",
+      "team": "player",
+      "x": 0,
+      "y": 3
+    },
+    {
+      "id": "a-8",
+      "assetId": "rocket-artillery",
+      "team": "player",
+      "x": 0,
+      "y": 6
+    },
+    {
+      "id": "b-1",
+      "assetId": "combat-skimmer",
+      "team": "enemy",
+      "x": 10,
+      "y": 9
+    },
+    {
+      "id": "b-2",
+      "assetId": "combat-skimmer",
+      "team": "enemy",
+      "x": 9,
+      "y": 7
+    },
+    {
+      "id": "b-3",
+      "assetId": "skimmer-scout",
+      "team": "enemy",
+      "x": 10,
+      "y": 6
+    },
+    {
+      "id": "b-4",
+      "assetId": "skimmer-scout",
+      "team": "enemy",
+      "x": 9,
+      "y": 10
+    },
+    {
+      "id": "b-5",
+      "assetId": "recon-tank",
+      "team": "enemy",
+      "x": 10,
+      "y": 4
+    },
+    {
+      "id": "b-6",
+      "assetId": "recon-tank",
+      "team": "enemy",
+      "x": 9,
+      "y": 5
+    },
+    {
+      "id": "b-7",
+      "assetId": "rocket-artillery",
+      "team": "enemy",
+      "x": 11,
+      "y": 8
+    },
+    {
+      "id": "b-8",
+      "assetId": "rocket-artillery",
+      "team": "enemy",
+      "x": 11,
+      "y": 5
+    }
+  ]
+}

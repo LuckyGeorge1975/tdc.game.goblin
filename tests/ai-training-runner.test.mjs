@@ -1,0 +1,40 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtemp,mkdir,writeFile,readFile,unlink} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {discover} from '../scripts/ai-training-runner/pool.mjs';
+import {makePlan,configuration} from '../scripts/ai-training-runner/plan.mjs';
+import {initialize,once,events,journal,lock} from '../scripts/ai-training-runner/files.mjs';
+const temporary=async()=>{const base=fileURLToPath(new URL('../.tools/runner-tests/',import.meta.url));await mkdir(base,{recursive:true});return mkdtemp(resolve(base,'case-'));};
+const validateLevel=async({level})=>{assert.equal(level.version,'goblin-level-v3');return {level,strategies:{player:['weak','medium'],enemy:['medium']}};};
+test('recursive level discovery snapshots packages, detects additions/removals, and rejects empty/duplicate/malformed pools',async()=>{
+ const root=await temporary();await assert.rejects(discover(root,validateLevel),/EMPTY/);
+ await mkdir(resolve(root,'with spaces'));
+ const file=resolve(root,'with spaces','one.json'),level={version:'goblin-level-v3',id:'one'};
+ await writeFile(file,JSON.stringify(level));const first=await discover(root,validateLevel);assert.equal(first.levels.length,1);
+ await writeFile(resolve(root,'package.json'),JSON.stringify({version:'goblin-level-package-v3',levels:[{...level,id:'two'}]}));
+ const second=await discover(root,validateLevel);assert.equal(second.levels.length,2);assert.equal(first.levels.length,1);
+ await unlink(resolve(root,'package.json'));assert.equal((await discover(root,validateLevel)).levels.length,1);
+ await writeFile(resolve(root,'duplicate.json'),JSON.stringify(level));await assert.rejects(discover(root,validateLevel),/DUPLICATE/);
+ const bad=await temporary();await writeFile(resolve(bad,'bad.json'),'{broken');await assert.rejects(discover(bad,validateLevel),/JSON_INVALID/);
+});
+test('fixed masterseed gives balanced maps and seat pairings, disjoint seeds and a real total game budget',()=>{
+ const pool={levels:[{id:'a'},{id:'b'},{id:'c'}]},config=configuration({maxGames:100,evaluationGames:30,strategies:['weak','medium']});
+ const allowed=(l,p,e)=>l.id!=='c'||p==='medium'&&e==='medium';
+ const plan=makePlan(pool,config,allowed);assert.deepEqual(plan,makePlan(pool,config,allowed));
+ assert.ok(plan.data.length*3+plan.evaluation.length*3<=100);
+ const counts=pool.levels.map(l=>plan.data.filter(j=>j.levelId===l.id).length);assert.ok(Math.max(...counts)-Math.min(...counts)<=1);
+ const seeds=[...plan.data,...plan.evaluation].map(j=>j.seed);assert.equal(new Set(seeds).size,seeds.length);
+ assert.ok(plan.data.filter(j=>j.levelId==='c').every(j=>j.seats.player==='medium'&&j.seats.enemy==='medium'));
+ for(const patch of [{maxGames:1001},{maxEpochs:5001},{workers:2},{evaluationGames:29},{strategies:['human']}])assert.throws(()=>configuration(patch));
+});
+test('exclusive controller lock, immutable journal chain and atomic status detect a competing writer and tampering',async()=>{
+ const parent=await temporary(),root=resolve(parent,'run');await initialize(root);
+ const release=await lock(root);await assert.rejects(lock(root,true),/RUN_LOCKED/);
+ const log=await journal(root);await log.append({type:'manifest-bound',manifestDigest:'a'});await log.append({type:'game-start',jobId:'one'});
+ assert.equal((await events(root)).length,2);
+ const path=resolve(root,'journal','00000001.json'),row=JSON.parse(await readFile(path));row.jobId='tampered';await writeFile(path,JSON.stringify(row));await assert.rejects(events(root),/DIGEST/);
+ await release();const again=await lock(root);await again();
+ await once(resolve(root,'immutable.json'),{});await assert.rejects(once(resolve(root,'immutable.json'),{}),{code:'EEXIST'});
+});

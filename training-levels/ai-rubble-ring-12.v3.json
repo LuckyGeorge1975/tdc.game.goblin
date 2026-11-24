@@ -1,0 +1,493 @@
+{
+  "version": "goblin-level-v3",
+  "id": "ai-rubble-ring-12",
+  "scenarioVersion": 1,
+  "width": 12,
+  "height": 10,
+  "objective": "eliminate-opponent",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "aiAllowed": true,
+  "briefing": "Trümmerring. Sieben Einheiten je Seite. Räume Trümmer mit den Feldpionieren oder nutze die Straße. Der Belagerungspanzer kann seine Hauptwaffen bündeln oder auf verschiedene Ziele verteilen. Die Häuserblöcke bieten Deckung und unterbrechen Sichtlinien.",
+  "terrain": [
+    {
+      "x": 3,
+      "y": 0,
+      "type": "urban"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "type": "rubble-field"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "type": "urban"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "type": "rubble-field"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "type": "rubble-field"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "type": "rubble-field"
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "rubble-field"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "type": "forest"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "rubble-field"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "type": "rubble-field"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "type": "forest"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "type": "rubble-field"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "rubble-field"
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "type": "forest"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "type": "urban"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "rubble-field"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "type": "urban"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "urban"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 8,
+      "type": "urban"
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "type": "rubble-field"
+    },
+    {
+      "x": 5,
+      "y": 8,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 8,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 8,
+      "type": "urban"
+    },
+    {
+      "x": 8,
+      "y": 8,
+      "type": "rubble-field"
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "type": "rubble-field"
+    },
+    {
+      "x": 4,
+      "y": 9,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 9,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 9,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 9,
+      "type": "rubble-field"
+    },
+    {
+      "x": 8,
+      "y": 9,
+      "type": "urban"
+    }
+  ],
+  "units": [
+    {
+      "id": "a-1",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 1,
+      "y": 2
+    },
+    {
+      "id": "a-2",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "id": "a-3",
+      "assetId": "infantry-platoon",
+      "team": "player",
+      "x": 1,
+      "y": 3
+    },
+    {
+      "id": "a-4",
+      "assetId": "infantry-platoon",
+      "team": "player",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "id": "a-5",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 1,
+      "y": 4
+    },
+    {
+      "id": "a-6",
+      "assetId": "siege-tank",
+      "team": "player",
+      "x": 2,
+      "y": 1
+    },
+    {
+      "id": "a-7",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 1,
+      "y": 1
+    },
+    {
+      "id": "b-1",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 10,
+      "y": 7
+    },
+    {
+      "id": "b-2",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 9,
+      "y": 6
+    },
+    {
+      "id": "b-3",
+      "assetId": "infantry-platoon",
+      "team": "enemy",
+      "x": 10,
+      "y": 6
+    },
+    {
+      "id": "b-4",
+      "assetId": "infantry-platoon",
+      "team": "enemy",
+      "x": 9,
+      "y": 5
+    },
+    {
+      "id": "b-5",
+      "assetId": "field-engineers",
+      "team": "enemy",
+      "x": 10,
+      "y": 5
+    },
+    {
+      "id": "b-6",
+      "assetId": "siege-tank",
+      "team": "enemy",
+      "x": 9,
+      "y": 8
+    },
+    {
+      "id": "b-7",
+      "assetId": "recon-tank",
+      "team": "enemy",
+      "x": 10,
+      "y": 8
+    }
+  ]
+}

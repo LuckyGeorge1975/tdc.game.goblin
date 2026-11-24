@@ -1,0 +1,229 @@
+{
+  "version": "goblin-level-v3",
+  "id": "ai-canal-crossing-10",
+  "scenarioVersion": 1,
+  "width": 10,
+  "height": 8,
+  "objective": "eliminate-opponent",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "aiAllowed": true,
+  "briefing": "Alter Kanal. Fünf Einheiten je Seite. Amphibische Infanterie kann den Kanal durchqueren oder den benachbarten Transporter nutzen. Die Leichtskimmer können nach dem Feuer ausweichen. Vergleiche die Brückenroute mit der Wasserroute.",
+  "terrain": [
+    {
+      "x": 3,
+      "y": 0,
+      "type": "forest"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "type": "river"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "forest"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "type": "river"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "type": "bridge"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "river"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "marsh"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "river"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "bridge"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "type": "forest"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "river"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "forest"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "river"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "type": "forest"
+    }
+  ],
+  "units": [
+    {
+      "id": "a-1",
+      "assetId": "skimmer-carrier",
+      "team": "player",
+      "x": 2,
+      "y": 2
+    },
+    {
+      "id": "a-2",
+      "assetId": "amphibious-infantry",
+      "team": "player",
+      "x": 1,
+      "y": 2,
+      "squads": 3
+    },
+    {
+      "id": "a-3",
+      "assetId": "amphibious-infantry",
+      "team": "player",
+      "x": 2,
+      "y": 1,
+      "squads": 3
+    },
+    {
+      "id": "a-4",
+      "assetId": "light-skimmer",
+      "team": "player",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "id": "a-5",
+      "assetId": "light-skimmer",
+      "team": "player",
+      "x": 1,
+      "y": 5
+    },
+    {
+      "id": "b-1",
+      "assetId": "skimmer-carrier",
+      "team": "enemy",
+      "x": 7,
+      "y": 5
+    },
+    {
+      "id": "b-2",
+      "assetId": "amphibious-infantry",
+      "team": "enemy",
+      "x": 8,
+      "y": 5,
+      "squads": 3
+    },
+    {
+      "id": "b-3",
+      "assetId": "amphibious-infantry",
+      "team": "enemy",
+      "x": 7,
+      "y": 6,
+      "squads": 3
+    },
+    {
+      "id": "b-4",
+      "assetId": "light-skimmer",
+      "team": "enemy",
+      "x": 7,
+      "y": 3
+    },
+    {
+      "id": "b-5",
+      "assetId": "light-skimmer",
+      "team": "enemy",
+      "x": 8,
+      "y": 2
+    }
+  ]
+}

@@ -1,0 +1,1047 @@
+{
+  "version": "goblin-level-v3",
+  "id": "ai-marsh-corridors-18",
+  "scenarioVersion": 1,
+  "width": 18,
+  "height": 18,
+  "objective": "eliminate-opponent",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "aiAllowed": true,
+  "briefing": "Marschwege. Vierzehn Einheiten je Seite. Skimmer und amphibische Infanterie können Wasser und Marschland für Flankenbewegungen nutzen. Die Drohne beginnt neben einem Transporter; nach dem Absetzen feuert sie ab dem nächsten eigenen Zug. Nutze die Brücken als alternative Verbindung für Bodenkräfte.",
+  "terrain": [
+    {
+      "x": 5,
+      "y": 0,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "type": "marsh"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "type": "marsh"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "type": "marsh"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "type": "marsh"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "type": "marsh"
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "type": "marsh"
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "type": "marsh"
+    },
+    {
+      "x": 11,
+      "y": 1,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 1,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "water"
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "type": "water"
+    },
+    {
+      "x": 10,
+      "y": 2,
+      "type": "water"
+    },
+    {
+      "x": 11,
+      "y": 2,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 2,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "water"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "type": "water"
+    },
+    {
+      "x": 10,
+      "y": 3,
+      "type": "water"
+    },
+    {
+      "x": 11,
+      "y": 3,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 3,
+      "type": "marsh"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "type": "bridge"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 14,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 15,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 16,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 17,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "marsh"
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 5,
+      "type": "marsh"
+    },
+    {
+      "x": 10,
+      "y": 5,
+      "type": "marsh"
+    },
+    {
+      "x": 11,
+      "y": 5,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 5,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "type": "water"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 6,
+      "type": "water"
+    },
+    {
+      "x": 10,
+      "y": 6,
+      "type": "water"
+    },
+    {
+      "x": 11,
+      "y": 6,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 6,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "type": "water"
+    },
+    {
+      "x": 8,
+      "y": 7,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "type": "water"
+    },
+    {
+      "x": 10,
+      "y": 7,
+      "type": "water"
+    },
+    {
+      "x": 11,
+      "y": 7,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 7,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 8,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 8,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 8,
+      "type": "marsh"
+    },
+    {
+      "x": 8,
+      "y": 8,
+      "type": "river"
+    },
+    {
+      "x": 9,
+      "y": 8,
+      "type": "marsh"
+    },
+    {
+      "x": 10,
+      "y": 8,
+      "type": "marsh"
+    },
+    {
+      "x": 11,
+      "y": 8,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 8,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 9,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 9,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 9,
+      "type": "marsh"
+    },
+    {
+      "x": 8,
+      "y": 9,
+      "type": "marsh"
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "type": "river"
+    },
+    {
+      "x": 10,
+      "y": 9,
+      "type": "marsh"
+    },
+    {
+      "x": 11,
+      "y": 9,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 9,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 10,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 10,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 10,
+      "type": "water"
+    },
+    {
+      "x": 8,
+      "y": 10,
+      "type": "water"
+    },
+    {
+      "x": 9,
+      "y": 10,
+      "type": "river"
+    },
+    {
+      "x": 10,
+      "y": 10,
+      "type": "water"
+    },
+    {
+      "x": 11,
+      "y": 10,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 11,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 11,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 11,
+      "type": "water"
+    },
+    {
+      "x": 8,
+      "y": 11,
+      "type": "water"
+    },
+    {
+      "x": 9,
+      "y": 11,
+      "type": "river"
+    },
+    {
+      "x": 10,
+      "y": 11,
+      "type": "water"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 11,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 12,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 12,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 12,
+      "type": "marsh"
+    },
+    {
+      "x": 8,
+      "y": 12,
+      "type": "marsh"
+    },
+    {
+      "x": 9,
+      "y": 12,
+      "type": "river"
+    },
+    {
+      "x": 10,
+      "y": 12,
+      "type": "marsh"
+    },
+    {
+      "x": 11,
+      "y": 12,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 12,
+      "type": "marsh"
+    },
+    {
+      "x": 0,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 13,
+      "type": "bridge"
+    },
+    {
+      "x": 10,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 12,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 13,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 14,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 15,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 16,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 17,
+      "y": 13,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 14,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 14,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 14,
+      "type": "water"
+    },
+    {
+      "x": 8,
+      "y": 14,
+      "type": "water"
+    },
+    {
+      "x": 9,
+      "y": 14,
+      "type": "river"
+    },
+    {
+      "x": 10,
+      "y": 14,
+      "type": "water"
+    },
+    {
+      "x": 11,
+      "y": 14,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 14,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 15,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 15,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 15,
+      "type": "water"
+    },
+    {
+      "x": 8,
+      "y": 15,
+      "type": "water"
+    },
+    {
+      "x": 9,
+      "y": 15,
+      "type": "river"
+    },
+    {
+      "x": 10,
+      "y": 15,
+      "type": "water"
+    },
+    {
+      "x": 11,
+      "y": 15,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 15,
+      "type": "marsh"
+    },
+    {
+      "x": 5,
+      "y": 16,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 16,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 16,
+      "type": "marsh"
+    },
+    {
+      "x": 8,
+      "y": 16,
+      "type": "marsh"
+    },
+    {
+      "x": 9,
+      "y": 16,
+      "type": "river"
+    },
+    {
+      "x": 10,
+      "y": 16,
+      "type": "marsh"
+    },
+    {
+      "x": 11,
+      "y": 16,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 16,
+      "type": "marsh"
+    },
+    {
+      "x": 14,
+      "y": 16,
+      "type": "forest"
+    },
+    {
+      "x": 5,
+      "y": 17,
+      "type": "marsh"
+    },
+    {
+      "x": 6,
+      "y": 17,
+      "type": "marsh"
+    },
+    {
+      "x": 7,
+      "y": 17,
+      "type": "marsh"
+    },
+    {
+      "x": 8,
+      "y": 17,
+      "type": "marsh"
+    },
+    {
+      "x": 9,
+      "y": 17,
+      "type": "river"
+    },
+    {
+      "x": 10,
+      "y": 17,
+      "type": "marsh"
+    },
+    {
+      "x": 11,
+      "y": 17,
+      "type": "marsh"
+    },
+    {
+      "x": 12,
+      "y": 17,
+      "type": "marsh"
+    }
+  ],
+  "units": [
+    {
+      "id": "a-1",
+      "assetId": "combat-skimmer",
+      "team": "player",
+      "x": 3,
+      "y": 4
+    },
+    {
+      "id": "a-2",
+      "assetId": "combat-skimmer",
+      "team": "player",
+      "x": 4,
+      "y": 7
+    },
+    {
+      "id": "a-3",
+      "assetId": "combat-skimmer",
+      "team": "player",
+      "x": 3,
+      "y": 11
+    },
+    {
+      "id": "a-4",
+      "assetId": "light-skimmer",
+      "team": "player",
+      "x": 4,
+      "y": 2
+    },
+    {
+      "id": "a-5",
+      "assetId": "light-skimmer",
+      "team": "player",
+      "x": 4,
+      "y": 13
+    },
+    {
+      "id": "a-6",
+      "assetId": "skimmer-carrier",
+      "team": "player",
+      "x": 2,
+      "y": 5
+    },
+    {
+      "id": "a-7",
+      "assetId": "skimmer-carrier",
+      "team": "player",
+      "x": 2,
+      "y": 11
+    },
+    {
+      "id": "a-8",
+      "assetId": "amphibious-infantry",
+      "team": "player",
+      "x": 3,
+      "y": 5,
+      "squads": 3
+    },
+    {
+      "id": "a-9",
+      "assetId": "amphibious-infantry",
+      "team": "player",
+      "x": 2,
+      "y": 6,
+      "squads": 3
+    },
+    {
+      "id": "a-10",
+      "assetId": "amphibious-infantry",
+      "team": "player",
+      "x": 2,
+      "y": 10,
+      "squads": 3
+    },
+    {
+      "id": "a-11",
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 4,
+      "y": 0
+    },
+    {
+      "id": "a-12",
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 4,
+      "y": 16
+    },
+    {
+      "id": "a-13",
+      "assetId": "artillery-drone",
+      "team": "player",
+      "x": 1,
+      "y": 5
+    },
+    {
+      "id": "a-14",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "id": "b-1",
+      "assetId": "combat-skimmer",
+      "team": "enemy",
+      "x": 14,
+      "y": 13
+    },
+    {
+      "id": "b-2",
+      "assetId": "combat-skimmer",
+      "team": "enemy",
+      "x": 13,
+      "y": 10
+    },
+    {
+      "id": "b-3",
+      "assetId": "combat-skimmer",
+      "team": "enemy",
+      "x": 14,
+      "y": 6
+    },
+    {
+      "id": "b-4",
+      "assetId": "light-skimmer",
+      "team": "enemy",
+      "x": 13,
+      "y": 15
+    },
+    {
+      "id": "b-5",
+      "assetId": "light-skimmer",
+      "team": "enemy",
+      "x": 13,
+      "y": 4
+    },
+    {
+      "id": "b-6",
+      "assetId": "skimmer-carrier",
+      "team": "enemy",
+      "x": 15,
+      "y": 12
+    },
+    {
+      "id": "b-7",
+      "assetId": "skimmer-carrier",
+      "team": "enemy",
+      "x": 15,
+      "y": 6
+    },
+    {
+      "id": "b-8",
+      "assetId": "amphibious-infantry",
+      "team": "enemy",
+      "x": 14,
+      "y": 12,
+      "squads": 3
+    },
+    {
+      "id": "b-9",
+      "assetId": "amphibious-infantry",
+      "team": "enemy",
+      "x": 15,
+      "y": 11,
+      "squads": 3
+    },
+    {
+      "id": "b-10",
+      "assetId": "amphibious-infantry",
+      "team": "enemy",
+      "x": 15,
+      "y": 7,
+      "squads": 3
+    },
+    {
+      "id": "b-11",
+      "assetId": "skimmer-scout",
+      "team": "enemy",
+      "x": 13,
+      "y": 17
+    },
+    {
+      "id": "b-12",
+      "assetId": "skimmer-scout",
+      "team": "enemy",
+      "x": 13,
+      "y": 1
+    },
+    {
+      "id": "b-13",
+      "assetId": "artillery-drone",
+      "team": "enemy",
+      "x": 16,
+      "y": 12
+    },
+    {
+      "id": "b-14",
+      "assetId": "field-engineers",
+      "team": "enemy",
+      "x": 15,
+      "y": 13
+    }
+  ]
+}

@@ -1,0 +1,1259 @@
+{
+  "version": "goblin-level-v3",
+  "id": "ai-hidden-valley-20",
+  "scenarioVersion": 1,
+  "width": 20,
+  "height": 22,
+  "objective": "eliminate-opponent",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "aiAllowed": true,
+  "briefing": "Verdecktes Tal. Siebzehn Einheiten je Seite. Wald und Höhenrücken unterbrechen die Sicht. Decke gegnerische Phantom-Plattformen mit aktiven Einheiten auf zwei Felder Entfernung bei freier Sicht auf. Eigene Tarnplattformen können flankieren; ein Schuss verrät sie. Der gegnerische Restzielzähler umfasst auch unentdeckte Einheiten.",
+  "terrain": [
+    {
+      "x": 6,
+      "y": 0,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "type": "ridge"
+    },
+    {
+      "x": 13,
+      "y": 0,
+      "type": "forest"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 13,
+      "y": 1,
+      "type": "forest"
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "type": "crater"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 3,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 3,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 3,
+      "type": "ridge"
+    },
+    {
+      "x": 13,
+      "y": 3,
+      "type": "forest"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 13,
+      "y": 4,
+      "type": "forest"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 12,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 13,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 15,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 16,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 17,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 18,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 19,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 6,
+      "type": "crater"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 8,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 13,
+      "y": 7,
+      "type": "forest"
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 8,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 8,
+      "type": "forest"
+    },
+    {
+      "x": 8,
+      "y": 8,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 8,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 8,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 8,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 8,
+      "type": "forest"
+    },
+    {
+      "x": 13,
+      "y": 8,
+      "type": "forest"
+    },
+    {
+      "x": 15,
+      "y": 8,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 9,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 9,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 9,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 9,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 9,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 9,
+      "type": "ridge"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "type": "forest"
+    },
+    {
+      "x": 0,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 12,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 13,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 14,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 15,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 16,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 17,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 18,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 19,
+      "y": 10,
+      "type": "road"
+    },
+    {
+      "x": 0,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 12,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 13,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 14,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 15,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 16,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 17,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 18,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 19,
+      "y": 11,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 12,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 12,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 12,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 12,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 12,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 12,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 12,
+      "type": "ridge"
+    },
+    {
+      "x": 13,
+      "y": 12,
+      "type": "forest"
+    },
+    {
+      "x": 4,
+      "y": 13,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 13,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 13,
+      "type": "forest"
+    },
+    {
+      "x": 8,
+      "y": 13,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 13,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 13,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 13,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 13,
+      "type": "forest"
+    },
+    {
+      "x": 13,
+      "y": 13,
+      "type": "forest"
+    },
+    {
+      "x": 15,
+      "y": 13,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 14,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 14,
+      "type": "forest"
+    },
+    {
+      "x": 8,
+      "y": 14,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 14,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 14,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 14,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 14,
+      "type": "forest"
+    },
+    {
+      "x": 13,
+      "y": 14,
+      "type": "forest"
+    },
+    {
+      "x": 8,
+      "y": 15,
+      "type": "crater"
+    },
+    {
+      "x": 0,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 12,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 13,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 14,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 15,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 16,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 17,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 18,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 19,
+      "y": 16,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 17,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 17,
+      "type": "forest"
+    },
+    {
+      "x": 8,
+      "y": 17,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 17,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 17,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 17,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 17,
+      "type": "forest"
+    },
+    {
+      "x": 13,
+      "y": 17,
+      "type": "forest"
+    },
+    {
+      "x": 6,
+      "y": 18,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 18,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 18,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 18,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 18,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 18,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 18,
+      "type": "ridge"
+    },
+    {
+      "x": 13,
+      "y": 18,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 19,
+      "type": "crater"
+    },
+    {
+      "x": 6,
+      "y": 20,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 20,
+      "type": "forest"
+    },
+    {
+      "x": 8,
+      "y": 20,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 20,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 20,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 20,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 20,
+      "type": "forest"
+    },
+    {
+      "x": 13,
+      "y": 20,
+      "type": "forest"
+    },
+    {
+      "x": 6,
+      "y": 21,
+      "type": "forest"
+    },
+    {
+      "x": 7,
+      "y": 21,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 21,
+      "type": "forest"
+    },
+    {
+      "x": 9,
+      "y": 21,
+      "type": "forest"
+    },
+    {
+      "x": 10,
+      "y": 21,
+      "type": "forest"
+    },
+    {
+      "x": 11,
+      "y": 21,
+      "type": "forest"
+    },
+    {
+      "x": 12,
+      "y": 21,
+      "type": "ridge"
+    },
+    {
+      "x": 13,
+      "y": 21,
+      "type": "forest"
+    }
+  ],
+  "units": [
+    {
+      "id": "a-1",
+      "assetId": "phantom-platform",
+      "team": "player",
+      "x": 3,
+      "y": 4
+    },
+    {
+      "id": "a-2",
+      "assetId": "phantom-platform",
+      "team": "player",
+      "x": 3,
+      "y": 15
+    },
+    {
+      "id": "a-3",
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 4,
+      "y": 1
+    },
+    {
+      "id": "a-4",
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 4,
+      "y": 8
+    },
+    {
+      "id": "a-5",
+      "assetId": "skimmer-scout",
+      "team": "player",
+      "x": 4,
+      "y": 18
+    },
+    {
+      "id": "a-6",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 3,
+      "y": 2
+    },
+    {
+      "id": "a-7",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 3,
+      "y": 17
+    },
+    {
+      "id": "a-8",
+      "assetId": "rocket-artillery",
+      "team": "player",
+      "x": 1,
+      "y": 5
+    },
+    {
+      "id": "a-9",
+      "assetId": "rocket-artillery",
+      "team": "player",
+      "x": 1,
+      "y": 16
+    },
+    {
+      "id": "a-10",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 3,
+      "y": 6,
+      "squads": 3
+    },
+    {
+      "id": "a-11",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 3,
+      "y": 10,
+      "squads": 3
+    },
+    {
+      "id": "a-12",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 3,
+      "y": 14,
+      "squads": 2
+    },
+    {
+      "id": "a-13",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "id": "a-14",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 2,
+      "y": 14
+    },
+    {
+      "id": "a-15",
+      "assetId": "combat-skimmer",
+      "team": "player",
+      "x": 4,
+      "y": 4
+    },
+    {
+      "id": "a-16",
+      "assetId": "combat-skimmer",
+      "team": "player",
+      "x": 4,
+      "y": 16
+    },
+    {
+      "id": "a-17",
+      "assetId": "siege-tank",
+      "team": "player",
+      "x": 2,
+      "y": 10
+    },
+    {
+      "id": "b-1",
+      "assetId": "phantom-platform",
+      "team": "enemy",
+      "x": 16,
+      "y": 17
+    },
+    {
+      "id": "b-2",
+      "assetId": "phantom-platform",
+      "team": "enemy",
+      "x": 16,
+      "y": 6
+    },
+    {
+      "id": "b-3",
+      "assetId": "skimmer-scout",
+      "team": "enemy",
+      "x": 15,
+      "y": 20
+    },
+    {
+      "id": "b-4",
+      "assetId": "skimmer-scout",
+      "team": "enemy",
+      "x": 15,
+      "y": 13
+    },
+    {
+      "id": "b-5",
+      "assetId": "skimmer-scout",
+      "team": "enemy",
+      "x": 15,
+      "y": 3
+    },
+    {
+      "id": "b-6",
+      "assetId": "recon-tank",
+      "team": "enemy",
+      "x": 16,
+      "y": 19
+    },
+    {
+      "id": "b-7",
+      "assetId": "recon-tank",
+      "team": "enemy",
+      "x": 16,
+      "y": 4
+    },
+    {
+      "id": "b-8",
+      "assetId": "rocket-artillery",
+      "team": "enemy",
+      "x": 18,
+      "y": 16
+    },
+    {
+      "id": "b-9",
+      "assetId": "rocket-artillery",
+      "team": "enemy",
+      "x": 18,
+      "y": 5
+    },
+    {
+      "id": "b-10",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 16,
+      "y": 15,
+      "squads": 3
+    },
+    {
+      "id": "b-11",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 16,
+      "y": 11,
+      "squads": 3
+    },
+    {
+      "id": "b-12",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 16,
+      "y": 7,
+      "squads": 2
+    },
+    {
+      "id": "b-13",
+      "assetId": "field-engineers",
+      "team": "enemy",
+      "x": 17,
+      "y": 15
+    },
+    {
+      "id": "b-14",
+      "assetId": "field-engineers",
+      "team": "enemy",
+      "x": 17,
+      "y": 7
+    },
+    {
+      "id": "b-15",
+      "assetId": "combat-skimmer",
+      "team": "enemy",
+      "x": 15,
+      "y": 17
+    },
+    {
+      "id": "b-16",
+      "assetId": "combat-skimmer",
+      "team": "enemy",
+      "x": 15,
+      "y": 5
+    },
+    {
+      "id": "b-17",
+      "assetId": "siege-tank",
+      "team": "enemy",
+      "x": 17,
+      "y": 11
+    }
+  ]
+}

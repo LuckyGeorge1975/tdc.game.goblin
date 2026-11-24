@@ -1,0 +1,915 @@
+{
+  "version": "goblin-level-v3",
+  "id": "ai-mountain-forks-16",
+  "scenarioVersion": 1,
+  "width": 16,
+  "height": 14,
+  "objective": "eliminate-opponent",
+  "ruleProfile": "FULL_CATALOG_v1",
+  "aiAllowed": true,
+  "briefing": "Geteilte Höhen. Elf Einheiten je Seite. Decke die beiden Straßen durch das Gebirge. Fernbatterie und mobile Belagerungsgeschütze können indirekt über einen lebenden, aktiven, unverladenen Beobachter mit direkter Sicht auf das Ziel feuern. Schütze die Beobachter und die langsamen Geschütze.",
+  "terrain": [
+    {
+      "x": 3,
+      "y": 0,
+      "type": "forest"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "type": "ridge"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "mountain"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "mountain"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "type": "mountain"
+    },
+    {
+      "x": 8,
+      "y": 0,
+      "type": "ridge"
+    },
+    {
+      "x": 9,
+      "y": 0,
+      "type": "mountain"
+    },
+    {
+      "x": 10,
+      "y": 0,
+      "type": "mountain"
+    },
+    {
+      "x": 11,
+      "y": 0,
+      "type": "mountain"
+    },
+    {
+      "x": 12,
+      "y": 0,
+      "type": "ridge"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 12,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 13,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 14,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 15,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "type": "ridge"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "mountain"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "mountain"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "mountain"
+    },
+    {
+      "x": 8,
+      "y": 2,
+      "type": "ridge"
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "type": "mountain"
+    },
+    {
+      "x": 10,
+      "y": 2,
+      "type": "mountain"
+    },
+    {
+      "x": 11,
+      "y": 2,
+      "type": "mountain"
+    },
+    {
+      "x": 12,
+      "y": 2,
+      "type": "ridge"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "mountain"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "mountain"
+    },
+    {
+      "x": 10,
+      "y": 3,
+      "type": "ridge"
+    },
+    {
+      "x": 11,
+      "y": 3,
+      "type": "mountain"
+    },
+    {
+      "x": 12,
+      "y": 3,
+      "type": "mountain"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "ridge"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "mountain"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "mountain"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "type": "mountain"
+    },
+    {
+      "x": 8,
+      "y": 4,
+      "type": "ridge"
+    },
+    {
+      "x": 9,
+      "y": 4,
+      "type": "mountain"
+    },
+    {
+      "x": 10,
+      "y": 4,
+      "type": "mountain"
+    },
+    {
+      "x": 11,
+      "y": 4,
+      "type": "mountain"
+    },
+    {
+      "x": 12,
+      "y": 4,
+      "type": "ridge"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 12,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 13,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 15,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "type": "ridge"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "mountain"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "mountain"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "type": "mountain"
+    },
+    {
+      "x": 8,
+      "y": 6,
+      "type": "ridge"
+    },
+    {
+      "x": 9,
+      "y": 6,
+      "type": "mountain"
+    },
+    {
+      "x": 10,
+      "y": 6,
+      "type": "mountain"
+    },
+    {
+      "x": 11,
+      "y": 6,
+      "type": "mountain"
+    },
+    {
+      "x": 12,
+      "y": 6,
+      "type": "ridge"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "type": "ridge"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "type": "mountain"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "mountain"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "type": "mountain"
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 7,
+      "type": "mountain"
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "type": "mountain"
+    },
+    {
+      "x": 10,
+      "y": 7,
+      "type": "mountain"
+    },
+    {
+      "x": 11,
+      "y": 7,
+      "type": "ridge"
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 12,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 13,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 15,
+      "y": 8,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "type": "ridge"
+    },
+    {
+      "x": 4,
+      "y": 9,
+      "type": "mountain"
+    },
+    {
+      "x": 5,
+      "y": 9,
+      "type": "mountain"
+    },
+    {
+      "x": 6,
+      "y": 9,
+      "type": "mountain"
+    },
+    {
+      "x": 7,
+      "y": 9,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 9,
+      "type": "mountain"
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "type": "mountain"
+    },
+    {
+      "x": 10,
+      "y": 9,
+      "type": "mountain"
+    },
+    {
+      "x": 11,
+      "y": 9,
+      "type": "ridge"
+    },
+    {
+      "x": 3,
+      "y": 10,
+      "type": "mountain"
+    },
+    {
+      "x": 4,
+      "y": 10,
+      "type": "mountain"
+    },
+    {
+      "x": 5,
+      "y": 10,
+      "type": "ridge"
+    },
+    {
+      "x": 10,
+      "y": 10,
+      "type": "mountain"
+    },
+    {
+      "x": 11,
+      "y": 10,
+      "type": "mountain"
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "type": "ridge"
+    },
+    {
+      "x": 4,
+      "y": 11,
+      "type": "mountain"
+    },
+    {
+      "x": 5,
+      "y": 11,
+      "type": "mountain"
+    },
+    {
+      "x": 6,
+      "y": 11,
+      "type": "mountain"
+    },
+    {
+      "x": 7,
+      "y": 11,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 11,
+      "type": "mountain"
+    },
+    {
+      "x": 9,
+      "y": 11,
+      "type": "mountain"
+    },
+    {
+      "x": 10,
+      "y": 11,
+      "type": "mountain"
+    },
+    {
+      "x": 11,
+      "y": 11,
+      "type": "ridge"
+    },
+    {
+      "x": 0,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 1,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 8,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 9,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 10,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 11,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 12,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 13,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 14,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 15,
+      "y": 12,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 13,
+      "type": "ridge"
+    },
+    {
+      "x": 4,
+      "y": 13,
+      "type": "mountain"
+    },
+    {
+      "x": 5,
+      "y": 13,
+      "type": "mountain"
+    },
+    {
+      "x": 6,
+      "y": 13,
+      "type": "mountain"
+    },
+    {
+      "x": 7,
+      "y": 13,
+      "type": "ridge"
+    },
+    {
+      "x": 8,
+      "y": 13,
+      "type": "mountain"
+    },
+    {
+      "x": 9,
+      "y": 13,
+      "type": "mountain"
+    },
+    {
+      "x": 10,
+      "y": 13,
+      "type": "mountain"
+    },
+    {
+      "x": 11,
+      "y": 13,
+      "type": "ridge"
+    },
+    {
+      "x": 12,
+      "y": 13,
+      "type": "forest"
+    }
+  ],
+  "units": [
+    {
+      "id": "a-1",
+      "assetId": "siege-tank",
+      "team": "player",
+      "x": 2,
+      "y": 2
+    },
+    {
+      "id": "a-2",
+      "assetId": "siege-tank",
+      "team": "player",
+      "x": 2,
+      "y": 5
+    },
+    {
+      "id": "a-3",
+      "assetId": "mobile-siege-gun",
+      "team": "player",
+      "x": 1,
+      "y": 2
+    },
+    {
+      "id": "a-4",
+      "assetId": "mobile-siege-gun",
+      "team": "player",
+      "x": 1,
+      "y": 5
+    },
+    {
+      "id": "a-5",
+      "assetId": "long-range-battery",
+      "team": "player",
+      "x": 3,
+      "y": 1
+    },
+    {
+      "id": "a-6",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "id": "a-7",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "id": "a-8",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 3,
+      "y": 2,
+      "squads": 3
+    },
+    {
+      "id": "a-9",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 3,
+      "y": 3,
+      "squads": 3
+    },
+    {
+      "id": "a-10",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 3,
+      "y": 4,
+      "squads": 2
+    },
+    {
+      "id": "a-11",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 3,
+      "y": 5
+    },
+    {
+      "id": "b-1",
+      "assetId": "siege-tank",
+      "team": "enemy",
+      "x": 13,
+      "y": 11
+    },
+    {
+      "id": "b-2",
+      "assetId": "siege-tank",
+      "team": "enemy",
+      "x": 13,
+      "y": 8
+    },
+    {
+      "id": "b-3",
+      "assetId": "mobile-siege-gun",
+      "team": "enemy",
+      "x": 14,
+      "y": 11
+    },
+    {
+      "id": "b-4",
+      "assetId": "mobile-siege-gun",
+      "team": "enemy",
+      "x": 14,
+      "y": 8
+    },
+    {
+      "id": "b-5",
+      "assetId": "long-range-battery",
+      "team": "enemy",
+      "x": 12,
+      "y": 12
+    },
+    {
+      "id": "b-6",
+      "assetId": "field-engineers",
+      "team": "enemy",
+      "x": 13,
+      "y": 10
+    },
+    {
+      "id": "b-7",
+      "assetId": "field-engineers",
+      "team": "enemy",
+      "x": 13,
+      "y": 9
+    },
+    {
+      "id": "b-8",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 12,
+      "y": 11,
+      "squads": 3
+    },
+    {
+      "id": "b-9",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 12,
+      "y": 10,
+      "squads": 3
+    },
+    {
+      "id": "b-10",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 12,
+      "y": 9,
+      "squads": 2
+    },
+    {
+      "id": "b-11",
+      "assetId": "recon-tank",
+      "team": "enemy",
+      "x": 12,
+      "y": 8
+    }
+  ]
+}

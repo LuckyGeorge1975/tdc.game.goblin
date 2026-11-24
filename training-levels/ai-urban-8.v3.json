@@ -1,0 +1,422 @@
+{
+  "version": "goblin-level-v3",
+  "id": "ai-urban-8",
+  "scenarioVersion": 1,
+  "width": 8,
+  "height": 8,
+  "ruleProfile": "FULL_CATALOG_v1",
+  "objective": "eliminate-opponent",
+  "briefing": "Kurze Sichtlinien und mehrere Straßenzugänge prüfen Deckungswahl, Feuerkonzentration, Infanterieeinsatz und das Freiräumen von Trümmern. Je Seite sechs Einheiten, einschließlich zwei voller Infanterietrupps.",
+  "terrain": [
+    {
+      "x": 0,
+      "y": 0,
+      "type": "urban"
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "type": "urban"
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "type": "urban"
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 0,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 0,
+      "type": "urban"
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "type": "rubble-field"
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "type": "urban"
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "type": "urban"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "type": "urban"
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "type": "urban"
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 2,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 2,
+      "type": "urban"
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 3,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "type": "urban"
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 5,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 6,
+      "y": 4,
+      "type": "road"
+    },
+    {
+      "x": 7,
+      "y": 4,
+      "type": "urban"
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "type": "urban"
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "type": "urban"
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "type": "urban"
+    },
+    {
+      "x": 2,
+      "y": 6,
+      "type": "urban"
+    },
+    {
+      "x": 3,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 6,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "type": "rubble-field"
+    },
+    {
+      "x": 7,
+      "y": 6,
+      "type": "urban"
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "type": "urban"
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "type": "urban"
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "type": "urban"
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 4,
+      "y": 7,
+      "type": "road"
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "urban"
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "type": "urban"
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "type": "urban"
+    }
+  ],
+  "units": [
+    {
+      "id": "a-1",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 1,
+      "y": 1
+    },
+    {
+      "id": "a-2",
+      "assetId": "assault-tank",
+      "team": "player",
+      "x": 2,
+      "y": 1
+    },
+    {
+      "id": "a-3",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 1,
+      "y": 2,
+      "squads": 3
+    },
+    {
+      "id": "a-4",
+      "assetId": "infantry-squad",
+      "team": "player",
+      "x": 2,
+      "y": 2,
+      "squads": 3
+    },
+    {
+      "id": "a-5",
+      "assetId": "recon-tank",
+      "team": "player",
+      "x": 1,
+      "y": 3
+    },
+    {
+      "id": "a-6",
+      "assetId": "field-engineers",
+      "team": "player",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "id": "b-1",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 6,
+      "y": 6
+    },
+    {
+      "id": "b-2",
+      "assetId": "assault-tank",
+      "team": "enemy",
+      "x": 5,
+      "y": 6
+    },
+    {
+      "id": "b-3",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 6,
+      "y": 5,
+      "squads": 3
+    },
+    {
+      "id": "b-4",
+      "assetId": "infantry-squad",
+      "team": "enemy",
+      "x": 5,
+      "y": 5,
+      "squads": 3
+    },
+    {
+      "id": "b-5",
+      "assetId": "recon-tank",
+      "team": "enemy",
+      "x": 6,
+      "y": 4
+    },
+    {
+      "id": "b-6",
+      "assetId": "field-engineers",
+      "team": "enemy",
+      "x": 5,
+      "y": 4
+    }
+  ]
+}
