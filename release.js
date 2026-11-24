@@ -1,5 +1,5 @@
 (function(root){
-  const release=Object.freeze({version:'0.1.32',build:32,releasedAt:'2026-11-22',tag:'v0.1.32',status:'release-candidate'});
+  const release=Object.freeze({version:'0.1.33',build:33,releasedAt:'2026-11-24',tag:'v0.1.33',status:'release-candidate'});
   root.GOBLIN_RELEASE=release;
   if(root.document){
     const label=root.document.querySelector('#build-version');

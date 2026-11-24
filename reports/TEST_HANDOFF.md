@@ -2,6 +2,23 @@
 
 Dieses Dokument definiert die verbindliche Übergabe jedes GitHub-Pages-Builds.
 
+## Build 0.1.33 · Lokales Autoplay und Feuerzieltraining
+
+| Feld | Stand am 24.11.2026 |
+|---|---|
+| Version | `0.1.33` |
+| Build | `33` |
+| Status | Isolierter Metadatenkandidat für `goblin-iysu.2`. Noch keine Veröffentlichung. Finaler Volltest, Release-, Content-/Legalprüfung und Browsernachlauf stehen aus. |
+| Rückfallpunkt | Öffentliches Pagesrelease `v0.1.32` auf `79d390db2ec747cbec07cdc98315559695303f34`; annotiertes Tagobjekt `1abf4e95c04d32b86ca4ca13b92f70e910a1d2ab`, erfolgreicher Pageslauf `45019836592`. `v0.1.33` war bei Vorbereitung nicht vorhanden. |
+| Quellbasis | `09e158bc28e23999fff1526a71e64fb53371406e`, unabhängig technisch abgenommen. Spielregeln, Runtime-Modelle und zwölf Trainingslevel bleiben unverändert. |
+| Umfang | [Änderungen seit Build 32](../CHANGELOG.md#0133---2026-11-24), [Werkzeugleitfaden](../docs/AI-TRAINING.md). Zwei lokale PS-Einstiege, dynamischer Pool, Standardobergrenze 1000 Gesamtstarts einschließlich 300 reservierter Evaluationsspiele, höchstens 5000 Epochen, gebundene Code-/Aufnahme-/Jobbelege und Stop/Resume. |
+| Lernumfang | Nur die bestehende Feuerzielbewertung. Vier native Autoplaystrategien; kontrollierte Interventionen und Modelloverlays nur Gering/Mittel/Stark. Trainiert-only kann regulär DATA_INSUFFICIENT liefern, ohne Strategieersatz. Keine Modellpromotion oder bestätigte Stärkerangfolge. |
+| Wiederverwendete QA | `goblin-iysu`: Hauptprobe 19 Starts = 15 native Datenpartien + 3 native Evaluationen + 1 erhaltener Abbruch; zwei Epochen je Sitz, NO_IMPROVEMENT/delta 0. Zusammen mit einer Strong-Limit- und einer nativen Trained-Probe genau 21 eigene Starts. 13 Identitäts-/Modellchecks = 2 positiv + 11 negativ; weitere 11 CLI-Frühfehler. Replays und Authorläufe sind keine zusätzlichen unabhängigen Stichproben. |
+| Herkunft und Grenzen | Vorhandene Notices v25 und vier Runtime-Modellbytes bleiben erhalten. Keine privaten Trainingslogs oder Datensätze, neuen Modellgewichte oder QA-Dateien werden in dieses Release übernommen. |
+| Kanäle | Pages erst nach allen Gates durch Koordination. itch.io und Butler bleiben ausschließlich manuell beim Nutzer. Keine Defaultänderung aus diesem Kandidaten. |
+| Testumgebung | Node `24.14.0`; finaler vollständiger Node-Testsatz auf raw Git-exakten LF-Produktdateien mit echter Kandidaten-HEAD-/Indexmetadatenbasis, danach Byteabgleich. Kein Testskip und keine Sourceguardlockerung. Verifier gegen `v0.1.32`, Source/SRI und Workflowlint. |
+| README-Bild | Bisherige Aufnahme ist noch ausdrücklich Build 32. Eine echte Aufnahme dieses Metadatenstands mit sichtbaren Einheiten wird vor dem finalen Kandidaten ergänzt. |
+
 ## Build 0.1.32 · Gemeinsame FULL-Züge und Desktopkorrekturen
 
 | Feld | Stand am 22.11.2026 |

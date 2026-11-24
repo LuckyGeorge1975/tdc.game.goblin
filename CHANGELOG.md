@@ -2,6 +2,13 @@
 
 Diese Versionslinie bleibt vorerst bei `0.1`; mit jedem Build wird ausschließlich die letzte Stelle erhöht. Der Veröffentlichungsstand und der tatsächlich auf Pages bereitgestellte Commit werden im jeweiligen Release-Issue nachgewiesen. Build 0.1.13 blieb ein unveröffentlichter Vorläufer.
 
+## [0.1.33] - 2026-11-24
+
+- Zwei lokale PowerShell-Starter sammeln native KI-Partien und trainieren daraus die bestehende Feuerzielbewertung. Das Standardbudget umfasst höchstens 1000 tatsächliche Spielstarts einschließlich Wiederholungen und 300 reservierter Prüfspiele; der Fit ist auf 5000 Epochen mit Validation und EarlyStopping begrenzt. Modelle werden vor der automatischen Prüfung eingefroren und nicht automatisch ins Spiel übernommen.
+- Der rekursiv gelesene Trainingsordner enthält anfangs zwölf deklarative FULL-Level. Dateien lassen sich ohne Skriptänderung hinzufügen oder entfernen. Neue Läufe lesen den aktuellen Ordner; angefangene Läufe behalten ihren gebundenen Snapshot. Stop und Resume bewahren abgebrochene Aufnahmen und zählen neue Versuche zum selben Budget.
+- Eigene Aufnahmen und Ergebnisse werden an tatsächlichen Code, vorab festgelegte Fälle, Seeds, Level und Sitzbelegungen sowie native Aufnahmebelege gebunden. Ein Verifier prüft Integrität und Jobzuordnung; technische Limits erhalten kein erfundenes Ergebnislabel.
+- Alle vier nativen KI-Strategien können Originalpartien spielen. Kontrollierte Feuerinterventionen und neue Modelloverlays unterstützen in diesem Werkzeugpaket Gering, Mittel und Stark. Trainiert bleibt als Originalstrategie erhalten und wird nicht still ersetzt. Die Funktionsproben zeigen keinen Stärkegewinn; es werden keine neuen Modellgewichte übernommen.
+
 ## [0.1.32] - 2026-11-22
 
 - In regulären FULL-Missionen lässt sich jeder vorhandene Sitz mit Mensch oder einer zugelassenen KI belegen. Die Auswahl bietet Gering, Mittel, Stark und Trainiert und berücksichtigt die Mindeststufe der Mission. Tutorials bleiben für Menschen. Trainiert verwendet die bestehenden Modelle; die neu untersuchten Trainingsmodelle werden wegen fehlenden allgemeinen Stärkegewinns nicht übernommen.
